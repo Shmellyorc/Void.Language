@@ -1,0 +1,19 @@
+{
+  "previous_manifest": "step24-checkpoint-source-hashes.json",
+  "prior_entries": 170,
+  "bounded_files": 11,
+  "unchanged_prior_entries_verified": 162,
+  "changed_previous_entries": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/console.hpp",
+    "src/runtime/console.cpp"
+  ],
+  "unexpected_byte_changes": [],
+  "prior_results": "step24-results.json unchanged",
+  "root_README": "git diff --quiet passed; untouched"
+}

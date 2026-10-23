@@ -227,8 +227,11 @@ void Runtime::string_index_into(void** out,void* source,ScalarEncoding encoding,
     string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
 }
 void Runtime::string_encode_into(void** out,void* source) {
-    // Native scratch owns bytes before metadata admission/allocation can poll.
-    std::string bytes(string_bytes(source));auto layout=fixed_scalar_layout(ScalarEncoding::u8,bytes.size());
+    bytes_into(out,string_bytes(source));
+}
+void Runtime::bytes_into(void** out,std::string_view source) {
+    // Own bytes before metadata admission/allocation can poll.
+    std::string bytes(source);auto layout=fixed_scalar_layout(ScalarEncoding::u8,bytes.size());
     void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
     Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
     if(!bytes.empty()){BufferBuilder builder(*this,layout,bytes.size(),quota);for(unsigned char byte:bytes)builder.write_scalar(byte);builder.finish_into(&backing);}
@@ -236,7 +239,7 @@ void Runtime::string_encode_into(void** out,void* source) {
     auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
     auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=bytes.size();*out=result;
 }
-bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {
+std::string Runtime::byte_array_bytes(RegisteredRootWord source) {
     auto schema=fixed_scalar_layout(ScalarEncoding::u8,0)->schema();
     // Capture the existing backing with a precise root and a read lease. No
     // source mutation is allowed while the owned native snapshot is copied.
@@ -246,6 +249,10 @@ bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {
     std::string bytes;
     if(count){BufferReadLease lease(*this,root_word(&backing),layout);bytes.resize(count);
         for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
+    return bytes;
+}
+bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {
+    auto bytes=byte_array_bytes(source);
     if(!valid_utf8(bytes))return false;
     string_into(out,bytes);return true;
 }

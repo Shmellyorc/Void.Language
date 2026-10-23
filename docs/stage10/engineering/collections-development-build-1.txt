@@ -1,0 +1,52 @@
+[  0%] Built target void_native_fixture
+[  0%] Building CXX object CMakeFiles/void_format_objects.dir/src/format.cpp.o
+[  0%] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2522:
+/home/shmellyorc/Documents/Void.Language/src/frontend/collection_display.inc:61:22: error: deduced conflicting types ('basic_string<char, char_traits<char>, allocator<char>>' vs 'const char *') for initializer list element type
+   61 |         for(auto key:{owners,cursor,versions,"$work"})expression(ended.body,method(key,"remove_at",last(key)));
+      |                      ^~~~~~~                 ~~~~~~~
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+1 error generated.
+gmake[3]: *** [CMakeFiles/void_core.dir/build.make:93: CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:1771: CMakeFiles/void_core.dir/all] Error 2
+gmake[2]: *** Waiting for unfinished jobs....
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:666:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  666 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:673:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  673 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:674:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  674 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:687:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  687 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+gmake[1]: *** [CMakeFiles/Makefile2:2091: CMakeFiles/voidc.dir/rule] Error 2
+gmake: *** [Makefile:401: voidc] Error 2

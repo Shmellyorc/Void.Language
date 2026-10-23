@@ -1,0 +1,12 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 12: stage10_conversion
+1/1 Test #12: stage10_conversion ...............Subprocess terminated***Exception: 288.88 sec
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) = 288.89 sec
+
+The following tests FAILED:
+	 12 - stage10_conversion (Subprocess terminated)
+Errors while running CTest

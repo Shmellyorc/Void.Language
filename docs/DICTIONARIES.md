@@ -43,8 +43,15 @@ func entry(value: i32) -> i32:
   ignoring native padding. Copying a value key preserves its stored value when the
   original variable changes; referenced object identities remain shared.
 - Float, interface, array/list/dictionary keys and value structs containing those
-  fields reject. Enum/custom equality and floating-point key policy are future
-  design. Hash values/algorithm are private implementation details; no stable
+  fields reject. Enum and floating-point keys remain unsupported. Stage 10
+  excludes direct owners defining custom `operator ==` (any visibility/signature),
+  including concrete generics and managed/nullable keys, and eligible value keys
+  recursively containing such owners through any stored field. Managed payloads
+  and ancestors do not participate in identity keys. Custom-equality values remain
+  legal dictionary values; patterns retain data-only comparison. Fixed-array keys
+  remain unsupported; custom equality inside their element shapes is diagnosed
+  too. Source/IR/Runtime enforce the exclusion without equality/hash callbacks.
+  Hash values/algorithm are private implementation details; no stable
   cross-launch hash or adversarial-input randomization guarantee is made.
 - `d[key]` performs checked lookup and raises a source-located runtime error if
   missing. `d[key] = value` inserts or replaces. Compound assignment requires an

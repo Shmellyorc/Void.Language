@@ -1,0 +1,3 @@
+source-hashes.json 173 matching entries
+step25-source-hashes.json 11 matching entries
+Step 37 observations preserved verbatim; results mirror identical; 19 native cases per configuration; no unexpected changes; final builds warning-free

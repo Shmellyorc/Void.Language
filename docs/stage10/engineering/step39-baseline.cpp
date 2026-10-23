@@ -1,0 +1,3 @@
+#include "void/frontend.hpp"
+#include <iostream>
+int main(){std::string text="func entry(input: i32) -> i32:\n  var text = \"{(func() -> i32:\n    return input\n  )()}\"\n  return text.length as i32\n";auto before=vd::analyze_source({"/format.void",text});auto formatted=vd::format_source({"/format.void",text});auto after=formatted?vd::analyze_source({"/format.void",*formatted}):vd::AnalysisResult{};std::cout<<"Step 38 archive baseline: original valid="<<before.succeeded()<<", rewrite returned="<<bool(formatted)<<", rewritten valid="<<after.succeeded()<<'\n';return before.succeeded() && formatted && !after.succeeded()?0:1;}

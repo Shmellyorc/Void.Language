@@ -1,0 +1,11 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  33: arrays_source
+1/3 Test  #33: arrays_source ....................   Passed   12.41 sec
+    Start  90: stage10_console_source
+2/3 Test  #90: stage10_console_source ...........   Passed    8.30 sec
+    Start 173: stage10_console_aot
+3/3 Test #173: stage10_console_aot ..............   Passed   38.31 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  59.02 sec

@@ -1,4 +1,5 @@
 #include "void/runtime.hpp"
+#include "void/console.hpp"
 #include "void/temporal.hpp"
 #include "void/native_runtime.hpp"
 #include "void/callback.hpp"
@@ -29,9 +30,25 @@ std::array<std::int64_t,3> Runtime::monotonic_sample() {
     return {elapsed.seconds,elapsed.nanosecond,clock_identity_};
 }
 std::uint64_t Runtime::monotonic_precision_ns(){return temporal::monotonic_precision_ns();}
+Runtime::Runtime(std::size_t budget,std::shared_ptr<console::Streams> streams):allocation_budget_(budget) {
+    console_context_=std::make_shared<console::Context>(std::move(streams));
+}
+// Existing source participants may report closed during reached cleanup.
+// New host admission still fails, and closing never initializes a lazy session.
+std::shared_ptr<console::Context> Runtime::console_context() {
+    if(auto* attached=Runtime::attached();attached && attached->is_managed()){Native safe(*attached);return console_context();}
+    {std::lock_guard lock(mutex_);if(closing_){if(current_runtime_==this && current_thread_->managed_depth)throw console::Closed();throw std::logic_error("runtime is closing");}if(console_context_)return console_context_;}
+    // Platform inspection/static initialization may wait. Do not hold the GC
+    // mutex across it; publish exactly one context after rechecking shutdown.
+    auto prepared=std::make_shared<console::Context>(console::Streams::process());
+    std::shared_ptr<console::Context> result;
+    {std::lock_guard lock(mutex_);if(closing_){if(current_runtime_==this && current_thread_->managed_depth)throw console::Closed();throw std::logic_error("runtime is closing");}if(!console_context_)console_context_=prepared;result=console_context_;}
+    return result;
+}
 Runtime::~Runtime() {
     close();
     if (!threads_.empty() || !handles_.empty() || requested_ || callbacks_ || async_owner_!=std::thread::id{}) std::terminate();
+    console_context_.reset(); // Native-only teardown precedes heap/root storage destruction.
 }
 Runtime::Thread& Runtime::thread() const {
     if (current_runtime_ != this || !current_thread_ || current_thread_->owner != std::this_thread::get_id())
@@ -291,11 +308,20 @@ void Runtime::async_worker_limit(unsigned count) {
 unsigned Runtime::async_worker_limit() const {std::lock_guard lock(mutex_);return async_worker_limit_;}
 bool Runtime::enter_async(){require_managed();std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)return false;async_owner_=std::this_thread::get_id();return true;}
 void Runtime::leave_async() noexcept {std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};}
-void Runtime::close() {
+std::int64_t Runtime::console_checkpoint() const {
+    std::shared_ptr<console::Context> context;{std::lock_guard lock(mutex_);context=console_context_;}return context?context->mode_checkpoint():1;
+}
+console::Error Runtime::console_finish(std::int64_t checkpoint) {
+    std::shared_ptr<console::Context> context;{std::lock_guard lock(mutex_);context=console_context_;}return context?context->finish_modes(checkpoint):console::Error{};
+}
+console::Error Runtime::close() {
     if(CallbackRegistration::active_on(*this))throw std::logic_error("Runtime cannot quiesce its own callback");
     if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("close requires NativeSafe state");
-    {std::lock_guard lock(mutex_);closing_ = true;changed_.notify_all();}
-    native_shutdown(*this);
+    if(current_runtime_ && current_thread_->state==State::managed){Native safe(*current_runtime_);return close();}
+    std::shared_ptr<console::Context> context;
+    {std::lock_guard lock(mutex_);if(console_context_)console_context_->check_drain();closing_ = true;context=console_context_;changed_.notify_all();}
+    auto error=context?context->close():console::Error{}; // Wake/cancel/drain without the GC mutex.
+    native_shutdown(*this);return error;
 }
 Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
     : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {
@@ -364,19 +390,24 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
     for(const auto& input:incoming) {
         if(input.identity.empty() || input.shape.empty() || !input.layout.size || input.layout.descriptor || input.layout.kind!=TypeLayout::Kind::ordinary)
             throw std::invalid_argument("invalid nominal descriptor");
+        if(input.dictionary_key_forbidden && input.dictionary_key_schema.empty())throw std::invalid_argument("custom equality key policy requires canonical schema identity");
+        if(input.dictionary_key_schema.find('\0')!=std::string::npos)throw std::invalid_argument("invalid key policy identity");
         auto value=std::make_shared<NominalDescriptor>(input);
         value->layout.references=ReferenceShape::legacy(value->layout.size,value->layout.references).legacy_offsets();
         if(!candidates.emplace(value->identity,std::move(value)).second) throw std::invalid_argument("duplicate nominal descriptor");
     }
+    // A reached cleanup can first need an intrinsic array schema (e.g. io_error
+    // partial bytes). Admitted source keeps its roots/code until return; allow
+    // its ordinary validated metadata, while rejecting new host admission.
     for(;;) {
         std::shared_ptr<const TypeCatalog> snapshot;
-        {std::lock_guard lock(mutex_); if(closing_) throw std::logic_error("runtime is closing"); snapshot=types_;}
+        {std::lock_guard lock(mutex_); if(closing_ && !(current_runtime_==this && current_thread_->managed_depth)) throw std::logic_error("runtime is closing"); snapshot=types_;}
         auto prepared=std::make_shared<TypeCatalog>(snapshot ? *snapshot : TypeCatalog{});
         for(const auto& [key,value]:candidates) {
             auto [found,added]=prepared->types.emplace(key,value);
             if(!added) {
                 const auto& a=*found->second;const auto& b=*value;
-                if(a.base!=b.base || a.shape!=b.shape || a.layout.size!=b.layout.size || a.layout.references!=b.layout.references)
+                if(a.dictionary_key_schema!=b.dictionary_key_schema || a.dictionary_key_forbidden!=b.dictionary_key_forbidden || a.base!=b.base || a.shape!=b.shape || a.layout.size!=b.layout.size || a.layout.references!=b.layout.references)
                     throw std::invalid_argument("incompatible nominal descriptor admission");
             }
         }
@@ -392,6 +423,8 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
                 current=parent;
             }
         }
+        std::set<std::string> key_policies;
+        for(const auto& [identity,type]:prepared->types)if(!type->dictionary_key_schema.empty() && !key_policies.insert(type->dictionary_key_schema).second)throw std::invalid_argument("conflicting canonical dictionary key policy");
         for(const auto& [key,value]:witness_candidates) {
             if(!prepared->types.contains(value->view_identity)) throw std::invalid_argument("unadmitted witness static view");
             auto [found,added]=prepared->witnesses.emplace(key,value);
@@ -402,6 +435,7 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
             }
         }
         for(const auto& [key,schema]:schema_candidates) {
+            if(schema->spec_.dictionary_key_use)validate_dictionary_key_schema(*prepared,*schema);
             std::map<std::string,std::shared_ptr<const NominalDescriptor>> targets;
             std::map<std::string,std::shared_ptr<const InterfaceWitness>> interfaces;
             for(const auto& node:schema->spec_.nodes) {
@@ -429,7 +463,7 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
             if(!added && !found->second->equivalent(*schema)) throw std::invalid_argument("incompatible element schema admission");
         }
         {std::lock_guard lock(mutex_);
-            if(closing_) throw std::logic_error("runtime is closing");
+            if(closing_ && !(current_runtime_==this && current_thread_->managed_depth)) throw std::logic_error("runtime is closing");
             if(types_!=snapshot) continue;
             types_=std::move(prepared); // All allocations/validation precede publication.
             return;

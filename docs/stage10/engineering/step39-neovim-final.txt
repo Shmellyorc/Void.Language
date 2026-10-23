@@ -1,0 +1,2 @@
+VOID: stale formatting rejected
+Neovim field/display/interpolation, temporal APIs, operator intelligence, format suggestions, conservative formatting/stale edits and multiline syntax checks passed

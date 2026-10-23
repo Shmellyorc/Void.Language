@@ -1,0 +1,22 @@
+[
+  {
+    "pid": 4117468,
+    "ppid": 4117467,
+    "elapsed_seconds": 4,
+    "cpu_percent": "507",
+    "rss_kib": 945552,
+    "state": "Sl",
+    "program": "ld.lld",
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41"
+  },
+  {
+    "pid": 4117496,
+    "ppid": 4117495,
+    "elapsed_seconds": 3,
+    "cpu_percent": "377",
+    "rss_kib": 902736,
+    "state": "Sl",
+    "program": "ld.lld",
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41"
+  }
+]

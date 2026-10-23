@@ -1,0 +1,25 @@
+combined failure or partial outer print: Recursive display hookCalled from /operator_console_model.void::<display /operator_console_model.void::recursive>
+/tmp/VOID-console27-994584854846787/operator_console_model.void:65:12: source call
+    return string(self)
+           ^
+Called from /operator_console_model.void::recursive::method::string
+/tmp/VOID-console27-994584854846787/operator_console_model.void:65:12: source call
+    return string(self)
+           ^
+Called from /operator_console_model.void::<display readonly /operator_console_model.void::recursive>
+/tmp/VOID-console27-994584854846787/operator_console_model.void:95:34: source call
+        print("NO OUTER PREFIX", [recursive(value = 1)])
+                                 ^
+Called from /operator_console_model.void::<display [/operator_console_model.void::recursive]>
+/tmp/VOID-console27-994584854846787/operator_console_model.void:95:34: source call
+        print("NO OUTER PREFIX", [recursive(value = 1)])
+                                 ^
+Called from /operator_console_model.void::run
+/tmp/VOID-console27-994584854846787/operator_console_model.void:95:34: source call
+        print("NO OUTER PREFIX", [recursive(value = 1)])
+                                 ^
+Called from /main.void::entry
+/tmp/VOID-console27-994584854846787/main.void:3:18: source call
+    return model.run(n)
+                 ^
+

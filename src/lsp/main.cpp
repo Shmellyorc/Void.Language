@@ -277,14 +277,17 @@ class Server {
         if(!source) return empty();
         auto offset=Positions(*source).offset(p);
         if(!offset) throw std::invalid_argument("Position is outside the document or inside a surrogate pair");
-        auto definition=index->definition_at(id,*offset);
-        if(!definition) for(const auto& declaration:index->declarations_in(id))
-            if(declaration.source.begin<=*offset && *offset<declaration.source.end) { definition=declaration; break; }
-        if(!definition) return empty();
-        if(method=="textDocument/definition") return definition->builtin?j::Value(nullptr):location(definition->source);
-        j::Array locations;
-        if(include && !definition->builtin) locations.push_back(location(definition->source));
-        for(const auto& ref:index->references_to(definition->identity)) locations.push_back(location(ref.source));
+        auto definitions=index->definitions_at(id,*offset);
+        if(definitions.empty())for(const auto& declaration:index->declarations_in(id))
+            if(declaration.source.begin<=*offset && *offset<declaration.source.end){definitions.push_back(declaration);break;}
+        if(definitions.empty())return empty();
+        j::Array locations;std::set<std::tuple<std::string,std::size_t,std::size_t>> seen;
+        auto append=[&](const vd::SourceSpan& s){if(seen.emplace(s.module_identity,s.begin,s.end).second)locations.push_back(location(s));};
+        for(const auto& definition:definitions) {
+            if((include || method=="textDocument/definition") && !definition.builtin)append(definition.source);
+            if(method=="textDocument/references")for(const auto& ref:index->references_to(definition.identity))append(ref.source);
+        }
+        if(method=="textDocument/definition"){if(locations.empty())return nullptr;if(locations.size()==1)return std::move(locations.front());}
         return locations;
     }
     static std::string name_of(const vd::AnalyzedDeclaration& d) {
@@ -294,11 +297,12 @@ class Server {
         if(d.editor_symbol_kind)return d.editor_symbol_kind;
         if(d.identity.find("::variant::")!=std::string::npos)return 22;
         using K=vd::AnalyzedDeclaration::Kind;
-        switch(d.kind){case K::import_alias:return 2;case K::function:return 12;case K::receiver_method:case K::initializer:case K::interface_requirement:return 6;
+        switch(d.kind){case K::import_alias:return 2;case K::function:return 12;case K::operator_function:return 25;case K::receiver_method:case K::initializer:case K::interface_requirement:return 6;
         case K::module_constant:case K::local_constant:return 14;case K::value_structure:case K::managed_structure:return 23;
         case K::interface_type:return 11;case K::value_field:case K::managed_field:return 8;case K::type_parameter:return 26;default:return 13;}
     }
     static std::string describe(const vd::AnalyzedDeclaration& d) {
+        if(!d.signature.empty())return d.signature;
         if(d.identity.ends_with("::$module"))return "module "+d.module;
         auto label=name_of(d);using K=vd::AnalyzedDeclaration::Kind;
         if(d.kind==K::function || d.kind==K::receiver_method || d.kind==K::initializer || d.kind==K::interface_requirement){
@@ -340,7 +344,8 @@ class Server {
             else selected=identity(string(object(params.get("textDocument")),"uri"));
             for(const auto& d:index->declarations()) {
                 if(!selected.empty() && selected!=d.module)continue;
-                if(d.builtin || d.visibility=="local" || !vd::valid_editor_identifier(name_of(d)))continue;
+                if(d.module.starts_with("/@stdlib/") && d.visibility!="public")continue;
+                if(d.builtin || d.visibility=="local" || (d.operator_glyph.empty() && !vd::valid_editor_identifier(name_of(d))))continue;
                 if(name_of(d).find(filter)==std::string::npos)continue;
                 if(!seen.emplace(d.module,d.source.begin,d.source.end).second)continue;
                 if(method=="textDocument/documentSymbol" && hierarchical_symbols){
@@ -398,12 +403,18 @@ class Server {
             return items;
         }
         if(!index)return nullptr;
-        auto definition=index->definition_at(module,*offset);
-        if(!definition)for(const auto& d:index->declarations_in(module))if(d.source.begin<=*offset && *offset<d.source.end){definition=d;break;}
-        if(!definition)return nullptr;
+        auto definitions=index->definitions_at(module,*offset);
+        if(definitions.empty())for(const auto& d:index->declarations_in(module))if(d.source.begin<=*offset && *offset<d.source.end){definitions.push_back(d);break;}
+        if(definitions.empty())return nullptr;
+        auto* definition=&definitions.front();
         auto selected_span=definition->source;
         for(const auto& ref:index->references())if(!ref.implicit && ref.to==definition->identity && ref.source.module_identity==module && ref.source.begin<=*offset && *offset<ref.source.end){selected_span=ref.source;break;}
-        if(method=="textDocument/hover")return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",describe(*definition)+(definition->documentation.empty()?"":"\n\n"+definition->documentation)}}},{"range",range(selected_span)}};
+        if(method=="textDocument/hover") {
+            std::string text;
+            for(const auto& d:definitions){if(!text.empty())text+="\n\n";text+=describe(d)+(d.documentation.empty()?"":"\n\n"+d.documentation);}
+            return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",std::move(text)}}},{"range",range(selected_span)}};
+        }
+        if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
         if(module.starts_with("/@stdlib/") || definition->module.starts_with("/@stdlib/"))throw std::invalid_argument("Installed standard sources are read-only");
         if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, constant or uncaptured local binding");
         if(!disk_current(*current->result().program))throw std::invalid_argument("Disk sources changed; refresh before rename");
@@ -555,7 +566,7 @@ public:
                 state=State::waiting;
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",j::Object{
                     {"capabilities",j::Object{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
-                        {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/"}}}},
+                        {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
                         {"experimental",j::Object{{"voidToolingProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});

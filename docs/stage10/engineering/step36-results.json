@@ -1,0 +1,129 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 36,
+  "increment_status": "implemented; focused Linux acceptance passed; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Concrete owner custom-equality declaration metadata and original glyph offsets; shared IR dictionary eligibility rejects direct owners and recursively contained value/private fields and fixed element shapes.",
+    "Source annotations/literals and generic instantiations diagnose key use and relevant foreign/private equality declaration, regardless of signature or accessibility.",
+    "Independent IR validates dictionary eligibility and matches equality markers against actual owner == declarations; forged insertion/removal and nested keys reject.",
+    "Existing LLVM nominal catalog includes value-owner data policies: canonical key schema identity and transitive exclusion, with checked C++/LLVM ABI layout.",
+    "Runtime native dictionary and explicit key-schema admission reject forbidden roots/nested managed leaves; immutable catalog re-admission prevents downgrade/aliasing. Values remain legal; no executable callback/hash protocol.",
+    "Existing managed payload/ancestor identity boundary, scalar/string/value hash behavior and data-only patterns preserved."
+  ],
+  "key_domain": "Fixed arrays, including zero extent, remain unsupported dictionary keys under DICTIONARIES.md. Equality inside fixed shapes is diagnosed without adding a new hash domain. Managed keys inspect their direct owner, not payload/ancestry.",
+  "checks": {
+    "key_protection_debug_final": 131,
+    "key_protection_strict": 131,
+    "preserved_resolution": 161,
+    "preserved_declarations": 278,
+    "preserved_compounds": 730,
+    "preserved_call_integration": 637,
+    "source_normal_o2_jit_aot_process": 260
+  },
+  "debug": {
+    "passed": 13,
+    "total": 13,
+    "seconds": 153.94,
+    "suites": [
+      "stage10_operator_keys",
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "gc_schemas",
+      "fixed_arrays_source",
+      "growable_arrays_source",
+      "generics_source",
+      "dictionaries_source",
+      "patterns_source",
+      "interfaces_source",
+      "stage10_operator_compounds",
+      "stage10_operator_integration",
+      "stage10_operators_aot"
+    ],
+    "log": "step36-debug-accepted.txt",
+    "detail": "step36-debug-detail.txt",
+    "build": "step36-debug-frozen-build.txt",
+    "final_targeted_check": {
+      "passed": 1,
+      "total": 1,
+      "checks": 131,
+      "seconds": 0.66,
+      "log": "step36-final-key-accepted.txt",
+      "build": "step36-final-key-build.txt",
+      "reason": "Strengthened malformed-IR rejection-reason assertions and native metadata fixture; added nested value/pattern/catalog checks after the initial 129-check key harness. Production source unchanged."
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 13,
+    "total": 13,
+    "seconds": 157.82,
+    "suites": [
+      "stage10_operator_keys",
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "gc_schemas",
+      "fixed_arrays_source",
+      "growable_arrays_source",
+      "generics_source",
+      "dictionaries_source",
+      "patterns_source",
+      "interfaces_source",
+      "stage10_operator_compounds",
+      "stage10_operator_integration",
+      "stage10_operators_aot"
+    ],
+    "log": "step36-san-accepted.txt",
+    "detail": "step36-san-detail.txt",
+    "build": "step36-san-frozen-build.txt",
+    "initial_build": "step36-san-build.txt",
+    "configure": "step36-san-configure.txt",
+    "configuration": "RelWithDebInfo ASan/UBSan/leaks, pinned LLVM/Clang 19.1.7",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "scope": "Compiler/Runtime/native fixtures instrumented; generated machine code is not equivalently instrumented. RTTI-off SDK excludes vptr. Execution outside sandbox ptrace preserves LeakSanitizer; no suppression/disabled assertion."
+  },
+  "small_stack": {
+    "bytes": 1048576,
+    "status": "passed",
+    "log": "step36-small-stack.txt",
+    "command": "python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc"
+  },
+  "commands": [
+    "cmake -S . -B build/ci-official-debug",
+    "cmake --build build/ci-official-debug -j2 --target void_operator_keys voidc void_operator_resolution void_operator_declarations void_operator_compounds void_operator_integration void_dictionaries_tests void_generics_tests void_gc_schemas void_patterns_tests void_interfaces_tests void_fixed_arrays_tests void_growable_arrays_tests",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_keys|stage10_operator_resolution|stage10_operator_declarations|stage10_operator_compounds|stage10_operator_integration|stage10_operators_aot|dictionaries_source|generics_source|gc_schemas|patterns_source|interfaces_source|fixed_arrays_source|growable_arrays_source)$'",
+    "ctest --test-dir build/ci-official-debug -V -R '^stage10_operator_keys$'",
+    "cmake -S . -B build/ci-official-san",
+    "cmake --build build/ci-official-san -j2 --target void_operator_keys voidc void_operator_resolution void_operator_declarations void_operator_compounds void_operator_integration void_dictionaries_tests void_generics_tests void_gc_schemas void_patterns_tests void_interfaces_tests void_fixed_arrays_tests void_growable_arrays_tests",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_keys|stage10_operator_resolution|stage10_operator_declarations|stage10_operator_compounds|stage10_operator_integration|stage10_operators_aot|dictionaries_source|generics_source|gc_schemas|patterns_source|interfaces_source|fixed_arrays_source|growable_arrays_source)$'"
+  ],
+  "development_failures_and_repairs": [
+    "New test target needed CMake regeneration; the first harness compilation used RelatedLocation.source rather than the existing .span member. Corrected fixture and rebuilt (step36-development-build.txt).",
+    "Tightened forged-IR negative assertions exposed rejection at the uncoordinated dictionary-type guard, before key eligibility. The injected dictionary modules now request coordinated storage and assert the key-shape/declaration-metadata rejection reasons.",
+    "Native negative fixture originally reused a scalar value-schema identity, allowing an earlier geometry rejection. It now uses an independent canonical policy/key schema and asserts the custom-equality rejection reason.",
+    "No demonstrated production failure remains after the final Debug and strict checks. Existing GCC 16/LLVM SDK ciso646 warning remains unsuppressed."
+  ],
+  "new_dependencies": "none; existing Ryu/date/IANA versions and licenses unchanged",
+  "runtime_trust_boundary": "Policies are data in the private same-build trusted native metadata ABI, generated after independent IR validation. This is not a claim to sandbox arbitrary hostile native code.",
+  "unverified": [
+    "native Windows",
+    "native macOS",
+    "native Vim",
+    "latest native editor hosts",
+    "separate Release configuration",
+    "consolidated Stage 10 acceptance"
+  ],
+  "unresolved_step36_defects": [],
+  "next_step": 37,
+  "next_source_change": "Audit and extend the existing contract_ declaration/reference serialization in src/frontend/compiler.cpp (analyze_result builder), then src/frontend/tooling.cpp comparison/invalidation and LLVM compile_analysis cache identity/reload tests for exact operator declaration sets/selected targets and shared formatting dependencies.",
+  "governance": "No commit, branch, push, hosted CI or public root README modification; prior Stage 9 and Stage 10 work/evidence preserved.",
+  "source_manifests": {
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 145,
+    "bounded": "step36-source-hashes.json",
+    "bounded_files": 15,
+    "previous_checkpoint": "step35-checkpoint-source-hashes.json"
+  }
+}

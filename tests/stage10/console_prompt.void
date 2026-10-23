@@ -1,0 +1,15 @@
+use console
+func done():
+    print("done")
+func main():
+    defer done()
+    print("Name é🎮: ", end = "", flush = true)
+    match console.stdin.read_line():
+        Ok(text_read.text(var name)):
+            print("Hello,", name)
+        Ok(text_read.eof):
+            print("EOF")
+        Err(var error):
+            print("input error", error.message, error.bytes_transferred)
+        _:
+            print("unexpected input result")

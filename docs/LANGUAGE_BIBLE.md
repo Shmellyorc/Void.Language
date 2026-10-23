@@ -3449,3 +3449,15 @@ accuracy. Source values use private const backing fields and existing result err
 These are implemented features under focused acceptance; collection/enum/result
 display, console/terminal and owner operators remain unfinished. The complete
 44-step status and acceptance limits are in `stage10/IMPLEMENTATION.md`.
+
+### Approved future VOID Sections — 22 October 2026
+
+Boss approved `# section Name` and `# endsection` as organizational comments,
+including nested named sections. They follow the existing indentation level and
+never require additional indentation. They may appear at file level, inside
+structs/value structs, functions and other existing scopes; they introduce no
+language scope and change neither runtime behavior nor compiled semantics.
+Future tooling should reuse existing editor/LSP infrastructure for folding,
+outline navigation, minimap section names and scrollbar markers where supported.
+This is documentation of an approved future direction, **not implemented
+functionality**; VOID Sections are outside Stage 10 implementation.

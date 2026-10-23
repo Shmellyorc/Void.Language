@@ -1,0 +1,39 @@
+{
+  "previous": "step31-checkpoint-source-hashes.json",
+  "previous_count": 206,
+  "current_count": 211,
+  "unchanged_count": 186,
+  "changed": [
+    "docs/WORK_LOG.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/format.hpp",
+    "include/void/ir.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "src/backend/llvm/backend.cpp",
+    "src/frontend/capabilities.inc",
+    "src/frontend/compiler.cpp",
+    "src/frontend/display_semantics.inc",
+    "src/ir/module.cpp",
+    "src/ir/reference_capabilities.inc",
+    "src/runtime/abi.cpp",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/conversion.cpp",
+    "tests/stage10/display_reload.cpp"
+  ],
+  "added": [
+    "docs/DEVELOPMENT_STRATEGY.md",
+    "src/frontend/collection_display.inc",
+    "tests/stage10/console_collection_failed_hook.void",
+    "tests/stage10/console_collection_invalidated.void",
+    "tests/stage10/console_collections.void"
+  ],
+  "deleted": [],
+  "root_README_unchanged": true,
+  "added_are_manifest_entries": true,
+  "note": "Added means first inclusion in the cumulative manifest, not necessarily a newly created Git file; DEVELOPMENT_STRATEGY.md already existed."
+}

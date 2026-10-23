@@ -41,16 +41,35 @@ std::optional<AnalyzedDeclaration> ToolingIndex::declaration(const std::string& 
     if (found==declarations_.end()) return {};
     return all_declarations_[found->second];
 }
-std::optional<AnalyzedDeclaration> ToolingIndex::definition_at(const std::string& module,std::size_t offset) const {
+std::vector<AnalyzedDeclaration> ToolingIndex::definitions_at(const std::string& module,std::size_t offset) const {
+    std::vector<AnalyzedDeclaration> result;
     auto found=positions_.find(module);
-    if (found==positions_.end()) return {};
-    const auto& references=all_references_;
+    if(found==positions_.end())return result;
     const auto& indices=found->second;
-    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i) { return at < references[i].source.begin; });
-    if (next==indices.begin()) return {};
-    const auto& r=references[*std::prev(next)];
-    if (offset>=r.source.end) return {};
-    return declaration(r.to);
+    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<all_references_[i].source.begin;});
+    if(next==indices.begin())return result;
+    auto begin=all_references_[*std::prev(next)].source.begin;
+    std::set<std::string> seen;
+    while(next!=indices.begin()) {
+        const auto& ref=all_references_[*--next];if(ref.source.begin!=begin)break;
+        if(offset>=ref.source.end || !seen.insert(ref.to).second)continue;
+        if(auto d=declaration(ref.to)){if(!ref.signature.empty())d->signature=ref.signature;result.push_back(std::move(*d));}
+    }
+    // Selected user hooks are the source definition of a compiler conversion.
+    if(std::any_of(result.begin(),result.end(),[](const auto& d){return !d.builtin;}))std::erase_if(result,[](const auto& d){return d.builtin;});
+    // A constructor spelling references both its type and its initializer. Keep
+    // established initializer navigation, rather than treating those two roles
+    // as different generic specializations.
+    std::set<std::string> initialized;
+    for(const auto& d:result)if(d.kind==AnalyzedDeclaration::Kind::initializer)initialized.insert(d.owner);
+    std::erase_if(result,[&](const auto& d){return (d.kind==AnalyzedDeclaration::Kind::value_structure || d.kind==AnalyzedDeclaration::Kind::managed_structure) && initialized.contains(d.identity);});
+    std::sort(result.begin(),result.end(),[](const auto& a,const auto& b){return a.identity<b.identity;});
+    return result;
+}
+std::optional<AnalyzedDeclaration> ToolingIndex::definition_at(const std::string& module,std::size_t offset) const {
+    auto selected=definitions_at(module,offset);
+    if(selected.size()!=1)return {};
+    return std::move(selected.front());
 }
 std::vector<AnalyzedReference> ToolingIndex::references_to(const std::string& identity) const {
     std::vector<AnalyzedReference> result;
@@ -89,16 +108,16 @@ struct Graph {
         }
         for(const auto& d:analysis.declarations()) {
             declarations.emplace(d.identity,&d);
-            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::managed_field || d.kind==AnalyzedDeclaration::Kind::interface_requirement || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer) references[d.identity].insert(d.owner);
+            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::managed_field || d.kind==AnalyzedDeclaration::Kind::interface_requirement || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer || d.kind==AnalyzedDeclaration::Kind::operator_function) references[d.identity].insert(d.owner);
         }
         for(const auto& r:analysis.references()) {
-            references[r.to].insert(r.from); bindings[r.from].push_back(r.to);
+            references[r.to].insert(r.from); bindings[r.from].push_back(r.binding_contract.empty()?r.to:r.binding_contract);
         }
     }
 };
 bool metadata_equal(const AnalyzedDeclaration& a,const AnalyzedDeclaration& b) {
     auto same_type=[](auto x,auto y) { return x==y && x.readonly==y.readonly && x.readonly_references==y.readonly_references; };
-    return a.readonly==b.readonly && a.base_identity==b.base_identity && a.virtual_slot==b.virtual_slot && a.override_target==b.override_target && a.using_field==b.using_field && a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
+    return a.operator_glyph==b.operator_glyph && a.readonly==b.readonly && a.base_identity==b.base_identity && a.virtual_slot==b.virtual_slot && a.override_target==b.override_target && a.using_field==b.using_field && a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
         a.parameters.size()==b.parameters.size() && std::equal(a.parameters.begin(),a.parameters.end(),b.parameters.begin(),same_type) && same_type(a.type,b.type) && a.constant_syntax==b.constant_syntax && a.value==b.value && same_type(a.receiver,b.receiver) && a.receiver_mutates==b.receiver_mutates && a.initialization_contract==b.initialization_contract && a.capability_contract==b.capability_contract && a.construction_parameters==b.construction_parameters && a.required_initialization_fields==b.required_initialization_fields;
 }
 void merge(Edges& into,const Edges& from) {

@@ -11,6 +11,9 @@
 #include "void/tooling.hpp"
 #include "void/numeric.hpp"
 #include "void/temporal_ops.hpp"
+#include "void/console_ops.hpp"
+#include "void/format.hpp"
+#include "void/temporal.hpp"
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
 #include "void/native_binding.hpp"
@@ -361,10 +364,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         b.SetInsertPoint(ordinary);b.CreateRet(b.CreateICmpEQ(b.CreateExtractValue(left,1),b.CreateExtractValue(right,1)));
     }
     std::map<std::string,ir::Type> nominal_types;
-    for(auto t:input.nominal_types) if(t.kind==ir::Type::managed_ref || t.kind==ir::Type::interface_ref) nominal_types.emplace(t.definition->identity,t);
-    auto* record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type);
+    for(auto t:input.nominal_types) if(t.kind==ir::Type::managed_ref || t.kind==ir::Type::interface_ref || t.kind==ir::Type::aggregate) nominal_types.emplace(t.definition->identity,t);
+    auto* record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getPtrTy(),b.getInt32Ty());
     const auto* record_layout=layout.getStructLayout(record_type);
-    if(record_layout->getSizeInBytes()!=sizeof(RuntimeTypeRecord) || record_layout->getElementOffset(3)!=offsetof(RuntimeTypeRecord,size) || record_layout->getElementOffset(5)!=offsetof(RuntimeTypeRecord,count))
+    if(record_layout->getSizeInBytes()!=sizeof(RuntimeTypeRecord) || record_layout->getElementOffset(3)!=offsetof(RuntimeTypeRecord,size) || record_layout->getElementOffset(5)!=offsetof(RuntimeTypeRecord,count) || record_layout->getElementOffset(6)!=offsetof(RuntimeTypeRecord,dictionary_key_schema) || record_layout->getElementOffset(7)!=offsetof(RuntimeTypeRecord,dictionary_key_forbidden))
         throw std::invalid_argument("runtime nominal descriptor ABI mismatch");
     auto string=[&](const std::string& text) {return b.CreateGlobalStringPtr(text,"",0,module.get());};
     std::vector<llvm::Constant*> records,keys;
@@ -378,9 +381,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             const auto& field=t.definition->fields[n];
             for(const auto& part:{field.name,field.owner,ir::type_name(field.type),std::to_string(field_offset(t,n))}) shape+="|"+std::to_string(part.size())+":"+part;
         }
-        if(host_catalog) { NominalDescriptor d{key,base ? base->identity : "",shape,{bytes,{}}};d.layout.references.assign(offsets.begin(),offsets.end());host_catalog->push_back(std::move(d)); }
+        const auto key_schema=element_key(t);const bool key_forbidden=ir::dictionary_equality_owner(t).has_value();
+        if(host_catalog) { NominalDescriptor d{key,base ? base->identity : "",shape,{bytes,{}}};d.dictionary_key_schema=key_schema;d.dictionary_key_forbidden=key_forbidden;d.layout.references.assign(offsets.begin(),offsets.end());host_catalog->push_back(std::move(d)); }
         auto* identity=string(key); keys.push_back(identity);
-        records.push_back(llvm::ConstantStruct::get(record_type,{identity,string(base ? base->identity : ""),string(shape),llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size())}));
+        records.push_back(llvm::ConstantStruct::get(record_type,{identity,string(base ? base->identity : ""),string(shape),llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),string(key_schema),b.getInt32(key_forbidden)}));
     }
     auto* catalog_type=llvm::ArrayType::get(record_type,records.size());
     new llvm::GlobalVariable(*module,catalog_type,true,llvm::GlobalValue::ExternalLinkage,llvm::ConstantArray::get(catalog_type,records),"__vd_types"+suffix);
@@ -543,8 +547,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         llvm::Value* failure = async?fn->getArg(1):f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
         llvm::Value* root_frame = nullptr;
         const bool deinit_body=f.receiver && (f.method_name=="deinit" || f.method_name.starts_with("deinit::$body$"));
+        const bool collection_body=std::any_of(f.blocks.begin(),f.blocks.end(),[](const auto& block){return std::any_of(block.instructions.begin(),block.instructions.end(),[](const auto& i){return i.op==ir::Op::collection_finish || i.op==ir::Op::collection_append || i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave;});});
         const bool display_body=f.receiver && (f.method_name=="string" || f.method_name=="format");
         auto leave_frame = [&] {
+            if(collection_body)b.CreateCall(module->getOrInsertFunction("vd_collection_scope_leave",b.getVoidTy()));
             if(display_body)b.CreateCall(module->getOrInsertFunction("vd_display_leave",b.getVoidTy()));
             if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
@@ -700,12 +706,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
         }
+        if(collection_body) {
+            auto* entered=b.CreateCall(module->getOrInsertFunction("vd_collection_scope",b.getInt1Ty(),b.getPtrTy()),{failure});
+            auto* invalid=llvm::BasicBlock::Create(context,"collection_scope_error",fn);auto* ready=llvm::BasicBlock::Create(context,"collection_scope_ready",fn);
+            b.CreateCondBr(entered,ready,invalid);b.SetInsertPoint(invalid);
+            b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave",b.getVoidTy(),b.getPtrTy()),{root_frame});if(f.result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
+            blocks[0]=ready;b.SetInsertPoint(ready);
+        }
         if(display_body) {
             llvm::Value* object=f.parameters[0].kind==ir::Type::managed_ref?static_cast<llvm::Value*>(fn->getArg(0)):llvm::ConstantPointerNull::get(b.getPtrTy());
             b.CreateCall(module->getOrInsertFunction("vd_display_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(f.name),object,failure});
             auto* invalid=llvm::BasicBlock::Create(context,"display_hook_error",fn);auto* ready=llvm::BasicBlock::Create(context,"display_hook_ready",fn);
             b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),invalid,ready);b.SetInsertPoint(invalid);
             // Entry failed before any source cleanup was reached or guard pushed.
+            if(collection_body)b.CreateCall(module->getOrInsertFunction("vd_collection_scope_leave",b.getVoidTy()));
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave",b.getVoidTy(),b.getPtrTy()),{root_frame});b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
             blocks[0]=ready;b.SetInsertPoint(ready);
         }
@@ -759,6 +773,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     } else { b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
                     b.SetInsertPoint(valid);
                 };
+                auto selected_failure = [&] {
+                    auto* bad=llvm::BasicBlock::Create(context,"selected.failure",fn);auto* ready=llvm::BasicBlock::Create(context,"selected.valid",fn);
+                    b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,ready);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(ready);
+                };
                 // IR operand types preserve signedness, even when native widths coincide.
                 auto operand_type = [&](unsigned id) { return value_types.at(id); };
                 std::function<void(ir::Type,llvm::Value*)> guard_complete;
@@ -797,7 +815,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     return source;
                 };
                 auto native_write=[&](ir::Type array,llvm::Value* owner,llvm::Value* index,llvm::Value* value,bool initialize=false,llvm::Value* version=nullptr) {
-                    b.CreateCall(module->getOrInsertFunction("vd_value_array_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty(),b.getPtrTy()),{owner,element_record(ir::array_element(array)),b.getInt64(array.definition->extent.value_or(0)),b.getInt32(array.kind==ir::Type::growable_array),index,value,version?version:b.getInt64(0),b.getInt32(version!=nullptr),b.getInt32(initialize),failure});array_failure();
+                    b.CreateCall(module->getOrInsertFunction("vd_value_array_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty(),b.getPtrTy()),{owner,element_record(ir::array_element(array)),b.getInt64(array.definition->extent.value_or(0)),b.getInt32(array.kind==ir::Type::growable_array),index,value,version?version:b.getInt64(0),b.getInt32(version!=nullptr),b.getInt32(initialize),failure});if(version)selected_failure();else array_failure();
                 };
                 auto bits=[&](llvm::Value* value,ir::Type t)->llvm::Value* {
                     if(numeric::floating(t)) value=b.CreateBitCast(value,b.getIntNTy(numeric::width(t)));
@@ -897,7 +915,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 }
                 case Op::dict_get: case Op::dict_contains: case Op::dict_remove: case Op::dict_set: case Op::dict_entry: case Op::dict_count: case Op::dict_version: case Op::dict_check: case Op::dict_clear: {
                     auto owner=operand_type(instruction.a);auto* root=value_roots[n].at(instruction.a);auto* record=dictionary_record(owner);auto entry=ir::array_element(owner);
-                    auto check=[&]{fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),instruction.op==Op::dict_get?"Dictionary key not found or lookup failed":instruction.op==Op::dict_set?"Dictionary selected write invalidated or failed":"Dictionary operation failed");};
+                    auto check=[&]{if(instruction.op==Op::dict_set){selected_failure();return;}fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),instruction.op==Op::dict_get?"Dictionary key not found or lookup failed":instruction.op==Op::dict_set?"Dictionary selected write invalidated or failed":"Dictionary operation failed");};
                     if(instruction.op==Op::dict_count || instruction.op==Op::dict_version || instruction.op==Op::dict_check){auto* count=b.CreateCall(module->getOrInsertFunction("vd_dict_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{root,record,b.getInt32(instruction.op!=Op::dict_count),failure});check();if(instruction.op==Op::dict_check)fail_if(b.CreateICmpNE(count,values[instruction.b]),"Dictionary structurally modified during iteration or selected access");else v=count;}
                     else if(instruction.op==Op::dict_clear){b.CreateCall(module->getOrInsertFunction("vd_dict_clear",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{root,record,failure});check();}
                     else if(instruction.op==Op::dict_set){b.CreateCall(module->getOrInsertFunction("vd_dict_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{root,record,native_arg(entry,instruction.b,true),values[instruction.arguments[0]],failure});check();}
@@ -943,7 +961,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         v=b.CreateCall(module->getOrInsertFunction("vd_list_push",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,bits(values[instruction.b],element),failure});array_failure();
                     } else if(instruction.op==Op::list_commit) {
                         v=b.CreateCall(module->getOrInsertFunction("vd_list_write",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,encoding,values[instruction.b],bits(values[instruction.arguments[0]],element),values[instruction.arguments[1]],b.getInt32(1),failure});
-                        fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"List selected write invalidated or failed");
+                        selected_failure();
                     } else {
                         auto* index=array_index(instruction.b,t,instruction.a);
                         auto* value=b.CreateCall(module->getOrInsertFunction("vd_list_remove",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,index,failure});array_failure();
@@ -1161,6 +1179,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
+                case Op::collection_enter: case Op::collection_leave: case Op::collection_append: case Op::collection_finish: {
+                    if(instruction.op==Op::collection_finish){auto* storage=value_roots[n].at(values.size());b.CreateCall(module->getOrInsertFunction("vd_collection_finish",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{storage,failure});fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Collection display failed");v=b.CreateLoad(b.getPtrTy(),storage);}
+                    else {auto name=instruction.op==Op::collection_enter?"vd_collection_enter":instruction.op==Op::collection_leave?"vd_collection_leave":"vd_collection_append";auto* call=b.CreateCall(module->getOrInsertFunction(name,instruction.op==Op::collection_enter?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],failure});fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Collection display failed");if(instruction.op==Op::collection_enter)v=call;}
+                    break;
+                }
                 case Op::string_join: {
                     auto* storage=value_roots[n].at(values.size());
                     auto* pointers=llvm::ArrayType::get(b.getPtrTy(),instruction.arguments.size());
@@ -1174,6 +1197,33 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto result=values[instruction.a];auto* bad=llvm::BasicBlock::Create(context,"format_rejected",fn);auto* ready=llvm::BasicBlock::Create(context,"format_accepted",fn);
                     b.CreateCondBr(b.CreateICmpEQ(b.CreateExtractValue(result,0),b.getInt32(0)),ready,bad);b.SetInsertPoint(bad);
                     b.CreateCall(module->getOrInsertFunction("vd_display_error",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateExtractValue(result,2),failure});trace_failure();b.SetInsertPoint(ready);v=b.CreateExtractValue(result,1);break;
+                }
+                case Op::console_endpoint:
+                    v=b.CreateInsertValue(llvm::Constant::getNullValue(type(instruction.type)),b.getInt64(instruction.immediate),0);break;
+                case Op::console_print: {
+                    auto* role=instruction.arguments.empty()?static_cast<llvm::Value*>(b.getInt64(1)):b.CreateExtractValue(values[instruction.arguments[0]],0);
+                    b.CreateCall(module->getOrInsertFunction("vd_console_print",b.getVoidTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt1Ty(),b.getPtrTy()),{values[instruction.a],role,values[instruction.b],failure});
+                    selected_failure();v=llvm::UndefValue::get(b.getInt8Ty());break;
+                }
+                case Op::console_native: {
+                    auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());auto* words_type=llvm::ArrayType::get(b.getInt64Ty(),8);
+                    auto* words=home(allocations.CreateAlloca(words_type),StorageRole::known_abi,llvm_backend::HomeKind::value);b.CreateStore(llvm::Constant::getNullValue(words_type),words);
+                    auto* text=b.CreateStructGEP(type(instruction.type),storage,6);auto* bytes=b.CreateStructGEP(type(instruction.type),storage,7);
+                    llvm::Value* data=llvm::ConstantPointerNull::get(b.getPtrTy());llvm::Value* count=b.getInt64(0);llvm::Value* timeout=b.getInt64(-1);
+                    auto operation=instruction.immediate;
+                    if(operation<=1 || operation==16)data=value_roots[n].at(instruction.arguments[1]);
+                    if(operation==2 || operation==4)timeout=values[instruction.arguments[1]];
+                    if(operation==3 || operation==5){count=values[instruction.arguments[1]];timeout=values[instruction.arguments[2]];}
+                    if(operation==11 || operation==13 || operation==18){count=values[instruction.arguments[1]];timeout=values[instruction.arguments[2]];}
+                    if(operation==12 || operation==20)count=values[instruction.arguments[1]];
+                    if(operation>=21){fail_if(b.CreateIsNull(values[instruction.arguments[0]]),"Invalid terminal session");count=b.CreateLoad(b.getInt64Ty(),field_address(operand_type(instruction.arguments[0]),values[instruction.arguments[0]],0));}
+                    llvm::Value* role=operation>=21?static_cast<llvm::Value*>(b.getInt64(0)):b.CreateExtractValue(values[instruction.arguments[0]],0);
+                    b.CreateCall(module->getOrInsertFunction("vd_console_v2",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt64Ty(),b.getPtrTy()),{text,bytes,words,b.getInt32(operation),role,data,count,timeout,failure});
+                    selected_failure();
+                    for(unsigned k=0;k<6;++k){llvm::Value* word=b.CreateLoad(b.getInt64Ty(),b.CreateInBoundsGEP(words_type,words,{b.getInt32(0),b.getInt32(k)}));if(k==5)word=b.CreateTrunc(word,b.getInt1Ty());b.CreateStore(word,b.CreateStructGEP(type(instruction.type),storage,k));}
+                    for(unsigned k=6;k<8;++k)b.CreateStore(b.CreateLoad(b.getInt64Ty(),b.CreateInBoundsGEP(words_type,words,{b.getInt32(0),b.getInt32(k)})),b.CreateStructGEP(type(instruction.type),storage,k+2));
+                    v=b.CreateLoad(type(instruction.type),storage);break;
                 }
                 case Op::temporal_native: {
                     const auto& contract=temporal::operations.at(instruction.immediate);
@@ -1528,7 +1578,9 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
         return std::move(object);
     });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
+    bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);
     bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);
     bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
@@ -1657,7 +1709,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     try {
     identity="VOID-debug-object-v1";
     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
-    field(impl_->cache.build_identity);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
+    field(impl_->cache.build_identity);field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
     field(std::to_string(analysis.modules().size()));
     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}

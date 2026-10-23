@@ -1,0 +1,12 @@
+async func child(value: i32) -> i32:
+    return value
+value struct number:
+    value: i32
+    operator +(const left: number, const right: number) -> i32:
+        var task = child(left.value)
+        return right.value
+async func entry(input: i32) -> i32:
+    defer {
+        var ignored = number(value = input) + number()
+    }
+    return input

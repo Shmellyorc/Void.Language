@@ -1,0 +1,8 @@
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 254, in <module>
+    check(required <= items.keys() and not forbidden & items.keys(), (expr,items))
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 126, in check
+    assert value, why
+           ^^^^^
+AssertionError: ('console.', {})

@@ -1,0 +1,62 @@
+[
+  {
+    "group": "conversion",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-debug",
+      "--output-on-failure",
+      "-R",
+      "^(stage10_conversion)$"
+    ],
+    "returncode": 0,
+    "seconds": 503.71375656104647,
+    "suites": [
+      "stage10_conversion"
+    ],
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-sum-display-stdlib-diga8w7z/stdlib"
+    }
+  },
+  {
+    "group": "accepted",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-debug",
+      "--output-on-failure",
+      "-R",
+      "^(stage10_hooks|stage10_interpolation|stage10_fields|stage10_display_reload|stage10_operator_reload|stage10_console_source|stage10_console_aot|stage10_conversion_aot|format_numeric|format_temporal|gc_buffers|gc_schemas|runtime_generated|runtime_failures|runtime_coordination|lsp_stage10_display|runtime_console|runtime_console_keyboard|runtime_console_native_keyboard|patterns_source|generics_source|collections_source|dictionaries_source)$"
+    ],
+    "returncode": 0,
+    "seconds": 491.2739090450341,
+    "suites": [
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "stage10_display_reload",
+      "stage10_operator_reload",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "format_numeric",
+      "format_temporal",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_generated",
+      "runtime_failures",
+      "runtime_coordination",
+      "lsp_stage10_display",
+      "runtime_console",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard",
+      "patterns_source",
+      "generics_source",
+      "collections_source",
+      "dictionaries_source"
+    ],
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-sum-display-stdlib-diga8w7z/stdlib"
+    }
+  }
+]

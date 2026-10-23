@@ -1,0 +1,15 @@
+{
+  "CMakeLists.txt": "43e282772ca81379862785014e8f4b701c2e87de7f75c681912a62a03ab0cda2",
+  "docs/WORK_LOG.md": "45cf7dcf2791261780ab79a5f5b4a7803c9e30d5d825341a2b226a721071fae9",
+  "docs/stage10/DISPLAY_FORMATTING.md": "654d2e469f958a1851c47e7d9339ac4b82278c91639832a4bdfb9c3dc1523bbf",
+  "docs/stage10/EVIDENCE.md": "6034e4e2f18276b373eeb278e2bc49cd78593c6cf77965c8acfdc3cb6c224465",
+  "docs/stage10/IMPLEMENTATION.md": "80227879807538f4e4a44ec4a8d5d18489241161c860dec8e2758d3cc141507b",
+  "docs/stage10/TEST_PLAN.md": "20e71c1c11d62ae3a5e9c722a0596209cc7be301ac89d29db0a620e52289a64d",
+  "editors/vscode/src/test/host.ts": "8b4ca3122a00729598898a0f3588b5708a6684f92e7cf210a852f23847334851",
+  "editors/vscode/syntaxes/void.tmLanguage.json": "46061366843011f7059b42b208fa1d32b8bb26460cbac8fc2455bcc1bc0b5d51",
+  "src/frontend/compiler.cpp": "651984aac32116843c7890d735c648c8e41452efba25c9f617cac21cdbfb799f",
+  "tests/stage10/editor.lua": "5de296dfaf56875294eff1e6a2b244e4046df01b8fcf49e4d89f8e9aa8173483",
+  "tests/stage10/editor.vim": "93ec121b5f783417e98c3e80b6b6aa446e6f520b6dfaab4ae74c3bc36b12bba2",
+  "tests/stage10/lsp_source_formatting.py": "6eda145828c0014c92bbd1ca2fad0031422e321d3d05ed1bf0fd5a432f5ada12",
+  "tests/stage10/source_formatting.cpp": "eb104ea86032c44e774629a5bc5fdf13522d25119aba445e4db75e43b41fe532"
+}

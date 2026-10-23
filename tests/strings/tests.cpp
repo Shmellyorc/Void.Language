@@ -21,8 +21,11 @@ void language() {
     const std::string entry="func entry(v: i32) -> i32:\n";
     for(const auto& expression:{"\"score\" + 100","\"a\" < \"b\"","\"a\" * 2","\"a\" == 1","null","\"a\" as i32"})
         reject(entry+"    var text: string = "+expression+"\n    return v\n");
-    for(const auto& literal:{"\"\\q\"","\"\\xFF\"","\"\\u{d800}\"","\"\\u{110000}\"","\"\\u{}\"","\"\\u{1234567}\"","\"\\u1234\"","\"\\u{zz}\"","\"{name}\"","\"}\"","\"\"\"multiline\"\"\"","\"unfinished","\"line\nnext\""})
+    for(const auto& literal:{"\"\\q\"","\"\\xFF\"","\"\\u{d800}\"","\"\\u{110000}\"","\"\\u{}\"","\"\\u{1234567}\"","\"\\u1234\"","\"\\u{zz}\"","\"{name}\"","\"}\"","\"\"\"unfinished\"\"","\"unfinished","\"line\nnext\""})
         reject(entry+"    var text = "+literal+"\n    return v\n");
+    // Stage10 admits triple strings; retain exact bytes in both JIT modes while
+    // the unterminated triple above preserves malformed-literal rejection.
+    run(entry+"    var text = \"\"\"multiline\"\"\"\n    if text == \"multiline\":\n        return v\n    return 0\n",10);
     for(char control:{'\0','\t','\x7f'}) reject(entry+"    var text = \"a"+control+"b\"\n    return v\n");
     reject(entry+"    var text: string?\n    return v\n");
     reject(entry+"    var text = \"a\"\n    text -= \"b\"\n    return v\n");

@@ -1,0 +1,19 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+    Start 19: gc_buffers
+1/7 Test #19: gc_buffers .......................   Passed    3.30 sec
+    Start 20: gc_schemas
+2/7 Test #20: gc_schemas .......................   Passed    0.22 sec
+    Start 22: runtime_console
+3/7 Test #22: runtime_console ..................   Passed    0.03 sec
+    Start 23: runtime_console_endpoints
+4/7 Test #23: runtime_console_endpoints ........   Passed    0.10 sec
+    Start 24: runtime_coordination
+5/7 Test #24: runtime_coordination .............   Passed    2.06 sec
+    Start 75: runtime_failures
+6/7 Test #75: runtime_failures .................   Passed    0.02 sec
+    Start 78: runtime_invariants
+7/7 Test #78: runtime_invariants ...............   Passed    0.06 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =   5.80 sec

@@ -1,0 +1,10 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_source_formatting.dir/tests/stage10/source_formatting.cpp.o
+[100%] Linking CXX executable void_source_formatting
+[100%] Built target void_source_formatting

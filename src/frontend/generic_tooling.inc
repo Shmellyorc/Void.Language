@@ -31,7 +31,26 @@ for(const auto& s:unit->generic_structures) {
     auto symbolic=std::make_shared<ir::ValueType>();symbolic->name=spelling;symbolic->identity=key;
     declaration({s.definition->managed?AnalyzedDeclaration::Kind::managed_structure:AnalyzedDeclaration::Kind::value_structure,key,id,s.visibility,location(s.token),{},Type(symbolic,Type::unresolved),{},{},id},false);
     parameter_records(s.generics,key);
-    for(const auto& f:s.fields)declaration({s.definition->managed?AnalyzedDeclaration::Kind::managed_field:AnalyzedDeclaration::Kind::value_field,key+"::field::"+f.name,id,s.visibility,location(f.token),{},pattern_type(*f.annotation),f.constant_syntax,{},key},false);
+    for(const auto& f:s.fields){
+        AnalyzedDeclaration record{s.definition->managed?AnalyzedDeclaration::Kind::managed_field:AnalyzedDeclaration::Kind::value_field,key+"::field::"+f.name,id,f.visibility,location(f.token),{},pattern_type(*f.annotation),f.constant_syntax,{},key};
+        record.readonly=f.readonly;declaration(std::move(record),false);
+    }
+    if(!s.operators.empty()) {
+        field(result->contract_,"generic-operator-owner");field(result->contract_,key);field(result->contract_,s.visibility);
+        field(result->contract_,s.definition->managed?"managed":"value");field(result->contract_,std::to_string(s.generics.size()));
+        for(const auto& parameter:s.generics){field(result->contract_,parameter.token.text);field(result->contract_,parameter.constraint?ir::type_name(*parameter.constraint):"");}
+    }
+    for(const auto& f:s.operators) {
+        std::vector<Type> operands;for(const auto& p:f.parameters){auto t=pattern_type(p.type);t.readonly=true;operands.push_back(t);}
+        auto identity=key+"::operator-template::"+f.operator_pattern;
+        AnalyzedDeclaration record{AnalyzedDeclaration::Kind::operator_function,identity,id,f.visibility,location(f.token),operands,pattern_type(f.result),{},{},key};
+        record.generic_template=true;record.editor_symbol_kind=25;record.operator_glyph=f.operator_glyph;record.constant_syntax=f.operator_pattern;
+        record.signature=f.visibility+" operator "+f.operator_glyph+"(";
+        for(unsigned n=0;n<operands.size();++n){if(n)record.signature+=", ";record.signature+=f.parameters[n].token.text+": "+ir::type_name(operands[n]);}
+        record.signature+=") -> "+ir::type_name(record.type)+"\nDeclared by "+spelling+"\nEffects: checked per concrete specialization";
+        for(unsigned n=0;n<f.parameters.size();++n)record.written_parameters.push_back({f.parameters[n].token.text,operands[n],location(f.parameters[n].token)});
+        declaration(std::move(record));
+    }
     type_references(s.type_uses,names,key);
 }
 for(const auto& f:unit->generic_functions) {

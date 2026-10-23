@@ -1,0 +1,360 @@
+{
+  "use ": {
+    "items": [
+      {
+        "word": "io/",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "io/",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 4,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 4,
+                      "line": 0
+                    }
+                  },
+                  "newText": "io/"
+                },
+                "documentation": "",
+                "kind": 19,
+                "detail": "folder"
+              }
+            }
+          }
+        },
+        "info": "```void\nfolder\n```",
+        "kind": "Folder",
+        "abbr": "io/"
+      }
+    ],
+    "accepted": "use io/"
+  },
+  "use io/": {
+    "items": [
+      {
+        "word": "files",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "files",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 7,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 7,
+                      "line": 0
+                    }
+                  },
+                  "newText": "files"
+                },
+                "documentation": "",
+                "kind": 17,
+                "detail": "standard module"
+              }
+            }
+          }
+        },
+        "info": "```void\nstandard module\n```",
+        "kind": "File",
+        "abbr": "files"
+      }
+    ],
+    "accepted": "use io/files"
+  },
+  "use \"": {
+    "items": [
+      {
+        "word": "app/",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "app/",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 5,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 5,
+                      "line": 0
+                    }
+                  },
+                  "newText": "app/"
+                },
+                "documentation": "",
+                "kind": 19,
+                "detail": "folder"
+              }
+            }
+          }
+        },
+        "info": "```void\nfolder\n```",
+        "kind": "Folder",
+        "abbr": "app/"
+      },
+      {
+        "word": "data/",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "data/",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 5,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 5,
+                      "line": 0
+                    }
+                  },
+                  "newText": "data/"
+                },
+                "documentation": "",
+                "kind": 19,
+                "detail": "folder"
+              }
+            }
+          }
+        },
+        "info": "```void\nfolder\n```",
+        "kind": "Folder",
+        "abbr": "data/"
+      },
+      {
+        "word": "main.void\"",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "main.void",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 5,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 5,
+                      "line": 0
+                    }
+                  },
+                  "newText": "main.void\""
+                },
+                "documentation": "",
+                "kind": 17,
+                "detail": "project source"
+              }
+            }
+          }
+        },
+        "info": "```void\nproject source\n```",
+        "kind": "File",
+        "abbr": "main.void"
+      },
+      {
+        "word": "standard/",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "standard/",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 5,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 5,
+                      "line": 0
+                    }
+                  },
+                  "newText": "standard/"
+                },
+                "documentation": "",
+                "kind": 19,
+                "detail": "folder"
+              }
+            }
+          }
+        },
+        "info": "```void\nfolder\n```",
+        "kind": "Folder",
+        "abbr": "standard/"
+      },
+      {
+        "word": "state/",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "state/",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 5,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 5,
+                      "line": 0
+                    }
+                  },
+                  "newText": "state/"
+                },
+                "documentation": "",
+                "kind": 19,
+                "detail": "folder"
+              }
+            }
+          }
+        },
+        "info": "```void\nfolder\n```",
+        "kind": "Folder",
+        "abbr": "state/"
+      }
+    ],
+    "accepted": "use \"app/"
+  },
+  "use \"app/": {
+    "items": [
+      {
+        "word": "systems/",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "systems/",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 9,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 9,
+                      "line": 0
+                    }
+                  },
+                  "newText": "systems/"
+                },
+                "documentation": "",
+                "kind": 19,
+                "detail": "folder"
+              }
+            }
+          }
+        },
+        "info": "```void\nfolder\n```",
+        "kind": "Folder",
+        "abbr": "systems/"
+      }
+    ],
+    "accepted": "use \"app/systems/"
+  },
+  "use \"app/systems/": {
+    "items": [
+      {
+        "word": "player.void\"",
+        "menu": "",
+        "kind_hlgroup": "",
+        "abbr_hlgroup": "",
+        "user_data": {
+          "nvim": {
+            "lsp": {
+              "client_id": 1,
+              "completion_item_needs_resolving": false,
+              "info_kind": "markdown",
+              "completion_item": {
+                "label": "player.void",
+                "textEdit": {
+                  "range": {
+                    "end": {
+                      "character": 17,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 17,
+                      "line": 0
+                    }
+                  },
+                  "newText": "player.void\""
+                },
+                "documentation": "",
+                "kind": 17,
+                "detail": "project source"
+              }
+            }
+          }
+        },
+        "info": "```void\nproject source\n```",
+        "kind": "File",
+        "abbr": "player.void"
+      }
+    ],
+    "accepted": "use \"app/systems/player.void\""
+  }
+}

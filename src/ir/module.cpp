@@ -2,6 +2,7 @@
 #include "void/native_binding.hpp"
 #include "void/numeric.hpp"
 #include "void/temporal_ops.hpp"
+#include "void/console_ops.hpp"
 #include "void/reference_capabilities.hpp"
 #include <map>
 #include <algorithm>
@@ -12,6 +13,36 @@
 #include <limits>
 #include <stdexcept>
 namespace vd::ir {
+bool operator_arity(std::string_view glyph,std::size_t arity) {
+    if(arity==1)return glyph=="+" || glyph=="-";
+    return arity==2 && (glyph=="+" || glyph=="-" || glyph=="*" || glyph=="/" || glyph=="%" || glyph=="==" || glyph=="<" || glyph==">" || glyph=="<=" || glyph==">=");
+}
+std::string operator_identity(Type owner,std::string_view glyph,const std::vector<Type>& operands) {
+    // No result, const spelling or visibility ranking. Length prefixes make
+    // nested generic/collection identities unambiguous and platform independent.
+    auto part=[](std::string_view value){return std::to_string(value.size())+":"+std::string(value);};
+    std::string result=Type::key(owner)+"::operator::"+part(glyph)+":"+std::to_string(operands.size());
+    for(auto t:operands)result+=":"+part(std::to_string(t.kind)+":"+Type::key(t)+(t.nullable?"?":""));
+    return result;
+}
+void validate_operator_declaration(const Function& f) {
+    auto fail=[](const char* message){throw std::invalid_argument(message);};
+    const auto owner=f.operator_owner;
+    if((owner.kind!=Type::aggregate && owner.kind!=Type::managed_ref) || !owner.definition || owner.nullable || owner.construction || owner.readonly || !owner.readonly_references.empty() || owner.definition->interface_type || owner.definition->native_resource || owner.definition->callable || owner.definition->result_type || owner.definition->task_result || owner.definition->element)fail("Operator requires an ordinary declaring nominal owner.");
+    if(!operator_arity(f.operator_glyph,f.parameters.size()))fail("Invalid operator glyph or arity.");
+    if(f.module_identity.empty() || owner.definition->module_identity!=f.module_identity || f.lexical_owner!=Type::key(owner) || !f.lexical_parent.empty())fail("Operator belongs to another nominal owner/module.");
+    if(f.receiver || f.receiver_mutates || f.initializer || f.accessor || f.closure || f.bound_receiver || f.asynchronous || f.worker || !f.virtual_slot.empty() || f.overriding || !f.method_name.empty() || f.task!=Type::none)fail("Prohibited operator declaration modifier or receiver.");
+    if(f.visibility!="public" && f.visibility!="internal" && f.visibility!="private")fail("Invalid operator visibility.");
+    bool owned=false;
+    for(auto t:f.parameters) {
+        if(t==Type::none || t.kind==Type::unresolved || t.kind==Type::prepared_receiver || t.construction || !t.readonly || readonly_paths(t)!=readonly_paths(readonly_view(t)))fail("Operator operands require complete storable const types.");
+        owned |= t.definition==owner.definition && t.kind==owner.kind && (!t.nullable || owner.kind==Type::managed_ref);
+    }
+    if(!owned)fail("At least one operator operand must be the exact declaring owner type.");
+    if(f.result==Type::none || f.result.kind==Type::unresolved || f.result.kind==Type::prepared_receiver || f.result.construction || f.result==Type::null_value)fail("Operator requires a complete storable result type.");
+    if((f.operator_glyph=="==" || f.operator_glyph=="<" || f.operator_glyph==">" || f.operator_glyph=="<=" || f.operator_glyph==">=") && f.result!=Type::boolean)fail("Equality and ordering operators must return exactly bool.");
+    if(f.name!=operator_identity(owner,f.operator_glyph,f.parameters))fail("Operator identity does not match its owner/glyph/exact operands.");
+}
 bool array_type(Type t) { return t.kind==Type::fixed_array || t.kind==Type::growable_array; }
 bool collection_type(Type t) {return array_type(t) || t.kind==Type::dictionary;}
 Type dictionary_type(Type key,Type value) {
@@ -27,7 +58,21 @@ Type dictionary_type(Type key,Type value) {
 }
 Type dictionary_key(Type t) {return field_type(array_element(t),0);}
 Type dictionary_value(Type t) {return field_type(array_element(t),1);}
+std::optional<Type> dictionary_equality_owner(Type root) {
+    std::vector<std::pair<Type,unsigned>> pending{{root,0}};std::set<const ValueType*> seen;std::size_t work=0;
+    while(!pending.empty()) {
+        auto [type,depth]=pending.back();pending.pop_back();
+        if(!type.definition)continue;
+        if(type.definition->custom_equality)return type;
+        if(depth>=128 || ++work>65536 || !seen.insert(type.definition.get()).second)continue;
+        if(type.kind==Type::aggregate)for(const auto& field:type.definition->fields)pending.emplace_back(field.type,depth+1);
+        else if(type.kind==Type::fixed_array && type.definition->element)pending.emplace_back(array_element(type),depth+1);
+        // Managed identity keys do not hash their payload fields or ancestry.
+    }
+    return {};
+}
 bool dictionary_key_supported(Type root) {
+    if(dictionary_equality_owner(root))return false;
     std::set<const ValueType*> active;std::map<const ValueType*,bool> memo;std::size_t work=0;
     std::function<bool(Type)> visit=[&](Type t){
         if(numeric::integer(t) || t==Type::boolean || t==Type::string || t.kind==Type::managed_ref)return true;
@@ -130,7 +175,7 @@ bool worker_transfer_safe(Type root) {
         if(t.construction || t.nullable)return false;
         if(t.kind==Type::none || t.kind==Type::string || (t.kind>=Type::i32 && t.kind<=Type::f64))continue;
         if(t.kind!=Type::aggregate && t.kind!=Type::fixed_array)return false;
-        if(!t.definition || t.definition->managed || t.definition->callable || t.definition->interface_type || t.definition->task_result)return false;
+        if(!t.definition || t.definition->managed || t.definition->callable || t.definition->interface_type || t.definition->task_result || console::endpoint_type(t))return false;
         if(!seen.insert(t.definition.get()).second)continue;
         if(t.kind==Type::fixed_array)pending.push_back(array_element(t));else for(const auto& field:t.definition->fields)pending.push_back(field.type);
     }return true;
@@ -140,7 +185,7 @@ bool async_boundary_safe(Type root) {
     while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable || t.definition->native_resource)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
     return true;
 }
-bool requires_initialization(Type t){return !t.nullable && (reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
+bool requires_initialization(Type t){return !t.nullable && (console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
@@ -273,8 +318,18 @@ Type with_field_type(Type owner,unsigned field,Type value) {
 bool capability_assignable(Type actual,Type expected) {
     std::set<std::string> seen;
     std::function<bool(Type,Type)> visit=[&](Type a,Type e) {
+        // Identical immutable descriptors and authority are reflexively
+        // assignable. Avoid re-projecting every descendant of deep containers.
+        if(a.kind==e.kind && a.definition==e.definition && a.nullable==e.nullable && a.construction==e.construction && a.readonly==e.readonly && a.readonly_references==e.readonly_references && a.preparation==e.preparation)return true;
         if(a.construction && a.readonly && !e.readonly)return false;
-        const auto allowed=readonly_paths(e);for(const auto& path:readonly_paths(a))if(!allowed.contains(path))return false;
+        const auto allowed=readonly_paths(e);
+        for(const auto& path:readonly_paths(a))if(!allowed.contains(path)){
+            // A stored const field already grants readonly projection in the
+            // declared nominal type, even without an explicit outer path fact.
+            auto projected=e;
+            for(auto field:path){if(!projected.definition || (collection_type(projected)?field!=array_element_path:field>=projected.definition->fields.size()))return false;projected=field_type(projected,field);}
+            if(!readonly_paths(projected).contains(ReferencePath{}))return false;
+        }
         auto key=std::to_string(a.kind)+":"+Type::key(a)+"|"+capability_key(a)+"|"+capability_key(e);
         if(!seen.insert(key).second)return true;
         if(collection_type(a) && collection_type(e)) {
@@ -450,7 +505,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
             if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
-            if(d->native_resource && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
+            if(console::endpoint_type(t) && (t.kind!=Type::aggregate || d->module_identity!=console::source_module || d->identity!=d->module_identity+"::"+d->name || d->managed || !d->base.expired() || !d->cases.empty() || d->interface_type || d->callable || d->native_resource || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].name!="_id" || !d->fields[0].readonly || d->fields[0].visibility!="internal"))fail("invalid console endpoint identity");
+            if(console::session_type(t) && (!d->native_resource || d->native_provider!="void.console.v1" || t.kind!=Type::managed_ref || !d->managed || d->module_identity!=console::source_module || !d->base.expired() || d->callable || !d->cases.empty() || d->interface_type || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].readonly || d->fields[0].visibility!="internal" || d->fields[0].name!="_token"))fail("invalid terminal session identity");
+            if(d->native_resource && !console::session_type(t) && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
             if(d->task_result){
                 auto r=Type(*d->task_result);if(t.kind!=Type::managed_ref || !d->managed || d->callable || d->interface_type || !d->base.expired() || !d->cases.empty() || d->result_type || d->element || d->extent || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::i32 || (Type(d->fields[1].type)!=(r==Type::none?Type::boolean:r) || capability_key(d->fields[1].type)!=capability_key(r==Type::none?Type::boolean:r)) || d->identity!="$task:"+std::to_string(r.kind)+":"+Type::key(r)+(r.nullable?"?":"")+":"+capability_key(r))fail("invalid task handle shape");
             }
@@ -562,6 +619,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if (!f.initializer) expected_name=construction_name(expected_name,context_parameters);
         if (!f.module_identity.empty() && (f.source_name.empty() || f.name != expected_name))
             fail("inconsistent function ownership");
+        if(!f.operator_glyph.empty()) {
+            validate_operator_declaration(f);
+            valid_type(f.operator_owner);
+            if(std::none_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.definition==f.operator_owner.definition && t.kind==f.operator_owner.kind;}))fail("operator owner absent from nominal catalog");
+        }else if(f.operator_owner!=Type::none)fail("operator owner without glyph");
         if(f.closure && (f.receiver || f.initializer || f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref || f.parameters[0].nullable || f.parameters[0].construction))fail("invalid closure environment signature");
         if(f.bound_receiver && (!f.closure || f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref || f.parameters[0].definition->fields.size()!=1 || (field_type(f.parameters[0],0).kind!=Type::managed_ref && field_type(f.parameters[0],0).kind!=Type::interface_ref)))fail("invalid bound callback receiver");
         if (f.receiver) {
@@ -638,7 +700,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
         if(!f.lexical_owner.empty()) {
-            if(f.receiver) {
+            if(!f.operator_glyph.empty()) {
+                // The independently validated static owner grants only lexical field access.
+            } else if(f.receiver) {
                 if(f.parameters.empty() || Type::key(f.parameters[0])!=f.lexical_owner)fail("forged lexical field owner");
                 if(!f.module_identity.empty() && f.parameters[0].definition->module_identity!=f.module_identity)fail("foreign lexical field owner");
             } else {
@@ -648,17 +712,30 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 bool selected=false;for(const auto& block:parent->second->blocks)for(const auto& i:block.instructions)selected|=(i.op==Op::function_reference || (adapter && i.op==Op::call)) && i.callee==f.name;
                 if(!selected)fail("closure field owner has no lexical creation");
                 std::set<std::string> ancestry{f.name};auto enclosing=parent->second;
-                while(!enclosing->receiver) {
+                while(!enclosing->receiver && enclosing->operator_glyph.empty()) {
                     if(!ancestry.insert(enclosing->name).second || !functions.contains(enclosing->lexical_parent))fail("cyclic or unowned closure field context");
                     enclosing=functions.at(enclosing->lexical_parent);
                 }
-                if(enclosing->parameters.empty() || Type::key(enclosing->parameters[0])!=f.lexical_owner)fail("closure field context has no declaring receiver");
+                if(!enclosing->operator_glyph.empty()){if(Type::key(enclosing->operator_owner)!=f.lexical_owner)fail("closure field context has no declaring operator owner");}
+                else if(enclosing->parameters.empty() || Type::key(enclosing->parameters[0])!=f.lexical_owner)fail("closure field context has no declaring receiver");
             }
         }
         if(f.cleanup_entry && (!m.coordinated || *f.cleanup_entry>=f.blocks.size()))fail("invalid function cleanup entry");
         qualified_types.emplace_back();
         std::set<unsigned> group_slots;
         for(const auto& block:f.blocks)for(unsigned n=0;n<block.instructions.size();++n){const auto& i=block.instructions[n];if(i.op==Op::store && i.b<n && block.instructions[i.b].op==Op::async_group_enter)group_slots.insert(i.a);}
+        if(!f.operator_glyph.empty()) {
+            if(f.locals.size()<f.parameters.size())fail("operator operand storage missing");
+            for(unsigned n=0;n<f.parameters.size();++n) {
+                if(f.locals[n]!=f.parameters[n] || readonly_paths(f.locals[n])!=readonly_paths(f.parameters[n]))fail("operator operand storage discards const");
+                unsigned writes=0;
+                for(const auto& b:f.blocks)for(unsigned i=0;i<b.instructions.size();++i){const auto& store=b.instructions[i];
+                    if(store.op==Op::array_capture && store.immediate==n)fail("operator const operand binding is replaced by iteration capture");
+                    if(store.op!=Op::store || store.a!=n)continue;
+                    ++writes;if(&b!=&f.blocks.front() || store.b>=i || b.instructions[store.b].op!=Op::argument || b.instructions[store.b].a!=n)fail("operator const operand binding is reassigned");}
+                if(writes!=1)fail("operator operand requires one argument snapshot");
+            }
+        }
         std::vector<std::vector<Type>> body_types;
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
@@ -678,6 +755,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for (const auto& i : b.instructions) {
                 validating=&i;
                 Type result = Type::i32;
+                if(!i.operator_glyph.empty() && i.op!=Op::call)fail("operator proof on non-call instruction");
                 if(i.array_repeat && i.op!=Op::fixed_array) fail("repeat template on non-array instruction");
                 switch (i.op) {
                 case Op::interface_pack: {
@@ -804,7 +882,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::aggregate:
                     valid_type(i.type);
-                    if (i.type.kind != Type::aggregate || !i.type.definition || (!i.type.definition->cases.empty() || i.type.definition->callable) || i.arguments.size() != i.type.definition->fields.size()) fail("invalid aggregate construction");
+                    if (console::endpoint_type(i.type) || i.type.kind != Type::aggregate || !i.type.definition || (!i.type.definition->cases.empty() || i.type.definition->callable) || i.arguments.size() != i.type.definition->fields.size()) fail("invalid aggregate construction");
                     for (unsigned n = 0; n < i.arguments.size(); ++n) expect(i.arguments[n], i.type.definition->fields[n].type);
                     result = i.type; break;
                 case Op::fixed_array:
@@ -865,7 +943,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result=operand(i.a);break;
                 case Op::fixed_select:
                     if(!f.fixed_ownership || !i.receiver || !i.receiver->fields.empty() || !scalar_fixed_array(slot(i.receiver->slot)) ||
-                       slot(i.receiver->slot).readonly || !numeric::integer(operand(i.a)) || i.b || i.immediate || i.initialization || !i.arguments.empty() || !i.callee.empty())
+                       slot(i.receiver->slot).readonly || (!f.operator_glyph.empty() && i.receiver->slot<f.parameters.size()) || !numeric::integer(operand(i.a)) || i.b || i.immediate || i.initialization || !i.arguments.empty() || !i.callee.empty())
                         fail("invalid fixed selection");
                     result=Type::none;break;
                 case Op::fixed_commit: {
@@ -890,6 +968,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::extract: case Op::insert: {
                     auto owner=operand(i.a);if(owner.definition && ((owner.definition->callable) || (!owner.definition->cases.empty() && (i.op==Op::insert || i.immediate!=0))))fail("sum payload requires checked access");
                     auto t = operand(i.a);
+                    if(i.op==Op::insert && console::endpoint_type(t))fail("compiler-owned console endpoint payload is immutable");
                     if (t.kind != Type::aggregate || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= t.definition->fields.size()) fail("invalid aggregate field");
                     auto index=static_cast<unsigned>(i.immediate);
                     if(!field_accessible(m,t,index,f.module_identity,f.lexical_owner))fail("inaccessible stored field '"+t.definition->fields[index].name+"' in "+f.name);
@@ -922,12 +1001,38 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::argument:
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
+                case Op::collection_enter: case Op::collection_leave: case Op::collection_append: case Op::collection_finish: {
+                    if(!m.coordinated || f.asynchronous || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid collection display operation");
+                    if(i.op==Op::collection_finish){if(i.a)fail("invalid collection finish");result=Type::string;}
+                    else if(i.op==Op::collection_append){expect(i.a,Type::string);result=Type::none;}
+                    else {auto owner=operand(i.a);if((owner.kind!=Type::growable_array && owner.kind!=Type::dictionary) || owner.nullable || owner.construction)fail("invalid collection display owner");result=i.op==Op::collection_enter?Type::boolean:Type::none;}
+                    if(i.type!=result)fail("invalid collection display result");break;
+                }
                 case Op::string_join:
                     if(!m.coordinated || i.a || i.b || i.type!=Type::string || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate)fail("invalid interpolation join");
                     for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid interpolation text");result=Type::string;break;
                 case Op::format_unwrap: {
                     auto type=operand(i.a);
                     if(!m.coordinated || type.kind!=Type::aggregate || !type.definition || !type.definition->result_type || type.definition->fields.size()!=3 || field_type(type,1)!=Type::string || field_type(type,2)!=Type::string || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type!=Type::string)fail("invalid format unwrap");result=Type::string;break;
+                }
+                case Op::console_endpoint:
+                    valid_type(i.type);
+                    if(!console::endpoint_type(i.type) || i.a || i.b || !i.arguments.empty() || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || (i.type.definition->name=="input"?i.immediate!=0:(i.immediate!=1 && i.immediate!=2)))fail("forged console endpoint");
+                    result=i.type;break;
+                case Op::console_print:
+                    if(!m.coordinated || operand(i.a)!=Type::string || operand(i.b)!=Type::boolean || i.type!=Type::none || i.immediate || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.arguments.size()>1)fail("invalid print operation");
+                    if(!i.arguments.empty()){auto endpoint=operand(i.arguments[0]);if(!console::endpoint_type(endpoint) || endpoint.definition->name!="output")fail("print requires output endpoint");}
+                    result=Type::none;break;
+                case Op::console_native: {
+                    if(!m.coordinated || f.module_identity!=console::source_module || i.a || i.b || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=console::source_operations.size() || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid console operation");
+                    const auto& contract=console::source_operations.at(i.immediate);
+                    if(i.arguments.size()!=contract.arguments.size())fail("invalid console arguments");
+                    auto endpoint=operand(i.arguments[0]);if(i.immediate>=21 ? !console::session_type(endpoint) : (!console::endpoint_type(endpoint) || (console::output_operation(i.immediate)?endpoint.definition->name!="output":console::input_operation(i.immediate)?endpoint.definition->name!="input":false)))fail("invalid console endpoint role");
+                    for(unsigned n=1;n<i.arguments.size();++n){auto t=operand(i.arguments[n]);if(contract.arguments[n]=='b'){if(t.kind!=Type::growable_array || array_element(t)!=Type::u8)fail("invalid console bytes");}else if(t!=(contract.arguments[n]=='t'?Type(Type::string):Type(Type::i64)))fail("invalid console argument type");}
+                    valid_type(i.type);auto d=i.type.definition;
+                    if(i.type.kind!=Type::aggregate || !d || d->identity!="/@stdlib/console.void::_reply" || d->module_identity!=console::source_module || d->fields.size()!=10)fail("invalid console reply");
+                    for(unsigned n=0;n<10;++n){auto t=field_type(i.type,n);if(n==7){if(t.kind!=Type::growable_array || array_element(t)!=Type::u8 || t.readonly || !readonly_paths(t).empty())fail("invalid console reply bytes");}else if(t!=(n<5 || n>=8?Type(Type::i64):n==5?Type(Type::boolean):Type(Type::string)))fail("invalid console reply field");}
+                    result=i.type;break;
                 }
                 case Op::temporal_native: {
                     if(!m.coordinated || i.a || i.b || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=temporal::operations.size() || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid temporal operation");
@@ -1034,6 +1139,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (i.receiver.has_value() != signature.receiver) fail("call receiver mismatch");
                     std::size_t first = 0;
                     if (i.receiver) {
+                        if(!f.operator_glyph.empty() && i.receiver->slot<f.parameters.size() && signature.mutates)fail("mutating receiver through const operator operand binding");
                         auto t = slot(i.receiver->slot);
                         for (auto field : i.receiver->fields) {
                             if ((t.kind != Type::aggregate && t.kind!=Type::managed_ref) || field >= t.definition->fields.size()) fail("invalid receiver field path");
@@ -1049,13 +1155,19 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!signature.receiver && args.empty() && signature.parameters.size() == 1) args.push_back(i.a);
                     if (args.size()+first != signature.parameters.size()) fail("call argument count mismatch");
                     for (std::size_t n = 0; n < args.size(); ++n) expect(args[n], signature.parameters[n+first]);
+                    if(declaration!=functions.end() && !declaration->second->operator_glyph.empty()) {
+                        if(i.operator_glyph!=declaration->second->operator_glyph || i.receiver || i.initialization)fail("missing or invalid exact operator call proof");
+                        std::vector<Type> operands;for(auto arg:args)operands.push_back(operand(arg));
+                        auto selected=select_operator(m,i.operator_glyph,operands,f.module_identity,f.lexical_owner);
+                        if(selected.status!=MemberSelection::found || selected.method!=i.callee)fail("operator call bypasses exact direct-owner selection/access");
+                    }else if(!i.operator_glyph.empty())fail("operator target is not an operator declaration");
                     result = i.op==Op::async_call ? declaration->second->task : target->second.result; break;
                 }
                 default: fail("unknown operation");
                 }
-                if((i.op==Op::gc_construct || i.op==Op::gc_allocate || i.op==Op::stage_begin) && i.type.definition && i.type.definition->native_resource)fail("forged native resource");
-                if((i.op==Op::gc_read || i.op==Op::gc_write || i.op==Op::extract || i.op==Op::insert) && operand(i.a).definition && operand(i.a).definition->native_resource)fail("native resource payload access");
-                bool pure=i.op==Op::constant || i.op==Op::string_literal || i.op==Op::function_null || (i.op==Op::function_reference && i.arguments.empty());
+                if((i.op==Op::gc_construct || i.op==Op::gc_allocate || i.op==Op::stage_begin) && i.type.definition && i.type.definition->native_resource && !(console::session_type(i.type) && f.module_identity==console::source_module && i.op==Op::gc_construct))fail("forged native resource");
+                if((i.op==Op::gc_read || i.op==Op::gc_write || i.op==Op::extract || i.op==Op::insert) && operand(i.a).definition && operand(i.a).definition->native_resource && !(console::session_type(operand(i.a)) && f.module_identity==console::source_module && (i.op==Op::gc_read || i.op==Op::gc_write)))fail("native resource payload access");
+                bool pure=i.op==Op::console_endpoint || i.op==Op::constant || i.op==Op::string_literal || i.op==Op::function_null || (i.op==Op::function_reference && i.arguments.empty());
                 if(i.op==Op::sum || i.op==Op::aggregate || i.op==Op::fixed_array || i.op==Op::dict_new) {
                     pure=true;
                     for(auto argument:i.arguments) pure=pure && argument<pure_templates.size() && pure_templates[argument];
@@ -1113,6 +1225,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
+                case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
                 case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
@@ -1122,6 +1235,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
     }
     for(const auto& f:m.functions)for(const auto& block:f.blocks)for(const auto& i:block.instructions)if(i.op==Op::async_call && functions.at(i.callee)->worker && (!f.asynchronous || f.worker))fail("spawn requires an owning async activation");
+    std::set<const ValueType*> equality_owners;
+    for(const auto& function:m.functions)if(function.operator_glyph=="==")equality_owners.insert(function.operator_owner.definition.get());
+    for(const auto& [identity,definition]:definitions)if(definition->custom_equality!=equality_owners.contains(definition))fail("custom equality metadata disagrees with owner declarations");
     if (results) *results=std::move(qualified_types);
 }
 }

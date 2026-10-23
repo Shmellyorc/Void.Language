@@ -1,0 +1,22 @@
+{
+  "command": [
+    "gdb",
+    "-q",
+    "-batch",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+    "-ex",
+    "set disable-randomization off",
+    "-ex",
+    "set pagination off",
+    "-ex",
+    "run run /home/shmellyorc/Documents/Void.Language/build/step41-console-repro/operator_console_systems.void",
+    "-ex",
+    "thread apply all bt 16",
+    "-ex",
+    "kill"
+  ],
+  "returncode": 0,
+  "seconds": 70.36941429402214,
+  "interrupted_for_stack": true,
+  "scope": "Debug controlled reproducer only. Batch debugger owns its inferior; no ptrace-policy change or strict instrumentation altered."
+}

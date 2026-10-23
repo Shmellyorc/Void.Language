@@ -1,0 +1,63 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start   1: stage10_operator_reload
+ 1/29 Test   #1: stage10_operator_reload ..........   Passed   52.83 sec
+      Start   5: stage10_source_formatting
+ 2/29 Test   #5: stage10_source_formatting ........   Passed    1.35 sec
+      Start   6: stage10_tooling
+ 3/29 Test   #6: stage10_tooling ..................   Passed    0.59 sec
+      Start   7: stage10_display_reload
+ 4/29 Test   #7: stage10_display_reload ...........   Passed   10.07 sec
+      Start  10: stage10_hooks
+ 5/29 Test  #10: stage10_hooks ....................   Passed    5.89 sec
+      Start  11: stage10_interpolation
+ 6/29 Test  #11: stage10_interpolation ............   Passed    1.70 sec
+      Start  13: stage10_fields
+ 7/29 Test  #13: stage10_fields ...................   Passed    0.61 sec
+      Start  22: runtime_console
+ 8/29 Test  #22: runtime_console ..................   Passed    0.05 sec
+      Start  38: generics_source
+ 9/29 Test  #38: generics_source ..................   Passed    5.64 sec
+      Start  42: patterns_source
+10/29 Test  #42: patterns_source ..................   Passed   10.02 sec
+      Start  88: lsp_positions
+11/29 Test  #88: lsp_positions ....................   Passed    0.02 sec
+      Start  89: lsp_protocol
+12/29 Test  #89: lsp_protocol .....................   Passed    1.18 sec
+      Start  90: lsp_stage8
+13/29 Test  #90: lsp_stage8 .......................   Passed    1.87 sec
+      Start  91: lsp_stage7
+14/29 Test  #91: lsp_stage7 .......................   Passed    0.45 sec
+      Start  92: lsp_demo
+15/29 Test  #92: lsp_demo .........................   Passed    0.08 sec
+      Start  94: stage10_console_source
+16/29 Test  #94: stage10_console_source ...........   Passed   68.87 sec
+      Start 160: sessions
+17/29 Test #160: sessions .........................   Passed    0.22 sec
+      Start 161: tooling
+18/29 Test #161: tooling ..........................   Passed    0.65 sec
+      Start 162: analysis
+19/29 Test #162: analysis .........................   Passed    1.16 sec
+      Start 177: stage10_console_aot
+20/29 Test #177: stage10_console_aot ..............   Passed  249.95 sec
+      Start 179: stage10_conversion_aot
+21/29 Test #179: stage10_conversion_aot ...........   Passed    3.55 sec
+      Start 180: lsp_sprint6
+22/29 Test #180: lsp_sprint6 ......................   Passed    0.78 sec
+      Start 181: lsp_stage10_fields
+23/29 Test #181: lsp_stage10_fields ...............   Passed    0.10 sec
+      Start 182: lsp_stage10_display
+24/29 Test #182: lsp_stage10_display ..............   Passed   10.04 sec
+      Start 183: lsp_stage10_intelligence
+25/29 Test #183: lsp_stage10_intelligence .........   Passed    0.51 sec
+      Start 184: lsp_stage10_source_formatting
+26/29 Test #184: lsp_stage10_source_formatting ....   Passed    0.88 sec
+      Start 186: lsp_sprint4
+27/29 Test #186: lsp_sprint4 ......................   Passed    0.07 sec
+      Start 190: lsp_sprint3
+28/29 Test #190: lsp_sprint3 ......................   Passed    0.13 sec
+      Start 191: lsp_sprint2
+29/29 Test #191: lsp_sprint2 ......................   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 29
+
+Total Test time (real) = 429.34 sec

@@ -58,8 +58,79 @@ local function main()
  if members.items then members=members.items end
  local names={};for _,item in ipairs(members)do names[item.label]=true end
  check(names.year and names.month and names.day and not names._year,'temporal property completion and private backing field protection')
+ local operators={
+  'value struct number:',
+  '    value: i32',
+  '    operator +(const left: number, const right: number) -> number:',
+  '        return number(value = left.value + right.value)',
+  '    operator %(const left: number, const right: number) -> number:',
+  '        return left',
+  'func entry(input: i32) -> i32:',
+  '    var a = number(value = input)',
+  '    var b = a + a',
+  '    b %= a',
+  '    var text = "{input:000}"',
+  '    return b.value',
+ }
+ vim.api.nvim_buf_set_lines(0,0,-1,false,operators)
+ check(vim.wait(10000,function()local ok,result=pcall(query,'textDocument/hover',8,14);return ok and result and result.contents.value:find('operator +(',1,true)end,10),'operator metadata after dirty edit')
+ local glyph=query('textDocument/hover',8,14).contents.value
+ check(glyph:find('Declared by',1,true) and glyph:find('Effects: synchronous',1,true),'operator owner and effects')
+ check(query('textDocument/definition',9,6).range.start.line==4,'compound definition')
+ local items=query('textDocument/completion',8,14)
+ local labels={};for _,item in ipairs(items)do labels[item.label]=item end
+ check(labels['+'] and labels['%'] and not labels['-'],'exact operator completion')
+ items=query('textDocument/completion',10,#'    var text = "{input:')
+ labels={};for _,item in ipairs(items)do labels[item.label]=item end
+ check(labels['000'] and labels['X'],'numeric format completion')
+ local rejected=client:request_sync('textDocument/rename',{textDocument={uri=uri},position={line=8,character=14},newName='sum'},10000,0)
+ check(rejected and rejected.err,'glyph rename rejected')
+ -- Format Stage 10 syntax through the shipped adapter, retaining literal bytes.
+ local ugly=vim.deepcopy(operators)
+ for n,line in ipairs(ugly)do local indent=line:match('^ *');ugly[n]=string.rep(' ',#indent/2)..line:sub(#indent+1) end
+ ugly[11]='  var text = """é😀 {{escaped}}:'
+ table.insert(ugly,12,'    {input:>8|000}')
+ table.insert(ugly,13,'  """')
+ vim.api.nvim_buf_set_lines(0,0,-1,false,ugly)
+ check(vim.wait(10000,function()return #vim.diagnostic.get(0)==0 end,10),'format input analysis')
+ local literal='"""é😀 {{escaped}}:\n    {input:>8|000}\n  """'
+ local adapter=require('void')
+ adapter.format()
+ check(vim.wait(10000,function()return vim.api.nvim_buf_get_lines(0,7,8,false)[1]=='    var a = number(value = input)'end,10),'Stage 10 adapter formatting')
+ check(table.concat(vim.api.nvim_buf_get_lines(0,0,-1,false),'\n'):find(literal,1,true),'format changed triple bytes')
+ check(vim.wait(10000,function()
+  local edits=client:request_sync('textDocument/formatting',{textDocument={uri=uri},options={tabSize=4,insertSpaces=true}},10000,0)
+  return edits and not edits.err and #edits.result==0
+ end,10),'Stage 10 idempotence after document synchronization')
+ -- Delay a real response so a newer edit deterministically wins its transaction.
+ vim.api.nvim_buf_set_lines(0,0,-1,false,ugly)
+ local original_request=client.request
+ local delivered=false
+ local proposed=false
+ check(vim.wait(10000,function()
+  local result=client:request_sync('textDocument/formatting',{textDocument={uri=uri},options={tabSize=4,insertSpaces=true}},10000,0)
+  return result and not result.err and #result.result>0
+ end,10),'stale test must start with an actual proposed edit')
+ client.request=function(self,method,params,handler,buf)
+  if method=='textDocument/formatting' then
+   return original_request(self,method,params,function(err,result,ctx,config)
+    vim.defer_fn(function()
+     proposed=not err and result and #result>0
+     vim.api.nvim_buf_set_lines(0,0,0,false,{'# newer revision'})
+     handler(err,result,ctx,config);delivered=true
+    end,100)
+   end,buf)
+  end
+  return original_request(self,method,params,handler,buf)
+ end
+ adapter.format()
+ client.request=original_request
+ check(vim.wait(10000,function()return delivered end,10),'delayed native formatting response')
+ check(proposed,'stale native response did not contain an edit')
+ local retained=vim.api.nvim_buf_get_lines(0,0,-1,false)
+ check(retained[1]=='# newer revision' and retained[9]=='  var a = number(value = input)','stale format overwrote newer source')
  client:stop(true)
 end
 local ok,error_message=pcall(main)
 vim.fn.delete(root,'rf')
-if not ok then io.stderr:write(tostring(error_message)..'\n');vim.cmd('cquit 1')else print('Neovim field/display/interpolation, temporal APIs and multiline syntax checks passed');vim.cmd('qa!')end
+if not ok then io.stderr:write(tostring(error_message)..'\n');vim.cmd('cquit 1')else print('Neovim field/display/interpolation, temporal APIs, operator intelligence, format suggestions, conservative formatting/stale edits and multiline syntax checks passed');vim.cmd('qa!')end

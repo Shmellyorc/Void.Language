@@ -1,0 +1,29 @@
+-- VOID LLVM: 19.1.7 at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (8.1s)
+-- Generating done (1.4s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_source_formatting.dir/tests/stage10/source_formatting.cpp.o
+[100%] Linking CXX executable void_source_formatting
+[100%] Built target void_source_formatting
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 50%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[100%] Built target void_tests

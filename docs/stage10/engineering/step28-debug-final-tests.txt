@@ -1,0 +1,45 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start  10: stage10_hooks
+ 1/20 Test  #10: stage10_hooks ......................   Passed    5.45 sec
+      Start  11: stage10_interpolation
+ 2/20 Test  #11: stage10_interpolation ..............   Passed    1.31 sec
+      Start  19: gc_buffers
+ 3/20 Test  #19: gc_buffers .........................   Passed   10.01 sec
+      Start  20: gc_schemas
+ 4/20 Test  #20: gc_schemas .........................   Passed    0.81 sec
+      Start  22: runtime_console
+ 5/20 Test  #22: runtime_console ....................   Passed    0.01 sec
+      Start  23: runtime_console_endpoints
+ 6/20 Test  #23: runtime_console_endpoints ..........   Passed    0.06 sec
+      Start  24: runtime_console_transfers
+ 7/20 Test  #24: runtime_console_transfers ..........   Passed    0.02 sec
+      Start  25: runtime_console_native_transfers
+ 8/20 Test  #25: runtime_console_native_transfers ...   Passed    0.43 sec
+      Start  26: runtime_console_wide
+ 9/20 Test  #26: runtime_console_wide ...............   Passed    0.09 sec
+      Start  27: runtime_console_input
+10/20 Test  #27: runtime_console_input ..............   Passed    0.03 sec
+      Start  28: runtime_console_native_input
+11/20 Test  #28: runtime_console_native_input .......   Passed    0.12 sec
+      Start  29: runtime_coordination
+12/20 Test  #29: runtime_coordination ...............   Passed    2.05 sec
+      Start  79: runtime_callbacks
+13/20 Test  #79: runtime_callbacks ..................   Passed    0.64 sec
+      Start  80: runtime_failures
+14/20 Test  #80: runtime_failures ...................   Passed    0.00 sec
+      Start  83: runtime_invariants
+15/20 Test  #83: runtime_invariants .................   Passed    0.03 sec
+      Start  90: stage10_console_source
+16/20 Test  #90: stage10_console_source .............   Passed   14.51 sec
+      Start 114: async_lifecycle
+17/20 Test #114: async_lifecycle ....................   Passed    6.37 sec
+      Start 173: stage10_console_aot
+18/20 Test #173: stage10_console_aot ................   Passed   62.71 sec
+      Start 183: application_native_sprint4_host
+19/20 Test #183: application_native_sprint4_host ....   Passed    1.76 sec
+      Start 184: application_native_sprint4
+20/20 Test #184: application_native_sprint4 .........   Passed    3.18 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) = 109.61 sec

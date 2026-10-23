@@ -1,0 +1,164 @@
+use console
+use time
+use "operator_systems.void" as library
+func quiet(n: i32) -> i32:
+    return n
+value struct number<t>:
+    private const stored: t
+    private const notify: func(i32) -> i32 = quiet
+    operator +(const left: number<t>, const right: t) -> number<t>:
+        left.notify(30)
+        if right < 0:
+            var failed = 1 / (right + 1)
+        return number<t>(value = left.stored + right, notify = left.notify)
+    operator %(const left: number<t>, const right: t) -> number<t>:
+        left.notify(31)
+        return number<t>(value = left.stored % right, notify = left.notify)
+    operator ==(const left: number<t>, const right: number<t>) -> bool:
+        left.notify(40)
+        return left.stored == right.stored
+func (self number<t>) init(value: t = 0, notify: func(i32) -> i32 = quiet):
+    self.stored = value
+    self.notify = notify
+func (self number<t>) read() -> t:
+    return self.stored
+func (self number<t>) mark(n: i32) -> i32:
+    return self.notify(n)
+func (self number<t>) string() -> string:
+    self.notify(50)
+    if self.stored < 0:
+        return "{self:reject}"
+    return "q:{self.stored:000}"
+func (self number<t>) format(pattern: string) -> result<string, string>:
+    self.notify(51)
+    if pattern == "reject":
+        return Err("integrated-{self.stored}")
+    return format(self.stored, pattern)
+struct holder<t>:
+    private current: number<t>
+    const history: [number<t>]
+func (self holder<t>) init(value: number<t>, history: [number<t>]):
+    self.current = value
+    self.history = history
+property (self holder<t>) amount: number<t>:
+    get:
+        self.current.mark(10)
+        return self.current
+    set(value):
+        value.mark(12)
+        self.current = value
+struct vault<t>:
+    private const value: t
+    marker: i32
+func (self vault<t>) init(value: t):
+    self.value = value
+func (self vault<t>) string() -> string:
+    return "v:{self.value}/{self.marker}"
+enum packet:
+    empty
+    data(value: vault<number<i32>>)
+enum branch:
+    nested(values: [branch])
+struct recursive:
+    value: i32
+func (self recursive) string() -> string:
+    return string(self)
+func capture<t>(item: t, action: func(i32) -> i32, mark: i32) -> t:
+    action(mark)
+    return item
+func run(mode: i32) -> i32:
+    var trace: [i32] = []
+    var note = func(n: i32) -> i32:
+        trace.push(n)
+        return n
+    var original = holder<i32>(value = number<i32>(value = 4, notify = note), history = [])
+    var current = original
+    defer {
+        if mode == -1:
+            print("uncommitted", original.amount.read(), file = console.stderr, end = ";")
+        print("done", trace, file = console.stderr, end = ";")
+    }
+    if mode == -2:
+        defer {
+            var cleanup = "{number<i32>(value = -2, notify = note):reject}"
+        }
+        var failed: result<number<i32>, string> = Ok(number<i32>(value = -1, notify = note))
+        print("NO OUTER PREFIX", [failed])
+    if mode == -3:
+        var values: [result<number<i32>, string>] = []
+        var mutate = func(n: i32) -> i32:
+            values.clear()
+            return n
+        values.push(Ok(number<i32>(value = 1, notify = mutate)))
+        print("NO OUTER PREFIX", values)
+    if mode == -4:
+        print("NO OUTER PREFIX", [recursive(value = 1)])
+    var rhs = func() -> i32:
+        note(20)
+        current = holder<i32>(value = number<i32>(value = 90, notify = note), history = [])
+        var scratch = "rhs:{mode:000}"
+        if mode == -1:
+            return -1
+        return 3
+    current.amount += rhs()
+    var copied = original.amount
+    copied %= 5
+    if copied != number<i32>(value = 2, notify = note) or original.amount.read() != 7 or current.amount.read() != 90:
+        return 101
+    var alias = vault<number<i32>>(value = copied)
+    var successful: result<packet, string> = Ok(packet.data(alias))
+    const view = successful
+    var another = successful
+    alias.marker = 9
+    var values = [successful]
+    var entries = {"item": another}
+    var fixed: [result<packet, string>, 2] = [view, successful]
+    var cycle: [branch] = []
+    cycle.push(branch.nested(cycle))
+    var day = make_date(2024, 2, 29)
+    print(capture(values, note, 1), capture(entries, note, 2), sep = capture("|", note, 3))
+    print(fixed, cycle, day)
+    var parent: library.base = library.account(value = 10, history = [])
+    var promoted = library.wrapper(component = library.component(item = library.quantity<i32>(value = 8)))
+    print(parent, promoted)
+    if make_duration(65, 500000000) is Ok(var span):
+        print("{copied:000}|{day}|{span:dd:hh:mm:ss.fff}")
+    print(zone_text())
+    if mode == 4:
+        print("Name é🎮: ", end = "", flush = true)
+        if console.stdin.read_line() is Ok(var response):
+            if response is text_read.text(var name):
+                var raw = console.stdin.read_bytes(1)
+                var scalar = console.stdin.read_char()
+                var zero = console.stdin.read_bytes(1)
+                print(name, raw, scalar, zero, console.stdin.read_line())
+    if mode == 8 or mode == 9:
+        match console.stdin.begin_mode(echo = false, line_input = false):
+            Ok(var session):
+                with session:
+                    print("READY", flush = true)
+                    if console.stdin.read_key(timeout_ms = 2000) is Ok(var pressed):
+                        if mode == 9:
+                            var failed: result<number<i32>, string> = Ok(number<i32>(value = -1, notify = note))
+                            print("NO OUTER PREFIX", [failed])
+                        var character: result<string, string> = Ok(pressed.character)
+                        print([character])
+            Err(var error):
+                print("mode", error.kind)
+    return mode
+func work(count: i32) -> i32:
+    if make_date(2024, 2, 29) is Ok(var day):
+        var i = 0
+        for i < count:
+            var value = library.quantity<i32>(value = 7)
+            value += 2
+            value %= 7
+            var payload: result<library.quantity<i32>, string> = Ok(value)
+            print("{[payload]}|{day:yyyy-MM-dd}|{value:000}")
+            i++
+    return 0
+func zone_text() -> result<string, string>:
+    var chosen_zone = find_zone("America/New_York")?
+    var local = make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?)?
+    var zoned = resolve_local(local, chosen_zone, local_choice.later)?
+    return Ok("{zoned:yyyy-MM-dd HH:mm:ss zzz VV}")

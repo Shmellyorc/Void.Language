@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  26: runtime_console_terminal
+1/4 Test  #26: runtime_console_terminal ..........   Passed    0.00 sec
+    Start  27: runtime_console_native_terminal
+2/4 Test  #27: runtime_console_native_terminal ...   Passed    0.67 sec
+    Start  92: stage10_console_source
+3/4 Test  #92: stage10_console_source ............   Passed   31.55 sec
+    Start 175: stage10_console_aot
+4/4 Test #175: stage10_console_aot ...............   Passed  119.59 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) = 151.82 sec

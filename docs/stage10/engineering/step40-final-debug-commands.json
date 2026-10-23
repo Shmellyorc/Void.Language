@@ -1,0 +1,95 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/ci-official-debug",
+      "--target",
+      "voidc",
+      "voidls",
+      "void_operator_integration",
+      "void_operator_reload",
+      "void_operator_compounds",
+      "void_operator_keys",
+      "void_console_source",
+      "void_stage10_fields",
+      "void_stage10_hooks",
+      "void_stage10_interpolation",
+      "void_temporal_ir",
+      "void_format_numeric",
+      "void_temporal",
+      "void_format_zones",
+      "void_stage10_tooling",
+      "void_source_formatting",
+      "void_display_reload",
+      "void_runtime_console",
+      "void_runtime_console_transfers",
+      "void_runtime_console_keyboard",
+      "void_native_fixture",
+      "void_stage10_conversion",
+      "void_format_workloads",
+      "-j",
+      "2"
+    ],
+    "returncode": 0,
+    "seconds": 49.128153058933094,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib"
+    }
+  },
+  {
+    "label": "tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-debug",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(stage10_operator_integration|stage10_operators_aot|stage10_console_source|stage10_console_aot|stage10_operator_reload|stage10_operator_compounds|stage10_operator_keys|stage10_fields|stage10_hooks|stage10_interpolation|stage10_temporal_ir|format_numeric|format_temporal|format_zones|stage10_tooling|stage10_source_formatting|lsp_stage10_display|lsp_stage10_intelligence|lsp_stage10_source_formatting|stage10_display_reload|runtime_console|runtime_console_transfers|runtime_console_native_transfers|runtime_console_keyboard|runtime_console_native_keyboard)$"
+    ],
+    "returncode": 0,
+    "seconds": 1161.9305861359462,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib"
+    }
+  },
+  {
+    "label": "sum-regression",
+    "command": [
+      "build/ci-official-debug/void_stage10_conversion",
+      "--sum-display"
+    ],
+    "returncode": 0,
+    "seconds": 21.152236707974225,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib"
+    }
+  },
+  {
+    "label": "native-workloads",
+    "command": [
+      "build/ci-official-debug/void_format_workloads"
+    ],
+    "returncode": 0,
+    "seconds": 0.08744430798105896,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib"
+    }
+  },
+  {
+    "label": "small-stack",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/integration/semantic_depth.py",
+      "build/ci-official-debug/voidc"
+    ],
+    "returncode": 0,
+    "seconds": 0.5427193338982761,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib"
+    }
+  }
+]

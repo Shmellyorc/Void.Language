@@ -1,0 +1,50 @@
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `native_call((anonymous namespace)::Provider&, unsigned int, unsigned long, void*, void*, unsigned long, void*, int (*)(unsigned long, void*, int, vd::RuntimeFailure*), void**, char const*, vd::RuntimeFailure*)':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:109:(.text+0x76f): undefined reference to `vd_sink_i32'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x7eb): undefined reference to `vd_fixture_i8'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x841): undefined reference to `vd_fixture_i16'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x896): undefined reference to `vd_fixture_i32'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x8eb): undefined reference to `vd_fixture_i64'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x93e): undefined reference to `vd_fixture_u8'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x994): undefined reference to `vd_fixture_u16'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0x9e9): undefined reference to `vd_fixture_u32'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0xa3e): undefined reference to `vd_fixture_u64'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0xa94): undefined reference to `vd_fixture_f32'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:110:(.text+0xaf1): undefined reference to `vd_fixture_f64'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:111:(.text+0xb32): undefined reference to `vd_fixture_bool'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:114:(.text+0xc3a): undefined reference to `vd_fixture_terminated'
+/usr/bin/x86_64-linux-gnu-ld.bfd: /home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:115:(.text+0xd42): undefined reference to `vd_fixture_length'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_0::operator()(bool) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2bad): undefined reference to `vd_fixture_create'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_1::operator()(void*) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2bd5): undefined reference to `vd_fixture_destroy'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_2::operator()(void*, char const*, unsigned long) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2c05): undefined reference to `vd_fixture_retain'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_3::operator()(void*, unsigned long) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2c2d): undefined reference to `vd_fixture_byte'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_4::operator()(void*, int (*)(void*, int), void*) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2c65): undefined reference to `vd_fixture_register'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_5::operator()(void*) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2c85): undefined reference to `vd_fixture_unregister'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_6::operator()(void*, void**) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:35:(.text+0x2cad): undefined reference to `vd_fixture_registered'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_7::operator()(bool) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2e7d): undefined reference to `vd_sink_create'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_8::operator()(void*) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2ea5): undefined reference to `vd_sink_destroy'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_9::operator()(void*, char const*, unsigned long) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2ed5): undefined reference to `vd_sink_retain'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_10::operator()(void*, unsigned long) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2efd): undefined reference to `vd_sink_byte'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_11::operator()(void*, int (*)(void*, int), void*) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2f35): undefined reference to `vd_sink_register'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_12::operator()(void*) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2f55): undefined reference to `vd_sink_unregister'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o): in function `(anonymous namespace)::$_13::operator()(void*, void**) const':
+/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp:36:(.text+0x2f7d): undefined reference to `vd_sink_registered'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o):(.data+0x18): undefined reference to `vd_fixture_copy'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o):(.data+0x20): undefined reference to `vd_fixture_free'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o):(.data+0x50): undefined reference to `vd_fixture_dispatch'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o):(.data+0x78): undefined reference to `vd_sink_copy'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o):(.data+0x80): undefined reference to `vd_sink_free'
+/usr/bin/x86_64-linux-gnu-ld.bfd: build/ci-official-debug/libvoid_runtime.a(native_binding.cpp.o):(.data+0xb0): undefined reference to `vd_sink_dispatch'
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)

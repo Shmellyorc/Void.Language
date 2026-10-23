@@ -1,0 +1,11 @@
+value struct rejected:
+    reason: string
+func (self rejected) format(spec: string) -> result<string, string>:
+    return Err(self.reason)
+func (self rejected) string() -> string:
+    return "{self:reject}"
+func fail():
+    print(rejected(reason = "cleanup-only"))
+func main():
+    defer fail()
+    print("body;", end = "")

@@ -1,0 +1,24 @@
+use "/native_bridge.void" as bridge
+use "operator_native_compounds.void" as library
+func entry(input: i32) -> i32:
+    if input == 0:
+        var items = [library.number(value = 10)]
+        defer {
+            bridge.scalar_i32(items[0].value)
+        }
+        var rhs = func() -> i32:
+            bridge.scalar_i32(30)
+            items.push(library.number(value = 99))
+            return 2
+        items[0] += rhs()
+    else:
+        var items = {"x": library.number(value = 10)}
+        defer {
+            bridge.scalar_i32(items["x"].value)
+        }
+        var rhs = func() -> i32:
+            bridge.scalar_i32(30)
+            items["new"] = library.number(value = 99)
+            return 2
+        items["x"] += rhs()
+    return 90

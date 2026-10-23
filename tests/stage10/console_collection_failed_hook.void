@@ -1,0 +1,11 @@
+value struct broken:
+    value: i32
+func (self broken) format(spec: string) -> result<string, string>:
+    return Err("collection-hook-failure")
+func (self broken) string() -> string:
+    return "{self:bad}"
+func cleanup():
+    print("cleanup", end = ";")
+func main():
+    defer cleanup()
+    print("NO OUTER PREFIX", [[broken(value = 7)]])

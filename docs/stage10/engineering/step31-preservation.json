@@ -1,0 +1,16 @@
+{
+  "previous_entries": 206,
+  "unchanged_entries": 197,
+  "changed": [
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "tests/runtime/console.cpp",
+    "tests/runtime/console_keyboard.cpp",
+    "tests/runtime/console_keyboard.py",
+    "tests/stage10/console.cpp"
+  ],
+  "new": []
+}

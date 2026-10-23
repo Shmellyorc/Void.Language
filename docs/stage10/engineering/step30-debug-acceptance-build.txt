@@ -1,0 +1,241 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[ 25%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 75%] Built target void_core
+[ 75%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 75%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 75%] Built target void_managed_test_abi
+[ 75%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 75%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 75%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:666:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  666 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:673:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  673 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:674:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  674 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:687:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  687 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+6 warnings generated.
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:25:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_keyboard.dir/tests/runtime/console_keyboard.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:41:75: warning: unused variable 'mode' [-Wunused-variable]
+   41 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto mode=c.begin_mode({false,false,true});f->restore_fault={ErrorKind::io_failure,77};check(c.close().os_code==77 && f->mode==0,"shutdown restoration failure not reported");f->restore_fault={};check(!c.close() && f->mode==7,"shutdown restoration retry lost original mode");}
+      |                                                                           ^~~~
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:69:764: warning: unused variable 'a' [-Wunused-variable]
+   69 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:69:804: warning: unused variable 'b' [-Wunused-variable]
+   69 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+3 warnings generated.
+[100%] Linking CXX executable void_runtime_console_keyboard
+[100%] Built target void_runtime_console_keyboard
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_runtime
+[ 66%] Building CXX object CMakeFiles/void_runtime_console_terminal.dir/tests/runtime/console_terminal.cpp.o
+[100%] Linking CXX executable void_runtime_console_terminal
+[100%] Built target void_runtime_console_terminal
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console.dir/tests/runtime/console.cpp.o
+[100%] Linking CXX executable void_runtime_console
+[100%] Built target void_runtime_console
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_transfers.dir/tests/runtime/console_transfers.cpp.o
+[100%] Linking CXX executable void_runtime_console_transfers
+[100%] Built target void_runtime_console_transfers
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_wide.dir/tests/runtime/console_wide.cpp.o
+[100%] Linking CXX executable void_runtime_console_wide
+[100%] Built target void_runtime_console_wide
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_input.dir/tests/runtime/console_input.cpp.o
+[100%] Linking CXX executable void_runtime_console_input
+[100%] Built target void_runtime_console_input
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_tests.dir/tests/runtime/coordination.cpp.o
+[100%] Linking CXX executable void_runtime_tests
+[100%] Built target void_runtime_tests
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_runtime_callbacks.dir/tests/runtime/callbacks.cpp.o
+[100%] Linking CXX executable void_runtime_callbacks
+[100%] Built target void_runtime_callbacks
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/fixed_call.cpp.o
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/buffers.cpp.o
+[100%] Linking CXX executable void_gc_buffers
+[100%] Built target void_gc_buffers
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_schemas.dir/tests/runtime/schemas.cpp.o
+[100%] Linking CXX executable void_gc_schemas
+[100%] Built target void_gc_schemas
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_failures.dir/tests/runtime/failures.cpp.o
+[100%] Linking CXX executable void_runtime_failures
+[100%] Built target void_runtime_failures
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_invariants.dir/tests/runtime/invariants.cpp.o
+[100%] Linking CXX executable void_runtime_invariants
+[100%] Built target void_runtime_invariants
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_sprint4_tests.dir/tests/stage8/sprint4.cpp.o
+[100%] Linking CXX executable void_sprint4_tests
+[100%] Built target void_sprint4_tests
+[  0%] Built target void_zone_objects
+[ 20%] Built target void_managed_test_abi
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_native_fixture
+[ 60%] Built target void_core
+[ 80%] Built target void_runtime
+[ 80%] Built target void_llvm
+[ 80%] Built target voidc_objects
+[ 80%] Built target void_cache_identity
+[ 80%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifecycle.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/ir.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifetime.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/parallel.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_async_tests
+[100%] Built target void_async_tests
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_hooks
+[100%] Built target void_stage10_hooks
+[ 25%] Built target void_format_objects
+[ 25%] Built target void_native_fixture
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_core
+[ 75%] Built target void_runtime
+[ 75%] Built target void_llvm
+[ 75%] Linking CXX executable void_stage10_interpolation
+[100%] Built target void_stage10_interpolation
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_fields
+[100%] Built target void_stage10_fields
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_operator_reload
+[100%] Built target void_operator_reload
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_display_reload
+[100%] Built target void_display_reload

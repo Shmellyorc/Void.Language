@@ -1,0 +1,10 @@
+Boss-provided native Linux GDB result (user message23 October2026); not captured by this restricted worker. Existing Release voidc and unchanged1MiB wrapper reproduce SIGSEGV.
+#0 Semantics::enum_expression(Expr&, bool)
+#1 Semantics::method_expression(Expr&, optional<Type>)
+#2 Semantics::expression_impl(Expr&, optional<Type>)
+#3 Semantics::expression(Expr&, optional<Type>)
+#4 Semantics::method_expression(...)
+#5 Semantics::expression_impl(...)
+#6 Semantics::expression(...)
+Repeating chain continues through at least40 frames. enum_expression is the crash location, not alone proof of root cause.
+Boss authorizes continued diagnosis/repair without worker debugger access. No further debugger launch attempted.

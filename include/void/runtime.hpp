@@ -1,6 +1,8 @@
 #pragma once
+#include "void/format.hpp"
 #include "void/heap.hpp"
 #include "void/buffer.hpp"
+#include "void/console.hpp"
 #include <optional>
 #include <array>
 #include <chrono>
@@ -12,6 +14,7 @@
 #include <map>
 
 namespace vd {
+namespace console { class Streams; class Context; struct Error; }
 // Native element geometry emitted from the shared LLVM DataLayout. This describes
 // the existing typed schema, not ownership or executable callbacks.
 struct NativeArrayField {const char* target;std::size_t offset;std::uint64_t extent;unsigned kind,nullable;};
@@ -37,6 +40,8 @@ public:
     class RegisteredRootWord;
     struct RootedInterfaceSource;
     explicit Runtime(std::size_t allocation_budget = 0) : allocation_budget_(allocation_budget) {}
+    Runtime(std::size_t allocation_budget, std::shared_ptr<console::Streams>);
+    std::shared_ptr<console::Context> console_context(); // Native state; lazy process defaults.
     ~Runtime();
     Runtime(const Runtime&) = delete;
     Runtime& operator=(const Runtime&) = delete;
@@ -48,11 +53,19 @@ public:
     std::array<std::int64_t,3> monotonic_sample();
     static std::uint64_t monotonic_precision_ns();
     void display_leave() noexcept;
+    void collection_scope();
+    void collection_scope_leave() noexcept;
+    bool collection_enter(void*);
+    void collection_leave(void*);
+    void collection_append(void*);
+    void collection_finish(void**);
     Collection collect(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
     void allocate_into(void** rooted_slot, const TypeLayout&);
     bool begin_release(void*);
     void construct_into(void** rooted_slot, const TypeLayout&, const void* prepared_payload);
     void string_into(void** rooted_slot, std::string_view);
+    void bytes_into(void**,std::string_view);
+    std::string byte_array_bytes(RegisteredRootWord);
     void concat_into(void** rooted_slot, void* left, void* right);
     std::uint64_t string_count(void*, bool bytes) const;
     void string_index_into(void**, void*, ScalarEncoding, std::uint64_t);
@@ -126,12 +139,15 @@ public:
     unsigned async_worker_limit() const;
     bool enter_async(); // Claim one owning executor for this Runtime.
     void leave_async() noexcept;
-    void close(); // Reject new attachments; existing participants must drain.
+    std::int64_t console_checkpoint() const;
+    console::Error console_finish(std::int64_t checkpoint);
+    console::Error close(); // Reject new attachments; existing participants must drain.
 private:
     friend class CallbackRegistration;
     friend class NativeLibrary;
     friend void native_shutdown(Runtime&);
     std::shared_ptr<NativeLibrary> native_library_;
+    std::shared_ptr<console::Context> console_context_;
     unsigned async_worker_limit_ = 4;
     static std::int64_t next_clock_identity();
     std::int64_t clock_identity_=0;
@@ -142,6 +158,9 @@ private:
         std::thread::id owner = std::this_thread::get_id();
         State state = State::native_safe;
         std::vector<std::pair<std::string,void*>> display_hooks;
+        struct CollectionDisplay { formatting::Builder bytes; std::size_t checkpoint; };
+        std::vector<CollectionDisplay> collection_displays;
+        std::vector<void*> collection_path; // Identity only; generated typed owner stacks root every active object.
         Frame* frames = nullptr;
         PrivateRoot* private_roots = nullptr;
         unsigned depth = 0;
@@ -160,6 +179,7 @@ private:
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
+    void validate_dictionary_key_schema(const RuntimeMetadata&,const ElementSchema&) const;
     struct DictionaryHeader {void* entries;void* buckets;std::uint64_t count,capacity,version;};
     struct DictionaryLayout {BufferLayoutRef entries,key;std::shared_ptr<const NominalDescriptor> header;};
     DictionaryLayout dictionary_layout(const NativeDictionary&);

@@ -1,0 +1,8 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_native_systems.void:46:23: error: Expected end of statement, found '+='.
+    code: VOID1101
+
+ 46 |     lhs(owner).amount += rhs(input)
+    |                       ^^
+    Module: /operator_native_systems.void
+    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.
+

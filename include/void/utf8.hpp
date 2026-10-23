@@ -3,11 +3,14 @@
 #include <string_view>
 namespace vd {
 // Shared scalar validation, independent of the frontend, LLVM and runtime.
+inline unsigned utf8_sequence_bytes(unsigned char c) {
+    return c < 128 ? 1 : c >= 0xc2 && c <= 0xdf ? 2 : c >= 0xe0 && c <= 0xef ? 3 : c >= 0xf0 && c <= 0xf4 ? 4 : 0;
+}
 inline unsigned utf8_scalar_bytes(std::string_view text, std::size_t i) {
     if (i >= text.size()) return 0;
     auto c = static_cast<unsigned char>(text[i]);
     if (c < 128) return 1;
-    unsigned count = c >= 0xc2 && c <= 0xdf ? 2 : c >= 0xe0 && c <= 0xef ? 3 : c >= 0xf0 && c <= 0xf4 ? 4 : 0;
+    unsigned count = utf8_sequence_bytes(c);
     if (!count || count > text.size()-i) return 0;
     unsigned scalar = c & (count == 2 ? 31 : count == 3 ? 15 : 7);
     for (unsigned n=1;n<count;++n) {

@@ -1,0 +1,1 @@
+730 captured-place compound checks passed

@@ -1,0 +1,15 @@
+{
+  "version": "ncurses 6.6.20260608",
+  "abi": "system terminfo (Linux soname 6; Darwin system ncurses fallback)",
+  "loaded_libraries": {
+    "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.6": "01f269b16e2fea55d86ba9e95316a82cc5f0e9e784de8c85d9137c845218fa12"
+  },
+  "license": "MIT/X11 (system ncurses package); no library or database redistribution",
+  "residency": "Process-owned native facility, like ordinary dynamic linkage; per-call TERMINAL instances freed, previous cur_term restored. No global curses cleanup or module unload.",
+  "primary_references": [
+    "https://invisible-island.net/ncurses/man/curs_terminfo.3x.html",
+    "https://invisible-island.net/ncurses/terminfo.src.html",
+    "https://invisible-island.net/xterm/ctlseqs/ctlseqs.html",
+    "https://learn.microsoft.com/en-us/windows/console/console-functions"
+  ]
+}

@@ -1,0 +1,23 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems_workload.void:28:32: error: Expected end of statement, found 'padded'.
+    code: VOID1101
+
+ 28 |     var output = if input < 0: padded(-input) else: repeated(input)
+    |                                ^^^^^^
+    Module: /operator_systems_workload.void
+    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems_workload.void:29:18: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 29 |     if output is Ok(var value):
+    |                  ^^
+    Module: /operator_systems_workload.void
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems_workload.void:30:16: error: Unknown identifier 'value'.
+    code: VOID2002
+
+ 30 |         return value
+    |                ^^^^^
+    Module: /operator_systems_workload.void
+    Hint: Declare it with var before use.
+

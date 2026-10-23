@@ -1,0 +1,371 @@
+Start testing: Oct 23 04:31 PDT
+----------------------------------------------------------
+1/199 Testing: stage10_operator_reload
+1/199 Test: stage10_operator_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_reload" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/operator reload fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_reload" start time: Oct 23 04:31 PDT
+Output:
+----------------------------------------------------------
+248 operator/format compatibility/cache/reload checks passed
+<end of output>
+Test time =  57.17 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_reload" end time: Oct 23 04:32 PDT
+"stage10_operator_reload" time elapsed: 00:00:57
+----------------------------------------------------------
+
+7/199 Testing: stage10_display_reload
+7/199 Test: stage10_display_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_display_reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_display_reload" start time: Oct 23 04:32 PDT
+Output:
+----------------------------------------------------------
+199 display dependency/reload checks passed
+<end of output>
+Test time =   4.78 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_display_reload" end time: Oct 23 04:32 PDT
+"stage10_display_reload" time elapsed: 00:00:04
+----------------------------------------------------------
+
+9/199 Testing: format_temporal
+9/199 Test: format_temporal
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_temporal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"format_temporal" start time: Oct 23 04:32 PDT
+Output:
+----------------------------------------------------------
+1308 temporal core checks passed
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"format_temporal" end time: Oct 23 04:32 PDT
+"format_temporal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/199 Testing: stage10_hooks
+10/199 Test: stage10_hooks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_hooks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_hooks" start time: Oct 23 04:32 PDT
+Output:
+----------------------------------------------------------
+77 nominal/custom display checks passed
+<end of output>
+Test time =   6.53 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_hooks" end time: Oct 23 04:33 PDT
+"stage10_hooks" time elapsed: 00:00:06
+----------------------------------------------------------
+
+11/199 Testing: stage10_interpolation
+11/199 Test: stage10_interpolation
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_interpolation"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_interpolation" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+57 interpolation checks passed
+<end of output>
+Test time =   1.95 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_interpolation" end time: Oct 23 04:33 PDT
+"stage10_interpolation" time elapsed: 00:00:01
+----------------------------------------------------------
+
+13/199 Testing: stage10_fields
+13/199 Test: stage10_fields
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_fields"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_fields" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.81 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Oct 23 04:33 PDT
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/199 Testing: format_numeric
+14/199 Test: format_numeric
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_format_numeric"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"format_numeric" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+18663 numeric format checks passed
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"format_numeric" end time: Oct 23 04:33 PDT
+"format_numeric" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/199 Testing: gc_buffers
+19/199 Test: gc_buffers
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_buffers"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"gc_buffers" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=3 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=4 sites=4 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=4 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=5 sites=5 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=5 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=6 sites=6 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=6 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=7 sites=7 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=7 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=8 sites=8 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=8 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=9 sites=9 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=9 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=10 sites=10 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=10 native_count=0 native_bytes=0
+buffer allocation-site sweep budget=0: 4 sites
+buffer allocation-site sweep budget=1: 6 sites
+Managed partial-buffer request: completed_collections=1 cooperative_parks=1
+NativeSafe reservation/zeroing, private adoption and deterministic chunk collection passed
+typed managed/string/interface buffers, capacity oracle and million-reference scans passed
+object-table ownership witness: initial=0 buckets=1->13 heap_retained_count=1 heap_retained_bytes=104 bucket_retained_count=1 bucket_retained_bytes=104 after_owners_count=0 after_owners_bytes=0
+object-table ownership witness: initial=2 buckets=13->13 heap_retained_count=0 heap_retained_bytes=0 bucket_retained_count=0 bucket_retained_bytes=0 after_owners_count=0 after_owners_bytes=0
+reference construction/partial-mark failure sweep: 11 sites
+byte copy allocation_calls=4 requested_bytes=3145952 copy_finish_ms=1.05658
+independent byte copy bytes=3145728 elapsed_ms=468.659 (includes oracle/GC/conflict checks; no latency claim)
+reference copy capacity=1 payload_bytes=8 allocation_calls=4 metadata_requested=184 copy_finish_ms=0.0071 two_live_buffers_gc_ms=0.00767
+reference copy capacity=131072 payload_bytes=1048576 allocation_calls=4 metadata_requested=184 copy_finish_ms=124.718 two_live_buffers_gc_ms=59.9229
+copy/partial-mark allocation failure sweep budget=0: 17 sites
+copy/partial-mark allocation failure sweep budget=1: 29 sites
+foundation acceptance: 32 budgeted lease/copy/abort/recovery cycles, two post-copy collections each passed
+fixed scalar values: 4 MiB content oracle, independent/self copy, all encodings, typed empty/zero-footprint and negatives passed
+fixed Managed store: genuine request/poll/park, rooted source and post-GC copy passed
+fixed value allocation sweep operation=0 budget=0: 4 sites
+fixed value allocation sweep operation=1 budget=0: 4 sites
+fixed value allocation sweep operation=2 budget=0: 4 sites
+fixed value allocation sweep operation=3 budget=0: 4 sites
+fixed value allocation sweep operation=4 budget=0: 4 sites
+fixed value allocation sweep operation=5 budget=0: 4 sites
+fixed value allocation sweep operation=0 budget=1: 8 sites
+fixed value allocation sweep operation=1 budget=1: 8 sites
+fixed value allocation sweep operation=2 budget=1: 10 sites
+fixed value allocation sweep operation=3 budget=1: 8 sites
+fixed value allocation sweep operation=4 budget=1: 8 sites
+fixed value allocation sweep operation=5 budget=1: 10 sites
+private scalar bridge: six caller homes, GC, ordered snapshots, independent result and failure preservation passed
+reference partial-element poll: one collection/park, source slot reacquired at verified Heap boundary
+reference post-poll wrong-type rejection preserved previous output
+private rooted byte/reference buffer checks passed
+private buffer roots/edges cannot bypass publication
+post-owner native leak checks reject bytes and zero-byte allocations
+<end of output>
+Test time =   3.47 sec
+----------------------------------------------------------
+Test Passed.
+"gc_buffers" end time: Oct 23 04:33 PDT
+"gc_buffers" time elapsed: 00:00:03
+----------------------------------------------------------
+
+20/199 Testing: gc_schemas
+20/199 Test: gc_schemas
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_schemas"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"gc_schemas" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"gc_schemas" end time: Oct 23 04:33 PDT
+"gc_schemas" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/199 Testing: runtime_console
+22/199 Test: runtime_console
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+347 console foundation identity/lifecycle/GC checks passed
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console" end time: Oct 23 04:33 PDT
+"runtime_console" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/199 Testing: runtime_console_keyboard
+26/199 Test: runtime_console_keyboard
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console_keyboard"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console_keyboard" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+127 key/mode checks passed
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_keyboard" end time: Oct 23 04:33 PDT
+"runtime_console_keyboard" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/199 Testing: runtime_console_native_keyboard
+28/199 Test: runtime_console_native_keyboard
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console_keyboard"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console_native_keyboard" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+92 native PTY key/mode checks passed
+99 native PTY key/mode integration checks passed
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_native_keyboard" end time: Oct 23 04:33 PDT
+"runtime_console_native_keyboard" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/199 Testing: runtime_coordination
+33/199 Test: runtime_coordination
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_coordination" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+NativeSafe rendezvous baseline (1000, one frozen object): mean 1.68724 us, max 138.919 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+<end of output>
+Test time =   2.08 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_coordination" end time: Oct 23 04:33 PDT
+"runtime_coordination" time elapsed: 00:00:02
+----------------------------------------------------------
+
+34/199 Testing: runtime_generated
+34/199 Test: runtime_generated
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_generated"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_generated" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+numeric loop normal: 2000003 polls, 100 collections, 11 parks
+numeric loop O2: 2000003 polls, 100 collections, 15 parks
+shared IR JIT roots: normal/O2, nested aggregates, temporaries, parameters, returns, loops, failure cleanup passed
+<end of output>
+Test time =   1.92 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_generated" end time: Oct 23 04:33 PDT
+"runtime_generated" time elapsed: 00:00:01
+----------------------------------------------------------
+
+84/199 Testing: runtime_failures
+84/199 Test: runtime_failures
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_failures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_failures" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_failures" end time: Oct 23 04:33 PDT
+"runtime_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+94/199 Testing: stage10_console_source
+94/199 Test: stage10_console_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_console_source"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_console_source" start time: Oct 23 04:33 PDT
+Output:
+----------------------------------------------------------
+source console checks: 3674
+<end of output>
+Test time =  58.02 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_source" end time: Oct 23 04:34 PDT
+"stage10_console_source" time elapsed: 00:00:58
+----------------------------------------------------------
+
+177/199 Testing: stage10_console_aot
+177/199 Test: stage10_console_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_console_aot" start time: Oct 23 04:34 PDT
+Output:
+----------------------------------------------------------
+source console JIT/AOT driver checks: 404
+<end of output>
+Test time = 210.00 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_aot" end time: Oct 23 04:37 PDT
+"stage10_console_aot" time elapsed: 00:03:30
+----------------------------------------------------------
+
+179/199 Testing: stage10_conversion_aot
+179/199 Test: stage10_conversion_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/conversion.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_conversion_aot" start time: Oct 23 04:37 PDT
+Output:
+----------------------------------------------------------
+16 source display JIT/AOT checks passed
+<end of output>
+Test time =   3.65 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_conversion_aot" end time: Oct 23 04:37 PDT
+"stage10_conversion_aot" time elapsed: 00:00:03
+----------------------------------------------------------
+
+182/199 Testing: lsp_stage10_display
+182/199 Test: lsp_stage10_display
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_display" start time: Oct 23 04:37 PDT
+Output:
+----------------------------------------------------------
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_display" end time: Oct 23 04:37 PDT
+"lsp_stage10_display" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 23 04:37 PDT

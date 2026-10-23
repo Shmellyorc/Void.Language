@@ -1,0 +1,62 @@
+[
+  {
+    "pid": 4084084,
+    "ppid": 3726759,
+    "elapsed": 5590,
+    "cpu": "0.0",
+    "rss_kib": 20244,
+    "state": "Ss",
+    "program": "python3.11",
+    "command": "/home/shmellyorc/.local/bin/python3.11 /tmp/step41-after-stack-sequence.py"
+  },
+  {
+    "pid": 4137341,
+    "ppid": 4084084,
+    "elapsed": 936,
+    "cpu": "0.0",
+    "rss_kib": 20712,
+    "state": "S",
+    "program": "python3.11",
+    "command": "/home/shmellyorc/.local/bin/python3.11 /tmp/step41-run.py debug test"
+  },
+  {
+    "pid": 4137342,
+    "ppid": 4137341,
+    "elapsed": 936,
+    "cpu": "0.0",
+    "rss_kib": 17228,
+    "state": "S",
+    "program": "ctest",
+    "command": "ctest --test-dir /home/shmellyorc/Documents/Void.Language/build/ci-official-debug --output-on-failure -j 2 --output-junit /home/shmellyorc/Documents/Void.Langua"
+  },
+  {
+    "pid": 4137343,
+    "ppid": 4137342,
+    "elapsed": 936,
+    "cpu": "0.0",
+    "rss_kib": 21296,
+    "state": "S",
+    "program": "python3.11",
+    "command": "/home/shmellyorc/.local/bin/python3.11 /home/shmellyorc/Documents/Void.Language/tests/stage10/console.py /home/shmellyorc/Documents/Void.Language/build/ci-offic"
+  },
+  {
+    "pid": 4140776,
+    "ppid": 4137342,
+    "elapsed": 26,
+    "cpu": "97.6",
+    "rss_kib": 75200,
+    "state": "R",
+    "program": "void_collection",
+    "command": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_collections_tests /home/shmellyorc/Documents/Void.Language"
+  },
+  {
+    "pid": 4140795,
+    "ppid": 4137343,
+    "elapsed": 13,
+    "cpu": "99.5",
+    "rss_kib": 134348,
+    "state": "R",
+    "program": "voidc",
+    "command": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc emit /tmp/VOID console source pcwav_6a/console_operator_mode_failure.void -o /tmp/VOID co"
+  }
+]

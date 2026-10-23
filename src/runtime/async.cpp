@@ -341,3 +341,5 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
     active=nullptr;return 0;
 }
 }
+
+namespace vd { const void* async_execution_context() noexcept {return active?active->current:nullptr;} }

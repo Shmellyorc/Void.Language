@@ -1,0 +1,112 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 75%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_display_reload
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_operator_reload.dir/tests/stage10/operator_reload.cpp.o
+[100%] Linking CXX executable void_operator_reload
+[100%] Built target void_operator_reload
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_hooks.dir/tests/stage10/hooks.cpp.o
+[100%] Linking CXX executable void_stage10_hooks
+[100%] Built target void_stage10_hooks
+[ 25%] Built target void_native_fixture
+[ 25%] Built target void_format_objects
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_core
+[ 75%] Built target void_runtime
+[ 75%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_interpolation.dir/tests/stage10/interpolation.cpp.o
+[100%] Linking CXX executable void_stage10_interpolation
+[100%] Built target void_stage10_interpolation
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_fields.dir/tests/stage10/fields.cpp.o
+[100%] Linking CXX executable void_stage10_fields
+[100%] Built target void_stage10_fields
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/buffers.cpp.o
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/fixed_call.cpp.o
+[100%] Linking CXX executable void_gc_buffers
+[100%] Built target void_gc_buffers
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_schemas.dir/tests/runtime/schemas.cpp.o
+[100%] Linking CXX executable void_gc_schemas
+[100%] Built target void_gc_schemas
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_runtime_generated_abi.dir/src/runtime/abi.cpp.o
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_runtime_generated_abi
+[100%] Building CXX object CMakeFiles/void_runtime_generated.dir/tests/runtime/generated.cpp.o
+[100%] Linking CXX executable void_runtime_generated
+[100%] Built target void_runtime_generated
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_failures.dir/tests/runtime/failures.cpp.o
+[100%] Linking CXX executable void_runtime_failures
+[100%] Built target void_runtime_failures
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_tests.dir/tests/runtime/coordination.cpp.o
+[100%] Linking CXX executable void_runtime_tests
+[100%] Built target void_runtime_tests
+Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_format_objects
+[ 66%] Built target void_core
+[ 66%] Built target void_lsp
+[ 66%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls

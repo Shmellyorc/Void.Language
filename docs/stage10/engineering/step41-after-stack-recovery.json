@@ -1,0 +1,132 @@
+{
+  "debug": [
+    {
+      "label": "configure",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 17.130181164946407
+    },
+    {
+      "label": "build",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 203.81484067393467
+    },
+    {
+      "label": "workload-build",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 1.6607820310164243
+    },
+    {
+      "label": "tests",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 1649.4998431450222
+    },
+    {
+      "label": "native-workloads",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 0.09867410594597459
+    },
+    {
+      "label": "semantic-depth-1m",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 0.5640587910311297
+    },
+    {
+      "label": "frontend-1m",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 9.550687120994553
+    }
+  ],
+  "release": [
+    {
+      "label": "configure",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 118.28880583902355
+    },
+    {
+      "label": "build",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 4361.828189273016
+    },
+    {
+      "label": "workload-build",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 0.34553766902536154
+    },
+    {
+      "label": "tests",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 849.3303637689678
+    },
+    {
+      "label": "native-workloads",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 0.011574278003536165
+    },
+    {
+      "label": "semantic-depth-1m",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 0.4079887979896739
+    },
+    {
+      "label": "frontend-1m",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 4.541446629096754
+    }
+  ],
+  "san": [
+    {
+      "label": "configure",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 29.502119140932336
+    },
+    {
+      "label": "build",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 284.9817564669065
+    },
+    {
+      "label": "workload-build",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 1.3581851390190423
+    },
+    {
+      "label": "tests",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 1790.9811380599858
+    },
+    {
+      "label": "native-workloads",
+      "status": "finished",
+      "returncode": 0,
+      "seconds": 0.07519439596217126
+    }
+  ],
+  "sequence_session": 12686,
+  "sequence_script": "/tmp/step41-after-stack-sequence.py",
+  "prepared_finalizer": "/tmp/step41-finalize-after-stack.py",
+  "finalizer_executed": true,
+  "note": "Complete final repaired-source Linux acceptance: Debug199/199, Release199/199, strict199/199; all phase commands finished0. Final source/artifact audit completed; stop for Wrench review. Stage10 INCOMPLETE; Steps42\u201344 remain separate.",
+  "source_diff": "step41-release-stack-repair.diff",
+  "native_Boss_success": "step41-boss-native-success.json",
+  "matching_artifacts": "step41-after-stack-artifact-checkpoint.json",
+  "sequence_exit_status": 0,
+  "next": "Wrench review, then separately scheduled Step42 native Windows/macOS gates. Do not rerun completed matrices."
+}

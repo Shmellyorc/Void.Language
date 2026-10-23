@@ -1,0 +1,14 @@
+{
+  "CMakeLists.txt": "fc3a4a78a88d406253f3175f52cb432422e9fc1298f88b60e6aa5e00f962c886",
+  "docs/WORK_LOG.md": "0ab0a4ad2043d5013d281618fac7b6eff83fd727528c057192ad3c936eadc0ae",
+  "docs/stage10/CONSOLE_IO.md": "6df3ffedbb74b6530a01d9ec34108ca8f9c920ce5f2f17354c15bcc59d127fcc",
+  "docs/stage10/EVIDENCE.md": "53861f953fc62c9fa92df2e2ef42793d698218d859f11b5b588f58d8d541bbc5",
+  "docs/stage10/IMPLEMENTATION.md": "644f621e7e2de63b90b170981bcfac26e72fec70b5908730f4a9ddf35d27da51",
+  "docs/stage10/TEST_PLAN.md": "238985c350f6510adcf2ed53232b5e594efb0bb6318913d0ddfee3b5049ea3ab",
+  "include/void/console.hpp": "368ccdde5d9e496a337e9648793d9773c76b3fa73f30ab0d8c985f925f55f2f2",
+  "include/void/runtime.hpp": "c8b119685c4990a471a44d2453cb72e1ac7e31b4c5d9940248dcfad816800898",
+  "src/runtime/console.cpp": "36471c571de4705a02de17e5160ef5e13b1dd621aef959c12894ee1ee0193418",
+  "src/runtime/coordination.cpp": "18f3e3452c413b898b332c4f581be5722418913265eea8758449688ad7c4a02e",
+  "tests/runtime/console.cpp": "9d4d503452dc8b1781fd615d3f12dbe95b12c6ab54be458c51086a1102b04967",
+  "tests/runtime/console_endpoints.py": "fcc5187c330f3bf922ca33e18100820b0d0837883a9a2e7698e2043982091966"
+}

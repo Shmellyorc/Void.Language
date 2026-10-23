@@ -1,0 +1,18 @@
+{
+  "CMakeLists.txt": "bf5b5c8c963b0d560e41682425496181d1ff32a78b3e31db7ce2badf8bc14a88",
+  "src/frontend/compiler.cpp": "7a68ba71c11e176d29686b5a33a6e855fd9fd93dd5b9715f4e68e112eedbb6ca",
+  "src/frontend/capabilities.inc": "c61525dec50744a4b9ed6acb27a76fb0a0a5084c2e14807cb7d859a9e914cb2c",
+  "src/ir/async_validation.inc": "d78beb1ded175fc3fee441126081d02647f2199e8e70edc96a3fde2824f70aba",
+  "src/backend/llvm/backend.cpp": "20a62ab85f1b65e67e3f002fd9d6799cb9ef487f02c954c838c0037265d903ae",
+  "tests/stage10/operator_compounds.cpp": "daf6333e20e1201f99b7896cb1240be630307b2558f3f59ca0a5463f5ea43538",
+  "tests/stage10/operators.py": "9d801e67fcdce9d7019d5548c9491afcd9559f8149b35042355fa4935db015f7",
+  "tests/stage10/operator_compound_capture.void": "df456e9e2b4de7214cb9000c35521fb8bd2a9bf8f1ea95b7065b3750775deba1",
+  "tests/stage10/operator_compound_conversions.void": "287cb05cff7486b7f5a4c210d208c0d125f254e658dd3d24e6face15c49bc6d8",
+  "tests/stage10/operator_compound_suspension.void": "911ea74b197b3118783c695df8e1791de6d94f1e1de91b6ac3216833ca40caa5",
+  "tests/stage10/operator_compound_workers.void": "d4e6778b1403039e4bac63b127172992f2ea0cbaf0f1dc08e678a2471aa4533b",
+  "tests/stage10/operator_compounds.void": "e200b003e002b1a080c8b3393624c110d0aed3477833f8bd42871b9301808986",
+  "tests/stage10/operator_native_compound_failure.void": "3a697966a1547dac86b7d635dd84f67992d940438d4ac4450bd91eddff05f831",
+  "tests/stage10/operator_native_compound_invalidation.void": "1101ae8990e8cc58ad02ba897a53b0a8dcb2def103655a270a62d3e2b83ae1b6",
+  "tests/stage10/operator_native_compound_worker.void": "ead626f3e25409a735ebe06399e5511f0d521b96d96a121d11a0fe6bd8fba836",
+  "tests/stage10/operator_native_compounds.void": "67c32ceed4f7830a821bca1871c1fe081d7564949799600f483840d0da38b48c"
+}

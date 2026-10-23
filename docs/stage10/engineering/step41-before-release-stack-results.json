@@ -1,0 +1,195 @@
+{
+  "increment": "Stage10 Step41 consolidated Linux acceptance",
+  "status": "INCOMPLETE \u2014 stopped at user-required security boundary",
+  "recorded_utc": "2026-10-23T20:16:17.068659+00:00",
+  "stage_status": "INCOMPLETE",
+  "configurations": {
+    "debug": {
+      "registered": 199,
+      "commands": "step41-debug-commands.json",
+      "complete_build_passed": true,
+      "status": "passed",
+      "executed": 199,
+      "passed": 199,
+      "failed": [],
+      "skipped": 0,
+      "seconds": 1672.6966907739406,
+      "returncode": 0,
+      "junit": "step41-debug-junit.xml",
+      "post_suite": {
+        "native-workloads": {
+          "returncode": 0,
+          "seconds": 0.09914340800605714,
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_format_workloads"
+          ]
+        },
+        "semantic-depth-1m": {
+          "returncode": 0,
+          "seconds": 0.5783722350606695,
+          "command": [
+            "/home/shmellyorc/.local/bin/python3.11",
+            "tests/integration/semantic_depth.py",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+          ]
+        },
+        "frontend-1m": {
+          "returncode": 0,
+          "seconds": 9.554402681998909,
+          "command": [
+            "/bin/bash",
+            "-c",
+            "ulimit -s 1024; exec \"$1\" frontend \"$2\"",
+            "void-frontend-1m",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+            "/home/shmellyorc/Documents/Void.Language"
+          ]
+        }
+      }
+    },
+    "release": {
+      "registered": 199,
+      "commands": "step41-release-commands.json",
+      "complete_build_passed": true,
+      "status": "failed",
+      "executed": 199,
+      "passed": 198,
+      "failed": [
+        "source_cli"
+      ],
+      "skipped": 0,
+      "seconds": 1068.1373667810112,
+      "returncode": 8,
+      "junit": "step41-release-junit.xml",
+      "post_suite": {
+        "native-workloads": {
+          "returncode": 0,
+          "seconds": 0.016073895967565477,
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_format_workloads"
+          ]
+        },
+        "semantic-depth-1m": {
+          "returncode": 1,
+          "seconds": 0.08098430803511292,
+          "command": [
+            "/home/shmellyorc/.local/bin/python3.11",
+            "tests/integration/semantic_depth.py",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc"
+          ]
+        },
+        "frontend-1m": {
+          "returncode": -11,
+          "seconds": 1.7143404660746455,
+          "command": [
+            "/bin/bash",
+            "-c",
+            "ulimit -s 1024; exec \"$1\" frontend \"$2\"",
+            "void-frontend-1m",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_tests",
+            "/home/shmellyorc/Documents/Void.Language"
+          ]
+        }
+      }
+    },
+    "san": {
+      "registered": 199,
+      "commands": "step41-san-commands.json",
+      "complete_build_passed": true,
+      "status": "NOT STARTED: final strict CTest stopped behind failed Release gate",
+      "executed": 0,
+      "warning": "step41-san-tests.txt is an interrupted initial-run artifact, NOT final acceptance. Final strict build and default-root controls pass; final unfiltered suite remains pending."
+    }
+  },
+  "security_blocker": {
+    "operation": "Parent-owned GDB launch of the Release voidc 1 MiB deep-receiver reproducer",
+    "diagnostic": "warning: Could not trace the inferior process.\nwarning: ptrace: Operation not permitted\nDuring startup program exited with code 127.\nNo stack.",
+    "gdb_process_returncode": 1,
+    "evidence": "step41-release-stack-gdb.txt",
+    "response": "Stopped diagnostic/engineering execution immediately after reading the denial. No escalation, debugger alternative, separate program application, policy change or new test matrix attempted. Only recovery/evidence records written afterwards.",
+    "origin": "Platform ptrace restriction; not an automatic approval-review rejection."
+  },
+  "confirmed_unresolved_failure": {
+    "suite": "source_cli (Release only in completed matrix)",
+    "suite_seconds": 2.82311,
+    "standalone": "semantic_depth.py returns1 because Release child is SIGSEGV (-11) on400-call receiver rejection; full frontend under genuine1MiB also SIGSEGV during combined expression/constant depth.",
+    "cause": "Not established: Release-only failure under unchanged1MiB budget. Debug gates pass; no debugger stack obtained. Do not claim a diagnosed cause or repair.",
+    "source": "build/step41-release-stack/deep-methods.void",
+    "source_sha256": "5fe5eedf5b5aef563320b33239b4de73c5b976d9e40ba1414112fd102751464b"
+  },
+  "process_recovery": {
+    "observed": "No step41 runners, CTest, void_tests or conversion acceptance processes remained running on resumption. Sequential runner had stopped after failed Release; no duplicate builds/tests started.",
+    "safe_point": "Complete matching Debug/Release/strict builds exist. Final Debug199/199 and standalone1MiB gates verified. Release198/199, both standalone1MiB gates failed. Final strict suite NOT STARTED. Preserve these exact records before any authorized diagnosis/repair.",
+    "next": "Owner decision on platform diagnostic access/security restriction; then establish and repair the Release1MiB failure without changing limits/guards/timeouts. If production changes, refresh freezes, rebuild matching configurations, repeat applicable final acceptance/editor/artifact checks. Do not execute the all-pass finalizer now. Steps42\u201344 remain separate."
+  },
+  "preserved_repairs": {
+    "production": "compiler.cpp compound_value builtin emission uses s.token again; custom calls retain compound_token. Unchanged modules_cli passes.",
+    "harnesses": [
+      "tests/strings/tests.cpp: valid triple string exact normal/O2 output, malformed unterminated triple remains rejected",
+      "tests/frontend/tests.cpp: current precise unsupported bool-compound diagnostic and3:10 location",
+      "tests/integration/growable_arrays.cmake: full actual structural-modification failure class/status/source; no accepted invalid write"
+    ],
+    "initial_complete_debug": "196/199,1692.65s preserved in step41-before-harness-debug-*; NOT final acceptance.",
+    "pre_stack_attempts": "Complete Debug/Release current-source records also copied to step41-before-release-stack-* before debugger probe."
+  },
+  "additional_completed_checks": {
+    "editor_phases": 6,
+    "editor_commands": "step41-editor-commands.json",
+    "server_sha256_verified": "07ee884170872326c3cc92557cbe635b2a588a92e6fce740999fb9a01523afda",
+    "default_root_controls": 6,
+    "controls": "step41-default-root-probes.json",
+    "source_isolation": {
+      "root": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib",
+      "sha256": {
+        "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+        "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385",
+        "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344"
+      }
+    },
+    "deep_conversion": "Both completed Debug/Release matrices retain unfiltered203-check conversion suite including72-level graph; no subset or reduced depth. Aggregate suite timing is not isolated deep-case time."
+  },
+  "integrity": {
+    "frozen_inputs": 766,
+    "source_mismatches": [],
+    "freeze": "step41-full-source-freeze.json",
+    "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "historical_step40_artifact_hashes_match": true,
+    "historical_baseline_artifact_hashes_match": true,
+    "final_acceptance_artifact_audit": "PENDING: consolidated acceptance failed; no all-pass finalizer executed."
+  },
+  "remaining_obligations": [
+    "Release source_cli and1MiB crash diagnosis/repair",
+    "Final strict unfiltered199-suite acceptance, native workload and strict console/workload outputs",
+    "Post-repair matching sources/artifacts/editors/roots and consolidated final hash verification as required",
+    "Native Windows/macOS acceptance remains unverified (Step42)",
+    "Steps43\u201344 final documentation/review; Stage10 remains INCOMPLETE"
+  ],
+  "historical_observations": "Step37 publication/default-root year anomalies, transient pinned Clang crash/reproducer, deep-collection compilation cost, deferred optimization/usability and F12/F2/hover/documentation backlog remain preserved/unresolved; no new cause or fix claimed.",
+  "governance": "No Git mutation, hosted CI, publication, public README change or security-boundary bypass.",
+  "evidence_sha256": {
+    "step41-release-stack-gdb.txt": "b5202d07e0006530755949b382d55d9c0a8e98f95d07726e6237a4a3b689d600",
+    "step41-release-stack-recovery.json": "e3238add85406aa79b34852b54ad8f5d87e6a94667b82d90e66406b566154a3f",
+    "step41-baseline.json": "384739c5c1fbfb2c4deca1e67c44c016f7cf378c4cbeb0ebe5c656743db585da",
+    "step41-full-source-freeze.json": "098a24f5a0a0145277a04aab87305638d1a01b02911dc4b015f7930f0cc56dd0",
+    "step41-editor-commands.json": "4ac8b33d7d47bf3f3712cfdc4c83e0c304d1acea182820826eb5fe10e4523a56",
+    "step41-editor-versions.json": "c128ca1549aa47383fe5e6bfec91704f92d1f761de4f83d32db27c84908a51ce",
+    "step41-default-root-probes.json": "0ecc8482c5328a31f5591f197b290d2548b713037d1fb2520c4e4ac2b3887938",
+    "step41-before-harness-debug-tests.txt": "60fedabf1f469d3d98618dea559d5b04b44bc13908af8a0a6142bac17a4d00a5",
+    "step41-debug-commands.json": "c61192dcac0f6748c00cbe12b6e53aff5afc7caf98e13c269bb37d444ff5b3c5",
+    "step41-debug-inventory.json": "27c53455cd001ef6551ac37f46cde953dac5c26a8be0c65e2b297d46e96cf0a1",
+    "step41-debug-junit.xml": "4526179b615fa03df0d6a97f4dfc47e456814db78d2157a5cb0b09ccf9dd60f9",
+    "step41-debug-tests.txt": "d45e51ebc1598edd780694d566ecad5d95463c99058f28694ab76ef98d92a2b6",
+    "step41-debug-frontend-1m.txt": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9",
+    "step41-debug-semantic-depth-1m.txt": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+    "step41-debug-native-workloads.txt": "4e874847283acd40bcaf5a6e8d703a7112c8d98c88ae86cb26f20deb5e492285",
+    "step41-release-commands.json": "0ab67cba665067dfc30550b3498537229c55cd727a0e40a334495747eff9b448",
+    "step41-release-inventory.json": "4551a1010866639812e224f3abde2b6d06a3e8b5a6c13d8e73b13ee6b7ebc341",
+    "step41-release-junit.xml": "bf639020a128686d60c58395725fe9653875cb9e19d2cb809085b736073b768a",
+    "step41-release-tests.txt": "8186767220ed8397fb0de06a16fbbc8531a300c51d5d755f008e0497c37fed32",
+    "step41-release-frontend-1m.txt": "19967c99028f537fc17d879c2e0c6a142d4b7b8c8d19550179b2d7df58c1e2e6",
+    "step41-release-semantic-depth-1m.txt": "84db084b1ba17511088ebf3dbfc4ed10ae87384b5b9c22796e86b5fee3470def",
+    "step41-release-native-workloads.txt": "881d8c00356716fd861c83eae17ad99bb1be7f5cf262cd075ba8acbcdbd61e18",
+    "step41-san-commands.json": "178e4cef12e901df08139c5b5c122025f87f6d87e370d4f3483b2d70a4cd4f38",
+    "step41-san-inventory.json": "08fe075b311012b9ddeff2f27f4695a982343da87ecb315a5433634de0e193ca"
+  }
+}

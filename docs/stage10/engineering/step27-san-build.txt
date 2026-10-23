@@ -1,0 +1,60 @@
+[ 20%] Built target void_native_fixture
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_zone_objects
+[ 40%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 60%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[ 80%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:25:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc

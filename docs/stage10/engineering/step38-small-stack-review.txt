@@ -1,0 +1,4 @@
+Deep receiver chains: bounded stack, nesting location and later error verified
+Numeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget
+String index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget
+Recursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified

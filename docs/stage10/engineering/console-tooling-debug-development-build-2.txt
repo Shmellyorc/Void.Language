@@ -1,0 +1,28 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 33%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2618:59: error: use of undeclared identifier 'count'; did you mean 'std::count'?
+ 2618 |                 out.active_parameter=out.active_parameter<count?0:out.active_parameter-count+1;
+      |                                                           ^~~~~
+      |                                                           std::count
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_algo.h:4046:5: note: 'std::count' declared here
+ 4046 |     count(_InputIterator __first, _InputIterator __last, const _Tp& __value)
+      |     ^
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2618:59: error: reference to overloaded function could not be resolved; did you mean to call it?
+ 2618 |                 out.active_parameter=out.active_parameter<count?0:out.active_parameter-count+1;
+      |                                                           ^~~~~
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_algo.h:4046:5: note: possible target for call
+ 4046 |     count(_InputIterator __first, _InputIterator __last, const _Tp& __value)
+      |     ^
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2618:88: error: use of undeclared identifier 'count'
+ 2618 |                 out.active_parameter=out.active_parameter<count?0:out.active_parameter-count+1;
+      |                                                                                        ^
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2664:51: error: use of undeclared identifier 'public_signature'
+ 2664 |         unit.builtins.at(target.symbol).signature=public_signature;
+      |                                                   ^
+4 errors generated.
+gmake[3]: *** [CMakeFiles/void_core.dir/build.make:93: CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:1771: CMakeFiles/void_core.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:1943: CMakeFiles/voidls.dir/rule] Error 2
+gmake: *** [Makefile:349: voidls] Error 2

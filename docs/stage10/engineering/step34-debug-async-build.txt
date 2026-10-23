@@ -1,0 +1,17 @@
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/parallel.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/ir.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifecycle.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifetime.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_async_tests
+[100%] Built target void_async_tests

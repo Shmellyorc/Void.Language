@@ -1,0 +1,77 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/array.cpp:66:245: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+   66 |             else if(f.kind==15) {if(!f.target)throw std::invalid_argument("missing nested list type");node=SchemaGrowable{f.target,f.nullable!=0};headers.push_back({f.target,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}});}
+      |                                                                                                                                                                                                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/array.cpp:67:290: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+   67 |             else if(f.kind==16) {if(!f.target)throw std::invalid_argument("missing dictionary type");node=SchemaManaged{f.target,f.nullable!=0};headers.push_back({f.target,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}});}
+      |                                                                                                                                                                                                                                                                                                  ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/array.cpp:83:138: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+   83 |         if(!type) {Native native(*this);NominalDescriptor spec{key,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}};admit_types({&spec,1});type=descriptor(key);}
+      |                                                                                                                                          ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/dictionary.cpp:25:187: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+   25 |     if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
+      |                                                                                                                                                                                           ^
+1 warning generated.
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+3 warnings generated.
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/gc_schema.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/heap.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/abi.cpp:193:74: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+  193 |             vd::NominalDescriptor d{r.identity,r.base,r.shape,{r.size,{}}};
+      |                                                                          ^
+1 warning generated.
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[ 50%] Linking CXX static library libvoid_runtime.a
+[ 50%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:22:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:382:95: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+  382 |         if(host_catalog) { NominalDescriptor d{key,base ? base->identity : "",shape,{bytes,{}}};d.dictionary_key_schema=key_schema;d.dictionary_key_forbidden=key_forbidden;d.layout.references.assign(offsets.begin(),offsets.end());host_catalog->push_back(std::move(d)); }
+      |                                                                                               ^
+2 warnings generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_operator_keys.dir/tests/stage10/operator_keys.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_keys.cpp:14:343: error: no member named 'source' in 'vd::RelatedLocation'
+   14 | void reject(const std::string& source,bool equality=true){auto result=vd::analyze_source({"/keys.void",source});check(!result.succeeded(),"ineligible key accepted: "+source);if(equality){bool found=false;for(const auto& d:result.diagnostics)if(d.description.find("custom operator ==")!=std::string::npos){for(const auto& r:d.related)found|=r.source.source->text().substr(r.source.begin,r.source.end-r.source.begin)=="==";}check(found,"missing equality declaration diagnostic: "+source);}}
+      |                                                                                                                                                                                                                                                                                                                                                     ~ ^
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_keys.cpp:14:374: error: no member named 'source' in 'vd::RelatedLocation'
+   14 | void reject(const std::string& source,bool equality=true){auto result=vd::analyze_source({"/keys.void",source});check(!result.succeeded(),"ineligible key accepted: "+source);if(equality){bool found=false;for(const auto& d:result.diagnostics)if(d.description.find("custom operator ==")!=std::string::npos){for(const auto& r:d.related)found|=r.source.source->text().substr(r.source.begin,r.source.end-r.source.begin)=="==";}check(found,"missing equality declaration diagnostic: "+source);}}
+      |                                                                                                                                                                                                                                                                                                                                                                                    ~ ^
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_keys.cpp:14:389: error: no member named 'source' in 'vd::RelatedLocation'
+   14 | void reject(const std::string& source,bool equality=true){auto result=vd::analyze_source({"/keys.void",source});check(!result.succeeded(),"ineligible key accepted: "+source);if(equality){bool found=false;for(const auto& d:result.diagnostics)if(d.description.find("custom operator ==")!=std::string::npos){for(const auto& r:d.related)found|=r.source.source->text().substr(r.source.begin,r.source.end-r.source.begin)=="==";}check(found,"missing equality declaration diagnostic: "+source);}}
+      |                                                                                                                                                                                                                                                                                                                                                                                                   ~ ^
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_keys.cpp:14:402: error: no member named 'source' in 'vd::RelatedLocation'
+   14 | void reject(const std::string& source,bool equality=true){auto result=vd::analyze_source({"/keys.void",source});check(!result.succeeded(),"ineligible key accepted: "+source);if(equality){bool found=false;for(const auto& d:result.diagnostics)if(d.description.find("custom operator ==")!=std::string::npos){for(const auto& r:d.related)found|=r.source.source->text().substr(r.source.begin,r.source.end-r.source.begin)=="==";}check(found,"missing equality declaration diagnostic: "+source);}}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                ~ ^
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_keys.cpp:49:60: warning: missing field 'dictionary_key_schema' initializer [-Wmissing-field-initializers]
+   49 |     vd::NominalDescriptor policy{"custom","","shape",{4,{}}};policy.dictionary_key_schema="custom-key";policy.dictionary_key_forbidden=true;
+      |                                                            ^
+1 warning and 4 errors generated.
+gmake[3]: *** [CMakeFiles/void_operator_keys.dir/build.make:79: CMakeFiles/void_operator_keys.dir/tests/stage10/operator_keys.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:2985: CMakeFiles/void_operator_keys.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2992: CMakeFiles/void_operator_keys.dir/rule] Error 2
+gmake: *** [Makefile:778: void_operator_keys] Error 2

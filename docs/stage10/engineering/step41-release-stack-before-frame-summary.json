@@ -1,0 +1,18 @@
+[
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics10expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "allocation": "   bd40a:\t48 81 ec 68 01 00 00 \tsub    $0x168,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics15enum_expressionERNS0_4ExprEb",
+    "allocation": "  13c01a:\t48 81 ec 68 0f 00 00 \tsub    $0xf68,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics15expression_implERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "allocation": "   be31a:\t48 81 ec 38 10 00 00 \tsub    $0x1038,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics17method_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "allocation": "   dc00a:\t48 81 ec 28 03 00 00 \tsub    $0x328,%rsp"
+  }
+]

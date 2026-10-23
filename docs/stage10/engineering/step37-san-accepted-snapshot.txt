@@ -1,0 +1,33 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start   1: stage10_operator_reload
+ 1/14 Test   #1: stage10_operator_reload ..........   Passed   18.17 sec
+      Start   2: stage10_operator_keys
+ 2/14 Test   #2: stage10_operator_keys ............   Passed    0.79 sec
+      Start   3: stage10_operator_resolution
+ 3/14 Test   #3: stage10_operator_resolution ......   Passed    2.87 sec
+      Start   4: stage10_operator_declarations
+ 4/14 Test   #4: stage10_operator_declarations ....   Passed    1.58 sec
+      Start   5: stage10_display_reload
+ 5/14 Test   #5: stage10_display_reload ...........   Passed    0.98 sec
+      Start   6: stage10_temporal_ir
+ 6/14 Test   #6: stage10_temporal_ir ..............   Passed    3.84 sec
+      Start  30: debug_cache
+ 7/14 Test  #30: debug_cache ......................   Passed    3.22 sec
+      Start  31: debug_cache_processes
+ 8/14 Test  #31: debug_cache_processes ............   Passed   11.59 sec
+      Start  80: stage10_operator_compounds
+ 9/14 Test  #80: stage10_operator_compounds .......   Passed    9.81 sec
+      Start  81: stage10_operator_integration
+10/14 Test  #81: stage10_operator_integration .....   Passed    5.27 sec
+      Start 146: sessions
+11/14 Test #146: sessions .........................   Passed    0.24 sec
+      Start 147: tooling
+12/14 Test #147: tooling ..........................   Passed    0.66 sec
+      Start 148: analysis
+13/14 Test #148: analysis .........................   Passed    1.13 sec
+      Start 163: stage10_operators_aot
+14/14 Test #163: stage10_operators_aot ............   Passed   79.53 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) = 139.70 sec

@@ -1,0 +1,8 @@
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 276, in <module>
+    check(set(items) == {"<12",">12","^12"}, items)
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 126, in check
+    assert value, why
+           ^^^^^
+AssertionError: {}

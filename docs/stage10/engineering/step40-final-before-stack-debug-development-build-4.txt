@@ -1,0 +1,28 @@
+-- VOID LLVM: 19.1.7 at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (9.4s)
+-- Generating done (3.4s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 75%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source
+[  0%] Built target void_zone_objects
+[ 16%] Built target void_native_test_fixture
+[ 16%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 50%] Built target void_managed_test_abi
+[ 66%] Built target void_core
+[ 83%] Built target void_runtime
+[ 83%] Built target void_llvm
+[ 83%] Building CXX object CMakeFiles/void_operator_integration.dir/tests/stage10/operator_integration.cpp.o
+[ 83%] Linking CXX executable void_operator_integration
+[100%] Built target void_operator_integration

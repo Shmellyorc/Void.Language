@@ -1,0 +1,56 @@
+use console
+private func name(value: key) -> string:
+    match value:
+        key.character:
+            return "character"
+        key.enter:
+            return "enter"
+        key.tab:
+            return "tab"
+        key.backspace:
+            return "backspace"
+        key.escape:
+            return "escape"
+        key.up:
+            return "up"
+        key.f12:
+            return "f12"
+        _:
+            return "unknown"
+func main():
+    var caps = console.stdin.capabilities()
+    print("caps", caps.key_input, caps.input_modes)
+    match console.stdin.begin_mode(echo = false, line_input = false, control_c_as_input = true):
+        Err(var error):
+            print("mode", error.message)
+            match console.stdin.read_key(timeout_ms = 0):
+                Err(var reason):
+                    print("key", reason.message)
+                _:
+                    print("bad key")
+            match console.stdin.key_available():
+                Err(var reason):
+                    print("available", reason.message)
+                _:
+                    print("bad available")
+        Ok(var session):
+            with session:
+                match console.stdin.key_available():
+                    Ok(var available):
+                        print("available", available)
+                    _:
+                        print("bad availability")
+                print("READY", flush = true)
+                var count = 0
+                for count < 10:
+                    match console.stdin.read_key(echo = true, timeout_ms = 2000):
+                        Ok(var pressed):
+                            print(name(pressed.key), pressed.character, pressed.bytes.count, pressed.modifiers_known, pressed.key_down_known, pressed.repeat_count)
+                        Err(var error):
+                            print("error", error.message)
+                    count += 1
+            match session.close():
+                Err(var error):
+                    print("closed", error.message)
+                _:
+                    print("bad close")

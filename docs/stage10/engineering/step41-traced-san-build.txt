@@ -1,0 +1,114 @@
+[  0%] Built target void_zone_objects
+[  1%] Built target void_format_objects
+[  1%] Built target void_native_fixture
+[  1%] Built target void_runtime_generated_abi
+[  2%] Built target void_managed_test_abi
+[  2%] Built target void_string_test_abi
+[  2%] Built target native_fixture
+[  3%] Built target void_native_test_fixture
+[  3%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  4%] Built target void_runtime
+[  4%] Built target void_temporal
+[  4%] Built target void_format_numeric
+[  4%] Built target void_format_zones
+[  4%] Built target void_gc_buffers
+[  4%] Built target void_gc_schemas
+[  4%] Built target void_runtime_console
+[  4%] Built target void_runtime_console_transfers
+[  4%] Built target void_runtime_console_keyboard
+[  5%] Built target void_runtime_console_terminal
+[  5%] Built target void_runtime_console_wide
+[  5%] Built target void_runtime_console_input
+[  5%] Built target void_runtime_tests
+[  5%] Built target void_runtime_failures
+[  5%] Built target void_runtime_invariants
+[  5%] Linking CXX static library libvoid_core.a
+[  6%] Built target void_core
+[  6%] Built target void_lsp
+[  6%] Built target void_llvm
+[  6%] Linking CXX executable void_arrays_foundation
+[  6%] Linking CXX executable void_lsp_tests
+[  6%] Built target void_lsp_tests
+[  6%] Linking CXX executable void_operator_compounds
+[  6%] Built target void_arrays_foundation
+[  6%] Linking CXX executable void_console_source
+[  6%] Built target void_operator_compounds
+[  6%] Linking CXX executable void_operator_integration
+[  6%] Built target void_console_source
+[  6%] Linking CXX executable void_tests
+[  7%] Built target void_operator_integration
+[  7%] Linking CXX executable void_sessions_example
+[  8%] Built target void_tests
+[  8%] Linking CXX executable void_tooling_example
+[  9%] Built target void_sessions_example
+[ 10%] Linking CXX executable voidls
+[ 10%] Built target void_tooling_example
+[ 10%] Built target voidc_objects
+[ 10%] Linking CXX executable void_operator_keys
+[ 10%] Built target voidls
+[ 10%] Linking CXX executable void_operator_resolution
+[ 10%] Built target void_operator_resolution
+[ 10%] Built target void_operator_keys
+[ 10%] Linking CXX executable void_operator_declarations
+[ 10%] Linking CXX executable void_source_formatting
+[ 10%] Built target void_source_formatting
+[ 10%] Linking CXX executable void_stage10_tooling
+[ 10%] Built target void_operator_declarations
+[ 10%] Linking CXX executable void_display_reload
+[ 10%] Built target void_stage10_tooling
+[ 10%] Linking CXX executable void_temporal_ir
+[ 10%] Built target void_display_reload
+[ 10%] Linking CXX executable void_stage10_hooks
+[ 10%] Built target void_temporal_ir
+[ 10%] Linking CXX executable void_stage10_interpolation
+[ 10%] Built target void_stage10_hooks
+[ 10%] Linking CXX executable void_stage10_conversion
+[ 11%] Built target void_stage10_interpolation
+[ 11%] Linking CXX executable void_stage10_fields
+[ 11%] Built target void_stage10_conversion
+[ 11%] Linking CXX executable void_runtime_generated
+[ 11%] Built target void_stage10_fields
+[ 11%] Linking CXX executable void_fixed_arrays_tests
+[ 11%] Built target void_runtime_generated
+[ 11%] Linking CXX executable void_growable_arrays_tests
+[ 11%] Built target void_fixed_arrays_tests
+[ 11%] Linking CXX executable void_arrays_source
+[ 11%] Built target void_arrays_source
+[ 12%] Linking CXX executable void_generics_tests
+[ 12%] Built target void_growable_arrays_tests
+[ 12%] Linking CXX executable void_collections_tests
+[ 12%] Built target void_generics_tests
+[ 12%] Linking CXX executable void_dictionaries_tests
+[ 12%] Built target void_collections_tests
+[ 12%] Linking CXX executable void_properties_tests
+[ 12%] Built target void_dictionaries_tests
+[ 12%] Linking CXX executable void_patterns_tests
+[ 12%] Built target void_properties_tests
+[ 12%] Linking CXX executable void_advanced_tests
+[ 13%] Built target void_patterns_tests
+[ 13%] Linking CXX executable void_managed_tests
+[ 13%] Built target void_advanced_tests
+[ 13%] Linking CXX executable void_managed_initialization_tests
+[ 13%] Built target void_managed_tests
+[ 13%] Linking CXX executable void_reference_values_tests
+[ 13%] Built target void_managed_initialization_tests
+[ 13%] Linking CXX executable void_composition_tests
+[ 13%] Built target void_reference_values_tests
+[ 13%] Linking CXX executable void_inheritance_tests
+[ 13%] Built target void_composition_tests
+[ 13%] Linking CXX executable void_interfaces_tests
+[ 13%] Built target void_interfaces_tests
+[ 13%] Linking CXX executable void_strings_tests
+[ 13%] Built target void_inheritance_tests
+[ 13%] Linking CXX executable void_runtime_callbacks
+[ 14%] Built target void_strings_tests
+[ 14%] Generating runtime-normal.o
+==1592==LeakSanitizer has encountered a fatal error.
+==1592==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==1592==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+gmake[2]: *** [CMakeFiles/void_runtime_aot_normal.dir/build.make:74: runtime-normal.o] Aborted
+gmake[2]: *** Deleting file 'runtime-normal.o'
+gmake[1]: *** [CMakeFiles/Makefile2:16081: CMakeFiles/void_runtime_aot_normal.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+[ 14%] Built target void_runtime_callbacks
+gmake: *** [Makefile:146: all] Error 2

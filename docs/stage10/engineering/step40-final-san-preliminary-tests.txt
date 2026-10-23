@@ -1,0 +1,3 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start 178: stage10_operators_aot
+      Start 177: stage10_console_aot

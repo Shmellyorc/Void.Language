@@ -1,0 +1,30 @@
+[
+  {
+    "configuration": "Release",
+    "calls": 124,
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/chain-124.void"
+    ],
+    "stack_bytes": 1048576,
+    "returncode": 0,
+    "seconds": 0.009737834916450083,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "configuration": "Release",
+    "calls": 400,
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/chain-400.void"
+    ],
+    "stack_bytes": 1048576,
+    "returncode": 1,
+    "seconds": 0.020324055920355022,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/chain-400.void:8:1028: error: Source nesting limit exceeded.\n    code: VOID1107\n\n 8 |     return point().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().same().inspect()\n   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^^^^\n    Module: /chain-400.void\n    Hint: Split deeply nested expressions or blocks into smaller functions.\n\n/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/chain-400.void:10:5: error: Unknown function 'missing'.\n    code: VOID2003\n\n 10 |     missing()\n    |     ^^^^^^^\n    Module: /chain-400.void\n    Hint: Declare it here or import its declaring file; imports are not transitive exports.\n\n"
+  }
+]

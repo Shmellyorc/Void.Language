@@ -1,0 +1,19 @@
+{
+  "CMakeLists.txt": "aedc89f93f1197975b933567f31229fea6a7a14bc9cd557f3d5c558f340929f9",
+  "editors/vim/syntax/void.vim": "bcb42f40131ff5739f9a1c3c5d9039162b3a2cf0729532749c97869c1b5c5aee",
+  "editors/vscode/src/test/host.ts": "fb263e659baeb8180842bc0f4ed8e791a94c74963e8fdd936d966823d390dcc8",
+  "editors/vscode/src/test/runHost.ts": "3521e6990db49f232cffae1e17a340053a14fa9411489b6f1859ef056e69fc4a",
+  "editors/vscode/syntaxes/void.tmLanguage.json": "09ec6ec28a1c7a2d30af5445033c4c6c0c2c926bec53024d9549eefc65c462dd",
+  "include/void/frontend.hpp": "5dc518cfb5b64916a64f9a1e6d3aceffaac8389c463b0962ed9acfa947fa12ee",
+  "include/void/tooling.hpp": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba",
+  "src/frontend/compiler.cpp": "26645205bda321015c6405cfdeb58c665a4393e26ddd61c0990ef2b1c1955e74",
+  "src/frontend/generic_tooling.inc": "95897a4e2ff9c0b34a89a0549fda4bd0c47fe821bcca9a930a8e2eb4f9720798",
+  "src/frontend/tooling.cpp": "7bae9162ea7aab48d88447e978f8d309e3779f6149c276de3f42ac3906d8fdbb",
+  "src/lsp/main.cpp": "048d2b5504ac97289cf2c0875cc269fd23c9cb93bca50f05facb163955a61119",
+  "tests/stage10/editor.lua": "7281620f9a3653069267bd2ece727931acffe2b5d206290efa728f01ae744f78",
+  "tests/stage10/editor.vim": "04c432c068fe40f8bdceb8f5999f61192f6ac186a35ecf7e2162d4907846e664",
+  "tests/stage10/lsp_display.py": "0471ea48389944f8c2b2a3cbb2477ee1f2a3a6fe0469aa43547b7b85cb872eaa",
+  "tests/stage10/lsp_fields.py": "b2e07c65508c3481afeacd2688d60f208ada315da31b5df0d809f0a548b6ed70",
+  "tests/stage10/lsp_intelligence.py": "efdf2e130e9b0ba97055dce25237170f79c3a04deb19351ed921db59194ce688",
+  "tests/stage10/tooling.cpp": "3928e3c38f051993bbdeff65c6ab306c4625b761ec19c7e531051e2458f73658"
+}

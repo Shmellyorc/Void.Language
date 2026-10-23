@@ -1,0 +1,15 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "build/ci-official-debug",
+    "-R",
+    "^(strings_source|frontend|growable_arrays_cli)$",
+    "--output-on-failure",
+    "-j",
+    "2"
+  ],
+  "returncode": 0,
+  "seconds": 27.385373241035268,
+  "scope": "All three corrected legacy harnesses before final unfiltered runs; same compiler/Runtime and tighter rejection/error-location checks."
+}

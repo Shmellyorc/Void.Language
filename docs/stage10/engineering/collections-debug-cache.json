@@ -1,0 +1,80 @@
+{
+  "configuration": "debug",
+  "records": [
+    {
+      "case": "cold",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"old\"\nprint([item(n = 1)])\n",
+      "source_sha256": "537f107c77028223ab6191b6d394403889d4641d3640bc43377343032860781e",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-collections-cache-v4mvzgyb/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b6f6c645d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 0.23842639999929816
+    },
+    {
+      "case": "hit",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"old\"\nprint([item(n = 1)])\n",
+      "source_sha256": "537f107c77028223ab6191b6d394403889d4641d3640bc43377343032860781e",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-collections-cache-v4mvzgyb/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b6f6c645d0a",
+      "stderr_hex": "44656275672063616368653a206869740a",
+      "seconds": 0.024923164979554713
+    },
+    {
+      "case": "corrupt",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"old\"\nprint([item(n = 1)])\n",
+      "source_sha256": "537f107c77028223ab6191b6d394403889d4641d3640bc43377343032860781e",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-collections-cache-v4mvzgyb/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b6f6c645d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 0.23375253204721957
+    },
+    {
+      "case": "hook-body",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"new\"\nprint([item(n = 1)])\n",
+      "source_sha256": "5f8ab7a94854fb8f29c13e3c876e2a7a01e186574854a219891799dec6ec7dba",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-collections-cache-v4mvzgyb/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b6e65775d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 0.23170842695981264
+    },
+    {
+      "case": "specification",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"new\"\nprint(\"{[item(n = 1)]:>8}\")\n",
+      "source_sha256": "7249b16a1e9edec0dbc1852522288a3ac5cb70f5dca3d0a23c8a413d94eef1cc",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-collections-cache-v4mvzgyb/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "2020205b6e65775d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 0.33856609906069934
+    }
+  ]
+}

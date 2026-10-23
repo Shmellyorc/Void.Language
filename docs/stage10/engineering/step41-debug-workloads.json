@@ -1,0 +1,93 @@
+{
+  "configuration": "Debug",
+  "clock": "Python perf_counter process wall; C++ steady_clock LLVM compilation/invocation",
+  "memory": "JIT getrusage process peak RSS includes analysis/compiler/Runtime; not incremental workload memory",
+  "measurements": [
+    {
+      "result": 270000,
+      "compile_ms": 3072.74,
+      "invoke_ms": 774.711,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 99740,
+      "engine": "JIT",
+      "optimization": "normal",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "wall_seconds": 4.087026820052415
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "normal",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "result": 270000,
+      "wall_seconds": 0.7506182710640132,
+      "memory": "not sampled by this process runner"
+    },
+    {
+      "result": 1000003,
+      "compile_ms": 3071.09,
+      "invoke_ms": 25549,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 101220,
+      "engine": "JIT",
+      "optimization": "normal",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "wall_seconds": 28.86238218995277
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "normal",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "result": 1000003,
+      "wall_seconds": 25.417892212048173,
+      "memory": "not sampled by this process runner"
+    },
+    {
+      "result": 270000,
+      "compile_ms": 5846.87,
+      "invoke_ms": 807.049,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 109496,
+      "engine": "JIT",
+      "optimization": "optimized",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "wall_seconds": 6.894396670977585
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "optimized",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "result": 270000,
+      "wall_seconds": 0.7826596159720793,
+      "memory": "not sampled by this process runner"
+    },
+    {
+      "result": 1000003,
+      "compile_ms": 5868.06,
+      "invoke_ms": 25476.7,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 107568,
+      "engine": "JIT",
+      "optimization": "optimized",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "wall_seconds": 31.580600654007867
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "optimized",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "result": 1000003,
+      "wall_seconds": 25.15173462696839,
+      "memory": "not sampled by this process runner"
+    }
+  ],
+  "original_harness_configuration_label": "Debug",
+  "label_note": "Existing process harness labels every nonsanitizer configuration Debug. This report uses actual CMake configuration; raw output and exact compile flags are preserved."
+}

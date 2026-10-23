@@ -1,0 +1,62 @@
+use time
+value struct item<t>:
+    private const value: t
+func (self item<t>) init(n: t):
+    self.value = n
+func (self item<t>) string() -> string:
+    return "q:{self.value:000}"
+enum shade:
+    plain
+    pair(n: i32, text: string)
+    items(values: [item<i32>])
+enum branch:
+    leaf
+    nested(values: [branch])
+struct unused:
+    n: i32
+func (self unused) string() -> string:
+    return string(1 / self.n)
+struct counted:
+    action: func() -> string
+func (self counted) string() -> string:
+    return self.action()
+enum ordered:
+    pair(first: counted, second: counted)
+func main():
+    print(shade.plain, shade.pair(7, "é\0🎮"))
+    var successful: result<item<i32>, string> = Ok(item<i32>(n = 7))
+    var failure: result<item<i32>, string> = Err("é\0🎮")
+    print(successful, failure)
+    print("{successful}", string(failure))
+    if format(successful, ">12") is Ok(var text):
+        print(text)
+    var pattern = "000"
+    if format(failure, pattern) is Err(var reason):
+        print("invalid pattern")
+    var absent: result<unused?, string> = Ok(null)
+    var active: result<unused, string> = Err("active")
+    print(absent, active)
+    var fixed: [result<item<i32>, string>, 2] = [successful, failure]
+    print({"k": fixed})
+    var nested: result<result<item<i32>, string>, i32> = Ok(successful)
+    print(nested)
+    print(shade.items([item<i32>(n = 2), item<i32>(n = 3)]))
+    var cycle: [branch] = []
+    cycle.push(branch.nested(cycle))
+    print(cycle)
+    var shared = [branch.leaf]
+    print([branch.nested(shared), branch.nested(shared)])
+    print(make_date(2026, 10, 23))
+    shared.push(branch.leaf)
+    print("alias", shared.count)
+    var calls: [i32] = []
+    var first = func() -> string:
+        calls.push(1)
+        return "A"
+    var second = func() -> string:
+        calls.push(2)
+        return "B"
+    var both: result<ordered, string> = Ok(ordered.pair(counted(action = first), counted(action = second)))
+    print(both, calls)
+    var inactive: result<i32, counted> = Ok(7)
+    print(inactive, calls)

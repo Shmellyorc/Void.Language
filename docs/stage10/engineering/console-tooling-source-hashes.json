@@ -1,0 +1,21 @@
+{
+  "docs/DEVELOPMENT_STRATEGY.md": "055d2f6bcfc486430fca758e4be1199e25b8f4fecbb5d91db4585730e1662855",
+  "docs/WORK_LOG.md": "972b12e8908aaa18d37c26ff13df3306cbbd49a0e9e27cab86dfd319efa5490f",
+  "docs/stage10/CONSOLE_IO.md": "8cd6f48e21e24880fd689960f41c900e157f3d357497807c613957178f3d3bed",
+  "docs/stage10/DISPLAY_FORMATTING.md": "881e9d6f03e5ffd8e73a4c9f2e1cf310090fc51a796dea6faa50633d2eb75e07",
+  "docs/stage10/EVIDENCE.md": "9da5b6c613f66a413d8a87e6c9ba2df85e5529a971604e0ae8dcbd420e1f3587",
+  "docs/stage10/IMPLEMENTATION.md": "2e65b0523ed3aae7e17de037f10bee2f3a7262dcfb75c483796c82a79af1552b",
+  "docs/stage10/TEST_PLAN.md": "3a10a16c541734a5c79ddd1b588a59e2b7287069fe45b0d3c3fd29e3913ffbf9",
+  "editors/vscode/src/test/host.ts": "5fbeaf1f99b3e9d6a6ad1c3bce416607ce96e22dfc2cf727c297249efdee340a",
+  "editors/vscode/src/test/runHost.ts": "f21e3b54fe570b0e477e780ee9e59489ebca06a93fc20f615cd5888fb615b6de",
+  "src/frontend/compiler.cpp": "e9a8cb2476f95281b5be46931b3e2e2a893c148d35603027811d66ceeb22f9a7",
+  "src/frontend/pattern_parser.inc": "5b9a0af017b9702e82fbebc0bd0799c620174d23a7cf6296141f96d67c0f8951",
+  "src/frontend/pattern_semantics.inc": "cff3689f716b295aa588989022c73d7f3c6531e5b23d170effef3fe1985255c4",
+  "src/lsp/main.cpp": "e146c937214864d97daa7f17d74e35597014a1d165fff391067dda7a78cc615f",
+  "stdlib/console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385",
+  "tests/editors/neovim.lua": "4934ee892321639e2c480317c94c46535bfc3f6f2d7b73c6f6257d38e6598c3f",
+  "tests/editors/run.py": "d143bf4a3663643f9d953a719b4e897a3af85e8d3e146fc1a6de66e40e46530b",
+  "tests/editors/vim.vim": "362098626c2476f07a50716a9c18325a7e2a09b2ed671ef4229a4506f835f8e9",
+  "tests/stage10/lsp_display.py": "cd51be57f9e73176241dd8287ff501fe10867c58590783b1ad74dffc38263c19",
+  "tests/stage10/tooling.cpp": "b6586319a863e8d2b639f725e5ceb2d7c36d9dca13837784119a797d82aa9254"
+}

@@ -1,0 +1,20 @@
+{
+  "status": "Repair verified by unchanged Release1MiB focused gates and all three final unfiltered configurations",
+  "root_cause": "Release inlined result_expression, including its large Function editor-signature temporary, into expression_impl. This enlarged every recursive expression dispatcher frame even for ordinary receiver chains that never construct a result. The unchanged256-level semantic guard could not be reached within1MiB. enum_expression was the transient top crash site, not the recursive frame growth source.",
+  "controlled_before": "step41-release-stack-before-cases.json",
+  "controlled_after": "step41-release-stack-after-cases.json",
+  "frame_before": "step41-release-stack-before-frame-summary.json",
+  "frame_after": "step41-release-stack-after-prologues.json",
+  "dispatcher_stack_reservation_before": 4152,
+  "dispatcher_stack_reservation_after": 1088,
+  "reduction_per_recursive_dispatcher": 3064,
+  "frame_scope": "x86_64 pinned Clang19.1.7 Release-O3 disassembly sub %rsp reservations; excludes register pushes, return addresses, caller arguments and transient callees. Not a whole-process stack measurement.",
+  "change": "Apply existing VOID_SEMANTIC_HANDLER(noinline) to result_expression, with explanatory comment. No expression/enum behavior, guard, stack limit, source diagnostic, compiler optimization flag or test changes.",
+  "source": "src/frontend/compiler.cpp",
+  "source_sha256": "9a54df7f1778446fc3d593829978b4180df2ffd4a55f92ebaae156fc37f81d32",
+  "Boss_host_backtrace": "step41-boss-native-backtrace-full.txt",
+  "Boss_log_sha256": "62894b38aa586fe0274f59274093f3354cb457c93be7076386e3f36624811723",
+  "worker_debugger": "Not retried. Prior denied launch preserved; Boss supplied native evidence and explicitly authorized continued repair without worker debugging.",
+  "direct_semantic_probe": "step41-release-stack-semantic-depth-1m-direct.txt",
+  "pending": "Independent Wrench review; native Windows/macOS and Steps42\u201344 remain separate."
+}

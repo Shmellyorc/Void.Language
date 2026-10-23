@@ -1,0 +1,7 @@
+{
+  "stdlib/time.void": {
+    "original": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+    "snapshot": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+    "matches_step37_baseline": true
+  }
+}

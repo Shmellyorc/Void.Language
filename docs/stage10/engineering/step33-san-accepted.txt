@@ -1,0 +1,11 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+    Start   1: stage10_operator_resolution
+1/3 Test   #1: stage10_operator_resolution ......   Passed    2.61 sec
+    Start   2: stage10_operator_declarations
+2/3 Test   #2: stage10_operator_declarations ....   Passed    1.41 sec
+    Start 159: stage10_operators_aot
+3/3 Test #159: stage10_operators_aot ............   Passed    3.12 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   7.15 sec

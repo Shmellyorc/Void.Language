@@ -1,0 +1,14 @@
+
+> void-language@0.1.0 test
+> npm run build && node --test out/test/config.test.js
+
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+src/test/host.ts(208,15): error TS2451: Cannot redeclare block-scoped variable 'formatting'.
+src/test/host.ts(284,15): error TS2451: Cannot redeclare block-scoped variable 'formatting'.

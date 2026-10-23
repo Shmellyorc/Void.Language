@@ -1,0 +1,340 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 31,
+  "increment_status": "Implemented applicable integration acceptance; focused Linux Debug and strict ASan/UBSan/leak passed. Wrench/native-platform/final-stage acceptance pending.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Two Runtime contexts share whole stdout/stderr/presentation records under one existing gate even when every native transfer accepts one byte; 256 exact Unicode records.",
+    "Barrier-controlled nested mode/key ownership rejects foreign line/availability/cursor/mode operations without bytes, permits independent output and Runtime close, retains frozen GC roots and entered requests, restores nested state after cancellation, and preserves queued CRLF across subsequent Runtime lifetime.",
+    "Real Linux PTY uses three Runtime contexts over process Streams, exact Unicode stdout/stderr records, forced GC, nested modes, foreign-owner rejection and mixed key/line reads; serialized original/active/restored termios state matches exactly.",
+    "Normal/O2 source generation replacement retains blocked code/native leases and roots through cleanup; old/new body results and exact bytes verified, retired generation released after completion.",
+    "Source partial native failure preserves primary native87/cleanup19/completed2, secondary reached-cleanup closed diagnostics; concurrent Runtime.close receives its own restoration89 error and subsequent close retries successfully. Production builds use matching headers/archive.",
+    "Permanent deferred editor-navigation/rename/hover/parameter/return-doc observations recorded with future acceptance obligations; no editor/parser/rename implementation changes."
+  ],
+  "debug": {
+    "passed": 28,
+    "total": 28,
+    "seconds": 341.9,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_display_reload",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_keyboard",
+      "runtime_console_terminal",
+      "runtime_console_native_keyboard",
+      "runtime_console_native_terminal",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "runtime_callbacks",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_console_source",
+      "async_lifecycle",
+      "stage10_console_aot",
+      "application_native_sprint4_host",
+      "application_native_sprint4",
+      "runtime_generated"
+    ],
+    "log": "step31-debug-accepted-tests.txt",
+    "detail": "step31-debug-accepted-detail.txt",
+    "command": "step31-debug-test-command.json",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step31-stdlib-tz01nkzo/stdlib"
+    },
+    "source_assertions": 3234,
+    "foundation_assertions": 347,
+    "key_mode_assertions": 127,
+    "driver_checks": 353,
+    "binary_execution_records": 72,
+    "native_key_PTY_checks": 99,
+    "native_key_process_cases": 9,
+    "shared_native_PTY_runtimes": 3,
+    "native_terminal_checks": 77,
+    "output_records": "step31-debug-outputs.json",
+    "native_key_records": "step31-debug-native-keyboard.json",
+    "native_terminal_records": "step31-debug-native-terminal.json",
+    "production_build": "step31-debug-native-build.json",
+    "build": "step31-debug-acceptance-build.txt",
+    "initial_foundation_assertions": 346,
+    "final_native_supplement": {
+      "passed": 1,
+      "total": 1,
+      "log": "step31-debug-final-gc-tests.txt",
+      "detail": "step31-debug-final-gc-detail.txt",
+      "command": "step31-debug-final-gc-command.json",
+      "reason": "Final deterministic native-only extension collects frozen key roots after close has begun. Only tests/runtime/console.cpp changed; unaffected source/production binaries unchanged."
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 28,
+    "total": 28,
+    "seconds": 352.2,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_display_reload",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_keyboard",
+      "runtime_console_terminal",
+      "runtime_console_native_keyboard",
+      "runtime_console_native_terminal",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "runtime_callbacks",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_console_source",
+      "async_lifecycle",
+      "stage10_console_aot",
+      "application_native_sprint4_host",
+      "application_native_sprint4",
+      "runtime_generated"
+    ],
+    "log": "step31-san-accepted-tests.txt",
+    "detail": "step31-san-accepted-detail.txt",
+    "command": "step31-san-test-command.json",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step31-stdlib-tz01nkzo/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "source_assertions": 3234,
+    "foundation_assertions": 347,
+    "key_mode_assertions": 127,
+    "driver_checks": 353,
+    "binary_execution_records": 72,
+    "native_key_PTY_checks": 99,
+    "native_key_process_cases": 9,
+    "shared_native_PTY_runtimes": 3,
+    "native_terminal_checks": 77,
+    "output_records": "step31-san-outputs.json",
+    "native_key_records": "step31-san-native-keyboard.json",
+    "native_terminal_records": "step31-san-native-terminal.json",
+    "production_build": "step31-san-native-build.json",
+    "build": "step31-san-acceptance-build.txt",
+    "initial_foundation_assertions": 346,
+    "final_native_supplement": {
+      "passed": 1,
+      "total": 1,
+      "log": "step31-san-final-gc-tests.txt",
+      "detail": "step31-san-final-gc-detail.txt",
+      "command": "step31-san-final-gc-command.json",
+      "reason": "Final deterministic native-only extension collects frozen key roots after close has begun. Only tests/runtime/console.cpp changed; unaffected source/production binaries unchanged."
+    }
+  },
+  "production_changes": "None required by the exercised integration; changes are existing regression harness extensions and engineering records.",
+  "development_failures_and_repairs": [
+    {
+      "observation": "Mistyped void_stage10_console target does not exist.",
+      "repair": "Use existing void_console_source.",
+      "evidence": "step31-source-development-build.txt"
+    },
+    {
+      "observation": "New real PTY fixture expected CRLF although the original host ICRNL mapped CR to LF.",
+      "repair": "Explicitly configure host ICRNL/INLCR/IGNCR before capturing original mode; Runtime mode policy unchanged. All old/new byte and exact restoration assertions retained.",
+      "evidence": "step31-pty-development.txt"
+    },
+    {
+      "observation": "New source integration finished its generation/shutdown assertions then attempted a fresh attachment after close: runtime is closing.",
+      "repair": "Remove invalid post-close host attachment; retain pre-close forced collections, post-join thread/drain checks and restoration retry.",
+      "evidence": "step31-source-development.txt"
+    },
+    {
+      "observation": "Initial cmake --build without target began unnecessary broad builds.",
+      "repair": "Intentionally stop broad make invocations; complete bounded target builds before tests. Interrupted logs are not acceptance evidence.",
+      "evidence": [
+        "step31-debug-interrupted-broad-build.txt",
+        "step31-san-interrupted-broad-build.txt"
+      ]
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "Actual native Windows SDK/console/ConPTY and macOS SDK/termios/terminfo execution remain unverified; Linux injected adapters are not native platform passes.",
+    "Fresh Release, console/composite tooling, composite display, complete four-system cross-products and consolidated Stage10 acceptance remain open.",
+    "Boss real VS Code F12/F2/function-hover/raw-doc-tag observations are recorded without reproduced cause. Future methods/fields rename and Returns presentation are proposals, not implemented capabilities."
+  ],
+  "platform_contract": {
+    "POSIX": "Named sequences only from terminfo or its explicitly declared normal ECMA protocol; other sequences return unknown with all bytes. Physical modifiers/key-up remain unknown. Existing OS CR input translation is preserved.",
+    "Windows": "Native ReadConsoleInputW/PeekConsoleInputW plus existing strict UTF16 transcoding/carry. Native ECHO_INPUT/LINE_INPUT restrictions require targeted native acceptance.",
+    "ownership": "Borrowed endpoints unchanged, no hidden tty/handle, no process-wide signal/code-page/descriptor flag changes. Mode state belongs to existing native Session/Streams; managed aliases share one identity.",
+    "failure": "read_key partial/count describes consumed input bytes, including failures during explicit echo. Do not retry a read to repair output. Saved state remains for retry when the OS refuses restoration. Entered uncancellable borrowed syscall and host-lifetime caveats remain.",
+    "embedding": "Context::close and Runtime::close now return console::Error, source-compatible for callers discarding it; embedding callers must rebuild with matching headers/archive and inspect failures when required. No stable old C++ binary ABI claimed."
+  },
+  "dependencies": {
+    "new": "None",
+    "reused": {
+      "new": {
+        "version": "ncurses 6.6.20260608",
+        "abi": "system terminfo (Linux soname 6; Darwin system ncurses fallback)",
+        "loaded_libraries": {
+          "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.6": "01f269b16e2fea55d86ba9e95316a82cc5f0e9e784de8c85d9137c845218fa12"
+        },
+        "license": "MIT/X11 (system ncurses package); no library or database redistribution",
+        "residency": "Process-owned native facility, like ordinary dynamic linkage; per-call TERMINAL instances freed, previous cur_term restored. No global curses cleanup or module unload.",
+        "primary_references": [
+          "https://invisible-island.net/ncurses/man/curs_terminfo.3x.html",
+          "https://invisible-island.net/ncurses/terminfo.src.html",
+          "https://invisible-island.net/xterm/ctlseqs/ctlseqs.html",
+          "https://learn.microsoft.com/en-us/windows/console/console-functions"
+        ]
+      },
+      "pinned_unchanged": {
+        "new": "None",
+        "existing": {
+          "date": {
+            "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+            "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+          },
+          "ryu": {
+            "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+            "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+          },
+          "tzdata2026e": {
+            "revision": "2026e",
+            "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+          }
+        },
+        "licenses": "Unchanged: Ryu Boost 1.0 option, Howard Hinnant date v3.0.3 MIT notices, IANA 2026e public domain; LLVM/Clang 19.1.7 pinned."
+      },
+      "packaging": "No terminfo implementation/database redistribution. Optional system DSO is process native state; text/OS dimensions still function without it. CMake CMAKE_DL_LIBS and production Linux -ldl handle loader symbols. Native executable smoke verifies build packaging."
+    },
+    "licenses": "Existing licenses unchanged; LLVM/Clang19.1.7 remains pinned."
+  },
+  "remaining_stage_obligations": [
+    "Native Windows/macOS, fresh Release/editor acceptance.",
+    "Composite display, later console/composite tooling and full four-system Step40 integration; final Steps41\u201344.",
+    "Complete composite display and revisit console/composite tooling and four-system integration; Steps41\u201344 final/native acceptance and Wrench review."
+  ],
+  "next_source_change": "Remaining composite display (Steps13/16/18): extend src/frontend/compiler.cpp conversion dispatch at current unsupported-collection/enum checks and existing generated display adapters to typed container traversal/shared builder, preserving readonly, effects, roots and recursion handling. Separate later editor-quality authorization; no editor repair in Step31.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "ABI_build_scope": "No production/header/ABI changes in this increment. Rebuilt focused targets and linked production executables against matching current Runtime archive; Step30 close Error return contract retained. Host must join admitted source work before destroying Runtime/code; entered uncancellable borrowed syscall may keep close blocked.",
+  "source_manifests": {
+    "previous": "step30-checkpoint-source-hashes.json",
+    "code_freeze": "step31-code-freeze.json",
+    "initial_acceptance_freeze": "step31-initial-code-freeze.json",
+    "bounded": "step31-source-hashes.json",
+    "cumulative": "source-hashes.json",
+    "preservation": "step31-preservation.json"
+  },
+  "verification_sequence": "Both initial 28-suite passes use step31-initial-code-freeze.json; then only tests/runtime/console.cpp gains an additional simultaneous closing/GC assertion. Rebuild and strict rerun of runtime_console pass 1/1 per configuration with 347 checks; all other frozen source/test hashes and production executable/archive hashes remain unchanged. No unaffected full-suite repetition.",
+  "bounded_files": [
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "tests/runtime/console.cpp",
+    "tests/runtime/console_keyboard.cpp",
+    "tests/runtime/console_keyboard.py",
+    "tests/stage10/console.cpp"
+  ],
+  "build_artifact_hashes": {
+    "debug": {
+      "voidc": "f9ff3cf0d7d0d1a7af995237cfc8ddacf380c9894d7161f134c22d1a3e559dea",
+      "libvoid_runtime.a": "e7e5682220f483195ffd3bd1e24fef843c3bfbdf88b1640499ddac1f9a4a30ca",
+      "void_console_source": "8924a5e733a7864d2abe878d15a72c79814ce44d5eea3fbf9822527e3713d626",
+      "void_runtime_console": "80d4c15252fa093fe9ba1ea389ecbff179038e0dce2c887087de2e23d722cd67",
+      "void_runtime_console_keyboard": "97b5362418830d2b501657ce9f825d1de1362dd7368420411e2b2bf9b6076a83"
+    },
+    "san": {
+      "voidc": "3226f897171a436809710e5acf5fd4796fb3e23a5365fcf4d64c44cadd6ae617",
+      "libvoid_runtime.a": "ac02516e354a7658622552ec33c6c0a1e6a3243858deaee32be5afabe9fd5743",
+      "void_console_source": "6af8cc2031c870077a9bd18f628a025d8609ee10f6b0607eb8b89cc87d34671c",
+      "void_runtime_console": "668b46527b80dd1eb23230baadbb537623eee0bb76f6c3005d4de1d5fd61e6c4",
+      "void_runtime_console_keyboard": "7914c900d2cd9c92dc12df1835d7f17994a8ed1d3c90744f84f39f3cfd7752a8"
+    }
+  },
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "configured_Python": "/home/shmellyorc/.local/bin/python3.11 (3.11.16)",
+    "shell_Python": "3.14.8",
+    "LLVM_Clang": "19.1.7"
+  },
+  "primary_references": [
+    "https://man7.org/linux/man-pages/man3/termios.3.html",
+    "https://learn.microsoft.com/en-us/windows/console/readconsoleinput",
+    "https://learn.microsoft.com/en-us/windows/console/key-event-record-str",
+    "https://learn.microsoft.com/en-us/windows/console/setconsolemode"
+  ],
+  "build_configuration": {
+    "debug": "Linux Debug; pinned LLVM/Clang19.1.7",
+    "strict_sanitizers": "Linux RelWithDebInfo ASan/UBSan with strict leaks and existing RTTI-off vptr exclusion; no new suppression/exclusion",
+    "python": "CMake configured Python3.11.16; native driver executed with that interpreter"
+  },
+  "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "acceptance_artifact_hashes": {
+    "step31-code-freeze.json": "f9b152f4adfe83c1308d691dd2f6b33a8f88243e5793192c4d4852d6762a2fbb",
+    "step31-debug-acceptance-build.txt": "11545162b277a8080570038066ff7c75dda7f337f07c26f0c18cbca6423ae82c",
+    "step31-debug-accepted-detail.txt": "4f0356e02ec06eae35885a37f0fdd5b942eb550a015454999ddc4453e026b960",
+    "step31-debug-accepted-tests.txt": "29b01a139729c06b4f3a84997cfff9fe530bb79beee6b233072b88430759e04f",
+    "step31-debug-build-command.json": "707f3b0cce373c5004e25b43ee9bd597e1c2b6cd3f84a51a0698a8c12b633b40",
+    "step31-debug-development-build.txt": "fd56edad97cc010120bca673a1edb35339e0925599ebca3a1a040dad5dd2390c",
+    "step31-debug-final-gc-build.txt": "69777b10fc0cc50b194d2b593f26108d3eb98d773be2d469223f03ea51addc81",
+    "step31-debug-final-gc-command.json": "cb774cef3d1cdc483d4ce329aebf586be83f8f83aca8e02195f5dc7d5353327f",
+    "step31-debug-final-gc-detail.txt": "2d46ac657ea2be9ade03d5e78f5958b59cd40886c8a8d97f6fd528e577ff28a4",
+    "step31-debug-final-gc-tests.txt": "53f04cf3432feeaaadff4efc4a6e3199f6c9d29c750dfd18870784bf74418f83",
+    "step31-debug-interrupted-broad-build.txt": "e0b7047988f2b4bc58b985d46dd656720d4c1971f43d68f5a9bf2a336bcbd8c6",
+    "step31-debug-native-build.json": "b3d112d96ad51df6a4c116d8ac7a2983c24026ea5c2a82384a80e534dc368c83",
+    "step31-debug-native-keyboard.json": "06b87035f72e2c94dbbf21a6b64a374e9890b6fdfaca3d401337548e095c7f06",
+    "step31-debug-native-terminal.json": "cbcedfe253cacb8bb6264e8e557323f9e9eb93454495cbea38640d714e5b8067",
+    "step31-debug-outputs.json": "5bd65c11b1956c9d02f320a7406f66cadfb8cb5b37b04b8e9816ee3e8ea1c66c",
+    "step31-debug-production-build.txt": "c29736e34d2b85a366904eefaff2d2ec778d352636333e934a435aed539f4be3",
+    "step31-debug-test-command.json": "ca0159d3dc5bd5c55599e3233d258f0d88c052a23215095a007aaf6750ef90d8",
+    "step31-initial-code-freeze.json": "d270e3a1c733701db4888aee51ae802e73aae3b38aa8468632f40a872d3c4097",
+    "step31-keyboard-development-build.txt": "162d5c82c9f065f5bedff9aad82f73b5da0d6c3db8878c4c834f8e9b0d4855c8",
+    "step31-native-development-build-2.txt": "fbd95e830febac2869c31e01fcdb91354f736c72bc27133259f766d700a3026b",
+    "step31-native-development.txt": "66a508c8f31bd534c790535efb0042144ddd2eff7fd43e329c0a73f63d8ea6ac",
+    "step31-preservation.json": "b938f284d394d27cc78c8efdbbfc86794d49267e213f5111d1cff542fc4bba1f",
+    "step31-pty-development-2.txt": "6fc6c31935329f739146cdf4a6441d4be70460f57eb1edc4c00de2dbabe53f37",
+    "step31-pty-development.txt": "b51611623f5c4f60797f63a2a605c0f86e09381167898dfcb6e1eb16a9fbab9d",
+    "step31-san-acceptance-build.txt": "900ed74f71a624c3bc800d896bedfa64b79f9b01e875abd9a456b15431f57386",
+    "step31-san-accepted-detail.txt": "88bf4c101e8217bee47d984b1b496b4a56c8bd87f7270fa9729a8de934a08a09",
+    "step31-san-accepted-tests.txt": "0fb7025b5083a8a0b95b61230af301e17fa98d8ec396331775b3be3d1a066849",
+    "step31-san-build-command.json": "96ec47c81bbd205c4011cf5c071c74121aaf01915350a089a2a7319ca8510421",
+    "step31-san-final-gc-build.txt": "1d072f322ff4afd538ecebf534dd7fd01dc3531f35519ca8d700bff531d710d2",
+    "step31-san-final-gc-command.json": "1e4c95e07aa03799a9a0979d77dbb883918506b94e5f8f6e9eae38566b3bfa4b",
+    "step31-san-final-gc-detail.txt": "616081bee3dafbf6ce467d95f53f2aee450f3ef6c4f783d31de96da668edf3ea",
+    "step31-san-final-gc-tests.txt": "810fc5b5a9939b69c3747b028bd09e2303691dc468c92d19035e24ccc3607ca5",
+    "step31-san-interrupted-broad-build.txt": "6f0c5781cc0c08cdfa37d3b09c15b33e468aaeb37fa67b1d24f3f2b15d9580f7",
+    "step31-san-native-build.json": "49d9cbaa3e2abcee2af9285fb8b0218bad20ff3f01fd8527b7b9cb9b080a09ee",
+    "step31-san-native-keyboard.json": "6f676a1595442515d4b9e6ea926c4c9b45a509a3151012139f9900e348124b1b",
+    "step31-san-native-terminal.json": "bca2a42d6a4685da8b9370de8dd9b3c3b6057c2329e569ca1b2cddc58151082a",
+    "step31-san-outputs.json": "96e495262d9378f86a484e98e5e77bb7864793d18c23ef80fca8dcff490fdb04",
+    "step31-san-production-build.txt": "c942fa14f5d9440b1fd1ad87f4078a8ba7f57d52c6d90850a5229ccaadb5b6cf",
+    "step31-san-test-command.json": "ae74783ffc0c0ec8dd82eb63a250568e1dd911761e6111be0a045d4f7c622b4c",
+    "step31-source-development-build-2.txt": "cad83376cf1025fb07399bcddd25d94146bc1acf00c3da75a7a22de2d8d3e697",
+    "step31-source-development-build.txt": "f0a9b0b7fdfaf26cd126574b9e17e45eb1f8fe698b0fbb985f75f4c9a473effa",
+    "step31-source-development.txt": "6b30da47d861e307fe10aba56d541f7f3637b9d646a2eb9dfebfbdf6383c9fcd",
+    "step31-source-hashes.json": "9856d5a9bb69aa533195c28c6eb55bd5be156ac5c15797429d457e870f80e882",
+    "step31-stdlib-snapshot.json": "de719d33b0788de264ac316aa671847e981e75b5a7044ed06284f4a43460efc7"
+  }
+}

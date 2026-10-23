@@ -1,0 +1,22 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console.dir/tests/runtime/console.cpp.o
+[100%] Linking CXX executable void_runtime_console
+[100%] Built target void_runtime_console

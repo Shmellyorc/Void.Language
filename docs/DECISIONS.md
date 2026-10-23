@@ -1146,3 +1146,27 @@ Dirty-call repair uses physical tokens from the same lexer so generated
 interpolation parentheses cannot alter source delimiter accounting. Source
 formatting treats original literal bytes as opaque. This checkpoint does not
 close all Stage 10 requirements or replace independent Wrench review.
+
+### Approved future design: VOID Sections — 22 October 2026
+
+Boss approved `# section Name` and `# endsection` as organizational comments,
+including nested named sections. They follow the existing indentation level and
+never require additional indentation. They may appear at file level, inside
+structs/value structs, functions and other existing scopes; they introduce no
+language scope and change neither runtime behavior nor compiled semantics.
+Future tooling should reuse existing editor/LSP infrastructure for folding,
+outline navigation, minimap section names and scrollbar markers where supported.
+This is documentation of an approved future direction, **not implemented
+functionality**; VOID Sections are outside Stage 10 implementation.
+
+
+## 22 October 2026 — approved borrowed standard-stream cancellation correction
+
+Boss approved Golden Wrench's Step 24 revision. Preserve borrowed descriptors and
+Runtime ownership; promptly cancel queued operations and interruptible readiness
+waits. Cancellation of an already-entered uncancellable OS syscall is best-effort.
+Retain its buffers, native state and lease through actual completion with exact
+known progress; shutdown can remain blocked when an external host/device prevents
+I/O progress. No mandatory io_uring, duplicate I/O framework, process-wide descriptor
+flag changes or cancellation of unrelated host requests. Preserve scoped SIGPIPE
+handling and NativeSafe/precise GC. See stage10/CONSOLE_IO.md and the Step 24 evidence.

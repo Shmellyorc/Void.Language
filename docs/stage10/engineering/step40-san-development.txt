@@ -1,0 +1,25 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+    Start 83: stage10_operator_integration
+1/1 Test #83: stage10_operator_integration .....***Failed   34.77 sec
+/operator-effects.void:7:23: error: Value init requires every field to be valid before its body; a non-nullable reference has no safe default.
+    code: VOID1106
+
+ 7 | func (self sealed<t>) init(item: t):
+   |                       ^^^^
+    Module: /operator-effects.void
+    Required reference field declared here. at /operator-effects.void:4:19
+
+ 4 |     private const item: t
+   |                   ^^^^
+    Module: /operator-effects.void
+    Hint: Use named-field construction without init for a value with required reference fields.
+
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  34.78 sec
+
+The following tests FAILED:
+	 83 - stage10_operator_integration (Failed)
+Errors while running CTest

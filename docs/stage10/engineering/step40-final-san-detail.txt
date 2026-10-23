@@ -1,0 +1,450 @@
+Start testing: Oct 23 08:25 PDT
+----------------------------------------------------------
+178/199 Testing: stage10_operators_aot
+178/199 Test: stage10_operators_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_integration"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operators_aot" start time: Oct 23 08:25 PDT
+Output:
+----------------------------------------------------------
+operator_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_async: normal/O2 JIT and independently linked AOT verified
+operator_native_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_workload: normal/O2 JIT and independently linked AOT verified
+operator_format_cache: normal/O2 JIT and independently linked AOT verified
+operator_keys: normal/O2 JIT and independently linked AOT verified
+operator_native_compound_invalidation: normal/O2 JIT and independently linked AOT verified
+operator_compound_capture: normal/O2 JIT and independently linked AOT verified
+operator_compound_conversions: normal/O2 JIT and independently linked AOT verified
+operator_compounds: normal/O2 JIT and independently linked AOT verified
+operator_native_compounds: normal/O2 JIT and independently linked AOT verified
+operator_native_compound_failure: normal/O2 JIT and independently linked AOT verified
+operator_compound_suspension: normal/O2 JIT and independently linked AOT verified
+operator_compound_workers: normal/O2 JIT and independently linked AOT verified
+operator_lifetimes: normal/O2 JIT and independently linked AOT verified
+operator_suspension: normal/O2 JIT and independently linked AOT verified
+operator_workers: normal/O2 JIT and independently linked AOT verified
+operator_failures: normal/O2 JIT and independently linked AOT verified
+operator_errors: normal/O2 JIT and independently linked AOT verified
+operator_worker_failures: normal/O2 JIT and independently linked AOT verified
+operator_cleanup: normal/O2 JIT and independently linked AOT verified
+operator_native: normal/O2 JIT and independently linked AOT verified
+344 source operator JIT/AOT checks passed
+<end of output>
+Test time = 350.04 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operators_aot" end time: Oct 23 08:31 PDT
+"stage10_operators_aot" time elapsed: 00:05:50
+----------------------------------------------------------
+
+94/199 Testing: stage10_console_source
+94/199 Test: stage10_console_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_console_source"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_console_source" start time: Oct 23 08:31 PDT
+Output:
+----------------------------------------------------------
+source console checks: 4463
+<end of output>
+Test time = 221.17 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_source" end time: Oct 23 08:35 PDT
+"stage10_console_source" time elapsed: 00:03:41
+----------------------------------------------------------
+
+95/199 Testing: stage10_operator_integration
+95/199 Test: stage10_operator_integration
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_integration" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_integration" start time: Oct 23 08:35 PDT
+Output:
+----------------------------------------------------------
+1169 operator GC/effect/failure integration checks passed
+<end of output>
+Test time =  62.48 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_integration" end time: Oct 23 08:36 PDT
+"stage10_operator_integration" time elapsed: 00:01:02
+----------------------------------------------------------
+
+1/199 Testing: stage10_operator_reload
+1/199 Test: stage10_operator_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_reload" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/operator reload fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_reload" start time: Oct 23 08:36 PDT
+Output:
+----------------------------------------------------------
+248 operator/format compatibility/cache/reload checks passed
+<end of output>
+Test time =  57.43 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_reload" end time: Oct 23 08:37 PDT
+"stage10_operator_reload" time elapsed: 00:00:57
+----------------------------------------------------------
+
+182/199 Testing: lsp_stage10_display
+182/199 Test: lsp_stage10_display
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_display" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+237 console/composite LSP checks passed
+<end of output>
+Test time =  10.68 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_display" end time: Oct 23 08:37 PDT
+"lsp_stage10_display" time elapsed: 00:00:10
+----------------------------------------------------------
+
+93/199 Testing: stage10_operator_compounds
+93/199 Test: stage10_operator_compounds
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_compounds" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_compounds" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+730 captured-place compound checks passed
+<end of output>
+Test time =   9.23 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_compounds" end time: Oct 23 08:37 PDT
+"stage10_operator_compounds" time elapsed: 00:00:09
+----------------------------------------------------------
+
+7/199 Testing: stage10_display_reload
+7/199 Test: stage10_display_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_display_reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_display_reload" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+275 display dependency/reload checks passed
+<end of output>
+Test time =  11.07 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_display_reload" end time: Oct 23 08:37 PDT
+"stage10_display_reload" time elapsed: 00:00:11
+----------------------------------------------------------
+
+8/199 Testing: stage10_temporal_ir
+8/199 Test: stage10_temporal_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_temporal_ir" "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_temporal_ir" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+8 temporal IR/worker checks passed
+<end of output>
+Test time =   3.42 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_temporal_ir" end time: Oct 23 08:37 PDT
+"stage10_temporal_ir" time elapsed: 00:00:03
+----------------------------------------------------------
+
+10/199 Testing: stage10_hooks
+10/199 Test: stage10_hooks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_hooks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_hooks" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+77 nominal/custom display checks passed
+<end of output>
+Test time =   6.11 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_hooks" end time: Oct 23 08:37 PDT
+"stage10_hooks" time elapsed: 00:00:06
+----------------------------------------------------------
+
+5/199 Testing: stage10_source_formatting
+5/199 Test: stage10_source_formatting
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_source_formatting"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_source_formatting" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+321 source formatting/diagnostic checks passed
+<end of output>
+Test time =   1.35 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_source_formatting" end time: Oct 23 08:37 PDT
+"stage10_source_formatting" time elapsed: 00:00:01
+----------------------------------------------------------
+
+184/199 Testing: lsp_stage10_source_formatting
+184/199 Test: lsp_stage10_source_formatting
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_source_formatting.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_source_formatting" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+144 source formatting LSP/revision/diagnostic checks passed
+<end of output>
+Test time =   0.86 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_source_formatting" end time: Oct 23 08:37 PDT
+"lsp_stage10_source_formatting" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/199 Testing: stage10_tooling
+6/199 Test: stage10_tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_tooling"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_tooling" start time: Oct 23 08:37 PDT
+Output:
+----------------------------------------------------------
+106 Stage 10 tooling metadata checks passed
+<end of output>
+Test time =   0.61 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_tooling" end time: Oct 23 08:38 PDT
+"stage10_tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+183/199 Testing: lsp_stage10_intelligence
+183/199 Test: lsp_stage10_intelligence
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_intelligence" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+170 Stage 10 LSP intelligence checks passed
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_intelligence" end time: Oct 23 08:38 PDT
+"lsp_stage10_intelligence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/199 Testing: stage10_interpolation
+11/199 Test: stage10_interpolation
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_interpolation"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_interpolation" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+57 interpolation checks passed
+<end of output>
+Test time =   1.79 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_interpolation" end time: Oct 23 08:38 PDT
+"stage10_interpolation" time elapsed: 00:00:01
+----------------------------------------------------------
+
+2/199 Testing: stage10_operator_keys
+2/199 Test: stage10_operator_keys
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_keys" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_keys" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+131 dictionary custom-equality checks passed
+<end of output>
+Test time =   0.70 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_keys" end time: Oct 23 08:38 PDT
+"stage10_operator_keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/199 Testing: format_zones
+15/199 Test: format_zones
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_format_zones"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"format_zones" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+2026e: 344 zones, 253 links, 1720 projections; embedded gap/overlap/history passed
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Passed.
+"format_zones" end time: Oct 23 08:38 PDT
+"format_zones" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/199 Testing: runtime_console_native_keyboard
+28/199 Test: runtime_console_native_keyboard
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console_keyboard"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console_native_keyboard" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+92 native PTY key/mode checks passed
+99 native PTY key/mode integration checks passed
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_native_keyboard" end time: Oct 23 08:38 PDT
+"runtime_console_native_keyboard" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/199 Testing: runtime_console_native_transfers
+25/199 Test: runtime_console_native_transfers
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console_transfers"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console_native_transfers" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+210 real POSIX binary/pipe/file/PTY/poll/deadline/cancel/GC/EINTR/SIGPIPE checks passed
+{"native_cases": [{"case": "pipe", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "eof": true, "kind": 0, "os_code": 0}, {"case": "file", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "eof": true, "kind": 0, "os_code": 0}, {"case": "file-output", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "eof": true, "kind": 0, "os_code": 0}, {"case": "empty", "child_checks_before_report": 3, "cleanup_code": 0, "completed": 0, "eof": true, "kind": 0, "os_code": 0}, {"case": "records", "child_checks_before_report": 129, "cleanup_code": 0, "completed": 1048704, "eof": false, "kind": 0, "os_code": 0}, {"case": "readers", "child_checks_before_report": 203, "cleanup_code": 0, "completed": 200, "eof": false, "kind": 0, "os_code": 0}, {"case": "short", "child_checks_before_report": 10, "cleanup_code": 0, "completed": 10, "eof": false, "kind": 0, "os_code": 0}, {"case": "pty-input", "child_checks_before_report": 4, "cleanup_code": 0, "completed": 11, "eof": false, "kind": 0, "os_code": 0}, {"case": "pty-output", "child_checks_before_report": 5, "cleanup_code": 0, "completed": 11, "eof": true, "kind": 0, "os_code": 0}, {"case": "poll", "child_checks_before_report": 2, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 4, "os_code": 0}, {"case": "timeout", "child_checks_before_report": 2, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 5, "os_code": 0}, {"case": "cancel-read", "child_checks_before_report": 5, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 6, "os_code": 0}, {"case": "cancel-write", "child_checks_before_report": 5, "cleanup_code": 0, "completed": 65536, "eof": false, "kind": 6, "os_code": 0}, {"case": "closed-input-while-output", "child_checks_before_report": 6, "cleanup_code": 0, "completed": 65536, "eof": false, "kind": 6, "os_code": 0}, {"case": "nonblocking", "child_checks_before_report": 2, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 4, "os_code": 0}, {"case": "interrupt", "child_checks_before_report": 3, "cleanup_code": 0, "completed": 1, "eof": false, "kind": 0, "os_code": 0}, {"case": "broken-default", "child_checks_before_report": 68, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 7, "os_code": 32}, {"case": "broken-handler", "child_checks_before_report": 68, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 7, "os_code": 32}, {"case": "broken-ignore", "child_checks_before_report": 68, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 7, "os_code": 32}, {"case": "broken-pending", "child_checks_before_report": 69, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 7, "os_code": 32}, {"case": "closed-input", "child_checks_before_report": 0, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 6, "os_code": 9}, {"case": "closed-output", "child_checks_before_report": 0, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 6, "os_code": 9}, {"case": "full", "child_checks_before_report": 0, "cleanup_code": 0, "completed": 0, "eof": false, "kind": 9, "os_code": 28}]}
+<end of output>
+Test time =   0.69 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_native_transfers" end time: Oct 23 08:38 PDT
+"runtime_console_native_transfers" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/199 Testing: stage10_fields
+13/199 Test: stage10_fields
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_fields"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_fields" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Oct 23 08:38 PDT
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/199 Testing: format_temporal
+9/199 Test: format_temporal
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_temporal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"format_temporal" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+1308 temporal core checks passed
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"format_temporal" end time: Oct 23 08:38 PDT
+"format_temporal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/199 Testing: format_numeric
+14/199 Test: format_numeric
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_format_numeric"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"format_numeric" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+18663 numeric format checks passed
+<end of output>
+Test time =   0.16 sec
+----------------------------------------------------------
+Test Passed.
+"format_numeric" end time: Oct 23 08:38 PDT
+"format_numeric" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/199 Testing: runtime_console_keyboard
+26/199 Test: runtime_console_keyboard
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console_keyboard"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console_keyboard" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+127 key/mode checks passed
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_keyboard" end time: Oct 23 08:38 PDT
+"runtime_console_keyboard" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/199 Testing: runtime_console
+22/199 Test: runtime_console
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+347 console foundation identity/lifecycle/GC checks passed
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console" end time: Oct 23 08:38 PDT
+"runtime_console" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/199 Testing: runtime_console_transfers
+24/199 Test: runtime_console_transfers
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console_transfers"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console_transfers" start time: Oct 23 08:38 PDT
+Output:
+----------------------------------------------------------
+178 checked console transfer/deadline/cancellation checks passed
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_transfers" end time: Oct 23 08:38 PDT
+"runtime_console_transfers" time elapsed: 00:00:00
+----------------------------------------------------------
+
+177/199 Testing: stage10_console_aot
+177/199 Test: stage10_console_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_console_aot" start time: Oct 23 08:25 PDT
+Output:
+----------------------------------------------------------
+operator_console_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_compound_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_workload: exact normal/O2 JIT and linked AOT verified
+console_sum_display: exact normal/O2 JIT and linked AOT verified
+console_sum_failure: exact normal/O2 JIT and linked AOT verified
+console_collections: exact normal/O2 JIT and linked AOT verified
+console_collection_invalidated: exact normal/O2 JIT and linked AOT verified
+console_collection_failed_hook: exact normal/O2 JIT and linked AOT verified
+console_keys: exact normal/O2 JIT and linked AOT verified
+console_terminal: exact normal/O2 JIT and linked AOT verified
+console_exit: exact normal/O2 JIT and linked AOT verified
+console_zero: exact normal/O2 JIT and linked AOT verified
+console_cleanup_primary: exact normal/O2 JIT and linked AOT verified
+console_cleanup_only: exact normal/O2 JIT and linked AOT verified
+console_print: exact normal/O2 JIT and linked AOT verified
+console_order: exact normal/O2 JIT and linked AOT verified
+console_reads: exact normal/O2 JIT and linked AOT verified
+console_fail: exact normal/O2 JIT and linked AOT verified
+console_endpoints: exact normal/O2 JIT and linked AOT verified
+console_read_errors: exact normal/O2 JIT and linked AOT verified
+source console JIT/AOT driver checks: 616
+<end of output>
+Test time = 1216.11 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_aot" end time: Oct 23 08:46 PDT
+"stage10_console_aot" time elapsed: 00:20:16
+----------------------------------------------------------
+
+End testing: Oct 23 08:46 PDT

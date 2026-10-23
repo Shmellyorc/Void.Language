@@ -1,0 +1,9 @@
+{
+  "preprocessed_bytes": 2418308,
+  "preprocessed_sha256": "02139e5f89a39b5c5d1c7be206ca0da48e9f374f4055ce594685df8f68e2b52c",
+  "archive_sha256": "8a4d226b2c68f962198cae9f3418961a4abc69846e09dd735820e2200abb60c5",
+  "command": "collections-clang-crash-repro.sh.txt",
+  "initial_failure": "collections-san-proof-build.txt",
+  "unchanged_retry": "collections-san-clang-reproduction.txt",
+  "status": "Unexplained pinned Clang optimizer crash; unchanged source and flags succeeded on retry; no cause or repair claimed."
+}

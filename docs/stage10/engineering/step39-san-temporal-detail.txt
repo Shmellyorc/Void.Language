@@ -1,0 +1,19 @@
+Start testing: Oct 22 12:24 PDT
+----------------------------------------------------------
+171/186 Testing: lsp_stage10_source_formatting
+171/186 Test: lsp_stage10_source_formatting
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_source_formatting.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_source_formatting" start time: Oct 22 12:24 PDT
+Output:
+----------------------------------------------------------
+144 source formatting LSP/revision/diagnostic checks passed
+<end of output>
+Test time =   0.94 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_source_formatting" end time: Oct 22 12:24 PDT
+"lsp_stage10_source_formatting" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 22 12:24 PDT

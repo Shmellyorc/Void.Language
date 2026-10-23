@@ -1,0 +1,11 @@
+Step 26 final integrity: PASS
+Source manifests: 175 cumulative / 10 bounded entries match actual bytes.
+Prior checkpoint: 173 entries; 165 unchanged; 8 approved bounded changes; 2 new sources; no unexpected changes.
+Step 37 observations: unchanged verbatim.
+Debug: 12/12 (13.62 s), final added wide cases 1/1 (0.10 s).
+Strict ASan/UBSan/leak: final 12/12 (7.24 s), actual leak checking outside ptrace.
+Wide deterministic checks: 271656 in Debug and strict builds.
+Final focused builds: no warnings/errors.
+Root README: unchanged. git diff --check: clean.
+Windows SDK/target compilation/runtime: UNVERIFIED; genuine missing target-header probe retained.
+No source print/terminal API; Step 27 not started. Stage 10 INCOMPLETE.

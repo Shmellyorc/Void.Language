@@ -41,5 +41,5 @@ std::string text(std::string_view, std::string_view spec = {});
 std::string align(std::string_view, Alignment);
 std::string number(Number, const Plan& = {});
 std::string number(Number, std::string_view);
-inline constexpr std::string_view abi_version = "void-format-v1;ryu-72e18e8d;iana-2026e";
+inline constexpr std::string_view abi_version = "void-format-v4;collections-v1;sum-display-v1;ties-to-even;unicode-scalar-alignment;ryu-72e18e8d14d4392a4a3261f37cde248e4fbedbec";
 }

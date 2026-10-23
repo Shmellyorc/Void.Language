@@ -1,0 +1,2 @@
+Vim(eval):E684: List index out of range: 0
+command line..script /home/shmellyorc/Documents/Void.Language/tests/stage10/editor.vim, line 45

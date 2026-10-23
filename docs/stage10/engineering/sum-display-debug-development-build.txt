@@ -1,0 +1,76 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_native_fixture
+[  0%] Building CXX object CMakeFiles/void_format_objects.dir/src/format.cpp.o
+[  0%] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 33%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:666:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  666 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:673:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  673 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:674:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  674 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:687:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  687 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 66%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:25:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_conversion
+[100%] Built target void_stage10_conversion

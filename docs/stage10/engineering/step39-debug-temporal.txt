@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 171: lsp_stage10_source_formatting
+1/1 Test #171: lsp_stage10_source_formatting ....   Passed    1.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.01 sec

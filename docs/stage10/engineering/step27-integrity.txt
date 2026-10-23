@@ -1,0 +1,12 @@
+step27-source-hashes.json: 30 current hashes verified
+source-hashes.json: 189 current hashes verified
+Step37 unresolved observations preserved verbatim; current/step27 results identical
+Six linked/JIT Runtime/compiler/harness build artifact hashes verified
+step27-debug-outputs.json: 24 binary output records, 127 checks, two real POSIX broken-pipe paths
+step27-san-outputs.json: 24 binary output records, 127 checks, two real POSIX broken-pipe paths
+debug: frontend object newer than all changed frontend sources
+san: frontend object newer than all changed frontend sources
+git diff --check: PASS
+Public root README: unchanged
+HEAD preserved: ecf0bec6e04ef66e1e50cac4afc1598a945066c0
+Stage10 INCOMPLETE; next28; native Windows/macOS and remaining acceptance unverified

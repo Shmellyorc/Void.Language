@@ -1,0 +1,45 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/20 Test   #1: stage10_operator_reload ..........   Passed   17.58 sec
+      Start   3: stage10_operator_resolution
+ 2/20 Test   #3: stage10_operator_resolution ......   Passed    2.40 sec
+      Start   5: stage10_source_formatting
+ 3/20 Test   #5: stage10_source_formatting ........   Passed    1.25 sec
+      Start   6: stage10_tooling
+ 4/20 Test   #6: stage10_tooling ..................   Passed    0.07 sec
+      Start  77: lsp_positions
+ 5/20 Test  #77: lsp_positions ....................   Passed    0.00 sec
+      Start  78: lsp_protocol
+ 6/20 Test  #78: lsp_protocol .....................   Passed    0.53 sec
+      Start  79: lsp_stage8
+ 7/20 Test  #79: lsp_stage8 .......................   Passed    0.41 sec
+      Start  80: lsp_stage7
+ 8/20 Test  #80: lsp_stage7 .......................   Passed    0.27 sec
+      Start  81: lsp_demo
+ 9/20 Test  #81: lsp_demo .........................   Passed    0.06 sec
+      Start 148: sessions
+10/20 Test #148: sessions .........................   Passed    0.19 sec
+      Start 149: tooling
+11/20 Test #149: tooling ..........................   Passed    0.51 sec
+      Start 150: analysis
+12/20 Test #150: analysis .........................   Passed    0.74 sec
+      Start 167: lsp_sprint6
+13/20 Test #167: lsp_sprint6 ......................   Passed    0.67 sec
+      Start 168: lsp_stage10_fields
+14/20 Test #168: lsp_stage10_fields ...............   Passed    0.06 sec
+      Start 169: lsp_stage10_display
+15/20 Test #169: lsp_stage10_display ..............   Passed    0.87 sec
+      Start 170: lsp_stage10_intelligence
+16/20 Test #170: lsp_stage10_intelligence .........   Passed    0.54 sec
+      Start 171: lsp_stage10_source_formatting
+17/20 Test #171: lsp_stage10_source_formatting ....   Passed    0.30 sec
+      Start 173: lsp_sprint4
+18/20 Test #173: lsp_sprint4 ......................   Passed    0.05 sec
+      Start 177: lsp_sprint3
+19/20 Test #177: lsp_sprint3 ......................   Passed    0.12 sec
+      Start 178: lsp_sprint2
+20/20 Test #178: lsp_sprint2 ......................   Passed    0.08 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) =  26.71 sec

@@ -1,0 +1,33 @@
+struct base:
+    value: i32
+    operator +(const left: base, const right: i32) -> child:
+        return child(value = left.value + right)
+struct child extends base:
+    extra: i32
+interface view:
+    func read() -> i32
+struct number:
+    value: i32
+    operator +(const left: view, const right: number) -> number:
+        return number(value = left.read() + right.value)
+func (self number) read() -> i32:
+    return self.value
+value struct callable:
+    value: i32
+func (self callable) call() -> i32:
+    return self.value
+value struct delta:
+    value: i32
+    operator +(const left: func() -> i32, const right: delta) -> callable:
+        return callable(value = left() + right.value)
+func entry(input: i32) -> i32:
+    var object = base(value = 10)
+    object += 2
+    var item: view = number(value = 10)
+    item += number(value = 2)
+    var fn: func() -> i32 = func() -> i32:
+        return 10
+    fn += delta(value = 2)
+    if object.value != 12 or item.read() != 12 or fn() != 12:
+        return 90
+    return input

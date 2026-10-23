@@ -1,0 +1,7 @@
+/stage10_conversion.void:3:18: error: Unsupported dictionary key type.
+    code: VOID1103
+
+ 3 |     var values = {key: [true, false]}
+   |                  ^
+    Module: /stage10_conversion.void
+

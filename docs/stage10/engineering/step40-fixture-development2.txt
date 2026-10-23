@@ -1,0 +1,41 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:29:38: error: Compile-time expressions cannot execute custom initialization.
+    code: VOID2011
+
+ 29 |     private current: quantity<i32> = quantity<i32>(value = 0)
+    |                                      ^^^^^^^^
+    Module: /operator_systems.void
+    Runtime initializer declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:10:25
+
+ 10 | func (self quantity<t>) init(value: t):
+    |                         ^^^^
+    Module: /operator_systems.void
+    Hint: Construct this value in a function or local const.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:43:27: error: Compile-time expressions cannot execute custom initialization.
+    code: VOID2011
+
+ 43 |     item: quantity<i32> = quantity<i32>(value = 0)
+    |                           ^^^^^^^^
+    Module: /operator_systems.void
+    Runtime initializer declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:10:25
+
+ 10 | func (self quantity<t>) init(value: t):
+    |                         ^^^^
+    Module: /operator_systems.void
+    Hint: Construct this value in a function or local const.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:80:34: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 80 |     if format(copy, "reject") is Err(var message):
+    |                                  ^^^
+    Module: /operator_systems.void
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:81:12: error: Unknown identifier 'message'.
+    code: VOID2002
+
+ 81 |         if message != "quantity-3":
+    |            ^^^^^^^
+    Module: /operator_systems.void
+    Hint: Declare it with var before use.
+

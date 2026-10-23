@@ -1,0 +1,231 @@
+Start testing: Oct 22 10:31 PDT
+----------------------------------------------------------
+1/182 Testing: stage10_operator_reload
+1/182 Test: stage10_operator_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_reload" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/operator reload fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_reload" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+219 operator/format compatibility/cache/reload checks passed
+<end of output>
+Test time =  18.17 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_reload" end time: Oct 22 10:31 PDT
+"stage10_operator_reload" time elapsed: 00:00:18
+----------------------------------------------------------
+
+2/182 Testing: stage10_operator_keys
+2/182 Test: stage10_operator_keys
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_keys" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_keys" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+131 dictionary custom-equality checks passed
+<end of output>
+Test time =   0.79 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_keys" end time: Oct 22 10:31 PDT
+"stage10_operator_keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/182 Testing: stage10_operator_resolution
+3/182 Test: stage10_operator_resolution
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_resolution" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_resolution" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+161 operator resolution/call checks passed
+<end of output>
+Test time =   2.87 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_resolution" end time: Oct 22 10:31 PDT
+"stage10_operator_resolution" time elapsed: 00:00:02
+----------------------------------------------------------
+
+4/182 Testing: stage10_operator_declarations
+4/182 Test: stage10_operator_declarations
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_declarations" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_declarations" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+278 operator declaration/validation checks passed
+<end of output>
+Test time =   1.58 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_declarations" end time: Oct 22 10:31 PDT
+"stage10_operator_declarations" time elapsed: 00:00:01
+----------------------------------------------------------
+
+5/182 Testing: stage10_display_reload
+5/182 Test: stage10_display_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_display_reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_display_reload" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+132 display dependency/reload checks passed
+<end of output>
+Test time =   0.98 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_display_reload" end time: Oct 22 10:31 PDT
+"stage10_display_reload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/182 Testing: stage10_temporal_ir
+6/182 Test: stage10_temporal_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_temporal_ir" "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_temporal_ir" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+8 temporal IR/worker checks passed
+<end of output>
+Test time =   3.84 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_temporal_ir" end time: Oct 22 10:31 PDT
+"stage10_temporal_ir" time elapsed: 00:00:03
+----------------------------------------------------------
+
+30/182 Testing: debug_cache
+30/182 Test: debug_cache
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_cache_tests" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/cache fixtures" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"debug_cache" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+cache generations, source/build invalidation, revisions, roots, failures and fallback passed
+<end of output>
+Test time =   3.22 sec
+----------------------------------------------------------
+Test Passed.
+"debug_cache" end time: Oct 22 10:31 PDT
+"debug_cache" time elapsed: 00:00:03
+----------------------------------------------------------
+
+31/182 Testing: debug_cache_processes
+31/182 Test: debug_cache_processes
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"debug_cache_processes" start time: Oct 22 10:31 PDT
+Output:
+----------------------------------------------------------
+Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+<end of output>
+Test time =  11.59 sec
+----------------------------------------------------------
+Test Passed.
+"debug_cache_processes" end time: Oct 22 10:32 PDT
+"debug_cache_processes" time elapsed: 00:00:11
+----------------------------------------------------------
+
+80/182 Testing: stage10_operator_compounds
+80/182 Test: stage10_operator_compounds
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_compounds" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_compounds" start time: Oct 22 10:32 PDT
+Output:
+----------------------------------------------------------
+730 captured-place compound checks passed
+<end of output>
+Test time =   9.81 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_compounds" end time: Oct 22 10:32 PDT
+"stage10_operator_compounds" time elapsed: 00:00:09
+----------------------------------------------------------
+
+81/182 Testing: stage10_operator_integration
+81/182 Test: stage10_operator_integration
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_integration" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_integration" start time: Oct 22 10:32 PDT
+Output:
+----------------------------------------------------------
+637 operator GC/effect/failure integration checks passed
+<end of output>
+Test time =   5.27 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_integration" end time: Oct 22 10:32 PDT
+"stage10_operator_integration" time elapsed: 00:00:05
+----------------------------------------------------------
+
+146/182 Testing: sessions
+146/182 Test: sessions
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests" "sessions" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/session fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"sessions" start time: Oct 22 10:32 PDT
+Output:
+----------------------------------------------------------
+sessions: passed
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"sessions" end time: Oct 22 10:32 PDT
+"sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+147/182 Testing: tooling
+147/182 Test: tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests" "tooling" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/tooling fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"tooling" start time: Oct 22 10:32 PDT
+Output:
+----------------------------------------------------------
+queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required
+tooling: passed
+<end of output>
+Test time =   0.66 sec
+----------------------------------------------------------
+Test Passed.
+"tooling" end time: Oct 22 10:32 PDT
+"tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+148/182 Testing: analysis
+148/182 Test: analysis
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests" "analysis" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/analysis fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"analysis" start time: Oct 22 10:32 PDT
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 517104
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 671733
+analysis: passed
+<end of output>
+Test time =   1.13 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Oct 22 10:32 PDT
+"analysis" time elapsed: 00:00:01
+----------------------------------------------------------
+
+163/182 Testing: stage10_operators_aot
+163/182 Test: stage10_operators_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_integration"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operators_aot" start time: Oct 22 10:32 PDT
+Output:
+----------------------------------------------------------
+276 source operator JIT/AOT checks passed
+<end of output>
+Test time =  79.53 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operators_aot" end time: Oct 22 10:33 PDT
+"stage10_operators_aot" time elapsed: 00:01:19
+----------------------------------------------------------
+
+End testing: Oct 22 10:33 PDT

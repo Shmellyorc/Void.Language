@@ -1,0 +1,505 @@
+Start testing: Oct 23 06:50 PDT
+----------------------------------------------------------
+1/199 Testing: stage10_operator_reload
+1/199 Test: stage10_operator_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_reload" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/operator reload fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_reload" start time: Oct 23 06:50 PDT
+Output:
+----------------------------------------------------------
+248 operator/format compatibility/cache/reload checks passed
+<end of output>
+Test time =  52.83 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_reload" end time: Oct 23 06:51 PDT
+"stage10_operator_reload" time elapsed: 00:00:52
+----------------------------------------------------------
+
+5/199 Testing: stage10_source_formatting
+5/199 Test: stage10_source_formatting
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_source_formatting"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_source_formatting" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+321 source formatting/diagnostic checks passed
+<end of output>
+Test time =   1.35 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_source_formatting" end time: Oct 23 06:51 PDT
+"stage10_source_formatting" time elapsed: 00:00:01
+----------------------------------------------------------
+
+6/199 Testing: stage10_tooling
+6/199 Test: stage10_tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_tooling"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_tooling" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+106 Stage 10 tooling metadata checks passed
+<end of output>
+Test time =   0.59 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_tooling" end time: Oct 23 06:51 PDT
+"stage10_tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/199 Testing: stage10_display_reload
+7/199 Test: stage10_display_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_display_reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_display_reload" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+275 display dependency/reload checks passed
+<end of output>
+Test time =  10.07 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_display_reload" end time: Oct 23 06:51 PDT
+"stage10_display_reload" time elapsed: 00:00:10
+----------------------------------------------------------
+
+10/199 Testing: stage10_hooks
+10/199 Test: stage10_hooks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_hooks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_hooks" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+77 nominal/custom display checks passed
+<end of output>
+Test time =   5.89 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_hooks" end time: Oct 23 06:51 PDT
+"stage10_hooks" time elapsed: 00:00:05
+----------------------------------------------------------
+
+11/199 Testing: stage10_interpolation
+11/199 Test: stage10_interpolation
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_interpolation"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_interpolation" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+57 interpolation checks passed
+<end of output>
+Test time =   1.70 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_interpolation" end time: Oct 23 06:51 PDT
+"stage10_interpolation" time elapsed: 00:00:01
+----------------------------------------------------------
+
+13/199 Testing: stage10_fields
+13/199 Test: stage10_fields
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_fields"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_fields" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.61 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Oct 23 06:51 PDT
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/199 Testing: runtime_console
+22/199 Test: runtime_console
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+347 console foundation identity/lifecycle/GC checks passed
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console" end time: Oct 23 06:51 PDT
+"runtime_console" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/199 Testing: generics_source
+38/199 Test: generics_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_generics_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"generics_source" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+<end of output>
+Test time =   5.64 sec
+----------------------------------------------------------
+Test Passed.
+"generics_source" end time: Oct 23 06:51 PDT
+"generics_source" time elapsed: 00:00:05
+----------------------------------------------------------
+
+42/199 Testing: patterns_source
+42/199 Test: patterns_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_patterns_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"patterns_source" start time: Oct 23 06:51 PDT
+Output:
+----------------------------------------------------------
+normal values allocation failures: 418
+normal large allocation failures: 232
+normal combined allocation failures: 169
+O2 values allocation failures: 418
+O2 large allocation failures: 232
+O2 combined allocation failures: 169
+<end of output>
+Test time =  10.02 sec
+----------------------------------------------------------
+Test Passed.
+"patterns_source" end time: Oct 23 06:52 PDT
+"patterns_source" time elapsed: 00:00:10
+----------------------------------------------------------
+
+88/199 Testing: lsp_positions
+88/199 Test: lsp_positions
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_lsp_tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_positions" start time: Oct 23 06:52 PDT
+Output:
+----------------------------------------------------------
+UTF16 positions, owned snapshots and URI mapping passed
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_positions" end time: Oct 23 06:52 PDT
+"lsp_positions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+89/199 Testing: lsp_protocol
+89/199 Test: lsp_protocol
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/lsp fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_protocol" start time: Oct 23 06:52 PDT
+Output:
+----------------------------------------------------------
+editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed
+interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed
+invalid disk UTF-8: original UTF16 ranges, overlay repair and close passed
+strings: imported constants, UTF16 escape spans and unsaved repair passed
+Stage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed
+<end of output>
+Test time =   1.18 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_protocol" end time: Oct 23 06:52 PDT
+"lsp_protocol" time elapsed: 00:00:01
+----------------------------------------------------------
+
+90/199 Testing: lsp_stage8
+90/199 Test: lsp_stage8
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage8" start time: Oct 23 06:52 PDT
+Output:
+----------------------------------------------------------
+Debug cache: miss
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+<end of output>
+Test time =   1.87 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage8" end time: Oct 23 06:52 PDT
+"lsp_stage8" time elapsed: 00:00:01
+----------------------------------------------------------
+
+91/199 Testing: lsp_stage7
+91/199 Test: lsp_stage7
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage7.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage7" start time: Oct 23 06:52 PDT
+Output:
+----------------------------------------------------------
+Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage7" end time: Oct 23 06:52 PDT
+"lsp_stage7" time elapsed: 00:00:00
+----------------------------------------------------------
+
+92/199 Testing: lsp_demo
+92/199 Test: lsp_demo
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tools/lsp_demo.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_demo" start time: Oct 23 06:52 PDT
+Output:
+----------------------------------------------------------
+initialized: full synchronization, UTF-16, definition and references
+open: no diagnostics
+definition: worker.void:1:6
+references: declaration and one source call
+unsaved edit: VOID2002 at worker.void:2:12
+invalid revision: navigation returns null
+repair: old diagnostics cleared; fresh navigation restored
+shutdown and exit: clean protocol streams
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_demo" end time: Oct 23 06:52 PDT
+"lsp_demo" time elapsed: 00:00:00
+----------------------------------------------------------
+
+94/199 Testing: stage10_console_source
+94/199 Test: stage10_console_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_console_source"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_console_source" start time: Oct 23 06:52 PDT
+Output:
+----------------------------------------------------------
+source console checks: 4123
+<end of output>
+Test time =  68.87 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_source" end time: Oct 23 06:53 PDT
+"stage10_console_source" time elapsed: 00:01:08
+----------------------------------------------------------
+
+160/199 Testing: sessions
+160/199 Test: sessions
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests" "sessions" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/session fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"sessions" start time: Oct 23 06:53 PDT
+Output:
+----------------------------------------------------------
+sessions: passed
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"sessions" end time: Oct 23 06:53 PDT
+"sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+161/199 Testing: tooling
+161/199 Test: tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests" "tooling" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/tooling fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"tooling" start time: Oct 23 06:53 PDT
+Output:
+----------------------------------------------------------
+queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required
+tooling: passed
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"tooling" end time: Oct 23 06:53 PDT
+"tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+162/199 Testing: analysis
+162/199 Test: analysis
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests" "analysis" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/analysis fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"analysis" start time: Oct 23 06:53 PDT
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 693840
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 704373
+analysis: passed
+<end of output>
+Test time =   1.16 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Oct 23 06:53 PDT
+"analysis" time elapsed: 00:00:01
+----------------------------------------------------------
+
+177/199 Testing: stage10_console_aot
+177/199 Test: stage10_console_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_console_aot" start time: Oct 23 06:53 PDT
+Output:
+----------------------------------------------------------
+source console JIT/AOT driver checks: 438
+<end of output>
+Test time = 249.95 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_aot" end time: Oct 23 06:57 PDT
+"stage10_console_aot" time elapsed: 00:04:09
+----------------------------------------------------------
+
+179/199 Testing: stage10_conversion_aot
+179/199 Test: stage10_conversion_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/conversion.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_conversion_aot" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+16 source display JIT/AOT checks passed
+<end of output>
+Test time =   3.55 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_conversion_aot" end time: Oct 23 06:57 PDT
+"stage10_conversion_aot" time elapsed: 00:00:03
+----------------------------------------------------------
+
+180/199 Testing: lsp_sprint6
+180/199 Test: lsp_sprint6
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_sprint6" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+<end of output>
+Test time =   0.78 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint6" end time: Oct 23 06:57 PDT
+"lsp_sprint6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+181/199 Testing: lsp_stage10_fields
+181/199 Test: lsp_stage10_fields
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_fields" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+Field LSP privacy, const hover/completion, dirty rejection and repair passed
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_fields" end time: Oct 23 06:57 PDT
+"lsp_stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+182/199 Testing: lsp_stage10_display
+182/199 Test: lsp_stage10_display
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_display" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+237 console/composite LSP checks passed
+<end of output>
+Test time =  10.04 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_display" end time: Oct 23 06:57 PDT
+"lsp_stage10_display" time elapsed: 00:00:10
+----------------------------------------------------------
+
+183/199 Testing: lsp_stage10_intelligence
+183/199 Test: lsp_stage10_intelligence
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_intelligence" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+170 Stage 10 LSP intelligence checks passed
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_intelligence" end time: Oct 23 06:57 PDT
+"lsp_stage10_intelligence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+184/199 Testing: lsp_stage10_source_formatting
+184/199 Test: lsp_stage10_source_formatting
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_source_formatting.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_stage10_source_formatting" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+144 source formatting LSP/revision/diagnostic checks passed
+<end of output>
+Test time =   0.88 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_source_formatting" end time: Oct 23 06:57 PDT
+"lsp_stage10_source_formatting" time elapsed: 00:00:00
+----------------------------------------------------------
+
+186/199 Testing: lsp_sprint4
+186/199 Test: lsp_sprint4
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint4.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_sprint4" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+Sprint 4 nonexecuting application analysis and native trust checks passed
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint4" end time: Oct 23 06:57 PDT
+"lsp_sprint4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+190/199 Testing: lsp_sprint3
+190/199 Test: lsp_sprint3
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint3.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_sprint3" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint3" end time: Oct 23 06:57 PDT
+"lsp_sprint3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+191/199 Testing: lsp_sprint2
+191/199 Test: lsp_sprint2
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/sprint2.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"lsp_sprint2" start time: Oct 23 06:57 PDT
+Output:
+----------------------------------------------------------
+Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint2" end time: Oct 23 06:57 PDT
+"lsp_sprint2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 23 06:57 PDT

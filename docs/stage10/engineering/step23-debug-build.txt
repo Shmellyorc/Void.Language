@@ -1,0 +1,1 @@
+gmake: *** No rule to make target 'void_runtime_console'.  Stop.

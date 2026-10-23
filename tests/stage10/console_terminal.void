@@ -1,0 +1,36 @@
+use console
+func ack(value: result<bool, io_error>):
+    match value:
+        Ok(var success):
+            print("ok", success, file = console.stderr)
+        Err(var error):
+            print(error.operation, error.message, error.bytes_transferred, file = console.stderr)
+func main():
+    var caps = console.stdout.capabilities()
+    print("caps", caps.text_output, caps.size, caps.cursor_position, caps.cursor_visibility, caps.color, caps.clear, caps.title, caps.bell, console.stdin.capabilities().text_input, console.stderr.capabilities().size, file = console.stderr)
+    match console.stdout.size():
+        Ok(var size):
+            print("size", size.columns, size.rows, file = console.stderr)
+        Err(var error):
+            print(error.operation, error.message, error.bytes_transferred, file = console.stderr)
+    match console.stdout.cursor_position():
+        Ok(var position):
+            print("position", position.column, position.row, file = console.stderr)
+            match console.stdin.read_bytes(32, timeout_ms = 0):
+                Ok(bytes_read.data(var bytes)):
+                    print("queued", bytes.count, bytes[0], file = console.stderr)
+                _:
+                    print("missing queued input", file = console.stderr)
+        Err(var error):
+            print(error.operation, error.message, error.bytes_transferred, file = console.stderr)
+    ack(console.stdout.set_cursor(2, 3))
+    ack(console.stdout.set_cursor_visible(false))
+    ack(console.stdout.set_cursor_visible(true))
+    ack(console.stdout.set_color(color.bright_red, color.blue))
+    ack(console.stdout.reset_color())
+    for foreground in [color.black, color.red, color.green, color.yellow, color.blue, color.magenta, color.cyan, color.white, color.bright_black, color.bright_red, color.bright_green, color.bright_yellow, color.bright_blue, color.bright_magenta, color.bright_cyan, color.bright_white]:
+        ack(console.stdout.set_color(foreground, color.black))
+    ack(console.stdout.clear())
+    ack(console.stdout.set_title("VOID é🎮"))
+    ack(console.stdout.bell())
+    ack(console.stdout.set_title("bad\0injection"))

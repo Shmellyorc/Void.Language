@@ -1255,3 +1255,102 @@ Preserve fail-closed coverage and all current tests, then the existing full loca
 and seven-job hosted acceptance. Do not trade safety checks for acceptance or
 claim cross-compilation as native execution. No compiler/runtime or CI changes
 are authorized by this documentation correction.
+
+## Future compiler usability and optimization — Boss direction, 23 October 2026
+
+**Approved design directions; implementation deferred until separately scheduled.**
+Priority follows current Stage10 language completeness unless Boss explicitly changes
+it. No new stage number or roadmap is assigned. This record authorizes no compiler
+implementation, Git action, hosted CI or publication. The ongoing collection display
+increment and the [deferred real editor observations](stage10/IMPLEMENTATION.md#deferred-editor-quality-observations--boss-report-step-31)
+retain their scope and priority.
+
+### Automatic Debug cache for voidc run
+
+Intended common workflow:
+
+| Command | Future intended behavior |
+| --- | --- |
+| `voidc run .` | Debug JIT with automatic persistent caching |
+| `voidc run . --no-cache` | Fresh Debug JIT without cache reuse |
+| `voidc run . --release` | Explicit optimized JIT, without Debug cache |
+| `voidc build .` | Optimized native executable |
+
+Reuse Stage5 persistent caching, source discovery/semantic validation, the existing
+dependency graph, LLVM19.1.7 lowerer and ORC JIT. Always validate current source and
+exact source/compiler/Runtime/dependency/target identities before accepting code.
+Unavailable, unsafe or corrupt persistence falls back safely to fresh compilation.
+Preserve current Windows fallback until native persistence is verified. Routine
+cache details must not enter program output; provide opt-in diagnostics. Define
+compatibility for existing --cache/--no-opt workflows and reject conflicting options
+clearly. No second cache, compiler or backend. Future acceptance compares cold,
+warm, edited-source and optimized output/errors, memory and execution time on each
+supported platform. These command defaults are proposed behavior, not current facts.
+
+### Smaller native executables
+
+Boss observed historical IANA commentary, native library symbols/internal diagnostics,
+source paths/excerpts and debugging/symbol material inside an actual native VOID
+executable. Audit actual retained Runtime/library/link sections before changing them.
+Avoid unused zone functionality when safe; compact embedded IANA runtime data by
+removing non-semantic commentary/whitespace while preserving real rules, meaningful
+directives, required metadata and licensing. **Do not indiscriminately strip comments
+from third-party source files.** Preserve bundled deterministic zone semantics; no
+mandatory machine zone data, sidecar or runtime download.
+
+Evaluate release-safe removal of unnecessary debug/symbol sections while retaining
+intentional source diagnostics, checked failures and crash-investigation capabilities.
+Preserve independent AOT linking. Measure executable size plus actual launch,
+compile and link times before/after. This is a future engineering objective, not
+an implemented size reduction or a finding about every retained byte.
+
+### Finer incremental compilation — research only
+
+Stage5 currently reuses whole-project native artifacts for exact validated inputs;
+a source edit invalidates the corresponding whole-project artifact. Investigate
+finer granularity only if real application benchmarks show whole-project rebuilds
+remain a significant bottleneck. Reuse source identity, dependency analysis, Runtime
+metadata, generation/code leases and reload contracts. Do not add per-function
+object caches, lazy compilation, a second semantic pipeline or dependency graph
+without measured benefit sufficient to justify the complexity.
+
+## Future source debugging and breakpoints — Boss direction, 23 October 2026
+
+**Approved future direction; documentation only.** Schedule separately after Stage10
+language completeness unless Boss changes priorities. No numbered stage is assigned.
+Existing LLVM DIBuilder support is a foundation, not acceptance of a working debugger.
+This note authorizes no debugger implementation during Stage10.
+
+Milestone A is source debugging of native executables: F9 toggles a breakpoint,
+F5 starts/continues, F10 steps over and F11 steps into. Include step out, pause,
+stop, accurate source files/lines, call stacks, locals/parameters and useful
+managed/value/collection presentation. First audit actual emitted DWARF,
+CodeView/PDB, source locations and variable metadata; repair demonstrated gaps.
+Reuse LLVM debug information, platform GDB/LLDB and appropriate existing DAP
+adapters before considering custom protocol code or a debugger engine.
+
+Milestone B investigates JIT breakpoints during `voidc run .` **after native
+execution debugging is proven**. Design must cover ORC debugger registration,
+generated addresses/source maps, breakpoints across generation/retirement,
+compatible reload and old-generation leases, precise GC roots/safepoints,
+async tasks/suspension, thread ownership/Runtime coordination and Debug-cache
+artifact loading. Inspection must preserve source private/readonly semantics.
+A documented initial Debug subset may defer advanced async/reload debugging;
+no Runtime, generation lifetime or reload guarantee may be weakened.
+
+Milestone C integrates VS Code through DAP. Keep voidls LSP responsible for
+completion, hover, diagnostics and navigation; DAP owns breakpoints, stepping,
+execution control, frames and variables. Evaluate existing debugger adapters
+first. Neovim can use compatible existing DAP clients where practical;
+traditional Vim requires separately verified client support.
+
+Future acceptance requires actual stopped-at-breakpoint execution, stepping,
+correct source lines, real variable values and failure behavior in native Debug
+builds. Verify supported Linux, Windows and macOS paths independently and document
+limits. Emitting metadata alone never proves debugger support. No breakpoints,
+DAP server/adapters, JIT debugger registration or variable-debug-metadata changes
+are part of the current console/composite tooling increment.
+
+The separately deferred automatic Debug cache, native-size audit, measured
+incremental research and F12/F2/hover/@param/@return quality observations remain
+in their existing records; this direction does not replace current Stage10 work.

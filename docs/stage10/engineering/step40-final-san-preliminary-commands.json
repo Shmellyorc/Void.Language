@@ -1,0 +1,43 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/ci-official-san",
+      "--target",
+      "voidc",
+      "voidls",
+      "void_operator_integration",
+      "void_operator_reload",
+      "void_operator_compounds",
+      "void_operator_keys",
+      "void_console_source",
+      "void_stage10_fields",
+      "void_stage10_hooks",
+      "void_stage10_interpolation",
+      "void_temporal_ir",
+      "void_format_numeric",
+      "void_temporal",
+      "void_format_zones",
+      "void_stage10_tooling",
+      "void_source_formatting",
+      "void_display_reload",
+      "void_runtime_console",
+      "void_runtime_console_transfers",
+      "void_runtime_console_keyboard",
+      "void_native_fixture",
+      "void_stage10_conversion",
+      "void_format_workloads",
+      "-j",
+      "2"
+    ],
+    "returncode": 0,
+    "seconds": 57.81389342295006,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    }
+  }
+]

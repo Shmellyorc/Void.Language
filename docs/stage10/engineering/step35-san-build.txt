@@ -1,0 +1,126 @@
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 66%] Built target void_managed_test_abi
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:22:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/stage10/operator_compounds.cpp.o
+[100%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_operator_compounds
+[100%] Built target void_operator_compounds
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[100%] Built target void_runtime
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_resolution
+[100%] Built target void_operator_resolution
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_declarations
+[100%] Built target void_operator_declarations
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_managed_test_abi
+[ 50%] Built target void_core
+[ 75%] Built target void_runtime
+[ 75%] Built target void_llvm
+[ 75%] Linking CXX executable void_operator_integration
+[100%] Built target void_operator_integration
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 33%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[ 33%] Built target void_managed_test_abi
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_native_fixture
+[ 66%] Built target void_format_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/growable_arrays/tests.cpp.o
+[100%] Linking CXX executable void_growable_arrays_tests
+[100%] Built target void_growable_arrays_tests
+[ 33%] Built target void_managed_test_abi
+[ 33%] Built target void_zone_objects
+[ 33%] Built target void_format_objects
+[ 66%] Built target void_native_fixture
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[100%] Linking CXX executable void_fixed_arrays_tests
+[100%] Built target void_fixed_arrays_tests
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_zone_objects
+[ 25%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_core
+[ 75%] Built target void_runtime
+[ 75%] Built target void_llvm
+[ 75%] Building CXX object CMakeFiles/void_dictionaries_tests.dir/tests/dictionaries/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_dictionaries_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_dictionaries_tests
+[100%] Built target void_dictionaries_tests
+[ 33%] Built target void_managed_test_abi
+[ 33%] Built target void_zone_objects
+[ 33%] Built target void_format_objects
+[ 66%] Built target void_native_fixture
+[100%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_properties_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_properties_tests.dir/tests/properties/tests.cpp.o
+[100%] Linking CXX executable void_properties_tests
+[100%] Built target void_properties_tests
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_core
+[ 75%] Built target void_runtime
+[ 75%] Built target void_llvm
+[ 75%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_async_tests
+[100%] Built target void_async_tests

@@ -1,0 +1,66 @@
+[
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "build/ci-official-debug",
+      "--target",
+      "voidc",
+      "voidls",
+      "void_stage10_tooling",
+      "void_source_formatting",
+      "void_tests",
+      "void_patterns_tests",
+      "void_generics_tests",
+      "void_stage10_hooks",
+      "void_stage10_interpolation",
+      "void_stage10_fields",
+      "void_display_reload",
+      "void_operator_reload",
+      "void_console_source",
+      "void_native_fixture",
+      "void_runtime_console",
+      "void_lsp_tests",
+      "void_stage10_conversion",
+      "-j",
+      "2"
+    ],
+    "label": "build",
+    "returncode": 0,
+    "seconds": 50.53202230297029,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-console-tooling-stdlib-l72zdh_a/stdlib",
+      "VOID_STAGE10_TOOLING_RECORD": "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/console-tooling-debug-lsp-responses.json"
+    }
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-debug",
+      "--output-on-failure",
+      "-R",
+      "^(stage10_operator_reload|stage10_tooling|stage10_source_formatting|stage10_display_reload|stage10_hooks|stage10_interpolation|stage10_fields|generics_source|patterns_source|lsp_positions|lsp_protocol|lsp_stage8|lsp_stage7|lsp_demo|sessions|tooling|analysis|lsp_sprint6|lsp_stage10_fields|lsp_stage10_display|lsp_stage10_intelligence|lsp_stage10_source_formatting|lsp_sprint4|lsp_sprint3|lsp_sprint2|stage10_console_source|stage10_console_aot|stage10_conversion_aot|runtime_console)$"
+    ],
+    "label": "tests",
+    "returncode": 0,
+    "seconds": 392.37639644299634,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-console-tooling-stdlib-l72zdh_a/stdlib",
+      "VOID_STAGE10_TOOLING_RECORD": "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/console-tooling-debug-lsp-responses.json"
+    }
+  },
+  {
+    "command": [
+      "build/ci-official-debug/void_stage10_conversion",
+      "--sum-display"
+    ],
+    "label": "sum-regression",
+    "returncode": 0,
+    "seconds": 21.23865495400969,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-console-tooling-stdlib-l72zdh_a/stdlib",
+      "VOID_STAGE10_TOOLING_RECORD": "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/console-tooling-debug-lsp-responses.json"
+    }
+  }
+]

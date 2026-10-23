@@ -1,0 +1,14 @@
+step28-source-hashes.json 14 current source hashes verified
+source-hashes.json 194 current source hashes verified
+Step37 unresolved observations preserved verbatim
+Current/Step28 results identical
+Six Runtime/compiler/harness build artifact hashes verified
+debug: 56 output records, 16 live prompts, 278 driver checks, two native broken-pipe paths verified
+debug: Runtime objects newer than changed sources
+san: 56 output records, 16 live prompts, 278 driver checks, two native broken-pipe paths verified
+san: Runtime objects newer than changed sources
+All reproduced-failure/repair evidence present
+git diff --check: PASS
+Public root README unchanged
+HEAD preserved: ecf0bec6e04ef66e1e50cac4afc1598a945066c0
+Step28 focused Linux acceptance passed; Stage10 INCOMPLETE; next Step29 not started

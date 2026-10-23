@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_systems.void:5:45: error: format at byte 0: Text and bool accept only alignment
+    code: VOID2009
+
+ 5 |     var bad = format([model.number<i32>()], "000")
+   |                                             ^
+    Module: /operator_console_systems.void
+

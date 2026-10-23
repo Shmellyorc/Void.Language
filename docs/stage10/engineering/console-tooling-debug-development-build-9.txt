@@ -1,0 +1,15 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_format_objects
+[ 66%] Built target void_core
+[ 66%] Built target void_lsp
+[ 66%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_tooling

@@ -1,0 +1,12 @@
+{
+  "CMakeLists.txt": "723265d68c83ad1832a8c1f3a9f659ac1b1d66344a22af314a5866c2f408de26",
+  "include/void/frontend.hpp": "eb7fddb23fd631909cbcb6da4b2de5b4860a5e7a436b65d71d122027aa86f5d5",
+  "include/void/ir.hpp": "4483b4634508a490fce943fdc3b882434936dfd3e863d24e11bc6817e044f8bd",
+  "src/frontend/compiler.cpp": "b18f387577f6ee6e32d5f20491f349a7b1305aa282fe134fbbd420cc8a1d030d",
+  "src/frontend/generic_declarations.inc": "38c18207bb3f60883165451e47e9db21ab5c42ad397dc919442c4fef58d78b12",
+  "src/frontend/generic_tooling.inc": "7da00ed2a5691676bb6458d698cafe290101221684d0a7311fea2c0c5693c25b",
+  "src/frontend/generics.inc": "fa4bdfcfc928b09a9bec9ea1a95f161aba1ec557a7147eb8f5e19058038682e9",
+  "src/ir/module.cpp": "1577e2b8a175ae27adc068790ee2649009b7208b403912acc6de4dd87b6d6a0b",
+  "src/lsp/main.cpp": "ab8c888ff5aaf824da545ba04dbdf84162ebe85d19e3d60aecbc81d53e37f27a",
+  "tests/stage10/operator_declarations.cpp": "e7e05dfffec965299456dabdd3ddac6782974c91a35aac4800924cc59779f616"
+}

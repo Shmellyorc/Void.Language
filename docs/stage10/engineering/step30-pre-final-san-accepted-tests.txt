@@ -1,0 +1,68 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start   1: stage10_operator_reload
+ 1/27 Test   #1: stage10_operator_reload ............   Passed   61.04 sec
+      Start   7: stage10_display_reload
+ 2/27 Test   #7: stage10_display_reload .............   Passed    0.94 sec
+      Start  10: stage10_hooks
+ 3/27 Test  #10: stage10_hooks ......................   Passed    6.09 sec
+      Start  11: stage10_interpolation
+ 4/27 Test  #11: stage10_interpolation ..............   Passed    1.71 sec
+      Start  13: stage10_fields
+ 5/27 Test  #13: stage10_fields .....................   Passed    0.65 sec
+      Start  19: gc_buffers
+ 6/27 Test  #19: gc_buffers .........................   Passed    3.35 sec
+      Start  20: gc_schemas
+ 7/27 Test  #20: gc_schemas .........................   Passed    0.22 sec
+      Start  22: runtime_console
+ 8/27 Test  #22: runtime_console ....................   Passed    0.04 sec
+      Start  23: runtime_console_endpoints
+ 9/27 Test  #23: runtime_console_endpoints ..........   Passed    0.12 sec
+      Start  24: runtime_console_transfers
+10/27 Test  #24: runtime_console_transfers ..........   Passed    0.03 sec
+      Start  25: runtime_console_native_transfers
+11/27 Test  #25: runtime_console_native_transfers ...   Passed    0.70 sec
+      Start  26: runtime_console_keyboard
+12/27 Test  #26: runtime_console_keyboard ...........   Passed    0.02 sec
+      Start  27: runtime_console_terminal
+13/27 Test  #27: runtime_console_terminal ...........   Passed    0.02 sec
+      Start  28: runtime_console_native_keyboard
+14/27 Test  #28: runtime_console_native_keyboard ....***Failed    0.02 sec
+  File "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py", line 26
+    expected=f'{key} 0 0 1 {(b'\n' if payload==b'\r' else payload).hex()}'.encode();assert row==expected,(row,expected);checks+=1
+                                ^
+SyntaxError: unexpected character after line continuation character
+
+      Start  29: runtime_console_native_terminal
+15/27 Test  #29: runtime_console_native_terminal ....   Passed    0.80 sec
+      Start  30: runtime_console_wide
+16/27 Test  #30: runtime_console_wide ...............   Passed    0.09 sec
+      Start  31: runtime_console_input
+17/27 Test  #31: runtime_console_input ..............   Passed    0.05 sec
+      Start  32: runtime_console_native_input
+18/27 Test  #32: runtime_console_native_input .......   Passed    0.36 sec
+      Start  33: runtime_coordination
+19/27 Test  #33: runtime_coordination ...............   Passed    2.06 sec
+      Start  83: runtime_callbacks
+20/27 Test  #83: runtime_callbacks ..................   Passed    0.93 sec
+      Start  84: runtime_failures
+21/27 Test  #84: runtime_failures ...................   Passed    0.02 sec
+      Start  87: runtime_invariants
+22/27 Test  #87: runtime_invariants .................   Passed    0.07 sec
+      Start  94: stage10_console_source
+23/27 Test  #94: stage10_console_source .............   Passed   53.91 sec
+      Start 118: async_lifecycle
+24/27 Test #118: async_lifecycle ....................   Passed    7.07 sec
+      Start 177: stage10_console_aot
+25/27 Test #177: stage10_console_aot ................   Passed  187.77 sec
+      Start 187: application_native_sprint4_host
+26/27 Test #187: application_native_sprint4_host ....   Passed    1.95 sec
+      Start 188: application_native_sprint4
+27/27 Test #188: application_native_sprint4 .........   Passed    6.36 sec
+
+96% tests passed, 1 tests failed out of 27
+
+Total Test time (real) = 336.42 sec
+
+The following tests FAILED:
+	 28 - runtime_console_native_keyboard (Failed)
+Errors while running CTest

@@ -1,0 +1,12 @@
+use console
+value struct rejected:
+    value: i32
+func (self rejected) format(spec: string) -> result<string, string>:
+    return Err("original-hook-failure")
+func (self rejected) string() -> string:
+    return "{self:reject}"
+func cleanup():
+    print("cleanup;", file = console.stderr, end = "")
+func main():
+    defer cleanup()
+    print("NEVER WRITTEN", rejected(value = 4), end = "NO")

@@ -1,0 +1,13 @@
+--- before/src/frontend/compiler.cpp
++++ after/src/frontend/compiler.cpp
+@@ -2342,7 +2342,9 @@
+         builtin_record(target,"Construct the selected result variant; only its active payload is stored. Ok(null) is successful.");
+         return target;
+     }
+-    Type result_expression(Expr& e,std::optional<Type> expected) {
++    // Keep the result signature's Function temporary out of the recursive
++    // expression dispatcher, including when Release would inline this handler.
++    VOID_SEMANTIC_HANDLER Type result_expression(Expr& e,std::optional<Type> expected) {
+         if(!expected || !expected->definition || !expected->definition->result_type)error(source,e.token,Code::type_mismatch,"Ok/Err require a contextual result<t, e> type.","Annotate the variable or the enclosing function result.");
+         auto target=result_editor_target(*expected,e.token.text=="Ok"?0:1,e.token);
+         if(diagnostics.editor)editor_call(e,target,0,false);

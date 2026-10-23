@@ -1,0 +1,30 @@
+struct ledger:
+    number: i32
+func cleanup(value: i32):
+    if value == 0:
+        var invalid = (value - 1) as u8
+value struct number:
+    value: i32
+    operator ==(const left: number, const right: number) -> bool:
+        var state = ledger(number = 20)
+        defer {
+            state.number += 1
+        }
+        defer cleanup(left.value)
+        if left.value == 0:
+            return 10 / left.value == right.value
+        return left.value == right.value
+func entry(input: i32) -> i32:
+    var state = ledger(number = 10)
+    defer {
+        state.number += 1
+    }
+    var different = number(value = input) != number(value = 4)
+    defer {
+        state.number += 100
+    }
+    if different and input == 4:
+        return 90
+    if not different and input != 4:
+        return 91
+    return input

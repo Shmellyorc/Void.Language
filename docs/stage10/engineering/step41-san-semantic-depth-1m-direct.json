@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/home/shmellyorc/.local/bin/python3.11",
+    "tests/integration/semantic_depth.py",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+  ],
+  "returncode": 0,
+  "seconds": 1.3093383320374414,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+  "reason": "Focused strict1MiB semantic-depth gate after Release cold-handler repair, before pending full strict matrix; all builds completed. No duplicate matrix."
+}

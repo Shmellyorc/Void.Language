@@ -1,0 +1,24 @@
+UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/DartConfiguration.tcl
+Parse Config file:/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/DartConfiguration.tcl
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: stage10_operator_keys
+
+1: Test command: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_keys "/home/shmellyorc/Documents/Void.Language"
+1: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+1: Test timeout computed to be: 1500
+1: 131 dictionary custom-equality checks passed
+1/1 Test #1: stage10_operator_keys ............   Passed    0.65 sec
+
+The following tests passed:
+	stage10_operator_keys
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.66 sec

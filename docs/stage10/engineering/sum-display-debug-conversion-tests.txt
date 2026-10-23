@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 12: stage10_conversion
+1/1 Test #12: stage10_conversion ...............   Passed  503.69 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 503.69 sec

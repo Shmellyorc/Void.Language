@@ -1,0 +1,16 @@
+{
+  "docs/WORK_LOG.md": "6341a67c5c5b160af46811c9353151fcf9c91c5bfdb1b3db133c7084cf352c1a",
+  "docs/stage10/CONSOLE_IO.md": "0c2c5a85f2e9995165b0a1b5b772f9368c04d8518d8ef3392d436a0f24fb81f4",
+  "docs/stage10/EVIDENCE.md": "8c25da8d6784bffcb2efb90abfc1061dffe3fd8b6ae6e682267a1cdb5b64a328",
+  "docs/stage10/IMPLEMENTATION.md": "decf11730daf5d356a3c233d3df56f2e15e0b46f64ccc635bc157a972a38575e",
+  "docs/stage10/TEST_PLAN.md": "db9dde984547ac02e62e2689b49d283e820dbf05531ac767a9062374894325ea",
+  "src/runtime/console_abi.cpp": "40f03d7e9fdfc34050222051edb64d79b5916e4574e86d9995e6ee448e57889a",
+  "src/runtime/coordination.cpp": "3643e491cfa8ee51e91cc549baefced574874100555a3183a22d21940ff45370",
+  "tests/stage10/console.cpp": "13904d0f6c4ccda37bc13f8ea496ad697d8ba8fe97a147023ec90cc2300a2c1b",
+  "tests/stage10/console.py": "bfe4da0c62dd8b33697c3001bfb1d0f8eed66e09b0266e179f1a81ce3911e444",
+  "tests/stage10/console_cleanup_only.void": "9c3eaafdb2f3d8460aac8e23a441a3a644740246412cab0ff94effb4b397148a",
+  "tests/stage10/console_cleanup_primary.void": "b4c8bb567e73b6313d2558d795c8067078d914115ddb8e9503774292b3f5594a",
+  "tests/stage10/console_exit.void": "213b44cb419f30b3c38faf68cb222a93025aaee18ee433d2b49f16899d932e15",
+  "tests/stage10/console_prompt.void": "90edbd3e3d49df808cd214903852525ad695441658cb585d4d24dde081fa6bae",
+  "tests/stage10/console_zero.void": "b0d564c142fc429d6aad9fe6e447af7d3a733f68a6a4bebded52ceeaacd9c73b"
+}

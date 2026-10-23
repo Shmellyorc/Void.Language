@@ -1,0 +1,39 @@
+use console
+func main():
+    var zero = console.stdin.read_bytes(0)
+    match zero:
+        Ok(bytes_read.data(var data)):
+            print(data.count)
+        _:
+            print("bad-zero")
+    var first = console.stdin.read_line()
+    match first:
+        Ok(text_read.text(var value)):
+            print("line:", value)
+        _:
+            print("bad-line")
+    var raw = console.stdin.read_bytes(1)
+    match raw:
+        Ok(bytes_read.data(var data)):
+            print(data[0])
+        _:
+            print("bad-raw")
+    var char = console.stdin.read_char()
+    match char:
+        Ok(text_read.text(var value)):
+            print("char:", value)
+        _:
+            print("bad-char")
+    var ending = console.stdin.read_line()
+    var finished = console.stdin.read_line()
+    match finished:
+        Ok(text_read.eof):
+            print("eof")
+        _:
+            print("bad-eof")
+    var bad = console.stdin.read_text(-1)
+    match bad:
+        Err(var reason):
+            print(reason.operation, reason.stream, reason.message, reason.bytes_transferred, reason.partial_utf16_units)
+        _:
+            print("bad-count")

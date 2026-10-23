@@ -100,6 +100,7 @@
                 auto selected=std::find_if(cases.begin(),cases.end(),[&](const auto& c){return c.name==variant;});
                 if(selected==cases.end() || selected->count!=p.children.size())error(source,p.token,Code::type_mismatch,"Enum/result pattern payload does not match its variant.");
                 p.tag=static_cast<unsigned>(selected-cases.begin());
+                if(type.definition->result_type)(void)result_editor_target(type,p.tag,p.variant_token);
                 for(unsigned n=0;n<p.children.size();++n){if(!p.fields[n].text.empty())error(source,p.fields[n],Code::syntax,"Variant patterns use positional payloads.");p.indexes.push_back(selected->begin+n);check_pattern(p.children[n],ir::field_type(type,selected->begin+n));}return;
             }
             auto resolved=p.annotated_type?resolve_type(p.narrowed,unit,root,units,p.token):Type(Type::none);

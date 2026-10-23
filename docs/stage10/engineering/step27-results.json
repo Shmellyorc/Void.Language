@@ -1,0 +1,285 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 27,
+  "increment_status": "Public heterogeneous print and borrowed source-console bindings implemented; frozen-source focused Linux Debug/strict acceptance passed. Native Windows/macOS and final-stage acceptance remain UNVERIFIED.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Compiler-recognized heterogeneous print pack; named-only sep/end/file/flush, existing argument binding/shadowing, no general varargs or object array. All explicit values/controls snapshot once in written order before left-to-right shared display hooks and checked whole-record assembly. Bare null display allocation is deferred until rendering.",
+    "Existing numeric, nominal/custom, generic, temporal and opaque-resource display reused. Unicode/NUL preserved, no outer record before successful rendering; nested hook prints run outside outer gate. Composite collections/enums/results remain explicitly unsupported.",
+    "Protected compiler-owned console.input/output roles and stdlib stdin/stdout/stderr. Endpoint copies, safe declared defaults, repeated templates, initializer authority and generic storage preserve real construction readiness. Forged creation/payload writes/roles and uninitialized loads reject independently; no native source handles.",
+    "Ordinary source recoverable write/write_bytes/flush/is_redirected and read_bytes/read_char/read_text/read_line wrappers. Shared native queue/decoder/deadlines/CRLF/EOF retained; readonly io_error includes operation, stream, kind, native code, message, exact byte progress, partial bytes, cleanup code and partial UTF16 units.",
+    "New private typed operations reuse existing compiler/LLVM Runtime ABI, exact JIT binding and linked Runtime archive. Native bytes owned before NativeSafe blocking, existing record serialization, Runtime cancellation/lifetime and worker restrictions. console-v1 compatibility identity; installed stdlib path/source protections reused.",
+    "Small supporting repairs: intrinsic const-field projection assignability, writable synthetic collection-count diagnostic, rich checked-failure propagation, and endpoint default construction/pure-factory classification. Existing readonly/private/worker/IR checks and legacy CLI result printing preserved."
+  ],
+  "bounded_files": [
+    "CMakeLists.txt",
+    "include/void/console_ops.hpp",
+    "include/void/ir.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "src/frontend/compiler.cpp",
+    "src/frontend/display_semantics.inc",
+    "src/frontend/construction.inc",
+    "src/ir/module.cpp",
+    "src/ir/reference_capabilities.inc",
+    "src/backend/llvm/backend.cpp",
+    "src/runtime/array.cpp",
+    "src/runtime/console_abi.cpp",
+    "stdlib/console.void",
+    "tests/managed/probe.hpp",
+    "tests/managed/probe.cpp",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/console_print.void",
+    "tests/stage10/console_order.void",
+    "tests/stage10/console_reads.void",
+    "tests/stage10/console_fail.void",
+    "tests/stage10/console_read_errors.void",
+    "tests/stage10/console_endpoints.void",
+    "docs/WORK_LOG.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md"
+  ],
+  "debug": {
+    "passed": 25,
+    "total": 25,
+    "seconds": 160.57,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_keys",
+      "stage10_operator_resolution",
+      "stage10_display_reload",
+      "stage10_temporal_ir",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_conversion",
+      "stage10_fields",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "arrays_source",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_operator_compounds",
+      "stage10_console_source",
+      "stage10_console_aot"
+    ],
+    "log": "step27-debug-frozen-tests.txt",
+    "build": "step27-debug-frozen-build.txt",
+    "detail": "step27-debug-frozen-detail.txt",
+    "output_records": "step27-debug-outputs.json",
+    "source_assertions": 917,
+    "driver_checks": 127,
+    "binary_execution_records": 24,
+    "real_closed_pipe_paths": 2,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step27-acceptance-stdlib"
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 25,
+    "total": 25,
+    "seconds": 171.38,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_keys",
+      "stage10_operator_resolution",
+      "stage10_display_reload",
+      "stage10_temporal_ir",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_conversion",
+      "stage10_fields",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "arrays_source",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_operator_compounds",
+      "stage10_console_source",
+      "stage10_console_aot"
+    ],
+    "log": "step27-san-frozen-tests.txt",
+    "build": "step27-san-frozen-build.txt",
+    "detail": "step27-san-frozen-detail.txt",
+    "output_records": "step27-san-outputs.json",
+    "source_assertions": 917,
+    "driver_checks": 127,
+    "binary_execution_records": 24,
+    "real_closed_pipe_paths": 2,
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+      "VOID_STDLIB_ROOT": "/tmp/void-step27-acceptance-stdlib"
+    },
+    "configuration": "RelWithDebInfo with pinned LLVM/Clang 19.1.7; existing RTTI-off vptr exclusion unchanged",
+    "execution": "LeakSanitizer actually executed outside the restricted ptrace runner; no sanitizer report in final focused acceptance."
+  },
+  "checks": {
+    "source_assertions_per_config": 917,
+    "source_driver_per_config": 127,
+    "binary_execution_records_per_config": 24,
+    "real_closed_pipe_paths_per_config": 2,
+    "preserved_native_wide": 271656,
+    "preserved_input_deterministic": 2261,
+    "preserved_input_POSIX_driver": 264,
+    "preserved_transfer_deterministic": 178,
+    "preserved_transfer_POSIX_driver": 210,
+    "preserved_foundation": 72,
+    "preserved_endpoints": 14
+  },
+  "coverage": [
+    "Six native source fixtures in normal/O2 JIT and independently linked normal/O2 AOT, binary stdout/stderr comparisons retained as hex, including Unicode/NUL/raw invalid bytes.",
+    "All controls and evaluation counts/order, old value versus shared managed identity, generic/temporal/custom displays, hook/native failures and reached cleanup.",
+    "Forced GC at allocation budget one, blocking native output while collecting, persistent and one-shot allocation failure sweeps with root/frame cleanup.",
+    "All portable recoverable error kinds and native/cleanup/partial-UTF16 progress, real POSIX broken pipe checked rather than SIGPIPE termination.",
+    "Private/const endpoints, worker effects/recursive transfer and malformed IR; selected const-field/read-only mutable-path negatives.",
+    "Installed stdlib resolution and canonical identity, standalone private-op rejection, cold/hit/corrupt/source-changed cache paths, preserved operator/display generation/reload tests."
+  ],
+  "development_failures_and_repairs": [
+    {
+      "defect": "Returning io_error with const partial array failed independent capability assignment.",
+      "repair": "Shared assignability recognizes readonly authority intrinsically imposed by const stored fields; unrelated mutable paths still reject.",
+      "evidence": [
+        "step27-second-stderr.bin"
+      ]
+    },
+    {
+      "defect": "Initial console checked branch overwrote original native error/progress with generic failure.",
+      "repair": "Existing LLVM selected_failure path retains native reason, partial progress, cleanup and source frames.",
+      "evidence": [
+        "step27-debug-error-detail.txt",
+        "step27-debug-failure-repair-tests.txt"
+      ]
+    },
+    {
+      "defect": "Preserved arrays_source negative crashed const-field writable walk on synthetic count metadata (24/25 initial broad run).",
+      "repair": "Stored-field const metadata walk restricted to nominal aggregate/managed owners. Synthetic count still diagnoses; selected const fields still reject.",
+      "evidence": [
+        "step27-debug-acceptance-tests.txt",
+        "step27-arrays-backtrace.txt",
+        "step27-debug-field-preservation-tests.txt"
+      ]
+    },
+    {
+      "defect": "Valid declared endpoint defaults/copies rejected as missing required field; repeated value template rejected as effectful.",
+      "repair": "Validated constant defaults participate in existing construction/readiness/prelude writes; endpoint factory is pure. Required fields with no defaults still need actual initialization.",
+      "evidence": [
+        "step27-endpoint-default-before-stderr.txt",
+        "step27-endpoint-repeat-before-stderr.txt",
+        "step27-endpoint-ready-stdout.txt",
+        "step27-endpoint-ready-stderr.txt"
+      ]
+    },
+    {
+      "defect": "Bare null display allocated before a written RHS side effect under one-shot allocation failure.",
+      "repair": "Capture null without allocation; materialize existing shared null display literal during render after all raw expressions.",
+      "evidence": [
+        "step27-null-once-before.txt",
+        "step27-null-repair-tests.txt"
+      ]
+    },
+    {
+      "defect": "Early test fixture/instrumentation assumptions did not match existing language/test APIs.",
+      "repair": "Filesystem source overlays, positional enum patterns, array count/cast syntax and preallocated one-shot observer modes corrected. Existing compiler rules and probe defaults preserved.",
+      "evidence": [
+        "step27-null-before.txt",
+        "step27-null-before-render.txt"
+      ]
+    }
+  ],
+  "historical_acceptance": {
+    "debug": "25/25 155.15 seconds before final-copy endpoint/null probes",
+    "strict": "25/25 157.12 seconds before final-copy endpoint/null probes",
+    "note": "Historical passes are superseded by the frozen-source runs above; not represented as verification of later fixes."
+  },
+  "unresolved_focused_Linux_defects": [],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "Native Windows SDK compilation and actual ReadConsoleW/WriteConsoleW/redirected console execution; Step26 targeted obligations retained.",
+    "Native macOS; fresh Release; new console-specific editor/LSP cross-product and final Stage10 acceptance."
+  ],
+  "ABI_build_scope": "Added private same-build console endpoint/native/print typed operations and two C Runtime entrypoints. Existing Runtime archive, JIT symbol binding, linked AOT, GC roots/NativeSafe and stdlib install paths reused; no public native handle ABI or new registry/backend/GC.",
+  "dependencies": {
+    "new": "None",
+    "existing": {
+      "date": {
+        "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+        "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+      },
+      "ryu": {
+        "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+        "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+      },
+      "tzdata2026e": {
+        "revision": "2026e",
+        "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      }
+    },
+    "licenses": "Unchanged: Ryu Boost 1.0 option, Howard Hinnant date v3.0.3 MIT notices, IANA 2026e public domain; LLVM/Clang 19.1.7 pinned."
+  },
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "LLVM_Clang": "19.1.7"
+  },
+  "remaining_stage_obligations": [
+    "Step28 prompt helpers and complete drain/normal-exit/failure/shutdown lifecycle acceptance (basic unbuffered flush supplied).",
+    "Step29 terminal capabilities/presentation, Step30 scoped modes/key events, Step31 full concurrency/source/native lifetime acceptance.",
+    "Composite collection/enum/result display; console/composite tooling cross-product.",
+    "Revisit complete four-system Step40; Steps41–44 consolidated/platform acceptance/documentation/Wrench review."
+  ],
+  "next_step": 28,
+  "next_source_change": "Add prompt helpers over existing public console reads/writes and verify drain ordering plus normal-exit/failure cleanup using existing Runtime/CLI/AOT teardown and reached-defer infrastructure. Preserve unbuffered flush, NativeSafe roots and retained entered-call lifetime; Step28 not started.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "source_manifests": {
+    "bounded": "step27-source-hashes.json",
+    "bounded_files": 30,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 189,
+    "previous_checkpoint": "step26-checkpoint-source-hashes.json",
+    "preservation": "step27-preservation.json",
+    "unchanged_prior_entries_verified": 159
+  },
+  "commands": [
+    "cmake --build build/ci-official-debug -j 2 --target void_console_source voidc void_stage10_fields void_stage10_conversion void_stage10_interpolation void_stage10_hooks void_temporal_ir void_display_reload void_operator_resolution void_operator_compounds void_operator_keys void_operator_reload void_arrays_source void_runtime_console_wide void_runtime_console_input void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "cmake --build build/ci-official-san -j 2 --target void_console_source voidc void_stage10_fields void_stage10_conversion void_stage10_interpolation void_stage10_hooks void_temporal_ir void_display_reload void_operator_resolution void_operator_compounds void_operator_keys void_operator_reload void_arrays_source void_runtime_console_wide void_runtime_console_input void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "VOID_STDLIB_ROOT=/tmp/void-step27-acceptance-stdlib ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_reload|stage10_operator_keys|stage10_operator_resolution|stage10_display_reload|stage10_temporal_ir|stage10_hooks|stage10_interpolation|stage10_conversion|stage10_fields|gc_buffers|gc_schemas|runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_wide|runtime_console_input|runtime_console_native_input|runtime_coordination|arrays_source|runtime_failures|runtime_invariants|stage10_operator_compounds|stage10_console_source|stage10_console_aot)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=/tmp/void-step27-acceptance-stdlib ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_reload|stage10_operator_keys|stage10_operator_resolution|stage10_display_reload|stage10_temporal_ir|stage10_hooks|stage10_interpolation|stage10_conversion|stage10_fields|gc_buffers|gc_schemas|runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_wide|runtime_console_input|runtime_console_native_input|runtime_coordination|arrays_source|runtime_failures|runtime_invariants|stage10_operator_compounds|stage10_console_source|stage10_console_aot)$'",
+    "git diff --check",
+    "git diff --quiet -- README.md"
+  ],
+  "build_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "1c6dbe1813d18a114a0c8a2fad7d181b0722f92ae5f7c8829ee85ff0d09544db",
+    "build/ci-official-debug/voidc": "48e13f0dff52226270d77d255cb3270bf2080817ffd8bf613240d986f3de331b",
+    "build/ci-official-debug/void_console_source": "7eb5f0dc90385dc994f3d912631416f282ad21e1f1e10f8d98a7865576cf89fc",
+    "build/ci-official-san/libvoid_runtime.a": "e261ba0dcd31358c58fb977dcce6013f8e7cf11bbcdb6791745c235fd8899dbc",
+    "build/ci-official-san/voidc": "9e8e699b643e51f9600ab7abcbba941c3958ed24aa4b491b71cc411fa8939d9f",
+    "build/ci-official-san/void_console_source": "6aaf88e2bb79670b9e243a1c8c276895f663c04d75fa10ca4928ce08b5247bdd"
+  }
+}

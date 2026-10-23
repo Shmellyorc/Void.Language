@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc",
+    "check",
+    "/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/combined-depth.void"
+  ],
+  "returncode": 1,
+  "seconds": 0.04071738291531801,
+  "stack_bytes": 1048576,
+  "stdout": "",
+  "stderr": "/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/combined-depth.void:7:37: error: Source nesting limit exceeded.\n    code: VOID1107\n\n 7 | const chain_6 = - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - chain_7\n   |                                     ^\n    Module: /combined-depth.void\n    Hint: Split deeply nested expressions or blocks into smaller functions.\n\n/home/shmellyorc/Documents/Void.Language/build/step41-release-stack/combined-depth.void:11:5: error: Unknown function 'unknown'.\n    code: VOID2003\n\n 11 |     unknown()\n    |     ^^^^^^^\n    Module: /combined-depth.void\n    Hint: Declare it here or import its declaring file; imports are not transitive exports.\n\n",
+  "fixture": "Exact original tests/frontend/diagnostics.hpp9-constant/40-unary combined-depth case; no harness edit.",
+  "source_sha256": "f82d4252c0203f73ff363944a1581c6d3136526f424cb09fc457e84e677ef7c3"
+}

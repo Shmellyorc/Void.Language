@@ -1,0 +1,19 @@
+Start testing: Oct 23 03:06 PDT
+----------------------------------------------------------
+22/199 Testing: runtime_console
+22/199 Test: runtime_console
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_runtime_console"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"runtime_console" start time: Oct 23 03:06 PDT
+Output:
+----------------------------------------------------------
+347 console foundation identity/lifecycle/GC checks passed
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console" end time: Oct 23 03:06 PDT
+"runtime_console" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 23 03:06 PDT

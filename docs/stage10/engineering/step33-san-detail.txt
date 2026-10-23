@@ -1,0 +1,51 @@
+Start testing: Oct 22 07:03 PDT
+----------------------------------------------------------
+1/178 Testing: stage10_operator_resolution
+1/178 Test: stage10_operator_resolution
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_resolution" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_resolution" start time: Oct 22 07:03 PDT
+Output:
+----------------------------------------------------------
+161 operator resolution/call checks passed
+<end of output>
+Test time =   2.61 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_resolution" end time: Oct 22 07:03 PDT
+"stage10_operator_resolution" time elapsed: 00:00:02
+----------------------------------------------------------
+
+2/178 Testing: stage10_operator_declarations
+2/178 Test: stage10_operator_declarations
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_declarations" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operator_declarations" start time: Oct 22 07:03 PDT
+Output:
+----------------------------------------------------------
+278 operator declaration/validation checks passed
+<end of output>
+Test time =   1.41 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_declarations" end time: Oct 22 07:03 PDT
+"stage10_operator_declarations" time elapsed: 00:00:01
+----------------------------------------------------------
+
+159/178 Testing: stage10_operators_aot
+159/178 Test: stage10_operators_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_operators_aot" start time: Oct 22 07:03 PDT
+Output:
+----------------------------------------------------------
+16 source operator JIT/AOT checks passed
+<end of output>
+Test time =   3.12 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operators_aot" end time: Oct 22 07:03 PDT
+"stage10_operators_aot" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 22 07:03 PDT

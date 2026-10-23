@@ -1,0 +1,27 @@
+use console
+use time
+value struct ticket<t>:
+    item: t
+func (self ticket<t>) string() -> string:
+    return "ticket:{self.item}"
+func main():
+    print()
+    print("HELLO FROM VOID!")
+    print("Level:", 42, true, 1.25)
+    print(-128 as i8, -32768 as i16, -2147483648, -9223372036854775808 as i64, 255 as u8, 65535 as u16, 4294967295 as u32, 18446744073709551615 as u64, 1.5 as f32, 2.5)
+    print("Loading...", end = "", flush = true)
+    print("a", "b", sep = ", ")
+    print("error:", -7, file = console.stderr)
+    print("é🎮\0", sep = "", end = "\0END\n")
+    print(ticket<i32>(item = 9))
+    print(console.stdout, console.stderr, null)
+    var date_value = make_date(2026, 10, 22)
+    match date_value:
+        Ok(var day):
+            print(day, "{day:yyyy/MM/dd}")
+        Err(var reason):
+            print(reason, file = console.stderr)
+    var sent = console.stdout.write("write\0!")
+    var binary: [u8] = [0, 255, 10]
+    var copied = console.stderr.write_bytes(binary)
+    var drained = console.stdout.flush()

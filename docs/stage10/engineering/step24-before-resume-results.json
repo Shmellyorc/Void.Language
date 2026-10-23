@@ -1,0 +1,139 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 24,
+  "increment_status": "BLOCKED on native cancellation/platform policy; no production transfer implementation or Step 24 acceptance",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Standalone Linux architecture counterexample using existing Runtime/Context/Operation, deterministic barriers, real pipes and /proc syscall observation.",
+    "Targeted libc POSIX AIO cancellation feasibility probe; separate io_uring setup probe inside/outside restricted runner.",
+    "Updated recovery/console/test/evidence/work-log records. Production sources, CMake, ABI, compiler, LLVM stack and dependencies unchanged."
+  ],
+  "bounded_files": [
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/engineering/step24-feasibility.md",
+    "docs/stage10/engineering/step24-posix-feasibility.cpp"
+  ],
+  "blocker": {
+    "readiness": "POLLOUT followed by a permitted independent host writer filling capacity leaves even a one-byte blocking write in the syscall. Runtime stop signals the owned wake pipe, but cannot drain that operation until the host reads. This refutes readiness plus self-pipe as a sufficient general transfer strategy under the existing independent-writer contract.",
+    "POSIX_AIO": "Observed on this host/libc: after an AIO worker enters a pipe read, aio_cancel(fd, &request) returns AIO_NOTCANCELED and aio_error remains EINPROGRESS. Explicit host byte delivery completes/reaps it.",
+    "io_uring": "Setup only: succeeds outside restriction (fd 3, errno 0); EPERM inside (errno 1). No transfer/cancellation or platform-support guarantee inferred.",
+    "owner_decision": "Settle whether native asynchronous requests may become a required adapter/platform facility where readiness is insufficient, including behavior where the kernel/sandbox denies that facility, or explicitly revise the embedding/wait contract. No option was adopted silently.",
+    "detail": "step24-feasibility.md"
+  },
+  "production_repairs": [],
+  "architecture_probe": {
+    "checks_per_configuration": 17,
+    "debug": "step24-probe-debug.txt",
+    "strict": "step24-probe-san.txt",
+    "strict_environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "method": "Real probe-owned blocking pipes, semaphores, per-thread syscall observation and zero-time status checks. No sleeps; bounded synchronization watchdog. Every pending request explicitly released/reaped/joined.",
+    "scope": "Architecture feasibility only; not a passing Step 24 implementation test.",
+    "debug_build": "step24-probe-build-final.txt",
+    "strict_build": "step24-probe-san-build.txt"
+  },
+  "baseline_preservation": {
+    "debug": {
+      "passed": 7,
+      "total": 7,
+      "seconds": 13.03,
+      "log": "step24-debug-baseline-tests.txt"
+    },
+    "strict_sanitizers": {
+      "passed": 7,
+      "total": 7,
+      "seconds": 5.8,
+      "log": "step24-san-baseline-tests.txt"
+    },
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants"
+    ],
+    "foundation_checks": 72,
+    "real_endpoint_checks": 14,
+    "build_scope": "Existing Step 23 Runtime/fixture archives and CTest executables reused because no production or existing test source changed. Standalone probe compiled separately with pinned LLVM/Clang 19.1.7. Actual strict leak executions outside ptrace; no assertions disabled. These results preserve the baseline and do not establish Step 24 transfers."
+  },
+  "capability_logs": {
+    "restricted": "step24-uring-restricted.txt",
+    "unrestricted": "step24-uring-host.txt"
+  },
+  "development_failures": [
+    "Initial manual probe link omitted libvoid_native_fixture and failed with the expected existing native-binding symbols. Corrected final link uses both existing archives and pinned lld; no production repair or check relaxation. Initial failure retained in step24-probe-build.txt."
+  ],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unimplemented_or_unaccepted": [
+    "Step 24 actual low-level transfers, EOF and native errors/progress",
+    "Step 24 short/partial transfer loops, partial input retention and zero-progress handling",
+    "Step 24 monotonic deadlines and owned-request native cancellation",
+    "Step 24 scoped SIGPIPE production handling and transfer GC/concurrency/lifetime acceptance",
+    "Steps 25\u201331 shared decoder/lines, Windows wide-console paths, source print and terminal/shutdown integration",
+    "Composite display and complete four-system integration",
+    "Final Steps 41\u201344 acceptance and Wrench handoff"
+  ],
+  "unverified": [
+    "Native Windows/macOS for this increment",
+    "io_uring actual read/write/cancellation/packaging and supported-platform policy",
+    "Separate Release, new source/JIT/O2/AOT/editor acceptance",
+    "Complete focused Step 24 transfer acceptance"
+  ],
+  "new_dependencies": "none adopted; existing LLVM 19.1.7 and Ryu/date/IANA versions/licenses unchanged. Installed Linux io_uring header used by diagnostic probe only.",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "LLVM_Clang": "19.1.7"
+  },
+  "next_step": 24,
+  "next_source_change": "After Boss/Wrench settles the native cancellation/platform contract, extend existing Adapter/Operation in include/void/console.hpp and src/runtime/console.cpp with explicit transfer outcomes/native-owned byte buffers and one monotonic deadline; implement the agreed owned-request platform path before Step 25.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. No source API, unsupported placeholder, descriptor status change or detached request added.",
+  "commands": [
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++ -std=c++20 -g -Iinclude --ld-path=\"$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\" docs/stage10/engineering/step24-posix-feasibility.cpp build/ci-official-debug/libvoid_runtime.a build/ci-official-debug/libvoid_native_fixture.a -pthread -ldl -lrt -o /tmp/void-step24-posix-feasibility",
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++ -std=c++20 -O2 -g -fsanitize=address,undefined -fno-sanitize=vptr -Iinclude --ld-path=\"$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\" docs/stage10/engineering/step24-posix-feasibility.cpp build/ci-official-san/libvoid_runtime.a build/ci-official-san/libvoid_native_fixture.a -pthread -ldl -lrt -o /tmp/void-step24-posix-feasibility-san",
+    "/tmp/void-step24-posix-feasibility",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 /tmp/void-step24-posix-feasibility-san",
+    "/tmp/void-step24-posix-feasibility --uring (inside restricted runner, then outside)",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "git diff --check",
+    "git diff --quiet -- README.md"
+  ],
+  "source_manifests": {
+    "bounded": "step24-source-hashes.json",
+    "bounded_files": 7,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 168,
+    "previous_checkpoint": "step23-checkpoint-source-hashes.json",
+    "preservation": "step24-preservation.json",
+    "unchanged_prior_entries_verified": 161
+  },
+  "primary_references": [
+    "https://man7.org/linux/man-pages/man2/poll.2.html",
+    "https://man7.org/linux/man-pages/man7/pipe.7.html",
+    "https://man7.org/linux/man-pages/man3/aio_cancel.3.html",
+    "https://man7.org/linux/man-pages/man2/io_uring_setup.2.html",
+    "https://learn.microsoft.com/en-us/windows/win32/fileio/canceling-pending-i-o-operations"
+  ],
+  "linked_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "57bbb3fe476349a490bef09d1b42c210287421766e05fea45961f9c552949f5e",
+    "build/ci-official-debug/libvoid_native_fixture.a": "cc778e3c1823c2a9073332eba3f735bb6bc0026d90ddfcd842837fa429ae6915",
+    "build/ci-official-san/libvoid_runtime.a": "d514f23b8aa73f1c9d98e7e3f10f11d1293ce53404c65518ca496860c3fadcfe",
+    "build/ci-official-san/libvoid_native_fixture.a": "251d6ac36a7fd94b5d7d1c4c4c8026fbad29024eca2f0a5e4541690ec51823c2"
+  }
+}

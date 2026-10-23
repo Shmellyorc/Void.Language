@@ -1,0 +1,56 @@
+[
+  {
+    "label": "configure",
+    "command": [
+      "cmake",
+      "-S",
+      "/home/shmellyorc/Documents/Void.Language",
+      "-B",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+      "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+      "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+      "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "-DVOID_DWARFDUMP=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-dwarfdump",
+      "-DPython3_EXECUTABLE=/home/shmellyorc/.local/bin/python3.11",
+      "-DBUILD_TESTING=ON",
+      "-DVOID_LLVM_RESEARCH=OFF",
+      "-DVOID_SANITIZERS=ON"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 16.19344062602613,
+    "child_user_seconds": 12.942822,
+    "child_system_seconds": 2.020936,
+    "cumulative_child_peak_rss_kib": 473152
+  },
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+      "-j",
+      "2"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "status": "finished",
+    "returncode": 2,
+    "seconds": 593.1937818849692,
+    "child_user_seconds": 644.121718,
+    "child_system_seconds": 27.478793,
+    "cumulative_child_peak_rss_kib": 2264904
+  }
+]

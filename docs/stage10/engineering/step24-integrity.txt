@@ -1,0 +1,3 @@
+source-hashes.json 170 matching entries
+step24-source-hashes.json 14 matching entries
+Step 37 observations identical; results mirror identical; 23 native cases per configuration; no unexpected source changes

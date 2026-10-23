@@ -1,0 +1,111 @@
+[
+  {
+    "label": "semantic-depth-1m-direct",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/integration/semantic_depth.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 0.3940406759502366
+  },
+  {
+    "label": "complete-release-build",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/tmp/step41-run.py",
+      "release",
+      "build"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 4480.684324859991
+  },
+  {
+    "label": "release-neighbors",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(source_cli|frontend|stage10_tooling)$"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 4.374860687996261
+  },
+  {
+    "label": "release-frontend-1m-direct",
+    "command": [
+      "/bin/bash",
+      "-c",
+      "ulimit -s 1024; exec \"$1\" frontend \"$2\"",
+      "void-frontend-1m",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_tests",
+      "/home/shmellyorc/Documents/Void.Language"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 4.357704576919787
+  },
+  {
+    "label": "final-editors",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/tmp/step41-editors.py"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 33.661217986023985
+  },
+  {
+    "label": "final-default-roots",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/tmp/step41-default-roots.py"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 130.49898714292794
+  },
+  {
+    "label": "final-debug",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/tmp/step41-run.py",
+      "debug",
+      "test"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 1659.98435168399
+  },
+  {
+    "label": "final-release",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/tmp/step41-run.py",
+      "release",
+      "test"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 854.5493556349538
+  },
+  {
+    "label": "final-san",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/tmp/step41-run.py",
+      "san",
+      "test"
+    ],
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 1791.5902113750344
+  }
+]

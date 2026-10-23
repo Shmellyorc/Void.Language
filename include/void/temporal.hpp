@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 namespace vd::temporal {
+inline constexpr std::string_view abi_version = "void-temporal-v1;date-3.0.3-5bdb7e6f31fac909c090a46dbd9fea27b6e609a4;iana-2026e;explicit-overlap-gap";
 // Validated at every public/native boundary. Seconds and fractions remain separate.
 struct Date { int year; unsigned month,day; };
 struct Time { unsigned hour,minute,second,nanosecond; };

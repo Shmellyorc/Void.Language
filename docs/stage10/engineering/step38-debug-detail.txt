@@ -1,0 +1,319 @@
+Start testing: Oct 22 10:58 PDT
+----------------------------------------------------------
+1/184 Testing: stage10_operator_reload
+1/184 Test: stage10_operator_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_reload" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/operator reload fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_reload" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+219 operator/format compatibility/cache/reload checks passed
+<end of output>
+Test time =  17.03 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_reload" end time: Oct 22 10:58 PDT
+"stage10_operator_reload" time elapsed: 00:00:17
+----------------------------------------------------------
+
+3/184 Testing: stage10_operator_resolution
+3/184 Test: stage10_operator_resolution
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_resolution" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_resolution" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+161 operator resolution/call checks passed
+<end of output>
+Test time =   2.22 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_resolution" end time: Oct 22 10:58 PDT
+"stage10_operator_resolution" time elapsed: 00:00:02
+----------------------------------------------------------
+
+5/184 Testing: stage10_tooling
+5/184 Test: stage10_tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_tooling"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_tooling" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+15 Stage 10 tooling metadata checks passed
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_tooling" end time: Oct 22 10:58 PDT
+"stage10_tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+76/184 Testing: lsp_positions
+76/184 Test: lsp_positions
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_lsp_tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_positions" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+UTF16 positions, owned snapshots and URI mapping passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_positions" end time: Oct 22 10:58 PDT
+"lsp_positions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+77/184 Testing: lsp_protocol
+77/184 Test: lsp_protocol
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/lsp fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_protocol" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed
+interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed
+invalid disk UTF-8: original UTF16 ranges, overlay repair and close passed
+strings: imported constants, UTF16 escape spans and unsaved repair passed
+Stage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed
+<end of output>
+Test time =   0.55 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_protocol" end time: Oct 22 10:58 PDT
+"lsp_protocol" time elapsed: 00:00:00
+----------------------------------------------------------
+
+78/184 Testing: lsp_stage8
+78/184 Test: lsp_stage8
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage8" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Debug cache: miss
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage8" end time: Oct 22 10:58 PDT
+"lsp_stage8" time elapsed: 00:00:00
+----------------------------------------------------------
+
+79/184 Testing: lsp_stage7
+79/184 Test: lsp_stage7
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage7.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage7" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage7" end time: Oct 22 10:58 PDT
+"lsp_stage7" time elapsed: 00:00:00
+----------------------------------------------------------
+
+80/184 Testing: lsp_demo
+80/184 Test: lsp_demo
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tools/lsp_demo.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_demo" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+initialized: full synchronization, UTF-16, definition and references
+open: no diagnostics
+definition: worker.void:1:6
+references: declaration and one source call
+unsaved edit: VOID2002 at worker.void:2:12
+invalid revision: navigation returns null
+repair: old diagnostics cleared; fresh navigation restored
+shutdown and exit: clean protocol streams
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_demo" end time: Oct 22 10:58 PDT
+"lsp_demo" time elapsed: 00:00:00
+----------------------------------------------------------
+
+147/184 Testing: sessions
+147/184 Test: sessions
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests" "sessions" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/session fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"sessions" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+sessions: passed
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"sessions" end time: Oct 22 10:58 PDT
+"sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+148/184 Testing: tooling
+148/184 Test: tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests" "tooling" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/tooling fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"tooling" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required
+tooling: passed
+<end of output>
+Test time =   0.52 sec
+----------------------------------------------------------
+Test Passed.
+"tooling" end time: Oct 22 10:58 PDT
+"tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+149/184 Testing: analysis
+149/184 Test: analysis
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests" "analysis" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/analysis fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"analysis" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 188878
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 359932
+analysis: passed
+<end of output>
+Test time =   0.81 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Oct 22 10:58 PDT
+"analysis" time elapsed: 00:00:00
+----------------------------------------------------------
+
+166/184 Testing: lsp_sprint6
+166/184 Test: lsp_sprint6
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_sprint6" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+<end of output>
+Test time =   0.72 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint6" end time: Oct 22 10:58 PDT
+"lsp_sprint6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+167/184 Testing: lsp_stage10_fields
+167/184 Test: lsp_stage10_fields
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_fields" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Field LSP privacy, const hover/completion, dirty rejection and repair passed
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_fields" end time: Oct 22 10:58 PDT
+"lsp_stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+168/184 Testing: lsp_stage10_display
+168/184 Test: lsp_stage10_display
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_display" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+<end of output>
+Test time =   0.87 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_display" end time: Oct 22 10:58 PDT
+"lsp_stage10_display" time elapsed: 00:00:00
+----------------------------------------------------------
+
+169/184 Testing: lsp_stage10_intelligence
+169/184 Test: lsp_stage10_intelligence
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_intelligence" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+150 Stage 10 LSP intelligence checks passed
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_intelligence" end time: Oct 22 10:58 PDT
+"lsp_stage10_intelligence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+171/184 Testing: lsp_sprint4
+171/184 Test: lsp_sprint4
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint4.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_sprint4" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 4 nonexecuting application analysis and native trust checks passed
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint4" end time: Oct 22 10:58 PDT
+"lsp_sprint4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+175/184 Testing: lsp_sprint3
+175/184 Test: lsp_sprint3
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint3.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_sprint3" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint3" end time: Oct 22 10:58 PDT
+"lsp_sprint3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+176/184 Testing: lsp_sprint2
+176/184 Test: lsp_sprint2
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/sprint2.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_sprint2" start time: Oct 22 10:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint2" end time: Oct 22 10:58 PDT
+"lsp_sprint2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 22 10:58 PDT

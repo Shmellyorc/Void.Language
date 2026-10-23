@@ -1,0 +1,43 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/19 Test   #1: stage10_operator_reload ...........   Passed   46.13 sec
+      Start   7: stage10_display_reload
+ 2/19 Test   #7: stage10_display_reload ............   Passed    4.50 sec
+      Start   9: format_temporal
+ 3/19 Test   #9: format_temporal ...................   Passed    0.23 sec
+      Start  10: stage10_hooks
+ 4/19 Test  #10: stage10_hooks .....................   Passed    5.89 sec
+      Start  11: stage10_interpolation
+ 5/19 Test  #11: stage10_interpolation .............   Passed    1.89 sec
+      Start  13: stage10_fields
+ 6/19 Test  #13: stage10_fields ....................   Passed    1.00 sec
+      Start  14: format_numeric
+ 7/19 Test  #14: format_numeric ....................   Passed    0.92 sec
+      Start  19: gc_buffers
+ 8/19 Test  #19: gc_buffers ........................   Passed    9.94 sec
+      Start  20: gc_schemas
+ 9/19 Test  #20: gc_schemas ........................   Passed    0.83 sec
+      Start  22: runtime_console
+10/19 Test  #22: runtime_console ...................   Passed    0.04 sec
+      Start  26: runtime_console_keyboard
+11/19 Test  #26: runtime_console_keyboard ..........   Passed    0.03 sec
+      Start  28: runtime_console_native_keyboard
+12/19 Test  #28: runtime_console_native_keyboard ...   Passed    0.15 sec
+      Start  33: runtime_coordination
+13/19 Test  #33: runtime_coordination ..............   Passed    2.07 sec
+      Start  34: runtime_generated
+14/19 Test  #34: runtime_generated .................   Passed    1.55 sec
+      Start  84: runtime_failures
+15/19 Test  #84: runtime_failures ..................   Passed    0.02 sec
+      Start  94: stage10_console_source
+16/19 Test  #94: stage10_console_source ............   Passed   54.22 sec
+      Start 177: stage10_console_aot
+17/19 Test #177: stage10_console_aot ...............   Passed  187.76 sec
+      Start 179: stage10_conversion_aot
+18/19 Test #179: stage10_conversion_aot ............   Passed    2.72 sec
+      Start 182: lsp_stage10_display
+19/19 Test #182: lsp_stage10_display ...............   Passed    0.97 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Total Test time (real) = 320.88 sec

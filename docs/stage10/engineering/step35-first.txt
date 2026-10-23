@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_compounds.void:42:39: error: Unknown initializer parameter 'items'.
+    code: VOID2004
+
+ 42 |     var object = owner(value = input, items = [number(value = 10)], fixed = [number(value = 10), number(value = 3)], entries = {"x": number(value = 10)})
+    |                                       ^^^^^
+    Module: /operator_compounds.void
+

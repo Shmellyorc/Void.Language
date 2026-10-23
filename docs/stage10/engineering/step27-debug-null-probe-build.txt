@@ -1,0 +1,12 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[ 20%] Built target void_native_fixture
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_core
+[ 80%] Built target void_runtime
+[ 80%] Built target void_llvm
+[ 80%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_console_source.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source

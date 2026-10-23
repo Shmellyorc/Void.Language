@@ -1,0 +1,20 @@
+struct private_node:
+    text: string
+value struct packet<t>:
+    item: t
+    operator +(const left: packet<t>, const right: packet<t>) -> packet<t>:
+        var local = private_node(text = left.item + right.item)
+        for i in 0..<3:
+            local.text = "{local.text}"
+        return packet<t>(item = local.text)
+    operator ==(const left: packet<t>, const right: packet<t>) -> bool:
+        return left.item == right.item
+func work(value: string) -> packet<string>:
+    return packet<string>(item = value) + packet<string>(item = "🎮\0")
+async func entry(input: i32) -> i32:
+    var task = spawn work("left")
+    var first = await task
+    var again = await task
+    if first != again or first.item != "left🎮\0":
+        return 90
+    return input

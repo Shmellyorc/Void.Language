@@ -1,0 +1,25 @@
+use "/native_bridge.void" as bridge
+value struct number:
+    value: i32
+    operator /(const left: number, const right: i32) -> number:
+        bridge.scalar_i32(35)
+        return number(value = left.value / right)
+struct owner:
+    stored: number
+property (self owner) value: number:
+    get:
+        bridge.scalar_i32(20)
+        return self.stored
+    set(value):
+        bridge.scalar_i32(40)
+        self.stored = value
+func rhs(value: i32) -> i32:
+    bridge.scalar_i32(30)
+    return value
+func entry(input: i32) -> i32:
+    var object = owner(stored = number(value = 20))
+    defer {
+        bridge.scalar_i32(50)
+    }
+    object.value /= rhs(input)
+    return object.stored.value

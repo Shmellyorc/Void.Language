@@ -1,0 +1,282 @@
+Start testing: Oct 22 09:39 PDT
+----------------------------------------------------------
+1/181 Testing: stage10_operator_keys
+1/181 Test: stage10_operator_keys
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_keys" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_keys" start time: Oct 22 09:39 PDT
+Output:
+----------------------------------------------------------
+129 dictionary custom-equality checks passed
+<end of output>
+Test time =   0.60 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_keys" end time: Oct 22 09:39 PDT
+"stage10_operator_keys" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/181 Testing: stage10_operator_resolution
+2/181 Test: stage10_operator_resolution
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_resolution" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_resolution" start time: Oct 22 09:39 PDT
+Output:
+----------------------------------------------------------
+161 operator resolution/call checks passed
+<end of output>
+Test time =   2.24 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_resolution" end time: Oct 22 09:39 PDT
+"stage10_operator_resolution" time elapsed: 00:00:02
+----------------------------------------------------------
+
+3/181 Testing: stage10_operator_declarations
+3/181 Test: stage10_operator_declarations
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_declarations" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_declarations" start time: Oct 22 09:39 PDT
+Output:
+----------------------------------------------------------
+278 operator declaration/validation checks passed
+<end of output>
+Test time =   1.25 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_declarations" end time: Oct 22 09:39 PDT
+"stage10_operator_declarations" time elapsed: 00:00:01
+----------------------------------------------------------
+
+17/181 Testing: gc_schemas
+17/181 Test: gc_schemas
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_gc_schemas"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"gc_schemas" start time: Oct 22 09:39 PDT
+Output:
+----------------------------------------------------------
+schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"gc_schemas" end time: Oct 22 09:39 PDT
+"gc_schemas" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/181 Testing: fixed_arrays_source
+21/181 Test: fixed_arrays_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_fixed_arrays_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"fixed_arrays_source" start time: Oct 22 09:39 PDT
+Output:
+----------------------------------------------------------
+source array normal: 222 failing allocation budgets, recovery and cleanup passed
+source array O2: 222 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+<end of output>
+Test time =   5.52 sec
+----------------------------------------------------------
+Test Passed.
+"fixed_arrays_source" end time: Oct 22 09:40 PDT
+"fixed_arrays_source" time elapsed: 00:00:05
+----------------------------------------------------------
+
+22/181 Testing: growable_arrays_source
+22/181 Test: growable_arrays_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_growable_arrays_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"growable_arrays_source" start time: Oct 22 09:40 PDT
+Output:
+----------------------------------------------------------
+list transaction 0: 14 failing allocation budgets passed
+list transaction 1: 1 failing allocation budgets passed
+list transaction 2: 1 failing allocation budgets passed
+list transaction 3: 12 failing allocation budgets passed
+cold list construction: 48 failing allocation budgets passed
+growable source normal: 42 failing allocation budgets, recovery and cleanup passed
+growable source O2: 42 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+<end of output>
+Test time =  10.14 sec
+----------------------------------------------------------
+Test Passed.
+"growable_arrays_source" end time: Oct 22 09:40 PDT
+"growable_arrays_source" time elapsed: 00:00:10
+----------------------------------------------------------
+
+24/181 Testing: generics_source
+24/181 Test: generics_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_generics_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"generics_source" start time: Oct 22 09:40 PDT
+Output:
+----------------------------------------------------------
+failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+<end of output>
+Test time =   6.26 sec
+----------------------------------------------------------
+Test Passed.
+"generics_source" end time: Oct 22 09:40 PDT
+"generics_source" time elapsed: 00:00:06
+----------------------------------------------------------
+
+26/181 Testing: dictionaries_source
+26/181 Test: dictionaries_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_dictionaries_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"dictionaries_source" start time: Oct 22 09:40 PDT
+Output:
+----------------------------------------------------------
+native dictionary 0: 20 failures; rollback/version/collection passed
+native dictionary 1: 45 failures; rollback/version/collection passed
+native dictionary 2: 10 failures; rollback/version/collection passed
+native dictionary 3: 10 failures; rollback/version/collection passed
+native dictionary 4: 9 failures; rollback/version/collection passed
+native dictionary 5: 9 failures; rollback/version/collection passed
+native dictionary 6: 9 failures; rollback/version/collection passed
+main normal: 742 allocation failures; cleanup/retry passed
+transactions normal: 1816 allocation failures; cleanup/retry passed
+main O2: 742 allocation failures; cleanup/retry passed
+transactions O2: 1816 allocation failures; cleanup/retry passed
+Dictionaries: source/GC/order/readonly/rollback/reload passed
+<end of output>
+Test time =  50.75 sec
+----------------------------------------------------------
+Test Passed.
+"dictionaries_source" end time: Oct 22 09:41 PDT
+"dictionaries_source" time elapsed: 00:00:50
+----------------------------------------------------------
+
+28/181 Testing: patterns_source
+28/181 Test: patterns_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_patterns_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"patterns_source" start time: Oct 22 09:41 PDT
+Output:
+----------------------------------------------------------
+normal values allocation failures: 418
+normal large allocation failures: 232
+normal combined allocation failures: 169
+O2 values allocation failures: 418
+O2 large allocation failures: 232
+O2 combined allocation failures: 169
+<end of output>
+Test time =   8.53 sec
+----------------------------------------------------------
+Test Passed.
+"patterns_source" end time: Oct 22 09:41 PDT
+"patterns_source" time elapsed: 00:00:08
+----------------------------------------------------------
+
+61/181 Testing: interfaces_source
+61/181 Test: interfaces_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_interfaces_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"interfaces_source" start time: Oct 22 09:41 PDT
+Output:
+----------------------------------------------------------
+interfaces: diagnostics begin
+interfaces: diagnostics passed
+interfaces: programs begin
+interfaces: programs passed
+interfaces: independent_ir begin
+interfaces: independent_ir passed
+interfaces: admission begin
+interfaces: admission passed
+interfaces: tooling_and_imports begin
+interfaces: tooling_and_imports passed
+interfaces: mode normal
+interfaces: roots begin
+interfaces: roots passed
+interfaces: handoffs begin
+interfaces: handoffs passed
+interfaces: selected begin
+interfaces: selected passed
+interfaces: retirement begin
+interfaces: retirement passed
+interfaces: parked begin
+interfaces: parked passed
+interfaces: timeout begin
+interfaces: timeout passed
+interfaces: active_reload begin
+interfaces: active_reload passed
+interfaces: mode O2
+interfaces: roots begin
+interfaces: roots passed
+interfaces: handoffs begin
+interfaces: handoffs passed
+interfaces: selected begin
+interfaces: selected passed
+interfaces: retirement begin
+interfaces: retirement passed
+interfaces: parked begin
+interfaces: parked passed
+interfaces: timeout begin
+interfaces: timeout passed
+interfaces: active_reload begin
+interfaces: active_reload passed
+structural interface checks passed
+<end of output>
+Test time =   5.99 sec
+----------------------------------------------------------
+Test Passed.
+"interfaces_source" end time: Oct 22 09:41 PDT
+"interfaces_source" time elapsed: 00:00:05
+----------------------------------------------------------
+
+79/181 Testing: stage10_operator_compounds
+79/181 Test: stage10_operator_compounds
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_compounds" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_compounds" start time: Oct 22 09:41 PDT
+Output:
+----------------------------------------------------------
+730 captured-place compound checks passed
+<end of output>
+Test time =   9.29 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_compounds" end time: Oct 22 09:41 PDT
+"stage10_operator_compounds" time elapsed: 00:00:09
+----------------------------------------------------------
+
+80/181 Testing: stage10_operator_integration
+80/181 Test: stage10_operator_integration
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_integration" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_integration" start time: Oct 22 09:41 PDT
+Output:
+----------------------------------------------------------
+637 operator GC/effect/failure integration checks passed
+<end of output>
+Test time =   4.72 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_integration" end time: Oct 22 09:41 PDT
+"stage10_operator_integration" time elapsed: 00:00:04
+----------------------------------------------------------
+
+162/181 Testing: stage10_operators_aot
+162/181 Test: stage10_operators_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_integration"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operators_aot" start time: Oct 22 09:41 PDT
+Output:
+----------------------------------------------------------
+260 source operator JIT/AOT checks passed
+<end of output>
+Test time =  47.81 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operators_aot" end time: Oct 22 09:42 PDT
+"stage10_operators_aot" time elapsed: 00:00:47
+----------------------------------------------------------
+
+End testing: Oct 22 09:42 PDT

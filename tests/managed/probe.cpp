@@ -3,9 +3,9 @@
 #include <cstring>
 #include <new>
 #include <stdexcept>
-namespace { thread_local int fail_after=-1; }
+namespace { thread_local int fail_after=-1; thread_local bool fail_once=false; }
 void* operator new(std::size_t size) {
-    if (fail_after==0) throw std::bad_alloc();
+    if (fail_after==0) {if(fail_once){fail_after=-1;fail_once=false;}throw std::bad_alloc();}
     if (fail_after>0) --fail_after;
     if (auto* p=std::malloc(size ? size : 1)) return p;
     throw std::bad_alloc();
@@ -28,8 +28,9 @@ void operator delete[](void* p,const std::nothrow_t&) noexcept { ::operator dele
 namespace managed_test {
 thread_local Probe* active=nullptr;
 std::atomic<void(*)()> concurrent_poll{nullptr};
-AllocationFailure::AllocationFailure(int budget) { fail_after=budget; }
-AllocationFailure::~AllocationFailure() { fail_after=-1; }
+AllocationFailure::AllocationFailure(int budget) { fail_after=budget;fail_once=false; }
+AllocationFailure::AllocationFailure(int budget,bool once) { fail_after=budget;fail_once=once; }
+AllocationFailure::~AllocationFailure() { fail_after=-1;fail_once=false; }
 void allocation_budget(int budget){fail_after=budget;}
 void require(bool yes,const char* message) { if (!yes) throw std::runtime_error(message); }
 }
@@ -94,7 +95,10 @@ template<class Commit> void observe_construct(void** slot,std::size_t size,const
             // Observe the actual published source object, including all pointer
             // leaves, after the production helper has released its commit lock.
             p->commits_valid &= *slot && std::memcmp(*slot,payload,size)==0;
-            if (p->capture && p->constructions==p->capture_at && !p->retained) p->retained=std::make_unique<vd::Runtime::Handle>(vd::Runtime::current(),*slot);
+            if (p->capture && p->constructions==p->capture_at) {
+                if(p->capture_into_existing && p->retained)p->retained->reset(*slot);
+                else if(!p->retained)p->retained=std::make_unique<vd::Runtime::Handle>(vd::Runtime::current(),*slot);
+            }
         }
     }
 }

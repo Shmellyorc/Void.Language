@@ -1,0 +1,37 @@
+struct leaf:
+    text: string
+    number: i32
+    operator +(const left: leaf, const right: leaf) -> leaf:
+        return leaf(text = left.text + right.text, number = left.number + right.number)
+value struct packet<t>:
+    text: string
+    item: t
+    operator +(const left: packet<t>, const right: packet<t>) -> string:
+        return left.text + right.text + left.item.text + right.item.text
+struct holder:
+    current: packet<leaf>
+func rhs(owner: holder) -> packet<leaf>:
+    owner.current = packet<leaf>(text = "changed", item = leaf(text = "changed", number = 222))
+    return packet<leaf>(text = "R", item = leaf(text = "r🎮\0", number = 222))
+func bump(owner: leaf) -> leaf:
+    var garbage = leaf(text = "collect before alias mutation", number = 333)
+    owner.number++
+    owner.text = owner.text + "x"
+    return owner
+func entry(input: i32) -> i32:
+    var owner = holder(current = packet<leaf>(text = "L", item = leaf(text = "l🎮\0", number = 111)))
+    var text = owner.current + rhs(owner)
+    if text != "LRl🎮\0r🎮\0" or owner.current.text != "changed":
+        return 90
+    var fresh = leaf(text = "a🎮\0", number = input) + leaf(text = "b", number = 3)
+    fresh.number++
+    if fresh.text != "a🎮\0b" or fresh.number != input + 4:
+        return 91
+    var shared = leaf(text = "m", number = input)
+    var combined = shared + bump(shared)
+    if combined.text != "mxmx" or combined.number != (input + 1) * 2:
+        return 92
+    combined.number++
+    if shared.number != input + 1:
+        return 93
+    return input

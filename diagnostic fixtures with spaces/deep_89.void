@@ -1,0 +1,3 @@
+use "./deep_90.void"
+func helper(value: i32) -> i32:
+    return value

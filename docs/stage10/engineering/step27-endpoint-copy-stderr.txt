@@ -1,0 +1,8 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/console_endpoints.void:14:28: error: Construction requires initialized field 'port' on every successful exit and before whole-view helper calls.
+    code: VOID1106
+
+ 14 | func (self default_logger) init():
+    |                            ^^^^
+    Module: /console_endpoints.void
+    Hint: Construction views cannot become ordinary references before successful initialization and commit.
+

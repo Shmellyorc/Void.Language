@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  90: stage10_console_source
+1/2 Test  #90: stage10_console_source ...........   Passed    8.15 sec
+    Start 173: stage10_console_aot
+2/2 Test #173: stage10_console_aot ..............   Passed   33.94 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  42.10 sec

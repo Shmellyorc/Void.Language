@@ -1,0 +1,403 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+        Start 177: stage10_console_aot
+        Start 167: async_retention_sprint5
+  1/199 Test #167: async_retention_sprint5 ...................   Passed   90.46 sec
+        Start 178: stage10_operators_aot
+  2/199 Test #178: stage10_operators_aot .....................   Passed  315.01 sec
+        Start  39: collections_source
+  3/199 Test  #39: collections_source ........................   Passed   63.80 sec
+        Start  50: collections_cli
+  4/199 Test  #50: collections_cli ...........................   Passed   58.17 sec
+        Start  12: stage10_conversion
+  5/199 Test  #12: stage10_conversion ........................   Passed  517.21 sec
+        Start 115: async_source
+  6/199 Test #115: async_source ..............................   Passed   46.82 sec
+        Start  52: properties_cli
+  7/199 Test #177: stage10_console_aot .......................   Passed  1129.07 sec
+        Start  51: dictionaries_cli
+  8/199 Test  #52: properties_cli ............................   Passed   43.43 sec
+        Start  54: advanced_cli
+  9/199 Test  #51: dictionaries_cli ..........................   Passed   40.59 sec
+        Start 189: text_collections_sprint3
+ 10/199 Test  #54: advanced_cli ..............................   Passed   39.11 sec
+        Start  94: stage10_console_source
+ 11/199 Test #189: text_collections_sprint3 ..................   Passed   48.83 sec
+        Start  47: growable_arrays_cli
+ 12/199 Test  #47: growable_arrays_cli .......................   Passed   27.06 sec
+        Start 199: numeric_cli
+ 13/199 Test #199: numeric_cli ...............................   Passed   31.29 sec
+        Start  48: arrays_cli
+ 14/199 Test  #48: arrays_cli ................................   Passed   23.53 sec
+        Start  45: advanced_source
+ 15/199 Test  #45: advanced_source ...........................   Passed   23.37 sec
+        Start 129: async_aot_large_normal
+ 16/199 Test #129: async_aot_large_normal ....................   Passed   20.54 sec
+        Start 130: async_aot_large_optimized
+ 17/199 Test #130: async_aot_large_optimized .................   Passed   20.41 sec
+        Start  40: dictionaries_source
+ 18/199 Test  #94: stage10_console_source ....................   Passed  193.87 sec
+        Start 176: stage10_temporal_aot
+ 19/199 Test #176: stage10_temporal_aot ......................   Passed   25.76 sec
+        Start  95: stage10_operator_integration
+ 20/199 Test  #40: dictionaries_source .......................   Passed   49.85 sec
+        Start  79: strings_source
+ 21/199 Test  #79: strings_source ............................   Passed   13.48 sec
+        Start  46: fixed_arrays_cli
+ 22/199 Test  #46: fixed_arrays_cli ..........................   Passed   10.01 sec
+        Start  97: stage6_integrated
+ 23/199 Test  #97: stage6_integrated .........................   Passed    9.65 sec
+        Start 175: stage10_temporal_install
+ 24/199 Test  #95: stage10_operator_integration ..............   Passed   57.52 sec
+        Start  49: generics_cli
+ 25/199 Test  #49: generics_cli ..............................   Passed    8.15 sec
+        Start  96: native_source
+ 26/199 Test #175: stage10_temporal_install ..................   Passed   14.56 sec
+        Start  44: debug_cache_processes
+ 27/199 Test  #96: native_source .............................   Passed    7.80 sec
+        Start   1: stage10_operator_reload
+ 28/199 Test  #44: debug_cache_processes .....................   Passed   20.40 sec
+        Start  66: reference_values_cli
+ 29/199 Test  #66: reference_values_cli ......................   Passed    8.05 sec
+        Start  41: properties_source
+ 30/199 Test   #1: stage10_operator_reload ...................   Passed   45.38 sec
+        Start  98: stage6_cache_processes
+ 31/199 Test  #41: properties_source .........................   Passed   22.10 sec
+        Start 168: async_retention_aot_growth_normal
+ 32/199 Test  #98: stage6_cache_processes ....................   Passed    5.49 sec
+        Start  36: growable_arrays_source
+ 33/199 Test #168: async_retention_aot_growth_normal .........   Passed    5.33 sec
+        Start 169: async_retention_aot_growth_optimized
+ 34/199 Test #169: async_retention_aot_growth_optimized ......   Passed    5.35 sec
+        Start 171: async_retention_aot_workers_optimized
+ 35/199 Test  #36: growable_arrays_source ....................   Passed   10.51 sec
+        Start 170: async_retention_aot_workers_normal
+ 36/199 Test #171: async_retention_aot_workers_optimized .....   Passed    5.20 sec
+        Start  37: arrays_source
+ 37/199 Test #170: async_retention_aot_workers_normal ........   Passed    5.33 sec
+        Start  74: inheritance_cli
+ 38/199 Test  #74: inheritance_cli ...........................   Passed    5.88 sec
+        Start  78: interfaces_cli
+ 39/199 Test  #37: arrays_source .............................   Passed   12.37 sec
+        Start  42: patterns_source
+ 40/199 Test  #78: interfaces_cli ............................   Passed    4.99 sec
+        Start  53: patterns_cli
+ 41/199 Test  #53: patterns_cli ..............................   Passed    4.57 sec
+        Start  62: managed_initialization_cli
+ 42/199 Test  #42: patterns_source ...........................   Passed    8.84 sec
+        Start  82: strings_cli
+ 43/199 Test  #82: strings_cli ...............................   Passed    2.95 sec
+        Start  58: managed_cli
+ 44/199 Test  #62: managed_initialization_cli ................   Passed    5.12 sec
+        Start  35: fixed_arrays_source
+ 45/199 Test  #58: managed_cli ...............................   Passed    3.97 sec
+        Start 196: initialization_cli
+ 46/199 Test #196: initialization_cli ........................   Passed    3.31 sec
+        Start  93: stage10_operator_compounds
+ 47/199 Test  #35: fixed_arrays_source .......................   Passed    5.81 sec
+        Start  15: format_zones
+ 48/199 Test  #15: format_zones ..............................   Passed    5.60 sec
+        Start 166: numeric_sprint2
+ 49/199 Test #166: numeric_sprint2 ...........................   Passed    2.66 sec
+        Start 182: lsp_stage10_display
+ 50/199 Test  #93: stage10_operator_compounds ................   Passed    9.12 sec
+        Start   7: stage10_display_reload
+ 51/199 Test   #7: stage10_display_reload ....................   Passed   10.47 sec
+        Start 173: ergonomics_sprint6
+ 52/199 Test #182: lsp_stage10_display .......................   Passed   12.47 sec
+        Start 195: receiver_methods_cli
+ 53/199 Test #195: receiver_methods_cli ......................   Passed    3.06 sec
+        Start 193: source_cli
+ 54/199 Test #173: ergonomics_sprint6 ........................   Passed    7.59 sec
+        Start 194: value_structs_cli
+ 55/199 Test #193: source_cli ................................   Passed    4.03 sec
+        Start 117: async_parallel
+ 56/199 Test #194: value_structs_cli .........................   Passed    1.81 sec
+        Start 197: modules_cli
+ 57/199 Test #117: async_parallel ............................   Passed    2.77 sec
+        Start   8: stage10_temporal_ir
+ 58/199 Test   #8: stage10_temporal_ir .......................   Passed    3.46 sec
+        Start  43: debug_cache
+ 59/199 Test  #43: debug_cache ...............................   Passed    3.16 sec
+        Start  55: managed_source
+ 60/199 Test  #55: managed_source ............................   Passed    3.36 sec
+        Start 118: async_lifecycle
+ 61/199 Test #118: async_lifecycle ...........................   Passed    5.38 sec
+        Start  38: generics_source
+ 62/199 Test  #38: generics_source ...........................   Passed    6.37 sec
+        Start  16: application_workflow_stage9
+ 63/199 Test  #16: application_workflow_stage9 ...............   Passed    3.31 sec
+        Start 188: application_native_sprint4
+ 64/199 Test #188: application_native_sprint4 ................   Passed    3.33 sec
+        Start  10: stage10_hooks
+ 65/199 Test  #10: stage10_hooks .............................   Passed    5.76 sec
+        Start   5: stage10_source_formatting
+ 66/199 Test   #5: stage10_source_formatting .................   Passed    1.74 sec
+        Start 198: analysis_cli
+ 67/199 Test #198: analysis_cli ..............................   Passed    0.48 sec
+        Start 187: application_native_sprint4_host
+ 68/199 Test #197: modules_cli ...............................   Passed   38.78 sec
+        Start 184: lsp_stage10_source_formatting
+ 69/199 Test #187: application_native_sprint4_host ...........   Passed    1.73 sec
+        Start 179: stage10_conversion_aot
+ 70/199 Test #184: lsp_stage10_source_formatting .............   Passed    0.99 sec
+        Start  19: gc_buffers
+ 71/199 Test #179: stage10_conversion_aot ....................   Passed    2.72 sec
+        Start  75: interfaces_source
+ 72/199 Test  #75: interfaces_source .........................   Passed    5.72 sec
+        Start 172: ergonomics_sprint6_host
+ 73/199 Test  #19: gc_buffers ................................   Passed    9.77 sec
+        Start 165: modules
+ 74/199 Test #172: ergonomics_sprint6_host ...................   Passed    2.00 sec
+        Start  70: composition_cli
+ 75/199 Test #165: modules ...................................   Passed    1.14 sec
+        Start 185: local_libraries
+ 76/199 Test #185: local_libraries ...........................   Passed    0.43 sec
+        Start 174: stage10_fields_aot
+ 77/199 Test #174: stage10_fields_aot ........................   Passed    1.07 sec
+        Start  11: stage10_interpolation
+ 78/199 Test  #11: stage10_interpolation .....................   Passed    1.86 sec
+        Start  17: native_output_paths_ci88
+ 79/199 Test  #17: native_output_paths_ci88 ..................   Passed    0.76 sec
+        Start   2: stage10_operator_keys
+ 80/199 Test  #70: composition_cli ...........................   Passed    4.84 sec
+        Start  14: format_numeric
+ 81/199 Test  #14: format_numeric ............................   Passed    0.87 sec
+        Start   3: stage10_operator_resolution
+ 82/199 Test   #2: stage10_operator_keys .....................   Passed    1.17 sec
+        Start   4: stage10_operator_declarations
+ 83/199 Test   #4: stage10_operator_declarations .............   Passed    1.74 sec
+        Start   6: stage10_tooling
+ 84/199 Test   #6: stage10_tooling ...........................   Passed    0.66 sec
+        Start 163: numeric
+ 85/199 Test   #3: stage10_operator_resolution ...............   Passed    2.79 sec
+        Start  29: runtime_console_native_terminal
+ 86/199 Test  #29: runtime_console_native_terminal ...........   Passed    0.74 sec
+        Start  18: long_physical_paths_ci89
+ 87/199 Test  #18: long_physical_paths_ci89 ..................   Passed    0.60 sec
+        Start  71: inheritance_source
+ 88/199 Test #163: numeric ...................................   Passed    4.94 sec
+        Start 183: lsp_stage10_intelligence
+ 89/199 Test #183: lsp_stage10_intelligence ..................   Passed    0.55 sec
+        Start  59: managed_initialization_source
+ 90/199 Test  #71: inheritance_source ........................   Passed    4.29 sec
+        Start  72: inheritance_aot_normal
+ 91/199 Test  #72: inheritance_aot_normal ....................   Passed    0.14 sec
+        Start  73: inheritance_aot_optimized
+ 92/199 Test  #73: inheritance_aot_optimized .................   Passed    0.15 sec
+        Start 155: reload
+ 93/199 Test #155: reload ....................................   Passed    0.42 sec
+        Start 164: frontend
+ 94/199 Test  #59: managed_initialization_source .............   Passed    7.22 sec
+        Start  81: strings_aot_optimized
+ 95/199 Test  #81: strings_aot_optimized .....................   Passed    0.09 sec
+        Start  63: reference_values_source
+ 96/199 Test #164: frontend ..................................   Passed    9.67 sec
+        Start  80: strings_aot_normal
+ 97/199 Test  #80: strings_aot_normal ........................   Passed    0.09 sec
+        Start   9: format_temporal
+ 98/199 Test   #9: format_temporal ...........................   Passed    0.20 sec
+        Start  25: runtime_console_native_transfers
+ 99/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.45 sec
+        Start  28: runtime_console_native_keyboard
+100/199 Test  #28: runtime_console_native_keyboard ...........   Passed    0.15 sec
+        Start  67: composition_source
+101/199 Test  #63: reference_values_source ...................   Passed    4.49 sec
+        Start 180: lsp_sprint6
+102/199 Test #180: lsp_sprint6 ...............................   Passed    0.76 sec
+        Start  13: stage10_fields
+103/199 Test  #13: stage10_fields ............................   Passed    0.63 sec
+        Start  90: lsp_stage8
+104/199 Test  #90: lsp_stage8 ................................   Passed    0.47 sec
+        Start  69: composition_aot_optimized
+105/199 Test  #69: composition_aot_optimized .................   Passed    0.06 sec
+        Start  77: interfaces_aot_optimized
+106/199 Test  #77: interfaces_aot_optimized ..................   Passed    0.08 sec
+        Start  64: reference_values_aot_normal
+107/199 Test  #64: reference_values_aot_normal ...............   Passed    0.06 sec
+        Start  76: interfaces_aot_normal
+108/199 Test  #76: interfaces_aot_normal .....................   Passed    0.06 sec
+        Start 156: gc
+109/199 Test #156: gc ........................................   Passed    0.11 sec
+        Start  65: reference_values_aot_optimized
+110/199 Test  #65: reference_values_aot_optimized ............   Passed    0.06 sec
+        Start  68: composition_aot_normal
+111/199 Test  #68: composition_aot_normal ....................   Passed    0.07 sec
+        Start  91: lsp_stage7
+112/199 Test  #91: lsp_stage7 ................................   Passed    0.29 sec
+        Start  61: managed_initialization_aot_optimized
+113/199 Test  #61: managed_initialization_aot_optimized ......   Passed    0.05 sec
+        Start  60: managed_initialization_aot_normal
+114/199 Test  #60: managed_initialization_aot_normal .........   Passed    0.05 sec
+        Start  99: native_aot_main_normal
+115/199 Test  #99: native_aot_main_normal ....................   Passed    0.04 sec
+        Start 192: aot
+116/199 Test #192: aot .......................................   Passed    0.08 sec
+        Start 119: async_aot_spawn_normal
+117/199 Test #119: async_aot_spawn_normal ....................   Passed    0.04 sec
+        Start 108: native_aot_cleanup_failure_optimized
+118/199 Test  #67: composition_source ........................   Passed    3.03 sec
+        Start 102: native_aot_terminated_nul_optimized
+119/199 Test #108: native_aot_cleanup_failure_optimized ......   Passed    0.05 sec
+        Start 135: async_aot_values_normal
+120/199 Test #102: native_aot_terminated_nul_optimized .......   Passed    0.04 sec
+        Start 105: native_aot_duplicate_normal
+121/199 Test #135: async_aot_values_normal ...................   Passed    0.04 sec
+        Start 104: native_aot_closed_optimized
+122/199 Test #105: native_aot_duplicate_normal ...............   Passed    0.04 sec
+        Start 149: async_aot_lifecycle_resources_normal
+123/199 Test #104: native_aot_closed_optimized ...............   Passed    0.04 sec
+        Start 123: async_aot_spawn_failure_normal
+124/199 Test #149: async_aot_lifecycle_resources_normal ......   Passed    0.04 sec
+        Start 143: async_aot_lifecycle_cancelled_normal
+125/199 Test #123: async_aot_spawn_failure_normal ............   Passed    0.04 sec
+        Start 140: async_aot_lifecycle_optimized
+126/199 Test #143: async_aot_lifecycle_cancelled_normal ......   Passed    0.04 sec
+        Start 124: async_aot_spawn_failure_optimized
+127/199 Test #140: async_aot_lifecycle_optimized .............   Passed    0.04 sec
+        Start 152: async_aot_lifecycle_values_optimized
+128/199 Test #124: async_aot_spawn_failure_optimized .........   Passed    0.04 sec
+        Start 150: async_aot_lifecycle_resources_optimized
+129/199 Test #152: async_aot_lifecycle_values_optimized ......   Passed    0.04 sec
+        Start 112: native_aot_integrated_cancel_optimized
+130/199 Test #150: async_aot_lifecycle_resources_optimized ...   Passed    0.03 sec
+        Start 107: native_aot_cleanup_failure_normal
+131/199 Test #112: native_aot_integrated_cancel_optimized ....   Passed    0.04 sec
+        Start 100: native_aot_main_optimized
+132/199 Test #107: native_aot_cleanup_failure_normal .........   Passed    0.04 sec
+        Start 137: async_aot_methods_normal
+133/199 Test #100: native_aot_main_optimized .................   Passed    0.04 sec
+        Start  21: arrays_foundation
+134/199 Test #137: async_aot_methods_normal ..................   Passed    0.03 sec
+        Start 103: native_aot_closed_normal
+135/199 Test #103: native_aot_closed_normal ..................   Passed    0.04 sec
+        Start 111: native_aot_integrated_cancel_normal
+136/199 Test #111: native_aot_integrated_cancel_normal .......   Passed    0.03 sec
+        Start 106: native_aot_duplicate_optimized
+137/199 Test #106: native_aot_duplicate_optimized ............   Passed    0.04 sec
+        Start 113: native_aot_integrated_failure_normal
+138/199 Test #113: native_aot_integrated_failure_normal ......   Passed    0.04 sec
+        Start 114: native_aot_integrated_failure_optimized
+139/199 Test  #21: arrays_foundation .........................   Passed    0.20 sec
+        Start 101: native_aot_terminated_nul_normal
+140/199 Test #114: native_aot_integrated_failure_optimized ...   Passed    0.04 sec
+        Start 121: async_aot_spawn_cancel_normal
+141/199 Test #101: native_aot_terminated_nul_normal ..........   Passed    0.04 sec
+        Start 138: async_aot_methods_optimized
+142/199 Test #121: async_aot_spawn_cancel_normal .............   Passed    0.04 sec
+        Start 136: async_aot_values_optimized
+143/199 Test #138: async_aot_methods_optimized ...............   Passed    0.03 sec
+        Start 148: async_aot_lifecycle_primary_optimized
+144/199 Test #136: async_aot_values_optimized ................   Passed    0.04 sec
+        Start 120: async_aot_spawn_optimized
+145/199 Test #148: async_aot_lifecycle_primary_optimized .....   Passed    0.04 sec
+        Start 147: async_aot_lifecycle_primary_normal
+146/199 Test #120: async_aot_spawn_optimized .................   Passed    0.04 sec
+        Start 110: native_aot_integrated_optimized
+147/199 Test #147: async_aot_lifecycle_primary_normal ........   Passed    0.04 sec
+        Start 134: async_aot_loops_optimized
+148/199 Test #110: native_aot_integrated_optimized ...........   Passed    0.04 sec
+        Start 151: async_aot_lifecycle_values_normal
+149/199 Test #134: async_aot_loops_optimized .................   Passed    0.04 sec
+        Start 142: async_aot_lifecycle_exits_optimized
+150/199 Test #151: async_aot_lifecycle_values_normal .........   Passed    0.04 sec
+        Start 141: async_aot_lifecycle_exits_normal
+151/199 Test #142: async_aot_lifecycle_exits_optimized .......   Passed    0.04 sec
+        Start 139: async_aot_lifecycle_normal
+152/199 Test #141: async_aot_lifecycle_exits_normal ..........   Passed    0.03 sec
+        Start 109: native_aot_integrated_normal
+153/199 Test #139: async_aot_lifecycle_normal ................   Passed    0.04 sec
+        Start 122: async_aot_spawn_cancel_optimized
+154/199 Test #109: native_aot_integrated_normal ..............   Passed    0.04 sec
+        Start 145: async_aot_lifecycle_failures_normal
+155/199 Test #122: async_aot_spawn_cancel_optimized ..........   Passed    0.04 sec
+        Start 146: async_aot_lifecycle_failures_optimized
+156/199 Test #145: async_aot_lifecycle_failures_normal .......   Passed    0.04 sec
+        Start 133: async_aot_loops_normal
+157/199 Test #133: async_aot_loops_normal ....................   Passed    0.03 sec
+        Start 144: async_aot_lifecycle_cancelled_optimized
+158/199 Test #146: async_aot_lifecycle_failures_optimized ....   Passed    0.04 sec
+        Start 125: async_aot_activation_normal
+159/199 Test #144: async_aot_lifecycle_cancelled_optimized ...   Passed    0.04 sec
+        Start  86: runtime_aot_optimized
+160/199 Test #125: async_aot_activation_normal ...............   Passed    0.04 sec
+        Start 131: async_aot_closures_normal
+161/199 Test #131: async_aot_closures_normal .................   Passed    0.03 sec
+        Start 132: async_aot_closures_optimized
+162/199 Test  #86: runtime_aot_optimized .....................   Passed    0.06 sec
+        Start  85: runtime_aot_normal
+163/199 Test #132: async_aot_closures_optimized ..............   Passed    0.04 sec
+        Start 127: async_aot_managed_normal
+164/199 Test #127: async_aot_managed_normal ..................   Passed    0.03 sec
+        Start 128: async_aot_managed_optimized
+165/199 Test  #85: runtime_aot_normal ........................   Passed    0.07 sec
+        Start 126: async_aot_activation_optimized
+166/199 Test #128: async_aot_managed_optimized ...............   Passed    0.04 sec
+        Start 158: sessions_demo
+167/199 Test #126: async_aot_activation_optimized ............   Passed    0.03 sec
+        Start  20: gc_schemas
+168/199 Test #158: sessions_demo .............................   Passed    0.05 sec
+        Start 159: tooling_demo
+169/199 Test #159: tooling_demo ..............................   Passed    0.04 sec
+        Start  33: runtime_coordination
+170/199 Test  #20: gc_schemas ................................   Passed    0.83 sec
+        Start 116: async_ir
+171/199 Test #116: async_ir ..................................   Passed    0.06 sec
+        Start 162: analysis
+172/199 Test #162: analysis ..................................   Passed    0.74 sec
+        Start  30: runtime_console_wide
+173/199 Test  #30: runtime_console_wide ......................   Passed    0.12 sec
+        Start  56: managed_aot_normal
+174/199 Test  #56: managed_aot_normal ........................   Passed    0.04 sec
+        Start  57: managed_aot_optimized
+175/199 Test  #57: managed_aot_optimized .....................   Passed    0.04 sec
+        Start  34: runtime_generated
+176/199 Test  #33: runtime_coordination ......................   Passed    2.06 sec
+        Start 190: lsp_sprint3
+177/199 Test #190: lsp_sprint3 ...............................   Passed    0.13 sec
+        Start  83: runtime_callbacks
+178/199 Test  #34: runtime_generated .........................   Passed    1.10 sec
+        Start 191: lsp_sprint2
+179/199 Test #191: lsp_sprint2 ...............................   Passed    0.08 sec
+        Start  89: lsp_protocol
+180/199 Test  #83: runtime_callbacks .........................   Passed    0.74 sec
+        Start 157: native
+181/199 Test #157: native ....................................   Passed    0.03 sec
+        Start  32: runtime_console_native_input
+182/199 Test  #32: runtime_console_native_input ..............   Passed    0.12 sec
+        Start 161: tooling
+183/199 Test  #89: lsp_protocol ..............................   Passed    0.51 sec
+        Start 154: jit
+184/199 Test #154: jit .......................................   Passed    0.06 sec
+        Start 186: lsp_sprint4
+185/199 Test #186: lsp_sprint4 ...............................   Passed    0.06 sec
+        Start 153: core
+186/199 Test #153: core ......................................   Passed    0.02 sec
+        Start  23: runtime_console_endpoints
+187/199 Test #161: tooling ...................................   Passed    0.51 sec
+        Start 160: sessions
+188/199 Test  #23: runtime_console_endpoints .................   Passed    0.05 sec
+        Start 181: lsp_stage10_fields
+189/199 Test #181: lsp_stage10_fields ........................   Passed    0.07 sec
+        Start  24: runtime_console_transfers
+190/199 Test  #24: runtime_console_transfers .................   Passed    0.02 sec
+        Start  31: runtime_console_input
+191/199 Test  #31: runtime_console_input .....................   Passed    0.02 sec
+        Start  22: runtime_console
+192/199 Test  #22: runtime_console ...........................   Passed    0.02 sec
+        Start  26: runtime_console_keyboard
+193/199 Test  #26: runtime_console_keyboard ..................   Passed    0.01 sec
+        Start  27: runtime_console_terminal
+194/199 Test  #27: runtime_console_terminal ..................   Passed    0.01 sec
+        Start  92: lsp_demo
+195/199 Test #160: sessions ..................................   Passed    0.19 sec
+        Start  87: runtime_invariants
+196/199 Test  #87: runtime_invariants ........................   Passed    0.04 sec
+        Start  88: lsp_positions
+197/199 Test  #92: lsp_demo ..................................   Passed    0.05 sec
+        Start  84: runtime_failures
+198/199 Test  #88: lsp_positions .............................   Passed    0.01 sec
+199/199 Test  #84: runtime_failures ..........................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 199
+
+Total Test time (real) = 1672.68 sec

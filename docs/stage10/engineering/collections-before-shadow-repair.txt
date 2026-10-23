@@ -1,0 +1,7 @@
+/tmp/collection-shadow.void:1:6: error: Expected a lowercase identifier.
+    code: VOID1102
+
+ 1 | func string(value: i32) -> i32:
+   |      ^^^^^^
+    Module: /collection-shadow.void
+

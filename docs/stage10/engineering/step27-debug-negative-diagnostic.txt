@@ -1,0 +1,8 @@
+invalid console source accepted:
+use console
+func task(port: console.output) -> i32:
+    return 0
+async func entry(n: i32) -> i32:
+    var job = spawn task(console.stdout)
+    return await job
+

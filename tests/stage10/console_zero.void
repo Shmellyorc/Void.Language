@@ -1,0 +1,5 @@
+func clean(text: string):
+    print(text, end = "")
+defer clean("done;")
+print("top;", end = "", flush = true)
+return 0

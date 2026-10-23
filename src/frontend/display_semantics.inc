@@ -2,6 +2,7 @@
 // values in source order; their bodies reuse ordinary selection, calls and effects.
 Function& nominal_display_adapter(Type type,bool formatted,const Token& site) {
     if(!current)error(source,site,Code::constant_call,"Custom display requires runtime evaluation.");
+    if(!formatted && (ir::collection_type(type) || !type.definition->cases.empty()) && !type.nullable)return collection_display_adapter(type,site);
     const auto identity=std::to_string(type.kind)+":"+std::to_string(Type::key(type).size())+":"+Type::key(type)+(type.nullable?"?":"")+"|"+ir::capability_key(type);
     const auto key=std::to_string(current->symbol.size())+":"+current->symbol+identity+(formatted?"|format":"|string");
     if(auto found=unit.display_adapters.find(key);found!=unit.display_adapters.end())return *found->second;
@@ -22,7 +23,7 @@ Function& nominal_display_adapter(Type type,bool formatted,const Token& site) {
     auto hook=[&](std::string spelling)->std::unique_ptr<Expr>{
         // Interfaces, resources and callables have opaque displays, never a
         // runtime concrete-type hook search or private-payload reflection.
-        if(nonnullable.kind==Type::interface_ref || nonnullable.definition->native_resource || nonnullable.definition->callable || nonnullable.definition->task_result)return {};
+        if(ir::collection_type(nonnullable) || !nonnullable.definition->cases.empty() || nonnullable.kind==Type::interface_ref || nonnullable.definition->native_resource || nonnullable.definition->callable || nonnullable.definition->task_result)return {};
         auto method=token(spelling);auto selected=ir::select_member(*root.member_catalog,nonnullable,spelling,unit.identity,nullptr,lexical_owner());
         if(auto* generic=direct_method(nonnullable,method);generic || selected.status!=ir::MemberSelection::missing) {
             if(selected.status==ir::MemberSelection::inaccessible || (selected.status==ir::MemberSelection::found && selected.method.empty()))return {};
@@ -35,14 +36,14 @@ Function& nominal_display_adapter(Type type,bool formatted,const Token& site) {
         }
         return {};
     };
-    auto default_value=[&](){auto e=hook("string");if(e)return e;std::string label;
+    auto default_value=[&](){if(ir::collection_type(nonnullable) || !nonnullable.definition->cases.empty()){auto& target=collection_display_adapter(nonnullable,site);return call(target.token.text,receiver());}auto e=hook("string");if(e)return e;std::string label;
         if(nonnullable.definition->callable)label="<callable>";
-        else if(nonnullable.definition->native_resource)label="<resource>";
+        else if(nonnullable.definition->native_resource || console::endpoint_type(nonnullable))label="<resource>";
         else if(nonnullable.definition->task_result)label="<task>";
         else {auto shown=nonnullable;shown.readonly=false;shown.readonly_references.clear();label="<"+ir::type_name(shown)+">";}
         return text(std::move(label));
     };
-    auto equal=[&](std::unique_ptr<Expr> left,std::unique_ptr<Expr> right){auto e=std::make_unique<Expr>(Expr::Kind::binary,site);e->op="==";e->parts.push_back(std::move(left));e->parts.push_back(std::move(right));return e;};
+    auto equal=[&](std::unique_ptr<Expr> left,std::unique_ptr<Expr> right){auto e=std::make_unique<Expr>(Expr::Kind::binary,site);e->op="==";e->implicit=true;e->parts.push_back(std::move(left));e->parts.push_back(std::move(right));return e;};
     auto choice=[&](std::unique_ptr<Expr> condition,std::unique_ptr<Expr> yes,std::unique_ptr<Expr> no){auto e=std::make_unique<Expr>(Expr::Kind::choice,site);e->parts.push_back(std::move(condition));e->parts.push_back(std::move(yes));e->parts.push_back(std::move(no));return e;};
     std::unique_ptr<Expr> body;
     auto propagated=[&](std::unique_ptr<Expr> value){auto e=std::make_unique<Expr>(Expr::Kind::propagate,site);e->parts.push_back(std::move(value));return e;};

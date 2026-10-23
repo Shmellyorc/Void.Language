@@ -1,0 +1,16 @@
+{
+  "previous_manifest": "step40-checkpoint-source-hashes.json",
+  "prior_entries": 161,
+  "bounded_files": 12,
+  "unchanged_prior_entries_verified": 154,
+  "changed_previous_entries": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/runtime.hpp",
+    "src/runtime/coordination.cpp"
+  ],
+  "unexpected_byte_changes": []
+}

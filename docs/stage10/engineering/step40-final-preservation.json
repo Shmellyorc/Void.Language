@@ -1,0 +1,33 @@
+{
+  "previous_entries": 217,
+  "current_entries": 226,
+  "unchanged_prior_entries": 208,
+  "changed_prior_entries": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "src/frontend/compiler.cpp",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/operator_integration.cpp"
+  ],
+  "new_fixtures": [
+    "tests/stage10/console_operator_compound_failure.void",
+    "tests/stage10/console_operator_failure.void",
+    "tests/stage10/console_operator_mode_failure.void",
+    "tests/stage10/console_operator_modes.void",
+    "tests/stage10/console_operator_partial.void",
+    "tests/stage10/console_operator_systems.void",
+    "tests/stage10/console_operator_workload.void",
+    "tests/stage10/operator_console_model.void",
+    "tests/stage10/operator_console_systems.void"
+  ],
+  "production_files_changed": [
+    "src/frontend/compiler.cpp"
+  ],
+  "other_production_files_unchanged": true,
+  "prior_artifacts_preserved": true,
+  "deep_source_unchanged": true
+}

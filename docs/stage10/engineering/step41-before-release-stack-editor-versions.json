@@ -1,0 +1,59 @@
+{
+  "node": {
+    "command": [
+      "node",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "v24.19.0"
+    ]
+  },
+  "vscode": {
+    "command": [
+      "/usr/share/code/bin/code",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "1.143.0",
+      "2d0b7506a36c1d6db9a466440131a8e01eab2289",
+      "x64"
+    ],
+    "original_binary_probe": {
+      "command": [
+        "/usr/share/code/code",
+        "--version"
+      ],
+      "returncode": 0,
+      "version": []
+    },
+    "application_package_version": "1.143.0",
+    "version_probe_note": "Raw Electron --version yields no text; use installed CLI/package manifest. /usr/bin/code is absent."
+  },
+  "neovim": {
+    "command": [
+      "/usr/bin/nvim",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "NVIM v0.13.0-dev-1410+g510f61555b",
+      "Build type: Release",
+      "LuaJIT 2.1.1787165859"
+    ]
+  },
+  "vim": {
+    "command": [
+      "/usr/bin/vim.basic",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "VIM - Vi IMproved 9.2 (2026 Feb 14, compiled Jul 27 2026 10:11:18)",
+      "Included patches: 1-858",
+      "Modified by team+vim@tracker.debian.org"
+    ]
+  },
+  "final_Debug_server_sha256": "07ee884170872326c3cc92557cbe635b2a588a92e6fce740999fb9a01523afda"
+}

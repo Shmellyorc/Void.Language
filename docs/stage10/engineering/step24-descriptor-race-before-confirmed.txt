@@ -1,0 +1,2 @@
+returncode: 1 native_output_bytes: 65536 stderr: initially absent stdin was mistaken for another operation's wake descriptor
+

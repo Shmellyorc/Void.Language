@@ -9,9 +9,14 @@ auto analyze(const std::string& source){auto result=vd::analyze_source({"/displa
 void check(bool valid,const char* why){if(!valid)throw std::runtime_error(why);++checks;}
 }
 int main(){try{
-    for(bool formatted:{false,true}) {
-        std::string source="value struct number:\n    private const value: i32 = 4\nfunc (self number) string() -> string:\n    return \"old\"\nfunc (self number) format(spec: string) -> result<string, string>:\n    return Ok(\"old\")\nfunc entry(input: i32) -> i32:\n    if ";
-        source+=formatted?"\"{number():custom}\"":"string(number())";source+=" == \"old\":\n        return 1\n    return 2\n";
+    for(unsigned variant=0;variant<4;++variant) {
+        const bool formatted=variant==1,collection=variant==2,sum=variant==3;
+        std::string source="value struct number:\n    private const value: i32 = 4\nfunc (self number) string() -> string:\n    return \"old\"\nfunc (self number) format(spec: string) -> result<string, string>:\n    return Ok(\"old\")\n";
+        if(sum)source+="enum parcel:\n    payload(value: number)\n";
+        source+="func entry(input: i32) -> i32:\n";
+        if(sum)source+="    var value: result<parcel, string> = Ok(parcel.payload(number()))\n";
+        source+="    if ";
+        source+=sum?"string([value])":collection?"string([[number()]])":formatted?"\"{number():custom}\"":"string(number())";source+=sum?" == \"[Ok(/display_reload.void::parcel.payload(old))]\":\n        return 1\n    return 2\n":collection?" == \"[[old]]\":\n        return 1\n    return 2\n":" == \"old\":\n        return 1\n    return 2\n";
         auto before=analyze(source);auto modified=source;const auto position=modified.find(formatted?"Ok(\"old\")":"return \"old\"");modified.replace(position,formatted?9:12,formatted?"Ok(\"new\")":"return \"new\"");auto after=analyze(modified);
         check(before->compatibility_contract()==after->compatibility_contract(),"hook body edit changed compatibility");
         vd::ToolingIndex index(before);bool selected=false,created=false;

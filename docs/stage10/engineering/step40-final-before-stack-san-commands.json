@@ -1,0 +1,90 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/ci-official-san",
+      "--target",
+      "voidc",
+      "voidls",
+      "void_operator_integration",
+      "void_operator_reload",
+      "void_operator_compounds",
+      "void_operator_keys",
+      "void_console_source",
+      "void_stage10_fields",
+      "void_stage10_hooks",
+      "void_stage10_interpolation",
+      "void_temporal_ir",
+      "void_format_numeric",
+      "void_temporal",
+      "void_format_zones",
+      "void_stage10_tooling",
+      "void_source_formatting",
+      "void_display_reload",
+      "void_runtime_console",
+      "void_runtime_console_transfers",
+      "void_runtime_console_keyboard",
+      "void_native_fixture",
+      "void_stage10_conversion",
+      "void_format_workloads",
+      "-j",
+      "2"
+    ],
+    "returncode": 0,
+    "seconds": 15.937572908005677,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    }
+  },
+  {
+    "label": "tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-san",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(stage10_operator_integration|stage10_operators_aot|stage10_console_source|stage10_console_aot|stage10_operator_reload|stage10_operator_compounds|stage10_operator_keys|stage10_fields|stage10_hooks|stage10_interpolation|stage10_temporal_ir|format_numeric|format_temporal|format_zones|stage10_tooling|stage10_source_formatting|lsp_stage10_display|lsp_stage10_intelligence|lsp_stage10_source_formatting|stage10_display_reload|runtime_console|runtime_console_transfers|runtime_console_native_transfers|runtime_console_keyboard|runtime_console_native_keyboard)$"
+    ],
+    "returncode": 0,
+    "seconds": 1347.9824758720351,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    }
+  },
+  {
+    "label": "sum-regression",
+    "command": [
+      "build/ci-official-san/void_stage10_conversion",
+      "--sum-display"
+    ],
+    "returncode": 0,
+    "seconds": 23.092884860001504,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    }
+  },
+  {
+    "label": "native-workloads",
+    "command": [
+      "build/ci-official-san/void_format_workloads"
+    ],
+    "returncode": 0,
+    "seconds": 0.048216638970188797,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    }
+  }
+]

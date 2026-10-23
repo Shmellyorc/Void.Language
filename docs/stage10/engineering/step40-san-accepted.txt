@@ -1,0 +1,41 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start   1: stage10_operator_reload
+ 1/18 Test   #1: stage10_operator_reload ..........   Passed   65.28 sec
+      Start   2: stage10_operator_keys
+ 2/18 Test   #2: stage10_operator_keys ............   Passed    0.80 sec
+      Start   3: stage10_operator_resolution
+ 3/18 Test   #3: stage10_operator_resolution ......   Passed    3.33 sec
+      Start   5: stage10_source_formatting
+ 4/18 Test   #5: stage10_source_formatting ........   Passed    1.89 sec
+      Start   6: stage10_tooling
+ 5/18 Test   #6: stage10_tooling ..................   Passed    0.12 sec
+      Start   7: stage10_display_reload
+ 6/18 Test   #7: stage10_display_reload ...........   Passed    0.95 sec
+      Start   8: stage10_temporal_ir
+ 7/18 Test   #8: stage10_temporal_ir ..............   Passed    3.91 sec
+      Start   9: format_temporal
+ 8/18 Test   #9: format_temporal ..................   Passed    0.07 sec
+      Start  10: stage10_hooks
+ 9/18 Test  #10: stage10_hooks ....................   Passed    6.29 sec
+      Start  11: stage10_interpolation
+10/18 Test  #11: stage10_interpolation ............   Passed    1.76 sec
+      Start  13: stage10_fields
+11/18 Test  #13: stage10_fields ...................   Passed    0.67 sec
+      Start  14: format_numeric
+12/18 Test  #14: format_numeric ...................   Passed    0.15 sec
+      Start  15: format_zones
+13/18 Test  #15: format_zones .....................   Passed    0.49 sec
+      Start  82: stage10_operator_compounds
+14/18 Test  #82: stage10_operator_compounds .......   Passed    9.51 sec
+      Start  83: stage10_operator_integration
+15/18 Test  #83: stage10_operator_integration .....   Passed   57.80 sec
+      Start 165: stage10_operators_aot
+16/18 Test #165: stage10_operators_aot ............   Passed  362.30 sec
+      Start 170: lsp_stage10_intelligence
+17/18 Test #170: lsp_stage10_intelligence .........   Passed    0.54 sec
+      Start 171: lsp_stage10_source_formatting
+18/18 Test #171: lsp_stage10_source_formatting ....   Passed    0.95 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Total Test time (real) = 516.81 sec

@@ -128,12 +128,13 @@ export async function run(): Promise<void> {
         }
         const mainText = main.getText();
         const mainEditor=await vscode.window.showTextDocument(main);
+        await vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup');
         const typingChild=children[children.length-1], typingCount=children.length;
         for(const fragment of ['u','us','unknown','var pending =','return (','func pending(','use "']) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,mainText);mainEditor.selection=new vscode.Selection(0,0,0,0);
             await vscode.commands.executeCommand('type',{text:fragment+'\n'});
-            assert(main.getText().startsWith(fragment+'\n'),'real incomplete edit was not applied');
+            assert(main.getText().startsWith(fragment+'\n'),'real incomplete edit was not applied: '+JSON.stringify({fragment,text:main.getText(),active:vscode.window.activeTextEditor?.document.uri.toString()}));
             const menu=await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',mainUri,new vscode.Position(0,fragment.length));
             assert(!menu || menu.items.every(i=>!(typeof i.label==='string'?i.label:i.label.label).includes('$')),'synthetic completion leaked');
             assert.equal(api!.status().state,'running');assert.equal(children.length,typingCount);
@@ -160,7 +161,7 @@ export async function run(): Promise<void> {
         await replace(main,mainText);assert.equal((await definitions())?.length,1);
         assert.equal(children.length,typingCount);assert(!gone(typingChild));
         record('PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair');
-        for (const [prefix,expected] of [['use ','use io/'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
+        for (const [prefix,expected] of [['use ','use console'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);
             await vscode.commands.executeCommand('type',{text:prefix});
@@ -181,6 +182,25 @@ export async function run(): Promise<void> {
         assert(documented?.some(h=>h.contents.some(c=>typeof c==='object' && 'value' in c && c.value.includes('fixture'))), JSON.stringify(documented));
         const standard=await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',mainUri,new vscode.Position(2,19));
         assert(standard?.[0].uri.fsPath.endsWith(path.join('standard','io','files.void')));
+        const composite = 'use console\nenum parcel:\n    empty\n    data(value: [i32])\nfunc entry(x: i32) -> i32:\n    var p = parcel.data([x])\n    print(p)\n    var r = console.stdout.write("é😀")\n    if p is parcel.data(var numbers):\n        return numbers.count as i32\n    return x\n';
+        await replace(main, composite);
+        await until(() => vscode.languages.getDiagnostics(mainUri), ds => ds.length===0, 'console composite analysis');
+        const consoleHover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider',mainUri,new vscode.Position(7,29));
+        assert(consoleHover?.some(h=>h.contents.some(c=>typeof c==='object' && 'value' in c && c.value.replace(/&nbsp;/g,' ').includes('Write UTF-8'))), JSON.stringify(consoleHover));
+        const consoleDefinition = await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',mainUri,new vscode.Position(7,29));
+        assert(consoleDefinition?.[0].uri.fsPath.endsWith(path.join('standard','console.void')));
+        const patternDefinition = await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',mainUri,new vscode.Position(8,20));
+        assert.equal(patternDefinition?.[0].range.start.line,3);
+        const printHover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider',mainUri,new vscode.Position(6,6));
+        assert(printHover?.some(h=>h.contents.some(c=>typeof c==='object' && 'value' in c && c.value.includes('*values'))));
+        await replace(main,composite.replace('parcel.data([x])','parcel.'));
+        const cases = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',mainUri,new vscode.Position(5,19),'.');
+        assert.deepEqual(cases?.items.map(i=>typeof i.label==='string'?i.label:i.label.label).sort(),['data','empty']);
+        await replace(main,composite.replace('print(p)','print(p, flush = '));
+        const printHelp = await vscode.commands.executeCommand<vscode.SignatureHelp>('vscode.executeSignatureHelpProvider',mainUri,new vscode.Position(6,21),'=');
+        assert.equal(printHelp?.activeParameter,4);
+        assert(printHelp.signatures[0].label.includes('file: console.output'));
+        record('Console/composite source docs, definition, pattern navigation, enum completion, print hover/signature passed');
         await replace(main,mainText);
         const hover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', mainUri, point);
         assert(hover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.includes('calculate'))));
@@ -257,6 +277,80 @@ export async function run(): Promise<void> {
         assert(fieldHover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.replace(/&nbsp;/g, ' ').includes('const id'))), 'Stage 10 const field hover');
         await replace(worker, originalText);
         await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 10 editor repair');
+        const operatorText = originalText.replace('    return x + 42',
+            '    var a = editor_number(value = x)\n    var b = a + a\n    b %= a\n    var text = "{x:000}"\n    return x + 42') +
+            '\nvalue struct editor_number:\n    value: i32\n    operator +(const left: editor_number, const right: editor_number) -> editor_number:\n        return left\n    operator %(const left: editor_number, const right: editor_number) -> editor_number:\n        return left\n';
+        await replace(worker, operatorText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 10 operator repair');
+        const operatorPosition = worker.positionAt(operatorText.indexOf('a + a') + 2);
+        record('Operator hover presentation: ' + JSON.stringify((await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', workerUri, operatorPosition))?.map(h => h.contents.map(c => typeof c === 'string' ? c : ('value' in c ? c.value : String(c))))));
+        const operatorHover = await until(() => vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', workerUri, operatorPosition), hs => !!hs?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.replace(/&nbsp;/g, ' ').replace(/\\/g, '').includes('operator +('))), 'current operator hover');
+        assert(operatorHover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.replace(/&nbsp;/g, ' ').replace(/\\/g, '').includes('operator +(') && c.value.replace(/&nbsp;/g, ' ').includes('Effects: synchronous'))), 'operator signature and effects');
+        const operatorDefinition = await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider', workerUri, worker.positionAt(operatorText.indexOf('b %= a') + 2));
+        assert(operatorDefinition?.length, 'compound operator navigation');
+        const operatorItems = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', workerUri, operatorPosition);
+        assert(operatorItems?.items.some(i => i.label === '+') && operatorItems.items.some(i => i.label === '%') && !operatorItems.items.some(i => i.label === '-'), 'exact operator completion');
+        const patterns = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', workerUri, worker.positionAt(operatorText.indexOf('{x:000}') + 3));
+        assert(patterns?.items.some(i => i.label === '000') && patterns.items.some(i => i.label === 'X'), 'format pattern completion');
+        await replace(worker, originalText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 10 operator final repair');
+        // Stage 39 uses the real compiler formatter and exact literal bytes.
+        await vscode.window.showTextDocument(worker);
+        await vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup');
+        assert.equal(vscode.window.activeTextEditor?.document.uri.toString(), workerUri.toString());
+        const formatterText = operatorText.replace('"{x:000}"', '"""é😀 {{escaped}}:\n        {x:>8|000}\n    """')
+            .replace(/^ +/gm, spaces => ' '.repeat(spaces.length / 2));
+        const literalStart = formatterText.indexOf('"""');
+        const literal = formatterText.slice(literalStart, formatterText.indexOf('"""', literalStart + 3) + 3);
+        await replace(worker, formatterText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 39 valid dirty input');
+        const stage39Formatting = await vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', workerUri, {tabSize:4,insertSpaces:true});
+        assert(stage39Formatting?.length, 'Stage 39 formatting edits');
+        const formattedEdit = new vscode.WorkspaceEdit(); formattedEdit.set(workerUri, stage39Formatting!);
+        assert(await vscode.workspace.applyEdit(formattedEdit));
+        assert(worker.getText().includes(literal), 'exact Unicode/triple/interpolation literal bytes');
+        assert(worker.getText().includes('    var a = editor_number'), 'canonical operator-body indentation');
+        assert.equal((await vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', workerUri, {tabSize:4,insertSpaces:true}))?.length ?? 0, 0, 'Stage 39 idempotence');
+        await replace(worker, formatterText);
+        // Hold the actual formatting request body while the editor model changes.
+        // The native response still comes from voidls, using the old revision.
+        const input = children[children.length - 1].stdin!;
+        const originalWrite = input.write;
+        const pendingWrites: (() => void)[] = [];
+        input.write = ((...args: Parameters<typeof input.write>) => {
+            if (String(args[0]).includes('"method":"textDocument/formatting"')) {
+                pendingWrites.push(() => Reflect.apply(originalWrite, input, args));
+                return true;
+            }
+            return Reflect.apply(originalWrite, input, args);
+        }) as typeof input.write;
+        let action: Thenable<unknown> | undefined;
+        const newerText = formatterText + '# newer revision\n';
+        try {
+            action = vscode.commands.executeCommand('editor.action.formatDocument');
+            await until(() => pendingWrites.length, n => n > 0, 'native formatting request held');
+            await replace(worker, newerText);
+        } finally {
+            input.write = originalWrite;
+            for (const send of pendingWrites) send();
+        }
+        await action;
+        assert.equal(worker.getText(), newerText, 'stale native formatting must preserve newer editor text');
+        await replace(worker, originalText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 39 editor repair');
+        record('Stage 39 conservative formatting/literal preservation/idempotence/stale-edit rejection passed');
+        const temporalText = 'use time\n' + originalText.replace('    return x + 42',
+            '    if make_date(2024, 2, 29) is Ok(var day):\n        var text = "{day:}"\n        return day.year as i32\n    return x + 42');
+        await replace(worker, temporalText);
+        const temporalPosition = worker.positionAt(temporalText.indexOf('make_date(') + 2);
+        const temporalHover = await until(() => vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', workerUri, temporalPosition), hs => !!hs?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.replace(/&nbsp;/g, ' ').replace(/\\/g, '').includes('make_date('))), 'temporal API hover');
+        assert(temporalHover?.length, 'temporal documentation');
+        const temporalDefinition = await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider', workerUri, temporalPosition);
+        assert(temporalDefinition?.some(d => d.uri.path.endsWith('/time.void')), 'installed temporal identity');
+        const temporalPatterns = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', workerUri, worker.positionAt(temporalText.indexOf('{day:}') + 5));
+        assert(temporalPatterns?.items.some(i => i.label === 'yyyy-MM-dd') && !temporalPatterns.items.some(i => i.label === 'HH:mm:ss'), 'typed temporal patterns');
+        await replace(worker, originalText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'temporal editor repair');
         record('Before save'); await worker.save(); record('After save');
         record('Before close'); await vscode.commands.executeCommand('workbench.action.closeAllEditors'); record('After close');
         assert(vscode.window.tabGroups.all.every(group => group.tabs.length === 0));

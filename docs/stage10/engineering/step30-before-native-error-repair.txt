@@ -1,0 +1,1 @@
+capability precheck hid original closed-input error

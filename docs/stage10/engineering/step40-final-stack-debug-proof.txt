@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/integration/semantic_depth.py", line 34, in <module>
+    assert accepted.returncode == 0, (count, accepted.returncode, accepted.stdout, accepted.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (124, -11, '', '')

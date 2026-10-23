@@ -43,6 +43,28 @@ try
   assert_match('Editor fixture API.', standardHover.result.contents.value)
   var standardDef = server.rpc('textDocument/definition', {textDocument: point.textDocument, position: {line: 2, character: 19}})
   assert_match('/standard/io/files.void$', standardDef.result.uri)
+  var composite = ['use console', 'enum parcel:', '    empty', '    data(value: [i32])', 'func entry(x: i32) -> i32:', '    var p = parcel.data([x])', '    print(p)', '    var r = console.stdout.write("é😀")', '    if p is parcel.data(var numbers):', '        return numbers.count as i32', '    return x']
+  setline(1, composite)
+  listener_flush()
+  var consoleHover = server.rpc('textDocument/hover', {textDocument: point.textDocument, position: {line: 7, character: 29}})
+  assert_match('Write UTF-8', consoleHover.result.contents.value)
+  var consoleDef = server.rpc('textDocument/definition', {textDocument: point.textDocument, position: {line: 7, character: 29}})
+  assert_match('/standard/console.void$', consoleDef.result.uri)
+  var patternDef = server.rpc('textDocument/definition', {textDocument: point.textDocument, position: {line: 8, character: 20}})
+  assert_equal(3, patternDef.result.range.start.line)
+  var printHover = server.rpc('textDocument/hover', {textDocument: point.textDocument, position: {line: 6, character: 6}})
+  assert_match('\*values', printHover.result.contents.value)
+  setline(6, '    var p = parcel.')
+  listener_flush()
+  var cases = server.rpc('textDocument/completion', {textDocument: point.textDocument, position: {line: 5, character: 19}})
+  assert_equal(['data', 'empty'], mapnew(cases.result, (_, item) => item.label)->sort())
+  setline(1, composite)
+  setline(7, '    print(p, flush = ')
+  listener_flush()
+  var printHelp = server.rpc('textDocument/signatureHelp', {textDocument: point.textDocument, position: {line: 6, character: 21}})
+  assert_equal(4, printHelp.result.activeParameter)
+  assert_match('file: console.output', printHelp.result.signatures[0].label)
+  deletebufline('%', 4, '$')
   setline(1, original)
   listener_flush()
   setline(3, '    return worker.')
@@ -82,7 +104,7 @@ try
   LspServer stop
   Wait(() => !g:LspServerRunning('void'))
   if !empty(v:errors) | throw string(v:errors) | endif
-  writefile([json_encode({editor: execute('version')->split('\n')[0], passed: ['shipped adapter', 'hover', 'symbols', 'incomplete completion', 'signature', 'definition', 'rename disabled', 'dirty diagnostics', 'guarded formatting', 'refresh', 'restart', 'stop']})], $VOID_STAGE7_OUTPUT)
+  writefile([json_encode({editor: execute('version')->split('\n')[0], passed: ['shipped adapter', 'console source docs/navigation', 'enum pattern navigation/completion', 'print hover/signature', 'hover', 'symbols', 'incomplete completion', 'signature', 'definition', 'rename disabled', 'dirty diagnostics', 'guarded formatting', 'refresh', 'restart', 'stop']})], $VOID_STAGE7_OUTPUT)
 catch
   writefile([v:exception, v:throwpoint, execute('messages')], $VOID_STAGE7_OUTPUT .. '.error')
   cquit 1

@@ -1,0 +1,25 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  90: stage10_console_source
+1/2 Test  #90: stage10_console_source ...........***Failed    0.29 sec
+invalid console source accepted
+
+    Start 173: stage10_console_aot
+2/2 Test #173: stage10_console_aot ..............***Failed   12.74 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 53, in <module>
+    p = run([compiler, "run", source, *switches], stdin, status)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 29, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc', 'run', PosixPath('/tmp/VOID console source k_e9fbn_/console_reads.void'), '--no-opt'], 1, b'', b'/tmp/VOID console source k_e9fbn_/console_reads.void:6:24: error: Field access requires a struct or interface.\n    code: VOID2001\n\n 6 |             print(data.length)\n   |                        ^^^^^^\n    Module: /console_reads.void\n\n')
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  13.04 sec
+
+The following tests FAILED:
+	 90 - stage10_console_source (Failed)
+	173 - stage10_console_aot (Failed)
+Errors while running CTest

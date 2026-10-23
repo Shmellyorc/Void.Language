@@ -23,3 +23,5 @@ std::uint64_t vd_async_group_enter(vd::RuntimeFailure*) noexcept;
 bool vd_async_group_join(std::uint64_t,std::int32_t,void*,vd::RuntimeFailure*) noexcept;
 bool vd_async_drain(void*,vd::RuntimeFailure*) noexcept;
 }
+
+namespace vd { const void* async_execution_context() noexcept; }

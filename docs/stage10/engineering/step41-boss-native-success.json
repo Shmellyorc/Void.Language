@@ -1,0 +1,35 @@
+{
+  "provenance": "Boss supplied actual native-host GDB output; retained verbatim beside original SIGSEGV log. Worker did not launch a debugger.",
+  "log": "step41-boss-native-success.txt",
+  "log_sha256": "467963ddc5cb3106263ad5fff0fcfd1ac698b632f322aceac19db2aa4d51d376",
+  "observed": [
+    "VOID1107 at8:1028",
+    "VOID2003 at10:5",
+    "Inferior exited code01",
+    "No stack because no crash"
+  ],
+  "binary": "build/ci-official-release-step41/voidc",
+  "current_binary_sha256": "3b49ba9af3c8978a33acca75668275c3bf2a676211827948ce6bc187cf4f2e57",
+  "matches_final_repaired_build_checkpoint": true,
+  "source_sha256": "9a54df7f1778446fc3d593829978b4180df2ffd4a55f92ebaae156fc37f81d32",
+  "wrapper": "docs/stage10/engineering/step40-final-stack-small-stack.sh",
+  "wrapper_sha256": "3d96e9ba9fa700552a15ddbc1187daaa12651663ea49ce7a3623813799504e77",
+  "wrapper_unchanged_since_Step40": true,
+  "stack_budget_bytes": 1048576,
+  "host_run_identity_scope": "Host log names the same shared Release binary and exact existing wrapper. Current binary hash matches repaired-source complete build checkpoint; host transcript itself contains no independent run-time digest. Independent local repaired-binary controlled/semantic-depth/full-frontend probes validate1MiB behavior.",
+  "focused_release": "source_cli/frontend/stage10_tooling3/3 and original full frontend1MiB pass; final unfiltered Debug currently running, Release and strict queued.",
+  "original_crash": "step41-boss-native-backtrace-full.txt",
+  "wrapper_limit_probe": {
+    "command": [
+      "/bin/sh",
+      "docs/stage10/engineering/step40-final-stack-small-stack.sh",
+      "/home/shmellyorc/.local/bin/python3.11",
+      "-c",
+      "import resource,json; print(json.dumps(resource.getrlimit(resource.RLIMIT_STACK)))"
+    ],
+    "returncode": 0,
+    "soft_bytes": 1048576,
+    "hard_bytes": 1048576,
+    "scope": "Direct child-only resource query through the exact original wrapper;1MiB soft stack limit remains enforced. No debugger or parent policy change."
+  }
+}

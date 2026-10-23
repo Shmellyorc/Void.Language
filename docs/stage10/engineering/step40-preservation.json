@@ -1,0 +1,17 @@
+{
+  "previous_manifest": "step39-checkpoint-source-hashes.json",
+  "prior_entries": 157,
+  "bounded_files": 12,
+  "unchanged_prior_entries_verified": 149,
+  "changed_previous_entries": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "tests/stage10/operator_integration.cpp",
+    "tests/stage10/operator_reload.cpp",
+    "tests/stage10/operators.py"
+  ],
+  "unexpected_byte_changes": []
+}

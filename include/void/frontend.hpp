@@ -14,7 +14,7 @@ struct AnalyzedParameter {
     std::optional<SourceSpan> default_source = {};
 };
 struct AnalyzedDeclaration {
-    enum class Kind { function, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias } kind;
+    enum class Kind { function, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias, operator_function } kind;
     std::string identity, module, visibility;
     SourceSpan source;
     std::vector<ir::Type> parameters;
@@ -43,11 +43,15 @@ struct AnalyzedDeclaration {
     int editor_symbol_kind = 0;
     std::string documentation = {};
     bool readonly = false;
+    std::string operator_glyph = {};
+    std::string signature = {}; // Compiler-owned presentation; excluded from native contracts.
 };
 struct AnalyzedReference {
     std::string from, to, spelling;
     SourceSpan source;
     bool implicit = false; // Dependency edge without a written use site.
+    std::string binding_contract = {}; // Exact native identities/specification, before editor normalization.
+    std::string signature = {}; // Concrete selected callable, before source identity normalization.
 };
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;

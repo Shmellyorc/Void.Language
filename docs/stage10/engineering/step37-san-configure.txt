@@ -1,0 +1,8 @@
+-- VOID LLVM: 19.1.7 at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- ASan/UBSan enabled; vptr checking requires an RTTI-enabled LLVM SDK and is unavailable in this ABI
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (8.9s)
+-- Generating done (1.2s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/ci-official-san

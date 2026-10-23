@@ -1,0 +1,93 @@
+{
+  "observation": "After the first25-suite Debug/strict passes, the unchanged Debug semantic_depth.py exposed a legal124-call stack overflow under its1MiB budget. A metadata-only repair restored legal chains but left400-chain guard/error recovery overflowing; both cold-frame repairs together pass.",
+  "repairs": [
+    {
+      "file": "src/frontend/compiler.cpp",
+      "location": "AnalysisAccess::build recursive visit_expression pattern reference",
+      "change": "Move the cold variant Expr temporary/reference work through the existing noinline frontend_case helper so ordinary recursive visitor frames do not reserve it."
+    },
+    {
+      "file": "src/frontend/compiler.cpp",
+      "location": "Semantics::editor_name_candidates",
+      "change": "Pass existing optional<Type> expected by const reference; eliminate unused by-value argument copy storage in every recursive Debug expression_impl frame."
+    }
+  ],
+  "attempts": [
+    {
+      "change": "Reference-only name-probe argument",
+      "result": "Failed legal124 receiver chain; metadata frame defect was independent.",
+      "log": "step40-final-stack-debug-proof.txt"
+    },
+    {
+      "change": "Metadata frontend_case only",
+      "result": "Legal chains passed;400-chain diagnostic recovery still crashed unwinding member selection.",
+      "log": "step40-final-stack-debug-proof-2.txt"
+    },
+    {
+      "change": "Both repairs",
+      "result": "PASS unchanged legal/deep receiver, numeric, string-index and recursive type guards plus subsequent diagnostic recovery.",
+      "log": "step40-final-stack-debug-proof-3.txt"
+    }
+  ],
+  "debugger": {
+    "instrumentation": "Debug only, not strict sanitizer execution",
+    "command": [
+      "gdb",
+      "-q",
+      "-batch",
+      "build/ci-official-debug/voidc",
+      "-ex",
+      "set disable-randomization off",
+      "-ex",
+      "set exec-wrapper /tmp/void-step40-small-stack.sh",
+      "-ex",
+      "run check /tmp/void-step40-depth.void",
+      "-ex",
+      "bt 32"
+    ],
+    "deep_guard_command_difference": "run check /tmp/void-step40-depth-400.void",
+    "reproducers": [
+      "step40-final-stack-depth.void",
+      "step40-final-stack-depth-400.void",
+      "step40-final-stack-small-stack.sh"
+    ],
+    "saved_reproducer_command": [
+      "gdb",
+      "-q",
+      "-batch",
+      "build/ci-official-debug/voidc",
+      "-ex",
+      "set disable-randomization off",
+      "-ex",
+      "set exec-wrapper /bin/sh docs/stage10/engineering/step40-final-stack-small-stack.sh",
+      "-ex",
+      "run check docs/stage10/engineering/step40-final-stack-depth.void",
+      "-ex",
+      "bt 32"
+    ]
+  },
+  "verification": {
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/integration/semantic_depth.py",
+      "build/ci-official-debug/voidc"
+    ],
+    "unchanged_test_sha256": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d",
+    "before_compiler_sha256": "e9a8cb2476f95281b5be46931b3e2e2a893c148d35603027811d66ceeb22f9a7",
+    "repaired_compiler_sha256": "c7de9d11e8a3228ac3510628138ce141c48f9d2dc334cb9abf688ae4e53299e9",
+    "intermediate_pass": "step40-final-stack-debug-proof-3.txt",
+    "final_pass": "step40-final-debug-small-stack.txt",
+    "final_pass_sha256": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+    "final_status": "PASS on final frozen Debug sources, after all25 focused suites and sum45/native workloads."
+  },
+  "limits": "Unchanged1MiB child stack and original semantic/type nesting limits, assertions and exact diagnostic locations/recovery checks. No safety checks disabled; no compiler optimization-mode change.",
+  "before_repair_acceptance": "step40-final-before-stack-* retain25/25 Debug and25/25 strict plus sum45; not matching repaired-source acceptance.",
+  "logs": {
+    "step40-final-stack-debug-proof.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6",
+    "step40-final-stack-debug-proof-2.txt": "84db084b1ba17511088ebf3dbfc4ed10ae87384b5b9c22796e86b5fee3470def",
+    "step40-final-stack-debug-proof-3.txt": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+    "step40-final-stack-reproducer.txt": "63e2a2f247f01f48930960feeeff20f9f44b1803afc687e5d1f5eae7ae51c31b",
+    "step40-final-stack-guard-reproducer.txt": "dcf6b2b460f5f42a1701bf2728c55ed53a0bbbd3bff4a5023d72db82110fb02a",
+    "step40-final-before-stack-debug-small-stack.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6"
+  }
+}

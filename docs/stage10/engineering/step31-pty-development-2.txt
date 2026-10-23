@@ -1,0 +1,2 @@
+92 native PTY key/mode checks passed
+99 native PTY key/mode integration checks passed

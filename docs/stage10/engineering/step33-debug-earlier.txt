@@ -1,0 +1,33 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_resolution
+ 1/14 Test   #1: stage10_operator_resolution ......   Passed    1.51 sec
+      Start   2: stage10_operator_declarations
+ 2/14 Test   #2: stage10_operator_declarations ....   Passed    1.17 sec
+      Start   3: stage10_display_reload
+ 3/14 Test   #3: stage10_display_reload ...........   Passed    0.73 sec
+      Start   6: stage10_hooks
+ 4/14 Test   #6: stage10_hooks ....................   Passed    5.40 sec
+      Start   7: stage10_interpolation
+ 5/14 Test   #7: stage10_interpolation ............   Passed    1.32 sec
+      Start   8: stage10_conversion
+ 6/14 Test   #8: stage10_conversion ...............   Passed    0.83 sec
+      Start   9: stage10_fields
+ 7/14 Test   #9: stage10_fields ...................   Passed    0.45 sec
+      Start  23: generics_source
+ 8/14 Test  #23: generics_source ..................   Passed    6.15 sec
+      Start 154: ergonomics_sprint6_host
+ 9/14 Test #154: ergonomics_sprint6_host ..........   Passed    1.56 sec
+      Start 155: ergonomics_sprint6
+10/14 Test #155: ergonomics_sprint6 ...............   Passed    8.07 sec
+      Start 159: stage10_operators_aot
+11/14 Test #159: stage10_operators_aot ............   Passed    2.62 sec
+      Start 161: lsp_sprint6
+12/14 Test #161: lsp_sprint6 ......................   Passed    0.71 sec
+      Start 162: lsp_stage10_fields
+13/14 Test #162: lsp_stage10_fields ...............   Passed    0.07 sec
+      Start 163: lsp_stage10_display
+14/14 Test #163: lsp_stage10_display ..............   Passed    0.85 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) =  31.46 sec

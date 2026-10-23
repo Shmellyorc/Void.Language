@@ -1,0 +1,14 @@
+use "operator_lifetimes.void" as shapes
+async func right(value: i32) -> shapes.leaf:
+    return shapes.leaf(text = "R🎮\0", number = value)
+async func packet() -> shapes.packet<shapes.leaf>:
+    return shapes.packet<shapes.leaf>(text = "R", item = shapes.leaf(text = "r🎮\0", number = 222))
+async func entry(input: i32) -> i32:
+    var result = shapes.leaf(text = "L", number = 3) + await right(input)
+    if result.text != "LR🎮\0" or result.number != input + 3:
+        return 90
+    result.number++
+    var text = shapes.packet<shapes.leaf>(text = "L", item = shapes.leaf(text = "l🎮\0", number = 111)) + await packet()
+    if text != "LRl🎮\0r🎮\0":
+        return 91
+    return input

@@ -1,0 +1,14 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:84:54: error: Expected an expression, found 'i64'.
+    code: VOID1101
+
+ 84 |         return _console_redirected(self).progress != i64(0)
+    |                                                      ^^^
+    Module: /@stdlib/console.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:87:54: error: Expected an expression, found 'i64'.
+    code: VOID1101
+
+ 87 |         return _console_redirected(self).progress != i64(0)
+    |                                                      ^^^
+    Module: /@stdlib/console.void
+

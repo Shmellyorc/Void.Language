@@ -137,3 +137,28 @@ std::vector<Module::Binding> interface_universe(const Module& m) {
             }
     std::vector<Module::Binding> result;for(auto& [key,binding]:bindings) result.push_back(std::move(binding));return result;
 }
+
+// Operators share ordinary nominal declarations and access scopes. Selection
+// examines only the static operand owners, with no ancestry/promotion or ranking.
+MemberSelection select_operator(const Module& m,std::string_view glyph,const std::vector<Type>& operands,std::string_view scope,std::string_view lexical_owner) {
+    MemberSelection result;std::set<std::string> seen;std::vector<std::pair<std::vector<unsigned>,std::string>> hidden;
+    if(std::none_of(operands.begin(),operands.end(),[](auto t){return t.definition && (t.kind==Type::aggregate || t.kind==Type::managed_ref);}))return result;
+    for(const auto& f:m.functions) {
+        if(f.operator_glyph!=glyph || f.parameters.size()!=operands.size() || !f.operator_owner.definition)continue;
+        bool direct=false,exact=true;
+        for(unsigned n=0;n<operands.size();++n){const auto t=operands[n];direct |= (t.kind==Type::aggregate || t.kind==Type::managed_ref) && Type::key(t)==Type::key(f.operator_owner);exact &= t==f.parameters[n];}
+        if(!direct || !exact || !seen.insert(f.name).second)continue;
+        const auto& owner=*f.operator_owner.definition;
+        const bool same_domain=scope.starts_with("/@stdlib/")==owner.module_identity.starts_with("/@stdlib/");
+        bool accessible=owner.visibility=="public" || (owner.visibility=="internal" && same_domain) || (owner.visibility=="private" && scope==owner.module_identity);
+        Function visibility;visibility.module_identity=f.module_identity;visibility.visibility="public"; // Private operators use lexical owner, not file-method policy.
+        accessible &= method_accessible(m,visibility,scope) && (f.visibility=="public" || (f.visibility=="internal" && same_domain) || (f.visibility=="private" && lexical_owner==Type::key(f.operator_owner)));
+        if(!accessible){hidden.push_back({{},f.name});continue;}
+        for(unsigned n=0;n<operands.size();++n)if(!capability_assignable(operands[n],f.parameters[n]))throw std::invalid_argument("Operator operands cannot discard readonly capabilities.");
+        result.candidates.push_back({{},f.name});
+    }
+    if(result.candidates.size()>1)result.status=MemberSelection::ambiguous;
+    else if(result.candidates.size()==1){result.status=MemberSelection::found;result.method=result.candidates[0].second;}
+    else if(!hidden.empty()){result.status=MemberSelection::inaccessible;result.candidates=std::move(hidden);}
+    return result;
+}

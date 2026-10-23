@@ -1,0 +1,29 @@
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 50%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_wide.dir/tests/runtime/console_wide.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_wide.cpp:87:10: warning: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' is deprecated [-Wdeprecated-declarations]
+   87 |     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> oracle;
+      |          ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/locale_conv.h:265:11: note: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' has been explicitly marked deprecated here
+  265 |     class _GLIBCXX17_DEPRECATED wstring_convert
+      |           ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/x86_64-linux-gnu/c++/16/bits/c++config.h:135:34: note: expanded from macro '_GLIBCXX17_DEPRECATED'
+  135 | # define _GLIBCXX17_DEPRECATED [[__deprecated__]]
+      |                                  ^
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_wide.cpp:142:62: warning: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' is deprecated [-Wdeprecated-declarations]
+  142 |     auto l=large.c->write(Stream::output,bytes(source));std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> oracle;
+      |                                                              ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/locale_conv.h:265:11: note: 'wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>' has been explicitly marked deprecated here
+  265 |     class _GLIBCXX17_DEPRECATED wstring_convert
+      |           ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/x86_64-linux-gnu/c++/16/bits/c++config.h:135:34: note: expanded from macro '_GLIBCXX17_DEPRECATED'
+  135 | # define _GLIBCXX17_DEPRECATED [[__deprecated__]]
+      |                                  ^
+2 warnings generated.
+[100%] Linking CXX executable void_runtime_console_wide
+[100%] Built target void_runtime_console_wide

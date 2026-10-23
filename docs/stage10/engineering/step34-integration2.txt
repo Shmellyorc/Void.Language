@@ -1,0 +1,7 @@
+/operator-effects.void:10:18: error: Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.
+    code: VOID1103
+
+ 10 |     return await spawn work(input)
+    |                  ^^^^^
+    Module: /operator-effects.void
+

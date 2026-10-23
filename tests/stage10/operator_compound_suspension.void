@@ -1,0 +1,12 @@
+use "operator_compounds.void" as library
+async func rhs(value: i32) -> i32:
+    var text = "allocate {value}"
+    return value
+async func entry(input: i32) -> i32:
+    var object = library.owner(value = 10)
+    object.value += await rhs(input)
+    var items = [library.number(value = 10)]
+    items[0] %= await rhs(3)
+    if object.value.value != 10 + input or items[0].value != 1:
+        return 90
+    return input

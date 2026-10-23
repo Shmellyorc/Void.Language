@@ -1,0 +1,7 @@
+use "operator_errors.void" as library
+func work(value: i32) -> i32:
+    if library.number(value = value) != library.number(value = 4):
+        return 1
+    return 0
+async func entry(input: i32) -> i32:
+    return await spawn work(input)

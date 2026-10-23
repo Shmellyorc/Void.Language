@@ -1,0 +1,12 @@
+{
+  "status": "Build-launch environment error, not source acceptance or an OS debugger-access denial",
+  "diagnostic": "LeakSanitizer has encountered a fatal error; LeakSanitizer does not work under ptrace (strace, gdb, etc)",
+  "phase": "Sanitized voidc generated runtime-normal.o during cmake build; strict all-target build returned2 before final tests started",
+  "cause": "Strict build was mistakenly launched in default traced worker mode. Previous accepted strict workflow already requires untraced execution for instrumented build helpers as well as tests.",
+  "correction": "Repeat same authorized build through existing require_escalated execution profile, retaining detect_leaks=1, ASan/UBSan flags, all tests, limits and source freeze. No security policy, debugger permission or program registration changed. If that tool request is denied, stop without fallback.",
+  "artifacts": [
+    "step41-traced-san-commands.json",
+    "step41-traced-san-build.txt"
+  ],
+  "not_a_source_fix": true
+}

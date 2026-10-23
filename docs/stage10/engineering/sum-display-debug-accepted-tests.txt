@@ -1,0 +1,51 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/23 Test   #1: stage10_operator_reload ...........   Passed   44.36 sec
+      Start   7: stage10_display_reload
+ 2/23 Test   #7: stage10_display_reload ............   Passed    9.46 sec
+      Start   9: format_temporal
+ 3/23 Test   #9: format_temporal ...................   Passed    0.20 sec
+      Start  10: stage10_hooks
+ 4/23 Test  #10: stage10_hooks .....................   Passed    5.26 sec
+      Start  11: stage10_interpolation
+ 5/23 Test  #11: stage10_interpolation .............   Passed    1.29 sec
+      Start  13: stage10_fields
+ 6/23 Test  #13: stage10_fields ....................   Passed    0.42 sec
+      Start  14: format_numeric
+ 7/23 Test  #14: format_numeric ....................   Passed    0.89 sec
+      Start  19: gc_buffers
+ 8/23 Test  #19: gc_buffers ........................   Passed    9.86 sec
+      Start  20: gc_schemas
+ 9/23 Test  #20: gc_schemas ........................   Passed    0.80 sec
+      Start  22: runtime_console
+10/23 Test  #22: runtime_console ...................   Passed    0.02 sec
+      Start  26: runtime_console_keyboard
+11/23 Test  #26: runtime_console_keyboard ..........   Passed    0.00 sec
+      Start  28: runtime_console_native_keyboard
+12/23 Test  #28: runtime_console_native_keyboard ...   Passed    0.13 sec
+      Start  33: runtime_coordination
+13/23 Test  #33: runtime_coordination ..............   Passed    2.04 sec
+      Start  34: runtime_generated
+14/23 Test  #34: runtime_generated .................   Passed    0.97 sec
+      Start  38: generics_source
+15/23 Test  #38: generics_source ...................   Passed    5.83 sec
+      Start  39: collections_source
+16/23 Test  #39: collections_source ................   Passed   62.01 sec
+      Start  40: dictionaries_source
+17/23 Test  #40: dictionaries_source ...............   Passed   47.57 sec
+      Start  42: patterns_source
+18/23 Test  #42: patterns_source ...................   Passed    8.42 sec
+      Start  84: runtime_failures
+19/23 Test  #84: runtime_failures ..................   Passed    0.01 sec
+      Start  94: stage10_console_source
+20/23 Test  #94: stage10_console_source ............   Passed   65.25 sec
+      Start 177: stage10_console_aot
+21/23 Test #177: stage10_console_aot ...............   Passed  222.84 sec
+      Start 179: stage10_conversion_aot
+22/23 Test #179: stage10_conversion_aot ............   Passed    2.68 sec
+      Start 182: lsp_stage10_display
+23/23 Test #182: lsp_stage10_display ...............   Passed    0.91 sec
+
+100% tests passed, 0 tests failed out of 23
+
+Total Test time (real) = 491.24 sec

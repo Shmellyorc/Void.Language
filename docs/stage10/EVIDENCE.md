@@ -172,7 +172,7 @@ All 16 recorded current-source digests were rechecked unchanged. Tracked changes
 remain under `docs/`; pre-existing Stage 9 documentation/artifacts were preserved.
 Compiler, Runtime, editor, dependency-build and hosted tests: **not run**.
 
-### Current source SHA-256
+### Historical initial engineering source SHA-256
 
 | Path | SHA-256 |
 |---|---|
@@ -236,3 +236,562 @@ and [Windows high-resolution counters](https://learn.microsoft.com/en-us/windows
 Linux paths are exercised; Windows code is implemented but not natively verified.
 Resolution reporting must not be interpreted as clock accuracy. Full Stage 10
 acceptance remains open.
+
+### Step 32 owner-contained declarations — 22 October 2026
+
+The increment adds owner-body parsing and declaration validation; it does not
+claim source glyph resolution or compounds. Exact evidence is in
+[step32-results.json](engineering/step32-results.json), the `step32-*` logs and
+[the recovery ledger](IMPLEMENTATION.md). Positive/negative tests cover all approved
+glyphs, mixed exact operands, nullable managed owners, generic specialization,
+alias-normalized duplicates and malicious IR. Normal/O2 execution of declaration
+bodies uses existing ordinary IR calls, explicitly distinguished from the still
+missing source expression selection. Field/hook/generic/LSP neighbors are retained.
+
+Development failures were corrected rather than weakening validation: immutable
+operand bindings use the existing snapshot representation, which does not retain
+a store initialization flag or scalar readonly type bit. Independent validation
+checks single entry argument stores, fixed-place and mutating receiver access,
+and iteration-capture replacement. The alias fixture now receives the repository
+root explicitly rather than assuming CTest's working directory. Full operator
+JIT/AOT/reload/tooling acceptance remains for subsequent integration steps.
+
+### Step 33 exact owner resolution — 22 October 2026
+
+[Step 33 results](engineering/step33-results.json), `step33-*.txt` transcripts and
+[source hashes](engineering/step33-source-hashes.json) record actual source
+selection, normal/O2 JIT and independently linked native AOT behavior. The existing
+MemberSelection shape and IR function catalog supply direct-owner lookup; selected
+expressions use ordinary calls, effects, snapshots, roots and failures. Independent
+IR reselects from the actual operands and glyph rather than trusting a target name.
+No source arithmetic is silently delegated to builtin operations after a custom
+match. Derived != calls == once; patterns/internal identity guards remain builtin.
+
+The focused source suite covers generic specialization/definition-scope imports,
+private/internal/nominal visibility, two-owner ambiguity, nullable exact matching,
+no lifting/boxing/ancestry/promotion/reversed retries, numeric default/result-context
+rules, value snapshots/managed identity, readonly results, checked failure/recovery,
+selected references and malformed IR. Native fixtures cover every approved glyph
+plus generic owners/functions and fresh managed results. Debug neighbors and the
+unchanged 1 MiB frontend stack probes pass. Existing LSP regression results concern
+field/display/interpolation neighbors; complete operator editor acceptance is open.
+
+One real regression was reproduced: callable-null equality lost its nullable
+context during the new pre-selection operand typing. `step33-callable-null-before.txt`
+records rejection; `step33-callable-null-after.txt` and final regression acceptance
+record the repaired behavior. Earlier passing runs precede this correction and
+are labeled separately. Final configuration outcomes remain distinct from full
+Stage 10 acceptance; native Windows/macOS and editor-host operator tests were not
+run. No hosted CI or Git mutation was performed.
+
+Final Step 33 Linux acceptance: Debug **14/14 (32.60 s)**; strict
+ASan/UBSan/leak **3/3 (7.15 s)**, including **161** resolution/call checks,
+**278** declaration/IR checks and **16** source JIT/AOT process checks. Strict
+runs use the final-source RelWithDebInfo compiler and Runtime outside ptrace
+restrictions, with leak checks enabled; generated application code is not
+equivalently instrumented. The existing RTTI-off LLVM SDK excludes vptr checks.
+Raw final build/configuration/test transcripts are retained under `engineering/`.
+
+### Step 34 call/GC/effect/failure integration — 22 October 2026
+
+[Exact results](engineering/step34-results.json), [source hashes](engineering/step34-source-hashes.json)
+and `step34-*.txt` records cover final-source Debug **9/9 (43.01 s)** and strict
+ASan/UBSan/leak **7/7 (45.20 s)**. The new harness passes **637** integration
+checks; preserved resolution/declaration suites pass **161/278** checks; expanded
+source normal/O2 JIT/independently linked AOT coverage passes **124** process checks.
+The existing async IR, parallel worker and lifecycle neighbors pass in both builds.
+No production compiler/Runtime repair or dependency change was required.
+
+Evidence includes collection during RHS construction, across RHS await, and on
+real worker safepoints; generic reference-bearing snapshots and managed identity;
+allocation-failure cleanup/retry; exactly-once derived inequality with native
+side effects; retained original source and owned errors; older reached cleanup
+after failing newer cleanup; rejected native/clock/task/indirect worker effects,
+const mutation and structured-cleanup enqueue. Independent IR rejects an inserted
+unknown native edge in a worker-reachable operator.
+
+Development records retain a diagnostic-case expectation error, correction from
+an incorrect static cleanup-enqueue expectation to the established Runtime guard,
+and three initially unbuilt async test executables. Final acceptance has zero
+failures or skipped suites. Earlier passing runs precede the final RHS-await tests
+and are labeled separately. Strict runs retain leak checks outside ptrace;
+compiler/probes/native fixture/Runtime instrumentation does not equivalently
+instrument generated application machine code. The RTTI-off SDK excludes vptr.
+Release, native Windows/macOS and editor-host operator tests were not run.
+
+Step 34 is ready for independent Wrench review. Step 35 compounds and Step 36 key
+protection remain unimplemented, and full Stage 10 acceptance remains open. The
+approved future VOID Sections direction is recorded in the Bible/decisions as
+documentation only. No Git, hosted CI, publication or public README mutation.
+
+### Step 35 captured-place compounds — 22 October 2026
+
+[Exact results](engineering/step35-results.json) and [frozen source hashes](engineering/step35-source-hashes.json)
+record Debug **14/14 (166.01 s)** and strict ASan/UBSan/leak **12/12 (151.86 s)**.
+The compound harness passes **730** checks in both configurations; existing
+resolution/declaration/Step 34 suites retain **161/278/637** checks. Expanded
+normal/O2 source JIT and independently linked AOT fixtures pass **244** process
+checks. Fixed/list/dictionary/property/async neighbors and unchanged 1 MiB frontend
+stack probes pass; Debug additionally includes field/generic suites.
+
+Implementation uses the existing assignment checker, selected-expression/place
+machinery, exact selector and ordinary call/effect/root/failure paths. All five
+arithmetic compounds, mixed/generic operands, owner/index/RHS rebindings, mutable
+managed identities and value copies, property counts, GC/RHS await and result
+assignment conversions are covered. Native traces prove failed setters do not
+run and invalidated list/dictionary writes leave old elements unchanged. Checked
+failure reaches cleanup. Malformed IR cannot forge a target/glyph, discard return
+authority, substitute bad collection write values or read a missing async capture.
+
+Preserved development failures show the array-capture initialization omission,
+stale readonly snapshot type and overwritten structural Runtime error; all were
+repaired rather than disabling checks. One constructor fixture was corrected to
+respect existing explicit initializer parameters. Earlier 14/14 acceptance predates
+result-conversion support and is labeled separately. No final failures/skips.
+
+Strict runs retain leak checks outside ptrace and instrument compiler/Runtime/
+fixture/probes; generated machine code is not equivalently instrumented, and the
+RTTI-off LLVM SDK excludes vptr. The existing ciso646 SDK warning remains unsuppressed.
+No new dependency/ABI/GC/backend was introduced. Native Windows/macOS, Release,
+editor-host and complete Stage 10 acceptance were not run. Step 35 is ready for
+Wrench review; Step 36 recursive custom-equality key exclusion remains unimplemented.
+No commits, branches, pushes, hosted CI, publication or public README changes.
+
+### Step 36 recursive dictionary-key protection — 22 October 2026
+
+Shared concrete-owner key eligibility now excludes any custom == declaration and
+eligible recursively contained value fields, including private/generic/managed
+leaves. Source dictionary annotations and literals identify the key use and original
+== declaration, including foreign/private operators and generic instantiations.
+Independent IR checks dictionary shapes and declaration/marker agreement, preventing
+forged policy removal or insertion. Managed payloads and inherited == declarations
+do not alter an otherwise plain direct owner's identity-key eligibility.
+
+The existing Runtime nominal catalog carries canonical key-schema identity and a
+transitive exclusion bit, emitted for value as well as managed owners. The private
+same-build LLVM/C++ catalog ABI is layout-checked. Transactional explicit key-schema
+admission and native dictionary metadata reject forbidden roots and nested managed
+leaves; ordinary values/schemas remain legal. Catalog compatibility prevents policy
+downgrade or canonical-policy aliasing. Data-only equality/hash and patterns remain
+unchanged; no executable dictionary descriptor or user hashing API is introduced.
+Runtime metadata is the compiler's private trusted native ABI; independent IR
+validation precedes its generation. This does not claim arbitrary hostile native
+code can be made safe by descriptor validation.
+
+Fixed arrays remain unsupported keys under DICTIONARIES.md. Custom equality within
+fixed shapes, including zero extent, receives the relevant declaration diagnostic;
+this increment introduces no new fixed-array hash contract or platform limitation.
+
+Debug focused acceptance: 13/13 suites, 153.94 seconds. The final strengthened key
+harness separately passes 131 checks (1/1 CTest, 0.66 seconds), checking the rejection
+reason rather than allowing an earlier malformed-shape failure. Preserved operator
+resolution/declaration/compound/integration counts are 161/278/730/637, and the
+normal/O2 JIT/independently linked AOT runner passes 260 process checks. Existing
+dictionary insertion/lookup/hash/collision/reload/allocation-failure, schemas,
+generics, patterns, interfaces and fixed/growable array regressions pass. Unchanged
+1 MiB source-depth probes pass. Strict ASan/UBSan/leak checks pass 13/13 in
+157.82 seconds with the final 131-check harness and 260-process JIT/AOT runner.
+Compiler/Runtime/native fixtures are instrumented; generated code is not
+equivalently instrumented, and the existing RTTI-off LLVM SDK excludes vptr checks.
+Leak checks execute outside ptrace; no suppression or disabled assertion is used.
+Raw build/test/detail logs, exact commands, development fixture repairs and source
+hashes are in engineering/step36-results.json and step36-*.
+No focused Linux failure remains. The original Step 35 manifest is preserved in
+step35-checkpoint-source-hashes.json; current code hashes are source-hashes.json
+and the bounded step36-source-hashes.json.
+
+Native Windows/macOS, native Vim, latest editor-host checks, Release and consolidated
+Stage 10 acceptance were not run for this increment. No Git, hosted dispatch or
+public README operation occurred. Step 37 is the next bounded increment.
+
+### Step 37 operator/format compatibility, cache and reload — 22 October 2026
+
+Implemented exact owner/glyph/template/signature/visibility/effect contracts, unused
+generic operator sets/owner policy and native binding identities before editor
+normalization. Existing graph invalidation follows selected !=/compound calls and
+operator owners. Owned framed format-spec syntax, ordinary hooks/helpers, existing
+constant/default contracts and full pinned Ryu/date/IANA policy identities enter
+compatibility and native cache keys. Existing archive/source cache, operation binding
+and whole-generation leases remain the only machinery. No new dependency/license.
+
+Final hash-verified standard-library snapshot: Debug **14/14 (126.81 s)**;
+strict ASan/UBSan/leaks **14/14 (139.70 s)**. **219** new reload/cache checks,
+**132** hook reload and **8** temporal IR checks; preserved key/operator checks
+**131/161/278/730/637**; **276** normal/O2 JIT and independently linked AOT process
+checks. Existing cache/allocation/root/failure/multiprocess/tooling/session/analysis
+and unchanged 1 MiB depth checks pass. Strict execution is outside ptrace, no checks
+suppressed. Generated code is not equivalently instrumented; SDK RTTI-off excludes
+vptr. O2 persistence remains disabled by the existing Debug-cache contract.
+
+Earlier harness .count was corrected to .length. One initial current-revision
+publication rejection did not reproduce with/without extra inspection assertions;
+the minimal variant passes 217 checks. A later default-root run failed two tests
+with _year/year library diagnostics. Original library hashes later matched baseline;
+isolated, explicit-original and default-root direct reruns passed. Cause remains
+**unproven**; external edits are a hypothesis only. Final acceptance uses identical
+baseline bytes at an isolated root, whose hashes are retained. No production library,
+loader, assertion or protection was modified to accommodate the observations.
+
+Exact commands/results, failures and hashes: engineering/step37-results.json,
+step37-library-hashes.json, step37-source-hashes.json and step37-*.txt. Prior Step 36
+source manifest is preserved. Native Windows/macOS/Vim/latest editor, separate
+Release and final Stage 10 acceptance are unexecuted. Next Step 38 compiler-owned
+tooling; no commit/branch/push/hosted CI/public README change.
+
+
+## Step 38 tooling engineering — 22 October 2026
+
+See [focused results](engineering/step38-results.json), raw step38-* logs and bounded
+source hashes. Concrete generic callable/field presentation, direct-owner operator
+completion, source glyph navigation/references, guarded rename, typed formatting
+suggestions and custom-hook navigation all use compiler-owned metadata and probes.
+Actual Linux VS Code/Neovim/Vim paths are exercised alongside protocol/session tests.
+Vim's triple-string synchronization defect was reproduced and repaired. Host test
+Markdown escaping/snapshot synchronization issues are documented as harness repairs.
+Step 37's earlier unexplained publication/time-source observations are preserved,
+not described as fixed. Existing hash-verified library snapshot is used explicitly.
+Console/composite display integration and final Stage 10 acceptance remain incomplete.
+
+Final Step 38 results: Debug 18/18 (23.88 s), strict ASan/UBSan/leak 18/18
+(29.43 s); 20 metadata, 170 LSP, 161 preserved resolution and 219 reload/cache
+checks. Actual Linux VS Code 1.143.0 (three trust/workspace profiles), Neovim
+0.13.0-dev-1410 and Vim 9.2 pass. TypeScript/build/unit and unchanged 1 MiB source
+depth checks pass. Seventeen bounded source hashes, 152 cumulative entries and 132
+unchanged prior entries are verified. No final native Windows/macOS/Release/AOT or
+whole-stage acceptance is inferred. Exact limitations remain in step38-results.json.
+
+
+## Step 39 conservative formatting/diagnostics — 22 October 2026
+
+Fixed a reproduced public format_source safety defect: unchanged physical literal
+bytes did not prove unchanged indentation tokens inside multiline interpolation.
+Existing-parser syntax validation plus physical/expanded token comparison now refuse
+unsafe edits. No replacement parser or semantic editor adapter. The LSP keeps its
+whole-project semantic/contract/idempotence/revision/disk checks. Original diagnostics
+and UTF-16 locations are preserved across safe formatting and dirty repair.
+
+Debug 20/20 (26.71 s), strict ASan/UBSan/leaks 20/20 (31.45 s), plus final temporal
+LSP extension 1/1 per configuration pass. Final compiler checks 321, real LSP checks
+144; prior metadata/LSP 20/170 and operator resolution/reload 161/219 remain passing.
+Actual VS Code 1.143.0 trusted/restricted/multi-root, Neovim and Vim 9.2 pass; native
+clients reject a stale formatter result after a newer text revision. Existing 1 MiB
+depth checks and VS Code TypeScript/build/unit test pass. Compiler/Runtime sanitizer
+coverage does not imply generated JIT instructions are equally instrumented; the
+existing RTTI-off LLVM vptr exclusion remains. No new AOT/Release/native Windows/macOS
+or consolidated Stage 10 pass was run. Historical Step 37 observations are retained
+unexplained. Console/composite implementation and final integration remain open.
+
+Reproduction, exact commands, development fixture failures, logs and source hashes:
+engineering/step39-results.json. Step 39's currently applicable functionality has
+focused acceptance; independent Wrench review remains pending. Next: Step 40.
+
+
+## Step 40 bounded implemented-system acceptance — 22 October 2026
+
+Existing integration/native/reload/AOT harnesses now combine private/const generic
+fields, initialization, inheritance/composition, exact operators/compounds/inequality,
+custom hooks, interpolation and temporal zones/arithmetic. Forced GC/root/frame checks,
+allocation failures, failed-hook no-commit/cleanup/source frames, readonly/private
+rejection, await/workers/effects and generation/cache compatibility pass. No production
+architecture/ABI/dependency change or repair was needed.
+
+Debug combined integration 1/1 (56.91 s), final neighbors/AOT 17/17
+(429.13 s); strict ASan/UBSan/leaks 18/18
+(516.81 s). Integration 1143, cache/reload 248 and
+JIT/O2/linked AOT 344 checks pass; preserved feature/LSP and 1 MiB depth regressions
+pass. Eight source workload measurements per configuration validate 10000 interpolated
+records (270000 scalars) and a 1000003-byte formatted result checked byte by byte.
+Compile/invoke/process wall times and JIT process peak RSS are recorded separately;
+AOT memory is not sampled. Native kernel workload remains passing. Initial fixture
+errors and old 240 s AOT timeout remain in evidence; expanded 600 s suite budget
+retains per-process limits and every check. No arbitrary performance threshold.
+
+Exact commands, failures/repairs, measurements and source hashes:
+engineering/step40-results.json. Step 37 observations remain unexplained.
+Native Windows/macOS, separate Release, fresh editor/VSIX and final Stage 10 acceptance
+are not claimed. Console/terminal Steps 23–31 and composite display remain missing;
+complete those and revisit four-system Step 40 before final acceptance. No Git/hosted
+CI/public root README action. Stage 10 remains INCOMPLETE; Wrench review is pending.
+
+
+## Step 23 native stream foundation — 22 October 2026
+
+Added Runtime-owned native sessions over shared borrowed process endpoints, one
+input gate and shared stdout/stderr coordination. Native adapter endpoint inspection
+and monotonic clock are injectable with isolated contexts. Per-session admission,
+stop tokens, queued rejection, granted-operation retention/drain and NativeSafe
+cleanup preserve GC/lifetime safety without closing/duplicating host handles.
+Lazy initialization prepares outside the GC mutex and rechecks closing before
+publishing. No new source/IR console API, renderer, GC path, ABI operation or dependency.
+
+Strengthened self-drain testing reproduced Runtime admission closing before the
+self-operation drain rejection. Checking the same operation chain before changing
+Runtime state repairs it; the regression remains. Source/closed error priority and
+concurrent lazy initialization/close are covered. Existing callback admission and
+self-close rules remain intact. Native-state destruction is NativeSafe even when
+last host references are released during Managed code.
+
+Debug 7/7 (12.97 s), strict ASan/UBSan/leak 7/7
+(5.89 s); 72 native foundation and 14 real POSIX
+endpoint checks pass. Neighboring coordination, buffers/schemas, allocation-failure
+and fatal-invariant regressions pass. Real pipe/file/PTY/closed-stdin probes verify
+independent roles, descriptor flags and untouched Unicode/NUL input after teardown.
+Exact source changes, commands, failures/repairs, ownership guarantees, hashes and
+limits: engineering/step23-results.json. Native Windows/macOS, new source
+JIT/O2/AOT console and final acceptance remain unverified/unimplemented as applicable.
+Previous Stage 40 evidence is preserved, not claimed to cover these native changes.
+Step 37 observations remain unexplained. Next: Step 24 checked native transfers,
+progress/EOF/errors, deadlines and cancellation of owned OS requests. Later decoding,
+Windows wide paths, print/terminal/shutdown integration and composite display remain
+open. No Git/hosted CI/public root README changes. Stage 10 is INCOMPLETE.
+
+
+## Step 24 native cancellation blocker — 22 October 2026
+
+No production changes. engineering/step24-feasibility.md records deterministic
+Linux evidence against relying solely on readiness/self-pipe for borrowed blocking
+output with independent host writers, and against assuming targeted POSIX AIO
+cancels an entered pipe read. The standalone probe passes 17 checks under Debug
+and strict ASan/UBSan/leaks. Existing seven Runtime suites rerun 7/7 Debug (13.03 s)
+and 7/7 strict (5.80 s). io_uring setup succeeds outside restriction and is denied
+inside; actual transfers/cancellation are unverified. Native Windows/macOS and all
+Step 24 implementation/acceptance remain open pending Boss/Wrench's request/platform
+policy decision. Exact logs, commands, source hashes and unchanged earlier checkpoint
+verification: engineering/step24-results.json. Step 37 observations remain unresolved.
+
+
+## Step 24 implemented under Boss's revised contract — 22 October 2026
+
+The preceding blocker is resolved by Boss's approved best-effort entered-syscall
+policy. No io_uring requirement or weakened lifetime/progress checks. Implemented
+checked native byte transfers in the existing Runtime Adapter/Context/Operation,
+owned buffers, short-write completion, explicit EOF and native/cleanup errors, one
+monotonic deadline, queued/readiness cancellation and retained entered-call lifetime.
+POSIX poll/wake pipes and scoped per-thread SIGPIPE preserve borrowed descriptors
+and host state. Windows redirected-byte request/thread/event paths are implemented
+but natively unverified; wide console remains Step 26.
+
+A real closed-input regression reproduced wake-descriptor reuse as fd 0 and hung.
+Retaining the original availability snapshot repairs both the sequential case and
+a confirmed concurrent output wake-fd reuse case; closed stdin/stdout and all other
+focused cases pass. Final Debug 9/9 (13.09 s), strict ASan/UBSan/leak 9/9
+(6.53 s), 178 deterministic checks and 210 real POSIX driver checks, plus unchanged
+72 foundation/14 endpoint checks. Per-case native progress/counters, exact commands,
+builds, source hashes, initial failure and limitations: engineering/step24-results.json.
+Leak checking ran outside ptrace. Native Windows/macOS, separate Release, source
+console/JIT/O2/AOT/editor and final-stage acceptance are not claimed. Previous
+checkpoints/Step 37 observations remain preserved; next is Step 25, not started.
+
+
+## Step 25 shared native input — 22 October 2026
+
+One Streams-owned transactional native queue now serves bytes/char/text/line and
+legacy/leased byte reads. The existing shared UTF-8 validator is reused; strict
+invalid-prefix recovery, partial/native errors, available text, EOF and immediate
+CR/pending CRLF all share the existing input lease/deadline. Allocation faults
+after OS consumption preserve queued bytes until owned result construction succeeds.
+A new regression reproduced replay of an upstream native encoding error; explicit
+event provenance fixes it without conflating decoder recovery. Original failure
+log retained. No second parser/GC/I/O framework or public source console API.
+
+Debug 11/11 (13.40 s), strict ASan/UBSan/leak 11/11 (7.20 s), 2261 new deterministic
+checks and 264 real POSIX driver checks in 19 native process cases. Prior Step 23–24
+checks stay enabled. Actual pipe/file/PTY/large boundary, live CR, timeout/retry and
+buffered stop/precise GC evidence plus commands/source hashes/platform limits are
+in engineering/step25-results.json. Native Windows/macOS and public source-console
+acceptance remain open. Step 37 observations stay unexplained; next Step 26 has
+not started. No Git, hosted CI, publication or public root README changes.
+
+## Step 26 Windows wide-console boundary
+
+ReadConsoleW/WriteConsoleW dispatch and allocation-free strict boundary transcoding
+now share the existing native worker/lease and UTF-8 queue architecture. Raw
+redirection and POSIX transfer policy stay unchanged. Partial UTF-16 completion
+maps to exact complete-source-byte progress plus explicit trailing half-scalar
+progress; invalid console binary rejects before output. All native storage remains
+alive through actual completion under the approved cancellation contract.
+
+Focused Linux production-helper/adapter acceptance: Debug 12/12, final added cases
+1/1; 271656 deterministic wide checks. Strict ASan/UBSan/leak 12/12 (7.24 s); exact
+logs and source hashes are in engineering/step26-results.json. Steps 23–25 suites
+remain enabled. Real Windows SDK compilation/runtime is UNVERIFIED, with failed
+local target-header probe retained. Linux simulation is not native Windows proof.
+Step 27 public print/source integration has not started. Composite display, native
+platform and final Stage 10 acceptance remain open; Step 37 observations preserved.
+
+## Step 27 public print and source-console integration
+
+Public heterogeneous print and standard borrowed endpoints now use existing
+frontend calls, typed IR, shared display/builder, LLVM ABI and Runtime sessions.
+Recoverable read/write/flush/classification wrappers expose readonly io_error with
+operation/stream/native/cleanup and exact UTF-8/partial-UTF16 progress. No source
+native handles, general varargs, second renderer or stream registry.
+
+Final focused Debug 25/25 (160.57 s); strict acceptance, exact source-harness/driver
+counts and raw output records are in engineering/step27-results.json. Actual binary
+comparisons cover 24 normal/O2 JIT/linked-AOT executions and real closed-pipe failure.
+Private endpoint/worker/malformed-IR, GC/fault/cleanup, installed stdlib and cache
+checks remain enabled. Native Windows/macOS/fresh console editor and final Stage 10
+acceptance are not claimed. Stage 37 historical observations remain unexplained.
+
+Retained development evidence proves the const-field capability return defect,
+the initial overwritten console-failure detail and the synthetic count-property
+writable-walk exception. Repairs preserve const/readonly checks and original failure
+frames. Exact backtrace, failed test logs, final reruns, source hashes and remaining
+prompts/terminal/composite obligations are recorded for independent Wrench review.
+
+Final frozen-source rerun: Debug 25/25 (160.57 s), strict ASan/UBSan/leak 25/25
+(171.38 s); 917 source assertions and 127 driver checks per configuration.
+Endpoint default/copy/repeated-template and bare-null allocation-order regressions
+pass. Six fixtures give 24 binary-output records per configuration. Earlier passes
+are historical; final evidence is engineering/step27-results.json.
+
+### 22 October 2026 — Step 28 explicit prompts and lifecycle
+
+Existing print/read/flush operations now have focused prompt/exit/failure/shutdown
+integration acceptance. Repaired admitted source cleanup reporting Invalid console
+operation after Runtime close and its first-use intrinsic byte-array metadata
+admission. New host admission remains closed; shape/key/readonly checks stay on.
+No helper, stream/GC framework, OS mode/signal/handle policy or source ABI added.
+
+Debug 20/20 (109.61 s), strict ASan/UBSan/leak 20/20 (112.09 s); 2141 source
+assertions, 278 driver checks, 56 binary output records, 16 live redirected prompts
+and two actual broken-pipe cases per configuration. Exact diagnostics, cleanup
+order, source frames, partial native progress, allocation/GC and retained entered
+call lifetime pass. Evidence: engineering/step28-results.json.
+Native Windows/macOS, Release/editor/final-stage verification remain open; Step37
+observations preserved verbatim. Next Step29 terminal capabilities/presentation;
+not started. No Git mutation, hosted CI, publication or public README edit.
+
+### 22 October 2026 — Stage10 Step29 terminal presentation
+
+Implemented source capabilities/size/cursor/visibility/color/reset/clear/title/bell
+through existing console leases, queue, stdlib, typed IR and ABI. Conservative
+system terminfo/live ioctl POSIX and native Windows code; no new manager/parser/
+GC/registry, hidden tty or mode/code-page mutation. Cursor input ownership and
+fresh report parsing preserve queued bytes, CRLF, errors and bounded readiness.
+Private console-v2/terminal-v1 compatibility and versioned C entry protect binding.
+
+Final Debug 23/23 (184.87 s), strict ASan/UBSan/leak 23/23 (187.43 s); 2581 source
+assertions, 482 terminal assertions, 320 driver checks, 64 JIT/O2/linked-AOT records,
+4 source PTYs and 77 native POSIX checks/10 process cases per configuration.
+Production native build/run passes. Reproduced/fixed swallowed report-boundary error
+and orphaned system-facility caches on dlclose (initial strict 21/23); retain module
+for process lifetime, free per-call TERMINAL, preserve host cur_term, no suppression.
+Evidence: engineering/step29-results.json.
+Native Windows/macOS, Release/editor/full-stage acceptance and Step37 observations
+remain open. Step28 stale prompt/lifecycle matrix references corrected; no helper
+added. Next Step30 keys/scoped modes/restoration, not started. No Git/hosted CI/
+publication/public README action.
+
+## Step30 focused Linux evidence — 23 October 2026
+
+Implemented compiler-owned source keys/availability/scoped sessions over the existing
+console queue and native Session/Streams ownership; exact mode restoration, entry
+cleanup, partial/error recovery and ordinary IR/JIT/AOT paths. Final Debug 27/27
+(393.60 s), strict ASan/UBSan/leak 27/27 (463.49 s); 3205 source
+assertions, 127 key/mode checks, 92 real key PTY checks/8 processes per configuration,
+72 exact execution records and production native build/run. Native flags and
+control characters are serialized; no disabled assertion/sanitizer/suppression.
+Preliminary Python 3.11 harness failure and native apply/error repairs are retained.
+Exact commands, hashes, counters, output hex and limits are in
+[Step30 results](engineering/step30-results.json). Native
+Windows/macOS, Release/editor, Step31, composite display and final acceptance remain
+open; Step37 observations unchanged. No Git/CI/publication/public README action.
+
+
+## Step31 console concurrency/lifetime — 23 October 2026
+
+[Focused results](engineering/step31-results.json), frozen/cumulative source hashes,
+commands, native flags and exact output bytes preserve the Step30 baseline. Debug
+28/28 (341.90s), strict ASan/UBSan/leak 28/28 (352.20s).
+No production repair required; native, source/JIT and real PTY harnesses extended.
+Permanent Boss editor observations are deferred in IMPLEMENTATION and linked from
+TEST_PLAN. Fixture corrections and intentionally interrupted broad build logs are
+retained, distinct from final focused acceptance. Step37 observations unresolved;
+native Windows/macOS, composite display and final-stage verification remain open.
+
+### 23 October 2026 — Collection display focused acceptance
+
+Implemented iterative fixed-array/list/dictionary display through existing string,
+format, interpolation and print paths; typed snapshots/roots, active-path cycles,
+ordinary hooks/effects, version failures and complete-record cleanup preserved.
+Debug 20/20 (840.04s), strict ASan/UBSan/leak 20/20
+(993.45s); 156 conversion checks, 3674 source console
+assertions, 199 display reload checks and 84 exact JIT/O2/linked-AOT records per
+configuration. Production native builds and five collection cache cold/hit/corrupt/
+hook-body/specification checks pass in each configuration.
+
+Equivalent deep proof fast paths retain the unchanged 72-level and forged-IR tests.
+A transient pinned Clang build crash remains unexplained; unchanged retry passed.
+Step37 observations remain unresolved. Exact commands, failures/repairs, output,
+source hashes and limitations: [collection results](engineering/collections-results.json). Enum/result display,
+native Windows/macOS, fresh Release/editor cross-products and final Stage10
+acceptance remain open. Stop for Wrench review; next source work is enum/result
+display in existing frontend adapters. No Git/CI/publication/public README action.
+
+### 23 October 2026 — Enum/result display
+
+Implemented enum/result defaults through the existing typed composite work stack,
+all four consumers and shared builder/context; active payloads, Ok(null), cycles,
+readonly/copies, ordinary hooks, GC/failures/cleanup and outer record atomicity pass.
+Repaired recursive readonly admission using the existing shared authority predicate;
+independent IR checks remain unchanged. No new renderer, IR/ABI, GC or dependency.
+
+Debug 24/24 (994.99s), strict ASan/UBSan/leak 24/24 (1137.49s);
+203 conversion checks, 4123 source console assertions, 270 display reload checks,
+92 exact JIT/O2/linked-AOT records and six cache probes per configuration. Production
+native builds and four managed-identity alias paths also pass. [Exact evidence](engineering/sum-display-results.json) includes hashes, commands, repairs and
+retained deep-compilation/Clang/Step37 observations. Stage10 remains INCOMPLETE;
+native platforms, fresh editor/Release, four-system/final acceptance remain open.
+Next: compiler-owned console/composite tooling. Deferred compiler/editor directions
+remain recorded only. No Git/CI/publication/public README action.
+
+## 23 October 2026 — Console/composite tooling
+
+[Focused results](engineering/console-tooling-results.json), frozen source manifests,
+full LSP requests/responses, exact JIT/O2/linked-AOT output records and actual editor
+logs record Linux Debug29/29/strict29/29 plus sum45 each. Prior sum/collection evidence,
+Clang reproducer, deep cost and Step37 observations are preserved. Future debugger
+direction is documentation only; final/native-platform Stage10 acceptance remains open.
+
+## 23 October 2026 — Step40 final four-system focused integration
+
+[New integration evidence](engineering/step40-final-integration-results.json) records
+Debug25/25 and strict25/25 plus sum45 each, exact source/native executions, output
+progress, PTY restoration, failure/GC/lease/cache and workload observations.
+[Earlier Step40](engineering/step40-results.json) remains partial historical evidence.
+Tooling deep-test wording was corrected with the original JSON retained; no earlier
+test outcome changed. Step37 and transient Clang observations remain unresolved.
+This is focused Step40 acceptance, not Step41 or complete Stage10/platform acceptance.
+
+
+## Step41 resumed acceptance: blocked security boundary —23 October2026
+
+Final Debug199/199 plus native workload and both genuine1MiB probes pass.
+Fresh Release198/199: source_cli and both standalone1MiB gates reproduce SIGSEGV;
+Release native workload passes. Final strict199-suite run has not started.
+All six editor phases and six default-root controls pass;766 frozen inputs and
+historical artifact hashes match. Earlier196/199 Debug and corrected legacy
+harness evidence are retained. No partial attempt certifies full acceptance.
+
+The parent-owned Release GDB probe returned `ptrace: Operation not permitted`;
+no stack was obtained. Engineering stopped at Boss's required security boundary,
+without escalation, substitute program or policy change. Owner recovery decision
+and Release failure diagnosis/repair are pending. No limits/guards/timeouts were
+changed. See [step41-results.json](engineering/step41-results.json) and the latest implementation ledger checkpoint.
+Step41 and Stage10 remain INCOMPLETE; Steps42–44 remain separate.
+
+## Step41 consolidated Linux acceptance — 23 October 2026
+
+[Step41 results](engineering/step41-results.json) record unfiltered Debug199/199,
+fresh Release199/199 and strict199/199 (597/597, no final failures/skips), unchanged
+1MiB gates, full203/deep72 regression, actual Linux editors, native/GC/console/cache
+and workload evidence. Initial/intermediate failures, the builtin-span and result-handler repairs and
+three corrected legacy test expectations remain separate. Native Windows/macOS and Steps42–44 remain open.
+
+The Release stack repair diff (+3/-1), original crash and Boss native successful
+reproduction are preserved with matching binary/source hashes and observed
+1,048,576-byte soft/hard wrapper limits. Original Release build exit was **0**;
+no unchanged retry occurred. Its emitted SDK GVN stack remains unexplained,
+separate from the preserved historical Clang/Step37 observations.

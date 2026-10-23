@@ -1,0 +1,13 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "build/ci-official-debug",
+    "--output-on-failure",
+    "-R",
+    "^runtime_console$"
+  ],
+  "returncode": 0,
+  "seconds": 0.03391606197692454,
+  "environment": {}
+}

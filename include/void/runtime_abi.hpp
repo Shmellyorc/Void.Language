@@ -12,13 +12,23 @@ struct RuntimeTypeRecord {
     std::size_t size;
     const std::size_t* references;
     std::size_t count;
+    const char* dictionary_key_schema = nullptr;
+    unsigned dictionary_key_forbidden = 0;
 };
 }
 extern "C" {
+void vd_console_v2(void**,void**,std::uint64_t*,unsigned,std::int64_t,void**,std::int64_t,std::int64_t,vd::RuntimeFailure*) noexcept;
+void vd_console_print(void*,std::int64_t,bool,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_string_count(void*,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_string_index(void**,void*,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 bool vd_temporal(void**,std::uint64_t*,unsigned,const std::uint64_t*,void* const*,vd::RuntimeFailure*) noexcept;
 void vd_display_enter(const char*,void*,vd::RuntimeFailure*) noexcept;
+bool vd_collection_scope(vd::RuntimeFailure*) noexcept;
+void vd_collection_scope_leave() noexcept;
+bool vd_collection_enter(void*,vd::RuntimeFailure*) noexcept;
+void vd_collection_leave(void*,vd::RuntimeFailure*) noexcept;
+void vd_collection_append(void*,vd::RuntimeFailure*) noexcept;
+void vd_collection_finish(void**,vd::RuntimeFailure*) noexcept;
 void vd_display_leave() noexcept;
 void vd_display_error(void*,vd::RuntimeFailure*) noexcept;
 void vd_string_encode(void**,void*,vd::RuntimeFailure*) noexcept;
@@ -97,3 +107,5 @@ void vd_value_array_push(void**,const vd::NativeArrayElement*,const void*,vd::Ru
 void vd_value_array_remove(void*,void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_value_array_copy(void**,void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
 }
+
+namespace vd { void finish_console(Runtime&,std::int64_t,RuntimeFailure*) noexcept; }

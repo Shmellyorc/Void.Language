@@ -1,0 +1,117 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:18:23: error: Value init requires every field to be valid before its body; a non-nullable reference has no safe default.
+    code: VOID1106
+
+ 18 | func (self number<t>) init(value: t, notify: func(i32) -> i32):
+    |                       ^^^^
+    Module: /operator_console_model.void
+    Required reference field declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:6:19
+
+ 6 |     private const notify: func(i32) -> i32
+   |                   ^^^^^^
+    Module: /operator_console_model.void
+    Hint: Use named-field construction without init for a value with required reference fields.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:36:13: error: Incorrect argument count: missing required argument 'value'.
+    code: VOID2004
+
+ 36 |     private current: number<t>
+    |             ^^^^^^^
+    Module: /operator_console_model.void
+    Required initializer parameter declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:18:28
+
+ 18 | func (self number<t>) init(value: t, notify: func(i32) -> i32):
+    |                            ^^^^^
+    Module: /operator_console_model.void
+    Default construction required for this field. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:36:13
+
+ 36 |     private current: number<t>
+    |             ^^^^^^^
+    Module: /operator_console_model.void
+    Hint: Supply an explicit constructed value or every required argument.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:49:19: error: Incorrect argument count: missing required argument 'value'.
+    code: VOID2004
+
+ 49 |     private const value: t
+    |                   ^^^^^
+    Module: /operator_console_model.void
+    Required initializer parameter declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:18:28
+
+ 18 | func (self number<t>) init(value: t, notify: func(i32) -> i32):
+    |                            ^^^^^
+    Module: /operator_console_model.void
+    Default construction required for this field. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:49:19
+
+ 49 |     private const value: t
+    |                   ^^^^^
+    Module: /operator_console_model.void
+    Hint: Supply an explicit constructed value or every required argument.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:126:48: error: Duplicate declaration or shadowing of 'zone'.
+    code: VOID2005
+
+ 126 |     if find_zone("America/New_York") is Ok(var zone):
+     |                                                ^^^^
+    Module: /operator_console_model.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:127:54: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 127 |         if make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?) is Ok(var local):
+     |                                                      ^
+    Module: /operator_console_model.void
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:127:76: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 127 |         if make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?) is Ok(var local):
+     |                                                                            ^
+    Module: /operator_console_model.void
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:127:82: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 127 |         if make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?) is Ok(var local):
+     |                                                                                  ^^
+    Module: /operator_console_model.void
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:128:30: error: Unknown identifier 'local'.
+    code: VOID2002
+
+ 128 |             if resolve_local(local, zone, local_choice.later) is Ok(var zoned):
+     |                              ^^^^^
+    Module: /operator_console_model.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:128:37: error: Unknown identifier 'zone'.
+    code: VOID2002
+
+ 128 |             if resolve_local(local, zone, local_choice.later) is Ok(var zoned):
+     |                                     ^^^^
+    Module: /operator_console_model.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:128:66: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 128 |             if resolve_local(local, zone, local_choice.later) is Ok(var zoned):
+     |                                                                  ^^
+    Module: /operator_console_model.void
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:129:25: error: Unknown identifier 'zoned'.
+    code: VOID2002
+
+ 129 |                 print("{zoned:yyyy-MM-dd HH:mm:ss zzz VV}")
+     |                         ^^^^^
+    Module: /operator_console_model.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_model.void:144:32: error: Ok/Err require a contextual result<t, e> type.
+    code: VOID2001
+
+ 144 |                         print([Ok(pressed.character) as result<string, string>])
+     |                                ^^
+    Module: /operator_console_model.void
+    Hint: Annotate the variable or the enclosing function result.
+

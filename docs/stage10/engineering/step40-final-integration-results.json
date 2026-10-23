@@ -1,0 +1,1194 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": "Step40 final four-system integration",
+  "increment_status": "Completed bounded focused Linux integration acceptance; Golden Wrench review pending. Not Steps41–44 or stage lock.",
+  "earlier_partial_evidence": "step40-results.json",
+  "earlier_partial_status": "Historical18-suite field/operator/custom-hook/temporal checkpoint; console and composite integration was not then complete. Preserved independently, not overwritten.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Shared operator_console_model fixture combines owner-private/const generic managed/value construction, readonly aliases, independent value copies, inherited/const-promoted hooks and captured property += plus custom %= and derived !=.",
+    "Arrays, dictionaries, enum/result payloads, nested composite interpolation, custom/default display and numeric/date/duration/explicit-zone formatting reach the same print/console implementation. Exact trace fixes getter/RHS/operator/setter, argument-capture/control and hook order; copied results retain managed identity.",
+    "Existing console Fake/managed probes/barriers force collection during RHS/rendering and blocked native output; allocation retries preserve roots/frames and complete-record boundaries. Operator/hook failures retain primary/secondary cleanup and original source, failed compounds retain old storage; cycles, recursion and structural invalidation are exercised.",
+    "Blocked scoped-mode output retains the old generation through compatible replacement; the new generation changes subsequent hook text. Existing contracts reject changed visibility/layout/operator sets/format specs and newly clock-effectful hooks. Shutdown preserves admitted buffers/code until completion and restores modes.",
+    "Existing console process driver now verifies all four JIT/AOT paths, exact application/nonzero status versus legacy result output, live prompt before mixed Unicode/CRLF/raw-LF/NUL/EOF input, normal/failure PTY mode restoration, real positive native pipe progress, production native build/startup, combined cache cold/hit/corrupt/body/spec and2048-record composite stdout workloads.",
+    "Existing operator integration adds26 cross-system private/readonly/custom-key/invalid-format/exact-operator/worker/construction and forged selected-target checks. Prior operator/GC/async/failure/workload neighbors remain intact.",
+    "Recovery overview, Step38/feature rows and remaining-step boundary reconciled; inherited72-level wording corrected with original JSON retained. Boss real VS Code F2 success recorded only for its reported scenario; broader editor backlog and all future compiler/debugger objectives remain deferred."
+  ],
+  "production_repairs": {
+    "observation": "After the first25-suite Debug/strict passes, the unchanged Debug semantic_depth.py exposed a legal124-call stack overflow under its1MiB budget. A metadata-only repair restored legal chains but left400-chain guard/error recovery overflowing; both cold-frame repairs together pass.",
+    "repairs": [
+      {
+        "file": "src/frontend/compiler.cpp",
+        "location": "AnalysisAccess::build recursive visit_expression pattern reference",
+        "change": "Move the cold variant Expr temporary/reference work through the existing noinline frontend_case helper so ordinary recursive visitor frames do not reserve it."
+      },
+      {
+        "file": "src/frontend/compiler.cpp",
+        "location": "Semantics::editor_name_candidates",
+        "change": "Pass existing optional<Type> expected by const reference; eliminate unused by-value argument copy storage in every recursive Debug expression_impl frame."
+      }
+    ],
+    "attempts": [
+      {
+        "change": "Reference-only name-probe argument",
+        "result": "Failed legal124 receiver chain; metadata frame defect was independent.",
+        "log": "step40-final-stack-debug-proof.txt"
+      },
+      {
+        "change": "Metadata frontend_case only",
+        "result": "Legal chains passed;400-chain diagnostic recovery still crashed unwinding member selection.",
+        "log": "step40-final-stack-debug-proof-2.txt"
+      },
+      {
+        "change": "Both repairs",
+        "result": "PASS unchanged legal/deep receiver, numeric, string-index and recursive type guards plus subsequent diagnostic recovery.",
+        "log": "step40-final-stack-debug-proof-3.txt"
+      }
+    ],
+    "debugger": {
+      "instrumentation": "Debug only, not strict sanitizer execution",
+      "command": [
+        "gdb",
+        "-q",
+        "-batch",
+        "build/ci-official-debug/voidc",
+        "-ex",
+        "set disable-randomization off",
+        "-ex",
+        "set exec-wrapper /tmp/void-step40-small-stack.sh",
+        "-ex",
+        "run check /tmp/void-step40-depth.void",
+        "-ex",
+        "bt 32"
+      ],
+      "deep_guard_command_difference": "run check /tmp/void-step40-depth-400.void",
+      "reproducers": [
+        "step40-final-stack-depth.void",
+        "step40-final-stack-depth-400.void",
+        "step40-final-stack-small-stack.sh"
+      ],
+      "saved_reproducer_command": [
+        "gdb",
+        "-q",
+        "-batch",
+        "build/ci-official-debug/voidc",
+        "-ex",
+        "set disable-randomization off",
+        "-ex",
+        "set exec-wrapper /bin/sh docs/stage10/engineering/step40-final-stack-small-stack.sh",
+        "-ex",
+        "run check docs/stage10/engineering/step40-final-stack-depth.void",
+        "-ex",
+        "bt 32"
+      ]
+    },
+    "verification": {
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "tests/integration/semantic_depth.py",
+        "build/ci-official-debug/voidc"
+      ],
+      "unchanged_test_sha256": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d",
+      "before_compiler_sha256": "e9a8cb2476f95281b5be46931b3e2e2a893c148d35603027811d66ceeb22f9a7",
+      "repaired_compiler_sha256": "c7de9d11e8a3228ac3510628138ce141c48f9d2dc334cb9abf688ae4e53299e9",
+      "intermediate_pass": "step40-final-stack-debug-proof-3.txt",
+      "final_pass": "step40-final-debug-small-stack.txt",
+      "final_pass_sha256": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+      "final_status": "PASS on final frozen Debug sources, after all25 focused suites and sum45/native workloads."
+    },
+    "limits": "Unchanged1MiB child stack and original semantic/type nesting limits, assertions and exact diagnostic locations/recovery checks. No safety checks disabled; no compiler optimization-mode change.",
+    "before_repair_acceptance": "step40-final-before-stack-* retain25/25 Debug and25/25 strict plus sum45; not matching repaired-source acceptance.",
+    "logs": {
+      "step40-final-stack-debug-proof.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6",
+      "step40-final-stack-debug-proof-2.txt": "84db084b1ba17511088ebf3dbfc4ed10ae87384b5b9c22796e86b5fee3470def",
+      "step40-final-stack-debug-proof-3.txt": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+      "step40-final-stack-reproducer.txt": "63e2a2f247f01f48930960feeeff20f9f44b1803afc687e5d1f5eae7ae51c31b",
+      "step40-final-stack-guard-reproducer.txt": "dcf6b2b460f5f42a1701bf2728c55ed53a0bbbd3bff4a5023d72db82110fb02a",
+      "step40-final-before-stack-debug-small-stack.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6"
+    }
+  },
+  "production_source_hashes_unchanged": {
+    "include/void/async.hpp": "984f04098d34be3a1104e73a6f488211e41e9f31c14abb85bfadc11c6563267e",
+    "include/void/console.hpp": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb",
+    "include/void/console_ops.hpp": "2afbea6d8eee7f97e536eacb138a79133f3c496d87197350d2e7c0d61b89abd2",
+    "include/void/detail/console_wide.hpp": "a4b47d68931579159e1e9b5cfbf8984727267acef6ffd253d7053e40476b3840",
+    "include/void/format.hpp": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b",
+    "include/void/frontend.hpp": "5dc518cfb5b64916a64f9a1e6d3aceffaac8389c463b0962ed9acfa947fa12ee",
+    "include/void/gc_schema.hpp": "a00705aa14c9bd8c96655e96fe91fe9ad0bc8915675b59d868e6670db9f94098",
+    "include/void/heap.hpp": "adfc433225e93e379ba6682b19821c7e4881c0c680917466428566196d98a1c1",
+    "include/void/ir.hpp": "2048203ff37c63942fdfd576ba764801beb4ebbeef26e2873522d79150f06787",
+    "include/void/numeric.hpp": "bdc8c6ae92eba6be4358f852c1aaa0e2034f0965b50f316415d770bc20c74edd",
+    "include/void/runtime.hpp": "ea879bccdeb96170578d5e67c59ee2287f62e95d79049700aa2dc8034b3d1ec3",
+    "include/void/runtime_abi.hpp": "70cf4ab5d26f78eb851aa2f3c8a7d91413bdeb65fcfe95bfb8e8c9591ccd85bf",
+    "include/void/temporal.hpp": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9",
+    "include/void/temporal_ops.hpp": "42a253ba5f55e5235c4492e6f548b5a1af43c082e48fa1c1742120e4a87e19e9",
+    "include/void/tooling.hpp": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba",
+    "include/void/utf8.hpp": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773",
+    "src/backend/llvm/backend.cpp": "a811a8801d68607094444db58b0bece20d097089e435ba5e6e4043574c3e2e06",
+    "src/format.cpp": "65aa6172548c494462e993b8ad0f5bbd7e22736b22bbc3eb4e831b424085d57d",
+    "src/frontend/capabilities.inc": "6b0e37f03f64ce2ee4f4d699fc4c6462cedfadd5add5716a06283156453c894f",
+    "src/frontend/collection_display.inc": "bc118b9767343dd3f05abe650e4118624c8b724886f4a867af722e9e97fa1697",
+    "src/frontend/construction.inc": "11dd4ab49feff3c1b428cb8cd5d957ba41d56351fb7154f3b62ae318392935d0",
+    "src/frontend/display_semantics.inc": "8519b88582fcf1805c651a314a0a894e99c6f822ebd6959ded4cb71389137e2e",
+    "src/frontend/generic_declarations.inc": "38c18207bb3f60883165451e47e9db21ab5c42ad397dc919442c4fef58d78b12",
+    "src/frontend/generic_tooling.inc": "95897a4e2ff9c0b34a89a0549fda4bd0c47fe821bcca9a930a8e2eb4f9720798",
+    "src/frontend/generics.inc": "fa4bdfcfc928b09a9bec9ea1a95f161aba1ec557a7147eb8f5e19058038682e9",
+    "src/frontend/pattern_parser.inc": "5b9a0af017b9702e82fbebc0bd0799c620174d23a7cf6296141f96d67c0f8951",
+    "src/frontend/pattern_semantics.inc": "cff3689f716b295aa588989022c73d7f3c6531e5b23d170effef3fe1985255c4",
+    "src/frontend/source.cpp": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+    "src/frontend/strings.inc": "1ca4225da42b4bb14ce1a4579fa70be84463b71f1ba8811f1c5d4f257ccc71bc",
+    "src/frontend/tooling.cpp": "7bae9162ea7aab48d88447e978f8d309e3779f6149c276de3f42ac3906d8fdbb",
+    "src/ir/async_validation.inc": "d78beb1ded175fc3fee441126081d02647f2199e8e70edc96a3fde2824f70aba",
+    "src/ir/interfaces.inc": "bccd3d2b7c086d01c7c6575033fe04f1d61e3676e991c78d802ba90d915ff207",
+    "src/ir/module.cpp": "7ef50ca013e2d74e8931b8f06b0da711a46ee2b3f13ee1907846944ae41ada99",
+    "src/ir/reference_capabilities.inc": "ada3cfacb12dc843bb90c1b859bf3283829623097dedcdb6d7a6b752cde457a1",
+    "src/lsp/main.cpp": "e146c937214864d97daa7f17d74e35597014a1d165fff391067dda7a78cc615f",
+    "src/main.cpp": "2be644fd7327f3d51e0bbe330b49a73d52dd0e926fd10ee8b19fca5c73e8a012",
+    "src/native_build.cpp": "e9ad76b14c76ccf71ecb4f1ba107903f9d603c67926550dd65eea78bf3bd0c67",
+    "src/numeric.cpp": "373627c21164ed3f805500bb0b29494707a281449f0fbf43cbe16b9f85dda2f6",
+    "src/runtime/abi.cpp": "83dc28dfcbe76974b7a1e83dd2518120dcabf0202b915634bf15cd7dac7fbb7c",
+    "src/runtime/array.cpp": "8d4afc14e4991c1505954df143bd2628947264385aea7b87dda08fbc130e9f6f",
+    "src/runtime/async.cpp": "fea523a98600e5cc5c3ab3258efda83e788610e18c55195dd76a7bcb3a08a14b",
+    "src/runtime/console.cpp": "9408146ef429a89e2ada7101ad9ff29cac73c3f3dac69214aabf0e2df26e52e2",
+    "src/runtime/console_abi.cpp": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c",
+    "src/runtime/console_keyboard.inc": "d16b05597255787bb62e3cc6f08ff3964a1ec6a6cbca496b8c547242cd19ba47",
+    "src/runtime/console_presentation.inc": "45c87f1ff65919cf1e388527a57230389ef1c9156972fc175a8c1e6a1b329124",
+    "src/runtime/console_terminfo.inc": "1a664e9813fd97d7124318a1f1107981adf8de1c98c88a1feadb156391e107e1",
+    "src/runtime/coordination.cpp": "2021870a9d5f5cf47f29d8979220fee2e91e28906db28062c45bdff26915f452",
+    "src/runtime/dictionary.cpp": "baeebadbe9dea5664740fde3e0c5c44b7977dd0242f69fd7b98e137e1fe3b80f",
+    "src/runtime/reload.cpp": "2b5eb711b3b8754c073abe57b3f10e7739298fc6ad5db9fae823c00665971a42",
+    "src/runtime/temporal_abi.cpp": "ede0161d7eba5a300829319f179cf0b2d63c3ed3a5577b5d38546b842e3e0874",
+    "src/temporal.cpp": "715a56a1d0ddc96ffbc58d215e240b577249ca271adfccdbcf369579a0c6a113",
+    "stdlib/README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+    "stdlib/console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385",
+    "stdlib/time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+    "third_party/date/LICENSE.txt": "c90f6c00fb961170560299cbda28ca2d45804913aa8b2a9f36dbb8e0028d6930",
+    "third_party/date/NOTICE": "b9d840b5a888bf6dfe9c22cddc75cfa5a9413d4b9a6a9c0ca7372dd4b58b6c8e",
+    "third_party/date/include/date/date.h": "c38505ff33b836ffac82676fe5aa96b841ce3ad69032a091863146e4404b793a",
+    "third_party/date/include/date/ios.h": "7368c4617ff954c0f135e27727118ca877cf46b81437a1b7b15419fbff17868b",
+    "third_party/date/include/date/tz.h": "0749f7275b5533fb34aef80f189d01831088c92d2662491c910d1ed983413f55",
+    "third_party/date/include/date/tz_private.h": "c84252b8e543feaaec328bfe9a256b8dc48f3eaac9d7d48a7864d81d2aa10101",
+    "third_party/date/src/tz.cpp": "c87fe15117b9c968cd0ad58fa217a87f31953d6cf1a0e5a81edfbd89f1ac133e",
+    "third_party/date/src/void_embedded_tzdb.hpp": "9345652c97bcfb945e2b485702166624ae1fbdf3e76a3969b422da3af5f4dfd3",
+    "third_party/ryu/CONTRIBUTORS": "5d1ce5f1f2515dc4587dfb681b0390bca432edd19b13fec47d8d1a59cc7e9bee",
+    "third_party/ryu/LICENSE-Apache2": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "third_party/ryu/LICENSE-Boost": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+    "third_party/ryu/ryu/BUILD": "97bca9d44a227a7cacd5afc914de165bded126ea372f62ac960f68b0559efac3",
+    "third_party/ryu/ryu/common.h": "9545485fb2ed7f3c5d2e51353679ff011e5758ba0636552fbdae896131be2a06",
+    "third_party/ryu/ryu/d2fixed.c": "27fb98af66fa13c2b52f69f8794abcfe65d41c88a52123855f6d8045fd877b1c",
+    "third_party/ryu/ryu/d2fixed_full_table.h": "c505f1f21f5e4658196afd23df50f1ec4d048144095f73d92454705240a14547",
+    "third_party/ryu/ryu/d2s.c": "7064fa597c87390ee90409cd40fec07bbbdb27985e83fd2a8e0a997ea61ebb45",
+    "third_party/ryu/ryu/d2s.h": "a8c001069d5bbe38e6c26f949ae523d4d2bb42bb72e1663ae2771b237336bab6",
+    "third_party/ryu/ryu/d2s_full_table.h": "a3f4515459eca87e9f44e0ecd5e2b86ec9b6347e0f5fbb2f28432671193ff9af",
+    "third_party/ryu/ryu/d2s_intrinsics.h": "c5127459404ed8b5b943701dff54316a5099dc4463d5d99c607f03e20c83653a",
+    "third_party/ryu/ryu/digit_table.h": "8b782573abc0b8554d74163ae6c02f0beb5c30d1e63eaebdb0ddf2c98d817e01",
+    "third_party/ryu/ryu/f2s.c": "346ab10ffd3b9467d7c2672de8f40ff5a17b2b9bce35e70f88bd34ed45ce0910",
+    "third_party/ryu/ryu/generic_128.c": "79e6a0ecfeed829832b01770577ee0cc2b68360f1d9935c86c91e155a768b10b",
+    "third_party/ryu/ryu/generic_128.h": "204b32d839b7fdaa06affae7adcd6f8e9817a18485aad65dcb8e6ceff2fe9d31",
+    "third_party/ryu/ryu/ryu.h": "82b553031ae983ecaaf159da7a71926e869f172aa0b453d3e899bd1c1d66eb55",
+    "third_party/ryu/ryu/ryu2.h": "39f8b1bfc1c23f62a65db53e3eb479abd1bb549bf112cc58d0b37890a5e4afaf",
+    "third_party/ryu/ryu/ryu_generic_128.h": "ab931d0c950229ba110e66bf3ce5989d63d9c1965ede3c847ee22ef9454099e2",
+    "third_party/ryu/ryu/tests/BUILD": "e01e77b1b6acb323d7bce10c1bd0575ae8b2bc3b29277690454c1e542de9a3c0",
+    "third_party/ryu/ryu/tests/d2fixed_test.cc": "30026baeeb33b6819e96f790047f9aa1b7a6182c45e949f4300bd7e0aa34f864",
+    "third_party/ryu/ryu/tests/d2s_intrinsics_test.cc": "87aa1284311380d0e37258627808dcd73429a84a49100740be9dda1601963e6f",
+    "third_party/ryu/ryu/tests/d2s_table_test.cc": "18f8a460f66825d0cd5e733fbecc47409c990999c3aa5f0e7e7ee29ac49a90bc",
+    "third_party/ryu/ryu/tests/d2s_test.cc": "2c837fe90126ac65721fb6bf74b0214b2e9d116e7367a79516f1ba09f8fec36f",
+    "third_party/ryu/ryu/tests/f2s_test.cc": "dd128620a77555fd7b7da87f1a6eccd67e969a06c3d2eb8542435668087d7b28",
+    "third_party/ryu/ryu/tests/generic_128_test.cc": "4e39b96230c4f5c7c4240326b1d27fb65bcf5339daf99f8ba7e30cf276bce38a",
+    "third_party/stage10-versions.json": "dfd06fa5b4605b85d756e00923357ae05dc0c16199abce3d4ddc7c1d89cce184",
+    "third_party/tzdata/LICENSE": "0613408568889f5739e5ae252b722a2659c02002839ad970a63dc5e9174b27cf",
+    "third_party/tzdata/africa": "f2851d4be4a4925cbdc9d56e10d780bccadb89d6ffb9aed78c3e35f97c200aed",
+    "third_party/tzdata/antarctica": "e410ad71c9450828c592d21419301d41ac79ce50159fd0ac2d6c5031cb6bdfe6",
+    "third_party/tzdata/asia": "02b69728085f6b0c999da70de2f1f9a2d8952b533a450d53bb41e03eb7d0e92e",
+    "third_party/tzdata/australasia": "846ba455578e3e0f9eb850f05be3cc06d02ff51bbe4b726f755be9dc765f16c9",
+    "third_party/tzdata/backward": "b8296b9ef1ece72d813878132c0f17e2c52b26af6004eeb9c37d049b64cd9401",
+    "third_party/tzdata/etcetera": "7281f095b42c13c4ae36b8bcba884e81dbb38127221fc1d9805c4dbf852487db",
+    "third_party/tzdata/europe": "fec11bf6c6bd0619a8777bbdaa2ecd184fde291cb4b97efa87d334c7145ba3c2",
+    "third_party/tzdata/leapseconds": "8f066f297a37a798d5103321957c5f5f4f1c9dda0f3d05db30b77bec3491659e",
+    "third_party/tzdata/northamerica": "c0c5da0dc337444d80709cf9f8d8011719b789df160ce107a5c38c90e73dc54c",
+    "third_party/tzdata/southamerica": "13be56a242da3c1a4a6d12050e5fd48b1753c8c1dc237cbc2edb40eac636be7f",
+    "third_party/tzdata/version": "af35b79aa1b21f258217dc39db156c783db83fd78afd095c5426061993877063"
+  },
+  "dependencies": {
+    "date": {
+      "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+      "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+    },
+    "ryu": {
+      "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+      "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+    },
+    "tzdata2026e": {
+      "revision": "2026e",
+      "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+    }
+  },
+  "source_isolation": {
+    "root": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+    "sha256": {
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110"
+    }
+  },
+  "development_failures_and_repairs": [
+    {
+      "observation": "Initial fixture used a required callback without a complete-default value initializer, required generic default constructors, reserved zone binding, ? outside a result function and a cast without contextual Ok typing.",
+      "repair": "Use the existing quiet function default/default initializer parameters, distinct binding, result-returning zone helper and typed payload variable. No grammar/ownership rule changed.",
+      "logs": [
+        "step40-final-development-source.txt",
+        "step40-final-development-source-2.txt"
+      ]
+    },
+    {
+      "observation": "Test C++ missed tooling.hpp; negatives expected different diagnostic spelling (Recursive versus recursion, alignment versus pattern).",
+      "repair": "Fix test include and assertions to actual established diagnostics. No compiler behavior changed.",
+      "logs": [
+        "step40-final-debug-development-build.txt",
+        "step40-final-development-console.txt",
+        "step40-final-development-policy.txt"
+      ]
+    },
+    {
+      "observation": "A Debug development probe unwound while an entered I/O barrier was held because it called Runtime.console_context after close correctly denied new admission. First gdb attempt lacked symbols across PID namespaces; explicit local executable produced the identifying stack. Probe deliberately terminated, not passed.",
+      "repair": "Retain the context before close, release the barrier before asserting, and preserve shutdown/admission protections. Final source/strict runs pass.",
+      "logs": [
+        "step40-final-development-blocked-stack.txt",
+        "step40-final-development-blocked-stack-2.txt",
+        "step40-final-development-console-3.txt",
+        "step40-final-development-console-4.txt"
+      ]
+    },
+    {
+      "observation": "First expanded console process driver continued into scoped-key PTY probes but exceeded its900s budget. An early strict run with that budget was deliberately terminated and restarted. Neither is acceptance.",
+      "repair": "Expanded driver deadline1800s reflects added integration modes, native/error/PTY/cache/build/workload checks; source-console deadline600s. No assertions, scenarios or sanitizers disabled.",
+      "logs": [
+        "step40-final-development-driver.txt",
+        "step40-final-san-preliminary-commands.json",
+        "step40-final-san-preliminary-tests.txt"
+      ],
+      "preliminary_freeze": "step40-final-preliminary-code-freeze.json"
+    },
+    {
+      "observation": "After the first25-suite Debug/strict passes, the unchanged Debug semantic_depth.py exposed a legal124-call stack overflow under its1MiB budget. A metadata-only repair restored legal chains but left400-chain guard/error recovery overflowing; both cold-frame repairs together pass.",
+      "repairs": [
+        {
+          "file": "src/frontend/compiler.cpp",
+          "location": "AnalysisAccess::build recursive visit_expression pattern reference",
+          "change": "Move the cold variant Expr temporary/reference work through the existing noinline frontend_case helper so ordinary recursive visitor frames do not reserve it."
+        },
+        {
+          "file": "src/frontend/compiler.cpp",
+          "location": "Semantics::editor_name_candidates",
+          "change": "Pass existing optional<Type> expected by const reference; eliminate unused by-value argument copy storage in every recursive Debug expression_impl frame."
+        }
+      ],
+      "attempts": [
+        {
+          "change": "Reference-only name-probe argument",
+          "result": "Failed legal124 receiver chain; metadata frame defect was independent.",
+          "log": "step40-final-stack-debug-proof.txt"
+        },
+        {
+          "change": "Metadata frontend_case only",
+          "result": "Legal chains passed;400-chain diagnostic recovery still crashed unwinding member selection.",
+          "log": "step40-final-stack-debug-proof-2.txt"
+        },
+        {
+          "change": "Both repairs",
+          "result": "PASS unchanged legal/deep receiver, numeric, string-index and recursive type guards plus subsequent diagnostic recovery.",
+          "log": "step40-final-stack-debug-proof-3.txt"
+        }
+      ],
+      "debugger": {
+        "instrumentation": "Debug only, not strict sanitizer execution",
+        "command": [
+          "gdb",
+          "-q",
+          "-batch",
+          "build/ci-official-debug/voidc",
+          "-ex",
+          "set disable-randomization off",
+          "-ex",
+          "set exec-wrapper /tmp/void-step40-small-stack.sh",
+          "-ex",
+          "run check /tmp/void-step40-depth.void",
+          "-ex",
+          "bt 32"
+        ],
+        "deep_guard_command_difference": "run check /tmp/void-step40-depth-400.void",
+        "reproducers": [
+          "step40-final-stack-depth.void",
+          "step40-final-stack-depth-400.void",
+          "step40-final-stack-small-stack.sh"
+        ],
+        "saved_reproducer_command": [
+          "gdb",
+          "-q",
+          "-batch",
+          "build/ci-official-debug/voidc",
+          "-ex",
+          "set disable-randomization off",
+          "-ex",
+          "set exec-wrapper /bin/sh docs/stage10/engineering/step40-final-stack-small-stack.sh",
+          "-ex",
+          "run check docs/stage10/engineering/step40-final-stack-depth.void",
+          "-ex",
+          "bt 32"
+        ]
+      },
+      "verification": {
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "tests/integration/semantic_depth.py",
+          "build/ci-official-debug/voidc"
+        ],
+        "unchanged_test_sha256": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d",
+        "before_compiler_sha256": "e9a8cb2476f95281b5be46931b3e2e2a893c148d35603027811d66ceeb22f9a7",
+        "repaired_compiler_sha256": "c7de9d11e8a3228ac3510628138ce141c48f9d2dc334cb9abf688ae4e53299e9",
+        "intermediate_pass": "step40-final-stack-debug-proof-3.txt",
+        "final_pass": "step40-final-debug-small-stack.txt",
+        "final_pass_sha256": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+        "final_status": "PASS on final frozen Debug sources, after all25 focused suites and sum45/native workloads."
+      },
+      "limits": "Unchanged1MiB child stack and original semantic/type nesting limits, assertions and exact diagnostic locations/recovery checks. No safety checks disabled; no compiler optimization-mode change.",
+      "before_repair_acceptance": "step40-final-before-stack-* retain25/25 Debug and25/25 strict plus sum45; not matching repaired-source acceptance.",
+      "logs": {
+        "step40-final-stack-debug-proof.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6",
+        "step40-final-stack-debug-proof-2.txt": "84db084b1ba17511088ebf3dbfc4ed10ae87384b5b9c22796e86b5fee3470def",
+        "step40-final-stack-debug-proof-3.txt": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+        "step40-final-stack-reproducer.txt": "63e2a2f247f01f48930960feeeff20f9f44b1803afc687e5d1f5eae7ae51c31b",
+        "step40-final-stack-guard-reproducer.txt": "dcf6b2b460f5f42a1701bf2728c55ed53a0bbbd3bff4a5023d72db82110fb02a",
+        "step40-final-before-stack-debug-small-stack.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6"
+      }
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "preserved_prior_evidence": {
+    "collection_checkpoint": "collections-results.json",
+    "unresolved_observations": [
+      "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review.",
+      "Pinned Clang19.1.7 initially crashed in BDCE/DemandedBits optimizing a libstdc++ string guard in the strict C++ conversion test compilation. Unchanged source/flags succeeded on retry. Cause unexplained; no repair claimed. Reproducer and logs retained."
+    ],
+    "clang_reproducer": "collections-clang-crash-repro.cpp.gz",
+    "deep_collection_compilation_cost": {
+      "debug_seconds": 519.1,
+      "strict_seconds": 640.91,
+      "status": "Historical 72-level collection regression and measured cost preserved, not rerun during Step40. Earlier enum/result acceptance reran the unchanged deep regression. No performance repair claimed."
+    },
+    "deferred_compiler_objectives": "../../DEVELOPMENT_STRATEGY.md",
+    "deferred_editor_observations": "../IMPLEMENTATION.md#deferred-editor-quality-observations--boss-report-step-31"
+  },
+  "limitations": [
+    "Step41 consolidated Debug/Release-relevant Linux acceptance, native Windows/macOS and Steps42–44 final review/docs/release obligations are not performed or closed here.",
+    "The unchanged72-level regression/cost remain preserved, not rerun here. The cold metadata/name-probe stack repair is verified by the unchanged1MiB semantic/diagnostic-recovery regression and final-source focused sum45, metadata/LSP and integrated consumers; the display renderer/adapter algorithms are unchanged.",
+    "Native C++ compiler/Runtime/kernels and test probes are instrumented; generated JIT/AOT instructions are not equivalently sanitizer-instrumented.",
+    "Actual positive pipe-capacity progress probe is Linux-specific; native Windows/macOS require their own accepted OS evidence. PTY modes are real Linux execution, not Windows simulation.",
+    "Workload times include source validation/compiler/startup/Runtime and run concurrently with other local checks. No performance threshold or optimization claim. Existing JIT workload getrusage peak includes compiler and sanitizer overhead; new subprocess composite/native runs do not sample RSS.",
+    "Unresolved Step37 observations and transient pinned Clang19.1.7 crash/reproducer remain unexplained; no repair claimed. Deferred compiler cache UX/native-size/IANA compaction/incremental research/editor-quality/native/JIT/DAP debugging objectives remain documentation-only."
+  ],
+  "governance": "No commits/pushes/branches/hosted CI/publication/public root README changes. No new dependencies/frameworks, debugger implementation or speculative optimization.",
+  "next_step": "Stop for Wrench review. Next separately reviewed increment is Step41 consolidated Linux Debug/Release-relevant execution and strict acceptance, then native-platform/final-stage obligations.",
+  "debug": {
+    "passed": 25,
+    "total": 25,
+    "seconds": 1161.9305861359462,
+    "build_seconds": 49.128153058933094,
+    "commands": "step40-final-debug-commands.json",
+    "logs": [
+      "step40-final-debug-build.txt",
+      "step40-final-debug-tests.txt",
+      "step40-final-debug-detail.txt",
+      "step40-final-debug-sum-regression.txt",
+      "step40-final-debug-native-workloads.txt"
+    ],
+    "suites": [
+      "stage10_operator_integration",
+      "stage10_operators_aot",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_operator_reload",
+      "stage10_operator_compounds",
+      "stage10_operator_keys",
+      "stage10_fields",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_temporal_ir",
+      "format_numeric",
+      "format_temporal",
+      "format_zones",
+      "stage10_tooling",
+      "stage10_source_formatting",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_stage10_source_formatting",
+      "stage10_display_reload",
+      "runtime_console",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard"
+    ],
+    "counts": {
+      "operator_integration": 1169,
+      "source_console": 4463,
+      "operator_reload": 248,
+      "operator_compounds": 730,
+      "dictionary_keys": 131,
+      "tooling": 106,
+      "additional_console_composite_LSP": 237,
+      "display_reload": 275,
+      "operator_process": 344,
+      "fields": 54,
+      "custom_hooks": 77,
+      "interpolation": 57,
+      "temporal_IR": 8,
+      "numeric_format": 18663,
+      "temporal_core": 1308,
+      "source_formatting": 321,
+      "source_formatting_LSP": 144,
+      "intelligence_LSP": 170,
+      "runtime_foundation": 347,
+      "runtime_transfers": 178,
+      "runtime_keys": 127,
+      "native_transfers": 210,
+      "native_keys": 92,
+      "native_key_integration": 99,
+      "console_driver": 616,
+      "exact_console_output_records": 120,
+      "new_main_and_PTY_records": 28,
+      "live_combined_prompt_records": 4,
+      "positive_native_pipe_records": 4,
+      "new_policy": 26,
+      "focused_sum": 45
+    },
+    "selected_four_mode_agreement": {
+      "operator_console_systems": {
+        "records": 4,
+        "status": 0,
+        "stdout_sha256": "aa74bc69526ab72d372a8aba14f6a5153e2fa9f0caa2be5ff05be9e2553c12b0",
+        "stderr_sha256": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b"
+      },
+      "console_operator_systems": {
+        "records": 4,
+        "status": 7,
+        "stdout_sha256": "1f99caf4cf6d627b278df979fcf28163d484c89c3b21c65ffb6b9a02dbe0a9d6",
+        "stderr_sha256": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b"
+      },
+      "console_operator_failure": {
+        "records": 4,
+        "status": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "472172bb8c0608f0465a6ab7769c65dab45ea525691a95640b87e93891cd4202"
+      },
+      "console_operator_compound_failure": {
+        "records": 4,
+        "status": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "d75bf1226c5fb1196e32a9034f637294c014eeceacdf5a808ec5ca3a135be7b4"
+      },
+      "console_operator_workload": {
+        "records": 4,
+        "status": 0,
+        "stdout_sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "console_operator_modes/PTY": {
+        "records": 4,
+        "status": 0,
+        "stdout_sha256": "be9f5fabf769494236d242e9bb1f28d66987205397021c571265f8358017035a",
+        "stderr_sha256": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b"
+      },
+      "console_operator_mode_failure/PTY": {
+        "records": 4,
+        "status": 1,
+        "stdout_sha256": "0674239a794bfa0ef0dddb7e0a3e02be920cb7857e13767ddd9ca01630b78359",
+        "stderr_sha256": "3a61c6f8f399ea93bd75582b315165952ecc203e91d1586fba1c0d5eb7d5018e"
+      }
+    },
+    "output_records": "step40-final-debug-outputs.json",
+    "operator_workloads": "step40-final-debug-operator-workloads.json",
+    "integrated_workloads": [
+      {
+        "engine": "JIT",
+        "optimized": false,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 28.064462362905033,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "linked AOT",
+        "optimized": false,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 3.043572535039857,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "JIT",
+        "optimized": true,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 42.54217884701211,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "linked AOT",
+        "optimized": true,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 3.1153614120557904,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "production native build/run",
+        "build_seconds": 23.827783309970982,
+        "wall_seconds": 0.22515131998807192,
+        "stdin_bytes": 12,
+        "stdout_bytes": 621,
+        "sha256": "1f99caf4cf6d627b278df979fcf28163d484c89c3b21c65ffb6b9a02dbe0a9d6",
+        "memory": "not sampled by this process runner"
+      }
+    ],
+    "positive_pipe": [
+      {
+        "path": "JIT",
+        "optimized": false,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      },
+      {
+        "path": "linked AOT",
+        "optimized": false,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      },
+      {
+        "path": "JIT",
+        "optimized": true,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      },
+      {
+        "path": "linked AOT",
+        "optimized": true,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      }
+    ],
+    "cache_cases": [
+      "cold",
+      "hit",
+      "corrupt",
+      "hook-body",
+      "format-spec"
+    ],
+    "artifact_hashes": {
+      "voidc": "cb4997a7b631762ce168d910dc5af9a839a358f1dba6fc04ab492aeb0dcace69",
+      "void_console_source": "0be8a65f3d9cf7ecad6c054a3253072f6dca035aaebb7afe78612a57f9b07d2a",
+      "void_operator_integration": "85baf014f525e0e354cfb19337532389a6af44a0fd6adc2a4d4b46435c7ebe15",
+      "libvoid_runtime.a": "ad502714fec8a6fe96018627dc2b48fa711f017c1efa16878dfd1b7467a50f1c",
+      "libvoid_core.a": "521540a45fd144c7b6389573df73c2e58e218b57e10a1b7ccdc0d3a00387873b",
+      "libvoid_llvm.a": "835fb8a4c4461b942048b5e18f66aed8b1418d45d33e64eb3c512487368428a6"
+    },
+    "build_configuration": {
+      "cache_settings": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS": "",
+        "CMAKE_CXX_FLAGS_DEBUG": "-g",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+        "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS": "OFF"
+      },
+      "native_flags": {
+        "void_core": "-g -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic",
+        "void_runtime": "-g -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic",
+        "void_llvm": "-g -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic"
+      },
+      "cmake_cache_sha256": "99f9a2002427f0c3455428ae7b200c1043126eab1aab56561402006f7e3a2402"
+    },
+    "operator_workload_measurements": {
+      "configuration": "Debug",
+      "clock": "Python perf_counter process wall; C++ steady_clock LLVM compilation/invocation",
+      "memory": "JIT getrusage process peak RSS includes analysis/compiler/Runtime; not incremental workload memory",
+      "measurements": [
+        {
+          "result": 270000,
+          "compile_ms": 3123.28,
+          "invoke_ms": 851.514,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 102516,
+          "engine": "JIT",
+          "optimization": "normal",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "wall_seconds": 4.217614001012407
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "normal",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "result": 270000,
+          "wall_seconds": 0.782436341047287,
+          "memory": "not sampled by this process runner"
+        },
+        {
+          "result": 1000003,
+          "compile_ms": 3098.34,
+          "invoke_ms": 25418.8,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 102360,
+          "engine": "JIT",
+          "optimization": "normal",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "wall_seconds": 28.757066366029903
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "normal",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "result": 1000003,
+          "wall_seconds": 25.275371656985953,
+          "memory": "not sampled by this process runner"
+        },
+        {
+          "result": 270000,
+          "compile_ms": 6123.57,
+          "invoke_ms": 800.789,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 109832,
+          "engine": "JIT",
+          "optimization": "optimized",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "wall_seconds": 7.1583680510520935
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "optimized",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "result": 270000,
+          "wall_seconds": 0.78491720801685,
+          "memory": "not sampled by this process runner"
+        },
+        {
+          "result": 1000003,
+          "compile_ms": 6259.23,
+          "invoke_ms": 25501,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 112164,
+          "engine": "JIT",
+          "optimization": "optimized",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "wall_seconds": 32.015802080975845
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "optimized",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "result": 1000003,
+          "wall_seconds": 25.463782890001312,
+          "memory": "not sampled by this process runner"
+        }
+      ]
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 25,
+    "total": 25,
+    "seconds": 1216.127894810983,
+    "build_seconds": 254.7264795860974,
+    "commands": "step40-final-san-commands.json",
+    "logs": [
+      "step40-final-san-build.txt",
+      "step40-final-san-tests.txt",
+      "step40-final-san-detail.txt",
+      "step40-final-san-sum-regression.txt",
+      "step40-final-san-native-workloads.txt"
+    ],
+    "suites": [
+      "stage10_operator_integration",
+      "stage10_operators_aot",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_operator_reload",
+      "stage10_operator_compounds",
+      "stage10_operator_keys",
+      "stage10_fields",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_temporal_ir",
+      "format_numeric",
+      "format_temporal",
+      "format_zones",
+      "stage10_tooling",
+      "stage10_source_formatting",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_stage10_source_formatting",
+      "stage10_display_reload",
+      "runtime_console",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard"
+    ],
+    "counts": {
+      "operator_integration": 1169,
+      "source_console": 4463,
+      "operator_reload": 248,
+      "operator_compounds": 730,
+      "dictionary_keys": 131,
+      "tooling": 106,
+      "additional_console_composite_LSP": 237,
+      "display_reload": 275,
+      "operator_process": 344,
+      "fields": 54,
+      "custom_hooks": 77,
+      "interpolation": 57,
+      "temporal_IR": 8,
+      "numeric_format": 18663,
+      "temporal_core": 1308,
+      "source_formatting": 321,
+      "source_formatting_LSP": 144,
+      "intelligence_LSP": 170,
+      "runtime_foundation": 347,
+      "runtime_transfers": 178,
+      "runtime_keys": 127,
+      "native_transfers": 210,
+      "native_keys": 92,
+      "native_key_integration": 99,
+      "console_driver": 616,
+      "exact_console_output_records": 120,
+      "new_main_and_PTY_records": 28,
+      "live_combined_prompt_records": 4,
+      "positive_native_pipe_records": 4,
+      "new_policy": 26,
+      "focused_sum": 45
+    },
+    "selected_four_mode_agreement": {
+      "operator_console_systems": {
+        "records": 4,
+        "status": 0,
+        "stdout_sha256": "aa74bc69526ab72d372a8aba14f6a5153e2fa9f0caa2be5ff05be9e2553c12b0",
+        "stderr_sha256": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b"
+      },
+      "console_operator_systems": {
+        "records": 4,
+        "status": 7,
+        "stdout_sha256": "1f99caf4cf6d627b278df979fcf28163d484c89c3b21c65ffb6b9a02dbe0a9d6",
+        "stderr_sha256": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b"
+      },
+      "console_operator_failure": {
+        "records": 4,
+        "status": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "a05be0066f6e3fd1d717ca70f83a26a09dd2aaaa811b47d312bc341755df2c5f"
+      },
+      "console_operator_compound_failure": {
+        "records": 4,
+        "status": 1,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "37d5b5e792fcf689594d3a635bb0d75c6f2799e5719ce1cac2988cad34d13d27"
+      },
+      "console_operator_workload": {
+        "records": 4,
+        "status": 0,
+        "stdout_sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "console_operator_modes/PTY": {
+        "records": 4,
+        "status": 0,
+        "stdout_sha256": "be9f5fabf769494236d242e9bb1f28d66987205397021c571265f8358017035a",
+        "stderr_sha256": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b"
+      },
+      "console_operator_mode_failure/PTY": {
+        "records": 4,
+        "status": 1,
+        "stdout_sha256": "0674239a794bfa0ef0dddb7e0a3e02be920cb7857e13767ddd9ca01630b78359",
+        "stderr_sha256": "e2c235c3b64248577f3a1a136eb70e4bd0577d2f7f05668a73224c0bd5b98689"
+      }
+    },
+    "output_records": "step40-final-san-outputs.json",
+    "operator_workloads": "step40-final-san-operator-workloads.json",
+    "integrated_workloads": [
+      {
+        "engine": "JIT",
+        "optimized": false,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 29.657548905001022,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "linked AOT",
+        "optimized": false,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 3.6009190400363877,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "JIT",
+        "optimized": true,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 39.936746393097565,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "linked AOT",
+        "optimized": true,
+        "records": 2048,
+        "bytes": 55296,
+        "sha256": "3e9ac2b7d6754118afd9c2063a10ef0f6619bdd0a89202cea3e5e52c6179180a",
+        "wall_seconds": 3.5608568399911746,
+        "memory": "not sampled by this process runner"
+      },
+      {
+        "engine": "production native build/run",
+        "build_seconds": 22.669918425031938,
+        "wall_seconds": 0.18495802907273173,
+        "stdin_bytes": 12,
+        "stdout_bytes": 621,
+        "sha256": "1f99caf4cf6d627b278df979fcf28163d484c89c3b21c65ffb6b9a02dbe0a9d6",
+        "memory": "not sampled by this process runner"
+      }
+    ],
+    "positive_pipe": [
+      {
+        "path": "JIT",
+        "optimized": false,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      },
+      {
+        "path": "linked AOT",
+        "optimized": false,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      },
+      {
+        "path": "JIT",
+        "optimized": true,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      },
+      {
+        "path": "linked AOT",
+        "optimized": true,
+        "pipe_capacity": 65536,
+        "observed_queued_bytes": 65536,
+        "status": 0,
+        "stderr_hex": "7061727469616c203635353336203138303232340a636c65616e75703b"
+      }
+    ],
+    "cache_cases": [
+      "cold",
+      "hit",
+      "corrupt",
+      "hook-body",
+      "format-spec"
+    ],
+    "artifact_hashes": {
+      "voidc": "1da94caa1a88fe01ea700f53b5bcf017e7da8cfcff7316388cbc3c082ec796d7",
+      "void_console_source": "e58b548aecef4e8c46ec7eac61671244a0c683eb18baba2265a1182fd7313c64",
+      "void_operator_integration": "9d5240fcdc0ead341202253ef8530b87a3e07d6c84601d263dad38cda50fab07",
+      "libvoid_runtime.a": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+      "libvoid_core.a": "fef964875110e942161a56aeb58c160801f6ac5200277a4016cc8bd7619e57cf",
+      "libvoid_llvm.a": "c1245c3959f259ad305ec41aee52574e69bb4cc2cbc077e267c75ca960e14b38"
+    },
+    "build_configuration": {
+      "cache_settings": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS": "",
+        "CMAKE_CXX_FLAGS_DEBUG": "-g",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+        "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS": "ON"
+      },
+      "native_flags": {
+        "void_core": "-O2 -g -DNDEBUG -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "void_runtime": "-O2 -g -DNDEBUG -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "void_llvm": "-O2 -g -DNDEBUG -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer"
+      },
+      "cmake_cache_sha256": "bba5b64d0683b84373bcdde4d46e263bbd85615673cad27d03f936243d815db9"
+    },
+    "operator_workload_measurements": {
+      "configuration": "strict ASan/UBSan/leaks",
+      "clock": "Python perf_counter process wall; C++ steady_clock LLVM compilation/invocation",
+      "memory": "JIT getrusage process peak RSS includes analysis/compiler/Runtime; not incremental workload memory",
+      "measurements": [
+        {
+          "result": 270000,
+          "compile_ms": 4250.16,
+          "invoke_ms": 715.57,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 910740,
+          "engine": "JIT",
+          "optimization": "normal",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "wall_seconds": 5.400129482964985
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "normal",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "result": 270000,
+          "wall_seconds": 0.7628425129223615,
+          "memory": "not sampled by this process runner"
+        },
+        {
+          "result": 1000003,
+          "compile_ms": 4112.17,
+          "invoke_ms": 21598.6,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 918736,
+          "engine": "JIT",
+          "optimization": "normal",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "wall_seconds": 26.340541276033036
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "normal",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "result": 1000003,
+          "wall_seconds": 21.381159385899082,
+          "memory": "not sampled by this process runner"
+        },
+        {
+          "result": 270000,
+          "compile_ms": 6928.46,
+          "invoke_ms": 685.44,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 1009856,
+          "engine": "JIT",
+          "optimization": "optimized",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "wall_seconds": 8.029588573030196
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "optimized",
+          "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+          "argument": 10000,
+          "result": 270000,
+          "wall_seconds": 0.7197500310139731,
+          "memory": "not sampled by this process runner"
+        },
+        {
+          "result": 1000003,
+          "compile_ms": 6156.84,
+          "invoke_ms": 21601.7,
+          "objects_after_collection": 0,
+          "process_peak_rss_kib": 1078496,
+          "engine": "JIT",
+          "optimization": "optimized",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "wall_seconds": 28.377763302065432
+        },
+        {
+          "engine": "linked_AOT",
+          "optimization": "optimized",
+          "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+          "argument": -1000000,
+          "result": 1000003,
+          "wall_seconds": 22.990898060961626,
+          "memory": "not sampled by this process runner"
+        }
+      ]
+    },
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "configuration": "RelWithDebInfo O2 ASan/UBSan/leaks outside ptrace; pinned LLVM/Clang19.1.7; existing RTTI-off vptr exclusion, no new suppression"
+  },
+  "before_stack_repair": {
+    "status": "25/25 Debug and25/25 strict passed; subsequent Debug1MiB failure triggered repair. Preserved runs are not final-source acceptance.",
+    "source_freeze": "step40-final-before-stack-code-freeze.json",
+    "debug": "step40-final-before-stack-debug-commands.json",
+    "strict": "step40-final-before-stack-san-commands.json"
+  },
+  "small_stack": {
+    "status": "unchanged Debug1MiB semantic/depth probes passed",
+    "log": "step40-final-debug-small-stack.txt"
+  },
+  "documentation_correction": {
+    "original": "console-tooling-results-before-step40-correction.json",
+    "corrected": "console-tooling-results.json",
+    "original_sha256": "f762ef57b4cbcb2dafff78312edd5ea01cd4a1d281d14285fcfca2fd243b3224",
+    "corrected_sha256": "acee71858c2e464d298fa366880d498f613ab7e72cd5afa3ad72928e562e7d7c",
+    "scope": "Clarified inherited72-level wording only; tooling did not rerun that deep regression, earlier sum-display did. Test outcomes unchanged."
+  },
+  "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "configured_Python": "/home/shmellyorc/.local/bin/python3.11 (3.11.16)",
+    "LLVM_Clang": "19.1.7"
+  },
+  "source_manifests": {
+    "previous": "console-tooling-checkpoint-source-hashes.json",
+    "code_freeze": "step40-final-code-freeze.json",
+    "bounded": "step40-final-source-hashes.json",
+    "cumulative": "source-hashes.json",
+    "preservation": "step40-final-preservation.json"
+  },
+  "bounded_files": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "src/frontend/compiler.cpp",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/console_operator_compound_failure.void",
+    "tests/stage10/console_operator_failure.void",
+    "tests/stage10/console_operator_mode_failure.void",
+    "tests/stage10/console_operator_modes.void",
+    "tests/stage10/console_operator_partial.void",
+    "tests/stage10/console_operator_systems.void",
+    "tests/stage10/console_operator_workload.void",
+    "tests/stage10/operator_console_model.void",
+    "tests/stage10/operator_console_systems.void",
+    "tests/stage10/operator_integration.cpp"
+  ],
+  "acceptance_artifact_hashes": {
+    "step40-final-before-stack-code-freeze.json": "b31b01ad21ca8f85be5104e264a8aa99ef491b4b32218df5727752f253805ee0",
+    "step40-final-before-stack-debug-build.txt": "e3a17036c369b5dbe19d0ad887e4cf146316253010897054a6c186a602cea03d",
+    "step40-final-before-stack-debug-commands.json": "3166c0458b853bdc8e5507428f08c9b1631b720ebec5d9b40c3c959c6b514ba9",
+    "step40-final-before-stack-debug-detail.txt": "eb690cbd57700407601d6126743cf34cef9a0dd304271c2bfda3d8c30ae63010",
+    "step40-final-before-stack-debug-development-build-2.txt": "9cbfd466f917945f95e85bde00e86908fbd6a2d5a970f810625ece138f34e860",
+    "step40-final-before-stack-debug-development-build-3.txt": "3d5ed68f2e1643d4b5901373534f88736745b2d5a47c545b0b49bd7f422203e2",
+    "step40-final-before-stack-debug-development-build-4.txt": "d6c90313a77ab39799389b91d8a2552a41164e443d58bbd40f12afab6eac2242",
+    "step40-final-before-stack-debug-development-build-5.txt": "8392d40628970ff24da6155f275956f92366e512580f101b4c2816a381a5539f",
+    "step40-final-before-stack-debug-development-build-6.txt": "48ce7890a5211f85d3bdadaf3535c43fd7ca36d844e0e7ac0c4069cfb51d9703",
+    "step40-final-before-stack-debug-development-build.txt": "7de627dd23fac5d9c889696ae1ef189c09b82481edd7d32d99edfc2a5ad8d4de",
+    "step40-final-before-stack-debug-native-workloads.txt": "08a3967a1580538a4010f5a755347b469c5e682b35b142a7d88fb500847d15dd",
+    "step40-final-before-stack-debug-operator-workloads.json": "51ad7560aea7aa9830fcd7e446083705382e8ea86713bfc25e2a6ee7d2187c4f",
+    "step40-final-before-stack-debug-outputs.json": "be170821d0d76e525717084951ff32fb1c9c7b7a91baaa03abc47e9ce4cd6ec7",
+    "step40-final-before-stack-debug-policy-build-2.txt": "c89afb504c793a63f13f489a7c6be34d3f4016c98884297a00c1056221c9a72b",
+    "step40-final-before-stack-debug-policy-build.txt": "b9d981f815321140a297f5d149916d2778d56de23de9f3613a1f7712611cf3ae",
+    "step40-final-before-stack-debug-small-stack.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6",
+    "step40-final-before-stack-debug-sum-regression.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "step40-final-before-stack-debug-tests.txt": "8c5f42fa2ba5f401ef005d2181097ee479851424805b6e99a6751508cd60ed71",
+    "step40-final-before-stack-san-build.txt": "d181617226368eb90e900b05422415cc654e64788408cfd77c7809d85172dadc",
+    "step40-final-before-stack-san-commands.json": "e28085a074696a2594698c9e2ea2e1684694ee3f229d1554d75d562c9be9d333",
+    "step40-final-before-stack-san-detail.txt": "1da375a2b245a4300a78f873e75aa2f2c1a22a2b19d8dd537d92adce20f9ce8d",
+    "step40-final-before-stack-san-development-build.txt": "f4daa76c0619d9c9beced4c43a481c551614af240dae5418b990512e78207bd2",
+    "step40-final-before-stack-san-native-workloads.txt": "5367bfad01c8717fbe2c507aac840c6d1bd9f32d790cff3fb54d5d7f2c4100b6",
+    "step40-final-before-stack-san-operator-workloads.json": "fb87c459065b919f39e4cedd0881dda4a942bc2713f2057bfa9e77fb2ffef332",
+    "step40-final-before-stack-san-outputs.json": "764c247774d23478004eb1d5514ae42f0aa7883d67c55889f7434e2bd2637850",
+    "step40-final-before-stack-san-preliminary-commands.json": "b3d9a14d8b22f443329df30b72d87f26cc4bafd1b87a536a4bf7f569f20fbf27",
+    "step40-final-before-stack-san-preliminary-tests.txt": "552ed7eb3b6682dd75432d8f50eb81b3176840cce7ee1a90ab5d1e1d1693a3a9",
+    "step40-final-before-stack-san-sum-regression.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "step40-final-before-stack-san-tests.txt": "46b18bc2f61f201267f43e43d173a28bce48871858fe5c50a774ffc1226fee6f",
+    "step40-final-code-freeze.json": "0ddadafa269d98d0df4aa2323ff25c78506cc94f354ddf474718afcf1fd00cdc",
+    "step40-final-debug-build.txt": "b85b40d5225a992fe58392f22025580f8533ff5096a644cf8b3ef84e7aa66288",
+    "step40-final-debug-commands.json": "6962cacebba13246a5ec180c7d018cd92f61bde8e6639dee45d92b2311ce2d52",
+    "step40-final-debug-detail.txt": "f981602f749c9616506a573b5710ecdbd06ad13e15c15765f771533dc19e920e",
+    "step40-final-debug-development-build-2.txt": "9cbfd466f917945f95e85bde00e86908fbd6a2d5a970f810625ece138f34e860",
+    "step40-final-debug-development-build-3.txt": "3d5ed68f2e1643d4b5901373534f88736745b2d5a47c545b0b49bd7f422203e2",
+    "step40-final-debug-development-build-4.txt": "d6c90313a77ab39799389b91d8a2552a41164e443d58bbd40f12afab6eac2242",
+    "step40-final-debug-development-build-5.txt": "8392d40628970ff24da6155f275956f92366e512580f101b4c2816a381a5539f",
+    "step40-final-debug-development-build-6.txt": "48ce7890a5211f85d3bdadaf3535c43fd7ca36d844e0e7ac0c4069cfb51d9703",
+    "step40-final-debug-development-build.txt": "7de627dd23fac5d9c889696ae1ef189c09b82481edd7d32d99edfc2a5ad8d4de",
+    "step40-final-debug-native-workloads.txt": "5e530296e098c21d2932fdca4a1af8bfa7b8ba6a0ecf146868d90a16e20f0f8e",
+    "step40-final-debug-operator-workloads.json": "d50dde4ded0d4e3da633f27576b0a62b1c127fdedab9c724ba0ffaaf2a6c385d",
+    "step40-final-debug-outputs.json": "9f94fc510665e69884fbe722fa330f274dd6a8eaf52a6033b1bff933e32c8ad9",
+    "step40-final-debug-policy-build-2.txt": "c89afb504c793a63f13f489a7c6be34d3f4016c98884297a00c1056221c9a72b",
+    "step40-final-debug-policy-build.txt": "b9d981f815321140a297f5d149916d2778d56de23de9f3613a1f7712611cf3ae",
+    "step40-final-debug-small-stack.txt": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+    "step40-final-debug-sum-regression.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "step40-final-debug-tests.txt": "c2eae496e6dee48e4e8e6a9aefc3fa1a8de954d7c10efd2ceb33f9e5cc85862b",
+    "step40-final-development-app-error.txt": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b",
+    "step40-final-development-app-out.bin": "0ba982f85ccbf83178f2a921ed22ee07ac4c33e8562ebf374ecbecb21fa3a320",
+    "step40-final-development-blocked-stack-2.txt": "81bb06ec64b88f899f101073116c652638f9e2deb0c5ac286fa2b4b71a481b59",
+    "step40-final-development-blocked-stack.txt": "d8804a2b20f5cfdada0fc00bc315b2c815b227c3ba19f9b2ca2a575ca3baabf8",
+    "step40-final-development-console-2.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step40-final-development-console-3.txt": "f688cd9a11bfb55d3097a9bc2e3848cc9d05cf2ec2777c70cb1dac069ee1dd38",
+    "step40-final-development-console-4.txt": "1c40a0d82c146652ba196d47adb82d17e0911073f40b7bc06bd0f0abfa043f6e",
+    "step40-final-development-console.txt": "0f6add7011a7ee1304f45f8172f5fe57ef1bbd0ae583bfe9258f89843260a195",
+    "step40-final-development-driver.txt": "8bfd57d5b3ee0dae37e446e61d252872f7b034e515d7709a53033fb6c9076542",
+    "step40-final-development-errors.txt": "4d3ea8704a7b45c374408aac71ba7f40c5b466f562e6ed6937a219aa49e3389b",
+    "step40-final-development-out.bin": "aa74bc69526ab72d372a8aba14f6a5153e2fa9f0caa2be5ff05be9e2553c12b0",
+    "step40-final-development-policy-2.txt": "3b21b4ca37f3d5673bd36e47f52b81aa5757c0711ad47a997693db8e1e135a65",
+    "step40-final-development-policy-3.txt": "16a7170d24665710f8c3b65c00e4c8065f73d2a5f6698f651650a948da0cc3ee",
+    "step40-final-development-policy.txt": "5ca4ec989a7d29dd624b74c42ea2adf4a7e757a8da664778084db94c33d8c30d",
+    "step40-final-development-source-2.txt": "56d4aaee5880d2520eb52b6fab4377c9151026137be76f0cfbc2a51835cbc6ff",
+    "step40-final-development-source.txt": "18bf8e1ad8f60dac5c509682babf41a28823a2de6b35c60803af32aa4e0bdd18",
+    "step40-final-preliminary-code-freeze.json": "7e0ea6fac40968d71a9f877474ed0d5f06afb840638e11ca5042f9bb3df994a0",
+    "step40-final-preservation.json": "a5bdbfc7c5b63057e8a80f72e4f37f84e3bbb9a867a9a4f0017687227e912a58",
+    "step40-final-san-build.txt": "073727c09145cc2ece87a8657bb99e3e47c7f016ccb9f2956632a027f25f025b",
+    "step40-final-san-commands.json": "746ac6552e8435c4c7701734a9fb7ade87cb3610b53ca5218d546bd54cc9667a",
+    "step40-final-san-detail.txt": "0ed855fc25b48897aa412388c5ee02b0239cda8b0698472013f1bdb133a901d0",
+    "step40-final-san-development-build.txt": "f4daa76c0619d9c9beced4c43a481c551614af240dae5418b990512e78207bd2",
+    "step40-final-san-native-workloads.txt": "6a6c4d4eb14802131c13eeff2424dc21f6083a59578fc3d74bfb6646104382b8",
+    "step40-final-san-operator-workloads.json": "82a7cba44cf5294a6866579b65ef067153e4964eed84ee2c855ad4cff08a3539",
+    "step40-final-san-outputs.json": "e5f48a70e33e7748b0bb74d5b96263b7d2b5b62c1e9541c4a35d6e4a95b0e45f",
+    "step40-final-san-preliminary-commands.json": "b3d9a14d8b22f443329df30b72d87f26cc4bafd1b87a536a4bf7f569f20fbf27",
+    "step40-final-san-preliminary-tests.txt": "552ed7eb3b6682dd75432d8f50eb81b3176840cce7ee1a90ab5d1e1d1693a3a9",
+    "step40-final-san-sum-regression.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "step40-final-san-tests.txt": "89296bb60a80e26f8b18006013a05e25507fc05fca2ca2672989b77acbb18193",
+    "step40-final-source-hashes.json": "95f517f90dd6026f9f7bebaa4369a4580d9269af1c8ee941f346829bbdc66145",
+    "step40-final-stack-debug-build-2.txt": "122bfba73b414fa2ae78e55f969183adb82d98cc21bffe0497d9a734da8332a0",
+    "step40-final-stack-debug-build-3.txt": "122bfba73b414fa2ae78e55f969183adb82d98cc21bffe0497d9a734da8332a0",
+    "step40-final-stack-debug-build.txt": "fba82f61b7f06cbfc80b0670fc50b7484859de2c30a4b179a55f96a0281fa27d",
+    "step40-final-stack-debug-proof-2.txt": "84db084b1ba17511088ebf3dbfc4ed10ae87384b5b9c22796e86b5fee3470def",
+    "step40-final-stack-debug-proof-3.txt": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+    "step40-final-stack-debug-proof.txt": "113325caee01ae90221c21e5f2359d6c38c2ef1d70e9e59eae56ce7f905a56f6",
+    "step40-final-stack-depth-400.void": "5fe5eedf5b5aef563320b33239b4de73c5b976d9e40ba1414112fd102751464b",
+    "step40-final-stack-depth.void": "c98a73289cc457f0af14e10a8021fef00a68733136e3c9bb25907ec4aad8877d",
+    "step40-final-stack-guard-reproducer.txt": "dcf6b2b460f5f42a1701bf2728c55ed53a0bbbd3bff4a5023d72db82110fb02a",
+    "step40-final-stack-repair.json": "8b2ca385e611747e428d4d97f23fe94b9b39be8835f6dfb0be80cb57451b9579",
+    "step40-final-stack-reproducer.txt": "63e2a2f247f01f48930960feeeff20f9f44b1803afc687e5d1f5eae7ae51c31b",
+    "step40-final-stack-small-stack.sh": "3d96e9ba9fa700552a15ddbc1187daaa12651663ea49ce7a3623813799504e77",
+    "step40-final-stdlib-snapshot.json": "a06594a8ee668f05a5f3362e32c7d3739f616ee09e3952c8c492265c40a4b696"
+  },
+  "step41_documentation_correction": "Inherited deep-regression wording only; original retained in step40-final-integration-results-before-step41-correction.json. Step40 outcomes are unchanged."
+}

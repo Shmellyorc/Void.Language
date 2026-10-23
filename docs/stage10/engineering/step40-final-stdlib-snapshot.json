@@ -1,0 +1,8 @@
+{
+  "root": "/tmp/void-step40-final-stdlib-qnnqa704/stdlib",
+  "sha256": {
+    "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385",
+    "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+    "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110"
+  }
+}

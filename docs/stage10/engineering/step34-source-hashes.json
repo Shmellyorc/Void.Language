@@ -1,0 +1,16 @@
+{
+  "CMakeLists.txt": "b21b3d9f982b4a63e33044537556a2f188dd3104f5ebd39c192b71ae94cd4ff3",
+  "tests/stage10/operator_integration.cpp": "ab2861ff257104c9978f29c034de7b9687ae472a5020e150a4c4580905e07245",
+  "tests/stage10/operators.py": "65c11a1e1a9b1e3723317544aed58865f07598c8abd8be492e919964fad85790",
+  "tests/stage10/operator_cleanup.void": "ee938952e6adad344bf9ec99c205da5f89b7905684531d7f5a01eb0800f99977",
+  "tests/stage10/operator_errors.void": "203c83fe0946e6c17fdaa69a8a3c48c19d6f6defe2c7ff8015aae3f85c0f0cda",
+  "tests/stage10/operator_failures.void": "34e55c68b97ca71175a16d0194ef9fd614f3bddc4e5825179d9a678c869071d6",
+  "tests/stage10/operator_lifetimes.void": "50c3288441c17d02e7deec9a7fb33083a8e11bc4e5bf47cc1ee1d7b643ae789f",
+  "tests/stage10/operator_native.void": "ca8518a0168b88fd8acffa39b4d9f3514ef6176c48d4e04d16f3039201f4ad71",
+  "tests/stage10/operator_native_worker.void": "ebcfe13e250d2c0a9aaf78220ca0c61e08a6b6c9ebe285d39af91c6404d88ff0",
+  "tests/stage10/operator_suspension.void": "90c49b79c05ff94504971faa77338bd64683f67508d89581f90f31e80d051500",
+  "tests/stage10/operator_worker_failures.void": "f2c8fc6e8721ac2d0619a7fe168184a4790379e2642fa4fa232acff2219cf392",
+  "tests/stage10/operator_workers.void": "bc486e0495dab744aaa7aa2589e64474b35539c3bbd20a43f241a278620b8a24",
+  "docs/LANGUAGE_BIBLE.md": "0caf026d20c243278c12cea0aed4781295ab5e22b84a002d9faa7686b2fd927d",
+  "docs/DECISIONS.md": "502774050402df92f1baa3ede04ead2d7c84d806f056f6841e8b972a304d4f0f"
+}

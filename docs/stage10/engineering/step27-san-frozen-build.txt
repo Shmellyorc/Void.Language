@@ -1,0 +1,170 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_native_fixture
+[ 40%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 80%] Built target void_runtime
+[ 80%] Linking CXX static library libvoid_core.a
+[ 80%] Built target void_core
+[ 80%] Built target void_llvm
+[ 80%] Building CXX object CMakeFiles/void_console_source.dir/tests/managed/probe.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_fields
+[100%] Built target void_stage10_fields
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_conversion
+[100%] Built target void_stage10_conversion
+[ 20%] Built target void_native_fixture
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_zone_objects
+[ 40%] Built target void_core
+[ 80%] Built target void_runtime
+[ 80%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_interpolation
+[100%] Built target void_stage10_interpolation
+[ 25%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_hooks
+[100%] Built target void_stage10_hooks
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_temporal_ir
+[100%] Built target void_temporal_ir
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_display_reload
+[100%] Built target void_display_reload
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_resolution
+[100%] Built target void_operator_resolution
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[ 25%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_managed_test_abi
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/stage10/operator_compounds.cpp.o
+[100%] Linking CXX executable void_operator_compounds
+[100%] Built target void_operator_compounds
+[ 25%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_keys
+[100%] Built target void_operator_keys
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_operator_reload
+[100%] Built target void_operator_reload
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[ 25%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/arrays/source.cpp.o
+[100%] Linking CXX executable void_arrays_source
+[100%] Built target void_arrays_source
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_runtime_console_wide
+[ 20%] Built target void_native_fixture
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_zone_objects
+[ 80%] Built target void_runtime
+[100%] Built target void_runtime_console_input
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_runtime_console_transfers
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_runtime_console
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_runtime_tests
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_gc_buffers
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_gc_schemas
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_runtime_failures
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_runtime_invariants

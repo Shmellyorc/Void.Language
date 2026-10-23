@@ -1,0 +1,16 @@
+value struct message:
+    value: i32
+func (self message) format(spec: string) -> result<string, string>:
+    return Err("owned-{self.value}")
+value struct number:
+    value: i32
+    operator ==(const left: number, const right: number) -> bool:
+        defer {
+            var ignored = "{message(value = 2):error}"
+        }
+        var ignored = "{message(value = 1):error}"
+        return left.value == right.value
+func entry(input: i32) -> i32:
+    if number(value = input) != number(value = 4):
+        return 1
+    return 0

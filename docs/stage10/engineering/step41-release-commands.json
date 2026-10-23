@@ -1,0 +1,152 @@
+[
+  {
+    "label": "configure",
+    "command": [
+      "cmake",
+      "-S",
+      "/home/shmellyorc/Documents/Void.Language",
+      "-B",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+      "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "-DVOID_DWARFDUMP=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-dwarfdump",
+      "-DPython3_EXECUTABLE=/home/shmellyorc/.local/bin/python3.11",
+      "-DBUILD_TESTING=ON",
+      "-DVOID_LLVM_RESEARCH=OFF",
+      "-DVOID_SANITIZERS=OFF"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 118.28880583902355,
+    "child_user_seconds": 837.234935,
+    "child_system_seconds": 2.994238,
+    "cumulative_child_peak_rss_kib": 1076220
+  },
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+      "-j",
+      "2"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 4361.828189273016,
+    "child_user_seconds": 59043.969259,
+    "child_system_seconds": 266.74519200000003,
+    "cumulative_child_peak_rss_kib": 1334596
+  },
+  {
+    "label": "workload-build",
+    "command": [
+      "cmake",
+      "--build",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+      "--target",
+      "void_format_workloads",
+      "-j",
+      "2"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 0.34553766902536154,
+    "child_user_seconds": 0.2134070000029169,
+    "child_system_seconds": 0.1578789999999799,
+    "cumulative_child_peak_rss_kib": 1334596
+  },
+  {
+    "label": "tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "--output-junit",
+      "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/step41-release-junit.xml"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 849.3303637689678,
+    "child_user_seconds": 1605.017772,
+    "child_system_seconds": 59.723628,
+    "cumulative_child_peak_rss_kib": 2028032
+  },
+  {
+    "label": "native-workloads",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_format_workloads"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 0.011574278003536165,
+    "child_user_seconds": 0.004464999999981956,
+    "child_system_seconds": 0.0035610000000048103,
+    "cumulative_child_peak_rss_kib": 2028032
+  },
+  {
+    "label": "semantic-depth-1m",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/integration/semantic_depth.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 0.4079887979896739,
+    "child_user_seconds": 0.1740389999999934,
+    "child_system_seconds": 0.24127999999999616,
+    "cumulative_child_peak_rss_kib": 2028032
+  },
+  {
+    "label": "frontend-1m",
+    "command": [
+      "/bin/bash",
+      "-c",
+      "ulimit -s 1024; exec \"$1\" frontend \"$2\"",
+      "void-frontend-1m",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_tests",
+      "/home/shmellyorc/Documents/Void.Language"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step41-stdlib-n2v3wnwo/stdlib"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 4.541446629096754,
+    "child_user_seconds": 4.376657000000023,
+    "child_system_seconds": 0.12157299999999793,
+    "cumulative_child_peak_rss_kib": 2028032
+  }
+]

@@ -5,7 +5,14 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
     for (unsigned slot=0;slot<f.locals.size();++slot) {
         all.insert(slot);
         if(f.locals[slot].definition && (f.locals[slot].definition->callable || !f.locals[slot].definition->cases.empty()) && !f.locals[slot].nullable)required.insert(slot);
-        for (const auto& path:reference_paths(f.locals[slot])) {
+        std::vector<Type> inline_types{f.locals[slot]};std::set<const ValueType*> endpoint_seen;
+        while(!inline_types.empty()){auto type=inline_types.back();inline_types.pop_back();if(console::endpoint_type(type)){required.insert(slot);break;}if(!type.definition || !endpoint_seen.insert(type.definition.get()).second)continue;if(type.kind==Type::aggregate)for(const auto& field:type.definition->fields)inline_types.push_back(field.type);else if(type.kind==Type::fixed_array && *type.definition->extent)inline_types.push_back(array_element(type));}
+        const auto paths=reference_paths(f.locals[slot]);
+        // Initialization requires a slot when ANY reference leaf is non-null.
+        // A non-null root already proves that requirement; projecting every
+        // descendant again is redundant (and costly for deep collection stacks).
+        if(paths.contains(ReferencePath{}) && !f.locals[slot].nullable){required.insert(slot);continue;}
+        for (const auto& path:paths) {
             auto leaf=f.locals[slot];for(auto field:path) leaf=field_type(leaf,field);
             if (!leaf.nullable) required.insert(slot);
         }

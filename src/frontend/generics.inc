@@ -76,6 +76,12 @@ for(auto& [id,u]:units) {
         concrete.definition->source_offset=generic.token.offset;concrete.definition->self=concrete.definition;concrete.definition->arena=arena;arena->definitions.push_back(concrete.definition);
         owner.specialized_structures.emplace(name,&concrete);owner.structure_names.emplace(name,&concrete);
         std::vector<Function*> methods;
+        for(auto& f:parsed.functions) {
+            f.instantiation_context=context;f.specialization_depth=depth;f.generic_origin=generic.definition->identity+"::operator-template::"+f.operator_pattern;
+            for(const auto& p:generic.generics)f.substitution_sources.emplace(p.token.text,generic.definition->identity+"::type::"+p.token.text);
+            methods.push_back(&f);
+        }
+        owner.functions.splice(owner.functions.end(),parsed.functions);
         for(auto& method:owner.generic_functions)if(method.receiver && method.generics.empty()) {
             const auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==method.receiver->type.definition;});
             if(application==owner.applications.end() || application->name!=generic.token.text)continue;

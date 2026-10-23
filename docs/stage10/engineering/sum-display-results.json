@@ -1,0 +1,416 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": "enum_result_display",
+  "increment_status": "Enum/result defaults implemented and focused Linux Debug/strict ASan/UBSan/leak accepted. Normal/O2 JIT, independently linked normal/O2 AOT, production native builds and six real cache paths pass. Wrench/platform/editor/four-system/final acceptance remains separate.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review.",
+    "Pinned Clang19.1.7 initially crashed in BDCE/DemandedBits optimizing a libstdc++ string guard in the strict C++ conversion test compilation. Unchanged source/flags succeeded on retry. Cause unexplained; no repair claimed. Reproducer and logs retained."
+  ],
+  "dependencies": {
+    "versions": {
+      "date": {
+        "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+        "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+      },
+      "ryu": {
+        "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+        "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+      },
+      "tzdata2026e": {
+        "revision": "2026e",
+        "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      }
+    },
+    "new_dependencies": [],
+    "licenses": "Unchanged pinned Ryu Boost, Howard Hinnant date MIT and bundled IANA notices.",
+    "formatter_policy": "void-format-v4;collections-v1;sum-display-v1;ties-to-even;unicode-scalar-alignment;ryu-72e18e8d14d4392a4a3261f37cde248e4fbedbec"
+  },
+  "build_configuration": {
+    "debug": "Linux Debug; pinned LLVM/Clang19.1.7",
+    "strict_sanitizers": "Linux RelWithDebInfo ASan/UBSan with strict leaks and existing RTTI-off vptr exclusion; no new suppression/exclusion",
+    "python": "CMake configured Python3.11.16; native driver executed with that interpreter"
+  },
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "prior_checkpoint": "collections-results.json",
+  "prior_source": "collections-checkpoint-source-hashes.json",
+  "code_freeze": "sum-display-code-freeze.json",
+  "next_source_change": "After Wrench review, revisit compiler-owned console/composite tooling in src/frontend/compiler.cpp EditorProbe/metadata and existing src/frontend/tooling.cpp/voidls paths, with enum/result/container source fixtures; then remaining four-system integration and final acceptance. No new editor parser/resolver.",
+  "unverified": [
+    "Native Windows/macOS execution",
+    "Fresh Release/editor console/composite integration",
+    "Complete four-system/final Stage10 acceptance and independent Wrench review"
+  ],
+  "development_checks": {
+    "sum_only": 45,
+    "console": 4123,
+    "display_reload": 270,
+    "production_native": [
+      "sum-display-debug-native-build.json",
+      "sum-display-san-native-build.json"
+    ],
+    "cache_records": [
+      "sum-display-debug-cache.json",
+      "sum-display-san-cache.json"
+    ],
+    "status": "Development-only probes; superseded by complete final frozen 24/24 acceptance in each configuration."
+  },
+  "debug": {
+    "passed": 24,
+    "total": 24,
+    "seconds": 994.9876656060806,
+    "suites": [
+      "stage10_conversion",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "stage10_display_reload",
+      "stage10_operator_reload",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "format_numeric",
+      "format_temporal",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_generated",
+      "runtime_failures",
+      "runtime_coordination",
+      "lsp_stage10_display",
+      "runtime_console",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard",
+      "patterns_source",
+      "generics_source",
+      "collections_source",
+      "dictionaries_source"
+    ],
+    "command_records": "sum-display-debug-test-commands.json",
+    "logs": [
+      "sum-display-debug-conversion-tests.txt",
+      "sum-display-debug-conversion-detail.txt",
+      "sum-display-debug-accepted-tests.txt",
+      "sum-display-debug-accepted-detail.txt"
+    ],
+    "counts": {
+      "conversion": 203,
+      "source_console": 4123,
+      "display_reload": 270,
+      "native_foundation": 347,
+      "key_mode": 127,
+      "operator_reload": 248,
+      "numeric": 18663,
+      "temporal": 1308
+    },
+    "driver_checks": 438,
+    "exact_execution_records": 92,
+    "output_records": "sum-display-debug-outputs.json",
+    "production_native": "sum-display-debug-native-build.json",
+    "cache": {
+      "passed": 6,
+      "total": 6,
+      "records": "sum-display-debug-cache.json"
+    },
+    "native_key_PTY_checks": 99,
+    "build": "sum-display-debug-acceptance-build.txt",
+    "managed_identity_supplement": {
+      "records": "sum-display-debug-alias.json",
+      "passed": 4,
+      "total": 4,
+      "scope": "Managed result copies retain object identity and independent mutable/const aliases; normal/O2 JIT and independent linked AOT."
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 24,
+    "total": 24,
+    "seconds": 1137.4907393261092,
+    "suites": [
+      "stage10_conversion",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "stage10_display_reload",
+      "stage10_operator_reload",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "format_numeric",
+      "format_temporal",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_generated",
+      "runtime_failures",
+      "runtime_coordination",
+      "lsp_stage10_display",
+      "runtime_console",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard",
+      "patterns_source",
+      "generics_source",
+      "collections_source",
+      "dictionaries_source"
+    ],
+    "command_records": "sum-display-san-test-commands.json",
+    "logs": [
+      "sum-display-san-conversion-tests.txt",
+      "sum-display-san-conversion-detail.txt",
+      "sum-display-san-accepted-tests.txt",
+      "sum-display-san-accepted-detail.txt"
+    ],
+    "counts": {
+      "conversion": 203,
+      "source_console": 4123,
+      "display_reload": 270,
+      "native_foundation": 347,
+      "key_mode": 127,
+      "operator_reload": 248,
+      "numeric": 18663,
+      "temporal": 1308
+    },
+    "driver_checks": 438,
+    "exact_execution_records": 92,
+    "output_records": "sum-display-san-outputs.json",
+    "production_native": "sum-display-san-native-build.json",
+    "cache": {
+      "passed": 6,
+      "total": 6,
+      "records": "sum-display-san-cache.json"
+    },
+    "native_key_PTY_checks": 99,
+    "build": "sum-display-san-acceptance-build.txt",
+    "managed_identity_supplement": {
+      "records": "sum-display-san-alias.json",
+      "passed": 4,
+      "total": 4,
+      "scope": "Managed result copies retain object identity and independent mutable/const aliases; normal/O2 JIT and independent linked AOT."
+    }
+  },
+  "implemented": [
+    "Qualified enum.case defaults; payload parentheses only for payload cases, declared order; result Ok(value)/Err(error), including Ok(null).",
+    "Shared string/format/interpolation/print conversions, recursive sum/container continuations, raw Unicode/NUL, generic const payload hooks, scalar alignment and literal/dynamic unsupported pattern handling.",
+    "Existing typed work/tag and owner/cursor stacks now include sums, sharing the same checked builder/scope and collection active path. Only active payloads read through checked sum_get; no new IR/Runtime ABI, renderer, boxing, reflection, executable callbacks, GC/backend or dependency.",
+    "Preserved readonly authorities, independent mutable aliases, fixed value-copy independence, managed payload roots/identities, callback order/counts, worker restrictions, version invalidation, allocation/retry, source failures/reached cleanup and outer record atomicity.",
+    "Shared authority predicate admits conservatively normalized recursive readonly views without the frontend subsequent raw-path false rejection; nonassignable writes/escapes still diagnose and independent IR capability proof is unchanged.",
+    "Existing variant/layout contracts, selected ordinary hook references and format-v4/sum-display-v1 identity preserve compatible reload leases and invalidate incompatible declarations/cache inputs."
+  ],
+  "production_changes": [
+    "include/void/format.hpp",
+    "src/frontend/compiler.cpp",
+    "src/frontend/collection_display.inc",
+    "src/frontend/display_semantics.inc",
+    "src/frontend/capabilities.inc"
+  ],
+  "development_failures_and_repairs": [
+    {
+      "observation": "Recursive enum/list shared references failed frontend readonly admission despite the shared normalized authority proof accepting the view.",
+      "repair": "Use the existing shared predicate as admission; retain rejection diagnostics for nonassignable authority and unchanged independent IR validation.",
+      "evidence": [
+        "sum-display-console-smoke-errors.txt",
+        "sum-display-console-smoke-errors-2.txt",
+        "sum-display-debug-development-conversion-3.txt"
+      ]
+    },
+    {
+      "observation": "A test used reserved identifier event; initial C++ raw-string delimiter collided with payload-closing parenthesis/quote; a negative incorrectly rejected a legal inferred readonly return.",
+      "repair": "Correct fixtures only: signal/parcel names, custom raw delimiter, mutate the returned alias in the negative. Existing legal return inference preserved.",
+      "evidence": [
+        "sum-display-debug-development-build-2.txt",
+        "sum-display-debug-development-conversion-2.txt",
+        "sum-display-negative-result.txt",
+        "sum-display-negative-recursive.txt"
+      ]
+    }
+  ],
+  "independent_IR": "Existing independent validators reject invalid constructor tags, invalid result variant coverage, zero/out-of-range sum_get payloads and unchecked aggregate extraction. A well-typed cross-variant sum_get is separately executed in normal/O2 and fails its existing active-tag guard with no outer output and clean roots/frames. No new validator/backend introduced.",
+  "unresolved_focused_Linux_defects": [],
+  "preserved_prior_evidence": {
+    "collection_checkpoint": "collections-results.json",
+    "unresolved_observations": [
+      "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review.",
+      "Pinned Clang19.1.7 initially crashed in BDCE/DemandedBits optimizing a libstdc++ string guard in the strict C++ conversion test compilation. Unchanged source/flags succeeded on retry. Cause unexplained; no repair claimed. Reproducer and logs retained."
+    ],
+    "clang_reproducer": "collections-clang-crash-repro.cpp.gz",
+    "deep_collection_compilation_cost": {
+      "debug_seconds": 519.1,
+      "strict_seconds": 640.91,
+      "status": "Historical measured compilation/execution regression cost retained; unchanged 72-level test rerun in this increment. No broad optimization or cause/repair of earlier observations claimed."
+    },
+    "deferred_compiler_objectives": "../../DEVELOPMENT_STRATEGY.md",
+    "deferred_editor_observations": "../IMPLEMENTATION.md#deferred-editor-quality-observations--boss-report-step-31"
+  },
+  "source_manifests": {
+    "previous": "collections-checkpoint-source-hashes.json",
+    "code_freeze": "sum-display-code-freeze.json",
+    "bounded": "sum-display-source-hashes.json",
+    "cumulative": "source-hashes.json",
+    "preservation": "sum-display-preservation.json"
+  },
+  "verification_sequence": "Freeze current source before matching Debug/RelWithDebInfo strict selected-target builds; run full unchanged conversion suite plus 23 neighbors in each configuration. Strict tests/native/cache probes run outside ptrace with detect_leaks=1:halt_on_error=1:abort_on_error=1 and UBSAN halt_on_error=1:print_stacktrace=1. Targeted --sum-display filter was development only; final CTest conversion has no filter and retains 72-level collection test. No disabled checks or new sanitizer exclusion.",
+  "ABI_build_scope": "No new Runtime/IR operation or ABI. Existing private checked collection builder operations and checked sum access/panic reuse matching archive/JIT bindings; formatter policy advances and exact code/dependency identities invalidate old cached behavior.",
+  "build_commands": {
+    "debug": [
+      "cmake",
+      "--build",
+      "build/ci-official-debug",
+      "--target",
+      "voidc",
+      "void_stage10_conversion",
+      "void_console_source",
+      "void_display_reload",
+      "void_operator_reload",
+      "void_stage10_hooks",
+      "void_stage10_interpolation",
+      "void_stage10_fields",
+      "void_gc_buffers",
+      "void_gc_schemas",
+      "void_runtime_generated",
+      "void_runtime_failures",
+      "void_runtime_tests",
+      "void_native_fixture",
+      "voidls",
+      "void_format_numeric",
+      "void_temporal",
+      "void_runtime_console",
+      "void_runtime_console_keyboard",
+      "void_patterns_tests",
+      "void_generics_tests",
+      "void_collections_tests",
+      "void_dictionaries_tests",
+      "-j",
+      "2"
+    ],
+    "san": [
+      "cmake",
+      "--build",
+      "build/ci-official-san",
+      "--target",
+      "voidc",
+      "void_stage10_conversion",
+      "void_console_source",
+      "void_display_reload",
+      "void_operator_reload",
+      "void_stage10_hooks",
+      "void_stage10_interpolation",
+      "void_stage10_fields",
+      "void_gc_buffers",
+      "void_gc_schemas",
+      "void_runtime_generated",
+      "void_runtime_failures",
+      "void_runtime_tests",
+      "void_native_fixture",
+      "voidls",
+      "void_format_numeric",
+      "void_temporal",
+      "void_runtime_console",
+      "void_runtime_console_keyboard",
+      "void_patterns_tests",
+      "void_generics_tests",
+      "void_collections_tests",
+      "void_dictionaries_tests",
+      "-j",
+      "2"
+    ]
+  },
+  "build_artifact_hashes": {
+    "debug": {
+      "voidc": "427837ee96cce2d29899daf1c376c29a77b7268d620fa9c20e15050155a8f60c",
+      "void_stage10_conversion": "1321e8c00b670979bb4b7ae7a42dd19f71dd34c3f41c868fa1bc218ae994bd4c",
+      "void_console_source": "2035ff1d91604560d3956296179811bc8e2dc0c524c2e4fe54e5b8ee6836863e",
+      "void_display_reload": "c457fe5ddd0055f2ee4410f2e08b924f7ab482d2a09039b20fd377a027d5127b",
+      "libvoid_runtime.a": "ad502714fec8a6fe96018627dc2b48fa711f017c1efa16878dfd1b7467a50f1c",
+      "libvoid_core.a": "c7bc555694ea65580417bb84a88ef552abce39982681892d879b179b41e9d713",
+      "libvoid_llvm.a": "835fb8a4c4461b942048b5e18f66aed8b1418d45d33e64eb3c512487368428a6"
+    },
+    "san": {
+      "voidc": "ca8f7e7457f5fa58c1ed0167f318d1ce8b5d71697c1c17bbcd7dbc3e25b71aa7",
+      "void_stage10_conversion": "86ad18de20b508ab08ac182cc16a98594cf0546f2a153590623bf6801b39fd5d",
+      "void_console_source": "4ca58e4d9bbccdcd6df42fef389d672a2fc4f25e9f0eb9db9f05211646a09bcc",
+      "void_display_reload": "312221a437776fcbbfc1ed88e6bda41a8d752cd767c56054c1eec5b5024f794d",
+      "libvoid_runtime.a": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+      "libvoid_core.a": "fa8e726445759761218e555f35ffd12f7f8045480daa639c32958740d1033146",
+      "libvoid_llvm.a": "c1245c3959f259ad305ec41aee52574e69bb4cc2cbc077e267c75ca960e14b38"
+    }
+  },
+  "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "configured_Python": "/home/shmellyorc/.local/bin/python3.11 (3.11.16)",
+    "shell_Python": "3.14.8",
+    "LLVM_Clang": "19.1.7"
+  },
+  "bounded_files": [
+    "docs/WORK_LOG.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/format.hpp",
+    "src/frontend/capabilities.inc",
+    "src/frontend/collection_display.inc",
+    "src/frontend/compiler.cpp",
+    "src/frontend/display_semantics.inc",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/console_sum_display.void",
+    "tests/stage10/console_sum_failure.void",
+    "tests/stage10/conversion.cpp",
+    "tests/stage10/display_reload.cpp"
+  ],
+  "acceptance_artifact_hashes": {
+    "sum-display-code-freeze.json": "e6918206a2f2c8a6f862a506819b90526d3e9985c189aab0cfce20358fd5cb57",
+    "sum-display-console-smoke-2.bin": "37f8b256f994bbf67c50c6c3af6f270d7bee2b3ba5acc112e2d45a38468fedaf",
+    "sum-display-console-smoke-errors-2.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sum-display-console-smoke-errors.txt": "740c854dec28e1ec643ca13e778a2e6d074089fde8c4d9e5cecbd7091a9fcbfa",
+    "sum-display-console-smoke.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sum-display-debug-acceptance-build.txt": "82a55226c176e7a46c266a90dde0a8b50b8c26bdc1378f8201eab5571ea86add",
+    "sum-display-debug-accepted-detail.txt": "6ade811371a005ab1218b0a0bd0b2d4d077aa7f37c28827ced45998e85c09291",
+    "sum-display-debug-accepted-tests.txt": "940da4a3de0ff3477b372f0a57126086f22aaab7d3a83ffae76690bfd4a2a175",
+    "sum-display-debug-alias.json": "0073c2e2c73df50c155a11a8b43007720f860fb21018c0a6e8cc10965547642c",
+    "sum-display-debug-cache.json": "d630d9a4586c57817c91ec3c0304230eab4f947a041f42dc8ee7d3d36f7837db",
+    "sum-display-debug-conversion-build-2.txt": "1848dd31a1ac183072f6d6d965fd8c9252182617c03939b9640121d33ff3cf5f",
+    "sum-display-debug-conversion-build.txt": "5a948921285f656bb414cd5d328fd66f738f0ccd2256a667a186cf86ce1f0b0b",
+    "sum-display-debug-conversion-detail.txt": "a9a8e8947436c137a3087b3820a9552552a7534534030f18444e8c36981f52af",
+    "sum-display-debug-conversion-tests.txt": "f4419c96e742ca86e84049839d353dbe310e3cfbc14b2e42a1ccd30e19d74a32",
+    "sum-display-debug-development-build-2.txt": "1bd88088504dd1cd13a2cdd266c36f73f639c5df87e97fa14451356d2268cf93",
+    "sum-display-debug-development-build-3.txt": "d253e5961e3f42ce6bdeef714c2d974a0d220ccdc073ef5eff6536152a24ba6d",
+    "sum-display-debug-development-build-4.txt": "fa6c8a2e7ccf1ca602797343686d96832fe33425704e210372dd79a3baea6c36",
+    "sum-display-debug-development-build.txt": "c58f6f62b8476b6ad4bc1c87d132ecb998c4b9d9fd5ec85c0634c0abb674f318",
+    "sum-display-debug-development-console-2.txt": "02c832b00a7db3f8be0159ab777542e0174b52b4db564ef0fc278492a580a56c",
+    "sum-display-debug-development-console.txt": "12af972813da7124c89fc3f779bf9de042bc84eed42aabeffac9e80f3985d527",
+    "sum-display-debug-development-conversion-2.txt": "899b251fd17cdfad8046a55fa8138ab00992c97c23dc72c62f2d05cbd0ad655e",
+    "sum-display-debug-development-conversion-3.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "sum-display-debug-development-conversion.txt": "779d612811c9e982a0ba642ae7d88b9e05c108ebade1d2642df721d1cf14182a",
+    "sum-display-debug-development-reload.txt": "70c2823062a9f558bc2599f76a81c2c51312589bc52b2f1dd0d094cd955194c8",
+    "sum-display-debug-managed-payload-build.txt": "ac66ea787d2a4bd738284a17d98f6fed1381c38a4ebd0a28c0f9555c5913c7eb",
+    "sum-display-debug-native-build.json": "d33fd004aaddbae4e61de731bb243759178212158d2adad90476a9922bf8b788",
+    "sum-display-debug-native-keyboard.json": "0b6e4786d1ad5e7b30690df0276a95a167208a57fc0c3d90ee39e8324e891178",
+    "sum-display-debug-outputs.json": "beb88e3269493e8750b1e62311225e46d25b25bfff24aa7620a56917338adaa7",
+    "sum-display-debug-projection-build.txt": "5373524bfa2cc482e0edfea8dfce7d55970165a42a900fa9da4bfc181be213ec",
+    "sum-display-debug-test-commands.json": "fb5295e7059cbf18855060ca2818f488d143337b47c07ef28d156018c1c0281e",
+    "sum-display-debug-tests-build.txt": "90a09497590c7d3e8627a5bedbca20b5842801535a36db0883cc7246f17685f4",
+    "sum-display-negative-recursive.txt": "d415feb5cd9c324bd07aa04d54f7441ffd3d79d35de3abff1c95ea49c10eb64f",
+    "sum-display-negative-result.txt": "213b539e34dfdaedc4daed1762288730a981bf60742122de02f6bcfe9ce0d08a",
+    "sum-display-preservation.json": "41877a53616e69ea4e91f64a4dcdc8a7d3dda7d4953672a35bb7fbf7c0346ef2",
+    "sum-display-san-acceptance-build.txt": "5e459c9859598405c66caf24302d10efb6d10cc654badf657d5a0c46d2579563",
+    "sum-display-san-accepted-detail.txt": "cf47b61d04cdf08875a15521f875b557e8a15ab45100694fe19b7daf2be4407e",
+    "sum-display-san-accepted-tests.txt": "e7ca9cf8096b74924c5b7873e75734f24f3a1d912985db0d5a69e29fa518c185",
+    "sum-display-san-alias.json": "220cd664326b3863567ed75b431c605df77bd0b15b77d11da945c36e2c5f4284",
+    "sum-display-san-cache.json": "8ea7a4a081268be4471c385a0fe873f741a9b2c7a347f0bd7e4d41efac719317",
+    "sum-display-san-conversion-detail.txt": "ee8371e988bf920c69c41828193a1450fec34dc09b7c815c2e74ed2e7d16df27",
+    "sum-display-san-conversion-tests.txt": "b6b2a6af1a4356daed14f568fc3695710363587d7c693bd93d25b50cb6140814",
+    "sum-display-san-native-build.json": "ccd00fd75b9525c1cfb8a18f1d9b9b092303f0ae8de640f4d650f7a88d899d77",
+    "sum-display-san-native-keyboard.json": "bd43886954ceeda6bf45c51034fc00573dde0bb5d207716366f8a9e70dd88aa7",
+    "sum-display-san-outputs.json": "49f4bae69a6288edde1f26d26a209df3ce881143b8596f1061ff70bc9ce79aef",
+    "sum-display-san-test-commands.json": "8d4eb559bfbd6ec9940a3fa7f40a99323dda727e44cd68490ed9cf0578655c7b",
+    "sum-display-smoke-errors.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sum-display-smoke-out.bin": "687048a4d96d04a01d17e05e0baf27387b002fcc8ef9c2e1801f9dd0e154c71b",
+    "sum-display-source-hashes.json": "f40aa467adc79105a73cf4c8b04617b39655cdfa3ff93a9aa4e465772a7893d3",
+    "sum-display-stdlib-snapshot.json": "14b5e46205e283c7e29c96d8c2797a272f2d0ee415ee909e9f28713aade08072"
+  }
+}

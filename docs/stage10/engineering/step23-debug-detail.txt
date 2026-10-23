@@ -1,0 +1,176 @@
+Start testing: Oct 22 13:30 PDT
+----------------------------------------------------------
+19/188 Testing: gc_buffers
+19/188 Test: gc_buffers
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_gc_buffers"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"gc_buffers" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=3 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=4 sites=4 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=4 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=5 sites=5 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=5 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=6 sites=6 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=6 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=7 sites=7 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=7 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=8 sites=8 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=8 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=9 sites=9 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=9 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=10 sites=10 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=10 native_count=0 native_bytes=0
+buffer allocation-site sweep budget=0: 4 sites
+buffer allocation-site sweep budget=1: 6 sites
+Managed partial-buffer request: completed_collections=1 cooperative_parks=1
+NativeSafe reservation/zeroing, private adoption and deterministic chunk collection passed
+typed managed/string/interface buffers, capacity oracle and million-reference scans passed
+object-table ownership witness: initial=0 buckets=1->13 heap_retained_count=1 heap_retained_bytes=104 bucket_retained_count=1 bucket_retained_bytes=104 after_owners_count=0 after_owners_bytes=0
+object-table ownership witness: initial=2 buckets=13->13 heap_retained_count=0 heap_retained_bytes=0 bucket_retained_count=0 bucket_retained_bytes=0 after_owners_count=0 after_owners_bytes=0
+reference construction/partial-mark failure sweep: 11 sites
+byte copy allocation_calls=4 requested_bytes=3145952 copy_finish_ms=0.471658
+independent byte copy bytes=3145728 elapsed_ms=1618.44 (includes oracle/GC/conflict checks; no latency claim)
+reference copy capacity=1 payload_bytes=8 allocation_calls=4 metadata_requested=184 copy_finish_ms=0.02026 two_live_buffers_gc_ms=0.013549
+reference copy capacity=131072 payload_bytes=1048576 allocation_calls=4 metadata_requested=184 copy_finish_ms=349.197 two_live_buffers_gc_ms=148.913
+copy/partial-mark allocation failure sweep budget=0: 17 sites
+copy/partial-mark allocation failure sweep budget=1: 29 sites
+foundation acceptance: 32 budgeted lease/copy/abort/recovery cycles, two post-copy collections each passed
+fixed scalar values: 4 MiB content oracle, independent/self copy, all encodings, typed empty/zero-footprint and negatives passed
+fixed Managed store: genuine request/poll/park, rooted source and post-GC copy passed
+fixed value allocation sweep operation=0 budget=0: 4 sites
+fixed value allocation sweep operation=1 budget=0: 4 sites
+fixed value allocation sweep operation=2 budget=0: 4 sites
+fixed value allocation sweep operation=3 budget=0: 4 sites
+fixed value allocation sweep operation=4 budget=0: 4 sites
+fixed value allocation sweep operation=5 budget=0: 4 sites
+fixed value allocation sweep operation=0 budget=1: 8 sites
+fixed value allocation sweep operation=1 budget=1: 8 sites
+fixed value allocation sweep operation=2 budget=1: 10 sites
+fixed value allocation sweep operation=3 budget=1: 8 sites
+fixed value allocation sweep operation=4 budget=1: 8 sites
+fixed value allocation sweep operation=5 budget=1: 10 sites
+private scalar bridge: six caller homes, GC, ordered snapshots, independent result and failure preservation passed
+reference partial-element poll: one collection/park, source slot reacquired at verified Heap boundary
+reference post-poll wrong-type rejection preserved previous output
+private rooted byte/reference buffer checks passed
+private buffer roots/edges cannot bypass publication
+post-owner native leak checks reject bytes and zero-byte allocations
+<end of output>
+Test time =  10.07 sec
+----------------------------------------------------------
+Test Passed.
+"gc_buffers" end time: Oct 22 13:30 PDT
+"gc_buffers" time elapsed: 00:00:10
+----------------------------------------------------------
+
+20/188 Testing: gc_schemas
+20/188 Test: gc_schemas
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_gc_schemas"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"gc_schemas" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+<end of output>
+Test time =   0.81 sec
+----------------------------------------------------------
+Test Passed.
+"gc_schemas" end time: Oct 22 13:30 PDT
+"gc_schemas" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/188 Testing: runtime_console
+22/188 Test: runtime_console
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"runtime_console" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+71 console foundation identity/lifecycle/GC checks passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console" end time: Oct 22 13:30 PDT
+"runtime_console" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/188 Testing: runtime_console_endpoints
+23/188 Test: runtime_console_endpoints
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_endpoints.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"runtime_console_endpoints" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+14 real POSIX endpoint identity/redirection/borrowing checks passed
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_console_endpoints" end time: Oct 22 13:30 PDT
+"runtime_console_endpoints" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/188 Testing: runtime_coordination
+24/188 Test: runtime_coordination
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"runtime_coordination" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+NativeSafe rendezvous baseline (1000, one frozen object): mean 2.37997 us, max 16.49 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+<end of output>
+Test time =   2.05 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_coordination" end time: Oct 22 13:30 PDT
+"runtime_coordination" time elapsed: 00:00:02
+----------------------------------------------------------
+
+75/188 Testing: runtime_failures
+75/188 Test: runtime_failures
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_failures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"runtime_failures" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_failures" end time: Oct 22 13:30 PDT
+"runtime_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+78/188 Testing: runtime_invariants
+78/188 Test: runtime_invariants
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/invariants.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_invariants"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"runtime_invariants" start time: Oct 22 13:30 PDT
+Output:
+----------------------------------------------------------
+corrupt roots and frame order cannot resume managed execution
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_invariants" end time: Oct 22 13:30 PDT
+"runtime_invariants" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 22 13:30 PDT

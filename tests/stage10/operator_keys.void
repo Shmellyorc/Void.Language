@@ -1,0 +1,38 @@
+value struct custom<t>:
+    value: t
+    operator ==(const left: custom<t>, const right: custom<t>) -> bool:
+        return false
+value struct envelope:
+    private payload: custom<i32>
+value struct plain:
+    value: i32
+    name: string
+struct object:
+    payload: custom<i32>
+struct base:
+    value: i32
+    operator ==(const left: base, const right: base) -> bool:
+        return false
+struct child extends base:
+    extra: i32
+func entry(input: i32) -> i32:
+    var values: {i32: custom<i32>} = {1: custom<i32>(value = input)}
+    var packets: {string: envelope} = {"a": envelope()}
+    if packets.count != 1:
+        return 100
+    var keys = {plain(value = input, name = "a\0b"): input}
+    var node = object(payload = custom<i32>(value = input))
+    var identity: {object?: i32} = {node: input, null: 0}
+    var derived = child(value = input)
+    var children = {derived: input}
+    if values[1].value != input or keys[plain(value = input, name = "a" + "\0b")] != input:
+        return 101
+    if identity[node] != input or identity[null] != 0 or children[derived] != input:
+        return 102
+    var sample = custom<i32>(value = input)
+    var same = custom<i32>(value = input)
+    if sample == same:
+        return 103
+    if sample is same:
+        return input
+    return 104

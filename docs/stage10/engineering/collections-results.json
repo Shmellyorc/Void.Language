@@ -1,0 +1,417 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": "collection_display",
+  "increment_status": "Implemented bounded collection display and focused Linux Debug/strict ASan/UBSan/leak acceptance; normal/O2 JIT, independently linked normal/O2 AOT and production native builds pass. Wrench/native-platform/final Stage10 acceptance pending.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Shared fixed-array, growable-list and dictionary display through string, format, interpolation and print; exact raw nested strings, order, numeric/temporal/custom nominal leaves and universal Unicode scalar alignment.",
+    "One ordinary typed generated iterative helper with managed continuation tags, typed owner/cursor/version stacks and dictionary entry snapshots; no boxing, executable metadata, reflection, recursive collection backend or additional GC.",
+    "Private scoped checked Builder and active collection path; cycle edges emit <cycle>, shared acyclic references repeat, immutable output published after success and failed conversion publishes no outer print record.",
+    "Ordinary readonly/value copies, hook effects/worker restrictions, checked failures/source frames, version invalidation, precise roots and normal/failure scope cleanup.",
+    "Shared formatter policy advanced to void-format-v3;collections-v1, ordinary hook dependencies/reload and exact compiler/Runtime cache identities.",
+    "Equivalent initialization/root and reflexive capability-proof fast paths support the deep inferred collection regression; non-identical authority retains complete proof.",
+    "Boss future Debug-cache/native-size/incremental-research directions recorded only in DEVELOPMENT_STRATEGY and recovery ledger; no scheduling or implementation."
+  ],
+  "production_changes": [
+    "include/void/format.hpp",
+    "include/void/ir.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "src/frontend/compiler.cpp",
+    "src/frontend/collection_display.inc",
+    "src/frontend/display_semantics.inc",
+    "src/frontend/capabilities.inc",
+    "src/ir/module.cpp",
+    "src/ir/reference_capabilities.inc",
+    "src/runtime/abi.cpp",
+    "src/backend/llvm/backend.cpp"
+  ],
+  "build_configuration": {
+    "debug": "Linux Debug; pinned LLVM/Clang19.1.7",
+    "strict_sanitizers": "Linux RelWithDebInfo ASan/UBSan with strict leaks and existing RTTI-off vptr exclusion; no new suppression/exclusion",
+    "python": "CMake configured Python3.11.16; native driver executed with that interpreter"
+  },
+  "production_native": {
+    "debug": {
+      "configuration": "debug",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage10/console_collections.void",
+        "-o",
+        "/tmp/VOID-collection-native-hvrvj6nc/program"
+      ],
+      "build_status": 0,
+      "build_seconds": 8.800140940002166,
+      "build_stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f564f49442d636f6c6c656374696f6e2d6e61746976652d687672766a366e632f70726f6772616d0a",
+      "build_stderr_hex": "",
+      "run_status": 0,
+      "run_seconds": 0.4392577289836481,
+      "stdout_hex": "5b312c20322c20335d205b392c20322c20335d0a5b5bc3a900f09f8eae2c2072617720746578745d2c205bc3a900f09f8eae2c2072617720746578745d5d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a736e617073686f74207b4b3a20713a3030377d20713a3039390a5b6e756c6c5d0a5b3c6379636c653e5d0a202020205b312c20325d0a2020205bc3a92c20f09f8eae5d2020200a696e76616c6964207061747465726e0a5b323032362d31302d32335d0a6c6172676520313035303632340a",
+      "stderr_hex": "",
+      "binary_sha256": "26e6b89f85c927e6a53e64452965370438c0092bf67afc349496c9c54db36981",
+      "source_sha256": "33e3667de19a9013e13e8ab14e9bdb5dbec1aac49ae37bd743b460c683f4bfc4",
+      "runtime_sha256": "ad502714fec8a6fe96018627dc2b48fa711f017c1efa16878dfd1b7467a50f1c",
+      "path": "production voidc build; independent native executable"
+    },
+    "strict": {
+      "configuration": "san",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage10/console_collections.void",
+        "-o",
+        "/tmp/VOID-collection-native-moa8uzhc/program"
+      ],
+      "build_status": 0,
+      "build_seconds": 9.450990634970367,
+      "build_stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f564f49442d636f6c6c656374696f6e2d6e61746976652d6d6f6138757a68632f70726f6772616d0a",
+      "build_stderr_hex": "",
+      "run_status": 0,
+      "run_seconds": 0.43220375408418477,
+      "stdout_hex": "5b312c20322c20335d205b392c20322c20335d0a5b5bc3a900f09f8eae2c2072617720746578745d2c205bc3a900f09f8eae2c2072617720746578745d5d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a736e617073686f74207b4b3a20713a3030377d20713a3039390a5b6e756c6c5d0a5b3c6379636c653e5d0a202020205b312c20325d0a2020205bc3a92c20f09f8eae5d2020200a696e76616c6964207061747465726e0a5b323032362d31302d32335d0a6c6172676520313035303632340a",
+      "stderr_hex": "",
+      "binary_sha256": "0d620e93763b005e446f9e7ca0021cee0412612218c850c91adac577a88bf43c",
+      "source_sha256": "33e3667de19a9013e13e8ab14e9bdb5dbec1aac49ae37bd743b460c683f4bfc4",
+      "runtime_sha256": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+      "path": "production voidc build; independent native executable"
+    }
+  },
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review.",
+    "Pinned Clang19.1.7 initially crashed in BDCE/DemandedBits optimizing a libstdc++ string guard in the strict C++ conversion test compilation. Unchanged source/flags succeeded on retry. Cause unexplained; no repair claimed. Reproducer and logs retained."
+  ],
+  "unverified": [
+    "Enum/result default display and their collection element forms remain unimplemented for the next bounded increment.",
+    "Native Windows/macOS collection execution and fresh Release/editor collection cross-products are not verified locally.",
+    "Complete four-system/final Stage10 acceptance and independent Wrench review remain open."
+  ],
+  "next_source_change": "After Wrench review, extend existing src/frontend/display_semantics.inc and compiler.cpp conversion dispatch/generated adapters for enum and result default display, preserving typed payload conversion and ordinary checked calls/roots; then revisit console/tooling/cross-system integration.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "dependencies": {
+    "versions": {
+      "date": {
+        "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+        "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+      },
+      "ryu": {
+        "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+        "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+      },
+      "tzdata2026e": {
+        "revision": "2026e",
+        "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      }
+    },
+    "new_dependencies": [],
+    "licenses": "Unchanged pinned Ryu Boost, Howard Hinnant date MIT and bundled IANA notices."
+  },
+  "source_manifests": {
+    "prior_checkpoint": "step31-checkpoint-source-hashes.json",
+    "final_code_freeze": "collections-code-freeze.json",
+    "bounded": "collections-source-hashes.json",
+    "cumulative": "source-hashes.json",
+    "preservation": "collections-preservation.json"
+  },
+  "primary_references": [
+    "../IMPLEMENTATION.md",
+    "../DISPLAY_FORMATTING.md",
+    "../TEST_PLAN.md",
+    "../../DEVELOPMENT_STRATEGY.md"
+  ],
+  "debug": {
+    "passed": 20,
+    "total": 20,
+    "seconds": 840.0390660479898,
+    "commands": "collections-debug-test-commands.json",
+    "suites": [
+      "stage10_conversion",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "stage10_display_reload",
+      "stage10_operator_reload",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "format_numeric",
+      "format_temporal",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_generated",
+      "runtime_failures",
+      "runtime_coordination",
+      "lsp_stage10_display",
+      "runtime_console",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard"
+    ],
+    "logs": [
+      "collections-debug-conversion-tests.txt",
+      "collections-debug-conversion-detail.txt",
+      "collections-debug-accepted-tests.txt",
+      "collections-debug-accepted-detail.txt"
+    ],
+    "counts": {
+      "source_conversion": 156,
+      "source_console": 3674,
+      "display_reload": 199,
+      "native_foundation": 347,
+      "key_mode": 127
+    },
+    "driver_checks": 404,
+    "native_key_PTY_checks": 99,
+    "exact_binary_execution_records": 84,
+    "output_records": "collections-debug-outputs.json",
+    "production_native": "collections-debug-native-build.json",
+    "build": "collections-debug-final-proof-build.txt",
+    "collection_cache": {
+      "passed": 5,
+      "total": 5,
+      "records": "collections-debug-cache.json",
+      "cases": [
+        "cold",
+        "hit",
+        "corrupt",
+        "hook-body",
+        "specification"
+      ]
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 20,
+    "total": 20,
+    "seconds": 993.4465141141554,
+    "commands": "collections-san-test-commands.json",
+    "suites": [
+      "stage10_conversion",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "stage10_display_reload",
+      "stage10_operator_reload",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "format_numeric",
+      "format_temporal",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_generated",
+      "runtime_failures",
+      "runtime_coordination",
+      "lsp_stage10_display",
+      "runtime_console",
+      "runtime_console_keyboard",
+      "runtime_console_native_keyboard"
+    ],
+    "logs": [
+      "collections-san-conversion-tests.txt",
+      "collections-san-conversion-detail.txt",
+      "collections-san-accepted-tests.txt",
+      "collections-san-accepted-detail.txt"
+    ],
+    "counts": {
+      "source_conversion": 156,
+      "source_console": 3674,
+      "display_reload": 199,
+      "native_foundation": 347,
+      "key_mode": 127
+    },
+    "driver_checks": 404,
+    "native_key_PTY_checks": 99,
+    "exact_binary_execution_records": 84,
+    "output_records": "collections-san-outputs.json",
+    "production_native": "collections-san-native-build.json",
+    "build": "collections-san-final-proof-build.txt",
+    "collection_cache": {
+      "passed": 5,
+      "total": 5,
+      "records": "collections-san-cache.json",
+      "cases": [
+        "cold",
+        "hit",
+        "corrupt",
+        "hook-body",
+        "specification"
+      ]
+    }
+  },
+  "development_failures_and_repairs": [
+    {
+      "observation": "Initial new helper C++ initializer list mixed string and C string types.",
+      "repair": "Use a homogeneous std::string list; no semantic change.",
+      "evidence": "collections-development-build-1.txt"
+    },
+    {
+      "observation": "Generated assignment selection omitted its local name and initial source dictionary fixture syntax was invalid.",
+      "repair": "Populate existing Statement.name and use existing dictionary syntax.",
+      "evidence": "collections-development-source-1.txt"
+    },
+    {
+      "observation": "Initial helper lexical symbol failed forged closure field owner validation.",
+      "repair": "Use existing $display$ lexical provenance identity; validator unchanged.",
+      "evidence": "collections-before-owner-provenance.txt"
+    },
+    {
+      "observation": "Fixed-array no-op version check emitted invalid Type::none literal.",
+      "repair": "Emit no operation and retain existing owner SSA value as discarded expression.",
+      "evidence": "collections-before-fixed-check.txt"
+    },
+    {
+      "observation": "Development fixtures attempted already-prohibited fixed-array keys and a declaration named reserved source type string.",
+      "repair": "Correct fixtures; no dictionary admission or name-lookup workaround implemented.",
+      "evidence": [
+        "collections-development-key-fixture.txt",
+        "collections-before-shadow-repair.txt"
+      ]
+    },
+    {
+      "observation": "Deep 72-level test exposed repeated non-null initialization projections and identical capability pair descent.",
+      "repair": "Equivalent root-required and exact immutable-descriptor/authority reflexivity fast paths; all non-identical paths retain full proofs. Unchanged deep test and forged uninitialized load remain. Slow development test intentionally terminated, not accepted.",
+      "evidence": [
+        "collections-deep-development-stack-2.txt",
+        "collections-deep-proof-stack-2.txt",
+        "collections-debug-pre-reflexivity-tests.txt",
+        "collections-debug-pre-reflexivity-command.json"
+      ]
+    },
+    {
+      "observation": "Strict C++ compilation transiently crashed pinned Clang BDCE/DemandedBits.",
+      "repair": "None claimed. Unchanged source/flags compiled on retry; final build and runtime sanitizer acceptance pass.",
+      "evidence": [
+        "collections-san-proof-build.txt",
+        "collections-san-clang-reproduction.txt",
+        "collections-clang-crash-repro.cpp.gz",
+        "collections-clang-crash-repro.cpp.json",
+        "collections-clang-crash-repro.sh.txt"
+      ]
+    },
+    {
+      "observation": "Scope entry failure return reviewed for valid hand IR with void result.",
+      "repair": "Emit void return for Type::none; scalar/aggregate path remains null-value return. Review hardening, not a reproduced production failure."
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "verification_sequence": "Final source freeze precedes matching selected target builds and focused conversion plus 19 neighboring suites in each configuration. Source hashes rechecked after acceptance. Strict acceptance and production native executions outside ptrace with detect_leaks=1, halt_on_error/abort_on_error; no sanitizer or optimizer flags disabled. Debug progress sample was in O2 LLVM post-RA scheduling; deep test retained unchanged, no performance threshold or arbitrary depth cap.",
+  "ABI_build_scope": "Private checked collection operations use existing Runtime archive and ORC binding; production native builds use matching Runtime headers/archive. Formatter policy changed to void-format-v3;collections-v1; source/kernel/dependency/archive identities remain exact.",
+  "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "build_artifact_hashes": {
+    "debug": {
+      "voidc": "535d05bec48f4e42511aeaf854941247d66471a0d481e5bd16f2e2c6858c4cf0",
+      "void_stage10_conversion": "1e7941234b113175d79c32f0de09f5fc07430c19905b43741f7a626b658d2792",
+      "void_console_source": "ce868ddf01c49391ee3b6d286fc32743c4d966f760be360ecacb3c7adb52c127",
+      "void_display_reload": "3e5f717aa9e965ab4842c32d3f424e7f3e2130b1b6f0876c1fe6e1b1bcb799a0",
+      "libvoid_runtime.a": "ad502714fec8a6fe96018627dc2b48fa711f017c1efa16878dfd1b7467a50f1c",
+      "libvoid_core.a": "cdd1337ad56229a2233f1f5379410dceaef36f48398f86d2c300401988d94f03",
+      "libvoid_llvm.a": "ffdc03f837ea9b8753aa3db548d9a78d35dc947c8d8bad576a6dd691e272690f"
+    },
+    "san": {
+      "voidc": "d6579f1b0bdad9a25c708df6b843829924590ad74c9d15bca9bc717988270010",
+      "void_stage10_conversion": "11e7eca37d76634f43836ae066f5d1c80454866175b524e66a41ac24f1bf04c8",
+      "void_console_source": "91561b1421777d615fadcfccb6588c6788951f5ae51cfb4d6f11de1c0a7ef889",
+      "void_display_reload": "adc2c5e5ece6837b99e7aab7acb168b9ae33e2e216e47a5c218e8c873f200eaa",
+      "libvoid_runtime.a": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+      "libvoid_core.a": "121d2e963e7d75f89aef0b27e28c0dc66037deeff31ba28de7037c023f5dea7d",
+      "libvoid_llvm.a": "6198224f1604e357aa7beae363b02fb2413060db188fdd1e7807a7051857bd00"
+    }
+  },
+  "acceptance_artifact_hashes": {
+    "collections-before-fixed-check.txt": "e6cefc50773fae5f18cd476e507393b2e71539aeacd89e0c1e44534fddd7aaa9",
+    "collections-before-owner-provenance.txt": "a93dd6c95eda5aee1582a3ba3a335000530c326427c5e2de8811eb5c92f233a9",
+    "collections-before-shadow-repair.txt": "9dc58b5c394235efd71c3fa766df171661ee17ab31c741fbd86e98d6d1681d7f",
+    "collections-clang-crash-repro.cpp.gz": "8a4d226b2c68f962198cae9f3418961a4abc69846e09dd735820e2200abb60c5",
+    "collections-clang-crash-repro.cpp.json": "4980f36c6be41920b218689eaee78ff2f34650ec93442cfa9a39943b4c3c4bee",
+    "collections-clang-crash-repro.sh.txt": "2dbb059097f58c7b23da5c5f371224f0da5104151539c48032cc4e19dad528c5",
+    "collections-code-freeze.json": "f504c3a9aa00fe4c1b71c339475fa006f74d276dcbff979a58a8b01324374b0b",
+    "collections-debug-acceptance-build.txt": "fdfa14e9a69d53168cf653f00efb9cd5bd1136edca372984032ff6c2ba560a6e",
+    "collections-debug-accepted-detail.txt": "7b02742d680622cd2efe73b415926a4fd6e02fc7777f0cbb673f6c60b7bca52e",
+    "collections-debug-accepted-tests.txt": "af4f26acbb04537c125357f2707ec135a4f6a7930ee21387afe30c777a5dc42a",
+    "collections-debug-build.txt": "3c7437549791566aa89adcf5e84cc3dd15ce38c28d066d387d3cb4938ce9dcf7",
+    "collections-debug-cache.json": "0814ecba02136ee55bd4c22d7f4097930b978036f489abcf3791abf9334b94b5",
+    "collections-debug-conversion-detail.txt": "c2aaea5404591cf970801dabc8381843fde6db50adc41151eb3aba8fdac7c4cf",
+    "collections-debug-conversion-tests.txt": "8d566c946540679021ac777fb076de5198b87da7dd3db4de9a5ce57cbbe6ba99",
+    "collections-debug-final-build.txt": "fd58b5d445bc6b51866e9ae0350223af9595b1f065075c72fbf8cb2a985db04a",
+    "collections-debug-final-proof-build.txt": "6edf1d7a415d6d4f9fdfe0c479fd926206bfa9a3d98dc4defb416c5daba15fb3",
+    "collections-debug-native-build.json": "91e1c83899121af684544b1b83db558d62beca13fa4e2c80732fa13ddf8aaad4",
+    "collections-debug-native-keyboard-initial.json": "458ad569b219d78ef0ebf135047d49f6483d709380172821552510c25ac5c2c6",
+    "collections-debug-native-keyboard.json": "49cd2db2bad4fe03ebef3fa2b5b4cf91e56cd235cf4362b523e5104106e6cfaf",
+    "collections-debug-outputs.json": "4687e113606bf3521119222dcd806135fff41bebc4537e748a3112750fc7465f",
+    "collections-debug-pre-reflexivity-command.json": "a92439b67f142550a18732265f3730fe57167a349af0c09df6723b5a3d905404",
+    "collections-debug-pre-reflexivity-detail.txt": "de4fed8c15efec191d5d398cc1bd24b7078fee3dd101d48a8d465b83fbb76474",
+    "collections-debug-pre-reflexivity-tests.txt": "5d528b664be0cab8bf4ae89d63730e1b016225d046ba25e687880f221c859006",
+    "collections-debug-test-commands.json": "70ffd8a229fa29f9d8cf435cbea60c235b6dfda404e4ea7d921e2a391acb663b",
+    "collections-deep-development-stack-2.txt": "2ee3b81e7616e4a1d963bef686bbb3415c35f323cdc0ef4b3806be45bc976011",
+    "collections-deep-development-stack.txt": "fb3211eabbf6c925c0aad5b9131ef4e1115e2e81a23199962191139b1fb6e23b",
+    "collections-deep-final-progress-stack.txt": "52130ebe79fc1f9c8a39283a922fe1dc9ee775aed1fed1add684ce021d330a07",
+    "collections-deep-proof-stack-2.txt": "3f5abff58fce1e690fe3827727656487da9321e515ee8558336dfd8046f57b29",
+    "collections-deep-proof-stack.txt": "3c2a829873a9525b038896a855bb99d80c773a8f95484f16158d7db18d8d1d56",
+    "collections-development-build-1.txt": "c054cd83fda438df9318483a77a7da0119e18f306437a53caaae6b5cc9fe967e",
+    "collections-development-console.txt": "3d03f817967a6e7cebf7385854840dd3b63014fe695439c1c2cd0ca257710981",
+    "collections-development-key-fixture.txt": "17dd793df05458c422e3737a401ab831762258b9b0befd98672d3d10a2320d04",
+    "collections-development-output.bin": "4b0578f3eb9ec26f1e76ca4b47927b244c63a91b5752b443bdf633a8577dee5a",
+    "collections-development-reload.txt": "22396763456f376817ea69a20691fef1aed4866cded11acd6c9a0ee812a5912e",
+    "collections-development-source-1.txt": "5024d2f7e0692eef14b6b676a7eafd6a907b37d74ed90c3aba091c7e3a61a1e1",
+    "collections-pre-final-conversion.txt": "bb439413a30e1b2f878ddff0c28bb3edeed3e40c097d0a47c83e8267428fae41",
+    "collections-pre-proof-freeze.json": "f6b3cccfbd94c2f19a851ee00c3af36c850c7d64696e41fa15d2e613d54cd30f",
+    "collections-pre-reflexivity-freeze.json": "92ccee33f5525dfbb6343b08165b00b3523bf2a139ff744fc1aa39bbfa094d67",
+    "collections-preservation.json": "2f63d8cd3c39f10805815564a4c64eb41b56166d50d77b4dffee4fd8fb313b9a",
+    "collections-san-acceptance-build.txt": "f57485aafc97ca34a5a3ee06ca7046a22b15e24413053f1424fbf4bbf2be59e6",
+    "collections-san-accepted-detail.txt": "479707b9427f984d546460cf617d5eb75cfeb39247ea146266987f8073a3dda4",
+    "collections-san-accepted-tests.txt": "69a80336f7caa36f5c38c031915b75b35951c2d647b0504e5c286984215156fa",
+    "collections-san-build.txt": "38f730327dc5f3c1fc0e6cdfcb95d3a014ab1cf7af0d13d45373bfd26448a967",
+    "collections-san-cache.json": "78bbbafbdb89d68f24ddd95afef4c3e11fe8cf7f24cf8f2da79619ccd0a68611",
+    "collections-san-clang-reproduction.txt": "a5e7a837596621468bad691efddecc2620c1efefc089a7f54f5600b1f1fcb929",
+    "collections-san-conversion-detail.txt": "ea4a9a41b7addb6f2a69d0d5d65a75f1315d890f1e49e1f58dd2d0cb7c763c15",
+    "collections-san-conversion-tests.txt": "2c1fdfd4e878cfbefdb51551d925844d926a9bc95772d9f51679c1f4badaabb3",
+    "collections-san-final-build.txt": "052b79492f1d8aafcbdfb07ec5ff53148540c9106de32bd45028ab35eb4e5d25",
+    "collections-san-final-proof-build.txt": "6fda47acc5305fea9093138ef3df88f0f9c5f187c7accf91badc161a905e532f",
+    "collections-san-native-build.json": "f21c523ae3741cc07d615f2e415ee2c61b4bf0206af3cc5f4328e3ab27f1f43f",
+    "collections-san-native-keyboard-initial.json": "8b851a040e475297431cf11a96ce72896330c4b61808d5ac7512df885d2ecd3a",
+    "collections-san-native-keyboard.json": "93cf82d6429bd5b9aab493d68846097724eb88567fe3c439577e9522ffb40cdc",
+    "collections-san-outputs.json": "aed51405cd551ad54c5d629f6120797ea677caa584f9163d8178f3020da0930a",
+    "collections-san-proof-build.txt": "264575912ce0912315e8d4ed3ab0f0ad136beb23c06f307b6472dd15cb7101fe",
+    "collections-san-test-commands.json": "03baa886fb27578392d8639a578527a6ee93f15debe72625d559b8958e6f17f1",
+    "collections-source-hashes.json": "fffe0b433e197922bc10a39584cf030da4124d5cfb8c1ef5ae9aab01dc16dad2",
+    "collections-stdlib-snapshot.json": "3b2f10faf567085152b53ee9b4eadd895118d41bac2a0682081d4a74e9b99025"
+  },
+  "bounded_files": [
+    "docs/DEVELOPMENT_STRATEGY.md",
+    "docs/WORK_LOG.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/format.hpp",
+    "include/void/ir.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "src/backend/llvm/backend.cpp",
+    "src/frontend/capabilities.inc",
+    "src/frontend/collection_display.inc",
+    "src/frontend/compiler.cpp",
+    "src/frontend/display_semantics.inc",
+    "src/ir/module.cpp",
+    "src/ir/reference_capabilities.inc",
+    "src/runtime/abi.cpp",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/console_collection_failed_hook.void",
+    "tests/stage10/console_collection_invalidated.void",
+    "tests/stage10/console_collections.void",
+    "tests/stage10/conversion.cpp",
+    "tests/stage10/display_reload.cpp"
+  ],
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "configured_Python": "/home/shmellyorc/.local/bin/python3.11 (3.11.16)",
+    "shell_Python": "3.14.8",
+    "LLVM_Clang": "19.1.7"
+  }
+}

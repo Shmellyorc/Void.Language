@@ -1,0 +1,10 @@
+[15:1022/104958.998289:ERROR:ui/ozone/platform/wayland/common/drm_render_node_path_finder.cc:45] drmGetDevices2() has not found any devices: No such file or directory (2)
+[15:1022/104958.998405:FATAL:content/browser/sandbox_host_linux.cc:41] Check failed: . shutdown: Operation not permitted (1)
+Exit code:   SIGTRAP
+TestRunFailedError: Test run terminated with signal SIGTRAP
+    at ChildProcess.onProcessClosed (/home/shmellyorc/Documents/Void.Language/editors/vscode/node_modules/@vscode/test-electron/out/runTest.js:125:24)
+    at ChildProcess.emit (node:events:509:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12) {
+  code: undefined,
+  signal: 'SIGTRAP'
+}

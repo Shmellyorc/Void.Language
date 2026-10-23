@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/bin/bash",
+    "-c",
+    "ulimit -s 1024; exec \"$1\" frontend \"$2\"",
+    "void-frontend-1m",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+    "/home/shmellyorc/Documents/Void.Language"
+  ],
+  "returncode": 0,
+  "seconds": 9.364550445927307
+}

@@ -1,0 +1,37 @@
+{
+  "previous_entries": 200,
+  "unchanged_entries": 177,
+  "changed": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/console.hpp",
+    "include/void/console_ops.hpp",
+    "include/void/detail/console_wide.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "src/backend/llvm/backend.cpp",
+    "src/frontend/compiler.cpp",
+    "src/ir/module.cpp",
+    "src/runtime/abi.cpp",
+    "src/runtime/async.cpp",
+    "src/runtime/console.cpp",
+    "src/runtime/console_abi.cpp",
+    "src/runtime/console_presentation.inc",
+    "src/runtime/coordination.cpp",
+    "stdlib/console.void",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py"
+  ],
+  "new": [
+    "include/void/async.hpp",
+    "src/runtime/console_keyboard.inc",
+    "src/runtime/reload.cpp",
+    "tests/runtime/console_keyboard.cpp",
+    "tests/runtime/console_keyboard.py",
+    "tests/stage10/console_keys.void"
+  ]
+}

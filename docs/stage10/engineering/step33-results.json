@@ -1,0 +1,93 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 33,
+  "increment_status": "implemented and focused Linux verification passed",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "preexisting_work": "Step 32 and prior Stage 10 source preserved; no commit or checkout changes",
+  "changes": [
+    "Shared exact direct static-owner selection using existing IR functions and MemberSelection, including concrete generic/nullability tuples, direct definition-scope imports, nominal/internal/owner-private visibility and readonly capabilities.",
+    "Ambiguity/inaccessible diagnostics with selected declaration source locations; no coercion/ranking/inheritance/promotion/reversed retries.",
+    "Necessary ordinary-call lowering, written-order snapshots, effects/roots/failure handling and derived != through one == call.",
+    "IR glyph proof with independent actual-operand selection/access validation; source references and dependencies preserve selected declaration identities and original glyph spans.",
+    "Unfinished managed self rejection, declaration-only result hints, compiler-generated display identity guards and preserved builtin numeric/reference/callable fallbacks."
+  ],
+  "checks": {
+    "operator_resolution": 161,
+    "operator_declarations": 278,
+    "source_operator_jit_aot_process": 16
+  },
+  "debug": {
+    "passed": 14,
+    "total": 14,
+    "seconds": 32.6,
+    "log": "step33-debug-accepted.txt",
+    "detail": "step33-debug-detail.txt",
+    "suites": [
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "stage10_operators_aot",
+      "stage10_hooks",
+      "stage10_fields",
+      "stage10_conversion",
+      "stage10_interpolation",
+      "stage10_display_reload",
+      "generics_source",
+      "ergonomics_sprint6_host",
+      "ergonomics_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_sprint6"
+    ]
+  },
+  "strict_sanitizers": {
+    "status": "passed",
+    "passed": 3,
+    "total": 3,
+    "seconds": 7.15,
+    "configuration": "RelWithDebInfo ASan/UBSan and leak checks; pinned LLVM 19.1.7",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "log": "step33-san-accepted.txt",
+    "detail": "step33-san-detail.txt",
+    "build": "step33-san-build.txt",
+    "configure": "step33-san-configure.txt",
+    "scope": "Compiler and Runtime instrumentation; generated application machine code is not equivalently instrumented. Existing RTTI-off LLVM SDK excludes vptr checks. Executed outside sandbox ptrace restrictions without disabling leak checks."
+  },
+  "execution_scope": "Source normal/O2 JIT and independently linked normal/O2 AOT cover all approved glyph families, generic owners/functions and fresh managed results. C++ source suite covers visibility/imports/ambiguity/nullability/readonly paths/evaluation order, checked failure recovery, references and malformed IR. Existing neighboring LSP tests cover fields/display/interpolation, not new full operator UI acceptance.",
+  "small_stack": {
+    "bytes": 1048576,
+    "status": "passed",
+    "log": "step33-small-stack.txt",
+    "command": "python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc"
+  },
+  "failure_and_fix": {
+    "issue": "New operand typing omitted callable-null context, breaking existing nullable callable equality.",
+    "before": "step33-callable-null-before.txt",
+    "after": "step33-callable-null-after.txt",
+    "fix": "Reference-or-callable nullable context restored. Regression suite verifies both operand directions and != under normal/O2 execution. Final Debug 14/14 passes."
+  },
+  "architecture": "Existing frontend, nominal catalog, typed IR, LLVM 19.1.7 calls, Runtime, precise GC and stdlib resolver retained; no new Runtime ABI/dependency/operator registry/backend.",
+  "not_run": [
+    "Release configuration for this increment",
+    "Native Windows/macOS",
+    "Native editor-host operator acceptance",
+    "Full Stage 10 consolidated acceptance"
+  ],
+  "remaining": [
+    "Step 34 broader worker/effect/GC/cleanup/failure integration and acceptance; required basic call lowering and derived != already implemented",
+    "Step 35 captured-place compound operators including %= remain unimplemented",
+    "Step 36 recursive custom-equality dictionary-key protection remains unimplemented",
+    "Remaining Stage 10 composite display, console/terminal, field/tooling/cache/source-library and final acceptance obligations"
+  ],
+  "next_source_change": "Extend tests/stage10/operator_resolution.cpp and existing Runtime/GC harness with RHS-triggered collection, worker reachability and failing cleanup/retained source failures, repairing confirmed ordinary-call defects before Step 35 captured-place work.",
+  "source_hashes": "step33-source-hashes.json",
+  "commands": {
+    "debug_build": "cmake --build build/ci-official-debug -j2 --target void_operator_resolution void_operator_declarations voidc voidls void_stage10_hooks void_stage10_fields void_stage10_conversion void_stage10_interpolation void_display_reload void_generics_tests void_sprint6_tests",
+    "san_build": "cmake --build build/ci-official-san -j2 --target void_operator_resolution void_operator_declarations voidc",
+    "debug_ctest": "ctest --test-dir build/ci-official-debug --output-on-failure -R ^(stage10_operator_resolution|stage10_operator_declarations|stage10_operators_aot|stage10_hooks|stage10_fields|stage10_conversion|stage10_interpolation|stage10_display_reload|generics_source|ergonomics_sprint6_host|ergonomics_sprint6|lsp_stage10_fields|lsp_stage10_display|lsp_sprint6)$",
+    "san_ctest": "ctest --test-dir build/ci-official-san --output-on-failure -R ^(stage10_operator_resolution|stage10_operator_declarations|stage10_operators_aot)$"
+  },
+  "git_hosted_publication": "not performed"
+}

@@ -60,6 +60,8 @@ struct ValueType {
     std::string identity, name;
     std::vector<ValueField> fields;
     std::size_t source_offset = 0;
+    bool custom_equality = false;
+    std::size_t custom_equality_offset = 0;
     bool managed = false;
     bool interface_type = false;
     std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
@@ -110,6 +112,7 @@ bool collection_type(Type);
 Type dictionary_type(Type key,Type value);
 Type dictionary_key(Type);
 Type dictionary_value(Type);
+std::optional<Type> dictionary_equality_owner(Type);
 bool dictionary_key_supported(Type);
 bool pattern_comparable(Type);
 Type array_element(Type);
@@ -124,7 +127,7 @@ std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t 
 enum class Op { bitcast, native_call, async_cancel_children, async_cancel, async_group_enter, async_group_join, async_drain, async_call, await, gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
-    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, scalar_display, scalar_format, format_unwrap, format_layout, temporal_native, string_join,
+    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, scalar_display, scalar_format, format_unwrap, format_layout, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, console_endpoint, console_native, console_print,
     fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
@@ -140,6 +143,7 @@ struct Instruction {
     bool initialization = false; // Only compiler-validated construction invokes init.
     std::string source_excerpt = {}; // Snapshot of the source line and caret.
     bool array_repeat = false; // fixed_array only: pure prototype value, copied extent times.
+    std::string operator_glyph = {}; // Exact source operator call proof, using ordinary call ABI.
 };
 struct Terminator {
     enum class Kind { return_value, branch, jump, return_void, unreachable } kind = Kind::return_value;
@@ -168,7 +172,12 @@ struct Function {
     bool fixed_ownership = false;
     std::string display_name = {}; // Debug/diagnostic spelling, independent of native identity.
     std::string lexical_owner = {}, lexical_parent = {};
+    Type operator_owner = Type::none;
+    std::string operator_glyph = {};
 };
+bool operator_arity(std::string_view glyph,std::size_t arity);
+std::string operator_identity(Type owner,std::string_view glyph,const std::vector<Type>& operands);
+void validate_operator_declaration(const Function&);
 struct Module {
     std::string identity;
     std::vector<std::string> imports; // Trusted C functions with i32(i32) ABI.
@@ -208,6 +217,7 @@ struct MemberSelection {
 bool field_accessible(const Module&,Type,unsigned,std::string_view scope,std::string_view lexical_owner = {});
 MemberSelection select_member(const Module&,Type,std::string_view,std::string_view scope,std::size_t* work=nullptr,std::string_view lexical_owner = {});
 bool method_accessible(const Module&,const Function&,std::string_view scope);
+MemberSelection select_operator(const Module&,std::string_view,const std::vector<Type>&,std::string_view scope,std::string_view lexical_owner = {});
 void satisfy_constraint(const Module&,Type,Type,std::string_view scope);
 Module::Binding structural_binding(const Module&,Type,Type,std::string_view scope,std::size_t* work=nullptr);
 std::vector<Module::Binding> interface_universe(const Module&);

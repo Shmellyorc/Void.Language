@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 26: runtime_console_terminal
+1/1 Test #26: runtime_console_terminal .........   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

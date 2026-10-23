@@ -1,0 +1,1 @@
+Step 38 archive baseline: original valid=1, rewrite returned=1, rewritten valid=0

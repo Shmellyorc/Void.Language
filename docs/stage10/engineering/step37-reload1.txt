@@ -1,0 +1,7 @@
+/reload.void:3:21: error: Field access requires a struct or interface.
+    code: VOID2001
+
+ 3 |         return text.count as i32
+   |                     ^^^^^
+    Module: /reload.void
+

@@ -33,7 +33,11 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             const auto& fields=parameters.at(origin).definition->fields;
             for (unsigned field=0;field<fields.size();++field) {
                 Type t=fields[field].type;
-                if (!f.initializer || !ir::requires_initialization(t)) initial.emplace(origin,field);
+                const bool endpoint_default=f.initializer && origin==0 && console::endpoint_type(t) &&
+                    std::any_of(f.initialization_defaults.begin(),f.initialization_defaults.end(),[&](const auto& value){return value->slot==field;});
+                // The existing initializer prelude writes these checked constant
+                // copies before the body; independent IR still proves the write.
+                if (!f.initializer || !ir::requires_initialization(t) || endpoint_default) initial.emplace(origin,field);
             }
         }
         auto require_field=[&](unsigned origin,unsigned field,const Ready& ready,const Token& token) {
@@ -64,6 +68,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         (target->second.second->token.text=="string" || target->second.second->token.text=="format");
                     if(!e.display_adapter.empty() || (target!=functions.end() && target->second.second->display_adapter) || (hook && i==0))
                         issue(e.token,"Display hooks cannot observe unfinished self or its aliases.");
+                    if(target!=functions.end() && !target->second.second->operator_glyph.empty())issue(e.token,"Operators cannot observe unfinished self or its aliases.");
                     if(e.interface_call) issue(e.token,"Interface dispatch is prohibited on unfinished self or its aliases.");
                     if (!e.virtual_slot.empty()) issue(e.token,"Virtual-family calls are prohibited on unfinished self or its aliases, including direct super calls.");
                     for(unsigned field=0;field<e.parts[i]->type.definition->fields.size();++field) require_field(*origin,field,ready,e.token);

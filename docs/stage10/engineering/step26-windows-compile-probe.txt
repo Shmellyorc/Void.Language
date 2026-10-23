@@ -1,0 +1,5 @@
+In file included from src/runtime/console.cpp:1:
+include/void/console.hpp:2:10: fatal error: 'array' file not found
+    2 | #include <array>
+      |          ^~~~~~~
+1 error generated.

@@ -1,0 +1,414 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": "Console and composite tooling",
+  "increment_status": "Implemented and focused Linux verified; independent Golden Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Existing compiler EditorProbe supplies accessible console/type/constant/method menus, enum case menus and contextual Ok/Err variants; session close() remains visible while native payloads and inaccessible fields remain hidden.",
+    "Enum constructors retain declared payload parameter names/docs, incomplete-call typed signature recovery and cross-file source navigation. Checked payload patterns reference the actual final written token, including whitespace around dots.",
+    "Concrete result constructor/pattern metadata preserves readonly capability identities, active payload type and builtin no-source-definition boundary; source pattern captures retain generic/readonly types.",
+    "Compiler-owned print hover/signature help presents *values and named controls with console.output, without synthetic $valueN/no-result file placeholders. Named active parameter mapping uses existing argument binding.",
+    "Installed console ## source documentation flows through existing metadata. Nonpublic installed declarations no longer appear in workspace/document symbol menus; real public definitions retain installed readonly identities.",
+    "Collections/enums/results share existing alignment suggestions and validation across conversion/interpolation/print analysis, original Unicode/UTF16/CRLF/triple/nested-hole spans and dirty/stale/repair/refresh/close/reopen paths. Editor requests do not execute source hooks, clocks or I/O.",
+    "Shipped real VS Code/Neovim/Vim acceptance harnesses exercise actual console/composite intelligence with ordinary compiler/LSP providers. No adapter API/resolver/parser added.",
+    "Future native debugging, JIT breakpoint/lease/GC/async/cache considerations and editor DAP milestones recorded only, without assigning a stage or implementing debugger metadata/protocols."
+  ],
+  "production_changes": [
+    "src/frontend/compiler.cpp",
+    "src/frontend/pattern_parser.inc",
+    "src/frontend/pattern_semantics.inc",
+    "src/lsp/main.cpp",
+    "stdlib/console.void"
+  ],
+  "architecture": "Reused Function, Structure, checked Pattern, builtin/declaration/reference records, EditorProbe, ToolingIndex/ToolingSession and voidls. No new semantic service, renderer, Runtime/GC/native console/LLVM/IR ABI or dependency. New result presentation references are editor-only; existing native compatibility/effect contracts remain authoritative.",
+  "dependencies": "Unchanged pinned LLVM/Clang 19.1.7, Ryu/date/IANA versions and licenses. Console source changes are documentation only; stripped bytes equal the prior accepted snapshot.",
+  "source_isolation": {
+    "root": "/tmp/void-console-tooling-stdlib-l72zdh_a/stdlib",
+    "sha256": {
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110"
+    }
+  },
+  "console_documentation_proof": "console-tooling-console-docs-proof.json",
+  "preserved_prior_evidence": {
+    "collection_checkpoint": "collections-results.json",
+    "unresolved_observations": [
+      "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review.",
+      "Pinned Clang19.1.7 initially crashed in BDCE/DemandedBits optimizing a libstdc++ string guard in the strict C++ conversion test compilation. Unchanged source/flags succeeded on retry. Cause unexplained; no repair claimed. Reproducer and logs retained."
+    ],
+    "clang_reproducer": "collections-clang-crash-repro.cpp.gz",
+    "deep_collection_compilation_cost": {
+      "debug_seconds": 519.1,
+      "strict_seconds": 640.91,
+      "status": "Historical collection/sum-display compilation and execution costs retained. The 72-level test was rerun in the preceding sum-display increment, not in the console/composite tooling increment; tooling preserved its source and prior acceptance evidence. No broad optimization or repair of earlier observations claimed."
+    },
+    "deferred_compiler_objectives": "../../DEVELOPMENT_STRATEGY.md",
+    "deferred_editor_observations": "../IMPLEMENTATION.md#deferred-editor-quality-observations--boss-report-step-31"
+  },
+  "unresolved_focused_Linux_defects": [],
+  "limitations": [
+    "Native Windows/macOS and fresh Release/final four-system Stage10 acceptance remain open; this increment is not Stage10 completion.",
+    "Real editor hosts use the Debug server; separate process LSP acceptance uses the strict instrumented server. Generated JIT/AOT code is not equivalently instrumented by the native C++ sanitizer build.",
+    "The unchanged 72-level collection regression is preserved with its earlier accepted evidence and compilation cost; not rerun in this metadata-only increment. Focused sum regression retains 45 checks in each configuration.",
+    "Standalone/copied standard-library entry private-operation rejection remains enabled. Lexically invalid uppercase fragments still produce conservative no completion; contextual empty/full Ok/Err spelling is supported.",
+    "Boss F12/F2/hover/@param/@return quality observations, cache UX/native-size/incremental goals and future debugging milestones remain deferred. No broad editor redesign or debugger implementation."
+  ],
+  "development_failures_and_repairs": [
+    {
+      "observation": "Probes reproduced missing enum cases, constructor payload names/help, pattern variant references, result metadata, print signature help/public file type and session close completion.",
+      "repair": "Existing compiler metadata/probe plumbing extended; no execution path/backend change.",
+      "evidence": [
+        "console-tooling-development-probe-2.txt",
+        "console-tooling-development-probe-3.txt"
+      ]
+    },
+    {
+      "observation": "Installed private _reply appeared in workspace-symbol results.",
+      "repair": "Filter nonpublic installed declarations in existing voidls symbol presentation; compiler declaration records and installed source identity/security remain intact."
+    },
+    {
+      "observation": "First C++ build placed the print help block at an earlier matching display argument-mapping line.",
+      "repair": "Moved it into print_call; all final builds/checks pass.",
+      "evidence": [
+        "console-tooling-debug-development-build.txt",
+        "console-tooling-debug-development-build-2.txt"
+      ]
+    },
+    {
+      "observation": "Initial fixtures used an import-shadowed input parameter, incorrect fixed/dictionary syntax, deferred nullable arrays, first-occurrence positions rather than dirty-expression offsets, and lexically invalid O/E fragments.",
+      "repair": "Use existing syntax/nominal nullable values, exact source positions and valid contextual variant prefixes; no source grammar/security change.",
+      "evidence": [
+        "console-tooling-development-probe.txt",
+        "console-tooling-lsp-development-2.txt",
+        "console-tooling-lsp-development-3.txt",
+        "console-tooling-lsp-development-4.txt",
+        "console-tooling-development-lsp-final.txt"
+      ]
+    },
+    {
+      "observation": "VS Code fixture assumed io/ was the first stdlib suggestion before adding real console.void; source doc assertion ignored VS Code rendered nonbreaking spaces.",
+      "repair": "Updated deterministic fixture expectation and normalized the existing renderer spaces in the test. Final trusted/untrusted/multi-root profiles pass.",
+      "evidence": [
+        "console-tooling-vscode-development-host.txt",
+        "console-tooling-vscode-host.txt",
+        "console-tooling-vscode-final-host.txt"
+      ]
+    },
+    {
+      "observation": "Restricted Neovim PTY test could not bind its local Unix socket (operation not permitted).",
+      "repair": "Same unchanged test passed outside the restricted sandbox; no product change or disabled assertion.",
+      "evidence": [
+        "console-tooling-neovim-automatic.json.terminal.log",
+        "console-tooling-neovim-automatic-final.txt"
+      ]
+    }
+  ],
+  "governance": "No commits/branches/pushes/hosted CI/publication/public root README changes.",
+  "next_engineering_step": "Remaining four-system Stage10 integration and final acceptance: extend existing tests/stage10/operator_integration.cpp and native fixtures with completed console plus collection/enum/result display; revisit matrix/Steps40–44. Stop this bounded increment for Wrench review.",
+  "debug": {
+    "passed": 29,
+    "total": 29,
+    "seconds": 392.37639644299634,
+    "build_seconds": 50.53202230297029,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_tooling",
+      "stage10_source_formatting",
+      "stage10_display_reload",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "generics_source",
+      "patterns_source",
+      "lsp_positions",
+      "lsp_protocol",
+      "lsp_stage8",
+      "lsp_stage7",
+      "lsp_demo",
+      "sessions",
+      "tooling",
+      "analysis",
+      "lsp_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_stage10_source_formatting",
+      "lsp_sprint4",
+      "lsp_sprint3",
+      "lsp_sprint2",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "runtime_console"
+    ],
+    "counts": {
+      "tooling_metadata": 106,
+      "extended_console_composite_LSP": 237,
+      "source_formatting": 321,
+      "formatting_LSP": 144,
+      "operator_format_LSP": 170,
+      "source_console": 4123,
+      "display_reload": 275,
+      "operator_reload": 248,
+      "native_console_foundation": 347,
+      "sum_regression": 45,
+      "console_driver": 438,
+      "exact_console_execution_records": 92,
+      "conversion_linked_AOT_driver": 16
+    },
+    "commands": "console-tooling-debug-commands.json",
+    "logs": [
+      "console-tooling-debug-build.txt",
+      "console-tooling-debug-tests.txt",
+      "console-tooling-debug-detail.txt",
+      "console-tooling-debug-sum-regression.txt"
+    ],
+    "lsp_responses": "console-tooling-debug-lsp-responses.json",
+    "exact_outputs": "console-tooling-debug-outputs.json",
+    "artifacts": {
+      "voidls": "2f3d44577481805b94896d1fd090e36962b883f6b3ff76a7ea64aec49c41e6d5",
+      "voidc": "13bcc29475c02cd752de56ee87e31cfdb748769e821a4ad8854ac0f73fbd944e",
+      "void_stage10_tooling": "00aa2464a6dee4169c8e90e5079ff0d2cee7d1cf551cc502becca6e3bd5a4551",
+      "libvoid_core.a": "7091a1e27385746a9c9aa9521896f6dbeceac101669535b5e0099af868deb444",
+      "libvoid_runtime.a": "ad502714fec8a6fe96018627dc2b48fa711f017c1efa16878dfd1b7467a50f1c",
+      "libvoid_llvm.a": "835fb8a4c4461b942048b5e18f66aed8b1418d45d33e64eb3c512487368428a6"
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 29,
+    "total": 29,
+    "seconds": 429.3568172280211,
+    "build_seconds": 325.12369653303176,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_tooling",
+      "stage10_source_formatting",
+      "stage10_display_reload",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "generics_source",
+      "patterns_source",
+      "lsp_positions",
+      "lsp_protocol",
+      "lsp_stage8",
+      "lsp_stage7",
+      "lsp_demo",
+      "sessions",
+      "tooling",
+      "analysis",
+      "lsp_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_stage10_source_formatting",
+      "lsp_sprint4",
+      "lsp_sprint3",
+      "lsp_sprint2",
+      "stage10_console_source",
+      "stage10_console_aot",
+      "stage10_conversion_aot",
+      "runtime_console"
+    ],
+    "counts": {
+      "tooling_metadata": 106,
+      "extended_console_composite_LSP": 237,
+      "source_formatting": 321,
+      "formatting_LSP": 144,
+      "operator_format_LSP": 170,
+      "source_console": 4123,
+      "display_reload": 275,
+      "operator_reload": 248,
+      "native_console_foundation": 347,
+      "sum_regression": 45,
+      "console_driver": 438,
+      "exact_console_execution_records": 92,
+      "conversion_linked_AOT_driver": 16
+    },
+    "commands": "console-tooling-san-commands.json",
+    "logs": [
+      "console-tooling-san-build.txt",
+      "console-tooling-san-tests.txt",
+      "console-tooling-san-detail.txt",
+      "console-tooling-san-sum-regression.txt"
+    ],
+    "lsp_responses": "console-tooling-san-lsp-responses.json",
+    "exact_outputs": "console-tooling-san-outputs.json",
+    "artifacts": {
+      "voidls": "992faddfa48a38d92d14a98ae948628c5137f665135a4ee45ff8a656a8c9f81e",
+      "voidc": "766ead54800d66e00d42ceb3bc9839e412224bd8c732d2f2b9543e1e8edd106f",
+      "void_stage10_tooling": "df133eb544ca70171509412156b3ffb501f2d78aaf47b209a1eb1f906b099fba",
+      "libvoid_core.a": "4b656f1b10b8b880178ebe1476262affe244a0eab053fa1952f1a3e0ae201519",
+      "libvoid_runtime.a": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+      "libvoid_llvm.a": "c1245c3959f259ad305ec41aee52574e69bb4cc2cbc077e267c75ca960e14b38"
+    },
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "configuration": "RelWithDebInfo O2, ASan/UBSan/leaks outside ptrace; pre-existing RTTI-off vptr exclusion unchanged; no new suppression"
+  },
+  "editors": {
+    "vscode": {
+      "status": "passed trusted/restricted-trust/multi-root profiles",
+      "version": "1.143.0",
+      "node": "24.19.0",
+      "unit_passed": 1,
+      "unit_log": "console-tooling-vscode-unit-final.txt",
+      "host_log": "console-tooling-vscode-final-host.txt",
+      "scope": "Real locally installed VS Code; development extension/native Debug server, no new packaged VSIX or download"
+    },
+    "automatic_entry": "console-tooling-editors.json",
+    "explicit_entry": "console-tooling-editors-explicit.json",
+    "neovim_version": "0.13.0-dev-1410+g510f61555b",
+    "vim_version": "9.2 patches 1-858",
+    "vim_executable": "/usr/bin/vim.basic",
+    "vim_client": "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+    "real_PTY_automatic_menus": {
+      "neovim": "console-tooling-neovim-automatic-final.json",
+      "vim": "console-tooling-vim-automatic.json",
+      "prefixes_per_client": 5
+    }
+  },
+  "editor_commands": [
+    [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/editors/run.py",
+      "--server",
+      "build/ci-official-debug/voidls",
+      "--nvim",
+      "/usr/bin/nvim",
+      "--vim",
+      "/usr/bin/vim.basic",
+      "--vim-client",
+      "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "--output",
+      "docs/stage10/engineering/console-tooling-editors.json"
+    ],
+    [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/editors/run.py",
+      "--server",
+      "build/ci-official-debug/voidls",
+      "--nvim",
+      "/usr/bin/nvim",
+      "--vim",
+      "/usr/bin/vim.basic",
+      "--vim-client",
+      "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "--explicit-entry",
+      "--output",
+      "docs/stage10/engineering/console-tooling-editors-explicit.json"
+    ],
+    "PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH npm test --prefix editors/vscode",
+    "PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH VSCODE_EXECUTABLE_PATH=/usr/share/code/code VOIDLS_PATH=$PWD/build/ci-official-debug/voidls node editors/vscode/out/test/runHost.js",
+    "/home/shmellyorc/.local/bin/python3.11 tests/editors/neovim_automatic.py --server build/ci-official-debug/voidls --nvim /usr/bin/nvim --output docs/stage10/engineering/console-tooling-neovim-automatic-final.json",
+    "/home/shmellyorc/.local/bin/python3.11 tests/editors/vim_automatic.py --server build/ci-official-debug/voidls --vim /usr/bin/vim.basic --vim-client /tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41 --output docs/stage10/engineering/console-tooling-vim-automatic.json"
+  ],
+  "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "configured_Python": "/home/shmellyorc/.local/bin/python3.11 (3.11.16)",
+    "LLVM_Clang": "19.1.7"
+  },
+  "source_manifests": {
+    "previous": "sum-display-checkpoint-source-hashes.json",
+    "code_freeze": "console-tooling-code-freeze.json",
+    "bounded": "console-tooling-source-hashes.json",
+    "cumulative": "source-hashes.json",
+    "preservation": "console-tooling-preservation.json"
+  },
+  "bounded_files": [
+    "docs/DEVELOPMENT_STRATEGY.md",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "editors/vscode/src/test/host.ts",
+    "editors/vscode/src/test/runHost.ts",
+    "src/frontend/compiler.cpp",
+    "src/frontend/pattern_parser.inc",
+    "src/frontend/pattern_semantics.inc",
+    "src/lsp/main.cpp",
+    "stdlib/console.void",
+    "tests/editors/neovim.lua",
+    "tests/editors/run.py",
+    "tests/editors/vim.vim",
+    "tests/stage10/lsp_display.py",
+    "tests/stage10/tooling.cpp"
+  ],
+  "acceptance_artifact_hashes": {
+    "console-tooling-code-freeze.json": "de7bab143da1238804b363a907b2f639c39cf7a5f8fab1e747dcbb3cb92acb78",
+    "console-tooling-console-docs-proof.json": "e6f7653dbf9143a9e98ac147bd5a86c3c1c91aa464c6c80dbd31b371c1ef1f54",
+    "console-tooling-debug-build.txt": "78a71b41d65b1ee6a9d648a15529861a6154f9d124a5d6c8e124fae3be53ddac",
+    "console-tooling-debug-commands.json": "747bd6e9431972033e03269968c0589d41e0ea052d82d1f1c65bc3543cd87765",
+    "console-tooling-debug-detail.txt": "2252422ffcfec049e119a40534662ab27bd8ff69c512f6fef9aa0c613c5d1c11",
+    "console-tooling-debug-development-build-2.txt": "9c6c7ae16170eb45b4cf77eb5adee20173d45ba09e987c4ae94289c17c6ea0f5",
+    "console-tooling-debug-development-build-3.txt": "a27bb575007807c8ff4233e983428e30f31c26db94552955ff88bc3d305fff8a",
+    "console-tooling-debug-development-build-4.txt": "b8507df387212c85cb6d31299af06ac9e75a78daf1771221f5192c8d94c81b6e",
+    "console-tooling-debug-development-build-5.txt": "5503728be73706b9d1d53ec097a0ec364ff0fcf3379db04fbb6ec003d334de4d",
+    "console-tooling-debug-development-build-6.txt": "93ff283a9df5fb44c9d0eb6e185778b0ce4a1c4766485e8cf5b27ebbe8c87585",
+    "console-tooling-debug-development-build-7.txt": "2f7181409ed2305f9b53153fe23fab8cbacd65b93200364dfc351f99c1b7b3ee",
+    "console-tooling-debug-development-build-8.txt": "0cd53b46ace4cd4826be97d48a03e1d9b4b02826ca9161eb2241142e30284fdb",
+    "console-tooling-debug-development-build-9.txt": "8d2f11e3a42c6a4715c3244742451c18bc59c6da88836647f8d5a9f206cf6c33",
+    "console-tooling-debug-development-build.txt": "3c4e6a0c3a3af936804128f2e2392c00e74681609c1ddc33510f8a78c9054c88",
+    "console-tooling-debug-lsp-responses.json": "2a37ccbf25822092e5c52d6f21e52d923e093cfdaecd6bf5fe3a813364e2e1eb",
+    "console-tooling-debug-outputs.json": "fb0949233d3054dc545f008c9a6c7409159d6b354d1e291be085a8fb893ab703",
+    "console-tooling-debug-sum-regression.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "console-tooling-debug-tests.txt": "e9136937e306ad289aa9f6fe9350c0907752e400b25915e3c7a616fad15ccde8",
+    "console-tooling-development-lsp-final.txt": "064bacdddb6c965b50f53518b0e0ac97cd162e40ec85664bd3c9d138b844f45e",
+    "console-tooling-development-lsp.txt": "79edf30ea4a939371ab66b9e2d0ae89a4047f9a9c118771b961f5487931fd218",
+    "console-tooling-development-metadata-final.txt": "ebe7bc804652a7709ee38d40e4adb128b6c8ccbeed535ce85586b73f44c695e6",
+    "console-tooling-development-metadata.txt": "427bf43b61451ee623d616dc7ff318e560fc3741a6220c2f01c46ce4521cb884",
+    "console-tooling-development-probe-2.txt": "33dff08aa769d91a46c19a26a95f15f88c92204307d18abb0d043f7f4799cf73",
+    "console-tooling-development-probe-3.txt": "956d2bc43a540a15a72e1820d9b544d5419656a8d4bab9067030beb05b760595",
+    "console-tooling-development-probe.txt": "279e388fc5f70e8d3a564b2100028652de17a240601e4fbc684ec502521feee6",
+    "console-tooling-editors-development.json": "2cb25b86b764379e940d0619a28d3e53f220d0d0fb6eaba04bce33e358a4658b",
+    "console-tooling-editors-development.txt": "b34a479da1ae69b179f101e36d6a87f4c0e4afa60678ad32b57c6721c7c3d690",
+    "console-tooling-editors-explicit.json": "7b7cf0f18a6d7b507a85c685b01cd4468e5178fef0a31a10b26a140c3b31a39f",
+    "console-tooling-editors-explicit.txt": "b34a479da1ae69b179f101e36d6a87f4c0e4afa60678ad32b57c6721c7c3d690",
+    "console-tooling-editors.json": "7adaafec5bac8a639679016caad469db2846d28f4a8ca48993388d4ad4fcca88",
+    "console-tooling-editors.txt": "b34a479da1ae69b179f101e36d6a87f4c0e4afa60678ad32b57c6721c7c3d690",
+    "console-tooling-lsp-development-2.txt": "aa673ee663b3e46a618cbaf8185576212e14992c03f6a2fc72db902a4f0908fa",
+    "console-tooling-lsp-development-3.txt": "06c21f06f42a2c2970eba671a964fe3f0cfbebf88062ed77d18f0a16fd75b974",
+    "console-tooling-lsp-development-4.txt": "6eaa8c2c8836beed551994c80070c0bcea4e9ca81f3b867b60b20cb89c67a6e5",
+    "console-tooling-lsp-development-5.txt": "88edccb41eeb54cea6512c8a305434a7a796f72a4b75be1fc74b1511ab07efb9",
+    "console-tooling-lsp-development-6.txt": "79edf30ea4a939371ab66b9e2d0ae89a4047f9a9c118771b961f5487931fd218",
+    "console-tooling-lsp-development-7.txt": "29034842ca737b4490246b75c85b29028eb86968e5cfda35d93953ac3f79a4e7",
+    "console-tooling-lsp-development-8.txt": "35499bc4ffb0704c44f9e508f448c945dda17d2b355f35cd1f4311925f25abe2",
+    "console-tooling-lsp-development.txt": "fbc16b17e55be473c7eb31e4b7a037f48be4746af99d7b703bef9b6295068f56",
+    "console-tooling-neovim-automatic-final.json": "aa26547dc752f57abf2ccf7a446264e0c6a1e7a1bfbc79f3a5fbb57a0500c833",
+    "console-tooling-neovim-automatic-final.json.terminal.log": "c4fd097db773f182807323096f889ac1a89f0e9d753fe0353383e3f2c7602fb6",
+    "console-tooling-neovim-automatic-final.txt": "00351ff997010df9564679f49eb486037a98886e4688c05d42aa7c9e88db1a95",
+    "console-tooling-neovim-automatic.json.terminal.log": "4bac0d8c396f38e119c25e77b918d1c86af2e8290330c8101e46f315c04ddf80",
+    "console-tooling-neovim-automatic.txt": "58a6a1d7aaf51a30d5a7c46049bd29307b403527557779cba4b9d931697138b4",
+    "console-tooling-preservation.json": "f60e7978208544e7fc2b91e04b24a2352ffa947e02650d5da41328fa12ff6f88",
+    "console-tooling-san-build.txt": "2ea7a585671fde2125379951dfef330d9d7b4384b90ecb9a4c6ed24c2f52bbed",
+    "console-tooling-san-commands.json": "bfda8913174b9ce6ff4a5d925952167593806aa59013f35a212654e7a750c6ea",
+    "console-tooling-san-detail.txt": "f842b5e0f648461ceb1c24dbd9ae0f6151df026b8b2e8e02c6ea840f65ead88a",
+    "console-tooling-san-lsp-responses.json": "8bce7814d0f0e143e50d11fe8a7e8788f25016d27a1401d2f5f686ac3224a8ff",
+    "console-tooling-san-outputs.json": "f2e93f3c875d8197fcf9938c2fca2e23e3100db274f016d5837d8c4529f408d7",
+    "console-tooling-san-sum-regression.txt": "3c9ca37785c43ed948eb1e7057c4010dbb94821bc18d905dd0c925a0a39224c2",
+    "console-tooling-san-tests.txt": "fc6907d6388224fdf30edfc74786c296f8442081a28c7b003357d74b1905025a",
+    "console-tooling-source-hashes.json": "8899cbaa3e23007558e57d965bdaca8615ca49161c225a3771b2c0dec58ba20c",
+    "console-tooling-stdlib-snapshot.json": "7a00f2d6190b7177cc82e70d56a4f3e70207c08364d04b5bc407e90938a3428c",
+    "console-tooling-vim-automatic.json": "03d1b5cba78ba847d21d192dff19c25cfb87657a5cefce07ce9ea228ebf0918f",
+    "console-tooling-vim-automatic.txt": "a73ca3d97063be8ded1fc91d5bdba9f0197842e3c189fa0e3b19b1056180d4dd",
+    "console-tooling-vscode-development-host.txt": "2d51c63898752de399f28402781bc406990e42ac5d789e6743e39faef5614f38",
+    "console-tooling-vscode-final-host.txt": "6b2872cad016dbfa4a0ff2763e0cc17463add048c835c45b0603715c769f52ae",
+    "console-tooling-vscode-host.txt": "8c638fe6498be135fd8c2cca82f7b281d3caaba8fd6743923c0b0fbda5551eb9",
+    "console-tooling-vscode-unit-2.txt": "70f4f106af2f53dba53a061d3598c22cad5fb34c5be896a3ff6a30427f307cb8",
+    "console-tooling-vscode-unit-final.txt": "2901484a866d6d35f12c7d577a3755f9cd4d304eba5c6c1fe686d3da6f25c116",
+    "console-tooling-vscode-unit.txt": "6e7144c4aea0d4c2d07392d8c98b5af91e0705e13a0b3284327961ff22c5e64f"
+  },
+  "documentation_correction": "Step40 final integration clarifies inherited 72-level status wording; no test result changed. Original record preserved in console-tooling-results-before-step40-correction.json."
+}

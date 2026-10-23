@@ -2,6 +2,7 @@
 #include "void/path.hpp"
 #include "void/numeric.hpp"
 #include "void/temporal_ops.hpp"
+#include "void/console_ops.hpp"
 #include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
 #include <algorithm>
@@ -33,7 +34,7 @@ using Type = ir::Type;
 // not accumulate in every recursive frame on the supported 1 MiB stack.
 template<class Work> VOID_SEMANTIC_HANDLER decltype(auto) frontend_case(Work&& work) { return work(); }
 enum class TokenKind { invalid, name, number, path, string, symbol, newline, indent, dedent, end };
-struct Token { TokenKind kind; std::string text; std::size_t offset; std::string decoded = {}; std::optional<std::size_t> source_width = {}; };
+struct Token { TokenKind kind; std::string text; std::size_t offset; std::string decoded = {}; std::optional<std::size_t> source_width = {}; bool format_spec = false; };
 using Code = DiagnosticCode;
 SourceSpan span(const SourceFile& source, const Token& token) {
     auto begin = std::min(token.offset, source.text().size());
@@ -66,6 +67,10 @@ struct EditorProbe {
     std::string module;
     std::size_t offset;
     EditorAssistance result;
+    bool operator_context = false;
+    std::map<std::string,std::set<std::string>> candidate_targets;
+    std::map<std::string,unsigned> candidate_occurrences;
+    unsigned operator_occurrences = 0;
 };
 struct EditorProbeFound {};
 class Diagnostics {
@@ -145,7 +150,7 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
-    "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
+    "operator", "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true) {
     const auto& text = source.text();
@@ -219,7 +224,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
                             for(auto& t:embedded)if(t.kind!=TokenKind::end)tokens.push_back(std::move(t));
                             emit(TokenKind::symbol,")",hole.end);emit(TokenKind::symbol,",",hole.spec_begin);
                             Token spec{TokenKind::string,"\""+text.substr(hole.spec_begin,hole.spec_end-hole.spec_begin)+"\"",hole.spec_begin,text.substr(hole.spec_begin,hole.spec_end-hole.spec_begin)};
-                            spec.source_width=hole.spec_end-hole.spec_begin;tokens.push_back(std::move(spec));emit(TokenKind::symbol,")",hole.spec_end);
+                            spec.source_width=hole.spec_end-hole.spec_begin;spec.format_spec=hole.spec_begin>hole.begin && text[hole.spec_begin-1]==':';tokens.push_back(std::move(spec));emit(TokenKind::symbol,")",hole.spec_end);
                         }
                     }
                     emit(TokenKind::symbol,")",p-1);
@@ -293,6 +298,7 @@ struct Pattern {
     Pattern& operator=(Pattern&&) = default;
     enum class Kind { wildcard, capture, value, range, constructor, list, dictionary } kind=Kind::wildcard;
     Token token{TokenKind::name,"",0};std::string spelling;
+    Token variant_token{TokenKind::name,"",0}; // Written final component, including whitespace around dots.
     std::vector<Pattern> children;std::vector<std::unique_ptr<Expr>> values;std::vector<Token> fields;
     std::vector<unsigned> indexes;
     std::vector<Type> type_arguments;
@@ -315,6 +321,7 @@ struct Expr {
     std::string initializer, display_adapter;
     std::vector<unsigned> field_indexes, argument_indexes;
     std::string literal_text;
+    std::optional<std::string> format_specification;
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
     unsigned slot = 0;
@@ -328,17 +335,44 @@ struct Expr {
     Expr(Expr&&) = default;
     Expr& operator=(Expr&&) = default;
 };
+// Owned, trivia-free specification syntax; runtime-producing helper bodies remain
+// ordinary reloadable code. Written expressions and exact selected targets stay distinct.
+std::string format_specification_syntax(const Expr& root) {
+    std::string out;auto field=[&](const std::string& value){out+=std::to_string(value.size())+":"+value;};
+    std::vector<const Expr*> pending{&root};
+    while(!pending.empty()) {
+        const auto& e=*pending.back();pending.pop_back();
+        field(std::to_string(static_cast<unsigned>(e.kind)));field(e.token.text);field(e.op);field(e.target);field(e.qualifier);field(std::to_string(e.parts.size()));
+        field(std::to_string(e.names.size()));field(std::to_string(e.omitted.size()));field(std::to_string(e.patterns.size()));
+        for(const auto& name:e.names)field(name.text);
+        for(auto i=e.parts.rbegin();i!=e.parts.rend();++i)pending.push_back(i->get());
+        for(const auto& omitted:e.omitted)pending.push_back(omitted.get());
+        std::vector<const Pattern*> patterns;for(const auto& pattern:e.patterns)patterns.push_back(&pattern);
+        for(std::size_t n=0;n<patterns.size();++n) {
+            const auto& pattern=*patterns[n];field(std::to_string(static_cast<unsigned>(pattern.kind)));field(pattern.spelling);field(pattern.exclusive?"exclusive":"inclusive");field(pattern.rest?"rest":"exact");
+            field(std::to_string(pattern.fields.size()));field(std::to_string(pattern.values.size()));field(std::to_string(pattern.children.size()));
+            for(const auto& name:pattern.fields)field(name.text);
+            for(const auto& value:pattern.values)pending.push_back(value.get());
+            for(const auto& child:pattern.children)patterns.push_back(&child);
+        }
+    }
+    return out;
+}
+
 struct Statement {
     std::size_t source_end=0;
     enum class Kind { scoped, deferred, match, variable, assignment, expression, returned, conditional, loop, broken, continued, no_op } kind;
     Token token;
     std::optional<Pattern> pattern;
-    std::string name, op, constant_syntax;
+    std::string name, op, constant_syntax, compound_target;
+    Token compound_token{TokenKind::symbol,"",0};
     std::optional<Type> annotation;
     std::unique_ptr<Expr> expression;
     std::unique_ptr<Expr> index;
     std::unique_ptr<Expr> selection;
     std::unique_ptr<Expr> range_end;
+    std::unique_ptr<Expr> compound_conversion;
+    unsigned compound_slot=0;
     Token binder{TokenKind::name,"",0}, index_binder{TokenKind::name,"",0};
     unsigned index_slot=0;
     bool reverse=false, exclusive=false;
@@ -367,6 +401,7 @@ struct ConstructionContext {
 struct GenericParameter { Token token; std::optional<Type> constraint; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
+    bool collection_adapter=false;
     bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
     Type task=Type::none;
     unsigned binding_ordinal=0;
@@ -391,6 +426,8 @@ struct Function {
     bool file_private = false, parse_failed = false;
     std::string symbol, visibility = "public";
     std::string lexical_owner, lexical_parent;
+    Type operator_owner=Type::none;
+    std::string operator_glyph, operator_pattern;
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
     bool receiver_mutates = false, initializer = false;
@@ -410,6 +447,25 @@ struct Function {
     std::size_t source_end = 0;
     std::vector<Type> locals;
 };
+// Presentation uses the selected compiler function, including concrete generic
+// types. Source identities remain shared for navigation and references.
+std::string editor_signature(const Function& f) {
+    std::string out=f.visibility+" ";
+    if(!f.operator_glyph.empty())out+="operator "+f.operator_glyph;
+    else out+=f.token.text;
+    out+="(";
+    for(unsigned n=0;n<f.parameters.size();++n){if(n)out+=", ";const auto& p=f.parameters[n];out+=p.token.text+": "+ir::type_name(p.type);if(p.default_expression)out+=" = …";}
+    out+=") -> "+ir::type_name(f.result);
+    if(!f.operator_glyph.empty())out+="\nDeclared by "+ir::type_name(f.operator_owner);
+    else if(f.receiver)out+="\nDeclared by "+ir::type_name(f.receiver->type);
+    if(f.capability_contract.empty())return out+"\nEffects: pending analysis";
+    out+=f.asynchronous?"\nEffects: asynchronous":"\nEffects: synchronous";
+    auto effects=[&](const auto& origins,const std::string& label){for(const auto& origin:origins){out+="; "+label+" ";if(f.receiver && origin.parameter==0)out+="self";else {auto n=origin.parameter-(f.receiver?1u:0u);out+=n<f.parameters.size()?f.parameters[n].token.text:"?";}for(auto field:origin.path)out+="["+std::to_string(field)+"]";}};
+    effects(f.reference_effects.mutations,"mutates");effects(f.reference_effects.retained,"retains");effects(f.reference_effects.required_mutable,"requires mutable");
+    for(const auto& [path,fact]:f.reference_effects.returned)if(fact.readonly)out+="; returns readonly reference";
+    return out;
+}
+
 struct Constant {
     Statement declaration;
     bool file_private = false;
@@ -461,6 +517,7 @@ struct Structure {
     unsigned layout_state = 0, default_state = 0, layout_depth = 1;
     std::size_t expanded_fields = 0;
     Function* initializer = nullptr;
+    std::list<Function> operators;
 };
 static_assert(!std::is_copy_constructible_v<Pattern> && !std::is_copy_assignable_v<Pattern>);
 static_assert(std::is_move_constructible_v<Pattern> && std::is_move_assignable_v<Pattern>);
@@ -600,11 +657,14 @@ class Parser {
         if (!at(")")) do {
             bool readonly_parameter=accept("const");
             auto token = name(); nodes=0; Parameter parameter{token,Type::none};
-            if(accept(":")) parameter.type=type();
+            if(accept(":")) {
+                const auto begin=p;parameter.type=type();
+                if(!f.operator_glyph.empty()){std::string spelling;for(auto n=begin;n<p;++n)spelling+=std::to_string(tokens[n].text.size())+":"+tokens[n].text;f.operator_pattern+=std::to_string(spelling.size())+":"+spelling;}
+            }
             else if(!at("=") || !defaults || !f.generics.empty()) error(source,token,Code::type_mismatch,"A parameter requires an explicit type or a concrete compile-time default; generic parameter types must be explicit.");
             parameter.type.readonly=readonly_parameter;
             if (accept("=")) {
-                if(!defaults) error(source,tokens[p-1],Code::argument_count,"Interface requirements cannot declare parameter defaults.");
+                if(!defaults) error(source,tokens[p-1],Code::argument_count,f.operator_glyph.empty()?"Interface requirements cannot declare parameter defaults.":"Operator operands cannot declare defaults.");
                 auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
                 parameter.default_end = peek().offset;
                 for (auto n = begin; n < p; ++n) parameter.default_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
@@ -612,6 +672,23 @@ class Parser {
             f.parameters.push_back(std::move(parameter));
         } while (accept(","));
         need(")"); if (accept("->")) {nodes=0;f.result = type();}
+    }
+    void operator_declaration(Structure& owner,std::string visibility) {
+        need("operator");Function f;f.visibility=std::move(visibility);f.token=take();f.operator_glyph=f.token.text;f.operator_pattern=std::to_string(f.operator_glyph.size())+":"+f.operator_glyph;
+        if(f.operator_glyph=="!=")error(source,f.token,Code::syntax,"Declare operator ==; != is derived from that equality declaration.");
+        if(!ir::operator_arity(f.operator_glyph,1) && !ir::operator_arity(f.operator_glyph,2))error(source,f.token,Code::syntax,"Unsupported operator declaration '"+f.operator_glyph+"'.");
+        if(at("<"))error(source,peek(),Code::syntax,"Operators cannot introduce operator-specific type parameters.");
+        parameters(f,false);
+        if(!ir::operator_arity(f.operator_glyph,f.parameters.size()))error(source,f.token,Code::argument_count,"Operator has invalid arity; only unary +/-, or two operands for the approved binary glyphs, are permitted.");
+        for(const auto& operand:f.parameters)if(!operand.type.readonly)error(source,operand.token,Code::readonly,"Operator operands require explicit const.");
+        if(f.result==Type::none)error(source,f.token,Code::type_mismatch,"An operator requires an explicit storable result type.");
+        if((f.operator_glyph=="==" || f.operator_glyph=="<" || f.operator_glyph==">" || f.operator_glyph=="<=" || f.operator_glyph==">=") && f.result!=Type::boolean)error(source,f.token,Code::type_mismatch,"Equality and ordering operators must return exactly bool.");
+        f.operator_owner=Type(owner.definition,owner.definition->managed?Type::managed_ref:Type::aggregate);
+        auto begin=p;{FunctionScope scope(parsing_function,f);f.body=block();}
+        for(auto n=begin;n<p;++n)f.body_syntax+=std::to_string(tokens[n].text.size())+":"+tokens[n].text;
+        f.source_end=peek().offset;f.parse_failed=diagnostics.within(source,f.token.offset,f.source_end);f.substitutions=substitutions;
+        if(f.operator_glyph=="=="){owner.definition->custom_equality=true;owner.definition->custom_equality_offset=f.token.offset;}
+        owner.operators.push_back(std::move(f));
     }
     bool at(const std::string& text) const { return peek().text == text; }
     Token take() { auto result = peek(); if (p + 1 < tokens.size()) ++p; return result; }
@@ -944,7 +1021,7 @@ class Parser {
                 Statement s(Statement::Kind::assignment, name());s.name=s.token.text;
                 if(indexes>1 || after_index)s.selection=postfix(std::make_unique<Expr>(Expr::Kind::name,s.token));
                 else {while(accept("."))s.fields.push_back(name());if(accept("[")){s.index=expression();need("]");}}
-                s.op = take().text;
+                s.compound_token=take();s.op = s.compound_token.text;
                 if (op == "++" || op == "--") {
                     s.expression = std::make_unique<Expr>(Expr::Kind::literal, s.token); s.expression->literal_text = "1";
                 } else s.expression = expression();
@@ -959,6 +1036,7 @@ public:
         :source(s),tokens(std::move(syntax)),diagnostics(d),substitutions(std::move(bindings)),instantiating(true) {
         tokens.push_back({TokenKind::end,"<end of file>",tokens.empty()?0:tokens.back().offset});
     }
+    const auto& syntax_tokens() const { return tokens; }
     void parse(Unit& unit) {
         auto before = diagnostics.size();
         Function application; application.token={TokenKind::name,"$application",0}; application.result=Type::i32; application.visibility="private";
@@ -997,6 +1075,10 @@ public:
                 Statement tag(Statement::Kind::variable,enumeration.token);tag.name="$tag";tag.annotation=Type::i32;enumeration.fields.push_back(std::move(tag));
                 need(":");newline();need("<indent>");std::set<std::string> cases;
                 while(!at("<dedent>") && !at("<end of file>")) {
+                    std::string visibility="public";
+                    if(at("private") || at("internal") || at("public"))visibility=take().text;
+                    if(at("operator")){operator_declaration(enumeration,visibility);continue;}
+                    if(visibility!="public")error(source,peek(),Code::syntax,"Enum variant visibility modifiers are not supported.");
                     auto token=name();enumeration.case_tokens.push_back(token);if(!cases.insert(token.text).second)error(source,token,Code::duplicate,"Duplicate enum variant.");
                     ir::SumCase variant{token.text,static_cast<unsigned>(enumeration.fields.size()),0};
                     if(accept("(")) {if(!at(")"))do {
@@ -1006,7 +1088,7 @@ public:
                     enumeration.definition->cases.push_back(variant);newline();
                 }
                 need("<dedent>");if(cases.empty())error(source,enumeration.token,Code::syntax,"An enum requires at least one variant.");
-                enumeration.source_end=peek().offset;unit.structures.push_back(std::move(enumeration));continue;
+                enumeration.source_end=peek().offset;unit.functions.splice(unit.functions.end(),enumeration.operators);unit.structures.push_back(std::move(enumeration));continue;
             }
             if (accept("interface")) {
                 Structure structure; structure.token=name(); structure.visibility=f.visibility;
@@ -1037,6 +1119,8 @@ public:
                 while (fields && !at("<dedent>") && !at("<end of file>")) {
                     std::string visibility="public";
                     if(at("private") || at("internal") || at("public"))visibility=take().text;
+                    if(at("operator")){operator_declaration(structure,visibility);continue;}
+                    if((at("const") || at("async") || at("virtual") || at("override") || at("static") || at("func")) && peek(1).text=="operator")error(source,peek(),Code::syntax,"Operators permit only one optional visibility modifier; const belongs on each operand.");
                     bool readonly=accept("const");
                     if(at("private") || at("internal") || at("public") || at("const"))error(source,peek(),Code::syntax,"Duplicate, conflicting or out-of-order field modifiers; use visibility then const.");
                     bool composition = at("using") && peek(1).text != ":";
@@ -1061,7 +1145,7 @@ public:
                 structure.source_end=peek().offset;
                 if(!instantiating && !structure.generics.empty()) {
                     template_syntax(structure);structure.syntax.assign(tokens.begin()+start,tokens.begin()+p);unit.generic_structures.push_back(std::move(structure));
-                } else {structure.generics.clear();unit.structures.push_back(std::move(structure));}
+                } else {structure.generics.clear();unit.functions.splice(unit.functions.end(),structure.operators);unit.structures.push_back(std::move(structure));}
                 continue;
             }
             if(accept("property")) {
@@ -1226,6 +1310,14 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
     return result;
 }
 ir::ConstantValue constant_value(const SourceFile&, const Expr&);
+void check_dictionary_key(const SourceFile& source,const Token& use,Type key,const std::map<std::string,std::unique_ptr<Unit>>& units) {
+    if(auto owner=ir::dictionary_equality_owner(key)) {
+        std::vector<RelatedLocation> related;
+        if(auto found=units.find(owner->definition->module_identity);found!=units.end())related.push_back({span(found->second->source,Token{TokenKind::symbol,"==",owner->definition->custom_equality_offset}),"Custom equality declared by "+Type::key(*owner)+"."});
+        error(source,use,Code::unsupported_type,"Dictionary key contains a type defining custom operator ==.","Use an explicit scalar, string or eligible value key projection; custom equality has no authorized hash contract.",std::move(related));
+    }
+    if(!ir::dictionary_key_supported(key))error(source,use,Code::unsupported_type,"Unsupported dictionary key type.");
+}
 class Semantics {
     const SourceFile& source;
     Unit& unit;
@@ -1249,7 +1341,8 @@ class Semantics {
             auto found = scope->find(name); if (found != scope->end()) return &found->second;
         }
         if(enclosing && current)if(auto* outer=enclosing(name)) {
-            const bool snapshot=outer->owner->receiver && outer->slot==outer->owner->receiver->slot && outer->type.kind==Type::aggregate;
+            const bool snapshot=(outer->owner->receiver && outer->slot==outer->owner->receiver->slot && outer->type.kind==Type::aggregate) ||
+                (!outer->owner->operator_glyph.empty() && outer->readonly && std::any_of(outer->owner->parameters.begin(),outer->owner->parameters.end(),[&](const auto& p){return p.slot==outer->slot;}));
             Type cell;
             if(!snapshot && outer->owner->captured_locals.contains(outer->slot))cell=outer->owner->captured_locals.at(outer->slot);
             else {
@@ -1410,7 +1503,7 @@ class Semantics {
             error(source,token,Code::ambiguous,"Ambiguous promoted member '"+token.text+"': "+routes+".","Qualify the intended embedded field explicitly; types and signatures do not select a component.",std::move(related));
         }
         if(selected.status==ir::MemberSelection::found) {
-            if(selected.method.empty()){auto path_owner=t;for(auto index:selected.path){if(path_owner.definition->native_resource)error(source,token,Code::unsupported_type,"Native resource payload is binding-private.");path_owner=ir::field_type(path_owner,index);}}
+            if(selected.method.empty()){auto path_owner=t;for(auto index:selected.path){if(path_owner.definition->native_resource && !(console::session_type(path_owner) && unit.identity==console::source_module))error(source,token,Code::unsupported_type,"Native resource payload is binding-private.");path_owner=ir::field_type(path_owner,index);}}
             const Function* target=nullptr;
             if(!selected.method.empty()) for(const auto& [id,u]:units) for(const auto& f:u->functions) if(f.symbol==selected.method) target=&f;
             return {selected.path,target};
@@ -1720,7 +1813,7 @@ class Semantics {
 
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
         e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
-        if(diagnostics.editor) editor_call(e,target,first,constructor);
+        if(diagnostics.editor) {editor_call(e,target,first,constructor);if(first==1 && target.token.text=="format" && e.parts.size()==2)editor_format(*e.parts[1],e.parts[0]->type);}
         if(e.interface_call) {
             std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
             while(!pending.empty()){auto* part=pending.back();pending.pop_back();if(part->kind==Expr::Kind::awaited)error(source,part->token,Code::unsupported_type,"await cannot retain a prepared interface receiver across suspension.","Await arguments into locals before selecting the interface method.");for(const auto& child:part->parts)pending.push_back(child.get());}
@@ -1762,7 +1855,13 @@ class Semantics {
             if (!e.initializer.empty() || std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
                 const auto& field = *structure.effective_fields[n].second;
                 auto& field_owner=*structure.effective_fields[n].first;
-                if(field.expression)continue;
+                if(field.expression){
+                    if(initializer_declaration && console::endpoint_type(*field.annotation)){
+                        auto value=std::make_unique<Expr>(Expr::Kind::literal,field.token);value->type=*field.annotation;value->aggregate_value=structure.defaults.fields.at(n);value->slot=n;e.omitted.push_back(std::move(value));
+                    }
+                    continue;
+                }
+                if(console::endpoint_type(*field.annotation))continue; // Required token has no implicit constructor.
                 if(ir::array_type(*field.annotation) && needs_array_recipe(*field.annotation)) {auto value=array_recipe(*field.annotation,initializer_declaration ? field.token : e.token,runtime,field_owner);value->slot=n;e.omitted.push_back(std::move(value));continue;}
                 if(field.annotation->kind!=Type::aggregate || (field.annotation->definition && (field.annotation->definition->callable || !field.annotation->definition->cases.empty())))continue;
                 auto [child_owner,child] = owned_structure(*field.annotation);
@@ -1778,7 +1877,8 @@ class Semantics {
         }
     }
     void construction(Expr& e, Unit& owner, Structure& structure, bool runtime, Unit& access) {
-        if(structure.definition->native_resource)error(source,e.token,Code::unsupported_type,"Native resources are nonforgeable; use the checked binding factory.");
+        if(console::endpoint_type(Type(structure.definition)) && unit.identity!=console::source_module)error(source,e.token,Code::unsupported_type,"Console endpoints are compiler-owned borrowed tokens; use console.stdin/stdout/stderr.");
+        if(structure.definition->native_resource && !(console::session_type(Type(structure.definition)) && unit.identity==console::source_module))error(source,e.token,Code::unsupported_type,"Native resources are nonforgeable; use the checked binding factory.");
         if(structure.definition->interface_type) error(source,e.token,Code::initializer,"An interface cannot be constructed; convert a complete conforming managed value.");
         defaults(owner,structure);
         if (structure.definition->managed && !runtime) error(source,e.token,Code::constant_call,"Managed allocation is not a compile-time expression.");
@@ -1812,7 +1912,7 @@ class Semantics {
         if (!structure.initializer) for (unsigned n=0;n<structure.effective_fields.size();++n) {
             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
             Type t = *field.annotation;
-            if (ir::requires_initialization(t) && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
+            if (ir::requires_initialization(t) && !(console::endpoint_type(t) && field.expression) && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
                 if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),n,access.identity,lexical_owner()))
                     error(source,e.token,Code::visibility,"An inaccessible required field cannot be supplied by this caller: "+field.name+".","Provide an accessible owner initializer or factory.",{{span(field_owner.source,field.token),"Required field declared here."}});
                 error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
@@ -1860,6 +1960,18 @@ class Semantics {
             return concrete_function(e,resolve(qualified),1).result;
         }
         return anchor(qualified);
+    }
+    VOID_SEMANTIC_HANDLER std::optional<Type> operator_anchor(Expr& e) {
+        using K=Expr::Kind;
+            std::vector<std::optional<Type>> hints;for(auto& part:e.parts)hints.push_back(anchor(*part));
+            std::vector<Type> operands;bool known=true;
+            for(unsigned n=0;n<e.parts.size();++n){auto type=hints[n];auto& part=*e.parts[n];
+                if(!type && part.token.text=="null" && hints.size()==2 && hints[1-n] && (ir::reference_value(*hints[1-n]) || (hints[1-n]->definition && hints[1-n]->definition->callable))){type=hints[1-n];type->nullable=true;}
+                if(!type && part.kind==K::literal && !part.literal_text.empty()){auto opposite=hints.size()==2?hints[1-n]:std::optional<Type>{};type=opposite && numeric::number(*opposite)?*opposite:decimal(part)?Type::f32:Type::i32;}
+                if(!type){known=false;break;}operands.push_back(*type);
+            }
+            if(known){auto selected=ir::select_operator(*root.member_catalog,e.op,operands,unit.identity,lexical_owner());if(selected.status==ir::MemberSelection::found)for(const auto& f:root.member_catalog->functions)if(f.name==selected.method)return f.result;}
+        return {};
     }
     // Hints resolve typed anchors without prematurely defaulting untyped literals.
     std::optional<Type> anchor(Expr& e) {
@@ -1931,11 +2043,13 @@ class Semantics {
             }
             return {};
         }
+        if((e.kind==K::binary || e.kind==K::unary) && (e.op=="+" || e.op=="-" || e.op=="*" || e.op=="/" || e.op=="%"))if(auto selected=operator_anchor(e))return selected;
         if (e.op == "not" || e.op == "and" || e.op == "or" || e.op == "==" || e.op == "!=" || e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") return Type::boolean;
         for (auto& part : e.parts) if (auto t = anchor(*part)) return t;
         return {};
         } catch (const CompilationError&) { return {}; }
           catch (const Poison&) { return {}; }
+          catch (const std::invalid_argument&) { return {}; }
     }
     bool decimal(const Expr& e) {
         if (e.kind == Expr::Kind::literal && e.literal_text.find('.') != std::string::npos) return true;
@@ -2031,7 +2145,7 @@ class Semantics {
                 for(auto& [name,candidate]:candidates)out.candidates.push_back(std::move(candidate));
                 throw EditorProbeFound{};
             }
-            if(t.nullable || !t.definition || t.definition->native_resource || t.definition->callable || !t.definition->cases.empty()) throw EditorProbeFound{};
+            if(t.nullable || !t.definition || (t.definition->native_resource && !console::session_type(t)) || t.definition->callable || !t.definition->cases.empty()) throw EditorProbeFound{};
             std::set<std::string> names;
             for(const auto& [id,u]:units) {
                 for(const auto& structure:u->structures) for(const auto& f:structure.definition->fields) names.insert(f.name);
@@ -2044,6 +2158,7 @@ class Semantics {
                     if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2))
                         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset);
                 } else {
+                    if(t.definition->native_resource)continue; // Source methods remain visible; native payloads do not.
                     auto type=t;bool readonly=false;std::string declaring;
                     for(auto field:selected.path){readonly|=type.definition->fields[field].readonly;declaring=type.definition->fields[field].owner;type=ir::field_type(type,field);}
                     if(auto* candidate=add(name,type,5)){if(readonly)candidate->detail="const "+candidate->detail;candidate->documentation="Stored field declared by "+declaring+".";}
@@ -2069,23 +2184,27 @@ class Semantics {
             if(e.qualifier.empty()) {
                 for(const auto& [name,owners]:unit.qualifiers) candidates.emplace(name,EditorCandidate{name,"import",9});
                 for(const auto& name:{"true","false","null","not","match","if","func"}) candidates.emplace(name,EditorCandidate{name,"keyword",14});
-                for(const auto& name:{"string","format"})if(!candidates.contains(name))candidates.emplace(name,EditorCandidate{name,name==std::string("string")?"string(value) -> string":"format(value, spec: string) -> result<string, string>",3,{},"Invariant type-aware display and formatting."});
+                for(const auto& name:{"string","format","print"})if(!candidates.contains(name))candidates.emplace(name,EditorCandidate{name,name==std::string("print")?"print(*values, sep = space, end = newline, file = console.stdout, flush = false)":name==std::string("string")?"string(value) -> string":"format(value, spec: string) -> result<string, string>",3,{},"Invariant type-aware display and formatting."});
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
         for(auto& [name,candidate]:candidates) {if(out.candidates.size()==256)break;out.candidates.push_back(std::move(candidate));}
         throw EditorProbeFound{};
     }
-    // Construct optional<Type> probe arguments only on cold editor paths. Debug
-    // recursive semantic frames must still reach their guard on a 1 MiB stack.
-    VOID_SEMANTIC_HANDLER void editor_name_candidates(Expr& e) {editor_candidates(e);}
+    // Borrow the expected type: even an unused by-value probe argument reserves
+    // copy storage in recursive Debug frames that must fit the 1 MiB stack.
+    VOID_SEMANTIC_HANDLER void editor_name_candidates(Expr& e,const std::optional<Type>& expected) {
+        if(e.qualifier.empty() && expected && expected->definition && expected->definition->result_type)
+            for(unsigned tag=0;tag<2;++tag){const auto name=tag?"Err":"Ok";diagnostics.editor->result.candidates.push_back({name,std::string(name)+"("+(tag?"error: ":"value: ")+ir::type_name(ir::field_type(*expected,tag?2:1))+") -> "+ir::type_name(*expected),3,{},"Construct the contextual result variant."});}
+        editor_candidates(e);
+    }
     VOID_SEMANTIC_HANDLER void editor_field_candidates(Expr& e,const Type& receiver) {
         auto type=receiver;
         if(e.parts[0]->kind==Expr::Kind::name)if(auto* variable=lookup(e.parts[0]->token.text))type.readonly|=variable->readonly;
         editor_candidates(e,type);
     }
     Type expression_impl(Expr& e, std::optional<Type> expected) {
-        if(editor_cursor(e) && e.kind==Expr::Kind::name) editor_name_candidates(e);
+        if(editor_cursor(e) && e.kind==Expr::Kind::name) editor_name_candidates(e,expected);
         switch (e.kind) {
         case Expr::Kind::spawned:return spawned_expression(e);
         case Expr::Kind::awaited:return awaited_expression(e);
@@ -2208,13 +2327,28 @@ class Semantics {
     }
     Type sum_expression(Expr& e,Type type,unsigned tag,unsigned first) {
         const auto& variant=type.definition->cases.at(tag);
+        // Dirty calls may not yet have all payloads. Visit the written arguments
+        // with their real context before reporting arity, just as ordinary calls do.
+        if(diagnostics.editor && e.parts.size()-first!=variant.count)
+            for(unsigned n=0;n<std::min<std::size_t>(e.parts.size()-first,variant.count);++n)expression(*e.parts[first+n],ir::field_type(type,variant.begin+n));
         if(e.parts.size()-first!=variant.count || std::any_of(e.names.begin(),e.names.end(),[](const auto& name){return !name.text.empty();}))error(source,e.token,Code::argument_count,"Incorrect variant payload arguments.");
         for(unsigned n=0;n<variant.count;++n)expect(expression(*e.parts[first+n],ir::field_type(type,variant.begin+n)),ir::field_type(type,variant.begin+n),e.parts[first+n]->token);
         if(first)e.parts.erase(e.parts.begin(),e.parts.begin()+first);
         e.kind=Expr::Kind::sum;e.slot=tag;return e.type=type;
     }
-    Type result_expression(Expr& e,std::optional<Type> expected) {
+    Function result_editor_target(Type type,unsigned tag,Token token) {
+        Function target;target.token=token;target.symbol="$result::"+Type::key(type)+"|"+ir::capability_key(type)+"::"+(tag?"Err":"Ok");target.result=type;
+        target.parameters.push_back({Token{TokenKind::name,tag?"error":"value",token.offset},ir::field_type(type,tag?2:1)});
+        builtin_record(target,"Construct the selected result variant; only its active payload is stored. Ok(null) is successful.");
+        return target;
+    }
+    // Keep the result signature's Function temporary out of the recursive
+    // expression dispatcher, including when Release would inline this handler.
+    VOID_SEMANTIC_HANDLER Type result_expression(Expr& e,std::optional<Type> expected) {
         if(!expected || !expected->definition || !expected->definition->result_type)error(source,e.token,Code::type_mismatch,"Ok/Err require a contextual result<t, e> type.","Annotate the variable or the enclosing function result.");
+        auto target=result_editor_target(*expected,e.token.text=="Ok"?0:1,e.token);
+        if(diagnostics.editor)editor_call(e,target,0,false);
+        e.source_target=target.symbol;
         return sum_expression(e,*expected,e.token.text=="Ok"?0:1,0);
     }
     std::optional<Type> enum_expression(Expr& e,bool call) {
@@ -2225,9 +2359,22 @@ class Semantics {
         auto [owner,structure]=structure_lookup(unit,root,units,spelling,base.token);
         if(!structure || structure->definition->cases.empty())return {};
         const auto& variants=structure->definition->cases;
+        if(editor_cursor(e)) {
+            auto& out=diagnostics.editor->result;
+            if(!invalid_function && !unit.failed_import)for(unsigned n=0;n<variants.size();++n) {
+                Function target;target.token=structure->case_tokens[n];target.result=Type(structure->definition);
+                for(unsigned i=0;i<variants[n].count;++i){const auto& field=structure->fields[variants[n].begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,variants[n].begin+i)});}
+                std::string signature=target.token.text;
+                if(!target.parameters.empty()){signature+="(";for(const auto& p:target.parameters){if(signature.back()!='(')signature+=", ";signature+=p.token.text+": "+ir::type_name(p.type);}signature+=")";}
+                signature+=" -> "+ir::type_name(target.result);
+                out.candidates.push_back({target.token.text,signature,20,{},source_documentation(owner->source,target.token.offset)});
+            }
+            throw EditorProbeFound{};
+        }
         auto found=std::find_if(variants.begin(),variants.end(),[&](const auto& variant){return variant.name==e.token.text;});
         if(found==variants.end())error(source,e.token,Code::unknown_identifier,"Unknown enum variant '"+e.token.text+"'.");
         if(!call && found->count)error(source,e.token,Code::argument_count,"Variant requires its payload arguments.");
+        if(diagnostics.editor && call){Function target;target.token=e.token;target.result=Type(structure->definition);for(unsigned i=0;i<found->count;++i){const auto& field=structure->fields[found->begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,found->begin+i)});}editor_call(e,target,1,false);diagnostics.editor->result.documentation=source_documentation(owner->source,structure->case_tokens[found-variants.begin()].offset);}
         auto result=sum_expression(e,Type(structure->definition),static_cast<unsigned>(found-variants.begin()),1);e.target=structure->definition->identity+"::variant::"+found->name;return result;
     }
     VOID_SEMANTIC_HANDLER Type dictionary_expression(Expr& e,std::optional<Type> expected) {
@@ -2238,7 +2385,7 @@ class Semantics {
             if(*key==Type::null_value || *value==Type::null_value || *key==Type::none || *value==Type::none)error(source,e.token,Code::unsupported_type,"Dictionary entries require concrete types or a typed context.");expected=unit.make_dictionary(*key,*value);
         }
         if(expected->kind!=Type::dictionary)error(source,e.token,Code::type_mismatch,"Dictionary literal requires dictionary context.");
-        if(!ir::dictionary_key_supported(ir::dictionary_key(*expected)))error(source,e.token,Code::unsupported_type,"Unsupported dictionary key type.");
+        check_dictionary_key(source,e.token,ir::dictionary_key(*expected),units);
         for(unsigned n=0;n<e.parts.size();n+=2){expect(expression(*e.parts[n],ir::dictionary_key(*expected)),ir::dictionary_key(*expected),e.parts[n]->token);expect(expression(*e.parts[n+1],ir::dictionary_value(*expected)),ir::dictionary_value(*expected),e.parts[n+1]->token);}
         return e.type=*expected;
     }
@@ -2401,12 +2548,34 @@ class Semantics {
         }
         for (unsigned n=0;n+1<selected.path.size();++n) embedded_receiver(e.parts[0],selected.path[n],e.token);
         auto owner=e.parts[0]->type;
-        if(owner.definition && owner.definition->native_resource)error(source,e.token,Code::unsupported_type,"Native resource payload is binding-private.");
+        if(owner.definition && owner.definition->native_resource && !(console::session_type(owner) && unit.identity==console::source_module))error(source,e.token,Code::unsupported_type,"Native resource payload is binding-private.");
         e.slot=selected.path.back(); e.target=owner.definition->fields[e.slot].owner+"::field::"+e.token.text;
         e.event=owner.definition->fields[e.slot].event;e.event_owner=owner.definition->fields[e.slot].owner;if(e.event && !allow_event)error(source,e.token,Code::invalid_value,"Events support subscriptions and owner emission; subscriber storage cannot escape.");
         return e.type=ir::field_type(owner,e.slot);
     }
+#include "collection_display.inc"
 #include "display_semantics.inc"
+    VOID_SEMANTIC_HANDLER void editor_format(const Expr& spec,Type type) {
+        if(!diagnostics.editor || diagnostics.editor->module!=unit.identity || spec.kind!=Expr::Kind::literal || spec.aggregate_value.text!="_void_editor_cursor_")return;
+        auto& out=diagnostics.editor->result;
+        if(invalid_function || unit.failed_import || type==error_type)throw EditorProbeFound{};
+        std::vector<std::string> patterns={"<12",">12","^12"};
+        if(numeric::number(type)) {
+            patterns.insert(patterns.end(),{"000","0.00","0.00#","#,##0.00","+0;-0;0","0%","D","F2","N2","P2","E3","e3"});
+            if(numeric::integer(type))patterns.insert(patterns.end(),{"X","x","B","b"});
+        } else if(type.definition && type.definition->module_identity=="/@stdlib/time.void") {
+            patterns.insert(patterns.end(),{"yyyy-MM-dd","HH:mm:ss","HH:mm:ss.fffffffff","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd'T'HH:mm:sszzz","yyyy-MM-dd HH:mm:ss VV","dd:hh:mm:ss.fffffffff","MMMM dd, yyyy","hh:mm:ss tt","zzzz","VV"});
+        }
+        for(const auto& pattern:patterns)try {
+            if(numeric::number(type))formatting::validate(numeric::display_number(0,type).kind,formatting::parse_numeric(pattern));
+            else if(type.definition && type.definition->module_identity=="/@stdlib/time.void") {
+                const std::map<std::string,temporal::Kind> kinds={{"date",temporal::Kind::date},{"time_of_day",temporal::Kind::time},{"local_datetime",temporal::Kind::local},{"instant",temporal::Kind::instant},{"offset_datetime",temporal::Kind::offset},{"zoned_datetime",temporal::Kind::zoned},{"duration",temporal::Kind::duration}};
+                auto kind=kinds.find(type.definition->name);if(kind==kinds.end())continue;temporal::validate(kind->second,pattern);
+            } else formatting::parse_text(pattern);
+            out.candidates.push_back({pattern,ir::type_name(type)+" format specification",12,{},"Invariant shared formatting pattern for "+ir::type_name(type)+"."});
+        }catch(const formatting::Error&){}
+        throw EditorProbeFound{};
+    }
     VOID_SEMANTIC_HANDLER Type interpolation_call(Expr& e) {
         if(e.target=="$interpolation" || e.target=="$hole")return e.type;
         if(e.token.text=="$interpolation") {
@@ -2415,9 +2584,11 @@ class Semantics {
         }
         auto& operand=*e.parts.at(0);if(operand.kind==Expr::Kind::literal && operand.token.text=="null"){operand.type=Type::string;operand.token.source_width=4;operand.token.text="\"null\"";operand.aggregate_value.text="null";}
         auto t=expression(operand);auto& spec=*e.parts.at(1);expect(expression(spec),Type::string,spec.token);
+        if(diagnostics.editor)editor_format(spec,t);
+        e.format_specification=format_specification_syntax(spec);
         if(t==error_type)return e.type=error_type;
         if(!numeric::number(t) && t!=Type::boolean && t!=Type::string) {
-            if(!t.definition || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || ir::collection_type(t) || !t.definition->cases.empty())error(source,e.parts[0]->token,Code::unsupported_type,"This value does not yet have a display implementation.");
+            if(!t.definition || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref && !ir::collection_type(t)))error(source,e.parts[0]->token,Code::unsupported_type,"This value does not yet have a display implementation.");
             if(t.definition->module_identity=="/@stdlib/time.void") {
                 const std::map<std::string,temporal::Kind> kinds={{"date",temporal::Kind::date},{"time_of_day",temporal::Kind::time},{"local_datetime",temporal::Kind::local},{"instant",temporal::Kind::instant},{"offset_datetime",temporal::Kind::offset},{"zoned_datetime",temporal::Kind::zoned},{"duration",temporal::Kind::duration}};
                 if(auto kind=kinds.find(t.definition->name);kind!=kinds.end())try{temporal::validate(kind->second,spec.aggregate_value.text);}catch(const formatting::Error& failure){auto site=spec.token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}
@@ -2433,7 +2604,7 @@ class Semantics {
         e.type_arguments.push_back(unit.make_result(Type::string,Type::string));e.target="$hole";return e.type=Type::string;
     }
     bool display_prelude(const Expr& e) {
-        if(!e.qualifier.empty() || (e.token.text!="string" && e.token.text!="format") || lookup(e.token.text) || unit.declarations.contains(e.token.text) || unit.constant_names.contains(e.token.text) || unit.invalid_declarations.contains(e.token.text))return false;
+        if(!e.qualifier.empty() || (e.token.text!="string" && e.token.text!="format" && e.token.text!="print") || lookup(e.token.text) || unit.declarations.contains(e.token.text) || unit.constant_names.contains(e.token.text) || unit.invalid_declarations.contains(e.token.text))return false;
         for(const auto& import:unit.imports)if(!import.explicit_alias && !import.target.empty()) {
             const auto& owner=*units.at(import.target);
             if(owner.declarations.contains(e.token.text) || owner.constant_names.contains(e.token.text) || owner.structure_names.contains(e.token.text) || owner.invalid_declarations.contains(e.token.text))return false;
@@ -2454,16 +2625,66 @@ class Semantics {
         if(operand.kind==Expr::Kind::literal && operand.token.text=="null"){operand.type=Type::string;operand.token.source_width=4;operand.token.text="\"null\"";operand.aggregate_value.text="null";}
         auto t=expression(operand);
         if(t==error_type)return e.type=error_type;
+        if(diagnostics.editor && formatted)for(unsigned n=0;n<mapping.size();++n)if(mapping[n]==1)editor_format(*e.parts[n],t);
         Function* adapter=nullptr;
         if(!numeric::number(t) && t!=Type::boolean && t!=Type::string) {
-            if(!t.definition || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || ir::collection_type(t) || (!t.definition->cases.empty() && !t.definition->callable))error(source,e.token,Code::unsupported_type,"This value does not yet have a display implementation.");
+            if(!t.definition || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref && !ir::collection_type(t)))error(source,e.token,Code::unsupported_type,"This value does not yet have a display implementation.");
             adapter=&nominal_display_adapter(t,formatted,e.token);
         }
         target.parameters[0].type=ir::readonly_view(t);
         target.symbol=std::string("$display.")+(formatted?"format":"string")+"::"+std::to_string(t.kind)+":"+std::to_string(Type::key(t).size())+":"+Type::key(t)+(t.nullable?"?":"")+"|"+ir::capability_key(t);
         builtin_record(target,formatted?"Format a value using invariant patterns; invalid specifications return Err with a byte offset.":"Display a value using invariant type-aware text.");
         e.source_target=target.symbol;e.target=adapter?adapter->symbol:formatted?"$display.format":"$display.string";
-        return e.type=call_arguments(e,target,0);
+        e.type=call_arguments(e,target,0);
+        if(formatted)for(unsigned n=0;n<e.parts.size();++n)if(e.argument_indexes[n]==1){e.format_specification=format_specification_syntax(*e.parts[n]);if((ir::collection_type(t) || (t.definition && !t.definition->cases.empty())) && e.parts[n]->kind==Expr::Kind::literal && e.parts[n]->type==Type::string)try{formatting::parse_text(e.parts[n]->aggregate_value.text);}catch(const formatting::Error& failure){auto site=e.parts[n]->token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}}
+        return e.type;
+    }
+    VOID_SEMANTIC_HANDLER Type print_call(Expr& e) {
+        if(e.target=="$console.print")return e.type;
+        if(!current)error(source,e.token,Code::constant_call,"print requires runtime evaluation.");
+        if(!e.type_arguments.empty())error(source,e.token,Code::argument_count,"print does not take type arguments.");
+        Function target;target.token=e.token;target.symbol="$console.print";target.result=Type::none;
+        unsigned count=0;for(const auto& name:e.names)if(name.text.empty())++count;
+        for(unsigned n=0;n<count;++n)target.parameters.push_back({Token{TokenKind::name,"$value"+std::to_string(n),e.token.offset},Type::i32});
+        for(const auto& name:{"sep","end","file","flush"})target.parameters.push_back({Token{TokenKind::name,name,e.token.offset},std::string(name)=="flush"?Type(Type::boolean):std::string(name)=="file"?Type(Type::none):Type(Type::string)});
+        auto mapping=argument_mapping(e,target,0,false);
+        const std::string public_signature="print(*values, sep: string = space, end: string = newline, file: console.output = console.stdout, flush: bool = false) -> no result";
+        if(diagnostics.editor) {
+            editor_call(e,target,0,false);
+            auto& out=diagnostics.editor->result;
+            if(!out.signature.empty() && out.signature.starts_with("print(")) {
+                out.signature=public_signature;out.parameters={"*values","sep: string = space","end: string = newline","file: console.output = console.stdout","flush: bool = false"};
+                out.parameter_documentation.resize(5);out.documentation="Capture arguments once, display left to right and write one complete record. Checked I/O failure; prohibited on workers.";
+                out.active_parameter=out.active_parameter<count?0:out.active_parameter-count+1;
+            }
+        }
+        for(unsigned n=0;n<e.parts.size();++n){
+            auto index=mapping[n];
+            if(index<count){
+                auto value=std::move(e.parts[n]);auto wrapper=std::make_unique<Expr>(Expr::Kind::call,value->token);wrapper->token.text="string";wrapper->implicit=true;wrapper->parts.push_back(std::move(value));wrapper->names.push_back(Token{TokenKind::name,"",e.token.offset});
+                const bool null_literal=wrapper->parts[0]->kind==Expr::Kind::literal && wrapper->parts[0]->token.text=="null";
+                display_call(*wrapper);if(null_literal)wrapper->op="$print.null";
+                target.parameters[index].type=ir::readonly_view(wrapper->parts[0]->type);e.parts[n]=std::move(wrapper);
+            }else {
+                auto t=expression(*e.parts[n]);
+                if(index==count+2){if(!console::endpoint_type(t) || t.definition->name!="output")error(source,e.parts[n]->token,Code::type_mismatch,"print file requires console.output.");target.parameters[index].type=t;}
+                else expect(t,index==count+3?Type(Type::boolean):Type(Type::string),e.parts[n]->token);
+            }
+        }
+        builtin_record(target,"print(*values, sep: string = space, end: string = newline, file: console.output = console.stdout, flush: bool = false). Capture written arguments once, render left to right, write one record. Checked I/O failure; prohibited on workers.");
+        unit.builtins.at(target.symbol).signature=public_signature;
+        e.slot=count;e.argument_indexes=std::move(mapping);e.target=e.source_target=target.symbol;return e.type=Type::none;
+    }
+    VOID_SEMANTIC_HANDLER Type console_call(Expr& e,unsigned operation) {
+        const auto& contract=console::source_operations.at(operation);Function target;target.token=e.token;target.symbol="$console."+std::to_string(operation);target.result=Type(unit.structure_names.at("_reply")->definition);
+        for(unsigned n=0;n<contract.arguments.size();++n){
+            Type type=Type::i64;
+            if(contract.arguments[n]=='e' || contract.arguments[n]=='r')type=expression(*e.parts.at(n));
+            else if(contract.arguments[n]=='t')type=Type::string;
+            else if(contract.arguments[n]=='b'){type=expression(*e.parts.at(n));if(type.kind!=Type::growable_array || ir::array_element(type)!=Type::u8)error(source,e.token,Code::type_mismatch,"Console bytes require [u8].");}
+            target.parameters.push_back({Token{TokenKind::name,"arg"+std::to_string(n),e.token.offset},ir::readonly_view(type)});
+        }
+        builtin_record(target,"Private checked standard-stream Runtime operation.");e.target=e.source_target=target.symbol;return e.type=call_arguments(e,target,0);
     }
     VOID_SEMANTIC_HANDLER Type temporal_call(Expr& e,unsigned operation) {
         if(!current)error(source,e.token,Code::constant_call,"Temporal Runtime operations require runtime evaluation.");
@@ -2476,6 +2697,9 @@ class Semantics {
         return e.type=call_arguments(e,target,0);
     }
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if(e.target=="$console.print" || (e.target.starts_with("$console.") && !e.target.empty()))return e.type;
+        if(unit.identity==console::source_module && e.qualifier.empty())for(unsigned n=0;n<console::source_operations.size();++n)if(e.token.text==console::source_operations[n].name)return console_call(e,n);
+        if(e.token.text=="print" && display_prelude(e))return print_call(e);
         if(e.target=="$layout.unwrap")return e.type;
         if(unit.identity=="/@stdlib/time.void" && e.qualifier.empty() && e.token.text=="_temporal_unwrap") {
             Function target;target.token=e.token;target.symbol="$layout.unwrap";target.result=Type::string;target.parameters.push_back({Token{TokenKind::name,"value",e.token.offset},unit.make_result(Type::string,Type::string)});
@@ -2484,6 +2708,22 @@ class Semantics {
         if(e.target.starts_with("$time."))return e.type;
         if(unit.identity=="/@stdlib/time.void" && e.qualifier.empty())for(unsigned n=0;n<temporal::operations.size();++n)if(temporal::operations[n].name==e.token.text)return temporal_call(e,n);
 
+        if(current && current->collection_adapter && e.token.text.starts_with("$collection_")) {
+            if(!e.target.empty())return e.type;
+            const auto operation=e.token.text.substr(12);std::vector<Type> args;for(auto& part:e.parts)args.push_back(expression(*part));
+            if(operation=="finish")e.type=Type::string;
+            else if(operation=="tag")e.type=Type::i32;
+            else if(operation=="payload")e.type=ir::field_type(args.at(0),e.parts.at(1)->value);
+            else if(operation=="invalid")e.type=Type::none;
+            else if(operation=="append"){expect(args.at(0),Type::string,e.token);e.type=Type::none;}
+            else if(operation=="version")e.type=Type::u64;
+            else if(operation=="check" || operation=="leave")e.type=Type::none;
+            else if(operation=="enter")e.type=Type::boolean;
+            else if(operation=="entry")e.type=ir::array_element(args.at(0));
+            else if(operation=="key" || operation=="value")e.type=ir::field_type(args.at(0),operation=="value"?1:0);
+            else error(source,e.token,Code::invalid_value,"Invalid private collection operation.");
+            e.target="$collection."+operation;return e.type;
+        }
         if(e.token.text=="$display_format"){e.token.text="format";return display_call(e);}
         if(e.token.text=="$display_pattern" || e.token.text=="$display_alignment") {
             if(!e.target.empty())return e.type;
@@ -2569,9 +2809,67 @@ class Semantics {
         if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
         return target;
     }
+    bool operator_expression(Expr& e,const std::vector<Type>& operands) {
+        if(e.implicit)return false; // Compiler-generated identity guards are not source operators.
+        const auto glyph=e.op=="!="?std::string("=="):e.op;
+        ir::MemberSelection selected;
+        if(diagnostics.editor && diagnostics.editor->operator_context && diagnostics.editor->module==unit.identity && diagnostics.editor->offset==e.token.offset) {
+            auto& out=diagnostics.editor->result;++diagnostics.editor->operator_occurrences;
+            if(!invalid_function && !unit.failed_import)for(const auto& name:{"+","-","*","/","%","==","!=","<",">","<=",">="}) {
+                auto match=ir::select_operator(*root.member_catalog,name==std::string("!=")?"==":name,operands,unit.identity,lexical_owner());
+                if(match.status!=ir::MemberSelection::found)continue;
+                for(const auto& [id,u]:units)for(const auto& f:u->functions)if(f.symbol==match.method){auto spelling=std::string(name);if(e.token.text.size()==2 && e.token.text[1]=='=' && e.token.text!="==" && e.token.text!="!=" && e.token.text!="<=" && e.token.text!=">="){if(spelling.size()!=1 || spelling=="<" || spelling==">")continue;spelling+="=";}out.candidates.push_back({spelling,editor_signature(f),24,{},source_documentation(u->source,f.token.offset)});diagnostics.editor->candidate_targets[spelling].insert(f.symbol);++diagnostics.editor->candidate_occurrences[spelling];}
+            }
+            // Continue the ordinary checker so effects and capability contracts
+            // are finalized before presenting these candidates.
+        }
+        try{selected=ir::select_operator(*root.member_catalog,glyph,operands,unit.identity,lexical_owner());}
+        catch(const std::invalid_argument& failure){error(source,e.token,Code::readonly,failure.what());}
+        if(selected.status==ir::MemberSelection::missing)return false;
+        std::vector<RelatedLocation> related;
+        const Function* target=nullptr;
+        for(const auto& [id,owner]:units)for(const auto& f:owner->functions) {
+            if(f.symbol==selected.method)target=&f;
+            for(const auto& candidate:selected.candidates)if(f.symbol==candidate.second)related.push_back({span(owner->source,f.token),"Operator declared by "+Type::key(f.operator_owner)+"."});
+        }
+        if(selected.status==ir::MemberSelection::ambiguous)error(source,e.token,Code::ambiguous,"Ambiguous exact operator '"+e.op+"'.",{},std::move(related));
+        if(selected.status==ir::MemberSelection::inaccessible)error(source,e.token,Code::visibility,"Exact operator '"+e.op+"' is not accessible; import its direct declaring owner and respect its visibility.",{},std::move(related));
+        if(!target)throw std::logic_error("Missing selected operator function");
+        if(!current)error(source,e.token,Code::constant_call,"A compile-time constant cannot call a custom operator.");
+        const bool negate=e.op=="!=";
+        e.kind=Expr::Kind::call;e.op="$operator";e.target=target->symbol;e.type=target->result;
+        for(unsigned n=0;n<operands.size();++n)e.argument_indexes.push_back(n);
+        if(negate){auto call=std::make_unique<Expr>(std::move(e));e=Expr(Expr::Kind::unary,call->token);e.op="not";e.type=Type::boolean;e.parts.push_back(std::move(call));}
+        return true;
+    }
+    void assignment_value(Statement& s,Type type) {
+        if(s.op!="=" && s.op.size()==2 && s.op[1]=='=') {
+            std::optional<Type> context=numeric::number(type)?std::optional<Type>(type):std::nullopt;
+            if(s.expression->token.text=="null" && (ir::reference_value(type) || (type.definition && type.definition->callable))){context=type;context->nullable=true;}
+            auto right=expression(*s.expression,context);
+            Expr operation(Expr::Kind::binary,s.compound_token);operation.op=s.op.substr(0,1);
+            if(right!=error_type && operator_expression(operation,{type,right})) {
+                s.compound_target=operation.target;
+                if(operation.type!=type) {
+                    auto value=std::make_unique<Expr>(Expr::Kind::name,s.compound_token);value->type=operation.type;
+                    value->slot=s.compound_slot=static_cast<unsigned>(current->locals.size());current->locals.push_back(operation.type);
+                    expect(contextual_conversion(*value,operation.type,type),type,s.compound_token);s.compound_conversion=std::move(value);
+                }
+                return;
+            }
+            // Only builtin fallback supplies ordinary assignment conversions.
+            expect(contextual_conversion(*s.expression,right,type),type,s.expression->token);
+        }else expect(expression(*s.expression,type),type,s.expression->token);
+        if(s.op!="=" && type!=error_type && !numeric::number(type) && !(type==Type::string && s.op=="+="))
+            error(source,s.compound_token,Code::type_mismatch,"Unsupported compound assignment operand types.");
+        if(s.op=="%=" && numeric::floating(type))error(source,s.compound_token,Code::numeric_operator,"Illegal compound floating remainder operator.");
+        if(numeric::integer(type) && (s.op=="/=" || s.op=="%=") && s.expression->kind==Expr::Kind::literal && s.expression->value==0)
+            error(source,s.expression->token,Code::zero_divisor,"Division or remainder by zero.");
+    }
     VOID_SEMANTIC_HANDLER Type unary_expression(Expr& e, std::optional<Type> expected) {
         auto left = expression(*e.parts[0], e.op == "not" ? std::optional<Type>(Type::boolean) : expected);
         if (left == error_type) return error_type;
+        if(e.op!="not" && operator_expression(e,{left}))return e.type;
         if (e.op == "not") expect(left,Type::boolean,e.token);
         else if (!numeric::number(left)) error(source,e.token,Code::numeric_operator,"Type mismatch: unary arithmetic requires a numeric operand.");
         return e.type = left;
@@ -2580,17 +2878,27 @@ class Semantics {
         using K = Expr::Kind;
         bool logical = e.op == "and" || e.op == "or";
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
-        auto context = logical ? std::optional<Type>(Type::boolean) : left_hint ? left_hint : right_hint ? right_hint :
-            expected && numeric::number(*expected) ? expected : std::optional<Type>(decimal(e) ? Type::f32 : Type::i32);
-        if (context && (ir::reference_value(*context) || (context->definition && context->definition->callable)) && (e.op=="==" || e.op=="!=")) context->nullable=true;
-        auto left = expression(*e.parts[0],context);
-        bool previous = suppress_zero;
-        if (e.parts[0]->kind == K::literal && ((e.op == "and" && !e.parts[0]->value) || (e.op == "or" && e.parts[0]->value))) suppress_zero = true;
-        auto right = expression(*e.parts[1],context); suppress_zero = previous;
-        if (left == error_type || right == error_type) return error_type;
-        if (logical) {
-            expect(left,Type::boolean,e.parts[0]->token); expect(right,Type::boolean,e.parts[1]->token); return e.type = Type::boolean;
+        // Result context cannot choose a custom signature. Numeric anchors and
+        // ordinary defaults type operands before selection; nominal conversions
+        // are reserved for builtin fallback after exact custom lookup fails.
+        auto context=logical?std::optional<Type>(Type::boolean):left_hint && numeric::number(*left_hint)?left_hint:right_hint && numeric::number(*right_hint)?right_hint:!left_hint && !right_hint && expected && numeric::number(*expected)?expected:std::optional<Type>(decimal(e)?Type::f32:Type::i32);
+        auto null_context=[&](const Expr& part,const std::optional<Type>& opposite)->std::optional<Type>{if(part.token.text=="null" && opposite && (ir::reference_value(*opposite) || (opposite->definition && opposite->definition->callable))){auto type=*opposite;type.nullable=true;return type;}return context;};
+        auto left=expression(*e.parts[0],null_context(*e.parts[0],right_hint));
+        bool previous=suppress_zero;
+        if(e.parts[0]->kind==K::literal && ((e.op=="and" && !e.parts[0]->value) || (e.op=="or" && e.parts[0]->value)))suppress_zero=true;
+        auto right=expression(*e.parts[1],null_context(*e.parts[1],left==error_type?right_hint:std::optional<Type>(left)));suppress_zero=previous;
+        if(left==error_type || right==error_type)return error_type;
+        if(logical){expect(left,Type::boolean,e.parts[0]->token);expect(right,Type::boolean,e.parts[1]->token);return e.type=Type::boolean;}
+        if(!left_hint && !right_hint && expected && numeric::number(*expected) && ((left.definition && (left.kind==Type::aggregate || left.kind==Type::managed_ref)) || (right.definition && (right.kind==Type::aggregate || right.kind==Type::managed_ref)))) {
+            auto defaults=std::optional<Type>(decimal(e)?Type::f32:Type::i32);
+            if(numeric::number(left))left=expression(*e.parts[0],defaults);
+            if(numeric::number(right))right=expression(*e.parts[1],defaults);
+            if(left==error_type || right==error_type)return error_type;
         }
+        if(operator_expression(e,{left,right}))return e.type;
+        auto builtin_context=left_hint?left_hint:right_hint?right_hint:expected && numeric::number(*expected)?expected:context;
+        if(builtin_context && (ir::reference_value(*builtin_context) || (builtin_context->definition && builtin_context->definition->callable)) && (e.op=="==" || e.op=="!="))builtin_context->nullable=true;
+        left=contextual_conversion(*e.parts[0],left,builtin_context);right=contextual_conversion(*e.parts[1],right,builtin_context);
         if (left==Type::string || right==Type::string) {
             expect(right,left,e.token);
             if (left!=Type::string || (e.op!="+" && e.op!="==" && e.op!="!=")) error(source,e.token,Code::numeric_operator,"Strings support only +, == and !=.");
@@ -2717,7 +3025,7 @@ class Semantics {
             if(s.selection) {
                 auto previous=allow_event;allow_event=true;t=expression(*s.selection);allow_event=previous;
                 std::function<void(const Expr&,bool)> writable=[&](const Expr& e,bool writeback){
-                    if(e.kind==Expr::Kind::field && !e.property && e.parts[0]->type.definition && e.parts[0]->type.definition->fields.at(e.slot).readonly)
+                    if(e.kind==Expr::Kind::field && !e.property && (e.parts[0]->type.kind==Type::aggregate || e.parts[0]->type.kind==Type::managed_ref) && e.parts[0]->type.definition && e.parts[0]->type.definition->fields.at(e.slot).readonly)
                         const_field_error(e.parts[0]->type,e.slot,e.token);
                     if(e.property && writeback && e.setter.empty())error(source,e.token,Code::readonly,"Property has no setter.");
                     if(e.kind==Expr::Kind::field || e.kind==Expr::Kind::array_index || e.property) {
@@ -2729,10 +3037,7 @@ class Semantics {
                 if(s.selection->target=="$array.count" || s.selection->target=="$dict.count")error(source,s.selection->token,Code::readonly,"Array count is readonly.");
                 s.event=s.selection->event;s.assigned_type=t;
                 if(s.event){if(s.op!="+=" && s.op!="-=")error(source,s.token,Code::invalid_value,"Events support only += and -= subscription changes.");auto signature=ir::array_element(t);expect(expression(*s.expression,signature),signature,s.expression->token);break;}
-                expect(expression(*s.expression,t),t,s.expression->token);
-                if(s.op!="=" && !numeric::number(t) && !(t==Type::string && s.op=="+="))error(source,s.token,Code::type_mismatch,"Unsupported compound element assignment.");
-                if(s.op=="%=" && numeric::floating(t))error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
-                if(numeric::integer(t) && (s.op=="/=" || s.op=="%=") && s.expression->kind==Expr::Kind::literal && s.expression->value==0)error(source,s.expression->token,Code::zero_divisor,"Division or remainder by zero.");
+                assignment_value(s,t);
                 break;
             }
             std::vector<Token> expanded;
@@ -2759,11 +3064,7 @@ class Semantics {
             }
             s.assigned_type = t;
             if(s.event){if((s.op!="+=" && s.op!="-=") || s.index)error(source,s.token,Code::invalid_value,"Events support only += and -= subscription changes.");auto signature=ir::array_element(t);expect(expression(*s.expression,signature),signature,s.expression->token);break;}
-            expect(expression(*s.expression, t), t, s.expression->token);
-            if (s.op != "=" && t != error_type && !numeric::number(t) && !(t==Type::string && s.op=="+=")) expect(t,Type::i32,s.token);
-            if (s.op == "%=" && numeric::floating(t)) error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
-            if (numeric::integer(t) && (s.op == "/=" || s.op == "%=") && s.expression->kind == Expr::Kind::literal && s.expression->value == 0)
-                error(source, s.expression->token, Code::zero_divisor, "Division or remainder by zero.");
+            assignment_value(s,t);
             break;
         }
         case K::expression:
@@ -2889,7 +3190,7 @@ public:
         auto [owner,structure] = owned_structure(f.receiver->type);
         if (f.receiver->type.kind==Type::aggregate) for (const auto& field:structure->fields) {
             auto type=*field.annotation;
-            const bool complete_default=field.expression && type.definition && (type.definition->callable || !type.definition->cases.empty());
+            const bool complete_default=field.expression && type.definition && (type.definition->callable || !type.definition->cases.empty() || console::endpoint_type(type));
             if (ir::requires_initialization(type) && !complete_default)
                 error(source,f.token,Code::initializer,"Value init requires every field to be valid before its body; a non-nullable reference has no safe default.","Use named-field construction without init for a value with required reference fields.",{{span(owner->source,field.token),"Required reference field declared here."}});
         }
@@ -2923,6 +3224,7 @@ public:
         ir::ConstantValue value;if(t.kind==Type::growable_array || t.kind==Type::dictionary)return value;value.repeat=*t.definition->extent;
         if(!*value.repeat) return value;
         auto element=ir::array_element(t);
+        if(console::endpoint_type(element))error(source,token,Code::initializer,"Console endpoint elements require explicit borrowed values.");
         if(ir::reference_value(element) && !element.nullable)error(source,token,Code::initializer,"A nonempty array of required references needs a complete literal.");
         if(ir::collection_type(element)) value.fields.push_back(array_default(element,token));
         else if(element.kind==Type::aggregate) {
@@ -3095,9 +3397,9 @@ class Lowering {
         if(i.receiver && cells.contains(i.receiver->slot)) {
             i.receiver->slot=cells.at(i.receiver->slot);i.receiver->fields.insert(i.receiver->fields.begin(),0);
         }
-        if(i.op==ir::Op::dict_new || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format)module.coordinated=true;
+        if(i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::dict_new || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format)module.coordinated=true;
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -3113,6 +3415,7 @@ class Lowering {
         emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;return emit({ir::Op::load,owner},token);
     }
     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
+        if(console::endpoint_type(t)){ir::Instruction endpoint{ir::Op::console_endpoint};endpoint.type=t;endpoint.immediate=value.fields.at(0).bits;return emit(endpoint,token);}
         if(t.definition && t.definition->callable){ir::Instruction instruction{value.text.empty()?ir::Op::function_null:ir::Op::function_reference};instruction.type=t;instruction.callee=value.text;return emit(instruction,token);}
         if(t.definition && !t.definition->cases.empty()) {
             ir::Instruction sum{ir::Op::sum};sum.type=t;sum.immediate=value.fields.at(0).bits;
@@ -3260,7 +3563,7 @@ class Lowering {
             }
             // Reading a nested list reference severs its former inline ancestry.
             std::optional<unsigned> selected_owner;
-            if(parent->type.kind==Type::growable_array && parent->dependent)selected_owner=capture(parent->read(),parent->type,token);
+            if(parent->type.kind==Type::growable_array)selected_owner=capture(parent->read(),parent->type,token);
             auto index=snapshot(expression(*e.parts[1]),e.parts[1]->type,token);
             if(parent->type.kind==Type::growable_array) {
                 auto owner=selected_owner.value_or(~0u);if(!selected_owner)owner=capture(parent->read(),parent->type,token);
@@ -3455,11 +3758,49 @@ class Lowering {
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: return frontend_case([&]() -> unsigned {
+            if(e.target=="$console.print")return frontend_case([&]() -> unsigned {
+                std::vector<unsigned> captured(e.parts.size());
+                for(unsigned n=0;n<e.parts.size();++n){
+                    // Bare null has no runtime allocation/identity to capture.
+                    // Its shared display literal is materialized after ALL args.
+                    if(e.argument_indexes[n]<e.slot && e.parts[n]->op=="$print.null")continue;
+                    const auto& raw=e.argument_indexes[n]<e.slot?*e.parts[n]->parts[0]:*e.parts[n];captured[n]=snapshot(expression(raw),expression_type(raw),raw.token);
+                }
+                std::vector<unsigned> rendered;std::optional<unsigned> sep,end,file,flush;
+                for(unsigned n=0;n<e.parts.size();++n){auto index=e.argument_indexes[n];if(index>=e.slot){auto slot=captured[n];if(index==e.slot)sep=slot;else if(index==e.slot+1)end=slot;else if(index==e.slot+2)file=slot;else flush=slot;continue;}
+                    const auto& wrapper=*e.parts[n];
+                    if(wrapper.op=="$print.null"){rendered.push_back(snapshot(constant(Type::string,wrapper.parts[0]->aggregate_value,wrapper.token),Type::string,wrapper.token));continue;}
+                    auto value=emit({ir::Op::load,captured[n]},wrapper.token);ir::Instruction display{ir::Op::scalar_display,value};display.type=Type::string;
+                    if(wrapper.target!="$display.string"){display.op=ir::Op::call;display.a=0;display.callee=wrapper.target;display.arguments={value};}
+                    rendered.push_back(snapshot(emit(display,wrapper.token),Type::string,wrapper.token));
+                }
+                if(!sep)sep=snapshot(constant(Type::string,{0,{}," "},e.token),Type::string,e.token);
+                if(!end)end=snapshot(constant(Type::string,{0,{},"\n"},e.token),Type::string,e.token);
+                ir::Instruction join{ir::Op::string_join};join.type=Type::string;
+                for(unsigned n=0;n<rendered.size();++n){if(n)join.arguments.push_back(emit({ir::Op::load,*sep},e.token));join.arguments.push_back(emit({ir::Op::load,rendered[n]},e.token));}join.arguments.push_back(emit({ir::Op::load,*end},e.token));
+                ir::Instruction print{ir::Op::console_print,emit(join,e.token),flush?emit({ir::Op::load,*flush},e.token):constant(Type::boolean,{0,{}},e.token)};print.type=Type::none;if(file)print.arguments.push_back(emit({ir::Op::load,*file},e.token));return emit(print,e.token);
+            });
+            if(e.target.starts_with("$console.")) {
+                std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
+                ir::Instruction operation{ir::Op::console_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(9));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
+            }
             if(e.target.starts_with("$time.")) {
                 std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.parts[n]->token);
                 ir::Instruction operation{ir::Op::temporal_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(6));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
             }
             if(e.target=="$layout.unwrap"){ir::Instruction unwrap{ir::Op::format_unwrap,expression(*e.parts[0])};unwrap.type=Type::string;return emit(unwrap,e.token);}
+            if(e.target.starts_with("$collection.")) {
+                const auto operation=e.target.substr(12);unsigned owner=0;if(!e.parts.empty())owner=expression(*e.parts[0]);
+                if(operation=="invalid"){ir::Instruction fail{ir::Op::panic};fail.callee="Invalid enum/result variant tag during display";return emit(fail,e.token);}
+                if(operation=="tag")return emit({ir::Op::extract,owner},e.token);
+                if(operation=="payload"){ir::Instruction get{ir::Op::sum_get,owner};get.immediate=e.parts.at(1)->value;return emit(get,e.token);}
+                if(operation=="version" && e.parts[0]->type.kind==Type::fixed_array)return constant(Type::u64,{0,{}},e.token);
+                if(operation=="check" && e.parts[0]->type.kind==Type::fixed_array)return owner;
+                if(operation=="entry")return emit({ir::Op::dict_entry,owner,expression(*e.parts[1])},e.token);
+                if(operation=="key" || operation=="value"){ir::Instruction field{ir::Op::extract,owner};field.immediate=operation=="value";return emit(field,e.token);}
+                auto op=operation=="enter"?ir::Op::collection_enter:operation=="leave"?ir::Op::collection_leave:operation=="append"?ir::Op::collection_append:operation=="finish"?ir::Op::collection_finish:operation=="version"?(e.parts[0]->type.kind==Type::dictionary?ir::Op::dict_version:ir::Op::list_version):(e.parts[0]->type.kind==Type::dictionary?ir::Op::dict_check:ir::Op::list_check);
+                ir::Instruction i{op,owner};i.type=e.type;if(operation=="check")i.b=expression(*e.parts[1]);return emit(i,e.token);
+            }
             if(e.target.starts_with("$layout.")){ir::Instruction layout{ir::Op::format_layout,expression(*e.parts[0])};layout.type=e.type;layout.immediate=e.target=="$layout.alignment";return emit(layout,e.token);}
             if(e.target=="$interpolation")return frontend_case([&]() -> unsigned {
                 std::vector<unsigned> slots;for(const auto& part:e.parts)slots.push_back(snapshot(expression(*part),Type::string,part->token));
@@ -3533,6 +3874,7 @@ class Lowering {
             return frontend_case([&]() -> unsigned {
             if(selected_receiver && !e.parts[0]->property)emit({ir::Op::store,receiver->slot,selected_receiver->read()},e.token);
             ir::Instruction i{e.asynchronous_call || !parallel_target.empty() ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = parallel_target.empty()?e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""):std::string(parallel_target); i.receiver = receiver;
+            if(e.op=="$operator")i.operator_glyph=e.token.text=="!="?"==":e.token.text;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             i.arguments.resize(slots.size());
@@ -3602,6 +3944,18 @@ class Lowering {
         auto count=snapshot(emit({ir::Op::array_count,load(owner)},token),Type::i64,token);ir::Instruction slice{ir::Op::array_slice,load(owner),constant(Type::i64,{0,{}},token)};slice.type=array;slice.immediate=1;slice.arguments={load(count)};auto subscribers=capture(emit(slice,token),array,token);auto cursor=snapshot(constant(Type::i64,{0,{}},token),Type::i64,token);auto test=block(),body=block(),done=block();jump(test);current=test;terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,load(cursor),load(count)},token),body,done});current=body;
         ir::Instruction call{ir::Op::function_call,emit({ir::Op::array_get,load(subscribers),load(cursor)},token)};for(auto argument:arguments)call.arguments.push_back(load(argument));emit(call,token);emit({ir::Op::store,cursor,emit({ir::Op::add,load(cursor),constant(Type::i64,{1,{}},token)},token)},token);jump(test);current=done;return 0;
     }
+    Type assignment_type(const Statement& s) {
+        if(s.selection)return expression_type(*s.selection);
+        auto type=output.locals.at(s.slot);for(auto field:s.field_indexes)type=ir::field_type(type,field);
+        return s.index?(type.kind==Type::dictionary?ir::dictionary_value(type):ir::array_element(type)):type;
+    }
+    unsigned compound_value(const Statement& s,unsigned old_slot,unsigned right) {
+        auto rhs=snapshot(right,expression_type(*s.expression),s.expression->token);
+        auto left=emit({ir::Op::load,old_slot},s.compound_token);right=emit({ir::Op::load,rhs},s.compound_token);
+        if(s.compound_target.empty())return emit({s.assigned_type==Type::string?ir::Op::string_concat:operation(s.op.substr(0,1)),left,right},s.token);
+        ir::Instruction call{ir::Op::call};call.callee=s.compound_target;call.operator_glyph=s.op.substr(0,1);call.arguments={left,right};auto value=emit(call,s.compound_token);
+        if(s.compound_conversion){emit({ir::Op::store,s.compound_slot,value},s.compound_token);return expression(*s.compound_conversion);}return value;
+    }
     void event_subscription(const Statement& statement){
         const auto& token=statement.token;auto load=[&](unsigned slot){return emit({ir::Op::load,slot},token);};auto array=statement.assigned_type;auto selected=statement.selection?select_expression(*statement.selection):Selection{array,[&]{return read_place(ir::Place{statement.slot,statement.field_indexes},token);},{}};auto owner=snapshot(selected.read(),array,token);auto callback=snapshot(expression(*statement.expression),statement.expression->type,token);
         if(statement.op=="+="){emit({ir::Op::list_push,load(owner),load(callback)},token);return;}
@@ -3636,9 +3990,9 @@ class Lowering {
             if(s.event){event_subscription(s);break;}
             if(s.selection) {
                 auto selected=select_expression(*s.selection);auto old=(selected.read_before_write || s.op!="=")?selected.read():0;std::optional<unsigned> old_slot;
-                if(s.op!="=")old_slot=snapshot(old,s.assigned_type,s.token);
+                if(s.op!="=")old_slot=snapshot(old,assignment_type(s),s.token);
                 auto value=expression(*s.expression);
-                if(old_slot)value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                if(old_slot)value=compound_value(s,*old_slot,value);
                 selected.write(value);break;
             }
             if(s.index) {
@@ -3646,29 +4000,30 @@ class Lowering {
                 auto array_type=output.locals[selected.slot];for(auto field:selected.fields)array_type=ir::field_type(array_type,field);
                 if(array_type.kind==Type::dictionary) {
                     auto owner=snapshot(read_place(selected,s.token),array_type,s.token);auto index_slot=snapshot(expression(*s.index),s.index->type,s.index->token);auto object=emit({ir::Op::load,owner},s.token);auto version=snapshot(emit({ir::Op::dict_version,object},s.token),Type::u64,s.token);std::optional<unsigned> old;
-                    if(s.op!="=")old=snapshot(emit({ir::Op::dict_get,object,emit({ir::Op::load,index_slot},s.token)},s.token),s.assigned_type,s.token);
-                    auto value=expression(*s.expression);if(old)value=emit({s.assigned_type==Type::string?ir::Op::string_concat:operation(s.op.substr(0,1)),emit({ir::Op::load,*old},s.token),value},s.token);
+                    if(s.op!="=")old=snapshot(emit({ir::Op::dict_get,object,emit({ir::Op::load,index_slot},s.token)},s.token),assignment_type(s),s.token);
+                    auto value=expression(*s.expression);if(old)value=compound_value(s,*old,value);
                     dictionary_set(emit({ir::Op::load,owner},s.token),emit({ir::Op::load,index_slot},s.token),value,emit({ir::Op::load,version},s.token),array_type,s.token);break;
                 }
+                std::optional<unsigned> captured_array;if(array_type.kind==Type::growable_array)captured_array=snapshot(read_place(selected,s.token),array_type,s.token);
                 auto index=expression(*s.index);auto index_slot=snapshot(index,s.index->type,s.index->token);
-                auto array=read_place(selected,s.token);
+                auto array=captured_array?emit({ir::Op::load,*captured_array},s.token):read_place(selected,s.token);
                 if(array_type.kind==Type::growable_array) {
                     auto owner_slot=snapshot(array,array_type,s.token);
                     auto normalized=emit({ir::Op::list_index,array,index},s.index->token);
                     auto normalized_slot=snapshot(normalized,Type::u64,s.token);
                     std::optional<unsigned> old_slot;
-                    if(s.op!="=")old_slot=snapshot(emit({ir::Op::array_get,array,normalized},s.index->token),s.assigned_type,s.token);
+                    if(s.op!="=")old_slot=snapshot(emit({ir::Op::array_get,array,normalized},s.index->token),assignment_type(s),s.token);
                     auto version_slot=snapshot(emit({ir::Op::list_version,array},s.token),Type::u64,s.token);
                     auto value=expression(*s.expression);
-                    if(s.op!="=")value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                    if(s.op!="=")value=compound_value(s,*old_slot,value);
                     ir::Instruction commit{ir::Op::list_commit,emit({ir::Op::load,owner_slot},s.token),emit({ir::Op::load,normalized_slot},s.token)};
                     commit.arguments={value,emit({ir::Op::load,version_slot},s.token)};emit(commit,s.index->token);break;
                 }
                 auto old=emit({ir::Op::array_get,array,index},s.index->token); // Bounds check before RHS, even for '='.
                 std::optional<unsigned> old_slot;
-                if(s.op!="=") old_slot=snapshot(old,s.assigned_type,s.token);
+                if(s.op!="=") old_slot=snapshot(old,assignment_type(s),s.token);
                 auto value=expression(*s.expression);
-                if(old_slot) value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                if(old_slot) value=compound_value(s,*old_slot,value);
                 index=emit({ir::Op::load,index_slot},s.index->token);
                 array=read_place(selected,s.token); // Reacquire current inline bytes after RHS effects.
                 ir::Instruction update{ir::Op::array_set,array,index};update.arguments={value};
@@ -3678,14 +4033,13 @@ class Lowering {
             // Load compound-assignment LHS before evaluating its RHS.
             std::optional<unsigned> old_slot;
             if (s.op != "=") {
-                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(s.assigned_type); old_slot = slot;
+                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(assignment_type(s)); old_slot = slot;
                 auto old = read_place(selected,s.token);
                 emit({ir::Op::store, slot, old}, s.token);
             }
             auto value = expression(*s.expression);
             if (old_slot) {
-                auto old = emit({ir::Op::load, *old_slot}, s.token);
-                value = emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0, 1)), old, value}, s.token);
+                value = compound_value(s,*old_slot,value);
             }
             write_place(selected,value,s.token); break;
         }
@@ -3771,7 +4125,7 @@ public:
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
-        output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;
+        output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
@@ -3806,9 +4160,9 @@ public:
             auto base=f.receiver->type.definition->base.lock();
             for (unsigned field=base ? static_cast<unsigned>(base->fields.size()) : 0;field<f.receiver->type.definition->fields.size();++field) {
                 Type t=f.receiver->type.definition->fields[field].type;
-                if (ir::requires_initialization(t)) continue;
                 std::optional<unsigned> selected;
                 for(const auto& child:f.initialization_defaults) if(child->slot==field) selected=expression(*child);
+                if (ir::requires_initialization(t) && !(console::endpoint_type(t) && selected)) continue;
                 auto value=selected ? *selected : constant(t,f.initialization_value.fields.at(field),f.token);
                 auto view=emit({ir::Op::load,0},f.token);
                 ir::Instruction write{ir::Op::gc_write,view,value}; write.immediate=field; emit(write,f.token);
@@ -4024,6 +4378,7 @@ public:
         auto before = diagnostics.size();
         Parser(result->source, diagnostics).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
+        if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
         if(native && id==native->module){for(auto& structure:result->structures){structure.definition->native_resource=true;structure.definition->native_provider=native->library;}for(auto& f:result->functions)for(const auto& b:native->bindings)if(f.token.text==b.name)f.native_symbol=b.symbol;}
 
         for (auto& import : result->imports) {
@@ -4136,9 +4491,9 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 #include "construction.inc"
 #include "inheritance.inc"
 ir::Function member_header(const Unit& u,const Function& f) {
-    ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.concrete_method_name.empty()?f.token.text:f.concrete_method_name;
+    ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.receiver?(f.concrete_method_name.empty()?f.token.text:f.concrete_method_name):std::string{};
     header.asynchronous=f.asynchronous;header.task=f.task;header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
-    header.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;header.lexical_parent=f.lexical_parent;
+    header.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;header.lexical_parent=f.lexical_parent;header.operator_owner=f.operator_owner;header.operator_glyph=f.operator_glyph;
     header.parameters.clear();if(f.receiver)header.parameters.push_back(f.receiver->type);
     for(const auto& p:f.parameters)header.parameters.push_back(p.type);
     return header;
@@ -4174,7 +4529,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     for (auto& [id, unit] : units) {
     std::vector<Function*> declarations;for(auto& f:unit->functions)declarations.push_back(&f);for(auto& f:unit->generic_functions)declarations.push_back(&f);
     for(auto* declaration:declarations) {auto& f=*declaration;
-        if (f.receiver) continue;
+        if (f.receiver || !f.operator_glyph.empty()) continue;
         f.symbol = id + "::" + f.token.text;
         auto [previous, inserted] = unit->declarations.emplace(f.token.text, &f);
         if (!inserted) {
@@ -4340,7 +4695,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if(syntax.key) {
                 auto key=resolve_type(*syntax.key,*owner,root,units,syntax.token);
                 if(key.kind==Type::aggregate)for(auto& [id,u]:units)for(auto& child:u->structures)if(child.definition==key.definition)layout(*u,child);
-                if(!ir::dictionary_key_supported(key))error(owner->source,syntax.token,Code::unsupported_type,"Unsupported dictionary key type.");
+                check_dictionary_key(owner->source,syntax.token,key,units);
                 syntax.resolved=owner->make_dictionary(key,element);syntax.state=2;auto result=syntax.resolved;result.readonly=raw.readonly;return result;
             }
             auto extent=array_extent(*owner,syntax);
@@ -4508,6 +4863,17 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             }
             resolve(parameter.type,parameter.token);
         }
+        if(!f.operator_glyph.empty() && !f.parse_failed)try {
+            for(auto& parameter:f.parameters){parameter.type=ir::readonly_view(parameter.type);parameter.type.readonly=true;}
+            f.lexical_owner=Type::key(f.operator_owner);
+            std::vector<Type> operands;for(const auto& parameter:f.parameters)operands.push_back(parameter.type);
+            f.symbol=ir::operator_identity(f.operator_owner,f.operator_glyph,operands);
+            f.concrete_name=f.symbol.substr(owner.identity.size()+2);f.display_name="operator "+f.operator_glyph;
+            ir::validate_operator_declaration(member_header(owner,f));
+            auto previous=std::find_if(owner.functions.begin(),owner.functions.end(),[&](const auto& other){return &other!=&f && other.prepared && other.symbol==f.symbol;});
+            if(previous!=owner.functions.end())error(owner.source,f.token,Code::duplicate,"Duplicate operator operand tuple.",{},{{span(owner.source,previous->token),"Previously declared"}});
+        }catch(const CompilationError& failure){diagnostics.add(failure);f.parse_failed=true;}
+         catch(const std::invalid_argument& reason){try{error(owner.source,f.token,Code::type_mismatch,reason.what());}catch(const CompilationError& failure){diagnostics.add(failure);f.parse_failed=true;}}
         if (f.receiver) {
             resolve(f.receiver->type,f.receiver->token);
             try {
@@ -4741,9 +5107,10 @@ struct AnalysisAccess {
             result->editor_declarations_.push_back(std::move(record));
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
-        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:display-v1:application-v1:"+result->entry_symbol_;
+        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:display-v1:console-v2:terminal-v2:application-v1:"+result->entry_symbol_;
         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
 
+        result->contract_+=std::string(formatting::abi_version)+"|"+std::string(temporal::abi_version);
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
         std::map<std::string,std::string> source_identities;
@@ -4758,13 +5125,30 @@ struct AnalysisAccess {
                 auto end=prefix.rfind("::");if(end==std::string::npos)return key;prefix.resize(end);
             }
         };
+        std::map<std::string,std::string> owner_names;
+        for(const auto& [id,u]:*graph)for(const auto& structure:u->structures)owner_names.emplace(structure.definition->identity,ir::type_name(Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate)));
+        std::map<std::string,std::string> signatures;
+        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver)signatures.emplace(f.symbol,editor_signature(f));
+        // Hook calls already selected in ordinary display adapter bodies supply
+        // navigation. No editor-side method lookup or runtime hook search.
+        std::map<std::string,std::map<std::string,std::string>> display_hooks;
+        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(f.display_adapter) {
+            std::vector<const Statement*> statements;for(const auto& s:f.body)statements.push_back(&s);
+            std::vector<const Expr*> expressions;
+            while(!statements.empty()){auto* s=statements.back();statements.pop_back();if(s->expression)expressions.push_back(s->expression.get());for(const auto& child:s->body)statements.push_back(&child);for(const auto& child:s->otherwise)statements.push_back(&child);}
+            while(!expressions.empty()){auto* e=expressions.back();expressions.pop_back();if(e->kind==Expr::Kind::method_call && (e->token.text=="string" || e->token.text=="format") && !e->target.empty())display_hooks[f.symbol].emplace(e->token.text,e->target);for(const auto& part:e->parts)expressions.push_back(part.get());for(const auto& part:e->omitted)expressions.push_back(part.get());}
+        }
         std::set<std::string> visible_declarations;
         std::set<std::tuple<std::string,std::string,std::string,std::size_t,std::size_t,bool>> visible_references;
+        std::set<std::string> exact_references;
         auto declaration = [&](AnalyzedDeclaration d,bool native_contract=true,bool visible=true) {
             if(d.source.source)d.documentation=source_documentation(*d.source.source,d.source.begin);
             if (d.owner.empty()) d.owner = d.module;
             if(native_contract) {
             field(result->contract_, "declaration"); field(result->contract_, d.identity); field(result->contract_, d.visibility);
+            field(result->contract_,d.owner);field(result->contract_,d.operator_glyph);
+            field(result->contract_,d.generic_template?"template":"concrete");
+            if(!d.operator_glyph.empty())field(result->contract_,d.constant_syntax);
             field(result->contract_, std::to_string(static_cast<int>(d.kind)));
             field(result->contract_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type));
             field(result->contract_,ir::capability_key(d.type));
@@ -4785,7 +5169,7 @@ struct AnalysisAccess {
             for (const auto& name:d.required_initialization_fields) field(result->contract_,name);
             field(result->contract_,d.receiver_mutates ? "mutating" : "nonmutating");
             field(result->contract_,d.initialization_contract);
-            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind!=AnalyzedDeclaration::Kind::interface_requirement && d.kind != AnalyzedDeclaration::Kind::initializer) {
+            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind!=AnalyzedDeclaration::Kind::interface_requirement && d.kind != AnalyzedDeclaration::Kind::initializer && d.kind != AnalyzedDeclaration::Kind::operator_function) {
                 field(result->constants_, d.identity); field(result->constants_, d.visibility);
                 field(result->constants_,d.using_field ? "using" : "ordinary-field");
                 field(result->constants_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
@@ -4794,13 +5178,28 @@ struct AnalysisAccess {
             d.identity=source_identity(d.identity);d.owner=source_identity(d.owner);d.virtual_slot=source_identity(d.virtual_slot);d.override_target=source_identity(d.override_target);
             if(visible && visible_declarations.insert(d.identity).second)result->declarations_.push_back(std::move(d));
         };
+        auto format_specification = [](const Expr& e)->std::optional<std::string> {
+            if(e.format_specification)return e.format_specification;
+            if(e.kind==Expr::Kind::method_call && e.token.text=="format" && e.parts.size()==2 && e.parts[1]->type==Type::string)return format_specification_syntax(*e.parts[1]);
+            return {};
+        };
         auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true) {
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
             auto origin=source_identity(from),target=source_identity(to);
-            if(visible_references.emplace(origin,target,u.identity,location.begin,location.end,implicit).second)
-                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit});
+            std::string binding;
+            if(native_contract){field(binding,from);field(binding,to);if(auto spec=format_specification(e))field(binding,*spec);}
+            std::string presentation=signatures.contains(to)?signatures.at(to):"";
+            if(e.kind==Expr::Kind::field && !e.parts.empty() && e.parts[0]->type.definition && e.slot<e.parts[0]->type.definition->fields.size()) {
+                const auto& member=e.parts[0]->type.definition->fields[e.slot];
+                if(to==member.owner+"::field::"+member.name)presentation=(member.visibility=="public"?"":member.visibility+" ")+(member.readonly?"const ":"")+member.name+": "+ir::type_name(e.type)+" (declared by "+(owner_names.contains(member.owner)?owner_names.at(member.owner):member.owner)+")";
+            }
+            const bool written=visible_references.emplace(origin,target,u.identity,location.begin,location.end,implicit).second;
+            std::string exact;field(exact,origin);field(exact,target);field(exact,u.identity);field(exact,std::to_string(location.begin));field(exact,std::to_string(location.end));field(exact,binding);field(exact,implicit?"implicit":"written");
+            if(exact_references.insert(exact).second)
+                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit || !written,std::move(binding),std::move(presentation)});
             if(native_contract) {field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);}
+
         };
         for (const auto& [id, unit] : *graph) {
             AnalyzedModule module{id,unit->source,{}};
@@ -4836,10 +5235,28 @@ struct AnalysisAccess {
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,owner.find("::$display$")!=std::string::npos); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
+                if(auto spec=format_specification(e)) {
+                    field(result->contract_,"format-specification");field(result->contract_,owner);field(result->contract_,*spec);
+                    reference(owner,"$display.specification",e,*unit,true);
+                }
                 if(!e.qualifier.empty() && aliases.contains(e.qualifier)) {
                     Expr alias(Expr::Kind::name,e.qualifier_token);reference(owner,id+"::import::"+e.qualifier,alias,*unit,implicit,false);
                 }
-                if(!e.source_target.empty()) {reference(owner,e.source_target,e,*unit,implicit);if(!e.target.empty())reference(owner,e.target,e,*unit,true);}
+                if(!e.source_target.empty()) {
+                    reference(owner,e.source_target,e,*unit,implicit,!e.source_target.starts_with("$result::"));if(!e.target.empty())reference(owner,e.target,e,*unit,true);
+                    if(!implicit && e.source_target.starts_with("$display.") && display_hooks.contains(e.target)) {
+                        std::set<std::string> names{e.token.text};
+                        if(e.token.text=="format") {
+                            names={"string","format"};
+                            for(unsigned n=0;n<e.parts.size();++n)if(n<e.argument_indexes.size() && e.argument_indexes[n]==1 && e.parts[n]->kind==Expr::Kind::literal) {
+                                names.clear();
+                                try{names.insert(formatting::split_layout(e.parts[n]->aggregate_value.text).pattern.empty()?"string":"format");}catch(const formatting::Error&){} // Fails before calling either hook.
+                            }
+                        }
+                        const auto& hooks=display_hooks.at(e.target);
+                        for(const auto& name:names)if(auto hook=hooks.find(name);hook!=hooks.end())reference(owner,hook->second,e,*unit,false,false);
+                    }
+                }
                 else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
@@ -4862,7 +5279,18 @@ struct AnalysisAccess {
                     Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->fields.at(e.field_indexes[n]).owner + "::field::" + e.names[n].text,use,*unit);
                 }
                 std::vector<const Pattern*> patterns;for(const auto& p:e.patterns)patterns.push_back(&p);
-                while(!patterns.empty()){auto* p=patterns.back();patterns.pop_back();for(const auto& value:p->values)visit_expression(*value,owner,locals,implicit);for(const auto& child:p->children)patterns.push_back(&child);}
+                while(!patterns.empty()){
+                    auto* p=patterns.back();patterns.pop_back();
+                    if(p->kind==Pattern::Kind::constructor && !p->nullable && p->type.definition && !p->type.definition->cases.empty() && !p->variant_token.text.empty()) {
+                        // Keep cold metadata temporaries out of every recursive
+                        // expression-visitor frame (including ordinary receiver chains).
+                        frontend_case([&] {
+                            const auto& variant=p->type.definition->cases.at(p->tag);
+                            if(p->variant_token.text==variant.name){Expr use(Expr::Kind::name,p->variant_token);reference(owner,p->type.definition->result_type?"$result::"+Type::key(p->type)+"|"+ir::capability_key(p->type)+"::"+variant.name:p->type.definition->identity+"::variant::"+variant.name,use,*unit,implicit,false);}
+                        });
+                    }
+                    for(const auto& value:p->values)visit_expression(*value,owner,locals,implicit);for(const auto& child:p->children)patterns.push_back(&child);
+                }
                 for (const auto& part : e.parts) visit_expression(*part,owner,locals,implicit);
                 for (const auto& part : e.omitted) visit_expression(*part,owner,locals,true);
             };
@@ -4899,7 +5327,9 @@ struct AnalysisAccess {
                     if (member.expression) expression(*member.expression,identity,{});
                 }
                 for(unsigned n=0;n<structure.case_tokens.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
-                    declaration({variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+variant.name,id,structure.visibility,location(structure.case_tokens[n]),parameters,Type(structure.definition),std::to_string(n),variant.count?std::optional<std::uint64_t>{}:std::optional<std::uint64_t>{n},key});
+                    AnalyzedDeclaration record{variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+variant.name,id,structure.visibility,location(structure.case_tokens[n]),parameters,Type(structure.definition),std::to_string(n),variant.count?std::optional<std::uint64_t>{}:std::optional<std::uint64_t>{n},key};
+                    for(unsigned i=0;i<variant.count;++i){const auto& member=structure.fields[variant.begin+i];record.written_parameters.push_back({member.token.text,parameters[i],location(member.token)});}
+                    record.editor_symbol_kind=22;declaration(std::move(record));
                 }
                 AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
                 if(structure.source_end>structure.token.offset){auto r=location(structure.token);r.begin=unit->source.line_starts().at(unit->source.location(structure.token.offset).line-1);r.end=structure.source_end;record.extent=r;}
@@ -4916,10 +5346,12 @@ struct AnalysisAccess {
             }
             for (const auto& f : unit->functions) {
                 std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
-                AnalyzedDeclaration method_record{f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
+                AnalyzedDeclaration method_record{!f.operator_glyph.empty() ? AnalyzedDeclaration::Kind::operator_function : f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
+                if(!f.operator_glyph.empty()){method_record.owner=Type::key(f.operator_owner);method_record.operator_glyph=f.operator_glyph;method_record.editor_symbol_kind=25;}
                 if(f.accessor)method_record.editor_symbol_kind=7;
-                method_record.rename_safe=!f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application";
+                method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application";
+                if(!f.operator_glyph.empty() || f.receiver)method_record.signature=editor_signature(f);
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
                 if(f.overriding) method_record.override_target=f.virtual_slot;
@@ -4985,6 +5417,8 @@ struct AnalysisAccess {
                                 t = t.definition->fields.at(s.field_indexes[n]).type;
                             }
                         }
+                        if(!s.compound_target.empty()){Expr use(Expr::Kind::name,s.compound_token);reference(owner,s.compound_target,use,*unit);}
+                        if(s.compound_conversion)expression(*s.compound_conversion,owner,locals);
                         if (s.selection) expression(*s.selection,owner,locals);
                         if (s.range_end) expression(*s.range_end,owner,locals);
                         if (s.index) expression(*s.index,owner,locals);
@@ -5006,6 +5440,17 @@ struct AnalysisAccess {
                 Expr use(Expr::Kind::name,Token{TokenKind::name,binding.interface.definition->name,binding.interface.definition->source_offset});
                 reference(requirement,route.second,use,owner,true);
             }
+        }
+        // One generic source expression may be instantiated with several exact
+        // contracts. Keep one written reference per target, but present every
+        // observed concrete signature instead of whichever instance came first.
+        using PresentationKey=std::tuple<std::string,std::string,std::string,std::size_t,std::size_t>;
+        std::map<PresentationKey,std::set<std::string>> presentations;
+        auto presentation_key=[](const AnalyzedReference& r){return PresentationKey{r.from,r.to,r.source.module_identity,r.source.begin,r.source.end};};
+        for(const auto* records:{&result->references_,&result->editor_references_})for(const auto& r:*records)if(!r.signature.empty())presentations[presentation_key(r)].insert(r.signature);
+        for(auto* records:{&result->references_,&result->editor_references_})for(auto& r:*records)if(!r.implicit && !r.signature.empty()) {
+            const auto& alternatives=presentations.at(presentation_key(r));
+            if(alternatives.size()>1){r.signature="Selected specializations:";for(const auto& label:alternatives)r.signature+="\n\n"+label;}
         }
         field(result->contract_,result->constants_);
         result->lower_ = [graph,entry] { return lower_graph(*graph,entry); };
@@ -5081,6 +5526,22 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     }
     first.editor=editor;
     validate_graph(graph.units, first.identity, diagnostics);
+    if(editor && editor->operator_context) {
+        std::map<std::string,EditorCandidate> candidates;
+        for(auto& candidate:editor->result.candidates)candidates.emplace(candidate.name,std::move(candidate));
+        editor->result.candidates.clear();
+        for(auto& [name,candidate]:candidates) {
+            if(editor->candidate_occurrences.at(name)!=editor->operator_occurrences)continue;
+            std::set<std::string> details,docs;
+            for(const auto& [id,u]:graph.units)for(const auto& f:u->functions)if(editor->candidate_targets.at(name).contains(f.symbol)) {
+                details.insert(editor_signature(f));auto doc=source_documentation(u->source,f.token.offset);if(!doc.empty())docs.insert(std::move(doc));
+            }
+            candidate.detail=details.size()>1?"Selected specializations:":"";
+            for(const auto& detail:details){if(!candidate.detail.empty())candidate.detail+="\n\n";candidate.detail+=detail;}
+            candidate.documentation.clear();for(const auto& doc:docs){if(!candidate.documentation.empty())candidate.documentation+="\n\n";candidate.documentation+=doc;}
+            editor->result.candidates.push_back(std::move(candidate));
+        }
+    }
     auto identity = first.identity;
     return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings());
 }
@@ -5172,9 +5633,20 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
     Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
     if(diagnostics.failed()) return empty;
     std::size_t begin=cursor,end=cursor;
+    bool format_context=false,operator_context=false;
     for(const auto& t:tokens) {
         auto r=span(source,t);
         if(t.kind==TokenKind::name && r.begin<=cursor && cursor<=r.end){begin=r.begin;end=r.end;break;}
+        if(t.format_spec && r.begin<=cursor && cursor<=r.end){begin=r.begin;end=r.end;format_context=true;break;}
+        if(t.kind==TokenKind::string && !t.source_width && r.begin<cursor && cursor<r.end){
+            auto quotes=text.compare(r.begin,3,"\"\"\"")==0?3u:1u;
+            begin=r.begin+quotes;end=r.end-quotes;if(cursor<begin || cursor>end)return empty;
+            format_context=true;break;
+        }
+        if(t.kind==TokenKind::symbol && r.begin<=cursor && cursor<r.end &&
+            (t.text=="+" || t.text=="-" || t.text=="*" || t.text=="/" || t.text=="%" || t.text=="==" || t.text=="!=" || t.text=="<" || t.text==">" || t.text=="<=" || t.text==">=" || t.text=="+=" || t.text=="-=" || t.text=="*=" || t.text=="/=" || t.text=="%=")) {
+            begin=r.begin;end=r.end;operator_context=true;break;
+        }
         if(r.begin<=cursor && cursor<r.end && (t.kind==TokenKind::string || t.kind==TokenKind::path || t.kind==TokenKind::number)) return empty;
     }
     // Reject trivia/comment positions. Only whitespace between compiler tokens is eligible.
@@ -5189,7 +5661,8 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
         auto prefix=text.substr(begin,cursor-begin);
         for(const auto& keyword:reserved)if(keyword.starts_with(prefix))empty.candidates.push_back({keyword,"keyword",14});
     }
-    auto repaired=text;repaired.replace(begin,end-begin,"_void_editor_cursor_");
+    auto repaired=text;if(!operator_context)repaired.replace(begin,end-begin,"_void_editor_cursor_");
+    if(!format_context && !operator_context) {
     // Repair physical delimiters only; interpolation lowering adds synthetic
     // parentheses at expression offsets that are not source characters.
     Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false);
@@ -5209,18 +5682,23 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
     // Keep the existing conditional colon and leave comments/literal bytes alone.
     if(last && last->text==":")insertion=last->offset;
     if(missing){if(insertion>stop)return empty;repaired.insert(insertion+std::string_view("_void_editor_cursor_").size()-(end-begin),static_cast<std::size_t>(missing),')');}
+    }
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
-    EditorProbe probe{module,begin,{}};probe.result.begin=begin;probe.result.end=end;
-    try {(void)validated_project(entry,frozen,true,nullptr,&probe);}
+    EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+    try {(void)validated_project(entry,frozen,true,nullptr,&probe);if(operator_context)return probe.result;}
     catch(const EditorProbeFound&) {
-        const auto prefix=text.substr(begin,cursor-begin);
+        const auto prefix=operator_context?std::string{}:text.substr(begin,cursor-begin);
         std::erase_if(probe.result.candidates,[&](const auto& c){return !c.name.starts_with(prefix);});
         return probe.result;
     } catch(const CompilationError&) {}
     return empty;
 }
 std::optional<std::string> format_source(const SourceFile& source) {
-    Diagnostics diagnostics;auto tokens=lex(source,diagnostics,0,std::string::npos,0,false);
+    // Parse with the ordinary compiler before proposing edits. This is local
+    // syntax validation, never import discovery or a second semantic resolver.
+    Diagnostics diagnostics;Parser parser(source,diagnostics);Unit parsed(source,source.path());parser.parse(parsed);
+    if(diagnostics.failed())return {};
+    auto tokens=lex(source,diagnostics,0,std::string::npos,0,false);
     if(diagnostics.failed())return {};
     const auto& text=source.text();
     struct Edit {std::size_t begin,end;std::string text;};std::vector<Edit> edits;
@@ -5257,8 +5735,17 @@ std::optional<std::string> format_source(const SourceFile& source) {
     // blocks. Ambiguous/unsupported relationships produce no edit.
     auto result=text;for(auto it=edits.rbegin();it!=edits.rend();++it)result.replace(it->begin,it->end-it->begin,it->text);
     Diagnostics check;auto after=lex(SourceFile(source.path(),result),check,0,std::string::npos,0,false);
-    if(check.failed() || tokens.size()!=after.size())return {};
-    for(std::size_t n=0;n<tokens.size();++n)if(tokens[n].kind!=after[n].kind || tokens[n].text!=after[n].text)return {};
+    auto same_tokens=[](const auto& before,const auto& after) {
+        if(before.size()!=after.size())return false;
+        for(std::size_t n=0;n<before.size();++n)if(before[n].kind!=after[n].kind || before[n].text!=after[n].text || before[n].decoded!=after[n].decoded)return false;
+        return true;
+    };
+    if(check.failed() || !same_tokens(tokens,after))return {};
+    // Literal bytes alone are insufficient: reindenting the physical opening
+    // line can change indentation-sensitive bodies inside an unchanged string.
+    // Prove the parser sees the identical expanded stream as well.
+    auto expanded=lex(SourceFile(source.path(),result),check);
+    if(check.failed() || !same_tokens(parser.syntax_tokens(),expanded))return {};
     return result;
 }
 

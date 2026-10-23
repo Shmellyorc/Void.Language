@@ -1,0 +1,95 @@
+{
+  "configuration": "debug",
+  "records": [
+    {
+      "case": "cold",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"old\"\nenum parcel:\n    payload(value: item)\nvar value: result<parcel, string> = Ok(parcel.payload(item(n = 1)))\nprint([value])\n",
+      "source_sha256": "6ea562e46fdae00f243777d1255def5c5ce40fd83c66bd0e92db4ecf842c6380",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-sum-cache-q3lpjzuy/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b4f6b282f6d61696e2e766f69643a3a70617263656c2e7061796c6f6164286f6c6429295d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 1.2161944480612874
+    },
+    {
+      "case": "hit",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"old\"\nenum parcel:\n    payload(value: item)\nvar value: result<parcel, string> = Ok(parcel.payload(item(n = 1)))\nprint([value])\n",
+      "source_sha256": "6ea562e46fdae00f243777d1255def5c5ce40fd83c66bd0e92db4ecf842c6380",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-sum-cache-q3lpjzuy/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b4f6b282f6d61696e2e766f69643a3a70617263656c2e7061796c6f6164286f6c6429295d0a",
+      "stderr_hex": "44656275672063616368653a206869740a",
+      "seconds": 0.050565475947223604
+    },
+    {
+      "case": "corrupt",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"old\"\nenum parcel:\n    payload(value: item)\nvar value: result<parcel, string> = Ok(parcel.payload(item(n = 1)))\nprint([value])\n",
+      "source_sha256": "6ea562e46fdae00f243777d1255def5c5ce40fd83c66bd0e92db4ecf842c6380",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-sum-cache-q3lpjzuy/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b4f6b282f6d61696e2e766f69643a3a70617263656c2e7061796c6f6164286f6c6429295d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 1.0403120040427893
+    },
+    {
+      "case": "hook-body",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"new\"\nenum parcel:\n    payload(value: item)\nvar value: result<parcel, string> = Ok(parcel.payload(item(n = 1)))\nprint([value])\n",
+      "source_sha256": "6d30fd36526d2595ea58b74e528bebd5b4d870a77cd26c362870b768a3f9c54b",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-sum-cache-q3lpjzuy/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "5b4f6b282f6d61696e2e766f69643a3a70617263656c2e7061796c6f6164286e657729295d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 1.195837471052073
+    },
+    {
+      "case": "specification",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"new\"\nenum parcel:\n    payload(value: item)\nvar value: result<parcel, string> = Ok(parcel.payload(item(n = 1)))\nprint(\"{[value]:>80}\")\n",
+      "source_sha256": "a6ee267b502f6ff394d94731dca56091b4d5f21022638c97cddf3ef6b23a3f7d",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-sum-cache-q3lpjzuy/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "202020202020202020202020202020202020202020202020202020202020202020202020202020202020205b4f6b282f6d61696e2e766f69643a3a70617263656c2e7061796c6f6164286e657729295d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 1.1475731909740716
+    },
+    {
+      "case": "variant-name",
+      "source": "value struct item:\n    n: i32\nfunc (self item) string() -> string:\n    return \"new\"\nenum parcel:\n    renamed(value: item)\nvar value: result<parcel, string> = Ok(parcel.renamed(item(n = 1)))\nprint(\"{[value]:>80}\")\n",
+      "source_sha256": "67cb932275546a483dc902867404585ed4afd717154622ec6f671f9ddf65d75c",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID-sum-cache-q3lpjzuy/main.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout_hex": "202020202020202020202020202020202020202020202020202020202020202020202020202020202020205b4f6b282f6d61696e2e766f69643a3a70617263656c2e72656e616d6564286e657729295d0a",
+      "stderr_hex": "44656275672063616368653a206d6973730a",
+      "seconds": 1.2406246580649167
+    }
+  ]
+}

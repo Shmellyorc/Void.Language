@@ -1,0 +1,14 @@
+use console
+func main():
+    var bad = console.stdin.read_char()
+    if bad is Err(var reason):
+        print(reason.message, reason.bytes_transferred, reason.partial.count, reason.partial[0], reason.partial[1])
+    var ready = console.stdin.read_text(3)
+    if ready is Ok(text_read.text(var value)):
+        print("ready:", value)
+    var truncated = console.stdin.read_char()
+    if truncated is Err(var reason):
+        print(reason.message, reason.bytes_transferred, reason.partial[0])
+    var finished = console.stdin.read_bytes(1)
+    if finished is Ok(bytes_read.eof):
+        print("eof")

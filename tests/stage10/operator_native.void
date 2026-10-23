@@ -1,0 +1,24 @@
+use "/native_bridge.void" as bridge
+value struct number:
+    value: i32
+    operator ==(const left: number, const right: number) -> bool:
+        defer {
+            bridge.scalar_i32(2)
+        }
+        bridge.scalar_i32(1)
+        return left.value / right.value == 1
+func lhs() -> number:
+    bridge.scalar_i32(10)
+    return number(value = 4)
+func rhs(value: i32) -> number:
+    bridge.scalar_i32(20)
+    if value < 0:
+        var invalid = 1 / (value - value)
+    return number(value = value)
+func entry(input: i32) -> i32:
+    defer {
+        bridge.scalar_i32(9)
+    }
+    if lhs() != rhs(input):
+        return 1
+    return 0

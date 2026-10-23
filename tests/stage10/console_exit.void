@@ -1,0 +1,11 @@
+func emit(text: string):
+    print(text, end = "")
+func main() -> i32:
+    defer emit("outer;")
+    print("body;", end = "")
+    if false:
+        defer emit("unreached;")
+    if true:
+        defer emit("inner;")
+        print("block;", end = "")
+    return 7

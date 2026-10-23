@@ -1,0 +1,231 @@
+Start testing: Oct 22 06:58 PDT
+----------------------------------------------------------
+1/178 Testing: stage10_operator_resolution
+1/178 Test: stage10_operator_resolution
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_resolution" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_resolution" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+161 operator resolution/call checks passed
+<end of output>
+Test time =   2.16 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_resolution" end time: Oct 22 06:58 PDT
+"stage10_operator_resolution" time elapsed: 00:00:02
+----------------------------------------------------------
+
+2/178 Testing: stage10_operator_declarations
+2/178 Test: stage10_operator_declarations
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_declarations" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_declarations" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+278 operator declaration/validation checks passed
+<end of output>
+Test time =   1.20 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_declarations" end time: Oct 22 06:58 PDT
+"stage10_operator_declarations" time elapsed: 00:00:01
+----------------------------------------------------------
+
+3/178 Testing: stage10_display_reload
+3/178 Test: stage10_display_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_display_reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_display_reload" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+132 display dependency/reload checks passed
+<end of output>
+Test time =   0.73 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_display_reload" end time: Oct 22 06:58 PDT
+"stage10_display_reload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/178 Testing: stage10_hooks
+6/178 Test: stage10_hooks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_hooks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_hooks" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+77 nominal/custom display checks passed
+<end of output>
+Test time =   5.43 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_hooks" end time: Oct 22 06:58 PDT
+"stage10_hooks" time elapsed: 00:00:05
+----------------------------------------------------------
+
+7/178 Testing: stage10_interpolation
+7/178 Test: stage10_interpolation
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_interpolation"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_interpolation" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+57 interpolation checks passed
+<end of output>
+Test time =   1.36 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_interpolation" end time: Oct 22 06:58 PDT
+"stage10_interpolation" time elapsed: 00:00:01
+----------------------------------------------------------
+
+8/178 Testing: stage10_conversion
+8/178 Test: stage10_conversion
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_conversion"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_conversion" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+78 source conversion checks passed
+<end of output>
+Test time =   0.86 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_conversion" end time: Oct 22 06:58 PDT
+"stage10_conversion" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/178 Testing: stage10_fields
+9/178 Test: stage10_fields
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_fields"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_fields" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.44 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Oct 22 06:58 PDT
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/178 Testing: generics_source
+23/178 Test: generics_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_generics_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"generics_source" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+<end of output>
+Test time =   6.29 sec
+----------------------------------------------------------
+Test Passed.
+"generics_source" end time: Oct 22 06:58 PDT
+"generics_source" time elapsed: 00:00:06
+----------------------------------------------------------
+
+154/178 Testing: ergonomics_sprint6_host
+154/178 Test: ergonomics_sprint6_host
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_sprint6_tests" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/sprint6 host fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"ergonomics_sprint6_host" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 GC, checked failure, reload, async and native checks passed
+<end of output>
+Test time =   1.67 sec
+----------------------------------------------------------
+Test Passed.
+"ergonomics_sprint6_host" end time: Oct 22 06:58 PDT
+"ergonomics_sprint6_host" time elapsed: 00:00:01
+----------------------------------------------------------
+
+155/178 Testing: ergonomics_sprint6
+155/178 Test: ergonomics_sprint6
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"ergonomics_sprint6" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 process checks passed: 55
+<end of output>
+Test time =   8.20 sec
+----------------------------------------------------------
+Test Passed.
+"ergonomics_sprint6" end time: Oct 22 06:58 PDT
+"ergonomics_sprint6" time elapsed: 00:00:08
+----------------------------------------------------------
+
+159/178 Testing: stage10_operators_aot
+159/178 Test: stage10_operators_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operators_aot" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+16 source operator JIT/AOT checks passed
+<end of output>
+Test time =   2.69 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operators_aot" end time: Oct 22 06:58 PDT
+"stage10_operators_aot" time elapsed: 00:00:02
+----------------------------------------------------------
+
+161/178 Testing: lsp_sprint6
+161/178 Test: lsp_sprint6
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_sprint6" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+<end of output>
+Test time =   0.66 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint6" end time: Oct 22 06:58 PDT
+"lsp_sprint6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+162/178 Testing: lsp_stage10_fields
+162/178 Test: lsp_stage10_fields
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_fields" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+Field LSP privacy, const hover/completion, dirty rejection and repair passed
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_fields" end time: Oct 22 06:58 PDT
+"lsp_stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+163/178 Testing: lsp_stage10_display
+163/178 Test: lsp_stage10_display
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_display" start time: Oct 22 06:58 PDT
+Output:
+----------------------------------------------------------
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_display" end time: Oct 22 06:58 PDT
+"lsp_stage10_display" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 22 06:58 PDT

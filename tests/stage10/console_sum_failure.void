@@ -1,0 +1,15 @@
+value struct broken:
+    value: i32
+func (self broken) format(spec: string) -> result<string, string>:
+    return Err("sum-hook-failure")
+func (self broken) string() -> string:
+    return "{self:bad}"
+enum parcel:
+    empty
+    payload(value: broken)
+func cleanup():
+    print("cleanup", end = ";")
+func main():
+    defer cleanup()
+    var value: result<parcel, string> = Ok(parcel.payload(broken(value = 1)))
+    print("NO OUTER PREFIX", [value])

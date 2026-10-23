@@ -1,0 +1,13 @@
+/tmp/step40-readonly.void:12:5: error: Cannot write through readonly reference leaf 'cell'.
+    code: VOID2007
+
+ 12 |     alias.value++
+    |     ^^^^^
+    Module: /step40-readonly.void
+    Reference type declared here. at /tmp/step40-readonly.void:1:8
+
+ 1 | struct cell:
+   |        ^^^^
+    Module: /step40-readonly.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

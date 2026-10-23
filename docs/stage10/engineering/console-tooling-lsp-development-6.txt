@@ -1,0 +1,2 @@
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+219 console/composite LSP checks passed

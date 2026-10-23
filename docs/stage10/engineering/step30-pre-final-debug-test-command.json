@@ -1,0 +1,15 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "build/ci-official-debug",
+    "--output-on-failure",
+    "-R",
+    "^(stage10_hooks|stage10_interpolation|stage10_fields|gc_buffers|gc_schemas|runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_terminal|runtime_console_native_terminal|runtime_console_keyboard|runtime_console_native_keyboard|runtime_console_wide|runtime_console_input|runtime_console_native_input|runtime_coordination|runtime_callbacks|runtime_failures|runtime_invariants|stage10_console_source|async_lifecycle|stage10_console_aot|application_native_sprint4_host|application_native_sprint4|stage10_operator_reload|stage10_display_reload)$"
+  ],
+  "returncode": 8,
+  "seconds": 326.9399969029473,
+  "environment": {
+    "VOID_STDLIB_ROOT": "/tmp/void-step30-stdlib-3j1vums5/stdlib"
+  }
+}

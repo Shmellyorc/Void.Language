@@ -1,0 +1,7 @@
+use "operator_native_compounds.void" as library
+func work(input: i32) -> i32:
+    var value = library.number(value = input)
+    value += 1
+    return value.value
+async func entry(input: i32) -> i32:
+    return await spawn work(input)

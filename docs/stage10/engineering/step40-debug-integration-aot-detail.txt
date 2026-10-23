@@ -1,0 +1,34 @@
+Start testing: Oct 22 12:53 PDT
+----------------------------------------------------------
+83/186 Testing: stage10_operator_integration
+83/186 Test: stage10_operator_integration
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_integration" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_integration" start time: Oct 22 12:53 PDT
+Output:
+----------------------------------------------------------
+1143 operator GC/effect/failure integration checks passed
+<end of output>
+Test time =  56.91 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_integration" end time: Oct 22 12:54 PDT
+"stage10_operator_integration" time elapsed: 00:00:56
+----------------------------------------------------------
+
+165/186 Testing: stage10_operators_aot
+165/186 Test: stage10_operators_aot
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_integration"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operators_aot" start time: Oct 22 12:54 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time = 240.08 sec
+----------------------------------------------------------
+Test Failed.
+"stage10_operators_aot" end time: Oct 22 12:58 PDT
+"stage10_operators_aot" time elapsed: 00:04:00
+----------------------------------------------------------
+
+End testing: Oct 22 12:58 PDT

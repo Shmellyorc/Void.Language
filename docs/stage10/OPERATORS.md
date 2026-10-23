@@ -24,8 +24,9 @@ statements below; it does not claim implementation or acceptance.
 
 
 **Approved for implementation; Stage 10 acceptance remains open.** The Bible's owner-contained operator direction
-is approved in principle, but exact signatures/resolution are not implemented.
-This proposal settles those details without changing ownership or coercion rules.
+is approved. Steps 32–34 implement declarations, exact selection and ordinary-call
+integration under focused Linux acceptance; Steps 35–36 supply captured compounds
+and recursive dictionary-key exclusion. Final-stage acceptance remains open. The contract below preserves ownership and coercion rules.
 [Main roadmap](../STAGE10_DESIGN.md).
 
 ## Complete approved surface
@@ -194,7 +195,7 @@ metadata, with scalar/string/managed identity and recursively eligible value key
 DECISIONS.md explicitly leaves **custom-equality keys deferred**. Do not install
 JIT callbacks in descriptors or infer a hash from arbitrary custom equality.
 
-Recommended B4 rule: a type defining custom `==`, or a value key recursively
+Approved B4 rule: a type defining custom `==`, or a value key recursively
 containing such a type, is ineligible as a dictionary key. This includes managed
 key types with custom equality, whose existing identity hash would otherwise
 disagree with a user expectation of equality. Adding equality can therefore make
@@ -235,3 +236,140 @@ glyph rename is rejected (changing a glyph changes semantics); parameter/type/fi
 renames continue through existing guarded paths. `voidls` never executes an operator
 to resolve hover. Source formatting retains precedence and cannot change a custom
 operation by rewriting operand order. See [TEST_PLAN.md](TEST_PLAN.md).
+
+## Step 32 implementation checkpoint — 22 October 2026
+
+The owner-contained declaration surface and frontend/independent IR validation
+are implemented. All approved glyphs, const operands, exact owner participation,
+visibility, arity, result categories and duplicate tuples are checked. Generic
+headers validate even when unused; dependent bodies keep existing deferred checks.
+Concrete specializations are ordinary functions; readonly alias/fresh-result
+authority follows existing effect inference. Analyzed metadata owns glyph source
+spans and rejects glyph rename. Tests can invoke declared bodies through ordinary
+IR calls, but source operator selection is not yet implemented.
+
+Steps 33–36 remain required for source resolution, ordinary-call integration and
+derived inequality, captured-place compounds and recursive dictionary-key
+exclusion. Existing builtin expression behavior remains in force meanwhile. See
+[the recovery ledger](IMPLEMENTATION.md) and engineering/step32-results.json for
+actual verification and the exact next source change. This checkpoint does not
+claim a complete operator system or complete Stage 10.
+
+## Step 33 implementation checkpoint — 22 October 2026
+
+Exact direct-owner selection and required source call integration are implemented.
+The shared IR selector enforces exact operand tuples/nullability, definition-scope
+imports, nominal/operator visibility and const capabilities. Generic operators
+and generic function bodies use concrete specialization. Ambiguity lists both
+accessible owners; hidden exact matches diagnose before builtin fallback. Numeric
+literal defaults/anchors are preserved without result-type ranking. Related
+managed identity and nullable callable comparison remain builtin behavior when
+no exact custom declaration matches.
+
+Selected source operations use existing ordinary call/effect/root/failure lowering.
+Derived != uses == once then Boolean negation. Independent IR repeats selection
+and access checks from the actual operands and glyph proof. Source glyphs retain
+ordinary definition/reference/dependency records. Compiler-generated null guards
+and patterns do not run custom equality. Normal/O2 execution and linked native
+AOT are covered by the focused evidence, not a whole operator-system acceptance.
+
+Steps 34–36 add focused lifetime/effect/failure coverage, captured compounds and
+recursive dictionary exclusion (see the subsequent checkpoints). Step 33 evidence
+is retained in engineering/step33-results.json. Stage 10 remains incomplete.
+
+## Step 34 integration checkpoint — 22 October 2026
+
+Ordinary operator call integration is focused-tested with collection during RHS
+construction, across RHS await, and in worker-reachable operators. Managed identity,
+generic reference-bearing value snapshots, fresh returns, precise roots and frame
+cleanup survive these boundaries and allocation-failure retries. No new production
+machinery or dependency was required. Derived != calls == once, including native
+side effects and failures; failed RHS evaluation never enters the operator.
+
+Checked failures retain original operator/caller source frames and dynamically
+owned primary messages through reached cleanup, further cleanup failure and worker
+handoff. Older reached defers run; unreached defers do not. Existing worker effects
+and readonly capability checks follow operator calls and independently reject
+forged unknown/native edges in IR. Task enqueue from structured cleanup remains
+a checked Runtime failure, matching ordinary helpers.
+
+See IMPLEMENTATION.md and engineering/step34-results.json for actual Linux
+Debug/strict and JIT/O2/linked AOT outcomes. This closes the bounded Step 34
+integration increment, not the whole operator system or Stage 10. Steps 35–36
+now supply compounds/key protection; later tooling/cache/reload integration and
+native-platform/final acceptance remain required.
+
+## Step 35 captured compounds — engineering continuation, 22 October 2026
+
+Custom +=, -=, *=, /= and %= reuse exact direct-owner arithmetic selection and
+ordinary calls. The selected place captures its owner/key/index and old operand
+before RHS evaluation; calls commit only through the established selected write.
+Mixed exact RHS and concrete generic owners work. Result conversions use ordinary
+assignment rules after selection (ancestor views, interface packing and callable
+binding); they never rank candidates or convert operands to find a declaration.
+Reference effects and worker edges include the selected arithmetic and any
+ordinary result adapter. Compound glyphs reference their selected declarations.
+
+Normal stored/private/const paths, properties, inline fixed arrays, lists and
+dictionary values retain their existing capability and version checks. A failed
+operator skips setters/commits. Invalidated list/dictionary writes retain the
+Runtime structural failure and source frame; RHS side effects remain visible.
+Ordinary builtin numeric/string compounds and excluded custom ++/-- remain.
+Focused acceptance is recorded in IMPLEMENTATION.md and engineering/step35-results.json;
+the complete Stage 10 and native-platform gates remain separate.
+
+## Step 36 recursive dictionary protection — 22 October 2026
+
+The shared IR eligibility walk uses concrete owner declaration metadata, traversing
+all value fields and fixed element shapes. The declaring owner's == glyph span is
+retained for source diagnostics; operator accessibility and operand signature do
+not exempt a type. Managed payloads and ancestors stay outside identity-key hashing.
+IR cross-checks the marker against actual == declarations, as well as rejecting
+ineligible dictionary types. Ordinary dictionary values and pattern comparisons
+retain their prior rules.
+
+Existing nominal Runtime metadata now carries canonical schema identity and a
+transitive exclusion bit for both value and managed owners. The LLVM/C++ ABI layout
+is checked; Runtime catalog re-admission cannot downgrade or alias that policy.
+Native dictionary metadata and explicit dictionary-key schema admission reject
+forbidden roots/managed leaves. Value-schema admission remains valid. No executable
+addresses, equality callbacks or user hash protocol are added. Fixed-array keys
+remain excluded by the existing key domain in DICTIONARIES.md, including zero
+extent; the source diagnostic can identify custom equality inside them.
+
+Focused execution evidence is in engineering/step36-results.json. This is separate
+from Step 37 compatibility/dependency work and final Stage 10 platform acceptance.
+
+## Step 37 compatibility and dependency integration — 22 October 2026
+
+The existing source contract records exact declaring owners, glyphs, template /
+concrete identity, operand/result capabilities, visibility and inferred effects.
+Unused generic operator sets also participate, including their owner's visibility,
+managed/value kind and generic parameters/constraints; unused bodies remain deferred.
+Analyzed references retain an owned exact native binding contract before generic
+editor normalization. Derived != and captured compounds use the selected ordinary
+call targets. The existing invalidation graph consumes those bindings and operator
+owner edges; repeated concrete dependencies are implicit rather than duplicate
+written references.
+
+Existing reload preflight requires restart for declaration-set/signature/visibility/
+effect/selection changes. Compatible arithmetic/hook body edits retain normal whole
+generation leases. Persistent Debug cache keys still include full source snapshots
+and actual archive build identities; shared formatting/temporal policy versions are
+also explicit inputs. There is no second cache, registry or operator backend.
+Focused execution and platform limits are in engineering/step37-results.json when
+finalized. Step 38 tooling and final Stage 10 acceptance remain separate.
+
+
+## Step 38 compiler-owned tooling — 22 October 2026
+
+At typed glyph positions, completion uses the same exact direct-owner/import/access
+selector as execution. Candidates carry source docs, concrete signatures and finalized
+ordinary effects. Hover retains each selected specialization while navigation and
+references share source declaration identity. Generic bodies preserve all selected
+specializations and targets; multi-target navigation/reference results are explicit,
+and completion intersects their available glyphs. Derived != and compounds navigate to
+their declared ==/arithmetic targets with their original glyph ranges. Operator
+symbols appear in outlines; glyph rename rejects. Ordinary renames retain compiler
+revalidation. Editor presentation is excluded from native compatibility contracts.
+Focused metadata, real LSP and editor evidence: engineering/step38-results.json.

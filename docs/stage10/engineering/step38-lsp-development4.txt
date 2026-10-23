@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 119, in <module>
+    check('const id: i32' in text and 'shell<i32>' in text,text)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 12, in check
+    assert value, message
+           ^^^^^
+AssertionError: const id: i32 (declared by /main.void::shell<2:0:>)

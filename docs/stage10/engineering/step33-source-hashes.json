@@ -1,0 +1,13 @@
+{
+  "CMakeLists.txt": "643e6f8b18b785cdd86c2846101947e266ae56b227ccbb5ca6f424632c54f958",
+  "include/void/ir.hpp": "e25a32b643c48fa1db552a2e9b2f8ac3ca29c584140c439271bd171a22c61d5b",
+  "src/frontend/compiler.cpp": "2b2b160103d32f36163b718826b38078469da64c640c78b3f671c94f259c3860",
+  "src/frontend/construction.inc": "dc3052a3643bca401932e58a3f1a98238eb187ab4f55ba2ab9c39e45c8130dee",
+  "src/frontend/display_semantics.inc": "aa14d157ba888e5a9bd6b91d801d0351b5364f52d03dd97e8d37b9e674bdf569",
+  "src/ir/interfaces.inc": "bccd3d2b7c086d01c7c6575033fe04f1d61e3676e991c78d802ba90d915ff207",
+  "src/ir/module.cpp": "6000acf81efefd580841beced12d9db261b122d6a94b8ce9950da2bee1a07172",
+  "tests/stage10/operator_declarations.cpp": "d27d33f91f111fd06da8c5dfe2a66f0a3fa8aae04f0d7609d0b84f91f2b1b809",
+  "tests/stage10/operator_resolution.cpp": "214799f91a33fd1008c74c924c10c829f36e961ac8da35881f7173d9d44b98cd",
+  "tests/stage10/operators.void": "17e15c5524f703ec919e139df00f57a7a3b4bddf3006e3c2143b23dbc7bac20a",
+  "tests/stage10/operators.py": "08bd2b89dccc08ad75c17a25fdec313d696095233c76a22de2b8dcfa57c52ec5"
+}

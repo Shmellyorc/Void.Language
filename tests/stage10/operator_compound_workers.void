@@ -1,0 +1,7 @@
+use "operator_compounds.void" as library
+func work(value: i32) -> i32:
+    var total = library.box<i32>(value = value)
+    total += 3
+    return total.value
+async func entry(input: i32) -> i32:
+    return await spawn work(input)

@@ -1,0 +1,160 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:70:17: error: Unknown function '_console_write'.
+    code: VOID2003
+
+ 70 |     var reply = _console_write(self, text)
+    |                 ^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:75:17: error: Unknown function '_console_write_bytes'.
+    code: VOID2003
+
+ 75 |     var reply = _console_write_bytes(self, bytes)
+    |                 ^^^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:80:17: error: Unknown function '_console_flush'.
+    code: VOID2003
+
+ 80 |     var reply = _console_flush(self)
+    |                 ^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:86:16: error: Unknown function '_console_redirected'.
+    code: VOID2003
+
+ 86 |         return _console_redirected(self).progress != (0 as i64)
+    |                ^^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:89:16: error: Unknown function '_console_redirected'.
+    code: VOID2003
+
+ 89 |         return _console_redirected(self).progress != (0 as i64)
+    |                ^^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:97:18: error: Unknown function '_console_read_char'.
+    code: VOID2003
+
+ 97 |     return _text(_console_read_char(self, timeout_ms), "read_char")
+    |                  ^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:99:18: error: Unknown function '_console_read_text'.
+    code: VOID2003
+
+ 99 |     return _text(_console_read_text(self, max_scalars, timeout_ms), "read_text")
+    |                  ^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:101:18: error: Unknown function '_console_read_line'.
+    code: VOID2003
+
+ 101 |     return _text(_console_read_line(self, timeout_ms), "read_line")
+     |                  ^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:103:17: error: Unknown function '_console_read_bytes'.
+    code: VOID2003
+
+ 103 |     var reply = _console_read_bytes(self, max_bytes, timeout_ms)
+     |                 ^^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:186:26: error: Unknown function '_console_capabilities'.
+    code: VOID2003
+
+ 186 |     return _capabilities(_console_capabilities(self))
+     |                          ^^^^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:188:26: error: Unknown function '_console_capabilities'.
+    code: VOID2003
+
+ 188 |     return _capabilities(_console_capabilities(self))
+     |                          ^^^^^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:194:17: error: Unknown function '_console_size'.
+    code: VOID2003
+
+ 194 |     var reply = _console_size(self)
+     |                 ^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:199:17: error: Unknown function '_console_position'.
+    code: VOID2003
+
+ 199 |     var reply = _console_position(self)
+     |                 ^^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:204:17: error: Unknown function '_console_cursor'.
+    code: VOID2003
+
+ 204 |     return _ack(_console_cursor(self, column, row), "set_cursor", _stream(self))
+     |                 ^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:209:17: error: Unknown function '_console_visible'.
+    code: VOID2003
+
+ 209 |     return _ack(_console_visible(self, flag), "set_cursor_visible", _stream(self))
+     |                 ^^^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:211:17: error: Unknown function '_console_color'.
+    code: VOID2003
+
+ 211 |     return _ack(_console_color(self, _color_code(foreground), _color_code(background)), "set_color", _stream(self))
+     |                 ^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:213:17: error: Unknown function '_console_reset'.
+    code: VOID2003
+
+ 213 |     return _ack(_console_reset(self), "reset_color", _stream(self))
+     |                 ^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:215:17: error: Unknown function '_console_clear'.
+    code: VOID2003
+
+ 215 |     return _ack(_console_clear(self), "clear", _stream(self))
+     |                 ^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:217:17: error: Unknown function '_console_title'.
+    code: VOID2003
+
+ 217 |     return _ack(_console_title(self, text), "set_title", _stream(self))
+     |                 ^^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:219:17: error: Unknown function '_console_bell'.
+    code: VOID2003
+
+ 219 |     return _ack(_console_bell(self), "bell", _stream(self))
+     |                 ^^^^^^^^^^^^^
+    Module: /console.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+

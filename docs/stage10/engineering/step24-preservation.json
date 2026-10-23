@@ -1,0 +1,24 @@
+{
+  "previous_manifest": "step24-blocker-checkpoint-source-hashes.json",
+  "prior_entries": 168,
+  "bounded_files": 14,
+  "unchanged_prior_entries_verified": 156,
+  "changed_previous_entries": [
+    "CMakeLists.txt",
+    "docs/DECISIONS.md",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/engineering/step24-feasibility.md",
+    "docs/stage10/engineering/step24-posix-feasibility.cpp",
+    "include/void/console.hpp",
+    "src/runtime/console.cpp",
+    "tests/runtime/console.cpp"
+  ],
+  "unexpected_byte_changes": [],
+  "root_README": "git diff --quiet passed; untouched",
+  "before_resume_results": "step24-before-resume-results.json",
+  "prior_step23_checkpoint": "step23-checkpoint-source-hashes.json"
+}

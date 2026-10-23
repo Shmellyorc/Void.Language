@@ -446,3 +446,143 @@ patterns and real time-zone names from installed metadata; never run hooks,
 read clocks or perform I/O to answer LSP requests. Formatting preserves literal
 bytes, escape spellings and spec strings. UTF-16 conversion uses the same original
 immutable snapshot, including supplementary characters before/inside holes.
+
+## Step 37 dependency compatibility — 22 October 2026
+
+Shared format policy `void-format-v2` names ties-to-even rounding, Unicode scalar
+alignment and the full pinned Ryu revision. Temporal policy `void-temporal-v1`
+names date v3.0.3/full revision, bundled IANA 2026e and explicit overlap/gap handling.
+Both enter source compatibility and the existing native Debug cache key, in addition
+to actual archive build digests and complete immutable source snapshots.
+
+Written format specification expressions have owned, trivia-free syntax contracts,
+including interpolation, reordered named prelude arguments, direct format hooks,
+concatenation and nested expression/pattern dependencies. Module/local constant
+syntax keeps the existing exact constant contract. Selected adapters, hooks and
+ordinary helpers retain ordinary reference edges and inferred effects. A relevant
+specification/selection/effect change requires restart; compatible helper/hook body
+edits use the established generation lease. Dynamic specification-producing helper
+bodies remain ordinary code; they are not evaluated during dependency analysis.
+No executable pointers enter formatting/zone/GC descriptors and no additional
+formatting engine/cache is introduced. Final focused evidence is in the Step 37
+engineering record; this does not complete composite display or Stage 10 acceptance.
+
+
+## Step 38 editor integration — 22 October 2026
+
+Compiler EditorProbe offers numeric, temporal and alignment examples in interpolation
+format tokens and ordinary format literal arguments. The production validators and
+actual operand type filter candidates; no hook executes to answer a query. Selected
+custom conversions navigate/reference the ordinary hook already selected in the
+compiler adapter. Layout-only specifications navigate to string; dynamic specs
+retain both conditional hooks. A format replacement requires an actual colon in
+an interpolation hole. Explicit hook calls retain ordinary docs and parameter assistance.
+Original expression spans support hover/signature/completion/navigation inside holes,
+including multiline/CRLF/Unicode and escaped braces. Installed temporal sources retain
+read-only identities. Future console/composite display tooling remains dependent on
+those implementations. Focused evidence: engineering/step38-results.json.
+
+
+## Step 39 conservative source formatting — 22 October 2026
+
+The compiler-owned formatter first parses with the existing frontend. It rewrites
+only proven inter-token space gaps and physical code indentation. Comments, blank
+lines, literal spelling/decoded bytes, format specifications and LF/CRLF bytes
+remain unchanged. Both physical and interpolation-expanded token streams must
+retain kind, spelling and decoded contents, including indentation tokens. A changed
+opening-line indentation can affect a multiline hole body even when the entire
+string token is byte-identical; such a proposed edit is refused. Malformed syntax
+also produces no edit. No interpolation mini-parser or formatting grammar is added.
+
+The LSP additionally requires current successful project analysis, reanalyzes the
+proposed overlay, compares exact compatibility, verifies idempotence and rechecks
+revision/disk state. Semantic diagnostics therefore prevent editor formatting.
+The standalone formatting API can normalize syntactically valid erroneous source
+while retaining the same errors in their own original-source snapshots. Literal
+content and expressions inside strings are never reformatted. Existing native
+clients retain their version/changedtick guards. Focused acceptance and limits:
+engineering/step39-results.json. Future console/composite integration is still open.
+
+## Step 27 print consumer integration
+
+The source heterogeneous print consumer now captures every supplied expression and
+control before rendering through ordinary scalar display or selected nominal hooks.
+It uses the existing checked join/builder kernel and writes only a completed record.
+Approved borrowed console tokens have the same opaque <resource> display policy as
+other native resources, with no payload traversal. Strings retain exact UTF-8/NUL
+bytes. Hook failures preserve their reason and run reached cleanup; no outer record
+prefix is emitted. Collections/enums/results remain a separate missing composite
+display obligation. Exact normal/O2 JIT, linked AOT and strict evidence is in
+engineering/step27-results.json; final four-system integration is still open.
+
+
+## Collection increment implementation — 23 October 2026
+
+Fixed arrays, growable lists and dictionaries now lower statically through the same
+conversion dispatcher used by string, format, interpolation and print. A generated
+ordinary function drives managed continuation tags and type-specific owner/cursor/
+version stacks; dictionary key/value snapshots use ordinary typed storage. Every
+container edge is processed iteratively, without native calls proportional to
+collection depth. Existing collection reads/version checks and readonly/value-copy
+rules remain authoritative; private fields of opaque nominal values are never
+traversed. Eligible key admission and data-only dictionary equality/hash are unchanged.
+
+A compiler-private per-call Runtime context holds the existing checked UTF8 Builder
+and active identity path. Generated typed roots retain owners; the context stores
+no executable metadata, boxed values or managed ownership. Nested conversions see
+active ancestors, cycle edges display <cycle>, and shared acyclic values repeat.
+Scope cleanup restores the path and builder on normal/failure/cancellation exits
+using the ordinary checked LLVM/Runtime call path. No nesting/output limit is added.
+
+Universal alignment remains scalar-based; collection patterns are otherwise empty.
+Invalid literal collection specs diagnose; dynamic unsupported specs return Err.
+The immutable result is published only after complete construction; print still
+assembles all conversions before admitting its outer native output record. Hooks
+retain existing effects, visibility, readonly authority and recursion guards.
+
+The formatter policy is void-format-v3;collections-v1, with the same pinned Ryu,
+date and bundled IANA versions/licenses. No dependency was added. Focused acceptance
+is recorded in engineering/collections-results.json. Enum/result display and their
+collection element forms remain the next composite increment. Native Windows/macOS,
+collection/editor integration and complete four-system/final acceptance remain open.
+
+## Enum/result increment implementation — 23 October 2026
+
+Enum defaults use the canonical qualified declaring type followed by `.case`.
+Payload-bearing cases append `(first, second)` in declared order; empty cases
+have no parentheses. Results use `Ok(value)` or `Err(error)`, preserving Ok(null).
+Nested strings retain exact raw Unicode/NUL contents. These defaults are shared
+by string, format, interpolation and print, including container and sum nesting.
+
+The existing generated typed work stack now includes sum continuations and typed
+owner/cursor storage. It checks the tag before selecting a case, reads only active
+payloads through existing checked sum_get IR, and uses the existing scoped builder,
+active collection path and ordinary leaf hooks. Enum/list cycles remain iterative;
+shared acyclic references repeat. Value copies and managed identities keep their
+existing semantics. No enum/result Runtime renderer, reflection, boxing, executable
+metadata callback, new IR/ABI operation or dependency was introduced.
+
+Universal alignment counts Unicode scalars. Other patterns are rejected by the
+same literal-analysis/dynamic-Err rules as collections. Failed display publishes
+no immutable result or outer print prefix. Existing source cleanup/frames, GC roots,
+worker effects, code leases, dictionary admission and pattern semantics remain.
+Concrete generic result/payload/owner specializations use existing syntax; this
+increment does not introduce a new generic-enum declaration syntax.
+
+Policy identity is void-format-v4;collections-v1;sum-display-v1. Ordinary hook edges,
+existing variant/layout contracts and exact compiler/Runtime/dependency identities
+cover reload and native caching. Focused final evidence is tracked in
+engineering/sum-display-results.json: focused Linux Debug/strict acceptance passes.
+Native-platform/editor/four-system/final-stage acceptance remains separate.
+
+## Composite tooling integration — 23 October 2026
+
+Existing EditorProbe/declaration/reference records cover enum case menus, declared
+payload names/docs, constructor parameter help and checked pattern source targets.
+Concrete result constructors and patterns expose compiler-owned metadata with
+separate readonly-capability identities and contextual Ok/Err menus; builtins have
+no invented filesystem definitions. Fixed/list/dictionary/result/enum consumers
+retain shared layout-only format suggestions and production invalid-spec validators.
+No display evaluation, renderer, reflection or editor semantic resolver is added.
+Unicode/CRLF/multiline/nested holes retain original compiler spans. Focused evidence
+and remaining platform/final acceptance are in console-tooling-results.json.

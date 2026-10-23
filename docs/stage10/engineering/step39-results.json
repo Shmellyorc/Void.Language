@@ -1,0 +1,220 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 39,
+  "increment_status": "currently applicable formatting/diagnostic functionality implemented; focused Linux and actual native-editor acceptance passed; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Existing Parser validates syntax before format_source proposes a whitespace edit; no second grammar or semantic resolver.",
+    "Both physical and interpolation-expanded token streams retain kind, spelling and decoded contents, including structural indentation; unsafe multiline literal-opening reindentation returns no edit.",
+    "Physical literal/specification bytes, comments, blank lines, LF/CRLF, UTF-8 and BOM remain unchanged. Existing spacing/indentation edit walk retained.",
+    "Existing LSP whole-project reanalysis, exact compatibility, idempotence, revision/disk and library identity gates retained; no LSP production change.",
+    "New compiler/LSP suites and native editor tests verify syntax/bindings/evaluation, original diagnostics/UTF-16 spans, malformed/dirty repair, stale notifications/edits and refresh/close/reopen.",
+    "Native VS Code test explicitly focuses editor for real UI commands, accepts minimized edits/undefined empty results, and holds a real formatting request while updating the model. Native Vim/Neovim require an actual old proposed edit and reject its stale application.",
+    "Existing VS Code lexical keyword list includes use alongside operator; coloring only, no source parser change."
+  ],
+  "demonstrated_production_defect": {
+    "baseline": "Step 38 archive baseline: original valid=1, rewrite returned=1, rewritten valid=0",
+    "method": "Before sanitizer rebuild, compile/link the retained probe against the preserved Step 38 sanitizer archives; run with strict ASan/UBSan/leaks outside ptrace. Baseline probe succeeded only when the old bug reproduced. Current regression requires no unsafe edit.",
+    "source": "step39-baseline.cpp",
+    "log": "step39-baseline.txt"
+  },
+  "checks": {
+    "compiler_formatting_diagnostics_native_JIT_O2": 321,
+    "final_LSP_formatting_revision_diagnostics_temporal": 144,
+    "preserved_tooling_metadata": 20,
+    "preserved_LSP_intelligence": 170,
+    "preserved_operator_resolution": 161,
+    "preserved_operator_format_reload_cache": 219
+  },
+  "debug": {
+    "status": "passed",
+    "passed": 20,
+    "total": 20,
+    "seconds": 26.71,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_resolution",
+      "stage10_tooling",
+      "stage10_source_formatting",
+      "lsp_positions",
+      "lsp_protocol",
+      "lsp_stage8",
+      "lsp_stage7",
+      "lsp_demo",
+      "sessions",
+      "tooling",
+      "analysis",
+      "lsp_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_stage10_source_formatting",
+      "lsp_sprint4",
+      "lsp_sprint3",
+      "lsp_sprint2"
+    ],
+    "build": "step39-debug-final-build.txt",
+    "log": "step39-debug-final-accepted.txt",
+    "detail": "step39-debug-final-detail.txt",
+    "note": "Full focused run had 122 formatting LSP checks. Only the LSP fixture was subsequently extended with temporal cases; final targeted 1/1 below passed all 144 checks. Production source was unchanged."
+  },
+  "strict_sanitizers": {
+    "status": "passed",
+    "passed": 20,
+    "total": 20,
+    "seconds": 31.45,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_resolution",
+      "stage10_tooling",
+      "stage10_source_formatting",
+      "lsp_positions",
+      "lsp_protocol",
+      "lsp_stage8",
+      "lsp_stage7",
+      "lsp_demo",
+      "sessions",
+      "tooling",
+      "analysis",
+      "lsp_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_stage10_source_formatting",
+      "lsp_sprint4",
+      "lsp_sprint3",
+      "lsp_sprint2"
+    ],
+    "configuration": "RelWithDebInfo, pinned LLVM/Clang 19.1.7, ASan/UBSan/leaks; existing RTTI-off vptr exclusion",
+    "build": "step39-san-build2.txt",
+    "configure": "step39-san-configure.txt",
+    "log": "step39-san-accepted.txt",
+    "detail": "step39-san-detail.txt",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "execution": "Outside restricted ptrace runner for real LeakSanitizer checking; automatic escalation review approved. No sanitizer error/leak report. Generated JIT instructions are not equivalently sanitizer-instrumented.",
+    "note": "Final added temporal LSP cases were verified separately below without production edits."
+  },
+  "final_temporal_LSP_extension": {
+    "Debug": {
+      "status": "passed",
+      "passed": 1,
+      "total": 1,
+      "checks": 144,
+      "seconds": 1.01,
+      "log": "step39-debug-temporal.txt",
+      "detail": "step39-debug-temporal-detail.txt"
+    },
+    "strict_ASan_UBSan_leaks": {
+      "status": "passed",
+      "passed": 1,
+      "total": 1,
+      "checks": 144,
+      "seconds": 0.95,
+      "log": "step39-san-temporal.txt",
+      "detail": "step39-san-temporal-detail.txt"
+    }
+  },
+  "editors": {
+    "vscode": {
+      "status": "passed",
+      "version": "1.143.0",
+      "executable": "/usr/share/code/code",
+      "node": "24.19.0",
+      "profiles": [
+        "trusted: real voidls formatting/literal/idempotence/stale edits and prior Stage 38 intelligence/diagnostics/lifecycle",
+        "restricted trust: no native child",
+        "multi-root: explanatory refusal, no native child"
+      ],
+      "host_log": "step39-vscode-host5.txt",
+      "typescript_build_unit": "step39-vscode-unit-final.txt",
+      "unit_tests": {
+        "passed": 1,
+        "failed": 0
+      },
+      "scope": "Installed native host; development extension, not a newly packaged VSIX. No download or hosted CI."
+    },
+    "neovim": {
+      "status": "passed",
+      "version": "0.13.0-dev-1410+g510f61555b",
+      "log": "step39-neovim-final.txt",
+      "stale_response_contains_actual_edit": true
+    },
+    "vim": {
+      "status": "passed",
+      "version": "9.2, patches 1-858",
+      "executable": "/usr/bin/vim.basic",
+      "client": "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "log": "step39-vim-final.txt",
+      "result": "step39-vim-final-result.txt",
+      "stale_response_contains_actual_edit": true
+    }
+  },
+  "small_stack": {
+    "status": "passed unchanged depth probes",
+    "bytes": 1048576,
+    "log": "step39-small-stack.txt"
+  },
+  "development_failures_and_repairs": [
+    "Initial safe nested-hole fixture used invalid indentation; corrected fixture, retained unsafe originally-valid baseline and regression. Initial focused run 2/3 passed, source fixture failed; repaired fixture passes all 321 checks (step39-development-tests.txt).",
+    "Sanitizer target initially absent before CMake regeneration (step39-san-build.txt); configured existing build then rebuilt successfully. Nonfatal existing /tmp/GMfifo4 warning did not affect successful builds.",
+    "Initial Neovim idempotence request raced its scheduled didChange; wait for synchronized current results, then require a genuinely proposed stale edit before guard verification (step39-neovim-development.txt).",
+    "Vim9 global function reference initially raised E700 Unknown function: Step39FormatRpc; corrected spelling to g:Step39FormatRpc. The first result file was overwritten by a subsequent fixture rerun; this observed error is explicitly retained in step39-development-notes.txt. Final native guard test passed.",
+    "Initial VS Code test variable shadowed an earlier formatting variable; TypeScript rejected it, renamed locally (step39-vscode-unit.txt).",
+    "VS Code minimizes one server whole-document edit to multiple native edits (12 in initial run); corrected harness to apply all returned edits, assert final literal bytes and canonical indentation (step39-vscode-host.txt).",
+    "Two host runs did not apply their first existing real type command despite main being active; explicit focusActiveEditorGroup in test harness resolves the reproduced UI-focus condition (step39-vscode-host2.txt, step39-vscode-host3.txt). No server semantic check disabled; final full three-profile run passed.",
+    "VS Code returns undefined for no provider edits rather than always []; corrected idempotence assertion to accept either zero-length form (step39-vscode-host4.txt). Final stale test explicitly focuses the worker document."
+  ],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "native Windows",
+    "native macOS",
+    "separate Release configuration",
+    "fresh independently linked AOT in this formatter-only increment (prior Steps 32\u201337 AOT evidence preserved)",
+    "fresh VSIX packaging/install",
+    "consolidated Stage 10 final acceptance"
+  ],
+  "remaining_stage_obligations": [
+    "Console/print/terminal implementation and its future tooling/formatting integration",
+    "Composite display and its future tooling/formatting integration",
+    "Step 40 cross-system tests, failures and measured representative workloads",
+    "Remaining final platform/Stage 10 acceptance, documentation and independent Wrench review"
+  ],
+  "new_dependencies": "none; existing Ryu/date/IANA versions/licenses preserved",
+  "next_step": 40,
+  "next_source_change": "Step 40: extend tests/stage10/operator_integration.cpp and its existing native fixtures with combined private/const field, exact owner operator/compound, custom display/format hook and temporal cases; repair demonstrated cross-system defects. Preserve explicit console/composite implementation obligations before four-system/final acceptance.",
+  "governance": "No commits, branches, pushes, hosted CI, publication or public root README changes. Source library, LLVM 19.1.7 architecture, Runtime/GC ownership, IR semantics and library security boundaries unchanged.",
+  "source_isolation": {
+    "environment": "VOID_STDLIB_ROOT=<repository>/build/step37-stdlib-snapshot",
+    "hashes": "step39-library-hashes.json",
+    "status": "original library and isolated snapshot still match Step 37 baseline; no library/loader edit"
+  },
+  "commands": [
+    "cmake --build build/ci-official-debug -j 2 --target void_source_formatting voidls void_tests void_stage10_tooling void_operator_reload void_operator_resolution voidc void_lsp_tests",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_reload|stage10_operator_resolution|stage10_tooling|stage10_source_formatting|lsp_positions|lsp_protocol|lsp_stage8|lsp_stage7|lsp_demo|sessions|tooling|analysis|lsp_sprint6|lsp_stage10_fields|lsp_stage10_display|lsp_stage10_intelligence|lsp_stage10_source_formatting|lsp_sprint4|lsp_sprint3|lsp_sprint2)$'",
+    "cmake -S . -B build/ci-official-san",
+    "cmake --build build/ci-official-san -j 2 --target void_source_formatting voidls void_tests void_stage10_tooling void_operator_reload void_operator_resolution voidc void_lsp_tests",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_reload|stage10_operator_resolution|stage10_tooling|stage10_source_formatting|lsp_positions|lsp_protocol|lsp_stage8|lsp_stage7|lsp_demo|sessions|tooling|analysis|lsp_sprint6|lsp_stage10_fields|lsp_stage10_display|lsp_stage10_intelligence|lsp_stage10_source_formatting|lsp_sprint4|lsp_sprint3|lsp_sprint2)$'",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-debug --output-on-failure -R '^lsp_stage10_source_formatting$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-san --output-on-failure -R '^lsp_stage10_source_formatting$'",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc",
+    "PATH=\"/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH\" npm test --prefix editors/vscode",
+    "PATH=\"/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH\" VSCODE_EXECUTABLE_PATH=/usr/share/code/code VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" node editors/vscode/out/test/runHost.js",
+    "VOID_REPO=\"$PWD\" VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" XDG_STATE_HOME=\"$PWD/build/step39-editor/state\" XDG_CACHE_HOME=\"$PWD/build/step39-editor/cache\" XDG_DATA_HOME=\"$PWD/build/step39-editor/data\" nvim --headless -u NONE -i NONE -l tests/stage10/editor.lua",
+    "VOID_REPO=\"$PWD\" VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" VOID_VIM_CLIENT=/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41 VOID_STAGE10_EDITOR_OUTPUT=\"$PWD/docs/stage10/engineering/step39-vim-final-result.txt\" vim.basic -Nu NONE -i NONE -n -es -S tests/stage10/editor.vim"
+  ],
+  "source_manifests": {
+    "bounded": "step39-source-hashes.json",
+    "bounded_files": 13,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 157,
+    "previous_checkpoint": "step38-checkpoint-source-hashes.json",
+    "preservation": "step39-preservation.json",
+    "unchanged_prior_entries_verified": 144
+  },
+  "source_integrity_check": "All 157 cumulative entries match final bytes; 144 prior entries outside the 13 bounded paths verified unchanged; git diff --check passed."
+}

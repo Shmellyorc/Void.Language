@@ -1,0 +1,13 @@
+/tmp/VOID-console27-955149681444624/main.void:5:16: error: Cannot mutate a const stored field outside its direct declaring initializer.
+    code: VOID2007
+
+ 5 |         reason.partial[0] = 9
+   |                ^^^^^^^
+    Module: /main.void
+    Const field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/console.void:26:11
+
+ 26 |     const partial: [u8]
+    |           ^^^^^^^
+    Module: /@stdlib/console.void
+    Hint: Prepare mutable child state before assigning the field in its owner's initializer.
+

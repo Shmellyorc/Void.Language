@@ -1,0 +1,16 @@
+/console-negative.void:1:5: error: Imports need a filesystem project context.
+    code: VOID3006
+
+ 1 | use console
+   |     ^^^^^^^
+    Module: /console-negative.void
+    Hint: Use compile_project or the check/run/emit CLI with a source filename.
+
+/console-negative.void:3:20: error: Unknown import qualifier 'console'.
+    code: VOID3003
+
+ 3 |     var endpoint = console.output(_id = 1)
+   |                    ^^^^^^^
+    Module: /console-negative.void
+    Hint: Import the module with this alias before calling it.
+

@@ -1,0 +1,41 @@
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libm.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libz.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libzstd.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libstdc++.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libgcc_s.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libc.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/lib64/ld-linux-x86-64.so.2' as an executable file: Input/output error
+
+warning: Unable to find dynamic linker breakpoint function.
+GDB will be unable to debug shared library initializers
+and track explicitly loaded dynamic code.
+
+warning: Target and debugger are in different PID namespaces; thread lists and other data are likely unreliable.  Connect to gdbserver inside the container.
+std::_Vector_base<unsigned int, std::allocator<unsigned int> >::_M_deallocate (this=0x55e53764d980, __p=0x55e537ab55a0, __n=14) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:398
+398		  _Tr::deallocate(_M_impl, __p, __n);
+
+Thread 1 (process 3852712 "void_stage10_co"):
+#0  std::_Vector_base<unsigned int, std::allocator<unsigned int> >::_M_deallocate (this=0x55e53764d980, __p=0x55e537ab55a0, __n=14) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:398
+#1  0x000055e524024d0d in std::_Vector_base<unsigned int, std::allocator<unsigned int> >::~_Vector_base (this=0x55e53764d980) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:378
+#2  0x000055e524024cb2 in std::vector<unsigned int, std::allocator<unsigned int> >::~vector (this=0x55e53764d980) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:795
+#3  0x000055e524024c55 in std::destroy_at<std::vector<unsigned int, std::allocator<unsigned int> > > (__location=0x55e53764d980) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_construct.h:88
+#4  0x000055e524024b95 in std::allocator_traits<std::allocator<std::_Rb_tree_node<std::vector<unsigned int, std::allocator<unsigned int> > > > >::destroy<std::vector<unsigned int, std::allocator<unsigned int> > > (__a=..., __p=0x55e53764d980) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/alloc_traits.h:738
+#5  std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::_M_destroy_node (this=0x7ffed04a0128, __p=0x55e53764d960) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:1265
+#6  0x000055e524024b21 in std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::_M_drop_node (this=0x7ffed04a0128, __p=0x55e53764d960) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:1273
+#7  0x000055e524024a2e in std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::_M_erase (this=0x7ffed04a0128, __x=0x55e53764d960) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:2631
+#8  0x000055e524024a14 in std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::_M_erase (this=0x7ffed04a0128, __x=0x55e5366e71c0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:2629
+#9  0x000055e524024a14 in std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::_M_erase (this=0x7ffed04a0128, __x=0x55e537f85240) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:2629
+#10 0x000055e524024a14 in std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::_M_erase (this=0x7ffed04a0128, __x=0x55e537533870) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:2629
+#11 0x000055e5240250b5 in std::_Rb_tree<std::vector<unsigned int, std::allocator<unsigned int> >, std::vector<unsigned int, std::allocator<unsigned int> >, std::_Identity<std::vector<unsigned int, std::allocator<unsigned int> > >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::~_Rb_tree (this=0x7ffed04a0128) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:1629
+#12 0x000055e524025085 in std::set<std::vector<unsigned int, std::allocator<unsigned int> >, std::less<std::vector<unsigned int, std::allocator<unsigned int> > >, std::allocator<std::vector<unsigned int, std::allocator<unsigned int> > > >::~set (this=0x7ffed04a0128) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_set.h:306
+#13 0x000055e524022b7a in vd::ir::Type::~Type (this=0x7ffed04a00f8) at /home/shmellyorc/Documents/Void.Language/include/void/ir.hpp:19
+#14 0x000055e524325809 in vd::ir::collection_type (t=...) at /home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:47
+#15 0x000055e524327e6a in vd::ir::array_element (t=...) at /home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:97
+[Inferior 1 (process 3852712) detached]

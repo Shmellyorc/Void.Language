@@ -1,0 +1,60 @@
+use time
+value struct item<t>:
+    private const value: t
+func (self item<t>) init(value: t):
+    self.value = value
+func (self item<t>) string() -> string:
+    return "q:{self.value:000}"
+struct node:
+    children: [node]
+func (self node) string() -> string:
+    return string(self.children)
+func key_text() -> string:
+    return "K"
+struct display_key:
+    action: func() -> string
+func (self display_key) string() -> string:
+    return self.action()
+func main():
+    var fixed: [i32, 3] = [1, 2, 3]
+    var copied = fixed
+    copied[0] = 9
+    print(fixed, copied)
+    var shared = ["é\0🎮", "raw text"]
+    print([shared, shared])
+    var entries = {"z": [item<i32>(value = 7)], "a": [item<i32>(value = 2)]}
+    print(entries)
+    print("{entries}")
+    if format(entries, "") is Ok(var text):
+        print(text)
+    var snapshots: {display_key: item<i32>} = {}
+    var key = display_key(action = key_text)
+    var update = func() -> string:
+        snapshots[key] = item<i32>(value = 99)
+        return "K"
+    key.action = update
+    snapshots[key] = item<i32>(value = 7)
+    var shown = string(snapshots)
+    print("snapshot", shown, snapshots[key])
+    var optional: [node?] = [null]
+    print(optional)
+    var cycle: [node] = []
+    cycle.push(node(children = cycle))
+    print(cycle)
+    print("{[1, 2]:>10}")
+    if format(["é", "🎮"], "^12") is Ok(var text):
+        print(text)
+    var pattern = "000"
+    if format(fixed, pattern) is Err(var reason):
+        print("invalid pattern")
+    if make_date(2026, 10, 23) is Ok(var day):
+        print([day])
+    if format("x", ">1024") is Ok(var chunk):
+        var many: [string] = []
+        for n in 0..<1024:
+            many.push(chunk)
+        var large = string(many)
+        if large.byte_length == 1050624 and large[0] == "[" and large[1024] == "x" and large[1050623] == "]":
+            print("large", large.byte_length)
+        else:
+            print("LARGE FAILED")

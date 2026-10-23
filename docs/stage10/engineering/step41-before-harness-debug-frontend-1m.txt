@@ -1,0 +1,9 @@
+Frontend begin: diagnostics
+FAILED: wrong diagnostic, expected expected i32
+/invalid.void:3:10: error: Unsupported compound assignment operand types.
+    code: VOID2001
+
+ 3 |     flag += false
+   |          ^^
+    Module: /invalid.void
+

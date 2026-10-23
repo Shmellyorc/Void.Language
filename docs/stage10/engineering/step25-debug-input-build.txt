@@ -1,0 +1,11 @@
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_input.dir/tests/runtime/console_input.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_input.cpp:82:104: warning: missing field 'deadline' initializer [-Wmissing-field-initializers]
+   82 |     {auto op=h.c->acquire(Stream::input);Bytes out(2);auto result=op.read(out,Request{op.cancellation()});check(out==bytes("st") && result.completed==2 && !result.error,"leased raw read bypassed queue");}
+      |                                                                                                        ^
+1 warning generated.
+[100%] Linking CXX executable void_runtime_console_input
+[100%] Built target void_runtime_console_input

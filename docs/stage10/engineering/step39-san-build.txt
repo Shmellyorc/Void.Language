@@ -1,0 +1,2 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+gmake: *** No rule to make target 'void_source_formatting'.  Stop.

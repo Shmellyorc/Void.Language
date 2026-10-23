@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/editors/neovim_automatic.py", line 27, in <module>
+    assert wait(lambda:sock.exists() and expr('luaeval("#vim.lsp.get_clients({bufnr=0})")')=='1'),'initialization'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: initialization

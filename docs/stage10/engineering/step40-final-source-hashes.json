@@ -1,0 +1,20 @@
+{
+  "CMakeLists.txt": "c8c821deca2c68ed197f4cf1ac05caf547c077a36fa79c07e89066f6c7672e47",
+  "docs/WORK_LOG.md": "f8a66f4a9b7d0d2e094b31c37dd9e6130159f3e2aebd7ba3df98789b98bf16f1",
+  "docs/stage10/EVIDENCE.md": "12c629bc500f7f4fc7a94b8232bb5a684295e2f7c6b6d61f21b1deb7156fe36b",
+  "docs/stage10/IMPLEMENTATION.md": "20e01c800916057d52bf2b955f094eee7720e6627eeeb6a94a3fe102f75cc5ff",
+  "docs/stage10/TEST_PLAN.md": "fb83d05c30b12b2d433a7ebefb65677b7b6e9c36e02fe39270a1c96fc3d1c7b1",
+  "src/frontend/compiler.cpp": "c7de9d11e8a3228ac3510628138ce141c48f9d2dc334cb9abf688ae4e53299e9",
+  "tests/stage10/console.cpp": "983b841f4097b3387f5b1c6c0e5d5a642906a06133a29146f0e3402aa8ffc4bf",
+  "tests/stage10/console.py": "7de7f31da579e49aae3294c940216d07b333e56e65434c537aef3ce2066feb22",
+  "tests/stage10/console_operator_compound_failure.void": "3280d53169fffafeb57a39b6e1026df472f0346ef1faaaa599a8dd2ce6298b9e",
+  "tests/stage10/console_operator_failure.void": "3122978d15e6fecc6b40d69ece31acbffccecc76fbacf64a3cc4d04b59aa1fde",
+  "tests/stage10/console_operator_mode_failure.void": "484d2014ac894a250bcd6b72677096994a123735490adb60d4e9acff90eeb0c8",
+  "tests/stage10/console_operator_modes.void": "e49665b95c0f73779b6f55e52ffc01c7f0f1a242be9ddd6c454967b9b59386d1",
+  "tests/stage10/console_operator_partial.void": "556194a6cd1e38a68d4683c94421ccf903308f60ac85271e73479b5e472c207d",
+  "tests/stage10/console_operator_systems.void": "6bad219dcc2bad76890af67f6594d3e5a2bae1ce94fb7479bf3dcceadb6656bb",
+  "tests/stage10/console_operator_workload.void": "6f05e156be1562f093016ceb27ff309ee6348fe68391e993d3a7fdb2f81dfbb5",
+  "tests/stage10/operator_console_model.void": "86b144bf5491f9db6f9030bed627cc51cbbfb89dfb32db5d36dcce0665aef719",
+  "tests/stage10/operator_console_systems.void": "e6106f31fe58d6988e95f3146cc51e0c368981b59760afd62485e33996b96b4b",
+  "tests/stage10/operator_integration.cpp": "30e924bbbed9e910509f21e41aa13cb7d71a5969276a9e84a11486b5133bd6c9"
+}

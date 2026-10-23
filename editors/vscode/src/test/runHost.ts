@@ -36,6 +36,8 @@ async function main(): Promise<void> {
         const documented='## Editor fixture API.\n## @param x input value\nfunc read(x: i32) -> i32:\n    return x\n';
         await fs.writeFile(path.join(root,'app/systems/player.void'),documented);
         await fs.writeFile(path.join(temp,'standard/io/files.void'),documented);
+        await fs.copyFile(path.resolve(__dirname, '../../../../stdlib/time.void'), path.join(temp, 'standard/time.void'));
+        await fs.copyFile(path.resolve(__dirname, '../../../../stdlib/console.void'), path.join(temp, 'standard/console.void'));
         await fs.mkdir(path.join(root,'libs/raylib'),{recursive:true});
         await fs.writeFile(path.join(root,'libs/raylib/raylib.void'),'## Local editor library.\nfunc read(x: i32) -> i32:\n    return x\nfunc main() -> i32:\n    return 99\n');
         await fs.writeFile(path.join(root,'libs/raylib/graphics.void'),'func draw(x: i32) -> i32:\n    return x\n');

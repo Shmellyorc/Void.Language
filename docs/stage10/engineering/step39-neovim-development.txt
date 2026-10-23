@@ -1,0 +1,15 @@
+tests/stage10/editor.lua:1: Stage 10 idempotence: {
+  result = { {
+      newText = 'value struct number:\n    value: i32\n    operator +(const left: number, const right: number) -> number:\n        return number(value = left.value + right.value)\n    operator %(const left: number, const right: number) -> number:\n        return left\nfunc entry(input: i32) -> i32:\n    var a = number(value = input)\n    var b = a + a\n    b %= a\n    var text = """é😀 {{escaped}}:\n    {input:>8|000}\n  """\n    return b.value\n',
+      range = {
+        ["end"] = {
+          character = 0,
+          line = 14
+        },
+        start = {
+          character = 0,
+          line = 0
+        }
+      }
+    } }
+}

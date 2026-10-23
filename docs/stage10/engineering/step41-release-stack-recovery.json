@@ -1,0 +1,5 @@
+{
+  "status": "Stopped after complete final-source Release run:198/199, source_cli semantic-depth crash; standalone1MiB semantic-depth and full frontend also fail. Debug199/199 and1MiB both pass. Strict final run NOT started. No acceptance process remains running.",
+  "preserved": "step41-before-release-stack-{debug,release}-*",
+  "next": "Diagnose Release-only stack overflow with existing parent-owned debugger, retaining all guards and1MiB limits."
+}

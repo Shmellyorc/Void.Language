@@ -1,0 +1,135 @@
+Start testing: Oct 22 06:09 PDT
+----------------------------------------------------------
+1/176 Testing: stage10_operator_declarations
+1/176 Test: stage10_operator_declarations
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_declarations" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_operator_declarations" start time: Oct 22 06:09 PDT
+Output:
+----------------------------------------------------------
+278 operator declaration/validation checks passed
+<end of output>
+Test time =   1.43 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_declarations" end time: Oct 22 06:09 PDT
+"stage10_operator_declarations" time elapsed: 00:00:01
+----------------------------------------------------------
+
+2/176 Testing: stage10_display_reload
+2/176 Test: stage10_display_reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_display_reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_display_reload" start time: Oct 22 06:09 PDT
+Output:
+----------------------------------------------------------
+132 display dependency/reload checks passed
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_display_reload" end time: Oct 22 06:09 PDT
+"stage10_display_reload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/176 Testing: stage10_hooks
+5/176 Test: stage10_hooks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_hooks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_hooks" start time: Oct 22 06:09 PDT
+Output:
+----------------------------------------------------------
+77 nominal/custom display checks passed
+<end of output>
+Test time =   6.02 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_hooks" end time: Oct 22 06:09 PDT
+"stage10_hooks" time elapsed: 00:00:06
+----------------------------------------------------------
+
+8/176 Testing: stage10_fields
+8/176 Test: stage10_fields
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_fields"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"stage10_fields" start time: Oct 22 06:09 PDT
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.61 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Oct 22 06:09 PDT
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/176 Testing: generics_source
+22/176 Test: generics_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_generics_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"generics_source" start time: Oct 22 06:09 PDT
+Output:
+----------------------------------------------------------
+failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+<end of output>
+Test time =   6.89 sec
+----------------------------------------------------------
+Test Passed.
+"generics_source" end time: Oct 22 06:10 PDT
+"generics_source" time elapsed: 00:00:06
+----------------------------------------------------------
+
+159/176 Testing: lsp_sprint6
+159/176 Test: lsp_sprint6
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_sprint6" start time: Oct 22 06:10 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+<end of output>
+Test time =   0.76 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint6" end time: Oct 22 06:10 PDT
+"lsp_sprint6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+160/176 Testing: lsp_stage10_fields
+160/176 Test: lsp_stage10_fields
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_fields" start time: Oct 22 06:10 PDT
+Output:
+----------------------------------------------------------
+Field LSP privacy, const hover/completion, dirty rejection and repair passed
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_fields" end time: Oct 22 06:10 PDT
+"lsp_stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+161/176 Testing: lsp_stage10_display
+161/176 Test: lsp_stage10_display
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"lsp_stage10_display" start time: Oct 22 06:10 PDT
+Output:
+----------------------------------------------------------
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage10_display" end time: Oct 22 06:10 PDT
+"lsp_stage10_display" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 22 06:10 PDT

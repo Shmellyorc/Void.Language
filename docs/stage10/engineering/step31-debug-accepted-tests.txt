@@ -1,0 +1,61 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/28 Test   #1: stage10_operator_reload ............   Passed   54.05 sec
+      Start   7: stage10_display_reload
+ 2/28 Test   #7: stage10_display_reload .............   Passed    0.84 sec
+      Start  10: stage10_hooks
+ 3/28 Test  #10: stage10_hooks ......................   Passed    5.70 sec
+      Start  11: stage10_interpolation
+ 4/28 Test  #11: stage10_interpolation ..............   Passed    1.47 sec
+      Start  13: stage10_fields
+ 5/28 Test  #13: stage10_fields .....................   Passed    0.57 sec
+      Start  19: gc_buffers
+ 6/28 Test  #19: gc_buffers .........................   Passed    9.82 sec
+      Start  20: gc_schemas
+ 7/28 Test  #20: gc_schemas .........................   Passed    0.84 sec
+      Start  22: runtime_console
+ 8/28 Test  #22: runtime_console ....................   Passed    0.02 sec
+      Start  23: runtime_console_endpoints
+ 9/28 Test  #23: runtime_console_endpoints ..........   Passed    0.06 sec
+      Start  24: runtime_console_transfers
+10/28 Test  #24: runtime_console_transfers ..........   Passed    0.02 sec
+      Start  25: runtime_console_native_transfers
+11/28 Test  #25: runtime_console_native_transfers ...   Passed    0.46 sec
+      Start  26: runtime_console_keyboard
+12/28 Test  #26: runtime_console_keyboard ...........   Passed    0.01 sec
+      Start  27: runtime_console_terminal
+13/28 Test  #27: runtime_console_terminal ...........   Passed    0.01 sec
+      Start  28: runtime_console_native_keyboard
+14/28 Test  #28: runtime_console_native_keyboard ....   Passed    0.14 sec
+      Start  29: runtime_console_native_terminal
+15/28 Test  #29: runtime_console_native_terminal ....   Passed    0.73 sec
+      Start  30: runtime_console_wide
+16/28 Test  #30: runtime_console_wide ...............   Passed    0.13 sec
+      Start  31: runtime_console_input
+17/28 Test  #31: runtime_console_input ..............   Passed    0.03 sec
+      Start  32: runtime_console_native_input
+18/28 Test  #32: runtime_console_native_input .......   Passed    0.12 sec
+      Start  33: runtime_coordination
+19/28 Test  #33: runtime_coordination ...............   Passed    2.06 sec
+      Start  34: runtime_generated
+20/28 Test  #34: runtime_generated ..................   Passed    1.06 sec
+      Start  83: runtime_callbacks
+21/28 Test  #83: runtime_callbacks ..................   Passed    1.16 sec
+      Start  84: runtime_failures
+22/28 Test  #84: runtime_failures ...................   Passed    0.02 sec
+      Start  87: runtime_invariants
+23/28 Test  #87: runtime_invariants .................   Passed    0.05 sec
+      Start  94: stage10_console_source
+24/28 Test  #94: stage10_console_source .............   Passed   69.49 sec
+      Start 118: async_lifecycle
+25/28 Test #118: async_lifecycle ....................   Passed    6.05 sec
+      Start 177: stage10_console_aot
+26/28 Test #177: stage10_console_aot ................   Passed  181.66 sec
+      Start 187: application_native_sprint4_host
+27/28 Test #187: application_native_sprint4_host ....   Passed    1.89 sec
+      Start 188: application_native_sprint4
+28/28 Test #188: application_native_sprint4 .........   Passed    3.45 sec
+
+100% tests passed, 0 tests failed out of 28
+
+Total Test time (real) = 341.90 sec

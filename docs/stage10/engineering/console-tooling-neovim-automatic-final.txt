@@ -1,0 +1,1 @@
+Real Neovim terminal: automatic menus and acceptance passed for all five prefixes

@@ -1,0 +1,115 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 34,
+  "increment_status": "call/GC/effect/failure integration complete under focused Linux verification; Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "preexisting_work": "Steps 32\u201333 and all prior Stage 10 work preserved. No Git or hosted mutation.",
+  "changes": [
+    "Added focused integration tests using existing managed/native ABI probes and Runtime/async test boundaries; no production compiler, backend or Runtime repair was required.",
+    "Forced collection during RHS construction, RHS await suspension and real worker safepoints; generic reference-bearing snapshots, managed alias identity and fresh result independence.",
+    "Whole-invocation allocation-failure sweep verifies failure/success, precise roots, frames, empty post-call heaps and retry.",
+    "Reached caller/operator cleanup, failing newer cleanup followed by older cleanup, unreached defer exclusion, original operator/caller frames and retained source snapshot.",
+    "Derived != exactly one == invocation; native side-effect traces cover left/RHS/operator/cleanup order and RHS-failure suppression.",
+    "Owned primary format error text survives failing cleanup and worker failure handoff. Native/clock/task/indirect worker effects, const capability propagation, structured-cleanup enqueue and forged worker IR retain existing rejection rules.",
+    "Expanded independently linked normal/O2 JIT/AOT fixtures for lifetime, suspension, workers, checked/owned errors, native effects and prohibited cleanup enqueue.",
+    "Recorded approved future VOID Sections in LANGUAGE_BIBLE.md and DECISIONS.md; documentation only, not implemented."
+  ],
+  "checks": {
+    "integration_debug": 637,
+    "integration_sanitizers": 637,
+    "preserved_operator_resolution": 161,
+    "preserved_declarations": 278,
+    "source_jit_aot_process": 124
+  },
+  "debug": {
+    "passed": 9,
+    "total": 9,
+    "seconds": 43.01,
+    "suites": [
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "stage10_hooks",
+      "stage10_operator_integration",
+      "async_ir",
+      "async_parallel",
+      "async_lifecycle",
+      "ergonomics_sprint6_host",
+      "stage10_operators_aot"
+    ],
+    "log": "step34-debug-accepted.txt",
+    "detail": "step34-debug-detail.txt",
+    "build": "step34-debug-final-build.txt"
+  },
+  "strict_sanitizers": {
+    "passed": 7,
+    "total": 7,
+    "seconds": 45.2,
+    "suites": [
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "stage10_operator_integration",
+      "async_ir",
+      "async_parallel",
+      "async_lifecycle",
+      "stage10_operators_aot"
+    ],
+    "log": "step34-san-accepted.txt",
+    "detail": "step34-san-detail.txt",
+    "build": "step34-san-final-build.txt",
+    "configuration": "RelWithDebInfo with existing ASan/UBSan/leak checks and pinned LLVM/Clang 19.1.7",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "limitations": "Executed outside sandbox ptrace restrictions so leak checks remain enabled. Compiler, probes, native fixture and Runtime are instrumented; generated machine code is not equivalently instrumented. Existing RTTI-off LLVM SDK excludes vptr checks."
+  },
+  "development_failures": [
+    {
+      "record": "step34-integration1.txt",
+      "cause": "Negative diagnostic expectation used lowercase worker while established source diagnostic uses Worker; expectation corrected."
+    },
+    {
+      "record": "step34-integration2.txt",
+      "cause": "Retained original diagnostic proving Worker rejection; no compiler repair needed."
+    },
+    {
+      "record": "step34-integration3.txt",
+      "cause": "Test incorrectly expected static rejection of indirect cleanup enqueue. Existing contract rejects this dynamically; replaced with normal/O2 Runtime failure and AOT tests at the structured-cleanup boundary."
+    },
+    {
+      "record": "step34-debug-initial-not-run.txt",
+      "cause": "Three async neighbor targets were not yet built in this build tree. Built existing void_async_tests, then reran final focused suite; no test disabled."
+    }
+  ],
+  "earlier_runs": {
+    "debug": "step34-debug-before-suspension.txt (9/9, 38.82 s; before RHS-await tests)",
+    "sanitizers": "step34-san-before-suspension.txt (7/7, 40.07 s; before RHS-await tests)"
+  },
+  "architecture": "No new production abstraction, dependency, registry, backend, GC or source Sections functionality. Existing LLVM19.1.7, ordinary calls, effects, precise roots, failure ownership and worker restrictions retained.",
+  "commands": {
+    "debug_configure": "cmake -S . -B build/ci-official-debug",
+    "san_configure": "cmake -S . -B build/ci-official-san",
+    "integration_build": "cmake --build build/ci-official-debug -j2 --target void_operator_integration",
+    "async_neighbor_build": "cmake --build build/ci-official-debug -j2 --target void_async_tests",
+    "san_build": "cmake --build build/ci-official-san -j2 --target void_operator_integration void_operator_resolution void_operator_declarations voidc void_async_tests",
+    "debug_ctest": "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_resolution|stage10_operator_declarations|stage10_hooks|stage10_operator_integration|async_ir|async_parallel|async_lifecycle|ergonomics_sprint6_host|stage10_operators_aot)$'",
+    "san_ctest": "ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_resolution|stage10_operator_declarations|stage10_operator_integration|async_ir|async_parallel|async_lifecycle|stage10_operators_aot)$'"
+  },
+  "not_run": [
+    "Release configuration for this increment",
+    "Native Windows/macOS",
+    "Native editor-host operator acceptance, including Vim",
+    "Full Stage 10 consolidated acceptance"
+  ],
+  "unresolved_step34_defects": [],
+  "remaining": [
+    "Step 35 custom captured-place compound operators, including %=, unimplemented",
+    "Step 36 recursive custom-equality dictionary-key exclusion unimplemented",
+    "Remaining operator tooling/cache/reload/source-library integration and final acceptance",
+    "Remaining Stage 10 console/terminal, composite display, field/tooling and four-system completeness obligations"
+  ],
+  "next_source_change": "Step 35: src/frontend/compiler.cpp assignment checking selects exact arithmetic from the captured old-value type and separately typed RHS; existing selected-place lowering snapshots operands once, emits the selected ordinary call, then commits only on success with existing version/readonly checks. Cover locals, fields, properties, arrays and dictionaries.",
+  "source_hashes": "step34-source-hashes.json",
+  "previous_checkpoint_hashes": "step33-checkpoint-source-hashes.json",
+  "git_hosted_publication": "not performed"
+}

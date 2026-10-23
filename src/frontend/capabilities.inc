@@ -61,11 +61,13 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if (requirements) for (const auto& origin:ir::mutable_requirements(actual,expected,capacity))
                 changed|=f.reference_effects.required_mutable.insert(origin).second;
             if (!report) return;
+            // Recursive collection paths can have equivalent unfolded spellings.
+            // The shared authority predicate normalizes them conservatively; a
+            // second raw-path subset check must not reject its accepted view.
+            if(ir::capability_assignable(ir::fact_type(expected,actual),expected))return;
             const auto allowed=ir::readonly_paths(expected);
-            if(!ir::capability_assignable(ir::fact_type(expected,actual),expected)) {
-                bool readonly_failure=false;for(const auto& [path,fact]:actual)readonly_failure|=fact.readonly && !allowed.contains(path);
-                if(!readonly_failure)issue(token,"Mutable list storage requires an invariant element authority profile.",related);
-            }
+            bool readonly_failure=false;for(const auto& [path,fact]:actual)readonly_failure|=fact.readonly && !allowed.contains(path);
+            if(!readonly_failure)issue(token,"Mutable list storage requires an invariant element authority profile.",related);
             for (const auto& [path,fact]:actual) if(fact.readonly && !allowed.contains(path)) {
                 auto fields=leaf_related(expected,path);fields.insert(fields.end(),related.begin(),related.end());
                 issue(token,"Cannot assign readonly reference leaf '"+ir::reference_path_name(expected,path)+"' to storage or a parameter promising mutable access.",std::move(fields));
@@ -185,7 +187,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.kind==K::awaited || e.kind==K::task_cancel || e.kind==K::function_call || e.asynchronous_call || e.interface_call || !e.virtual_slot.empty())edges.unsafe=true;
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
             if(e.target.starts_with("$time.") && temporal::operations.at(std::stoul(e.target.substr(6))).clock)edges.unsafe=true;
-            if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.") && !e.target.starts_with("$time.") && !e.target.starts_with("$layout.") && !e.target.starts_with("$display.") && e.target!="$interpolation" && e.target!="$hole")edges.unsafe=true;
+            if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$collection.") && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.") && !e.target.starts_with("$time.") && !e.target.starts_with("$layout.") && !e.target.starts_with("$display.") && e.target!="$interpolation" && e.target!="$hole")edges.unsafe=true;
             auto view=ir::reference_facts(e.type);
             if(e.kind==K::spawned)frontend_case([&] {auto result=expression(*e.parts[0]);view=ir::replaced_facts(view,1,result);
             }); else if(e.kind==K::awaited)frontend_case([&] {
@@ -354,8 +356,17 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (s.selection)expression(*s.selection);
                 if (s.range_end) expression(*s.range_end);
                 if (s.index) expression(*s.index);
+                ReferenceFacts old;
+                if(!s.compound_target.empty()) {
+                    if(s.selection)old=evaluated.at(s.selection.get());
+                    else {auto type=ir::fact_type(f.locals.at(s.slot),locals.at(s.slot));old=locals.at(s.slot);for(auto field:s.field_indexes){old=ir::field_facts(type,old,field);type=ir::field_type(type,field);}if(s.index)old=ir::field_facts(type,old,ir::array_element_path);}
+                }
                 if (s.expression && !s.task_group) rhs=expression(*s.expression);
                 else if (s.kind==K::variable) rhs=ir::reference_facts(f.locals.at(s.slot));
+                if(!s.compound_target.empty()){
+                    rhs=call(*functions.at(s.compound_target),{old,rhs},s.compound_token);
+                    if(s.compound_conversion){local_changed|=ir::join_facts(locals[s.compound_slot],rhs);rhs=expression(*s.compound_conversion);}
+                }
                 if (s.kind==K::variable || (s.kind==K::scoped && !s.task_group)) {
                     if (s.readonly) for (auto& [path,fact]:rhs) fact.readonly=true;
                     local_changed|=ir::join_facts(locals[s.slot],rhs);

@@ -1,0 +1,32 @@
+use "operator_systems.void" as library
+use time
+func work(input: i32) -> result<string, string>:
+    var total = library.quantity<i32>(value = input)
+    total += 7
+    total %= 5
+    var day = make_date(2024, 2, 29)?
+    return Ok("{total:000}/{day:yyyy-MM-dd}")
+async func rhs(value: i32) -> i32:
+    if make_date(2024, 2, 29) is Ok(var day):
+        var text = "{day:yyyy-MM-dd}:{value:000}"
+        return value
+    return 100
+async func entry(input: i32) -> i32:
+    var original = library.account(value = 10, history = [])
+    original.amount += await rhs(3)
+    var items = [library.quantity<i32>(value = 10)]
+    items[0] %= await rhs(3)
+    var pending = spawn work(input)
+    var first = await pending
+    var again = await pending
+    if first is Ok(var text):
+        if again is Ok(var repeated):
+            if text != repeated or text != "{(input + 7) % 5:000}/2024-02-29":
+                return 101
+        else:
+            return 102
+    else:
+        return 103
+    if original.amount.read() != 13 or items[0].read() != 1:
+        return 104
+    return input

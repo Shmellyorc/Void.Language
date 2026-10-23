@@ -24,6 +24,8 @@ struct TypeLayout {
 struct NominalDescriptor {
     std::string identity, base, shape;
     TypeLayout layout;
+    std::string dictionary_key_schema = {}; // Canonical native element identity, no code.
+    bool dictionary_key_forbidden = false; // Derived by the shared IR admission rule.
 };
 // Immutable binding data: no executable addresses, generation leases or permissions.
 struct InterfaceWitness {

@@ -34,6 +34,19 @@ local function main()
   vim.api.nvim_buf_set_lines(buf,0,-1,false,{'use io/files as files','func entry(x: i32) -> i32:','    return files.read(x)'})
   local documented=request('textDocument/hover',point(2,19));check(documented.contents.value:find('Editor fixture API.',1,true),'standard source documentation')
   check(vim.uri_to_fname(request('textDocument/definition',point(2,19)).uri)==root..'/standard/io/files.void','standard navigation')
+  local composite={'use console','enum parcel:','    empty','    data(value: [i32])','func entry(x: i32) -> i32:','    var p = parcel.data([x])','    print(p)','    var r = console.stdout.write("é😀")','    if p is parcel.data(var numbers):','        return numbers.count as i32','    return x'}
+  vim.api.nvim_buf_set_lines(buf,0,-1,false,composite)
+  check(request('textDocument/hover',point(7,29)).contents.value:find('Write UTF-8',1,true),'console source documentation')
+  check(vim.uri_to_fname(request('textDocument/definition',point(7,29)).uri)==root..'/standard/console.void','console source navigation')
+  check(request('textDocument/definition',point(8,20)).range.start.line==3,'enum pattern navigation')
+  check(request('textDocument/hover',point(6,6)).contents.value:find('*values',1,true),'public print hover')
+  vim.api.nvim_buf_set_lines(buf,5,6,false,{'    var p = parcel.'})
+  local cases=request('textDocument/completion',point(5,19));local names={};for _,item in ipairs(cases)do names[item.label]=true end
+  check(names.data and names.empty and not names['$tag'],'enum completion')
+  vim.api.nvim_buf_set_lines(buf,0,-1,false,composite)
+  vim.api.nvim_buf_set_lines(buf,6,7,false,{'    print(p, flush = '})
+  local print_help=request('textDocument/signatureHelp',point(6,21))
+  check(print_help.activeParameter==4 and print_help.signatures[1].label:find('file: console.output',1,true),'print signature')
   vim.api.nvim_buf_set_lines(buf,0,-1,false,original)
   vim.api.nvim_buf_set_lines(buf,2,3,false,{'    return worker.'})
   local items=request('textDocument/completion',point(2,18));check(#items==1 and items[1].label=='calculate','incomplete member completion')
@@ -73,7 +86,7 @@ local function main()
   wait(function()return c:is_stopped()end)
   local replacement=vim.lsp.get_clients({bufnr=worker,name='voidls'})[1]
   replacement:stop();wait(function()return replacement:is_stopped()end)
-  vim.fn.writefile({vim.json.encode({editor=vim.version(),passed={'shipped adapter','shared entry preflight','nested import edits','standard docs/navigation','completion selection','incomplete call signature','hover','symbols','navigation','dirty repair','cross-file guarded rename','stale edit rejection','stale formatting rejection','formatting','refresh','restart','stop'}})},output)
+  vim.fn.writefile({vim.json.encode({editor=vim.version(),passed={'shipped adapter','console source docs/navigation','enum pattern navigation/completion','public print hover/signature','shared entry preflight','nested import edits','standard docs/navigation','completion selection','incomplete call signature','hover','symbols','navigation','dirty repair','cross-file guarded rename','stale edit rejection','stale formatting rejection','formatting','refresh','restart','stop'}})},output)
 end
 local ok,err=pcall(main)
 if not ok then vim.fn.writefile({tostring(err)},output..'.error');vim.cmd('cquit 1')else vim.cmd('qa!')end

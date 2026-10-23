@@ -63,4 +63,5 @@ with tempfile.TemporaryDirectory(prefix="VOID Stage10 field editor ") as directo
         assert replace(source.replace("return b.id", "b.id = 2\n    return 0"))
         assert not replace(source)
         assert query("textDocument/definition", 7, 14)["result"]
+        client.shutdown()
 print("Field LSP privacy, const hover/completion, dirty rejection and repair passed")

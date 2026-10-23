@@ -1,0 +1,12 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/console_prompt.void:7:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 7 |     match console.stdin.read_line():
+   |     ^^^^^
+    Module: /console_prompt.void
+
+Source checked successfully
+Source checked successfully
+Source checked successfully
+Source checked successfully
+Source checked successfully

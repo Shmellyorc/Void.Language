@@ -1,0 +1,8 @@
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[ 33%] Linking CXX static library libvoid_runtime.a
+[ 66%] Built target void_runtime
+[ 66%] Linking CXX executable void_runtime_console_input
+[100%] Built target void_runtime_console_input

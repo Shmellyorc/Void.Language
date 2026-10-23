@@ -1,0 +1,60 @@
+{
+  "change": "+3/-1 only: two comment lines plus existing noinline handler annotation; no semantic logic or limits changed",
+  "before_sha256": "cd466017cfdd73a8afb786e0ba675461fb9f4b319efafa8a184ad897e7785a19",
+  "after_sha256": "9a54df7f1778446fc3d593829978b4180df2ffd4a55f92ebaae156fc37f81d32",
+  "before_reconstructed_matches_preserved_freeze": true,
+  "all_frozen_inputs_match": 766,
+  "diff": "step41-release-stack-repair.diff",
+  "complete_builds": {
+    "debug": {
+      "returncode": 0,
+      "seconds": 203.81484067393467,
+      "source_freeze": "step41-full-source-freeze.json",
+      "verification": "Runner checks frozen inputs before and after each phase; full build uses matching compiler/core/Runtime and native fixtures."
+    },
+    "release": {
+      "returncode": 0,
+      "seconds": 4361.828189273016,
+      "source_freeze": "step41-full-source-freeze.json",
+      "verification": "Runner checks frozen inputs before and after each phase; full build uses matching compiler/core/Runtime and native fixtures."
+    },
+    "san": {
+      "returncode": 0,
+      "seconds": 284.9817564669065,
+      "source_freeze": "step41-full-source-freeze.json",
+      "verification": "Runner checks frozen inputs before and after each phase; full build uses matching compiler/core/Runtime and native fixtures."
+    }
+  },
+  "acceptance_artifact_sha256": {
+    "debug": {
+      "voidc": "c2a0d6d2af66d38cf40d604c74fd418a84828dbf423b895974e536ba9626121b",
+      "voidls": "84c1a1b9d3359a0b84f1874157c165b5de88bccc4c787580968c8684e1af30d2",
+      "void_tests": "df87949716a0abf57ec51cab76f5f9fa816538d7f25929a340ebb9ab2c87249b",
+      "void_stage10_conversion": "b457c9b18d8787acd7751ae46f038fc9ce7bbc2099dc91b2278af9bb8780a349",
+      "void_operator_integration": "d86d915ff7b431d3479507765e83a73169133489ca9a22019296aafde00e29a4",
+      "libvoid_core.a": "01a161982c580ebf05c77fbf0cee08dd486862157c9541996f9639aa48efd129",
+      "libvoid_runtime.a": "ad502714fec8a6fe96018627dc2b48fa711f017c1efa16878dfd1b7467a50f1c",
+      "CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o": "e4b5dc54795f59ec42f962655783ebf4ca54e7fe9ca64cf468d5bf10e78862d7"
+    },
+    "release": {
+      "voidc": "3b49ba9af3c8978a33acca75668275c3bf2a676211827948ce6bc187cf4f2e57",
+      "voidls": "6f0f5293bd8d4e46e4b25f5eefa75c076d715af3d61ab60a75af3060e6a242b7",
+      "void_tests": "900a7ce0b28f93d13b810ed294edbab15f93b3c0356cb1c3fcd661caa331cd11",
+      "void_stage10_conversion": "c59dcbb75318778ff1d0661c143138ef02571fc83b48479962445aa1cd132b14",
+      "void_operator_integration": "73c3237016d6ee545fc8ba613ff79262222f465c01ef49b9073405c1878360b5",
+      "libvoid_core.a": "3a6e956034bc71e71e1d087fa13435e7ab2e741e611d757454f95032c108228b",
+      "libvoid_runtime.a": "beb7500400fadfdc6043ebb77a8b4b3c55c9907ce15568b145376d39a02aa41b",
+      "CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o": "070485ae07b14c75075996b0fc3303a0cab3931a16fedc2907227e8659f100dd"
+    },
+    "san": {
+      "voidc": "fb39807582d1ea62bd8e22dce87dd7469061a19d89338c8c66e69b8260092ee3",
+      "voidls": "3eb891a49e4bf89da942c18f91a124a572d46a82e231937104fa78e01e54fc59",
+      "void_tests": "d305b1734ad1d2727003b7fbc392c5d3057f53b4d5cf49e10946e1d6c4f2fc1e",
+      "void_stage10_conversion": "be68e6280faa032d5c8246ebe828aae9920ff60bf06af7270d079347f10be122",
+      "void_operator_integration": "1b5b58296b62f6999df2e1e9f689f804b13749fc275e317a74625ec294a91c9c",
+      "libvoid_core.a": "82724e4d554f3e5a898fda0b78cf5492125046aa11e5aae086e2fe0bba804650",
+      "libvoid_runtime.a": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+      "CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o": "c8a013e9bc4f6829df131a919c8187eed911a738ea1d94b002f71fbd75e9e280"
+    }
+  }
+}

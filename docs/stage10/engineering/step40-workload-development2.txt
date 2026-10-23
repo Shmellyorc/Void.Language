@@ -1,0 +1,13 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:17:32: error: Duplicate declaration or shadowing of 'spec'.
+    code: VOID2005
+
+ 17 | func (self quantity<t>) format(spec: string) -> result<string, string>:
+    |                                ^^^^
+    Module: /operator_systems.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:2:7
+
+ 2 | const spec = "000"
+   |       ^^^^
+    Module: /operator_systems.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+

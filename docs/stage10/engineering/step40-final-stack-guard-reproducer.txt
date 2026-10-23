@@ -1,0 +1,23 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007f8f515f2e86 in ?? () from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+#0  0x00007f8f515f2e86 in ?? () from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+#1  0x00007f8f515f4262 in ?? () from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+#2  0x00007f8f515f48a2 in _Unwind_RaiseException () from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+#3  0x00007f8f516bd84b in __cxa_throw () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#4  0x000055904f82ff01 in vd::(anonymous namespace)::Semantics::member (this=0x7ffc16125e70, t=..., token=..., calling=true) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1473
+#5  0x000055904f87a780 in vd::(anonymous namespace)::Semantics::resolved_method_expression(vd::(anonymous namespace)::Expr&, vd::ir::Type)::{lambda()#1}::operator()() const (this=0x7ffc16031420) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1706
+#6  0x000055904f87643a in vd::(anonymous namespace)::Semantics::resolved_method_expression (this=0x7ffc16125e70, e=..., receiver=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1702
+#7  0x000055904f825792 in vd::(anonymous namespace)::Semantics::method_expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1645
+#8  0x000055904f8132e7 in vd::(anonymous namespace)::Semantics::expression_impl (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2231
+#9  0x000055904f8121e5 in vd::(anonymous namespace)::Semantics::expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2090
+#10 0x000055904f8252c3 in vd::(anonymous namespace)::Semantics::method_expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1638
+#11 0x000055904f8132e7 in vd::(anonymous namespace)::Semantics::expression_impl (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2231
+#12 0x000055904f8121e5 in vd::(anonymous namespace)::Semantics::expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2090
+#13 0x000055904f8252c3 in vd::(anonymous namespace)::Semantics::method_expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1638
+#14 0x000055904f8132e7 in vd::(anonymous namespace)::Semantics::expression_impl (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2231
+#15 0x000055904f8121e5 in vd::(anonymous namespace)::Semantics::expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2090
+#16 0x000055904f8252c3 in vd::(anonymous namespace)::Semantics::method_expression (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:1638
+#17 0x000055904f8132e7 in vd::(anonymous namespace)::Semantics::expression_impl (this=0x7ffc16125e70, e=..., expected=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2231

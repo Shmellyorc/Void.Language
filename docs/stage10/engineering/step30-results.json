@@ -1,0 +1,311 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 30,
+  "increment_status": "Implemented; focused Linux acceptance passed. Independent Wrench/native-platform/final-stage acceptance pending.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Public read_key/key_available/begin_mode; immutable key events, all approved named keys, Unicode, raw unknown bytes, actual/unknown modifier/key-up facts and repeats.",
+    "Single transactional InputReader queue, non-consuming availability, raw/line/CRLF/UTF8 carry ownership, exact partial/error/EOF recovery and checked 30ms/caller deadlines with injected clocks.",
+    "Same-owner LIFO native mode state in existing Session/Streams, binding-private nonforgeable managed session identities, reached with/one-shot deinit/close, worker/async rejection and independent IR validation.",
+    "POSIX requested-only termios changes/readback; ECHONL suppression, preserved default signal policy, explicit Ctrl-C input, exact original restoration on normal/failure/shutdown/last native lease.",
+    "Windows native input event/peek APIs and existing strict WideConsole transcoder/carry, actual key-up/modifier/repeat data; implementation present but native SDK/runtime UNVERIFIED.",
+    "Existing JIT/AOT entry completion checkpoints restore new modes even before with activation, preserve older nesting and append cleanup failures to primary source diagnostics. Embedding close returns native Error; persistent failures retain saved state for retry.",
+    "Coordinated explicit character echo, no key-up double echo, repeated-event echo, partial apply rollback, precise roots/GC, admitted entered-call retention, dependency/cache identity terminal-v2 and existing Runtime bindings."
+  ],
+  "debug": {
+    "passed": 27,
+    "total": 27,
+    "seconds": 393.6,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_display_reload",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_keyboard",
+      "runtime_console_terminal",
+      "runtime_console_native_keyboard",
+      "runtime_console_native_terminal",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "runtime_callbacks",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_console_source",
+      "async_lifecycle",
+      "stage10_console_aot",
+      "application_native_sprint4_host",
+      "application_native_sprint4"
+    ],
+    "log": "step30-debug-accepted-tests.txt",
+    "detail": "step30-debug-accepted-detail.txt",
+    "command": "step30-debug-test-command.json",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step30-stdlib-3j1vums5/stdlib"
+    },
+    "source_assertions": 3205,
+    "key_mode_assertions": 127,
+    "terminal_assertions": 482,
+    "driver_checks": 353,
+    "binary_execution_records": 72,
+    "source_key_PTY_records": 4,
+    "source_terminal_PTY_records": 4,
+    "native_key_PTY_checks": 92,
+    "native_key_process_cases": 8,
+    "native_terminal_checks": 77,
+    "native_terminal_process_cases": 10,
+    "output_records": "step30-debug-outputs.json",
+    "native_key_records": "step30-debug-native-keyboard.json",
+    "native_terminal_records": "step30-debug-native-terminal.json",
+    "production_build": "step30-debug-native-build.json",
+    "build": "step30-debug-acceptance-build.txt",
+    "native_flag_evidence": "Original/restored native flag words, speeds and every control character are serialized and compared; temporary active ECHONL/ISIG combinations recorded."
+  },
+  "strict_sanitizers": {
+    "passed": 27,
+    "total": 27,
+    "seconds": 463.49,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_display_reload",
+      "stage10_hooks",
+      "stage10_interpolation",
+      "stage10_fields",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_keyboard",
+      "runtime_console_terminal",
+      "runtime_console_native_keyboard",
+      "runtime_console_native_terminal",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "runtime_callbacks",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_console_source",
+      "async_lifecycle",
+      "stage10_console_aot",
+      "application_native_sprint4_host",
+      "application_native_sprint4"
+    ],
+    "log": "step30-san-accepted-tests.txt",
+    "detail": "step30-san-accepted-detail.txt",
+    "command": "step30-san-test-command.json",
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step30-stdlib-3j1vums5/stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "source_assertions": 3205,
+    "key_mode_assertions": 127,
+    "terminal_assertions": 482,
+    "driver_checks": 353,
+    "binary_execution_records": 72,
+    "source_key_PTY_records": 4,
+    "source_terminal_PTY_records": 4,
+    "native_key_PTY_checks": 92,
+    "native_key_process_cases": 8,
+    "native_terminal_checks": 77,
+    "native_terminal_process_cases": 10,
+    "output_records": "step30-san-outputs.json",
+    "native_key_records": "step30-san-native-keyboard.json",
+    "native_terminal_records": "step30-san-native-terminal.json",
+    "production_build": "step30-san-native-build.json",
+    "build": "step30-san-acceptance-build.txt",
+    "native_flag_evidence": "Original/restored native flag words, speeds and every control character are serialized and compared; temporary active ECHONL/ISIG combinations recorded.",
+    "configuration": "RelWithDebInfo, ASan/UBSan/LSan; existing RTTI-off vptr exclusion unchanged; actual LSan outside ptrace, no suppression or disabled assertions."
+  },
+  "development_failures_and_repairs": [
+    {
+      "defect": "Partially applied failed mode was not restored.",
+      "repair": "Restore the saved mode on apply error; preserve primary/cleanup codes and retain failed saved state for shutdown retry.",
+      "evidence": "step30-before-mode-fault-repair.txt"
+    },
+    {
+      "defect": "Capability precheck hid original closed-input error.",
+      "repair": "Validate/save the actual endpoint before allocation/apply; preserve native error and reject redirected/wrong-direction input before mode changes.",
+      "evidence": "step30-before-native-error-repair.txt"
+    },
+    {
+      "defect": "Preliminary combined acceptance was 26/27 in each configuration: Python 3.11 rejected newer f-string grammar accepted by shell Python 3.14.",
+      "repair": "Compute payload hex separately; actual configured Python 3.11.16 syntax/native driver reruns preserve every assertion.",
+      "evidence": [
+        "step30-pre-final-debug-accepted-tests.txt",
+        "step30-pre-final-san-accepted-tests.txt",
+        "step30-python-compatibility.txt"
+      ]
+    },
+    {
+      "defect": "Additional review found native key-up/repeat echo, physical native error boundaries, malformed carried scalar tails and sticky delivered key errors needed explicit handling.",
+      "repair": "Do not echo key-up; repeat characters exactly; preserve native partial/error fields; return invalid_encoding with owned bytes; acknowledge delivered errors and allow subsequent reads. Deterministic regressions pass.",
+      "evidence": "tests/runtime/console_keyboard.cpp; final deterministic checks (no archived pre-fix binary reproduction claimed for these cases)."
+    },
+    {
+      "defect": "Development source fixture initially used while/event tokens and a stale development compiler used the earlier private argument shape.",
+      "repair": "Use existing for/pressed syntax; rebuild matching source/compiler. No production language or source identity check weakened.",
+      "evidence": "step30-stale-development-binary.txt"
+    },
+    {
+      "defect": "Exceptional mode restoration failure vanished when a later retry succeeded.",
+      "repair": "Carry the original exception and cleanup error with the native call; translate through the ordinary checked ABI before reached source cleanup. No shared diagnostic state that another entry can consume; saved modes remain for retry. Native/source/concurrent ordering regressions remain enabled.",
+      "evidence": "step30-before-unwind-error-repair.txt"
+    },
+    {
+      "defect": "Availability temporarily disabled canonical mode and pulled an unfinished line into the queue, breaking later OS backspace editing despite restoring all mode flags.",
+      "repair": "Availability peeks the shared queue or native event/readiness state without consuming input or changing modes; explicit noncanonical sessions enable per-key POSIX polling. Real PTY abc/erase/Enter regression returns ab.",
+      "evidence": "step30-before-canonical-availability-repair.txt"
+    },
+    {
+      "defect": "Review found native mode queries/restores held the shared metadata mutex over OS calls, and key mode preparation needed the original request deadline.",
+      "repair": "Native mode calls run outside the metadata mutex under the existing input lease; cleanup claims that same input lease/admission. Recheck cancellation/deadline before apply and roll back late entered completion. Barrier regressions verify prompt cancellation/rejection; injected clocks verify no restarted deadline.",
+      "evidence": "tests/runtime/console_keyboard.cpp; final deterministic checks (no archived pre-fix binary reproduction claimed)."
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "Actual native Windows SDK compilation and traditional console/Windows Terminal/ConPTY input/event/mode/Unicode/failure combinations. No Linux fake is credited as native execution.",
+    "Native macOS SDK/termios/terminfo/PTY behavior.",
+    "Fresh Release, new console/composite editor cross-product and final Stage10 acceptance. Step31 and missing composite display remain open."
+  ],
+  "platform_contract": {
+    "POSIX": "Named sequences only from terminfo or its explicitly declared normal ECMA protocol; other sequences return unknown with all bytes. Physical modifiers/key-up remain unknown. Existing OS CR input translation is preserved.",
+    "Windows": "Native ReadConsoleInputW/PeekConsoleInputW plus existing strict UTF16 transcoding/carry. Native ECHO_INPUT/LINE_INPUT restrictions require targeted native acceptance.",
+    "ownership": "Borrowed endpoints unchanged, no hidden tty/handle, no process-wide signal/code-page/descriptor flag changes. Mode state belongs to existing native Session/Streams; managed aliases share one identity.",
+    "failure": "read_key partial/count describes consumed input bytes, including failures during explicit echo. Do not retry a read to repair output. Saved state remains for retry when the OS refuses restoration. Entered uncancellable borrowed syscall and host-lifetime caveats remain.",
+    "embedding": "Context::close and Runtime::close now return console::Error, source-compatible for callers discarding it; embedding callers must rebuild with matching headers/archive and inspect failures when required. No stable old C++ binary ABI claimed."
+  },
+  "primary_references": [
+    "https://man7.org/linux/man-pages/man3/termios.3.html",
+    "https://learn.microsoft.com/en-us/windows/console/readconsoleinput",
+    "https://learn.microsoft.com/en-us/windows/console/key-event-record-str",
+    "https://learn.microsoft.com/en-us/windows/console/setconsolemode"
+  ],
+  "dependencies": {
+    "new": "None",
+    "reused": {
+      "new": {
+        "version": "ncurses 6.6.20260608",
+        "abi": "system terminfo (Linux soname 6; Darwin system ncurses fallback)",
+        "loaded_libraries": {
+          "/usr/lib/x86_64-linux-gnu/libtinfo.so.6.6": "01f269b16e2fea55d86ba9e95316a82cc5f0e9e784de8c85d9137c845218fa12"
+        },
+        "license": "MIT/X11 (system ncurses package); no library or database redistribution",
+        "residency": "Process-owned native facility, like ordinary dynamic linkage; per-call TERMINAL instances freed, previous cur_term restored. No global curses cleanup or module unload.",
+        "primary_references": [
+          "https://invisible-island.net/ncurses/man/curs_terminfo.3x.html",
+          "https://invisible-island.net/ncurses/terminfo.src.html",
+          "https://invisible-island.net/xterm/ctlseqs/ctlseqs.html",
+          "https://learn.microsoft.com/en-us/windows/console/console-functions"
+        ]
+      },
+      "pinned_unchanged": {
+        "new": "None",
+        "existing": {
+          "date": {
+            "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+            "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+          },
+          "ryu": {
+            "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+            "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+          },
+          "tzdata2026e": {
+            "revision": "2026e",
+            "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+          }
+        },
+        "licenses": "Unchanged: Ryu Boost 1.0 option, Howard Hinnant date v3.0.3 MIT notices, IANA 2026e public domain; LLVM/Clang 19.1.7 pinned."
+      },
+      "packaging": "No terminfo implementation/database redistribution. Optional system DSO is process native state; text/OS dimensions still function without it. CMake CMAKE_DL_LIBS and production Linux -ldl handle loader symbols. Native executable smoke verifies build packaging."
+    },
+    "licenses": "Existing licenses unchanged; LLVM/Clang19.1.7 remains pinned."
+  },
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "configured_Python": "/home/shmellyorc/.local/bin/python3.11 (3.11.16)",
+    "shell_Python": "3.14.8",
+    "LLVM_Clang": "19.1.7"
+  },
+  "remaining_stage_obligations": [
+    "Step31 final console concurrency/lifetime integration.",
+    "Native Windows/macOS, fresh Release/editor acceptance.",
+    "Composite display, later console/composite tooling and full four-system Step40 integration; final Steps41\u201344."
+  ],
+  "next_step": 31,
+  "next_source_change": "Extend existing console/session and application lifecycle regressions to combine shared Runtime/Streams admission, blocked/entered input and output, GC, modes, shutdown, generation leases and borrowed endpoint lifetime. Repair demonstrated production defects in the same coordination/console paths; do not create another registry/scheduler/GC path.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "ABI_build_scope": "Existing console_native catalog and fixed 8-word vd_console_v2 reply reused; no new backend/ABI buffer layout. Resource identity and exact op directions checked independently. console-v2/terminal-v2 prevents stale contract reuse.",
+  "bounded_files": [
+    "CMakeLists.txt",
+    "include/void/console.hpp",
+    "include/void/console_ops.hpp",
+    "include/void/async.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "include/void/detail/console_wide.hpp",
+    "src/runtime/console.cpp",
+    "src/runtime/console_keyboard.inc",
+    "src/runtime/console_presentation.inc",
+    "src/runtime/console_abi.cpp",
+    "src/runtime/coordination.cpp",
+    "src/runtime/async.cpp",
+    "src/runtime/abi.cpp",
+    "src/runtime/reload.cpp",
+    "src/frontend/compiler.cpp",
+    "src/ir/module.cpp",
+    "src/backend/llvm/backend.cpp",
+    "stdlib/console.void",
+    "tests/runtime/console_keyboard.cpp",
+    "tests/runtime/console_keyboard.py",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/console_keys.void",
+    "docs/WORK_LOG.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md"
+  ],
+  "source_manifests": {
+    "bounded": "step30-source-hashes.json",
+    "bounded_files": 29,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 206,
+    "previous_checkpoint": "step29-checkpoint-source-hashes.json",
+    "preservation": "step30-preservation.json",
+    "unchanged_prior_entries_verified": 177
+  },
+  "build_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "e7e5682220f483195ffd3bd1e24fef843c3bfbdf88b1640499ddac1f9a4a30ca",
+    "build/ci-official-debug/voidc": "f9ff3cf0d7d0d1a7af995237cfc8ddacf380c9894d7161f134c22d1a3e559dea",
+    "build/ci-official-debug/void_console_source": "02f54a3eefa061b7166887e3e86fb42868e1ee6c5cf38edd4ba6971c682347db",
+    "build/ci-official-debug/void_runtime_console_keyboard": "64112ed17a3dc17cf3207f07dc419bf18bcded7b9267302730c68e67efd1894d",
+    "build/ci-official-san/libvoid_runtime.a": "ac02516e354a7658622552ec33c6c0a1e6a3243858deaee32be5afabe9fd5743",
+    "build/ci-official-san/voidc": "3226f897171a436809710e5acf5fd4796fb3e23a5365fcf4d64c44cadd6ae617",
+    "build/ci-official-san/void_console_source": "50a22b328a811e3c7316a71ab6e8749c29d41856690cd141dfd2b6c442945f59",
+    "build/ci-official-san/void_runtime_console_keyboard": "c3ccbfdadd26dbce5479ab6fb21bf607b154cd6df75801c5a38f5795dc6e4b54"
+  }
+}

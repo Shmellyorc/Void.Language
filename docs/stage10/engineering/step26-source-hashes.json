@@ -1,0 +1,12 @@
+{
+  "CMakeLists.txt": "f9fc11cd72b536dc328b4745a2753ddbb880ef70ab79682cbd89f06b4741697b",
+  "include/void/console.hpp": "6baf5e97f3dffac411b700b74c8682b5a02dbbbd85ac91622b996a8c04c8378a",
+  "include/void/detail/console_wide.hpp": "3d9de7846fc3a07c4fe3ed5ea46393bde556947238f6495960611663f03da86c",
+  "src/runtime/console.cpp": "77250104835caaed964d0e8875d3d1c51e8b9932f0d551d74c78ee9521911ae3",
+  "tests/runtime/console_wide.cpp": "e2ff3b274da60023d5db4da9026471c2f5d7c54b8e57781d7d769dbf217c37b7",
+  "docs/WORK_LOG.md": "07a2a26f1178e004c1e8fccfc86459ef241d86cfb5f4717da3194e8672067e72",
+  "docs/stage10/IMPLEMENTATION.md": "643b206f2db209dc7e6fabefce6fb65c3f48783387dc9e2902e2fcee362bfac6",
+  "docs/stage10/CONSOLE_IO.md": "98dbaa18bf9c040f0a4627f97d8516610a7053cb567d8ae15341abec61e7c7b3",
+  "docs/stage10/TEST_PLAN.md": "1a7face5bc41ec0758ee911d57f466e99f6ffd174f525201605bb323118955da",
+  "docs/stage10/EVIDENCE.md": "6b8c0e602282972f6c560987b43c5168fe07086dc6cd1d6ffc111626bf70f494"
+}

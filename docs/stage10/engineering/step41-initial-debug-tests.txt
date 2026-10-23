@@ -1,0 +1,121 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+        Start 177: stage10_console_aot
+        Start  39: collections_source
+  1/199 Test  #39: collections_source ........................   Passed   96.36 sec
+        Start 178: stage10_operators_aot
+  2/199 Test #177: stage10_console_aot .......................***Failed  183.63 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 88, in <module>
+    p = run([compiler, "run", source, *switches], stdin, status)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 35, in run
+    p = subprocess.run([str(a) for a in args], input=stdin, capture_output=True, timeout=120, env=env or environment)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc', 'run', '/tmp/VOID console source 7271y96j/operator_console_systems.void']' timed out after 120 seconds
+
+        Start 197: modules_cli
+  3/199 Test #197: modules_cli ...............................***Failed   10.74 sec
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/acceptance-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/acceptance-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/nested-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/nested-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/cyclic-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/cyclic-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/edited_import-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/edited_import-optimized.o
+-- Four real source graphs compiled, linked, debug-verified and executed in normal/O2 JIT and AOT
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/constants-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/constants-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/numeric-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/error-division-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/error-division-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/error-remainder-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/error-remainder-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module native programs with spaces/error-compound_division-normal.o
+CMake Error at /home/shmellyorc/Documents/Void.Language/tests/integration/values.cmake:60 (message):
+  compound_division/normal/jit: wrong runtime failure (1):
+  /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module
+  native programs with spaces/error
+  acceptance/runtime_errors/arithmetic.void:3:12: runtime error: Division by
+  zero
+
+      result /= value
+             ^
+
+  In function /arithmetic.void::calculate
+
+  Called from /main.void::bridge
+
+  /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module
+  native programs with spaces/error acceptance/runtime_errors/main.void:4:23:
+  source call
+
+      return arithmetic.calculate(value)
+                        ^
+
+  Called from /main.void::entry
+
+  /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module
+  native programs with spaces/error acceptance/runtime_errors/main.void:7:12:
+  source call
+
+      return bridge(value)
+             ^
+
+
+
+Call Stack (most recent call first):
+  /home/shmellyorc/Documents/Void.Language/tests/integration/modules.cmake:110 (include)
+
+
+
+        Start 189: text_collections_sprint3
+  4/199 Test #189: text_collections_sprint3 ..................   Passed  190.36 sec
+        Start  12: stage10_conversion
+  5/199 Test #178: stage10_operators_aot .....................***Failed  498.95 sec
+operator_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_async: normal/O2 JIT and independently linked AOT verified
+operator_native_systems: normal/O2 JIT and independently linked AOT verified
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py", line 109, in <module>
+    measured=json.loads(run([integration,"--measure",source,value,mode,kind]))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py", line 29, in run
+    p = subprocess.run([str(a) for a in args], capture_output=True, text=True,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_integration', '--measure', '/tmp/VOID Stage10 operators 3gp5r473/operator_systems_workload.void', '-1000000', 'normal', 'sync']' timed out after 60 seconds
+
+        Start  94: stage10_console_source

@@ -14,13 +14,13 @@ incoming[0].clear();if(f.receiver)incoming[0].insert(0);
 bool changed;
 do{changed=false;for(unsigned b=0;b<f.blocks.size();++b)if(reachable[b]){
     auto entry=incoming[b];if(b){entry=universe;for(auto p:predecessors[b]){std::set<unsigned> intersection;std::set_intersection(entry.begin(),entry.end(),outgoing[p].begin(),outgoing[p].end(),std::inserter(intersection,intersection.end()));entry=std::move(intersection);}}
-    auto exit=entry;for(const auto& i:f.blocks[b].instructions)if(i.op==Op::store || i.op==Op::stage_begin)exit.insert(i.a);
+    auto exit=entry;for(const auto& i:f.blocks[b].instructions)if(i.op==Op::store || i.op==Op::stage_begin)exit.insert(i.a);else if(i.op==Op::array_capture)exit.insert(static_cast<unsigned>(i.immediate));
     if(incoming[b]!=entry || outgoing[b]!=exit){incoming[b]=std::move(entry);outgoing[b]=std::move(exit);changed=true;}
 }}while(changed);
 for(unsigned b=0;b<f.blocks.size();++b)if(reachable[b]){auto initialized=incoming[b];for(const auto& i:f.blocks[b].instructions){
-    if(i.op==Op::load && required(f.locals[i.a]) && !initialized.contains(i.a))fail("async frame reads an uninitialized required local");
+    if(i.op==Op::load && required(f.locals[i.a]) && !initialized.contains(i.a))fail("async frame reads an uninitialized required local "+std::to_string(i.a)+" in "+f.name);
     if(i.receiver && required(f.locals[i.receiver->slot]) && !initialized.contains(i.receiver->slot))fail("async frame uses an uninitialized receiver");
-    if(i.op==Op::store || i.op==Op::stage_begin)initialized.insert(i.a);
+    if(i.op==Op::store || i.op==Op::stage_begin)initialized.insert(i.a);else if(i.op==Op::array_capture)initialized.insert(static_cast<unsigned>(i.immediate));
 }}
 // A saved stack-only construction/prepared place must not be read after await.
 for(unsigned block=0;block<f.blocks.size();++block)for(unsigned position=0;position<f.blocks[block].instructions.size();++position)if(f.blocks[block].instructions[position].op==Op::await || f.blocks[block].instructions[position].op==Op::async_group_join || f.blocks[block].instructions[position].op==Op::async_drain){

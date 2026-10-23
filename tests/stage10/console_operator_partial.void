@@ -1,0 +1,18 @@
+use console
+use "operator_systems.void" as library
+func main() -> i32:
+    defer {
+        print("cleanup;", file = console.stderr, end = "")
+    }
+    var value = library.quantity<i32>(value = 7)
+    value += 2
+    value %= 7
+    var payload: result<library.quantity<i32>, string> = Ok(value)
+    var text = string([payload])
+    for text.byte_length < 131072:
+        text += text
+    if console.stdout.write(text) is Err(var reason):
+        if reason.kind is io_error_kind.broken_pipe:
+            print("partial", reason.bytes_transferred, text.byte_length, file = console.stderr)
+            return 0
+    return 101

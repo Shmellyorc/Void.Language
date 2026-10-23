@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 22: runtime_console
+1/4 Test #22: runtime_console ....................   Passed    0.01 sec
+    Start 23: runtime_console_endpoints
+2/4 Test #23: runtime_console_endpoints ..........   Passed    0.06 sec
+    Start 24: runtime_console_transfers
+3/4 Test #24: runtime_console_transfers ..........   Passed    0.02 sec
+    Start 25: runtime_console_native_transfers
+4/4 Test #25: runtime_console_native_transfers ...   Passed    0.41 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.50 sec

@@ -1,0 +1,1 @@
+io_uring_setup entries=2, flags=0, struct_bytes=120, result=-1, errno=1

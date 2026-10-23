@@ -1,0 +1,129 @@
+[
+  {
+    "label": "vscode-unit",
+    "command": [
+      "npm",
+      "test",
+      "--prefix",
+      "editors/vscode"
+    ],
+    "environment": {
+      "PATH": "/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools",
+      "VSCODE_EXECUTABLE_PATH": "/usr/share/code/code",
+      "VOIDLS_PATH": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 5.426431671017781
+  },
+  {
+    "label": "vscode-host",
+    "command": [
+      "node",
+      "editors/vscode/out/test/runHost.js"
+    ],
+    "environment": {
+      "PATH": "/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools",
+      "VSCODE_EXECUTABLE_PATH": "/usr/share/code/code",
+      "VOIDLS_PATH": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 23.32798941899091
+  },
+  {
+    "label": "automatic",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/editors/run.py",
+      "--server",
+      "build/ci-official-debug/voidls",
+      "--nvim",
+      "/usr/bin/nvim",
+      "--vim",
+      "/usr/bin/vim.basic",
+      "--vim-client",
+      "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "--output",
+      "docs/stage10/engineering/step41-editors-automatic.json"
+    ],
+    "environment": {
+      "PATH": "/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools",
+      "VSCODE_EXECUTABLE_PATH": "/usr/share/code/code",
+      "VOIDLS_PATH": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 1.8430079539539292
+  },
+  {
+    "label": "explicit",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/editors/run.py",
+      "--server",
+      "build/ci-official-debug/voidls",
+      "--nvim",
+      "/usr/bin/nvim",
+      "--vim",
+      "/usr/bin/vim.basic",
+      "--vim-client",
+      "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "--output",
+      "docs/stage10/engineering/step41-editors-explicit.json",
+      "--explicit-entry"
+    ],
+    "environment": {
+      "PATH": "/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools",
+      "VSCODE_EXECUTABLE_PATH": "/usr/share/code/code",
+      "VOIDLS_PATH": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 1.7518027379410341
+  },
+  {
+    "label": "neovim-pty",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/editors/neovim_automatic.py",
+      "--server",
+      "build/ci-official-debug/voidls",
+      "--nvim",
+      "/usr/bin/nvim",
+      "--output",
+      "docs/stage10/engineering/step41-neovim-automatic.json"
+    ],
+    "environment": {
+      "PATH": "/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools",
+      "VSCODE_EXECUTABLE_PATH": "/usr/share/code/code",
+      "VOIDLS_PATH": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 1.8469364270567894
+  },
+  {
+    "label": "vim-pty",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "tests/editors/vim_automatic.py",
+      "--server",
+      "build/ci-official-debug/voidls",
+      "--vim",
+      "/usr/bin/vim.basic",
+      "--vim-client",
+      "/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "--output",
+      "docs/stage10/engineering/step41-vim-automatic.json"
+    ],
+    "environment": {
+      "PATH": "/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools",
+      "VSCODE_EXECUTABLE_PATH": "/usr/share/code/code",
+      "VOIDLS_PATH": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    },
+    "status": "finished",
+    "returncode": 0,
+    "seconds": 0.6959620559355244
+  }
+]

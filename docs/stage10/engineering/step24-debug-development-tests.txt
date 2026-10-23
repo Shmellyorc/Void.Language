@@ -1,0 +1,29 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 24: runtime_console_transfers
+1/2 Test #24: runtime_console_transfers ..........   Passed    0.02 sec
+    Start 25: runtime_console_native_transfers
+2/2 Test #25: runtime_console_native_transfers ...***Failed   10.14 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.py", line 91, in <module>
+    run=subprocess.run([binary,'--read-error',path],stdin=subprocess.DEVNULL,capture_output=True,preexec_fn=lambda:os.close(0),timeout=10)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '[PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_transfers'), '--read-error', PosixPath('/tmp/VOID transfer 🔧 u0lml0of/closed-input.txt')]' timed out after 10 seconds
+
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  10.16 sec
+
+The following tests FAILED:
+	 25 - runtime_console_native_transfers (Failed)
+Errors while running CTest

@@ -1,0 +1,988 @@
+[90m[main 2026-10-22T19:23:07.402Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-22T19:23:07.490Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-22T19:23:07.572Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-22T19:23:07.572Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-22T19:23:07.604Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-22T19:23:07.605Z][0m update#setState disabled
+[90m[main 2026-10-22T19:23:07.605Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-22T19:23:08.902Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-10-22T19:23:09.457Z][0m [AgentHost:stderr] (node:3633506) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 3633617.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=67f6faa0-b9b0-4ac6-8302-ca7ea3e72168 requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=67f6faa0-b9b0-4ac6-8302-ca7ea3e72168 durationMs=713
+[AgentHost:renderer] Protocol connection established; clientId=67f6faa0-b9b0-4ac6-8302-ca7ea3e72168
+Started initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/extensions
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/extensions
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 0)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 1)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Unknown channel: agentHostClientProxy
+Editor test begins: trusted
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Activation ready: {"state":"running","entry":"/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"}
+Editor diagnostics: []
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":1,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 404
+
+{"id":2,"jsonrpc":"2.0","result":[{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"},{"range":{"end":{"character":27,"line":3},"start":{"character":18,"line":3}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 868
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'u'.\nHint: Declare it with var before use.","range":{"end":{"character":1,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":3,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":4,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 869
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'us'.\nHint: Declare it with var before use.","range":{"end":{"character":2,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":5,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":6,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 874
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'unknown'.\nHint: Declare it with var before use.","range":{"end":{"character":7,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":7,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":8,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 850
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 1896
+
+{"id":9,"jsonrpc":"2.0","result":[{"detail":"i32","documentation":"","kind":3,"label":"entry","textEdit":{"newText":"entry","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"false","textEdit":{"newText":"false","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"format(value, spec: string) -> result<string, string>","documentation":"Invariant type-aware display and formatting.","kind":3,"label":"format","textEdit":{"newText":"format","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"func","textEdit":{"newText":"func","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"if","textEdit":{"newText":"if","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"match","textEdit":{"newText":"match","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"not","textEdit":{"newText":"not","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"null","textEdit":{"newText":"null","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"string(value) -> string","documentation":"Invariant type-aware display and formatting.","kind":3,"label":"string","textEdit":{"newText":"string","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"true","textEdit":{"newText":"true","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}}]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+PASS real typing: incomplete top-level keywords/expressions/imports recover in the same native process
+PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Settings Sync: Account status changed from uninitialized to unavailable
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+Operator hover presentation: [["public&nbsp;operator&nbsp;\\+\\(left:&nbsp;readonly&nbsp;/worker&nbsp;space.void::editor\\_number,&nbsp;right:&nbsp;readonly&nbsp;/worker&nbsp;space.void::editor\\_number\\)&nbsp;-\\>&nbsp;/worker&nbsp;space.void::editor\\_number\n\nDeclared&nbsp;by&nbsp;/worker&nbsp;space.void::editor\\_number\n\nEffects:&nbsp;synchronous"]]
+Stage 39 conservative formatting/literal preservation/idempotence/stale-edit rejection passed
+Before save
+After save
+Before close
+After close
+Document close/open events verified
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/YTVjYjZiODYtMjNmYS00OWZmLTg0NDctYjI2OThjNmRhYWJk" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Diagnostics/navigation/unsaved repair/close-reopen passed
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/second.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}
+Native stdout: Content-Length: 192
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/second.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 36
+
+{"id":1,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Error notification: VOID: Cannot find voidls executable: /tmp/VOID editor é😀 3qZZT9/project space # %/missing-voidls. Build voidls and configure void.server.path. See Output → VOID.
+Native exit: code=0, signal=null
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/second.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 192
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/second.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":1,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/tmp/VOID editor é😀 3qZZT9/project space # %/voidls disappears",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Error notification: VOID client: couldn't create connection to server.
+Launching server using command /tmp/VOID editor é😀 3qZZT9/project space # %/voidls disappears failed. Error: spawn /tmp/VOID editor é😀 3qZZT9/project space # %/voidls disappears ENOENT
+Error notification: VOID language server failed to start: Launching server using command /tmp/VOID editor é😀 3qZZT9/project space # %/voidls disappears failed. Error: spawn /tmp/VOID editor é😀 3qZZT9/project space # %/voidls disappears ENOENT See Output → VOID.
+Error notification: VOID: Error: Client is not running and can't be stopped. It's current state is: startFailed See Output → VOID.
+Native exit: code=0, signal=null
+Error notification: VOID: Cannot find voidls executable: /tmp/VOID editor é😀 3qZZT9/project space # %/voidls disappears. Build voidls and configure void.server.path. See Output → VOID.
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdin error: Error: Focused transport failure before close
+Native stdin error: Error: Focused transport failure before close
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Error notification: VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log. See Output → VOID.
+Native exit: code=null, signal=SIGTERM
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native exit: code=null, signal=SIGTERM
+Error notification: VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log. See Output → VOID.
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 443
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID3002","message":"Cannot find imported file '/main.void'.\nHint: Check this path relative to the importing file or virtual project root.","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/worker space.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Error notification: VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects. See Output → VOID.
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%203qZZT9/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 477
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"entry(x: i32) -> i32","kind":12,"name":"entry","range":{"end":{"character":0,"line":4},"start":{"character":0,"line":2}},"selectionRange":{"end":{"character":10,"line":2},"start":{"character":5,"line":2}}},{"detail":"private worker: no result","kind":2,"name":"worker","range":{"end":{"character":34,"line":1},"start":{"character":28,"line":1}},"selectionRange":{"end":{"character":34,"line":1},"start":{"character":28,"line":1}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 3qZZT9/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 3qZZT9/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 38
+
+{"id":1,"jsonrpc":"2.0","result":null}
+Native stderr: textDocument/didOpen: Server has shut down
+textDocument/didOpen: Server has shut down
+
+Native exit: code=0, signal=null
+PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup
+[90m[main 2026-10-22T19:23:19.883Z][0m Extension host with pid 3633617 exited with code: 0, signal: unknown.
+Exit code:   0
+[90m[main 2026-10-22T19:23:20.438Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-22T19:23:20.534Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-22T19:23:20.612Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-22T19:23:20.613Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-22T19:23:20.646Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-22T19:23:20.646Z][0m update#setState disabled
+[90m[main 2026-10-22T19:23:20.647Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-22T19:23:21.890Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-10-22T19:23:22.462Z][0m [AgentHost:stderr] (node:3634325) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 3634432.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=f8c00b8f-a838-4f07-a550-8a4f1f68d3f2 requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=f8c00b8f-a838-4f07-a550-8a4f1f68d3f2 durationMs=712
+[AgentHost:renderer] Protocol connection established; clientId=f8c00b8f-a838-4f07-a550-8a4f1f68d3f2
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 0)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 1)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+Unknown channel: agentHostClientProxy
+Editor test begins: untrusted
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODExZWE2ZDgtMDY5Mi00YTk5LTg5N2ItODQwMGUzNDZkNzAw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODExZWE2ZDgtMDY5Mi00YTk5LTg5N2ItODQwMGUzNDZkNzAw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Error notification: VOID native analysis requires a trusted workspace. Syntax highlighting remains available. See Output → VOID.
+Activation ready: {"state":"stopped"}
+Editor diagnostics: []
+PASS real editor restricted trust: no native child spawned
+[90m[main 2026-10-22T19:23:23.939Z][0m Extension host with pid 3634432 exited with code: 0, signal: unknown.
+[90m[main 2026-10-22T19:23:24.526Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-22T19:23:24.610Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-22T19:23:24.687Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-22T19:23:24.687Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-22T19:23:24.719Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-22T19:23:24.720Z][0m update#setState disabled
+[90m[main 2026-10-22T19:23:24.720Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-22T19:23:25.969Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost:renderer] MessagePort acquired, creating client...
+[91m[main 2026-10-22T19:23:26.552Z][0m [AgentHost:stderr] (node:3635019) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+Started local extension host with pid 3635114.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=c61a2872-41f4-42cf-95ac-9c7dda67e333 requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=c61a2872-41f4-42cf-95ac-9c7dda67e333 durationMs=679
+[AgentHost:renderer] Protocol connection established; clientId=c61a2872-41f4-42cf-95ac-9c7dda67e333
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 0)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 1)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NTNkYWVmMjctNjFiZi00NjkxLWJlODItMzJiNDU2ZmQ0NzIx" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Editor test begins: multi-root
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NTNkYWVmMjctNjFiZi00NjkxLWJlODItMzJiNDU2ZmQ0NzIx" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Error notification: VOID: VOID supports one project in one workspace folder. Open each project in a separate window. See Output → VOID.
+Activation ready: {"state":"stopped"}
+Editor diagnostics: []
+PASS real editor multi-root: explanatory error, no native child spawned
+[90m[main 2026-10-22T19:23:28.080Z][0m Extension host with pid 3635114 exited with code: 0, signal: unknown.
+Exit code:   0

@@ -1,0 +1,3 @@
+poll/POLLOUT -> permitted independent host fill -> one-byte write blocked; session stop woke self-pipe but Runtime close could not drain until host read; all joined
+per-request aio_cancel returned AIO_NOTCANCELED for entered pipe read; completed/drained after explicit host write
+17 deterministic native feasibility checks passed (not Step 24 acceptance)

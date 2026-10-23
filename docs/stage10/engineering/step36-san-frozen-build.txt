@@ -1,0 +1,116 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_runtime
+[ 50%] Built target void_core
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_operator_keys.dir/tests/stage10/operator_keys.cpp.o
+[100%] Linking CXX executable void_operator_keys
+[100%] Built target void_operator_keys
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_operator_resolution
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_operator_declarations
+[ 33%] Built target void_native_test_fixture
+[ 33%] Built target void_zone_objects
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_managed_test_abi
+[ 33%] Built target void_core
+[ 66%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_operator_compounds
+[ 25%] Built target void_native_test_fixture
+[ 25%] Built target void_zone_objects
+[ 25%] Built target void_format_objects
+[ 25%] Built target void_native_fixture
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_core
+[ 50%] Built target void_runtime
+[ 75%] Built target void_llvm
+[100%] Built target void_operator_integration
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 33%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[100%] Built target void_dictionaries_tests
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_generics_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_gc_schemas
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Building CXX object CMakeFiles/void_patterns_tests.dir/tests/patterns/tests.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_patterns_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_patterns_tests
+[100%] Built target void_patterns_tests
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_interfaces_tests.dir/tests/interfaces/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_interfaces_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_interfaces_tests
+[100%] Built target void_interfaces_tests
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[100%] Linking CXX executable void_fixed_arrays_tests
+[100%] Built target void_fixed_arrays_tests
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/growable_arrays/tests.cpp.o
+[100%] Linking CXX executable void_growable_arrays_tests
+[100%] Built target void_growable_arrays_tests

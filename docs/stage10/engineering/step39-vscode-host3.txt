@@ -1,0 +1,236 @@
+[90m[main 2026-10-22T19:20:57.900Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-22T19:20:57.988Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-22T19:20:58.066Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-22T19:20:58.066Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-22T19:20:58.101Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-22T19:20:58.102Z][0m update#setState disabled
+[90m[main 2026-10-22T19:20:58.102Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-22T19:20:59.476Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-10-22T19:21:00.026Z][0m [AgentHost:stderr] (node:3630192) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[AgentHost:renderer] MessagePort acquired, creating client...
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=3ee869e0-392f-4756-be8e-537530c3faa4 requestId=1
+Started local extension host with pid 3630293.
+[RemoteAgentHostProtocol] Initialized: address=local clientId=3ee869e0-392f-4756-be8e-537530c3faa4 durationMs=762
+[AgentHost:renderer] Protocol connection established; clientId=3ee869e0-392f-4756-be8e-537530c3faa4
+Started initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/extensions
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/extensions
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/neovim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 0)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json'): Error: Unable to read file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json' (Error: Unable to resolve nonexistent file '/home/shmellyorc/Documents/Void.Language/editors/vim/package.json')
+    at owe.restoreReadError (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:95062)
+    at owe.doReadFileStream (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94845)
+    at async owe.doReadFile (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5419:94090)
+    at async dpt.scanExtensionManifest (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:28923)
+    at async dpt.scanExtension (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27347)
+    at async Promise.all (index 1)
+    at async dpt.scanExtensionsFromLocation (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:25602)
+    at async dpt.scanOneOrMultipleExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:27171)
+    at async vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:17171
+    at async Promise.all (index 0)
+    at async Uqt.scanExtensionsUnderDevelopment (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5429:16948)
+    at async Opt._scanInstalledExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7974)
+    at async Opt.startScanningExtensions (vscode-file://vscode-app/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js:5475:7015)
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MzA2YzcyZTEtMWNlNC00MWE1LTlmODgtMTBjZTE5NzE2ZGJi" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Unknown channel: agentHostClientProxy
+Editor test begins: trusted
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MzA2YzcyZTEtMWNlNC00MWE1LTlmODgtMTBjZTE5NzE2ZGJi" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",["--entry","/tmp/VOID editor é😀 Dv372t/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 Dv372t/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Activation ready: {"state":"running","entry":"/tmp/VOID editor é😀 Dv372t/project space # %/main.void"}
+Editor diagnostics: []
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":1,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 404
+
+{"id":2,"jsonrpc":"2.0","result":[{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/worker%20space.void"},{"range":{"end":{"character":27,"line":3},"start":{"character":18,"line":3}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/main.void"}]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/worker%20space.void"}}
+Editor test failure: AssertionError [ERR_ASSERTION]: real incomplete edit was not applied: {"fragment":"u","text":"# UTF-8 é😀\nuse \"/worker space.void\" as worker\nfunc entry(x: i32) -> i32:\n    return worker.calculate(x)\n","active":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/main.void"}
+AssertionError [ERR_ASSERTION]: real incomplete edit was not applied: {"fragment":"u","text":"# UTF-8 é😀\nuse \"/worker space.void\" as worker\nfunc entry(x: i32) -> i32:\n    return worker.calculate(x)\n","active":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/main.void"}
+	at Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/host.js:205:34)
+Native stdout: Content-Length: 38
+
+{"id":3,"jsonrpc":"2.0","result":null}
+Native exit: code=0, signal=null
+AssertionError [ERR_ASSERTION]: real incomplete edit was not applied: {"fragment":"u","text":"# UTF-8 é😀\nuse \"/worker space.void\" as worker\nfunc entry(x: i32) -> i32:\n    return worker.calculate(x)\n","active":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%20Dv372t/project%20space%20%23%20%25/main.void"}
+	at Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/host.js:205:34)
+[90m[main 2026-10-22T19:21:01.901Z][0m Extension host with pid 3630293 exited with code: 0, signal: unknown.
+Exit code:   1
+TestRunFailedError: Test run failed with code 1
+    at ChildProcess.onProcessClosed (/home/shmellyorc/Documents/Void.Language/editors/vscode/node_modules/@vscode/test-electron/out/runTest.js:125:24)
+    at ChildProcess.emit (node:events:509:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12) {
+  code: 1,
+  signal: undefined
+}

@@ -1,0 +1,203 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 26,
+  "increment_status": "Windows wide-console paths implemented; production transcoder and existing-adapter integration focused Linux Debug/strict acceptance passed; native Windows compile/runtime acceptance UNVERIFIED",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "SystemAdapter real GetConsoleMode/GetFileType classification dispatches confirmed consoles to ReadConsoleW/WriteConsoleW. Redirected ReadFile/WriteFile path, original file-mode rules and POSIX transfer code retain prior policy.",
+    "Allocation-free internal boundary helper uses existing utf8.hpp scalar legality. Strict UTF-16 pairs across native calls, isolated/truncated-unit errors, recovery unit retention, NUL/BOM and encoded scalar remainder for byte-sized reads feed the one Step 25 shared queue.",
+    "At most one UTF-16 carry unit and one encoded UTF-8 scalar, guarded by the existing input lease; no second character/line queue. One native UTF-16 unit per input request preserves immediate CR without lookahead. Native console throughput remains unmeasured.",
+    "Whole output record validation before native output; invalid console binary returns unsupported/ERROR_NO_UNICODE_TRANSLATION. Bounded 2048-unit chunks and resubmissions contain whole surrogate pairs; no output-size ceiling.",
+    "Actual UTF-16 completion counts map to complete source UTF-8 byte progress with original native/cleanup errors. Native acceptance ending after only a high half stops non-retryably and reports Error.partial_utf16_units=1; no duplicated high or isolated low-unit resubmission. Ordinary Operation.write retry respects this fact.",
+    "Existing Windows per-request worker/event/targeted-cancellation implementation reused for wide and raw requests. Native conversion/request storage retained until actual completion; no borrowed handle close/replacement, hidden input, mode/code-page/CRT/global signal change.",
+    "Shared queue transaction/allocation safety, stdout/stderr whole-record gate, NativeSafe precise-root GC, original request/deadline propagation, cancellation and Runtime carry handoff covered by focused production-helper/adapter tests."
+  ],
+  "bounded_files": [
+    "CMakeLists.txt",
+    "include/void/console.hpp",
+    "include/void/detail/console_wide.hpp",
+    "src/runtime/console.cpp",
+    "tests/runtime/console_wide.cpp",
+    "docs/WORK_LOG.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md"
+  ],
+  "debug": {
+    "passed": 12,
+    "total": 12,
+    "seconds": 13.62,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_console_wide"
+    ],
+    "log": "step26-debug-final-tests.txt",
+    "build": "step26-debug-focused-build.txt",
+    "configure": "step26-debug-configure.txt",
+    "final_added_cases": {
+      "passed": 1,
+      "total": 1,
+      "seconds": 0.1,
+      "log": "step26-debug-handoff-wide-test.txt",
+      "build": "step26-debug-handoff-build.txt",
+      "detail": "step26-debug-handoff-wide-detail.txt"
+    },
+    "note": "12 unique focused suites pass. Final test-only malformed-unit diagnostic and cross-Runtime high-surrogate cases were subsequently added and the affected wide suite rerun; all production sources unchanged."
+  },
+  "strict_sanitizers": {
+    "passed": 12,
+    "total": 12,
+    "seconds": 7.24,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_console_wide"
+    ],
+    "log": "step26-san-handoff-tests.txt",
+    "build": "step26-san-handoff-build.txt",
+    "initial_all_targets_build": "step26-san-build.txt",
+    "configure": "step26-san-configure.txt",
+    "detail": "step26-san-handoff-wide-detail.txt",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "configuration": "RelWithDebInfo, pinned LLVM/Clang 19.1.7, existing RTTI-off vptr exclusion",
+    "execution": "Actual LeakSanitizer run outside restricted ptrace runner. Final source/test suite passes with no ASan/UBSan/leak report. Existing negative controls/invariant children and all Step 23\u201325 suites enabled."
+  },
+  "checks": {
+    "wide_deterministic": 271656,
+    "all_BMP_scalars": 63488,
+    "supplementary_pairs": 4096,
+    "pair_output_capacities": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "isolated_surrogate_units": 2048,
+    "preserved_step25_deterministic": 2261,
+    "preserved_step25_POSIX_driver": 264,
+    "preserved_step24_deterministic": 178,
+    "preserved_step24_POSIX_driver": 210,
+    "preserved_step23_foundation": 72,
+    "preserved_step23_endpoints": 14,
+    "suites_per_configuration": 12,
+    "note": "New wide count includes individual reference-oracle/native-span/progress assertions; these are deterministic helper/adapter checks, not native Windows execution."
+  },
+  "coverage": [
+    "BMP scalars including NUL/BOM/noncharacters against standard codecvt oracle; representative supplementary pairs over all low units, split calls and 1/2/3/4-byte destination capacities",
+    "Every lone high/low surrogate; high-high and nonlow recovery; high carry across timeout/Runtime cancellation/close; truncated EOF then later host input",
+    "UTF-8 byte counts, native/cleanup error ordering, malformed-unit error offset and partial prefix, mixed byte/character/text/line/CRLF and no CR following-byte probe",
+    "UTF-16 write count at each tested prefix boundary, pair-safe short writes/chunk boundaries, half-native-scalar failure with original error/no retry, zero progress, invalid UTF8 before any output, invalid native count/EOF defenses",
+    "Allocation fault after native consumption retains queue bytes; transcoding allocates neither after input nor output completion; entered native read/write retains carry/output storage through cancellation",
+    "Original deadline/token propagation, concurrent multi-chunk stdout/stderr records, precise-root GC during simulated blocked native read, close drain and independent Runtime native carry ownership"
+  ],
+  "development_failures_and_repairs": [
+    {
+      "failure": "Initial wide fixture failed because its text helper expected zero progress for a consumed CR delimiter.",
+      "log": "step26-debug-wide.txt",
+      "repair": "Corrected the fixture to count its CR delimiter. Also corrected a three-byte carry expectation during review before execution. No production check was disabled or changed to satisfy these assertions."
+    },
+    {
+      "warning": "Initial std::wstring_convert oracle wrapper emitted deprecation warnings.",
+      "log": "step26-debug-build.txt",
+      "repair": "Use standard codecvt facet directly as the independent test oracle; compiler warning flags unchanged. Final builds warning-free."
+    },
+    {
+      "review": "Ensure a native error accompanying a valid scalar is reported to a partial raw read immediately, while retaining the rest of its UTF8 bytes. Otherwise a control event could be deferred to an unrelated Runtime session.",
+      "repair": "Boundary helper consumes its pending native error with the first returned byte batch; regression verifies timeout and retained-byte handoff. This was a code-review correction, not a separately captured pre-fix failing run."
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "Native Windows source compilation/linking and real console execution; no Windows SDK/target standard C++ headers installed. Target probe fails at <array> before Win32 source checking.",
+    "Actual ReadConsoleW cooked/raw/pending-text and surrogate-return behavior, WriteConsoleW short/error counts, real console/Windows Terminal/ConPTY display and native unit-read throughput",
+    "Windows redirected binary file/pipe errors/EOF/async borrowed modes, original LastError/modes/code pages, actual cancellation and protection of unrelated host requests",
+    "Native Windows fault injection/OS heap failures and actual half-surrogate completion where feasible; Linux injection proves handling logic only",
+    "Native macOS, separate Release and future public source/JIT/O2/AOT/editor console integration and final Stage 10 acceptance"
+  ],
+  "windows_toolchain_probe": {
+    "log": "step26-windows-compile-probe.txt",
+    "command": ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++ --target=x86_64-w64-windows-gnu -std=c++20 -Iinclude -fsyntax-only src/runtime/console.cpp",
+    "exit_code": 1,
+    "result": "Target C++ header array not found. No real windows.h/winternl.h/MinGW SDK/toolchain found in inspected /usr, /opt and repository .toolchains. LLVM internal support headers are not a Windows SDK. No synthetic header compile was used as evidence."
+  },
+  "primary_API_references": [
+    "https://learn.microsoft.com/en-us/windows/console/readconsole",
+    "https://learn.microsoft.com/en-us/windows/console/writeconsole",
+    "https://learn.microsoft.com/en-us/windows/win32/fileio/canceling-pending-i-o-operations"
+  ],
+  "ABI_build_scope": "No new native dependency, source/IR operation or generated-code/C Runtime ABI. Existing Runtime archive/build/install path reused. Native C++ Error gains partial_utf16_units for otherwise unrepresentable device half-scalar progress. POSIX leaves it zero. LLVM 19.1.7 and pinned formatter/date/IANA licenses unchanged.",
+  "dependencies": "No new dependency. Existing C++20/Threads/Runtime/OS adapter and shared UTF-8 utility; LLVM 19.1.7 and Ryu/date/IANA versions/licenses unchanged.",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "LLVM_Clang": "19.1.7"
+  },
+  "remaining_stage_obligations": [
+    "Step 27 public heterogeneous print/source console bindings and error progress conversion",
+    "Steps 28\u201331 prompts/flush/terminal modes/controls and final source/lifetime integration",
+    "Composite display",
+    "Revisit complete four-system Step 40; Steps 41\u201344 consolidated/native acceptance/documentation/Wrench review"
+  ],
+  "next_step": 27,
+  "next_source_change": "Extend existing compiler builtin selection and typed ordinary Runtime console bindings for heterogeneous public print/source console. Reuse shared display/format kernels, one whole-record assembly, stream gate and NativeSafe/session ownership; retain complete UTF8 and partial_utf16_units error progress. Step 27 has not started.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "source_manifests": {
+    "bounded": "step26-source-hashes.json",
+    "bounded_files": 10,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 175,
+    "previous_checkpoint": "step25-checkpoint-source-hashes.json",
+    "preservation": "step26-preservation.json",
+    "unchanged_prior_entries_verified": 165
+  },
+  "commands": [
+    "cmake -S . -B build/ci-official-debug",
+    "cmake -S . -B build/ci-official-san",
+    "cmake --build build/ci-official-debug -j 2 --target void_runtime_console_wide void_runtime_console_input void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "cmake --build build/ci-official-san -j 2 --target void_runtime_console_wide void_runtime_console_input void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_input|runtime_console_native_input|runtime_console_wide|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^runtime_console_wide$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_input|runtime_console_native_input|runtime_console_wide|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "build/ci-official-debug/void_runtime_console_wide",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 build/ci-official-san/void_runtime_console_wide",
+    "git diff --check",
+    "git diff --quiet -- README.md"
+  ],
+  "build_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "8f4346d180eaac3a8ab3e502d6c1d1159b72e72afef8864c4ba9083299210c2f",
+    "build/ci-official-debug/void_runtime_console_wide": "0e8ad6027e8265379c0057f83cb5d43bf57c07df8faf16f2d95c98789868b78d",
+    "build/ci-official-san/libvoid_runtime.a": "67d4e6d750db4d9266aa51392df3390ecda06b12b7df1c9ed8235380cc040898",
+    "build/ci-official-san/void_runtime_console_wide": "1f50b9d4502fbf48d231d475aca5dc3620d0edecddefd41dce5e99bb3aaa6f54"
+  }
+}

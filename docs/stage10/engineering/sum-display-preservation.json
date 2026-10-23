@@ -1,0 +1,29 @@
+{
+  "previous": "collections-checkpoint-source-hashes.json",
+  "previous_count": 211,
+  "current_count": 213,
+  "unchanged_count": 197,
+  "changed": [
+    "docs/WORK_LOG.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/format.hpp",
+    "src/frontend/capabilities.inc",
+    "src/frontend/collection_display.inc",
+    "src/frontend/compiler.cpp",
+    "src/frontend/display_semantics.inc",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/conversion.cpp",
+    "tests/stage10/display_reload.cpp"
+  ],
+  "added_manifest_entries": [
+    "tests/stage10/console_sum_display.void",
+    "tests/stage10/console_sum_failure.void"
+  ],
+  "deleted": [],
+  "root_README_unchanged": true,
+  "deferred_strategy_unchanged": true
+}

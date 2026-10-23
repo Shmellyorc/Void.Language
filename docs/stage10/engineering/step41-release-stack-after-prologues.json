@@ -1,0 +1,122 @@
+[
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics10expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "prologue": [
+      "<_ZN2vd12_GLOBAL__N_19Semantics10expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE>:",
+      "   bd400:\t55                   \tpush   %rbp",
+      "   bd401:\t41 57                \tpush   %r15",
+      "   bd403:\t41 56                \tpush   %r14",
+      "   bd405:\t41 55                \tpush   %r13",
+      "   bd407:\t41 54                \tpush   %r12",
+      "   bd409:\t53                   \tpush   %rbx",
+      "   bd40a:\t48 81 ec 68 01 00 00 \tsub    $0x168,%rsp",
+      "   bd411:\t49 89 cc             \tmov    %rcx,%r12",
+      "   bd414:\t49 89 d6             \tmov    %rdx,%r14",
+      "   bd417:\t49 89 f7             \tmov    %rsi,%r15",
+      "   bd41a:\t48 89 fb             \tmov    %rdi,%rbx",
+      "   bd41d:\t48 8b 16             \tmov    (%rsi),%rdx",
+      "   bd420:\t48 8b b6 90 00 00 00 \tmov    0x90(%rsi),%rsi",
+      "   bd427:\t48 83 c6 7c          \tadd    $0x7c,%rsi",
+      "   bd42b:\t49 8d 8e c0 00 00 00 \tlea    0xc0(%r14),%rcx",
+      "   bd432:\t48 8d 7c 24 08       \tlea    0x8(%rsp),%rdi",
+      "   bd437:\t41 b8 00 01 00 00    \tmov    $0x100,%r8d"
+    ],
+    "allocation": "   bd40a:\t48 81 ec 68 01 00 00 \tsub    $0x168,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics15enum_expressionERNS0_4ExprEb",
+    "prologue": [
+      "<_ZN2vd12_GLOBAL__N_19Semantics15enum_expressionERNS0_4ExprEb>:",
+      "  13bff0:\t55                   \tpush   %rbp",
+      "  13bff1:\t41 57                \tpush   %r15",
+      "  13bff3:\t41 56                \tpush   %r14",
+      "  13bff5:\t41 55                \tpush   %r13",
+      "  13bff7:\t41 54                \tpush   %r12",
+      "  13bff9:\t53                   \tpush   %rbx",
+      "  13bffa:\t48 81 ec 68 0f 00 00 \tsub    $0xf68,%rsp",
+      "  13c001:\t89 8c 24 9c 00 00 00 \tmov    %ecx,0x9c(%rsp)",
+      "  13c008:\t48 89 74 24 18       \tmov    %rsi,0x18(%rsp)",
+      "  13c00d:\t48 89 fb             \tmov    %rdi,%rbx",
+      "  13c010:\t48 89 54 24 10       \tmov    %rdx,0x10(%rsp)",
+      "  13c015:\t48 8b 82 80 03 00 00 \tmov    0x380(%rdx),%rax",
+      "  13c01c:\t48 8b 08             \tmov    (%rax),%rcx",
+      "  13c01f:\t48 8d 44 24 50       \tlea    0x50(%rsp),%rax",
+      "  13c024:\t48 89 44 24 40       \tmov    %rax,0x40(%rsp)",
+      "  13c029:\tc6 44 24 50 00       \tmovb   $0x0,0x50(%rsp)",
+      "  13c02e:\t48 c7 44 24 48 00 00 \tmovq   $0x0,0x48(%rsp)"
+    ],
+    "allocation": "  13bffa:\t48 81 ec 68 0f 00 00 \tsub    $0xf68,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics15expression_implERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "prologue": [
+      "<_ZN2vd12_GLOBAL__N_19Semantics15expression_implERNS0_4ExprESt8optionalINS_2ir4TypeEE>:",
+      "   be310:\t41 57                \tpush   %r15",
+      "   be312:\t41 56                \tpush   %r14",
+      "   be314:\t41 55                \tpush   %r13",
+      "   be316:\t41 54                \tpush   %r12",
+      "   be318:\t53                   \tpush   %rbx",
+      "   be319:\t48 81 ec 40 04 00 00 \tsub    $0x440,%rsp",
+      "   be320:\t48 8b 86 90 00 00 00 \tmov    0x90(%rsi),%rax",
+      "   be327:\t48 8b 98 a0 00 00 00 \tmov    0xa0(%rax),%rbx",
+      "   be32e:\t48 85 db             \ttest   %rbx,%rbx",
+      "   be331:\t0f 84 b3 00 00 00    \tje     be3ea <_ZN2vd12_GLOBAL__N_19Semantics15expression_implERNS0_4ExprESt8optionalINS_2ir4TypeEE+0xda>",
+      "   be337:\t4c 8b 46 08          \tmov    0x8(%rsi),%r8",
+      "   be33b:\t48 8b 43 08          \tmov    0x8(%rbx),%rax",
+      "   be33f:\t49 3b 40 60          \tcmp    0x60(%r8),%rax",
+      "   be343:\t0f 85 a1 00 00 00    \tjne    be3ea <_ZN2vd12_GLOBAL__N_19Semantics15expression_implERNS0_4ExprESt8optionalINS_2ir4TypeEE+0xda>",
+      "   be349:\t48 85 c0             \ttest   %rax,%rax",
+      "   be34c:\t74 31                \tje     be37f <_ZN2vd12_GLOBAL__N_19Semantics15expression_implERNS0_4ExprESt8optionalINS_2ir4TypeEE+0x6f>",
+      "   be34e:\t4d 8b 40 58          \tmov    0x58(%r8),%r8"
+    ],
+    "allocation": "   be319:\t48 81 ec 40 04 00 00 \tsub    $0x440,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics17method_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "prologue": [
+      "<_ZN2vd12_GLOBAL__N_19Semantics17method_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE>:",
+      "   dbfe0:\t55                   \tpush   %rbp",
+      "   dbfe1:\t41 57                \tpush   %r15",
+      "   dbfe3:\t41 56                \tpush   %r14",
+      "   dbfe5:\t41 55                \tpush   %r13",
+      "   dbfe7:\t41 54                \tpush   %r12",
+      "   dbfe9:\t53                   \tpush   %rbx",
+      "   dbfea:\t48 81 ec 28 03 00 00 \tsub    $0x328,%rsp",
+      "   dbff1:\t48 89 d3             \tmov    %rdx,%rbx",
+      "   dbff4:\t49 89 fe             \tmov    %rdi,%r14",
+      "   dbff7:\t48 8b 82 20 03 00 00 \tmov    0x320(%rdx),%rax",
+      "   dbffe:\t48 3b 82 28 03 00 00 \tcmp    0x328(%rdx),%rax",
+      "   dc005:\t74 23                \tje     dc02a <_ZN2vd12_GLOBAL__N_19Semantics17method_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE+0x4a>",
+      "   dc007:\t48 81 c3 98 03 00 00 \tadd    $0x398,%rbx",
+      "   dc00e:\t4c 89 f7             \tmov    %r14,%rdi",
+      "   dc011:\t48 89 de             \tmov    %rbx,%rsi",
+      "   dc014:\t48 81 c4 28 03 00 00 \tadd    $0x328,%rsp",
+      "   dc01b:\t5b                   \tpop    %rbx"
+    ],
+    "allocation": "   dbfea:\t48 81 ec 28 03 00 00 \tsub    $0x328,%rsp"
+  },
+  {
+    "symbol": "_ZN2vd12_GLOBAL__N_19Semantics17result_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE",
+    "prologue": [
+      "<_ZN2vd12_GLOBAL__N_19Semantics17result_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE>:",
+      "   d7e80:\t55                   \tpush   %rbp",
+      "   d7e81:\t41 57                \tpush   %r15",
+      "   d7e83:\t41 56                \tpush   %r14",
+      "   d7e85:\t41 55                \tpush   %r13",
+      "   d7e87:\t41 54                \tpush   %r12",
+      "   d7e89:\t53                   \tpush   %rbx",
+      "   d7e8a:\t48 81 ec 18 0c 00 00 \tsub    $0xc18,%rsp",
+      "   d7e91:\t48 89 d3             \tmov    %rdx,%rbx",
+      "   d7e94:\t48 89 74 24 18       \tmov    %rsi,0x18(%rsp)",
+      "   d7e99:\t80 79 70 01          \tcmpb   $0x1,0x70(%rcx)",
+      "   d7e9d:\t0f 85 cb 04 00 00    \tjne    d836e <_ZN2vd12_GLOBAL__N_19Semantics17result_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE+0x4ee>",
+      "   d7ea3:\t49 89 cc             \tmov    %rcx,%r12",
+      "   d7ea6:\t48 8b 41 60          \tmov    0x60(%rcx),%rax",
+      "   d7eaa:\t48 85 c0             \ttest   %rax,%rax",
+      "   d7ead:\t0f 84 bb 04 00 00    \tje     d836e <_ZN2vd12_GLOBAL__N_19Semantics17result_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE+0x4ee>",
+      "   d7eb3:\t80 b8 90 00 00 00 00 \tcmpb   $0x0,0x90(%rax)",
+      "   d7eba:\t0f 84 ae 04 00 00    \tje     d836e <_ZN2vd12_GLOBAL__N_19Semantics17result_expressionERNS0_4ExprESt8optionalINS_2ir4TypeEE+0x4ee>"
+    ],
+    "allocation": "   d7e8a:\t48 81 ec 18 0c 00 00 \tsub    $0xc18,%rsp"
+  }
+]

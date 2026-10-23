@@ -1,0 +1,13 @@
+/tmp/sum-negative-recursive.void:8:9: error: Cannot assign readonly reference leaf '[/sum-negative-recursive.void::branch]' to storage or a parameter promising mutable access.
+    code: VOID2007
+
+ 8 |         use_mutable(children)
+   |         ^^^^^^^^^^^
+    Module: /sum-negative-recursive.void
+    Parameter declared here; const accepts readonly reference leaves. at /tmp/sum-negative-recursive.void:4:18
+
+ 4 | func use_mutable(values: [branch]):
+   |                  ^^^^^^
+    Module: /sum-negative-recursive.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

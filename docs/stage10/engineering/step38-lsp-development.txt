@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 77, in <module>
+    check('operator '+glyph+'(' in text and owner in text and 'Effects:' in text and 'const' in text, text)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 12, in check
+    assert value, message
+           ^^^^^
+AssertionError: public operator +(left: readonly /main.void::box<i32>, right: readonly /main.void::box<i32>) -> /main.void::box<i32>
+Declared by /main.void::box<i32>
+Effects: synchronous
+
+Exact sum of two boxes.

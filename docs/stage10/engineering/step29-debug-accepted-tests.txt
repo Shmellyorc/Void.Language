@@ -1,0 +1,51 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start  10: stage10_hooks
+ 1/23 Test  #10: stage10_hooks ......................   Passed    5.42 sec
+      Start  11: stage10_interpolation
+ 2/23 Test  #11: stage10_interpolation ..............   Passed    1.33 sec
+      Start  13: stage10_fields
+ 3/23 Test  #13: stage10_fields .....................   Passed    0.46 sec
+      Start  19: gc_buffers
+ 4/23 Test  #19: gc_buffers .........................   Passed    9.96 sec
+      Start  20: gc_schemas
+ 5/23 Test  #20: gc_schemas .........................   Passed    0.81 sec
+      Start  22: runtime_console
+ 6/23 Test  #22: runtime_console ....................   Passed    0.01 sec
+      Start  23: runtime_console_endpoints
+ 7/23 Test  #23: runtime_console_endpoints ..........   Passed    0.06 sec
+      Start  24: runtime_console_transfers
+ 8/23 Test  #24: runtime_console_transfers ..........   Passed    0.02 sec
+      Start  25: runtime_console_native_transfers
+ 9/23 Test  #25: runtime_console_native_transfers ...   Passed    0.41 sec
+      Start  26: runtime_console_terminal
+10/23 Test  #26: runtime_console_terminal ...........   Passed    0.01 sec
+      Start  27: runtime_console_native_terminal
+11/23 Test  #27: runtime_console_native_terminal ....   Passed    0.72 sec
+      Start  28: runtime_console_wide
+12/23 Test  #28: runtime_console_wide ...............   Passed    0.09 sec
+      Start  29: runtime_console_input
+13/23 Test  #29: runtime_console_input ..............   Passed    0.02 sec
+      Start  30: runtime_console_native_input
+14/23 Test  #30: runtime_console_native_input .......   Passed    0.11 sec
+      Start  31: runtime_coordination
+15/23 Test  #31: runtime_coordination ...............   Passed    2.05 sec
+      Start  81: runtime_callbacks
+16/23 Test  #81: runtime_callbacks ..................   Passed    0.61 sec
+      Start  82: runtime_failures
+17/23 Test  #82: runtime_failures ...................   Passed    0.00 sec
+      Start  85: runtime_invariants
+18/23 Test  #85: runtime_invariants .................   Passed    0.04 sec
+      Start  92: stage10_console_source
+19/23 Test  #92: stage10_console_source .............   Passed   31.50 sec
+      Start 116: async_lifecycle
+20/23 Test #116: async_lifecycle ....................   Passed    6.31 sec
+      Start 175: stage10_console_aot
+21/23 Test #175: stage10_console_aot ................   Passed  119.90 sec
+      Start 185: application_native_sprint4_host
+22/23 Test #185: application_native_sprint4_host ....   Passed    1.78 sec
+      Start 186: application_native_sprint4
+23/23 Test #186: application_native_sprint4 .........   Passed    3.24 sec
+
+100% tests passed, 0 tests failed out of 23
+
+Total Test time (real) = 184.87 sec

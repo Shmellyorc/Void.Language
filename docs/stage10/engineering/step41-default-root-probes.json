@@ -1,0 +1,101 @@
+[
+  {
+    "configuration": "debug",
+    "label": "temporal",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_temporal_ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+    ],
+    "returncode": 0,
+    "seconds": 2.9374560459982604,
+    "VOID_STDLIB_ROOT": "unset: compiled default /repository/stdlib",
+    "stdlib_hashes": {
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385"
+    }
+  },
+  {
+    "configuration": "debug",
+    "label": "reload",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_operator_reload",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/void-step41-default-debug-ropfa55s"
+    ],
+    "returncode": 0,
+    "seconds": 43.70258443499915,
+    "VOID_STDLIB_ROOT": "unset: compiled default /repository/stdlib",
+    "stdlib_hashes": {
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385"
+    }
+  },
+  {
+    "configuration": "san",
+    "label": "temporal",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_temporal_ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+    ],
+    "returncode": 0,
+    "seconds": 3.382228304981254,
+    "VOID_STDLIB_ROOT": "unset: compiled default /repository/stdlib",
+    "stdlib_hashes": {
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385"
+    }
+  },
+  {
+    "configuration": "san",
+    "label": "reload",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_operator_reload",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/void-step41-default-san-zi4dls75"
+    ],
+    "returncode": 0,
+    "seconds": 51.301752612926066,
+    "VOID_STDLIB_ROOT": "unset: compiled default /repository/stdlib",
+    "stdlib_hashes": {
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385"
+    }
+  },
+  {
+    "configuration": "release",
+    "label": "temporal",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_temporal_ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+    ],
+    "returncode": 0,
+    "seconds": 1.3926130420295522,
+    "VOID_STDLIB_ROOT": "unset: compiled default /repository/stdlib",
+    "stdlib_hashes": {
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385"
+    }
+  },
+  {
+    "configuration": "release",
+    "label": "reload",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/void_operator_reload",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/void-step41-default-release-6q_2zduf"
+    ],
+    "returncode": 0,
+    "seconds": 27.713063636096194,
+    "VOID_STDLIB_ROOT": "unset: compiled default /repository/stdlib",
+    "stdlib_hashes": {
+      "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+      "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344",
+      "console.void": "c66c5fce54316a2b35e82ff0ac1469d5a0cbe41db60cc77ba4d488a678610385"
+    }
+  }
+]

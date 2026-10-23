@@ -1,0 +1,105 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_runtime
+[ 33%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 33%] Linking CXX static library libvoid_core.a
+[ 33%] Built target void_core
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Generating cache-identity-RelWithDebInfo.cpp
+[ 66%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_operator_reload
+[100%] Built target void_operator_reload
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_runtime
+[ 50%] Built target void_core
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_display_reload
+[100%] Built target void_display_reload
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_runtime
+[ 33%] Built target void_core
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_cache_tests
+[100%] Built target void_cache_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_resolution
+[100%] Built target void_operator_resolution
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_declarations
+[100%] Built target void_operator_declarations
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 33%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Linking CXX executable void_operator_keys
+[100%] Built target void_operator_keys
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_compounds
+[100%] Built target void_operator_compounds
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_integration
+[100%] Built target void_operator_integration
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_core
+[ 50%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_temporal_ir
+[100%] Built target void_temporal_ir

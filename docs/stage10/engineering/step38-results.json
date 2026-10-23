@@ -1,0 +1,171 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 38,
+  "increment_status": "implemented for current systems; focused Linux Debug/strict sanitizer and actual editor verification passed; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Compiler-owned concrete callable signatures, declaring owners and inferred effects; exact source glyph definitions/references for unary/binary, derived != and compounds; glyph rename refusal and ordinary rename validation.",
+    "Generic-body presentation aggregates exact selected signatures and multiple source targets; definition/reference unions are deduplicated; completion intersects available glyphs across checked instantiations. Constructor navigation preserves initializer precedence.",
+    "Typed operator completion uses existing direct-owner/import/access selection, followed by finalized ordinary capability analysis. Generic declarations expose honest specialization-time effects.",
+    "Compiler Lexer/EditorProbe supplies numeric/temporal/layout format examples filtered by the actual operand and production validators, with colon trigger. Interpolation expressions retain original source spans and existing compiler signature/completion/navigation.",
+    "Selected custom conversion hooks obtain navigation/references from existing ordinary adapter calls; explicit hooks retain docs/signatures. No hook evaluation or editor resolver.",
+    "Generic fields preserve individual private/const metadata and concrete projected types/human-readable original owner in hover. Installed time source identities and readonly navigation remain unchanged.",
+    "Real Vim triple-string synchronization corrected; shipped Vim/VS Code syntax highlights operator declarations. Existing clients and compiler session/discovery/stale-result boundaries reused.",
+    "Layout-only custom format conversions navigate to the default string hook; dynamic specifications expose both selected conditional hooks. A hole without a format colon never offers a malformed format edit."
+  ],
+  "checks": {
+    "new_tooling_metadata": 20,
+    "new_lsp_intelligence": 170,
+    "preserved_operator_resolution": 161,
+    "preserved_operator_format_reload_cache": 219
+  },
+  "debug": {
+    "passed": 18,
+    "total": 18,
+    "seconds": 23.88,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_resolution",
+      "stage10_tooling",
+      "lsp_positions",
+      "lsp_protocol",
+      "lsp_stage8",
+      "lsp_stage7",
+      "lsp_demo",
+      "sessions",
+      "tooling",
+      "analysis",
+      "lsp_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_sprint4",
+      "lsp_sprint3",
+      "lsp_sprint2"
+    ],
+    "log": "step38-debug-handoff-tests.txt",
+    "detail": "step38-debug-handoff-detail.txt",
+    "build": "step38-debug-handoff-build.txt"
+  },
+  "strict_sanitizers": {
+    "status": "passed",
+    "configuration": "RelWithDebInfo ASan/UBSan/leaks, pinned LLVM/Clang 19.1.7; existing RTTI-off vptr exclusion",
+    "build": "step38-san-handoff-build.txt",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "scope": "Compiler/Runtime/native code instrumented; generated code is not equivalently instrumented. Native editor hosts use Debug server. New and existing Stage 10 LSP clients explicitly shut down and check server exit/sanitizer stderr.",
+    "passed": 18,
+    "total": 18,
+    "seconds": 29.43,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_resolution",
+      "stage10_tooling",
+      "lsp_positions",
+      "lsp_protocol",
+      "lsp_stage8",
+      "lsp_stage7",
+      "lsp_demo",
+      "sessions",
+      "tooling",
+      "analysis",
+      "lsp_sprint6",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_stage10_intelligence",
+      "lsp_sprint4",
+      "lsp_sprint3",
+      "lsp_sprint2"
+    ],
+    "log": "step38-san-handoff-tests.txt",
+    "detail": "step38-san-handoff-detail.txt"
+  },
+  "editors": {
+    "vscode": {
+      "status": "passed trusted/restricted-trust/multi-root host profiles",
+      "version": "1.143.0",
+      "node": "24.19.0",
+      "unit": "step38-vscode-frozen-unit.txt",
+      "unit_passed": 1,
+      "host": "step38-vscode-handoff-host.txt",
+      "build": "step38-vscode-frozen-unit.txt",
+      "detail": "Real installed editor, development extension path and actual Debug voidls. Native execution outside restricted filesystem sandbox; initial restricted Electron launch rejected shutdown EPERM. No hosted CI or download.",
+      "standard_library": "runHost copies current baseline time.void into its isolated standard root, alongside its existing io fixture; no source identity rule is relaxed"
+    },
+    "neovim": {
+      "status": "passed",
+      "version": "0.13.0-dev-1410+g510f61555b",
+      "log": "step38-neovim-handoff.txt"
+    },
+    "vim": {
+      "status": "passed",
+      "version": "9.2, patches 1-858",
+      "executable": "/usr/bin/vim.basic",
+      "client": "existing /tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41",
+      "log": "step38-vim-handoff.txt",
+      "result": "step38-vim-handoff-result.txt"
+    }
+  },
+  "small_stack": {
+    "bytes": 1048576,
+    "status": "passed unchanged depth probes",
+    "log": "step38-small-stack-handoff.txt"
+  },
+  "source_isolation": {
+    "environment": "VOID_STDLIB_ROOT=<repository>/build/step37-stdlib-snapshot",
+    "hashes": "step37-library-hashes.json",
+    "status": "original library and isolated snapshot still match Step 37 baseline; no library/loader edit"
+  },
+  "development_failures_and_repairs": [
+    "Expected const spelling in initial hover fixture corrected to the existing type printer readonly spelling; no semantic check disabled.",
+    "Initial newly registered CMake target required a fresh make invocation after regeneration. Intermediate builds overlapping source edits produced an undefined definitions_at linker symbol; final verification uses a frozen-source rebuild, not those intermediate artifacts.",
+    "Generic field source metadata copied owner visibility and omitted const; repaired metadata emission. Generic owner hover exposed an encoded native identity; presentation now uses the compiler type name.",
+    "Real Vim triple-string synstack was empty under backward syntax synchronization; reproduced independently and repaired with fromstart synchronization. Original assertion retained.",
+    "VS Code hover contains escaped Markdown and nbsp spacing; raw returned text retained. Host assertions normalize that presentation and wait for current hover. Native server protocol assertions retain exact plain-text semantics.",
+    "Generic-body multi-target navigation initially returned both constructor type and initializer, breaking an existing protocol assertion. Restored initializer precedence in compiler-owned ToolingIndex without weakening the regression.",
+    "Editor adapter/source/API tests were strengthened to retain all checked generic specializations/targets and reject partial-availability completion; clean shutdown now enables actual leak checks in Stage 10 LSP clients.",
+    "Layout-only literals now follow split_layout to the string hook; dynamic spec expressions expose both ordinary conditional hooks. Synthetic empty specs without a source colon are excluded from format completion. Regression assertions retained."
+  ],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "native Windows",
+    "native macOS",
+    "separate Release configuration",
+    "fresh linked AOT in this tooling increment (prior Step 37 evidence preserved)",
+    "consolidated Stage 10 acceptance"
+  ],
+  "remaining_stage_obligations": [
+    "Console/print/terminal implementation and its future tooling integration",
+    "Composite display and its future tooling integration",
+    "Step 39 remaining source-formatting/diagnostic integration",
+    "Remaining cross-product, representative workloads and final Stage 10 acceptance/documentation/Wrench review"
+  ],
+  "new_dependencies": "none; existing Ryu Boost-1.0/date MIT/IANA notices and versions preserved",
+  "next_step": 39,
+  "next_source_change": "Audit/extend existing format_source and formatting-aware diagnostics in src/frontend/compiler.cpp for operator declarations, interpolation and dirty-source spans; preserve literal bytes, original source identity and exact semantic contracts.",
+  "governance": "No commits, branches, pushes, hosted CI, publication or public root README changes; Step 37 unexplained observations preserved rather than claimed repaired.",
+  "source_manifests": {
+    "bounded": "step38-source-hashes.json",
+    "bounded_files": 17,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 152,
+    "previous_checkpoint": "step37-checkpoint-source-hashes.json",
+    "preservation": "step38-preservation.json",
+    "unchanged_prior_entries_verified": 132
+  },
+  "commands": [
+    "cmake --build build/ci-official-debug -j2 --target voidls void_stage10_tooling void_tests void_operator_reload void_operator_resolution voidc",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-debug --output-on-failure -R \"^(stage10_tooling|lsp_stage10_intelligence|lsp_stage10_fields|lsp_stage10_display|tooling|sessions|analysis|stage10_operator_reload|stage10_operator_resolution|lsp_positions|lsp_protocol|lsp_stage7|lsp_stage8|lsp_sprint2|lsp_sprint3|lsp_sprint4|lsp_sprint6|lsp_demo)$\"",
+    "cmake --build build/ci-official-san -j2 --target voidls void_stage10_tooling void_tests void_operator_reload void_operator_resolution voidc void_lsp_tests",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-san --output-on-failure -R \"^(stage10_tooling|lsp_stage10_intelligence|lsp_stage10_fields|lsp_stage10_display|tooling|sessions|analysis|stage10_operator_reload|stage10_operator_resolution|lsp_positions|lsp_protocol|lsp_stage7|lsp_stage8|lsp_sprint2|lsp_sprint3|lsp_sprint4|lsp_sprint6|lsp_demo)$\"",
+    "python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc",
+    "PATH=\"/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH\" npm test --prefix editors/vscode",
+    "PATH=\"/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH\" VSCODE_EXECUTABLE_PATH=/usr/share/code/code VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" node editors/vscode/out/test/runHost.js",
+    "VOID_REPO=\"$PWD\" VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" XDG_STATE_HOME=\"$PWD/build/step38-editor/state\" XDG_CACHE_HOME=\"$PWD/build/step38-editor/cache\" XDG_DATA_HOME=\"$PWD/build/step38-editor/data\" nvim --headless -u NONE -i NONE -l tests/stage10/editor.lua",
+    "VOID_REPO=\"$PWD\" VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" VOID_VIM_CLIENT=/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41 VOID_STAGE10_EDITOR_OUTPUT=\"$PWD/docs/stage10/engineering/step38-vim-handoff-result.txt\" vim.basic -Nu NONE -i NONE -n -es -S tests/stage10/editor.vim"
+  ]
+}

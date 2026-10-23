@@ -1,0 +1,5 @@
+checked print failure/provenance lost: /tmp/VOID-console27-955680471256108/main.void:3:5: runtime error: Console print failed
+    print("ab🎮tail", file = console.stderr)
+    ^
+In function /main.void::entry
+; bytes=ab

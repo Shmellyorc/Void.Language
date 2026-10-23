@@ -1,0 +1,49 @@
+{
+  "node": {
+    "command": [
+      "node",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "v24.19.0"
+    ]
+  },
+  "vscode": {
+    "command": [
+      "/usr/share/code/bin/code",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "1.143.0",
+      "2d0b7506a36c1d6db9a466440131a8e01eab2289",
+      "x64"
+    ]
+  },
+  "neovim": {
+    "command": [
+      "/usr/bin/nvim",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "NVIM v0.13.0-dev-1410+g510f61555b",
+      "Build type: Release",
+      "LuaJIT 2.1.1787165859"
+    ]
+  },
+  "vim": {
+    "command": [
+      "/usr/bin/vim.basic",
+      "--version"
+    ],
+    "returncode": 0,
+    "version": [
+      "VIM - Vi IMproved 9.2 (2026 Feb 14, compiled Jul 27 2026 10:11:18)",
+      "Included patches: 1-858",
+      "Modified by team+vim@tracker.debian.org"
+    ]
+  },
+  "final_Debug_server_sha256": "84c1a1b9d3359a0b84f1874157c165b5de88bccc4c787580968c8684e1af30d2"
+}

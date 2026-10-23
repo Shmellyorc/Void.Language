@@ -1,0 +1,17 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 146: sessions
+1/6 Test #146: sessions .........................   Passed    0.20 sec
+    Start 147: tooling
+2/6 Test #147: tooling ..........................   Passed    0.51 sec
+    Start 148: analysis
+3/6 Test #148: analysis .........................   Passed    0.77 sec
+    Start 166: lsp_stage10_fields
+4/6 Test #166: lsp_stage10_fields ...............   Passed    0.06 sec
+    Start 167: lsp_stage10_display
+5/6 Test #167: lsp_stage10_display ..............   Passed    0.88 sec
+    Start 168: lsp_stage10_intelligence
+6/6 Test #168: lsp_stage10_intelligence .........   Passed    0.42 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   2.85 sec

@@ -1,0 +1,51 @@
+[ 20%] Built target void_native_fixture
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_zone_objects
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 60%] Linking CXX static library libvoid_runtime.a
+[ 80%] Built target void_runtime
+[100%] Linking CXX executable void_runtime_console_terminal
+[100%] Built target void_runtime_console_terminal
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:25:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[ 20%] Built target void_format_objects
+[ 40%] Built target void_native_fixture
+[ 40%] Built target void_core
+[ 80%] Built target void_runtime
+[ 80%] Built target void_llvm
+[ 80%] Built target void_managed_test_abi
+[ 80%] Building CXX object CMakeFiles/void_console_source.dir/tests/managed/probe.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source

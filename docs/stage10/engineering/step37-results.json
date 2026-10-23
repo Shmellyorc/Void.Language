@@ -1,0 +1,124 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 37,
+  "increment_status": "implemented; focused Linux verification passed with hash-verified isolated standard-library sources; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Exact owner/glyph/template/signature/visibility/effect declaration contracts, including unused generic operator sets and owner visibility/kind/parameters/constraints.",
+    "Exact selected native binding contracts retained before editor normalization; derived != and compounds use existing ordinary-call reference edges. Existing invalidation graph consumes binding/owner dependencies.",
+    "Owned, explicitly framed, trivia-free format-specification syntax; selected hooks/adapters/helpers and existing constant/default-argument contracts retain ordinary dependencies/effects.",
+    "Full pinned Ryu/date/IANA and formatting/temporal policy identities enter source compatibility and the existing native Debug cache key.",
+    "Existing source/archive identity cache, Runtime binding and whole-generation leases retained; no new registry/cache/GC/operator backend."
+  ],
+  "checks": {
+    "operator_format_reload_cache": 219,
+    "prior_key_protection": 131,
+    "prior_resolution": 161,
+    "prior_declarations": 278,
+    "display_reload": 132,
+    "temporal_ir_worker": 8,
+    "prior_compounds": 730,
+    "prior_call_gc_failure_integration": 637,
+    "normal_o2_jit_linked_aot_process": 276
+  },
+  "debug": {
+    "passed": 14,
+    "total": 14,
+    "seconds": 126.81,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_keys",
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "stage10_display_reload",
+      "stage10_temporal_ir",
+      "debug_cache",
+      "debug_cache_processes",
+      "stage10_operator_compounds",
+      "stage10_operator_integration",
+      "sessions",
+      "tooling",
+      "analysis",
+      "stage10_operators_aot"
+    ],
+    "log": "step37-debug-accepted-snapshot.txt",
+    "detail": "step37-debug-snapshot-detail.txt",
+    "build": "step37-debug-frozen2-build.txt"
+  },
+  "strict_sanitizers": {
+    "passed": 14,
+    "total": 14,
+    "seconds": 139.7,
+    "suites": [
+      "stage10_operator_reload",
+      "stage10_operator_keys",
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "stage10_display_reload",
+      "stage10_temporal_ir",
+      "debug_cache",
+      "debug_cache_processes",
+      "stage10_operator_compounds",
+      "stage10_operator_integration",
+      "sessions",
+      "tooling",
+      "analysis",
+      "stage10_operators_aot"
+    ],
+    "log": "step37-san-accepted-snapshot.txt",
+    "detail": "step37-san-snapshot-detail.txt",
+    "build": "step37-san-final-build.txt",
+    "configuration": "RelWithDebInfo ASan/UBSan/leaks; pinned LLVM/Clang 19.1.7; existing RTTI-off vptr exclusion",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "scope": "Compiler/Runtime/native code instrumented; generated code is not equivalently instrumented. Runs outside ptrace retain LeakSanitizer; no suppression/disabled assertion."
+  },
+  "source_isolation": {
+    "environment": "VOID_STDLIB_ROOT=<repository>/build/step37-stdlib-snapshot",
+    "hashes": "step37-library-hashes.json",
+    "reason": "Investigate intermittent worktree/default-root analysis discrepancies with identical, stable input bytes; production library/loader unchanged.",
+    "original_source_hashes_match_baseline": true,
+    "preparation": "Read stdlib/*.void, assert SHA-256 equals step36-checkpoint-source-hashes.json, write identical bytes into build/step37-stdlib-snapshot; verify original and snapshot hashes again after acceptance."
+  },
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "development_repairs": [
+    "Corrected harness string .count to existing .length.",
+    "Serialized previously omitted generic operator sets and generic owner policy; preserved concrete bindings that editor normalization previously erased.",
+    "Added specification syntax/policy identities and explicit structural counts; ordinary parameter defaults already had exact contracts and were verified rather than replaced."
+  ],
+  "new_dependencies": "none; pinned Ryu Boost/date MIT/IANA notices and versions unchanged",
+  "cache_policy": "Existing persistent cache is Debug-only; optimized mode deliberately retains its established disabled persistence policy. Optimized JIT/reload and linked AOT still execute.",
+  "small_stack": {
+    "bytes": 1048576,
+    "status": "passed",
+    "log": "step37-small-stack.txt"
+  },
+  "unverified": [
+    "native Windows",
+    "native macOS",
+    "native Vim/latest editor-host acceptance",
+    "separate Release configuration",
+    "consolidated Stage 10 acceptance"
+  ],
+  "next_step": 38,
+  "next_source_change": "Audit/complete existing compiler EditorProbe and AnalyzedDeclaration/AnalyzedReference emission for operators and formatting, then src/lsp/main.cpp completion/hover/signature/navigation/reference consumers using ToolingIndex; no secondary semantic resolver.",
+  "governance": "No commit/branch/push/hosted CI/public root README edit. Prior Stage 9 and Stage 10 engineering preserved.",
+  "commands": [
+    "cmake --build build/ci-official-debug -j2 --target void_operator_reload void_display_reload voidc void_tests void_cache_tests void_operator_resolution void_operator_declarations void_operator_keys void_operator_compounds void_operator_integration void_temporal_ir",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_reload|stage10_display_reload|debug_cache|debug_cache_processes|tooling|sessions|analysis|stage10_operator_resolution|stage10_operator_declarations|stage10_operator_keys|stage10_operator_compounds|stage10_operator_integration|stage10_operators_aot|stage10_temporal_ir)$'",
+    "cmake --build build/ci-official-san -j2 --target void_operator_reload void_display_reload voidc void_tests void_cache_tests void_operator_resolution void_operator_declarations void_operator_keys void_operator_compounds void_operator_integration void_temporal_ir",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_reload|stage10_display_reload|debug_cache|debug_cache_processes|tooling|sessions|analysis|stage10_operator_resolution|stage10_operator_declarations|stage10_operator_keys|stage10_operator_compounds|stage10_operator_integration|stage10_operators_aot|stage10_temporal_ir)$'",
+    "python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc"
+  ],
+  "source_manifests": {
+    "bounded": "step37-source-hashes.json",
+    "bounded_files": 11,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 148,
+    "previous_checkpoint": "step36-checkpoint-source-hashes.json"
+  }
+}

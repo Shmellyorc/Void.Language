@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 26: runtime_console_wide
+1/1 Test #26: runtime_console_wide .............   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.10 sec

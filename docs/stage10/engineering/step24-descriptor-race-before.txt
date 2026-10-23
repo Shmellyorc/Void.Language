@@ -1,0 +1,4 @@
+returncode: 0 native_output_bytes: 65536 stderr: 
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+AssertionError: (0, b'')

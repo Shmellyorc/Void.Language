@@ -1,0 +1,13 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "build/ci-official-debug",
+    "-R",
+    "^modules_cli$",
+    "--output-on-failure"
+  ],
+  "returncode": 0,
+  "seconds": 42.339303112006746,
+  "scope": "Unchanged modules_cli assertions for division/remainder compounds at3:5, normal/O2 JIT/independent AOT, source frames and protected outputs."
+}

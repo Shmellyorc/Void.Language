@@ -1,0 +1,13 @@
+shutdown primary result changed: Invalid console operationCalled from /@stdlib/console.void::output::method::flush
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:78:17: source call
+    var reply = _console_flush(self)
+                ^
+Called from /main.void::cleanup
+/tmp/VOID-console27-961724729510315/main.void:3:23: source call
+    if console.stdout.flush() is Err(var error):
+                      ^
+Called from /main.void::<defer>
+/tmp/VOID-console27-961724729510315/main.void:8:11: source call
+    defer cleanup()
+          ^
+

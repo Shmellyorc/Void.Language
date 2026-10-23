@@ -1,0 +1,10 @@
+{
+  "include/void/console.hpp": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb",
+  "src/runtime/console.cpp": "9408146ef429a89e2ada7101ad9ff29cac73c3f3dac69214aabf0e2df26e52e2",
+  "src/runtime/console_abi.cpp": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c",
+  "src/runtime/console_keyboard.inc": "d16b05597255787bb62e3cc6f08ff3964a1ec6a6cbca496b8c547242cd19ba47",
+  "stdlib/console.void": "160f58a8b8f1608ef0a32f1b882338bda970d93d802356a705af9e00d9b98918",
+  "tests/runtime/console_keyboard.cpp": "2a17e69c7bb15f5308a7cb51bac8bcb51d11c7ac1fe91770fd715398e07b1147",
+  "tests/runtime/console_keyboard.py": "1e339abc65395bfde2a4867930f70bdd97d9c9762ecd84ebee7439dd248df354",
+  "tests/stage10/console_keys.void": "b12cfeaa720b2c477283dd7996fb9ab227613198544a606f1a490b8ce63204b7"
+}

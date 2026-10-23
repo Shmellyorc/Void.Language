@@ -1,0 +1,17 @@
+{
+  "reason": "Confirmed builtin compound failure source-column regression requires compiler repair. Stop initial old-source builds/tests; preserve all raw failures and partial runs. Final unfiltered acceptance will use repaired sources and serialized configurations without increasing test limits.",
+  "root_pids": [
+    3925305,
+    3925339,
+    3925362,
+    3944989
+  ],
+  "owned_process_count": 24,
+  "owned_groups": [
+    3925304,
+    3925339,
+    3925361,
+    3944989
+  ],
+  "partial_results_are_acceptance": false
+}

@@ -1,0 +1,13 @@
+{
+  "CMakeLists.txt": "b1e4d0f68a515745b47af913e15a71250863c1a5a81c404b7df5f22f7d96e95a",
+  "include/void/console.hpp": "380be0b5fa4dcaf72ef3bf950b1501d621ee2704c3a7b63494760752ce572edb",
+  "include/void/utf8.hpp": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773",
+  "src/runtime/console.cpp": "6392b060999959987f208f97f8a05d6206a14ab99dc515ce11bff71bb9a85915",
+  "tests/runtime/console_input.cpp": "b5c8300738532f33de5b0ee9b73b52a57826c1a62d8ed0bd94d621f456a86e84",
+  "tests/runtime/console_input.py": "8dca7fe26b6f7ce3592f4c4b1199a8ead1c1244c7ba6b09217fe2e25d854721b",
+  "docs/WORK_LOG.md": "f3e70a66ba4253fa120f0ac8c5a05ab31375b64f963520d46f4a104de4d55c70",
+  "docs/stage10/IMPLEMENTATION.md": "b5ad430af00fa81682854e2931c170a5ba5ae08b698abdb97867919072f9aa1c",
+  "docs/stage10/CONSOLE_IO.md": "6f4df751294b5a2911b548edf9bc02f4c46e89430bf48514120dfe53e5be54b5",
+  "docs/stage10/TEST_PLAN.md": "af20709d3b5d463b86cd344a018f0a79e47bb52852fe0bf6b63688189c8f5b70",
+  "docs/stage10/EVIDENCE.md": "954b620382c637a7be2f0fca99ef3518d1f8264aede39ce9b7b42d69e72d4560"
+}

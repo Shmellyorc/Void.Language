@@ -14,6 +14,7 @@ struct Probe {
     std::function<void(std::size_t,const void*,std::size_t)> before_construct;
     std::size_t constructions=0, polls=0;
     bool commits_valid=true, collect_before=false, capture=false;
+    bool capture_into_existing=false; // Preallocated observation root for whole-call fault sweeps.
     unsigned capture_at=1;
     unsigned fail_construction=0;
     int fail_allocation=-1;
@@ -27,6 +28,7 @@ extern thread_local Probe* active;
 extern std::atomic<void(*)()> concurrent_poll; // Native source execution rendezvous, tests only.
 struct AllocationFailure {
     explicit AllocationFailure(int budget);
+    AllocationFailure(int budget,bool once);
     ~AllocationFailure();
 };
 struct Observe {

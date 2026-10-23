@@ -1,0 +1,16 @@
+/tmp/step33-null-function.void:3:17: error: null requires a nullable managed-reference context.
+    code: VOID2001
+
+ 3 |     if empty == null and null == empty:
+   |                 ^^^^
+    Module: /step33-null-function.void
+    Hint: Use a type annotation such as node?.
+
+/tmp/step33-null-function.void:3:26: error: null requires a nullable managed-reference context.
+    code: VOID2001
+
+ 3 |     if empty == null and null == empty:
+   |                          ^^^^
+    Module: /step33-null-function.void
+    Hint: Use a type annotation such as node?.
+

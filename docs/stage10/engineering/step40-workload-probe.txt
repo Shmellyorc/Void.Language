@@ -1,0 +1,1 @@
+{"result":270000,"compile_ms":6656.5,"invoke_ms":802.12,"objects_after_collection":0,"process_peak_rss_kib":110992}

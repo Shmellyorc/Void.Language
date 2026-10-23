@@ -1,0 +1,16 @@
+{
+  "debug": {
+    "passed": 199,
+    "exact_output_records": 120,
+    "integrated_cases_with_four_mode_agreement": 7,
+    "checked_partial_progress_records": 4,
+    "combined_cache_cases": 5
+  },
+  "release": {
+    "passed": 199,
+    "exact_output_records": 120,
+    "integrated_cases_with_four_mode_agreement": 7,
+    "checked_partial_progress_records": 4,
+    "combined_cache_cases": 5
+  }
+}

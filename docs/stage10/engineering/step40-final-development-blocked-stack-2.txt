@@ -1,0 +1,84 @@
+[New LWP 3896301]
+[New LWP 3896300]
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libm.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libz.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libzstd.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libstdc++.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libgcc_s.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libc.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/lib64/ld-linux-x86-64.so.2' as an executable file: Input/output error
+
+warning: Unable to find dynamic linker breakpoint function.
+GDB will be unable to debug shared library initializers
+and track explicitly loaded dynamic code.
+
+warning: Target and debugger are in different PID namespaces; thread lists and other data are likely unreliable.  Connect to gdbserver inside the container.
+0x00007f8d6569ec62 in ?? ()
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Thread 3 (Thread 0x7f8d64b8f6c0 (LWP 3896300) "void_console_so"):
+#0  0x00007f8d657178cd in syscall () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f8d659ddc4a in std::__detail::__wait_impl(void const*, std::__detail::__wait_args_base&) () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#2  0x0000555b5fbbfe94 in std::__atomic_wait_address_v (__addr=0x7ffc6745a04c, __old=0, __order=2, __bare_wait=true) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/atomic_wait.h:379
+#3  0x0000555b5fbbfe22 in std::__platform_semaphore_impl<true>::_M_acquire (this=0x7ffc6745a04c) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/semaphore_base.h:239
+#4  0x0000555b5fbb2465 in std::counting_semaphore<1l>::acquire (this=0x7ffc6745a04c) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/semaphore:79
+#5  0x0000555b5fb94d01 in (anonymous namespace)::four_systems()::$_2::operator()(vd::console::Request const&) const (this=0x555b86303080, request=...) at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:390
+#6  0x0000555b5fb94c2d in std::__invoke_impl<void, (anonymous namespace)::four_systems()::$_2&, vd::console::Request const&>(std::__invoke_other, (anonymous namespace)::four_systems()::$_2&, vd::console::Request const&) (__f=..., __args=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:63
+#7  0x0000555b5fb94bdd in std::__invoke_r<void, (anonymous namespace)::four_systems()::$_2&, vd::console::Request const&>((anonymous namespace)::four_systems()::$_2&, vd::console::Request const&) (__fn=..., __args=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:113
+#8  0x0000555b5fb94ad5 in std::_Function_handler<void(vd::console::Request const&), (anonymous namespace)::four_systems()::$_2>::_M_invoke (__functor=..., __args=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_function.h:295
+#9  0x0000555b5fbb8976 in std::function<void(vd::console::Request const&)>::operator() (this=0x555b8641bf70, __args=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_function.h:581
+#10 0x0000555b5fb91da6 in (anonymous namespace)::Fake::write (this=0x555b8641be60, stream=vd::console::Stream::output, bytes=std::span of length 6 = {...}, request=...) at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:36
+#11 0x0000555b6002211f in vd::console::Operation::write (this=0x7f8d64b853a0, bytes=std::span of length 6 = {...}, request=...) at /home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:1023
+#12 0x0000555b60024acd in vd::console::Context::write (this=0x555b86349720, stream=vd::console::Stream::output, bytes=std::vector of length 6, capacity 6 = {...}, timeout_ms=-1) at /home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:631
+#13 0x0000555b6003b99b in vd_console_print (record=0x7f8d60000fe0, role=1, flush=true, failure=0x7f8d64b8e228) at /home/shmellyorc/Documents/Void.Language/src/runtime/console_abi.cpp:33
+#14 0x00007f8d642efb37 in ?? ()
+#15 0x0000010000000000 in ?? ()
+#16 0x0000000000000000 in ?? ()
+
+Thread 2 (Thread 0x7f8d5ffff6c0 (LWP 3896301) "void_console_so"):
+#0  0x00007f8d6569ec62 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f8d656936e0 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f8d65695ec8 in pthread_cond_wait () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#3  0x0000555b60022cfa in std::condition_variable::wait<vd::console::Context::close()::$_0>(std::unique_lock<std::mutex>&, vd::console::Context::close()::$_0) (this=0x555b86416808, __lock=..., __p=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/condition_variable:107
+#4  0x0000555b60022c72 in vd::console::Context::close (this=0x555b86349720) at /home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:542
+#5  0x0000555b60006195 in vd::Runtime::close (this=0x555b863e9eb0) at /home/shmellyorc/Documents/Void.Language/src/runtime/coordination.cpp:323
+#6  0x0000555b5fb98120 in (anonymous namespace)::four_systems()::$_5::operator()() const (this=0x555b87c2b418) at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:392
+#7  0x0000555b5fb980dc in std::__invoke_impl<vd::console::Error, (anonymous namespace)::four_systems()::$_5>(std::__invoke_other, (anonymous namespace)::four_systems()::$_5&&) (__f=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:63
+#8  0x0000555b5fb9808c in std::__invoke<(anonymous namespace)::four_systems()::$_5>((anonymous namespace)::four_systems()::$_5&&) (__fn=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:98
+#9  0x0000555b5fb98059 in std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >::_M_invoke<0ul> (this=0x555b87c2b418) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_thread.h:303
+#10 0x0000555b5fb9801c in std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >::operator() (this=0x555b87c2b418) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_thread.h:310
+#11 0x0000555b5fb97f43 in std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<vd::console::Error>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error>::operator() (this=0x7f8d5fffe9f8) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/future:1419
+#12 0x0000555b5fb97ef0 in std::__invoke_impl<std::unique_ptr<std::__future_base::_Result<vd::console::Error>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<vd::console::Error>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error>&> (__f=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:63
+#13 0x0000555b5fb97e78 in std::__invoke_r<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<vd::console::Error>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error>&> (__fn=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:116
+#14 0x0000555b5fb97da0 in std::_Function_handler<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>(), std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<vd::console::Error>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error> >::_M_invoke (__functor=...) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_function.h:295
+#15 0x0000555b5fbbdd11 in std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>()>::operator() (this=0x7f8d5fffe9f8) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_function.h:581
+#16 0x0000555b5fbbdaa9 in std::__future_base::_State_baseV2::_M_do_set (this=0x555b87c2b3e0, __f=0x7f8d5fffe9f8, __did_set=0x7f8d5fffe94e) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/future:599
+#17 0x0000555b5fbbdcc8 in std::__invoke_impl<void, void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>()>*, bool*> (__f=@0x7f8d5fffe938: (void (std::__future_base::_State_baseV2::*)(std::__future_base::_State_baseV2 * const, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>()> *, bool *)) 0x555b5fbbda80 <std::__future_base::_State_baseV2::_M_do_set(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*)>, __t=@0x7f8d5fffe930: 0x555b87c2b3e0, __args=@0x7f8d5fffe920: 0x7f8d5fffe94e, __args=@0x7f8d5fffe920: 0x7f8d5fffe94e) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/invoke.h:76
+
+Thread 1 (Thread 0x7f8d65ae0fc0 (LWP 3896261) "void_console_so"):
+#0  0x00007f8d6569ec62 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f8d656936e0 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f8d6569867d in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f8d658ecfbb in std::thread::join() () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#4  0x0000555b5fb97b90 in std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error>::~_Async_state_impl (this=0x555b87c2b3e0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/future:1780
+#5  0x0000555b5fb98765 in std::destroy_at<std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error> > (__location=0x555b87c2b3e0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_construct.h:88
+#6  0x0000555b5fb98745 in std::_Destroy<std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error> > (__pointer=0x555b87c2b3e0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_construct.h:164
+#7  0x0000555b5fb9772f in std::allocator_traits<std::allocator<void> >::destroy<std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error> > (__p=0x555b87c2b3e0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/alloc_traits.h:859
+#8  std::_Sp_counted_ptr_inplace<std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<(anonymous namespace)::four_systems()::$_5> >, vd::console::Error>, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose (this=0x555b87c2b3d0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:682
+#9  0x0000555b5fbb45aa in std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release (this=0x555b87c2b3d0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:423
+#10 0x0000555b5fbb4526 in std::__shared_count<(__gnu_cxx::_Lock_policy)2>::~__shared_count (this=0x7ffc6745a008) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1137
+#11 0x0000555b5fbbee39 in std::__shared_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr (this=0x7ffc6745a000) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1611
+#12 0x0000555b5fbbcc45 in std::shared_ptr<std::__future_base::_State_baseV2>::~shared_ptr (this=0x7ffc6745a000) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr.h:175
+#13 0x0000555b5fbc2bc5 in std::__basic_future<vd::console::Error>::~__basic_future (this=0x7ffc6745a000) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/future:705
+#14 0x0000555b5fbb2b15 in std::future<vd::console::Error>::~future (this=0x7ffc6745a000) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/future:795
+#15 0x0000555b5fb81f9c in (anonymous namespace)::four_systems () at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:394
+#16 0x0000555b5fb7e1d3 in main (argc=2, argv=0x7ffc6745bbd8) at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:404
+[Inferior 1 (process 3896261) detached]

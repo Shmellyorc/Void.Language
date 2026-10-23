@@ -1,0 +1,5 @@
+use "operator_console_model.void" as model
+func main() -> i32:
+    if model.run(4) != 4:
+        return 101
+    return 7

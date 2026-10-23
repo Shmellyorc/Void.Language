@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  90: stage10_console_source
+1/2 Test  #90: stage10_console_source ...........***Failed    0.28 sec
+invalid console source accepted
+
+    Start 173: stage10_console_aot
+2/2 Test #173: stage10_console_aot ..............   Passed   26.30 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  26.59 sec
+
+The following tests FAILED:
+	 90 - stage10_console_source (Failed)
+Errors while running CTest

@@ -1,0 +1,224 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 28,
+  "increment_status": "Explicit prompt and normal-exit/failure/Runtime-shutdown integration implemented and focused Linux Debug/strict verified; independent Wrench and native-platform/final-stage acceptance pending.",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Explicit existing print(end=\"\",flush=true) then read prompt model, no helper/new competing API; Unicode/no-newline prompt delivered before redirected input is sent, including empty lines/EOF/errors/CR while pipe remains open.",
+    "Synchronous unbuffered write completion is VOID-owned drain; existing explicit flush gate used. Normal and nonzero application results preserve reached LIFO cleanup before entry return and existing CLI/AOT Runtime teardown. Legacy entry result output remains distinct.",
+    "Existing checked primary/secondary/cleanup-only failure semantics verified through ordinary calls, source frames, dynamic native error retention and reached cleanup; full diagnostic bytes match JIT/O2/linked AOT.",
+    "Source in-flight cleanup after concurrent Runtime close observes portable closed rather than generic Invalid console operation. Existing Closed exception reused; closing lazy console admission stays rejected.",
+    "Ordinary metadata admission allows validated intrinsic reply/array construction only for already-admitted source Managed depth while closing; new host metadata/entry/resource admission still rejects. Existing metadata safety validators retained.",
+    "NativeSafe GC and retained native buffer/code/Runtime ownership through entered best-effort cancellation, successful and partial/failed completion, plus persistent/one-shot allocation cleanup sweeps."
+  ],
+  "bounded_files": [
+    "src/runtime/coordination.cpp",
+    "src/runtime/console_abi.cpp",
+    "tests/stage10/console.cpp",
+    "tests/stage10/console.py",
+    "tests/stage10/console_prompt.void",
+    "tests/stage10/console_exit.void",
+    "tests/stage10/console_zero.void",
+    "tests/stage10/console_cleanup_primary.void",
+    "tests/stage10/console_cleanup_only.void",
+    "docs/WORK_LOG.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md"
+  ],
+  "debug": {
+    "passed": 20,
+    "total": 20,
+    "seconds": 109.61,
+    "suites": [
+      "stage10_hooks",
+      "stage10_interpolation",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "runtime_callbacks",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_console_source",
+      "async_lifecycle",
+      "stage10_console_aot",
+      "application_native_sprint4_host",
+      "application_native_sprint4"
+    ],
+    "log": "step28-debug-final-tests.txt",
+    "build": "step28-debug-final-build.txt",
+    "detail": "step28-debug-final-detail.txt",
+    "output_records": "step28-debug-outputs.json",
+    "source_assertions": 2141,
+    "driver_checks": 278,
+    "binary_execution_records": 56,
+    "live_prompt_records": 16,
+    "real_broken_pipe_paths": 2,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step27-acceptance-stdlib"
+    }
+  },
+  "strict_sanitizers": {
+    "passed": 20,
+    "total": 20,
+    "seconds": 112.09,
+    "suites": [
+      "stage10_hooks",
+      "stage10_interpolation",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_console_wide",
+      "runtime_console_input",
+      "runtime_console_native_input",
+      "runtime_coordination",
+      "runtime_callbacks",
+      "runtime_failures",
+      "runtime_invariants",
+      "stage10_console_source",
+      "async_lifecycle",
+      "stage10_console_aot",
+      "application_native_sprint4_host",
+      "application_native_sprint4"
+    ],
+    "log": "step28-san-final-tests.txt",
+    "build": "step28-san-final-build.txt",
+    "detail": "step28-san-final-detail.txt",
+    "output_records": "step28-san-outputs.json",
+    "source_assertions": 2141,
+    "driver_checks": 278,
+    "binary_execution_records": 56,
+    "live_prompt_records": 16,
+    "real_broken_pipe_paths": 2,
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-step27-acceptance-stdlib",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "configuration": "RelWithDebInfo, LLVM/Clang19.1.7, existing RTTI-off vptr exclusion unchanged",
+    "execution": "Strict sanitizer and actual LeakSanitizer checks run outside the restricted ptrace runner; no check disabled."
+  },
+  "coverage": {
+    "source_assertions_per_config": 2141,
+    "driver_checks_per_config": 278,
+    "binary_output_records_per_config": 56,
+    "live_prompt_records_per_config": 16,
+    "real_broken_pipe_paths_per_config": 2,
+    "stdout_stderr": "All actual output hex retained; successful expected bytes exact; full failure stderr identical across all four execution paths, including source frames and secondary failures.",
+    "lifecycle_neighbors": [
+      "runtime_callbacks",
+      "async_lifecycle",
+      "application_native_sprint4_host",
+      "application_native_sprint4"
+    ],
+    "console_native_gc": "Preserved foundation/endpoints/transfers/native probes/input/wide/GC/failure/invariants suites enabled."
+  },
+  "development_failures_and_repairs": [
+    {
+      "defect": "Source defer flush after host Runtime close produced Invalid console operation and converted successful entry into failure.",
+      "repair": "Existing source Managed depth receives console::Closed at Runtime console boundary; existing ABI maps to portable closed or rich checked print failure.",
+      "evidence": [
+        "step28-before.txt"
+      ]
+    },
+    {
+      "defect": "First repair still failed when cleanup reply first needed lazy byte-array schema/header metadata after Runtime close.",
+      "repair": "Normal fully validated metadata publication can finish for already-admitted source depth; new host metadata admission still rejects. No check or root/code lifetime weakened.",
+      "evidence": [
+        "step28-repair-tests.txt",
+        "step28-metadata-tests.txt"
+      ]
+    },
+    {
+      "defect": "Prompt fixture match emitted the existing nonexhaustive-match warning; literal-only first-use barrier did not run the managed-construction probe.",
+      "repair": "Added explicit wildcard arm and used a real managed construction barrier. Preserved exact stderr assertion and production warning checks.",
+      "evidence": [
+        "step28-debug-driver-tests.txt",
+        "step28-expanded-tests.txt",
+        "step28-gate-tests.txt"
+      ]
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "Native Windows/macOS build/runtime behavior; Step26 native obligations preserved.",
+    "Fresh Release/new console editor and final four-system Stage10 acceptance."
+  ],
+  "lifetime_contract": "Host close stops new admission and cancels/drains native operations; already-admitted source may still unwind under retained Runtime/code/roots. Host must join participants before destruction. Entered uncancellable borrowed syscalls may block shutdown indefinitely; no detach/forced-handle close/bounded promise.",
+  "ABI_build_scope": "No new source operation, C ABI, IR opcode, helper, registry, scheduler, stream or GC framework. Existing Runtime close, metadata admission and console ABI corrected. Runtime archive and existing exact native-cache binding reused.",
+  "dependencies": {
+    "new": "None",
+    "existing": {
+      "date": {
+        "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+        "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+      },
+      "ryu": {
+        "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+        "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+      },
+      "tzdata2026e": {
+        "revision": "2026e",
+        "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      }
+    },
+    "licenses": "Unchanged: Ryu Boost 1.0 option, Howard Hinnant date v3.0.3 MIT notices, IANA 2026e public domain; LLVM/Clang 19.1.7 pinned."
+  },
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "LLVM_Clang": "19.1.7"
+  },
+  "remaining_stage_obligations": [
+    "Step29 terminal capabilities/presentation, Step30 scoped input/key operations, Step31 complete concurrency/lifetime acceptance.",
+    "Composite collection/enum/result display and subsequent console/composite tooling cross-product.",
+    "Revisit full four-system Step40; Steps41–44 consolidated/native acceptance/documentation/Wrench review."
+  ],
+  "next_step": 29,
+  "next_source_change": "Extend existing console Adapter/Context and source result bindings for capability-based terminal size/color/cursor/clear/title/bell. Preserve input-response ownership, no hidden channels and recoverable unsupported behavior. Step29 not started.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "source_manifests": {
+    "bounded": "step28-source-hashes.json",
+    "bounded_files": 14,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 194,
+    "previous_checkpoint": "step27-checkpoint-source-hashes.json",
+    "preservation": "step28-preservation.json",
+    "unchanged_prior_entries_verified": 180
+  },
+  "commands": [
+    "cmake --build build/ci-official-debug -j 2 --target void_console_source voidc void_stage10_hooks void_stage10_interpolation void_runtime_console void_runtime_console_transfers void_runtime_console_wide void_runtime_console_input void_runtime_tests void_runtime_callbacks void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants void_sprint4_tests void_async_tests",
+    "cmake --build build/ci-official-san -j 2 --target void_console_source voidc void_stage10_hooks void_stage10_interpolation void_runtime_console void_runtime_console_transfers void_runtime_console_wide void_runtime_console_input void_runtime_tests void_runtime_callbacks void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants void_sprint4_tests void_async_tests",
+    "VOID_STDLIB_ROOT=/tmp/void-step27-acceptance-stdlib ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_hooks|stage10_interpolation|gc_buffers|gc_schemas|runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_wide|runtime_console_input|runtime_console_native_input|runtime_coordination|runtime_callbacks|runtime_failures|runtime_invariants|stage10_console_source|async_lifecycle|stage10_console_aot|application_native_sprint4_host|application_native_sprint4)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=/tmp/void-step27-acceptance-stdlib ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_hooks|stage10_interpolation|gc_buffers|gc_schemas|runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_wide|runtime_console_input|runtime_console_native_input|runtime_coordination|runtime_callbacks|runtime_failures|runtime_invariants|stage10_console_source|async_lifecycle|stage10_console_aot|application_native_sprint4_host|application_native_sprint4)$'",
+    "git diff --check",
+    "git diff --quiet -- README.md"
+  ],
+  "build_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "f88bc20889d81191631e42d7f5844a303d1c11ec19a3ab6598a3040411715900",
+    "build/ci-official-debug/voidc": "1370909f1c50782d650a1e23250e104b69e65fadbfaa6e0bcea30164889ad87f",
+    "build/ci-official-debug/void_console_source": "27e1c00fe7202b58dd7150e54d12c13d6f7234d0daada5537e5300068c91c66a",
+    "build/ci-official-san/libvoid_runtime.a": "8cdb8cf8be21f800d4d87189256764da4cee844e681a74aba74ebc772dcfc02c",
+    "build/ci-official-san/voidc": "b1bb08a3bddf4a1743deef312384efafc5153c441dcec566040f9b9fbfb7fc56",
+    "build/ci-official-san/void_console_source": "84045f498d572675496d62f42c2e9bbecfbf9e3453a2f9c66a4e46faf546e56c"
+  }
+}

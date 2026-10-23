@@ -1,0 +1,131 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 35,
+  "increment_status": "implemented; focused Linux acceptance passed; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "preexisting_work": "Steps 32\u201334 and prior Stage 10 work preserved; no commit, branch, push, hosted dispatch or public README change.",
+  "changes": [
+    "Captured-place +=, -=, *=, /= and %= use shared exact direct-owner arithmetic selection, separately typed RHS and existing ordinary calls, for locals, fields, properties, fixed/growable arrays and dictionary elements.",
+    "Generic/mixed operand tuples and source compound glyph references; normal call effects and worker reachability include the selected arithmetic.",
+    "Old operands and original owner/key/index are captured before RHS; writes use the existing property/setter/collection/place commit only after call success. Growable owner identity now captures before an effectful index too.",
+    "Ordinary assignment result upcasts, interface packing and callable binding use the existing conversion AST and compiler-owned result home after selection, with no operand coercion or result-based ranking.",
+    "Old-value snapshot types project final inferred readonly profiles; return authority is checked before commit and independently by IR.",
+    "Async initialized-home proof recognizes the validated array_capture destination; removed captures remain rejected.",
+    "Selected collection writes retain Runtime structural failures and source frames through the existing checked-failure return/cleanup path, rather than replacing the message with a generic array error.",
+    "Focused managed/native ABI probe and source JIT/AOT fixtures; no new Runtime ABI, GC, registry, selector engine or operator backend."
+  ],
+  "checks": {
+    "captured_compounds_debug": 730,
+    "captured_compounds_sanitizers": 730,
+    "preserved_resolution": 161,
+    "preserved_declarations": 278,
+    "preserved_step34_integration": 637,
+    "source_normal_o2_jit_aot_process": 244
+  },
+  "debug": {
+    "passed": 14,
+    "total": 14,
+    "seconds": 166.01,
+    "suites": [
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "fixed_arrays_source",
+      "growable_arrays_source",
+      "dictionaries_source",
+      "properties_source",
+      "stage10_operator_compounds",
+      "stage10_operator_integration",
+      "async_ir",
+      "async_parallel",
+      "async_lifecycle",
+      "stage10_operators_aot",
+      "stage10_fields",
+      "generics_source"
+    ],
+    "log": "step35-debug-accepted.txt",
+    "detail": "step35-debug-detail.txt",
+    "build": "step35-debug-frozen-build.txt"
+  },
+  "strict_sanitizers": {
+    "passed": 12,
+    "total": 12,
+    "seconds": 151.86,
+    "suites": [
+      "stage10_operator_resolution",
+      "stage10_operator_declarations",
+      "fixed_arrays_source",
+      "growable_arrays_source",
+      "dictionaries_source",
+      "properties_source",
+      "stage10_operator_compounds",
+      "stage10_operator_integration",
+      "async_ir",
+      "async_parallel",
+      "async_lifecycle",
+      "stage10_operators_aot"
+    ],
+    "log": "step35-san-accepted.txt",
+    "detail": "step35-san-detail.txt",
+    "build": "step35-san-frozen-build.txt",
+    "initial_build": "step35-san-build.txt",
+    "configuration": "RelWithDebInfo ASan/UBSan/leaks, pinned LLVM/Clang 19.1.7",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "scope": "Compiler/Runtime/native fixture/probes instrumented; generated machine code is not equivalently instrumented. Existing RTTI-off SDK excludes vptr checks. Execution outside sandbox ptrace preserves leak checks; no suppression or disabled assertion."
+  },
+  "small_stack": {
+    "bytes": 1048576,
+    "status": "passed",
+    "log": "step35-small-stack.txt",
+    "command": "python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc"
+  },
+  "development_failures": [
+    {
+      "record": "step35-first.txt",
+      "cause": "Fixture mixed a custom initializer with undeclared field arguments; corrected fixture to use existing initialization rules."
+    },
+    {
+      "record": "step35-compounds1.txt",
+      "cause": "Async IR initialized-home validation omitted array_capture writes; repaired with destination-aware fixed-point/sequential proof and a missing-capture rejection regression."
+    },
+    {
+      "record": "step35-compounds6.txt",
+      "cause": "Selected write lowering replaced the Runtime structural message with Array operation failed; repaired selected failure propagation. Final tests demand structural diagnostics and observe the unchanged old element during cleanup."
+    },
+    {
+      "record": "step35-compounds8.txt",
+      "cause": "Old-value home used a stale pre-inference capability type, discarding readonly authority; repaired final-type projection. A readonly view can be rebound to a fresh result without thawing authority."
+    }
+  ],
+  "earlier_acceptance": {
+    "record": "step35-debug-before-conversions.txt",
+    "status": "14/14 passed, 164.44 seconds; predates final result-conversion support and is not final-source acceptance"
+  },
+  "commands": {
+    "configure_debug": "cmake -S . -B build/ci-official-debug",
+    "configure_san": "cmake -S . -B build/ci-official-san",
+    "debug_build": "cmake --build build/ci-official-debug -j2 --target void_operator_resolution void_operator_declarations void_operator_integration void_operator_compounds voidc void_growable_arrays_tests void_fixed_arrays_tests void_dictionaries_tests void_properties_tests void_generics_tests void_stage10_fields void_async_tests",
+    "san_build": "cmake --build build/ci-official-san -j2 --target void_operator_compounds void_operator_resolution void_operator_declarations void_operator_integration voidc void_growable_arrays_tests void_fixed_arrays_tests void_dictionaries_tests void_properties_tests void_async_tests",
+    "debug_ctest": "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_resolution|stage10_operator_declarations|fixed_arrays_source|growable_arrays_source|dictionaries_source|properties_source|stage10_operator_compounds|stage10_operator_integration|async_ir|async_parallel|async_lifecycle|stage10_operators_aot|stage10_fields|generics_source)$'",
+    "san_ctest": "ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_resolution|stage10_operator_declarations|fixed_arrays_source|growable_arrays_source|dictionaries_source|properties_source|stage10_operator_compounds|stage10_operator_integration|async_ir|async_parallel|async_lifecycle|stage10_operators_aot)$'"
+  },
+  "not_run": [
+    "Release configuration for this increment",
+    "Native Windows/macOS",
+    "Native editor-host operator checks including Vim",
+    "Consolidated complete Stage 10 acceptance"
+  ],
+  "unresolved_step35_defects": [],
+  "remaining": [
+    "Step 36 recursive custom-equality dictionary-key exclusion remains unimplemented",
+    "Later operator tooling/cache/reload and cross-system integration acceptance remains open",
+    "Console/terminal, composite display and remaining field/tooling/full Stage 10 obligations remain open"
+  ],
+  "next_source_change": "Step 36: dictionary literal/type admission in src/frontend/compiler.cpp currently calls ir::dictionary_key_supported. Extend the shared key-admission proof in src/ir/module.cpp using concrete custom == declarations and recursive eligible value/fixed shapes; repeat eligibility at independent dictionary/schema and Runtime metadata admission, with declaration/use diagnostics. Keep descriptors data-only and normal dictionary values unaffected.",
+  "warning": "Existing LLVM/GCC ciso646 C++20 header warning occurred during backend rebuild; not suppressed.",
+  "source_hashes": "step35-source-hashes.json",
+  "previous_checkpoint_hashes": "step34-checkpoint-source-hashes.json",
+  "git_hosted_publication": "not performed"
+}

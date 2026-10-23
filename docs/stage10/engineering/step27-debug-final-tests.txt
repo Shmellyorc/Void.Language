@@ -1,0 +1,55 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/25 Test   #1: stage10_operator_reload ............   Passed   52.86 sec
+      Start   2: stage10_operator_keys
+ 2/25 Test   #2: stage10_operator_keys ..............   Passed    0.65 sec
+      Start   3: stage10_operator_resolution
+ 3/25 Test   #3: stage10_operator_resolution ........   Passed    2.19 sec
+      Start   7: stage10_display_reload
+ 4/25 Test   #7: stage10_display_reload .............   Passed    0.74 sec
+      Start   8: stage10_temporal_ir
+ 5/25 Test   #8: stage10_temporal_ir ................   Passed    3.51 sec
+      Start  10: stage10_hooks
+ 6/25 Test  #10: stage10_hooks ......................   Passed    5.80 sec
+      Start  11: stage10_interpolation
+ 7/25 Test  #11: stage10_interpolation ..............   Passed    1.36 sec
+      Start  12: stage10_conversion
+ 8/25 Test  #12: stage10_conversion .................   Passed    0.86 sec
+      Start  13: stage10_fields
+ 9/25 Test  #13: stage10_fields .....................   Passed    0.45 sec
+      Start  19: gc_buffers
+10/25 Test  #19: gc_buffers .........................   Passed   10.36 sec
+      Start  20: gc_schemas
+11/25 Test  #20: gc_schemas .........................   Passed    0.85 sec
+      Start  22: runtime_console
+12/25 Test  #22: runtime_console ....................   Passed    0.01 sec
+      Start  23: runtime_console_endpoints
+13/25 Test  #23: runtime_console_endpoints ..........   Passed    0.07 sec
+      Start  24: runtime_console_transfers
+14/25 Test  #24: runtime_console_transfers ..........   Passed    0.02 sec
+      Start  25: runtime_console_native_transfers
+15/25 Test  #25: runtime_console_native_transfers ...   Passed    0.46 sec
+      Start  26: runtime_console_wide
+16/25 Test  #26: runtime_console_wide ...............   Passed    0.10 sec
+      Start  27: runtime_console_input
+17/25 Test  #27: runtime_console_input ..............   Passed    0.02 sec
+      Start  28: runtime_console_native_input
+18/25 Test  #28: runtime_console_native_input .......   Passed    0.16 sec
+      Start  29: runtime_coordination
+19/25 Test  #29: runtime_coordination ...............   Passed    2.05 sec
+      Start  33: arrays_source
+20/25 Test  #33: arrays_source ......................   Passed   12.50 sec
+      Start  80: runtime_failures
+21/25 Test  #80: runtime_failures ...................   Passed    0.01 sec
+      Start  83: runtime_invariants
+22/25 Test  #83: runtime_invariants .................   Passed    0.04 sec
+      Start  89: stage10_operator_compounds
+23/25 Test  #89: stage10_operator_compounds .........   Passed   10.04 sec
+      Start  90: stage10_console_source
+24/25 Test  #90: stage10_console_source .............   Passed    8.87 sec
+      Start 173: stage10_console_aot
+25/25 Test #173: stage10_console_aot ................   Passed   41.15 sec
+
+100% tests passed, 0 tests failed out of 25
+
+Total Test time (real) = 155.15 sec

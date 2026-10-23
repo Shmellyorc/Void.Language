@@ -1,0 +1,17 @@
+valid [{'diagnostics': [{'code': 'VOID2005', 'message': "Duplicate declaration or shadowing of 'input'.\nHint: Assign to the existing variable, or choose a distinct name.", 'range': {'end': {'character': 16, 'line': 4}, 'start': {'character': 11, 'line': 4}}, 'severity': 1, 'source': 'VOID'}, {'code': 'VOID2002', 'message': "Unknown identifier 'input'.\nHint: Declare it with var before use.", 'range': {'end': {'character': 29, 'line': 5}, 'start': {'character': 24, 'line': 5}}, 'severity': 1, 'source': 'VOID'}, {'code': 'VOID2002', 'message': "Unknown identifier 'input'.\nHint: Declare it with var before use.", 'range': {'end': {'character': 33, 'line': 6}, 'start': {'character': 28, 'line': 6}}, 'severity': 1, 'source': 'VOID'}, {'code': 'VOID2002', 'message': "Unknown identifier 'input'.\nHint: Declare it with var before use.", 'range': {'end': {'character': 16, 'line': 12}, 'start': {'character': 11, 'line': 12}}, 'severity': 1, 'source': 'VOID'}], 'uri': 'file:///tmp/tmpxkyz9jw4/main.void', 'version': 1}]
+hover print( {'id': 3, 'jsonrpc': '2.0', 'result': None}
+hover shade.pair(input {'id': 4, 'jsonrpc': '2.0', 'result': None}
+definition shade.pair(var {'id': 5, 'jsonrpc': '2.0', 'result': None}
+hover Ok(chosen) {'id': 6, 'jsonrpc': '2.0', 'result': None}
+hover number
+ {'id': 7, 'jsonrpc': '2.0', 'result': None}
+console. {'id': 9, 'jsonrpc': '2.0', 'result': []}
+console.stdout. {'id': 11, 'jsonrpc': '2.0', 'result': []}
+console.stdin. {'id': 13, 'jsonrpc': '2.0', 'result': []}
+shade. {'id': 15, 'jsonrpc': '2.0', 'result': []}
+items. {'id': 17, 'jsonrpc': '2.0', 'result': []}
+print( {'id': 19, 'jsonrpc': '2.0', 'result': None}
+print(items,  {'id': 21, 'jsonrpc': '2.0', 'result': None}
+print(items, flush =  {'id': 23, 'jsonrpc': '2.0', 'result': None}
+console.stdout.set_cursor( {'id': 25, 'jsonrpc': '2.0', 'result': None}
+console.stdin.read_line( {'id': 27, 'jsonrpc': '2.0', 'result': None}

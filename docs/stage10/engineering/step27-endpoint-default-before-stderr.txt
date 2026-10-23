@@ -1,0 +1,12 @@
+/tmp/void-console-default-copy.void:5:16: error: A non-nullable reference field requires an explicit value: port.
+    code: VOID2004
+
+ 5 |     var item = logger()
+   |                ^^^^^^
+    Module: /void-console-default-copy.void
+    Required field declared here. at /tmp/void-console-default-copy.void:3:11
+
+ 3 |     const port: console.output = console.stdout
+   |           ^^^^
+    Module: /void-console-default-copy.void
+

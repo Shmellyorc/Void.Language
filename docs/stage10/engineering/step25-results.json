@@ -1,0 +1,356 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 25,
+  "increment_status": "Shared native input foundation implemented; focused Linux Debug/strict acceptance passed; independent Wrench/native platform acceptance pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "One Streams::State-owned native byte queue with ordered error/EOF observations and pending logical CRLF state. All Context read_bytes/read_char/read_text/read_line, old byte read alias and leased Operation.read use it under one existing input lease.",
+    "Private Step 24 native refill only; no competing OS input path. 4096-byte queue blocks are allocated before native consumption, and logical cursors commit only after owned result construction. Allocation/size failure preserves bytes without rollback allocation.",
+    "Shared utf8.hpp lead-width factoring and existing complete-scalar validator authority. ASCII/NUL/BOM, 2/3/4-byte scalars and all tested transfer partitions; strict overlong/surrogate/range/continuation/truncation handling.",
+    "Maximal immediately available invalid-prefix consumption using nonblocking recovery lookahead; next legal starter retained, precise partial/error offset, never invalid result text.",
+    "LF/CR/CRLF logical lines, immediate standalone CR without following-byte probe, pending LF only consumed by a later line read. Mixed raw/char/text returns raw terminators; zero or failed empty reads preserve continuation.",
+    "Available complete text without waiting to fill capacity; following incomplete scalar remains entirely queued when a valid prefix can already be returned. Final unterminated line before EOF; ordered EOF observation can be followed by a later host-stream read.",
+    "One original request deadline, complete native/partial/cleanup progress, session-only control failures do not poison other Runtime sessions; buffered state survives independent close. Step 24 best-effort entered-syscall/NativeSafe/precise-root/lifetime contracts unchanged.",
+    "Future native encoding errors are queued events consumed once, distinct from decoder-generated recovery errors. No Step 26 wide adapter or public source console API implemented."
+  ],
+  "bounded_files": [
+    "CMakeLists.txt",
+    "include/void/console.hpp",
+    "include/void/utf8.hpp",
+    "src/runtime/console.cpp",
+    "tests/runtime/console_input.cpp",
+    "tests/runtime/console_input.py",
+    "docs/WORK_LOG.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md"
+  ],
+  "debug": {
+    "passed": 11,
+    "total": 11,
+    "seconds": 13.4,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants",
+      "runtime_console_input",
+      "runtime_console_native_input"
+    ],
+    "log": "step25-debug-handoff-tests.txt",
+    "build": "step25-debug-handoff-build.txt",
+    "configure": "step25-debug-configure.txt",
+    "input_detail": "step25-debug-input-handoff-detail.txt",
+    "native_detail": "step25-debug-native-handoff-detail.txt"
+  },
+  "strict_sanitizers": {
+    "passed": 11,
+    "total": 11,
+    "seconds": 7.2,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants",
+      "runtime_console_input",
+      "runtime_console_native_input"
+    ],
+    "log": "step25-san-handoff-tests.txt",
+    "build": "step25-san-handoff-build.txt",
+    "configure": "step25-san-configure.txt",
+    "input_detail": "step25-san-input-handoff-detail.txt",
+    "native_detail": "step25-san-native-handoff-detail.txt",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "configuration": "RelWithDebInfo, pinned LLVM/Clang 19.1.7, existing RTTI-off vptr exclusion",
+    "execution": "Outside restricted ptrace runner for actual LeakSanitizer checking. No sanitizer/leak error; existing invariants/fatal children and negative leak controls remain enabled. No assertion or safety check disabled."
+  },
+  "checks": {
+    "new_deterministic_input_checks": 2261,
+    "new_real_POSIX_driver_checks": 264,
+    "real_native_case_processes": 19,
+    "preserved_step24_transfer_checks": 178,
+    "preserved_step24_POSIX_driver_checks": 210,
+    "preserved_step23_foundation_checks": 72,
+    "preserved_step23_endpoint_checks": 14,
+    "suites_per_configuration": 11,
+    "note": "Native child counters are recorded per case; no total inferred from variable kernel split/short-read behavior."
+  },
+  "native_cases": {
+    "debug": [
+      {
+        "case": "pipe",
+        "child_checks_before_report": 17
+      },
+      {
+        "case": "file",
+        "child_checks_before_report": 17
+      },
+      {
+        "case": "large-line",
+        "child_checks_before_report": 7
+      },
+      {
+        "case": "invalid-boundary",
+        "child_checks_before_report": 8
+      },
+      {
+        "case": "line-lf",
+        "child_checks_before_report": 3
+      },
+      {
+        "case": "line-other",
+        "child_checks_before_report": 3
+      },
+      {
+        "case": "char-lf",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "char-other",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "text-lf",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "text-other",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "bytes-lf",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "bytes-other",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "timeout-line",
+        "child_checks_before_report": 6
+      },
+      {
+        "case": "timeout-char",
+        "child_checks_before_report": 7
+      },
+      {
+        "case": "malformed",
+        "child_checks_before_report": 11
+      },
+      {
+        "case": "bytewise",
+        "child_checks_before_report": 3
+      },
+      {
+        "case": "pty-input",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "pty-output",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "blocked",
+        "child_checks_before_report": 6
+      }
+    ],
+    "strict": [
+      {
+        "case": "pipe",
+        "child_checks_before_report": 17
+      },
+      {
+        "case": "file",
+        "child_checks_before_report": 17
+      },
+      {
+        "case": "large-line",
+        "child_checks_before_report": 7
+      },
+      {
+        "case": "invalid-boundary",
+        "child_checks_before_report": 8
+      },
+      {
+        "case": "line-lf",
+        "child_checks_before_report": 3
+      },
+      {
+        "case": "line-other",
+        "child_checks_before_report": 3
+      },
+      {
+        "case": "char-lf",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "char-other",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "text-lf",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "text-other",
+        "child_checks_before_report": 4
+      },
+      {
+        "case": "bytes-lf",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "bytes-other",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "timeout-line",
+        "child_checks_before_report": 6
+      },
+      {
+        "case": "timeout-char",
+        "child_checks_before_report": 7
+      },
+      {
+        "case": "malformed",
+        "child_checks_before_report": 11
+      },
+      {
+        "case": "bytewise",
+        "child_checks_before_report": 3
+      },
+      {
+        "case": "pty-input",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "pty-output",
+        "child_checks_before_report": 5
+      },
+      {
+        "case": "blocked",
+        "child_checks_before_report": 6
+      }
+    ]
+  },
+  "queue_contract": {
+    "ownership": "One shared native queue per Streams; state accessed under the existing exclusive input lease, not per-Runtime or competing read-ahead buffers. Native Adapter remains trusted embedding boundary. All public read routes use this queue.",
+    "transaction": "Queue retains OS-read and logical prefix bytes until success/error result storage is constructed. Exception restores logical consumption implicitly; no allocation required to roll back. Pending control marker is scoped to its original request.",
+    "text_result": "Valid UTF-8 text on success; empty text and raw partial on error. completed counts logical raw bytes including stripped delimiters/skipped CRLF LF. error_offset is invalid-prefix start in partial, or end for native/control errors. Unconsumed read-ahead remains queued.",
+    "invalid_prefix": "Consume invalid sequence and immediately available non-starters; use only polling probes after invalidity is known, preserve the first legal scalar starter. Do not wait for a future recovery byte.",
+    "available_text": "Return current complete scalars up to count; after a valid prefix, leave a following incomplete scalar entirely queued rather than wait for it. No complete scalar yet waits under the original deadline.",
+    "line_continuation": "CR immediately completes. Only a later logical line read may skip a following LF; raw/char/text clears continuation only on actual byte consumption. Zero and failed empty reads preserve it.",
+    "EOF": "Pending EOF is observed after queued bytes or truncation error. Deliver a final nonempty unterminated line once before EOF. Delivered EOF does not permanently close/refuse future host native reads, preserving Step 24 behavior.",
+    "failure": "Native errors remain ordered after their payload; raw partial consumed before failure is always returned. Already-disclosed incomplete UTF-8/line bytes are not secretly reassembled on retry. Original native and secondary cleanup codes preserved."
+  },
+  "deterministic_coverage": [
+    "Mixed raw/char/text/line/leased reads with exact bytes and zero requests",
+    "Unicode scalar bounds, NUL/BOM/supplementary scalars and every split for representative scalar/line inputs",
+    "Invalid lead families, overlong/surrogate/range/continuation/truncation cases across partitions, retained next starter, exact partial offsets and EOF recovery",
+    "LF/CR/CRLF/repeated/empty/final lines and CR-to-each-read-method transitions, zero and failed empty reads",
+    "Shared queue/continuation after independent Runtime close; concurrent typed readers; Managed rejection",
+    "Native partial/cleanup/control errors, queued event order and native encoding failure consumed once",
+    "One injected deadline through multiple native reads and successful entered completion",
+    "Fault injection after native consumption: successful-result string, error partial, raw result and next queue-block allocation, preserving bytes and releasing leases"
+  ],
+  "real_native_coverage": [
+    "Pipes and redirected files with BOM/NUL/Unicode, mixed line endings and final EOF",
+    "35000-byte Unicode/NUL line whose 7-byte cycle crosses all phases of the real 4096-byte refill boundary",
+    "4096-byte-boundary malformed/truncated-prefix recovery",
+    "Live writer remains open while CR result is read; every line/char/text/raw next-read transition with LF and non-LF",
+    "Timeout after already-buffered line/scalar prefix, complete partial disclosure and clean retry",
+    "One-byte pipe delivery (kernel may coalesce; deterministic cases prove exact split boundaries separately)",
+    "Raw host-configured PTY input/output, unchanged native modes/descriptor flags",
+    "Buffered continuation/tail then actual Linux poll wait, precise frozen-root GC, shutdown partial and independent fresh Runtime polling without stale error"
+  ],
+  "development_failures_and_repairs": [
+    {
+      "failure": "New upstream/native invalid_encoding event regression reproduced replay of the same queued error, preventing next Z recovery.",
+      "log": "step25-native-encoding-before.txt",
+      "build": "step25-debug-native-encoding-build.txt",
+      "repair": "Carry explicit queued-event provenance through cursor/scalar results; consume adapter events once independently of ErrorKind. Decoder invalidity still retains later input/error events."
+    },
+    {
+      "review": "Preserved Step 24 EOF behavior by treating EOF as an ordered observation, not a permanent borrowed-stream close; completed native batches can satisfy a request despite a simultaneous stop.",
+      "claim_limit": "These were integration design corrections before focused acceptance, not separately captured historical production failure claims."
+    },
+    {
+      "build": "Initial aggregate default-initializer warnings removed with explicit member defaults/complete Request initialization. Warning flags unchanged; final focused builds clean."
+    }
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "Native Windows/macOS compilation/runtime for queue and native adapter paths",
+    "Windows wide UTF-16 conversion/console feed (Step 26, unimplemented here)",
+    "Separate Release and fresh source/JIT/O2/AOT/editor console acceptance",
+    "Public source console API and consolidated/four-system final Stage 10 acceptance"
+  ],
+  "remaining_stage_obligations": [
+    "Step 26 Windows wide-console and redirected UTF-8 integration through this same queue",
+    "Steps 27\u201331 public heterogeneous print, flush/prompts, terminal controls/modes and full source/shutdown integration",
+    "Composite display",
+    "Revisit complete four-system Step 40; final Steps 41\u201344 acceptance/documentation/Wrench review"
+  ],
+  "dependencies": "No new dependency. Existing C++20/Threads/Runtime/OS adapter and shared UTF-8 utility; LLVM 19.1.7 and Ryu/date/IANA versions/licenses unchanged.",
+  "ABI_build_scope": "Native C++ read APIs/results and private queue state added; Adapter transfer signatures remain unchanged from Step 24. Existing Runtime archive and install/native-link paths reused. No source/IR/C Runtime operation or LLVM/GC/backend added. Existing shared UTF-8 legality behavior preserved by factoring lead width.",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "LLVM_Clang": "19.1.7"
+  },
+  "next_step": 26,
+  "next_source_change": "Extend SystemAdapter Windows confirmed-console branch with strict UTF-16/UTF-8 wide-console reads/writes, feeding validated UTF-8 bytes and encoding errors into the existing shared queue, while preserving redirected raw paths, progress and NativeSafe/session ownership. Step 26 has not started.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Previous checkpoints and Step 37 observations preserved. Stage 10 remains INCOMPLETE; Wrench review pending.",
+  "source_manifests": {
+    "bounded": "step25-source-hashes.json",
+    "bounded_files": 11,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 173,
+    "previous_checkpoint": "step24-checkpoint-source-hashes.json",
+    "preservation": "step25-preservation.json",
+    "unchanged_prior_entries_verified": 162
+  },
+  "commands": [
+    "cmake -S . -B build/ci-official-debug",
+    "cmake -S . -B build/ci-official-san",
+    "cmake --build build/ci-official-debug -j 2 --target void_runtime_console_input void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "cmake --build build/ci-official-san -j 2 --target void_runtime_console_input void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_input|runtime_console_native_input|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_console_input|runtime_console_native_input|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "build/ci-official-debug/void_runtime_console_input",
+    "python3 tests/runtime/console_input.py build/ci-official-debug/void_runtime_console_input",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 build/ci-official-san/void_runtime_console_input",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 python3 tests/runtime/console_input.py build/ci-official-san/void_runtime_console_input",
+    "python3 -m py_compile tests/runtime/console_input.py",
+    "git diff --check",
+    "git diff --quiet -- README.md"
+  ],
+  "build_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "40c3f55a2664a580f50c5f6f35ec82c528c80e5347bde3653078d99e8229418f",
+    "build/ci-official-debug/void_runtime_console_input": "e24d87c34baf4db76bdcefeab6bde66c3799e5dff6db39ec1006a2c5fecf4701",
+    "build/ci-official-san/libvoid_runtime.a": "0d7007e54e32d82c4bede96ccff74701d7d6988f6f257e25287434da99f92c2f",
+    "build/ci-official-san/void_runtime_console_input": "9de659857eab1025a8c9ac40a8af5a44484727237b399790de8431f7e8deda23"
+  }
+}

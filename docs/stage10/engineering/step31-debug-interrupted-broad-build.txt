@@ -1,0 +1,202 @@
+[  1%] Built target void_zone_objects
+[  1%] Built target void_format_objects
+[  1%] Built target void_native_fixture
+[  1%] Building CXX object CMakeFiles/void_runtime_generated_abi.dir/src/runtime/abi.cpp.o
+[  2%] Built target void_managed_test_abi
+[  2%] Building CXX object CMakeFiles/void_string_test_abi.dir/src/runtime/abi.cpp.o
+[  2%] Built target void_runtime_generated_abi
+[  2%] Built target native_fixture
+[  3%] Built target void_native_test_fixture
+[  3%] Built target void_string_test_abi
+[  4%] Built target void_core
+[  5%] Built target void_runtime
+[  5%] Built target void_lsp
+[  5%] Building CXX object CMakeFiles/void_arrays_foundation.dir/tests/arrays/foundation.cpp.o
+[  5%] Built target void_runtime_console
+[  5%] Built target void_runtime_console_transfers
+[  5%] Built target void_runtime_console_keyboard
+[  6%] Built target void_runtime_console_terminal
+[  6%] Built target void_runtime_console_wide
+[  6%] Built target void_runtime_console_input
+[  6%] Built target void_runtime_tests
+[  6%] Built target void_runtime_failures
+[  6%] Built target void_runtime_invariants
+[  6%] Building CXX object CMakeFiles/void_lsp_tests.dir/tests/lsp/positions.cpp.o
+[  6%] Linking CXX executable void_lsp_tests
+[  6%] Built target void_lsp_tests
+[  7%] Building CXX object CMakeFiles/void_sessions_example.dir/examples/sessions.cpp.o
+[  7%] Linking CXX executable void_arrays_foundation
+[  7%] Built target void_arrays_foundation
+[  7%] Building CXX object CMakeFiles/void_tooling_example.dir/examples/tooling.cpp.o
+[  7%] Linking CXX executable void_sessions_example
+[  7%] Built target void_sessions_example
+[  7%] Built target void_llvm
+[  8%] Linking CXX executable voidls
+[  8%] Built target voidls
+[  8%] Built target voidc_objects
+[  8%] Building CXX object CMakeFiles/void_operator_keys.dir/tests/stage10/operator_keys.cpp.o
+[  8%] Linking CXX executable void_tooling_example
+[  8%] Built target void_tooling_example
+[  8%] Linking CXX executable void_operator_resolution
+[  8%] Built target void_operator_resolution
+[  8%] Building CXX object CMakeFiles/void_operator_declarations.dir/tests/stage10/operator_declarations.cpp.o
+[  8%] Linking CXX executable void_operator_keys
+[  8%] Built target void_operator_keys
+[  8%] Linking CXX executable void_operator_declarations
+[  8%] Building CXX object CMakeFiles/void_source_formatting.dir/tests/stage10/source_formatting.cpp.o
+[  8%] Linking CXX executable void_source_formatting
+[  8%] Built target void_operator_declarations
+[  8%] Building CXX object CMakeFiles/void_stage10_tooling.dir/tests/stage10/tooling.cpp.o
+[  8%] Linking CXX executable void_stage10_tooling
+[  8%] Built target void_stage10_tooling
+[  8%] Built target void_display_reload
+[  8%] Linking CXX executable void_temporal_ir
+[  8%] Built target void_source_formatting
+[  8%] Building CXX object CMakeFiles/void_temporal.dir/tests/formatting/temporal.cpp.o
+[  8%] Built target void_temporal_ir
+[  8%] Built target void_stage10_hooks
+[  9%] Built target void_stage10_interpolation
+[  9%] Linking CXX executable void_stage10_conversion
+[  9%] Linking CXX executable void_temporal
+[  9%] Built target void_temporal
+[  9%] Built target void_stage10_fields
+[  9%] Linking CXX executable void_format_numeric
+[  9%] Built target void_format_numeric
+[  9%] Linking CXX executable void_format_zones
+[  9%] Built target void_format_zones
+[  9%] Built target void_gc_buffers
+[  9%] Built target void_gc_schemas
+[  9%] Building CXX object CMakeFiles/void_runtime_generated.dir/tests/runtime/generated.cpp.o
+[  9%] Built target void_stage10_conversion
+[  9%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[  9%] Linking CXX executable void_runtime_generated
+[  9%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[  9%] Built target void_runtime_generated
+[  9%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/growable_arrays/tests.cpp.o
+[  9%] Linking CXX executable void_fixed_arrays_tests
+[  9%] Built target void_fixed_arrays_tests
+[  9%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/managed/probe.cpp.o
+[  9%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/arrays/source.cpp.o
+[  9%] Linking CXX executable void_growable_arrays_tests
+[  9%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/managed/probe.cpp.o
+[  9%] Built target void_growable_arrays_tests
+[  9%] Building CXX object CMakeFiles/void_generics_tests.dir/tests/generics/tests.cpp.o
+[  9%] Linking CXX executable void_arrays_source
+[  9%] Building CXX object CMakeFiles/void_generics_tests.dir/tests/managed/probe.cpp.o
+[  9%] Built target void_arrays_source
+[  9%] Building CXX object CMakeFiles/void_collections_tests.dir/tests/collections/tests.cpp.o
+[ 10%] Linking CXX executable void_generics_tests
+[ 10%] Building CXX object CMakeFiles/void_collections_tests.dir/tests/managed/probe.cpp.o
+[ 10%] Built target void_generics_tests
+[ 10%] Building CXX object CMakeFiles/void_dictionaries_tests.dir/tests/dictionaries/tests.cpp.o
+[ 10%] Linking CXX executable void_collections_tests
+[ 10%] Building CXX object CMakeFiles/void_dictionaries_tests.dir/tests/managed/probe.cpp.o
+[ 10%] Built target void_collections_tests
+[ 10%] Building CXX object CMakeFiles/void_properties_tests.dir/tests/managed/probe.cpp.o
+[ 10%] Linking CXX executable void_dictionaries_tests
+[ 10%] Building CXX object CMakeFiles/void_properties_tests.dir/tests/properties/tests.cpp.o
+[ 10%] Built target void_dictionaries_tests
+[ 11%] Building CXX object CMakeFiles/void_patterns_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Linking CXX executable void_properties_tests
+[ 11%] Building CXX object CMakeFiles/void_patterns_tests.dir/tests/patterns/tests.cpp.o
+[ 11%] Built target void_properties_tests
+[ 11%] Building CXX object CMakeFiles/void_advanced_tests.dir/tests/advanced/tests.cpp.o
+[ 11%] Linking CXX executable void_patterns_tests
+[ 11%] Building CXX object CMakeFiles/void_advanced_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Built target void_patterns_tests
+[ 11%] Building CXX object CMakeFiles/void_managed_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Linking CXX executable void_advanced_tests
+[ 11%] Building CXX object CMakeFiles/void_managed_tests.dir/tests/managed/tests.cpp.o
+[ 11%] Built target void_advanced_tests
+[ 11%] Building CXX object CMakeFiles/void_managed_initialization_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Linking CXX executable void_managed_tests
+[ 11%] Building CXX object CMakeFiles/void_managed_initialization_tests.dir/tests/managed_initialization/tests.cpp.o
+[ 11%] Built target void_managed_tests
+[ 11%] Building CXX object CMakeFiles/void_reference_values_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Building CXX object CMakeFiles/void_reference_values_tests.dir/tests/reference_values/tests.cpp.o
+[ 11%] Linking CXX executable void_managed_initialization_tests
+[ 11%] Built target void_managed_initialization_tests
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 11%] Building CXX object CMakeFiles/void_composition_tests.dir/tests/composition/tests.cpp.o
+[ 11%] Linking CXX executable void_reference_values_tests
+[ 11%] Built target void_reference_values_tests
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 11%] Building CXX object CMakeFiles/void_inheritance_tests.dir/tests/inheritance/tests.cpp.o
+[ 11%] Building CXX object CMakeFiles/void_composition_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Linking CXX executable void_composition_tests
+[ 11%] Building CXX object CMakeFiles/void_inheritance_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Built target void_composition_tests
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 11%] Building CXX object CMakeFiles/void_interfaces_tests.dir/tests/interfaces/tests.cpp.o
+[ 11%] Linking CXX executable void_inheritance_tests
+[ 11%] Built target void_inheritance_tests
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 11%] Building CXX object CMakeFiles/void_strings_tests.dir/tests/managed/probe.cpp.o
+[ 11%] Building CXX object CMakeFiles/void_interfaces_tests.dir/tests/managed/probe.cpp.o
+[ 12%] Building CXX object CMakeFiles/void_strings_tests.dir/tests/strings/probe.cpp.o
+[ 12%] Linking CXX executable void_interfaces_tests
+[ 12%] Building CXX object CMakeFiles/void_strings_tests.dir/tests/strings/tests.cpp.o
+[ 12%] Built target void_interfaces_tests
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 12%] Built target void_runtime_callbacks
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 12%] Generating runtime-normal.o
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 13%] Building CXX object CMakeFiles/void_runtime_aot_normal.dir/tests/runtime/aot.cpp.o
+[ 13%] Linking CXX executable void_runtime_aot_normal
+[ 13%] Built target void_runtime_aot_normal
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 13%] Generating runtime-optimized.o
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 13%] Building CXX object CMakeFiles/void_runtime_aot_optimized.dir/tests/runtime/aot.cpp.o
+[ 13%] Linking CXX executable void_strings_tests
+[ 13%] Linking CXX executable void_runtime_aot_optimized
+[ 13%] Built target void_strings_tests
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 13%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/managed/probe.cpp.o
+[ 13%] Built target void_runtime_aot_optimized
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 13%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[ 13%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/native/probe.cpp.o
+[ 13%] Building CXX object CMakeFiles/void_operator_compounds.dir/tests/stage10/operator_compounds.cpp.o
+[ 13%] Linking CXX executable void_console_source
+[ 13%] Built target void_console_source
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+gmake[2]: cannot open jobserver /tmp/GMfifo6: No such file or directory
+gmake[2]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+[ 14%] Building CXX object CMakeFiles/void_operator_integration.dir/tests/managed/probe.cpp.o
+[ 14%] Linking CXX executable void_operator_compounds
+[ 14%] Building CXX object CMakeFiles/void_operator_integration.dir/tests/native/probe.cpp.o
+gmake[2]: *** [CMakeFiles/void_operator_compounds.dir/build.make:202: void_operator_compounds] Terminated
+gmake[1]: *** [CMakeFiles/Makefile2:16283: CMakeFiles/void_operator_compounds.dir/all] Terminated
+gmake[2]: *** [CMakeFiles/void_operator_integration.dir/build.make:93: CMakeFiles/void_operator_integration.dir/tests/native/probe.cpp.o] Terminated
+gmake[1]: *** [CMakeFiles/Makefile2:16356: CMakeFiles/void_operator_integration.dir/all] Terminated
+gmake: *** [Makefile:146: all] Terminated
+Subprocess terminated
+CMake Error: Generator: build tool execution failed, command was: /usr/bin/gmake -f Makefile -j2

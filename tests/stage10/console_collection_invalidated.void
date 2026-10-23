@@ -1,0 +1,14 @@
+struct item:
+    action: func() -> string
+func (self item) string() -> string:
+    return self.action()
+func cleanup():
+    print("cleanup", end = ";")
+func main():
+    defer cleanup()
+    var values: {string: item} = {}
+    var callback = func() -> string:
+        values.clear()
+        return "modified"
+    values["key"] = item(action = callback)
+    print("NO OUTER PREFIX", values)

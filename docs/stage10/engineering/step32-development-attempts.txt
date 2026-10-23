@@ -1,0 +1,90 @@
+step32-development-compile-failure.log
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_runtime
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:4554:22: warning: exception of type 'const CompilationError &' will be caught by earlier handler [-Wexceptions]
+ 4554 |          catch(const CompilationError& failure){diagnostics.add(failure);f.parse_failed=true;}
+      |                      ^
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:4553:22: note: for type 'const std::invalid_argument &'
+ 4553 |         }catch(const std::invalid_argument& failure){try{error(owner.source,f.token,Code::type_mismatch,failure.what());}catch(const CompilationError& failure){diagnostics.add(failure);f.parse_failed=true;}}
+      |                      ^
+In file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:4603:
+/home/shmellyorc/Documents/Void.Language/src/frontend/generic_declarations.inc:54:192: error: no matching function for call to object of type '(lambda at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:4342:23)'
+   54 |             for(const auto& a:u->arrays)if(a.definition==raw.definition){key=a.key?"dictionary":a.extent?"fixed":"list";if(a.key)add(operand_key(*a.key));else if(a.extent)add(std::to_string(*array_extent(*u,a)));add(operand_key(a.element));return key;}
+      |                                                                                                                                                                                                ^~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:4342:23: note: candidate function not viable: 2nd argument ('vd::(anonymous namespace)::ArraySyntax const') would lose const qualifier
+ 4342 |     auto array_extent=[&](Unit& owner,ArraySyntax& syntax) {
+      |                       ^               ~~~~~~~~~~~~~~~~~~~
+1 warning and 1 error generated.
+gmake[3]: *** [CMakeFiles/void_core.dir/build.make:93: CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:1726: CMakeFiles/void_core.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2046: CMakeFiles/voidc.dir/rule] Error 2
+gmake: *** [Makefile:401: voidc] Error 2
+
+
+step32-development-enum-failure.log
+/operators.void:2:5: error: Unexpected character in source.
+    code: VOID1003
+
+ 2 |     Empty
+   |     ^
+    Module: /operators.void
+    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.
+
+/operators.void:2:5: error: Expected a lowercase identifier.
+    code: VOID1102
+
+ 2 |     Empty
+   |     ^
+    Module: /operators.void
+
+/operators.void:3:5: error: Unexpected character in source.
+    code: VOID1003
+
+ 3 |     Full(value: i32)
+   |     ^
+    Module: /operators.void
+    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.
+
+
+
+step32-development-capture-failure.log
+VOID IR: operator operand requires one argument snapshot
+
+
+step32-development-private-field-fixture-failure.log
+VOID IR: inaccessible stored field 'x' in /operators.void::entry
+
+
+step32-debug-failed-cwd.log
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start   1: stage10_operator_declarations
+1/8 Test   #1: stage10_operator_declarations ....***Failed    1.90 sec
+wrong aliased tuple diagnostic
+
+    Start   2: stage10_display_reload
+2/8 Test   #2: stage10_display_reload ...........   Passed    1.24 sec
+    Start   5: stage10_hooks
+3/8 Test   #5: stage10_hooks ....................   Passed   10.25 sec
+    Start   8: stage10_fields
+4/8 Test   #8: stage10_fields ...................   Passed    0.77 sec
+    Start  22: generics_source
+5/8 Test  #22: generics_source ..................   Passed   10.56 sec
+    Start 159: lsp_sprint6
+6/8 Test #159: lsp_sprint6 ......................   Passed    1.18 sec
+    Start 160: lsp_stage10_fields
+7/8 Test #160: lsp_stage10_fields ...............   Passed    0.12 sec
+    Start 161: lsp_stage10_display
+8/8 Test #161: lsp_stage10_display ..............   Passed    1.40 sec
+
+88% tests passed, 1 tests failed out of 8
+
+Total Test time (real) =  27.43 sec
+
+The following tests FAILED:
+	  1 - stage10_operator_declarations (Failed)
+Errors while running CTest

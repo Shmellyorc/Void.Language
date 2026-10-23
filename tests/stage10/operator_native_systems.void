@@ -1,0 +1,56 @@
+use "/native_bridge.void" as bridge
+use "operator_systems.void" as library
+use time
+value struct observed:
+    value: i32
+    operator +(const left: observed, const right: observed) -> observed:
+        bridge.scalar_i32(30)
+        if right.value < 0:
+            defer {
+                bridge.scalar_i32(60)
+                var cleanup = "{observed(value = -2):bad}"
+            }
+            var primary = "{observed(value = -1):bad}"
+        var total = library.quantity<i32>(value = left.value)
+        total += right.value
+        return observed(value = total.read())
+    operator ==(const left: observed, const right: observed) -> bool:
+        bridge.scalar_i32(40)
+        return left.value == right.value
+func (self observed) format(spec: string) -> result<string, string>:
+    bridge.scalar_i32(50)
+    if self.value < 0:
+        return Err("cross-{self.value}")
+    return format(self.value, spec)
+struct tracked:
+    value: observed
+property (self tracked) amount: observed:
+    get:
+        bridge.scalar_i32(11)
+        return self.value
+    set(value):
+        bridge.scalar_i32(12)
+        self.value = value
+struct container:
+    value: tracked
+property (self container) target: tracked:
+    get:
+        bridge.scalar_i32(10)
+        return self.value
+func rhs(input: i32) -> observed:
+    bridge.scalar_i32(20)
+    var text = "collect {input:000}"
+    return observed(value = input)
+func entry(input: i32) -> i32:
+    var owner = tracked(value = observed(value = 4))
+    defer {
+        bridge.scalar_i32(90)
+    }
+    var holder = container(value = owner)
+    holder.target.amount += rhs(input)
+    if owner.value != observed(value = input + 4):
+        return 101
+    if make_date(2024, 2, 29) is Ok(var day):
+        if "{owner.value:000}/{day:yyyy-MM-dd}" == "{input + 4:000}/2024-02-29":
+            return input
+    return 102

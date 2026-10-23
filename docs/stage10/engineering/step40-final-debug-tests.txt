@@ -1,0 +1,55 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start 177: stage10_console_aot
+      Start 178: stage10_operators_aot
+ 1/25 Test #178: stage10_operators_aot ..............   Passed  320.18 sec
+      Start  94: stage10_console_source
+ 2/25 Test  #94: stage10_console_source .............   Passed  202.76 sec
+      Start  95: stage10_operator_integration
+ 3/25 Test  #95: stage10_operator_integration .......   Passed   60.09 sec
+      Start   1: stage10_operator_reload
+ 4/25 Test   #1: stage10_operator_reload ............   Passed   48.35 sec
+      Start  93: stage10_operator_compounds
+ 5/25 Test  #93: stage10_operator_compounds .........   Passed    8.61 sec
+      Start  15: format_zones
+ 6/25 Test  #15: format_zones .......................   Passed    5.67 sec
+      Start 182: lsp_stage10_display
+ 7/25 Test #182: lsp_stage10_display ................   Passed   12.82 sec
+      Start   7: stage10_display_reload
+ 8/25 Test   #7: stage10_display_reload .............   Passed   11.02 sec
+      Start   8: stage10_temporal_ir
+ 9/25 Test   #8: stage10_temporal_ir ................   Passed    2.94 sec
+      Start   5: stage10_source_formatting
+10/25 Test   #5: stage10_source_formatting ..........   Passed    1.15 sec
+      Start  10: stage10_hooks
+11/25 Test  #10: stage10_hooks ......................   Passed    5.34 sec
+      Start 184: lsp_stage10_source_formatting
+12/25 Test #184: lsp_stage10_source_formatting ......   Passed    0.99 sec
+      Start  11: stage10_interpolation
+13/25 Test  #11: stage10_interpolation ..............   Passed    1.30 sec
+      Start  14: format_numeric
+14/25 Test  #14: format_numeric .....................   Passed    0.86 sec
+      Start   2: stage10_operator_keys
+15/25 Test   #2: stage10_operator_keys ..............   Passed    0.62 sec
+      Start   6: stage10_tooling
+16/25 Test   #6: stage10_tooling ....................   Passed    0.58 sec
+      Start 183: lsp_stage10_intelligence
+17/25 Test #183: lsp_stage10_intelligence ...........   Passed    0.56 sec
+      Start   9: format_temporal
+18/25 Test   #9: format_temporal ....................   Passed    0.20 sec
+      Start  28: runtime_console_native_keyboard
+19/25 Test  #28: runtime_console_native_keyboard ....   Passed    0.15 sec
+      Start  25: runtime_console_native_transfers
+20/25 Test  #25: runtime_console_native_transfers ...   Passed    0.42 sec
+      Start  13: stage10_fields
+21/25 Test  #13: stage10_fields .....................   Passed    0.43 sec
+      Start  24: runtime_console_transfers
+22/25 Test  #24: runtime_console_transfers ..........   Passed    0.02 sec
+      Start  22: runtime_console
+23/25 Test  #22: runtime_console ....................   Passed    0.02 sec
+      Start  26: runtime_console_keyboard
+24/25 Test  #26: runtime_console_keyboard ...........   Passed    0.01 sec
+25/25 Test #177: stage10_console_aot ................   Passed  1161.91 sec
+
+100% tests passed, 0 tests failed out of 25
+
+Total Test time (real) = 1161.92 sec

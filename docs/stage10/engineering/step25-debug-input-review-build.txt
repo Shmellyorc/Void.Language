@@ -1,0 +1,25 @@
+[  0%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 33%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:580:57: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  580 |                 if(pos<data.size)return {data.bytes[pos]};
+      |                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:584:41: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  584 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:585:44: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  585 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:599:137: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  599 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:667:30: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  667 |         return {width,data[0]};
+      |                              ^
+5 warnings generated.
+[ 33%] Linking CXX static library libvoid_runtime.a
+[ 66%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_input.dir/tests/runtime/console_input.cpp.o
+[100%] Linking CXX executable void_runtime_console_input
+[100%] Built target void_runtime_console_input

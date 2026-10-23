@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  90: stage10_console_source
+1/2 Test  #90: stage10_console_source ...........***Failed    3.77 sec
+checked print failure/provenance lost
+
+    Start 173: stage10_console_aot
+2/2 Test #173: stage10_console_aot ..............   Passed   31.82 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  35.59 sec
+
+The following tests FAILED:
+	 90 - stage10_console_source (Failed)
+Errors while running CTest

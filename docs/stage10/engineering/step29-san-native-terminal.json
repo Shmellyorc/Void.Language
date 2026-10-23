@@ -1,0 +1,114 @@
+{
+  "checks": 77,
+  "records": [
+    {
+      "case": "custom",
+      "report": [
+        "1 2002 2 ",
+        "0 80 24",
+        "0 0 0 0 0 0 0 ",
+        "1"
+      ],
+      "terminal_hex": "43302c303b483b46393b47343b523b4b3b43302c303b1b5d323b564f494420c3a9f09f8eae07423b",
+      "elapsed_seconds": 0.06101768498774618
+    },
+    {
+      "case": "presentation",
+      "report": [
+        "1 2034 2 ",
+        "0 80 24",
+        "0 0 0 0 0 0 0 ",
+        "1"
+      ],
+      "terminal_hex": "1b5b313b31481b5b3f32356c1b5b39316d1b5b34346d1b5b33393b34396d1b5b481b5b324a1b5b313b31481b5d323b564f494420c3a9f09f8eae0707",
+      "elapsed_seconds": 0.062219467014074326
+    },
+    {
+      "case": "dumb",
+      "report": [
+        "1 18 2 ",
+        "0 80 24",
+        "3 3 3 3 3 3 3 ",
+        "1"
+      ],
+      "terminal_hex": "",
+      "elapsed_seconds": 0.05138278205413371
+    },
+    {
+      "case": "unknown",
+      "report": [
+        "1 18 2 ",
+        "0 80 24",
+        "3 3 3 3 3 3 3 ",
+        "1"
+      ],
+      "terminal_hex": "",
+      "elapsed_seconds": 0.051196883083321154
+    },
+    {
+      "case": "query",
+      "report": [
+        "1 2034 2 ",
+        "0 80 24",
+        "0 33 11",
+        "75736572c3a97461696c"
+      ],
+      "terminal_hex": "1b5b366e",
+      "elapsed_seconds": 0.05959246295969933
+    },
+    {
+      "case": "timeout",
+      "report": [
+        "1 2034 2 ",
+        "0 80 24",
+        "5 0 0",
+        "7072651b5b333b"
+      ],
+      "terminal_hex": "1b5b366e",
+      "elapsed_seconds": 0.2639254510868341
+    },
+    {
+      "case": "redirected-input",
+      "report": [
+        "1 2002 2 ",
+        "0 80 24",
+        "3 80 24",
+        "7265646972656374656400ff"
+      ],
+      "terminal_hex": "",
+      "elapsed_seconds": 0.05121550301555544
+    },
+    {
+      "case": "cooked",
+      "report": [
+        "1 2002 2 ",
+        "0 80 24",
+        "3 80 24",
+        ""
+      ],
+      "terminal_hex": "",
+      "elapsed_seconds": 0.05130961292888969
+    },
+    {
+      "case": "both-output",
+      "report": [
+        "1 2034 2034 ",
+        "0 80 24",
+        "0 0 0 0 0 0 0 ",
+        "1"
+      ],
+      "terminal_hex": "1b5b313b31481b5b3f32356c1b5b39316d1b5b34346d1b5b33393b34396d1b5b481b5b324a1b5b313b31481b5d323b564f494420c3a9f09f8eae0707",
+      "elapsed_seconds": 0.0648567620664835
+    },
+    {
+      "case": "redirected",
+      "report": [
+        "1 2 2 ",
+        "3 0 0",
+        "3 3 3 3 3 3 3 ",
+        "1"
+      ],
+      "terminal_hex": ""
+    }
+  ]
+}

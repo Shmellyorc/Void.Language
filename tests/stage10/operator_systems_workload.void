@@ -1,0 +1,35 @@
+use "operator_systems.void" as library
+use time
+func repeated(count: i32) -> result<i32, string>:
+    var item = library.quantity<i32>(value = 42)
+    var day = make_date(2024, 2, 29)?
+    var total = 0
+    var last = ""
+    for index in 0..<count:
+        var text = "{item}|{item:0000}|{day:yyyy-MM-dd}|{index:00000}"
+        if text.length != 27:
+            return Err("record length")
+        total += text.length as i32
+        last = text
+    if count > 0 and last != "q:042|0042|2024-02-29|{count - 1:00000}":
+        return Err("last record")
+    return Ok(total)
+func padded(precision: i32) -> result<i32, string>:
+    var spec = "F{precision}"
+    var text = format(42 as u64, spec)?
+    var data = text.to_utf8()
+    if data.count != (precision + 3) as i64 or data[0] != (52 as u8) or data[1] != (50 as u8) or data[2] != (46 as u8):
+        return Err("padding header/extent")
+    for index in 3..<data.count:
+        if data[index] != (48 as u8):
+            return Err("padding byte")
+    return Ok(text.length as i32)
+func entry(input: i32) -> i32:
+    var output: result<i32, string> = Ok(0)
+    if input < 0:
+        output = padded(-input)
+    else:
+        output = repeated(input)
+    if output is Ok(var value):
+        return value
+    return -1

@@ -1,0 +1,13 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 50%] Built target void_runtime
+[ 50%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 50%] Linking CXX static library libvoid_core.a
+[ 50%] Built target void_core
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_tooling.dir/tests/stage10/tooling.cpp.o
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling

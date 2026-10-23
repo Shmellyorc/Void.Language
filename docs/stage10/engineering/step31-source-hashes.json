@@ -1,0 +1,11 @@
+{
+  "docs/WORK_LOG.md": "c815ea712b7629f87b77fafe3de13ecadf7420d0401c9145cb8c34aa83196549",
+  "docs/stage10/CONSOLE_IO.md": "19dbc014657b3235995aae606e7284646397b8af4b07866f9f3db522597c0259",
+  "docs/stage10/EVIDENCE.md": "7d2a081d5ec6b566d33b5f1c0ddea5d39bbbc3bfec5f3c00586cc65d412f56b7",
+  "docs/stage10/IMPLEMENTATION.md": "a1132da493df1ecbff755d867a9d56ffc5e65cfd2fe53e1db38e5cfe9444a547",
+  "docs/stage10/TEST_PLAN.md": "c99ce117b00f8f1a47b7b5b7994fdb81996a21f43210dd7b492dd51fb687323e",
+  "tests/runtime/console.cpp": "ccc0efdce71d07b31f86ade75d7150825f2281a267e5a76ebbd41c901731c53e",
+  "tests/runtime/console_keyboard.cpp": "9a9a0651174fc44bfc937998431ccc90037842add28c986443d332e2b0038758",
+  "tests/runtime/console_keyboard.py": "4b90ffcf6448d28a084cef12d5b582892321723ce11651d79c848f29634783a3",
+  "tests/stage10/console.cpp": "865a4e0d742d320a508e39cf4f8685824d702ef7de82fc8e2ebebe63ced1d75a"
+}

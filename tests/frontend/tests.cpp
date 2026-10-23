@@ -92,7 +92,7 @@ void diagnostics() {
     rejects("func f():\n    if true:\n        var local = 1\n    var value = local\n", "Unknown identifier");
     rejects("func f():\n    var x = 0\n    var y = x++\n", "end of statement");
     rejects("func f():\n    var x = 0\n    ++x\n", "Expected an expression");
-    rejects("func f():\n    var flag = true\n    flag += false\n", "expected i32");
+    rejects("func f():\n    var flag = true\n    flag += false\n", "Unsupported compound assignment operand types.", "3:10");
     rejects("func f():\n    return\n        return\n", "Expected an expression");
     rejects("func f():\n    var x = not 1\n", "expected bool");
     rejects("func f():\n    var x = 1 < 2 < 3\n", "expected i32");

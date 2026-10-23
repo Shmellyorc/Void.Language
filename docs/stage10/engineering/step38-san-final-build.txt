@@ -1,0 +1,19 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  0%] Linking CXX static library libvoid_core.a
+[  0%] Built target void_core
+[  0%] Built target void_lsp
+[  0%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+ld.lld: error: undefined symbol: vd::ToolingIndex::definitions_at(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const&, unsigned long) const
+>>> referenced by main.cpp:280 (/home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:280)
+>>>               CMakeFiles/voidls.dir/src/lsp/main.cpp.o:((anonymous namespace)::Server::query(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const&, llvm::json::Object const&) const)
+>>> referenced by main.cpp:405 (/home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:405)
+>>>               CMakeFiles/voidls.dir/src/lsp/main.cpp.o:((anonymous namespace)::Server::editor_query(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const&, llvm::json::Object const&))
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[3]: *** [CMakeFiles/voidls.dir/build.make:108: voidls] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:1912: CMakeFiles/voidls.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:1919: CMakeFiles/voidls.dir/rule] Error 2
+gmake: *** [Makefile:349: voidls] Error 2

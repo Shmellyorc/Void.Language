@@ -1,0 +1,8 @@
+{
+  "root": "/tmp/void-step30-stdlib-3j1vums5/stdlib",
+  "sha256": {
+    "README.md": "ee1fa3e2e2b439690b747cb59256a9808f5bc945dfbc23f0ea40958c73b64110",
+    "console.void": "160f58a8b8f1608ef0a32f1b882338bda970d93d802356a705af9e00d9b98918",
+    "time.void": "4ac46f52a11f7a35eba4fe0b4c61b018b49ce1259490829ef50ecd9c8ab40344"
+  }
+}

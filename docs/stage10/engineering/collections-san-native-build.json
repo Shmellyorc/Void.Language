@@ -1,0 +1,22 @@
+{
+  "configuration": "san",
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+    "build",
+    "/home/shmellyorc/Documents/Void.Language/tests/stage10/console_collections.void",
+    "-o",
+    "/tmp/VOID-collection-native-moa8uzhc/program"
+  ],
+  "build_status": 0,
+  "build_seconds": 9.450990634970367,
+  "build_stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f564f49442d636f6c6c656374696f6e2d6e61746976652d6d6f6138757a68632f70726f6772616d0a",
+  "build_stderr_hex": "",
+  "run_status": 0,
+  "run_seconds": 0.43220375408418477,
+  "stdout_hex": "5b312c20322c20335d205b392c20322c20335d0a5b5bc3a900f09f8eae2c2072617720746578745d2c205bc3a900f09f8eae2c2072617720746578745d5d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a7b7a3a205b713a3030375d2c20613a205b713a3030325d7d0a736e617073686f74207b4b3a20713a3030377d20713a3039390a5b6e756c6c5d0a5b3c6379636c653e5d0a202020205b312c20325d0a2020205bc3a92c20f09f8eae5d2020200a696e76616c6964207061747465726e0a5b323032362d31302d32335d0a6c6172676520313035303632340a",
+  "stderr_hex": "",
+  "binary_sha256": "0d620e93763b005e446f9e7ca0021cee0412612218c850c91adac577a88bf43c",
+  "source_sha256": "33e3667de19a9013e13e8ab14e9bdb5dbec1aac49ae37bd743b460c683f4bfc4",
+  "runtime_sha256": "e999d294b7886710f68912b68e4c9c47f464d0acef1a6048523888d6daf07aaf",
+  "path": "production voidc build; independent native executable"
+}

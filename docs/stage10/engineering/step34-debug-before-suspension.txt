@@ -1,0 +1,23 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start   1: stage10_operator_resolution
+1/9 Test   #1: stage10_operator_resolution ......   Passed    2.25 sec
+    Start   2: stage10_operator_declarations
+2/9 Test   #2: stage10_operator_declarations ....   Passed    1.25 sec
+    Start   6: stage10_hooks
+3/9 Test   #6: stage10_hooks ....................   Passed    5.54 sec
+    Start  78: stage10_operator_integration
+4/9 Test  #78: stage10_operator_integration .....   Passed    3.83 sec
+    Start  99: async_ir
+5/9 Test  #99: async_ir .........................   Passed    0.05 sec
+    Start 100: async_parallel
+6/9 Test #100: async_parallel ...................   Passed    3.53 sec
+    Start 101: async_lifecycle
+7/9 Test #101: async_lifecycle ..................   Passed    6.49 sec
+    Start 155: ergonomics_sprint6_host
+8/9 Test #155: ergonomics_sprint6_host ..........   Passed    1.44 sec
+    Start 160: stage10_operators_aot
+9/9 Test #160: stage10_operators_aot ............   Passed   14.43 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =  38.82 sec

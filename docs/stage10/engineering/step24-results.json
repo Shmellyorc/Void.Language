@@ -1,0 +1,645 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 24,
+  "increment_status": "Native Step 24 implemented under Boss-approved revised contract; focused Linux Debug/strict acceptance passed; independent Wrench review and native platform acceptance pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "approved_contract": {
+    "authority": "Boss explicitly approved Golden Wrench revision in this chat on 22 October 2026",
+    "queued_and_readiness": "Prompt cancellation of queued operations and interruptible readiness waits.",
+    "entered_syscalls": "Best-effort cancellation only; retain bytes, adapters, leases and Runtime/participant lifetime until actual completion. External host/device activity can keep shutdown blocked.",
+    "deadline": "One monotonic deadline covers buffer preparation, admission, readiness/retry and partial transfers. It does not forcibly bound an already-entered uncancellable syscall. Successful final completion remains successful; further required work stops with the precise known prefix.",
+    "prohibitions": "No mandatory io_uring, borrowed descriptor duplication/closure/replacement, process-wide descriptor flag changes, unrelated-host cancellation, detached native requests, duplicate I/O registry/framework or process-global signal handler."
+  },
+  "implemented": [
+    "Extended existing Adapter/Context/Operation with native-owned Bytes, ReadResult/Transfer and portable/native/secondary cleanup errors. No source API or new C/IR Runtime operation.",
+    "Native real byte reads and complete record writes with positive short progress, EOF, zero-count/no-progress handling, EINTR/EAGAIN retry, precise completed counts and retained consumed partial input.",
+    "Deadline-aware existing gate admission; -1 wait, zero poll, positive one monotonic deadline across all progress/retries, saturating large timeout without overflow. Existing thread/token/NativeSafe/closing safeguards retained.",
+    "POSIX real read/write and interruptible poll with operation-scoped owned nonblocking close-on-exec wake pipes. Original endpoint availability snapshots govern every transfer, including initially absent std fds reused by another operation. Host descriptors/flags and PTY/stdio state untouched.",
+    "Per-thread scoped SIGPIPE mask/pending preservation and own-EPIPE signal consumption, exact original error and secondary cleanup preservation. Linux verified; Darwin pending/sigwait branch unverified.",
+    "Windows redirected-byte path uses actual handle-mode queries, owned synchronous worker or request-specific OVERLAPPED/event, exact-target best-effort cancellation and complete draining. Completion counts use the real OS result; original metadata output storage also retained if pending. No ANSI/ACP/CRT assumptions. Native build/execution unverified.",
+    "Full-write stdout/stderr serialization and shared native input gate retained across Runtime sessions, precise roots/GC progress during actual blocked IO, queued stop and entered-call lifetime without abandoned buffers."
+  ],
+  "bounded_files": [
+    "CMakeLists.txt",
+    "include/void/console.hpp",
+    "src/runtime/console.cpp",
+    "tests/runtime/console.cpp",
+    "tests/runtime/console_transfers.cpp",
+    "tests/runtime/console_transfers.py",
+    "docs/DECISIONS.md",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/engineering/step24-feasibility.md",
+    "docs/stage10/engineering/step24-posix-feasibility.cpp"
+  ],
+  "debug": {
+    "passed": 9,
+    "total": 9,
+    "seconds": 13.09,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants"
+    ],
+    "log": "step24-debug-handoff-tests.txt",
+    "build": "step24-debug-handoff-build.txt",
+    "configure": "step24-debug-configure.txt",
+    "native_detail": "step24-debug-native-handoff-detail.txt",
+    "transfer_detail": "step24-debug-transfer-handoff-detail.txt"
+  },
+  "strict_sanitizers": {
+    "passed": 9,
+    "total": 9,
+    "seconds": 6.53,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_console_transfers",
+      "runtime_console_native_transfers",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants"
+    ],
+    "log": "step24-san-handoff-tests.txt",
+    "build": "step24-san-handoff-build.txt",
+    "configure": "step24-san-configure.txt",
+    "native_detail": "step24-san-native-handoff-detail.txt",
+    "transfer_detail": "step24-san-transfer-handoff-detail.txt",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "configuration": "RelWithDebInfo, pinned LLVM/Clang 19.1.7, existing RTTI-off vptr exclusion",
+    "execution": "Outside restricted ptrace runner for actual LeakSanitizer checking. No sanitizer/leak error, assertion removal or safety bypass. Existing fatal-invariant children and native leak-negative controls remain enabled."
+  },
+  "checks": {
+    "deterministic_transfer_checks": 178,
+    "real_POSIX_driver_checks": 210,
+    "real_native_case_processes": 23,
+    "preserved_foundation_checks": 72,
+    "preserved_endpoint_driver_checks": 14,
+    "suites_per_configuration": 9,
+    "note": "Real child reports include additional per-case counters; their counts can vary with actual short reads and are recorded below. No universal total for variable child transfer counts is inferred."
+  },
+  "native_cases": {
+    "debug": [
+      {
+        "case": "pipe",
+        "child_checks_before_report": 261,
+        "cleanup_code": 0,
+        "completed": 1048590,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "file",
+        "child_checks_before_report": 261,
+        "cleanup_code": 0,
+        "completed": 1048590,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "file-output",
+        "child_checks_before_report": 261,
+        "cleanup_code": 0,
+        "completed": 1048590,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "empty",
+        "child_checks_before_report": 3,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "records",
+        "child_checks_before_report": 129,
+        "cleanup_code": 0,
+        "completed": 1048704,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "readers",
+        "child_checks_before_report": 203,
+        "cleanup_code": 0,
+        "completed": 200,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "short",
+        "child_checks_before_report": 10,
+        "cleanup_code": 0,
+        "completed": 10,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "pty-input",
+        "child_checks_before_report": 4,
+        "cleanup_code": 0,
+        "completed": 11,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "pty-output",
+        "child_checks_before_report": 5,
+        "cleanup_code": 0,
+        "completed": 11,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "poll",
+        "child_checks_before_report": 2,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 4,
+        "os_code": 0
+      },
+      {
+        "case": "timeout",
+        "child_checks_before_report": 2,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 5,
+        "os_code": 0
+      },
+      {
+        "case": "cancel-read",
+        "child_checks_before_report": 5,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 6,
+        "os_code": 0
+      },
+      {
+        "case": "cancel-write",
+        "child_checks_before_report": 5,
+        "cleanup_code": 0,
+        "completed": 65536,
+        "eof": false,
+        "kind": 6,
+        "os_code": 0
+      },
+      {
+        "case": "closed-input-while-output",
+        "child_checks_before_report": 6,
+        "cleanup_code": 0,
+        "completed": 65536,
+        "eof": false,
+        "kind": 6,
+        "os_code": 0
+      },
+      {
+        "case": "nonblocking",
+        "child_checks_before_report": 2,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 4,
+        "os_code": 0
+      },
+      {
+        "case": "interrupt",
+        "child_checks_before_report": 3,
+        "cleanup_code": 0,
+        "completed": 1,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "broken-default",
+        "child_checks_before_report": 68,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "broken-handler",
+        "child_checks_before_report": 68,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "broken-ignore",
+        "child_checks_before_report": 68,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "broken-pending",
+        "child_checks_before_report": 69,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "closed-input",
+        "child_checks_before_report": 0,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 6,
+        "os_code": 9
+      },
+      {
+        "case": "closed-output",
+        "child_checks_before_report": 0,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 6,
+        "os_code": 9
+      },
+      {
+        "case": "full",
+        "child_checks_before_report": 0,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 9,
+        "os_code": 28
+      }
+    ],
+    "strict": [
+      {
+        "case": "pipe",
+        "child_checks_before_report": 261,
+        "cleanup_code": 0,
+        "completed": 1048590,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "file",
+        "child_checks_before_report": 261,
+        "cleanup_code": 0,
+        "completed": 1048590,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "file-output",
+        "child_checks_before_report": 261,
+        "cleanup_code": 0,
+        "completed": 1048590,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "empty",
+        "child_checks_before_report": 3,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "records",
+        "child_checks_before_report": 129,
+        "cleanup_code": 0,
+        "completed": 1048704,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "readers",
+        "child_checks_before_report": 203,
+        "cleanup_code": 0,
+        "completed": 200,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "short",
+        "child_checks_before_report": 10,
+        "cleanup_code": 0,
+        "completed": 10,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "pty-input",
+        "child_checks_before_report": 4,
+        "cleanup_code": 0,
+        "completed": 11,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "pty-output",
+        "child_checks_before_report": 5,
+        "cleanup_code": 0,
+        "completed": 11,
+        "eof": true,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "poll",
+        "child_checks_before_report": 2,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 4,
+        "os_code": 0
+      },
+      {
+        "case": "timeout",
+        "child_checks_before_report": 2,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 5,
+        "os_code": 0
+      },
+      {
+        "case": "cancel-read",
+        "child_checks_before_report": 5,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 6,
+        "os_code": 0
+      },
+      {
+        "case": "cancel-write",
+        "child_checks_before_report": 5,
+        "cleanup_code": 0,
+        "completed": 65536,
+        "eof": false,
+        "kind": 6,
+        "os_code": 0
+      },
+      {
+        "case": "closed-input-while-output",
+        "child_checks_before_report": 6,
+        "cleanup_code": 0,
+        "completed": 65536,
+        "eof": false,
+        "kind": 6,
+        "os_code": 0
+      },
+      {
+        "case": "nonblocking",
+        "child_checks_before_report": 2,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 4,
+        "os_code": 0
+      },
+      {
+        "case": "interrupt",
+        "child_checks_before_report": 3,
+        "cleanup_code": 0,
+        "completed": 1,
+        "eof": false,
+        "kind": 0,
+        "os_code": 0
+      },
+      {
+        "case": "broken-default",
+        "child_checks_before_report": 68,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "broken-handler",
+        "child_checks_before_report": 68,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "broken-ignore",
+        "child_checks_before_report": 68,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "broken-pending",
+        "child_checks_before_report": 69,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 7,
+        "os_code": 32
+      },
+      {
+        "case": "closed-input",
+        "child_checks_before_report": 0,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 6,
+        "os_code": 9
+      },
+      {
+        "case": "closed-output",
+        "child_checks_before_report": 0,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 6,
+        "os_code": 9
+      },
+      {
+        "case": "full",
+        "child_checks_before_report": 0,
+        "cleanup_code": 0,
+        "completed": 0,
+        "eof": false,
+        "kind": 9,
+        "os_code": 28
+      }
+    ]
+  },
+  "real_native_coverage": [
+    "Exact NUL/invalid UTF-8 raw binary bytes, no decoding/BOM/line conversion in this increment",
+    "1,048,590-byte pipes and redirected input/output files, empty EOF, short reads while writer remains open",
+    "Raw host-configured PTY input/output and unchanged modes/descriptor flags",
+    "128 shared stdout/stderr redirected-file records of 8193 bytes, no interleaving across short writes; 200 reads across two native Runtime sessions",
+    "Actual polling/deadline waits, inherited O_NONBLOCK, real EINTR from host test handler",
+    "Actual blocked read/full-pipe write cancellation and precise GC root collection while NativeSafe",
+    "Closed stdin/stdout, initial absence with concurrent output wake-fd reuse, ENOSPC",
+    "Default/custom/ignored/preexisting-pending SIGPIPE, unchanged mask/disposition and exact EPIPE"
+  ],
+  "deterministic_coverage": [
+    "Short read/write progress and complete-output loops",
+    "Partial read error with retained bytes, partial output/native errors, zero progress",
+    "One injected monotonic deadline across interrupted/would-block retries; poll, large timeout saturation",
+    "Queued deadline/close, independent sessions, successful completion/stop races",
+    "Full-record gates, concurrent input, NativeSafe/token/provider-result validation",
+    "Native allocation failure exception cleanup without fake IO error",
+    "Entered-transfer storage/lease retained until actual completion after close",
+    "Primary and secondary cleanup failure preservation"
+  ],
+  "development_failures_and_repairs": [
+    {
+      "failure": "First native endpoint test hung with closed stdin: creating the wake pipe reused fd 0 and native code could read/poll the wake fd as input.",
+      "log": "step24-debug-development-tests.txt",
+      "repair": "Validate the original endpoint availability before any wake allocation; strengthened below to retain the immutable snapshot for every transfer."
+    },
+    {
+      "failure": "A deterministic concurrent output wait used wake fd 0 while stdin was originally absent; fresh fstat-based checking mistook that wake fd for available input.",
+      "log": "step24-descriptor-race-before-confirmed.txt",
+      "repair": "POSIX SystemAdapter captures original roles/kinds/errors once and uses that immutable availability for all transfers. Sequential and concurrent regressions remain enabled."
+    },
+    {
+      "fixture_observation": "The first expanded race probe passed unexpectedly because /proc inspection could occupy fd 0 before wake allocation. A non-opening fcntl barrier establishes descriptor reuse before /proc observation.",
+      "log": "step24-descriptor-race-before.txt",
+      "outcome": "Strengthened counterexample then reproduced the production defect. No production check disabled."
+    },
+    {
+      "review": "Retry loops retain secondary cleanup errors instead of discarding them; deterministic regression passes. Windows metadata/overlapped completion and request-storage lifetime reviewed; native Windows verification still required.",
+      "claim_limit": "No previously captured native Windows failure or its repair is claimed."
+    }
+  ],
+  "resolved_blocker": {
+    "method": "Boss-approved cancellation contract revision, not a claim that readiness cancels entered syscalls. No repeated io_uring/AIO feasibility investigation or dependency adoption.",
+    "historical_results": "step24-before-resume-results.json",
+    "historical_cumulative_manifest": "step24-blocker-checkpoint-source-hashes.json",
+    "historical_bounded_manifest": "step24-blocker-bounded-source-hashes.json",
+    "historical_preservation": "step24-blocker-preservation.json",
+    "probe_maintenance": "Historical Metadata probe gained only no-I/O pure-interface overrides so it remains buildable after Adapter extension; historical native cases were not re-investigated."
+  },
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unresolved_focused_Linux_defects": [],
+  "documented_limits": [
+    "Entered uncancellable syscall may outlive timeout/stop and block shutdown until external progress; this is the approved contract, not a hidden implementation omission.",
+    "Independent host output writers can interleave and invalidate readiness; no rollback/reserved pipe capacity promise.",
+    "No mixing of independent input readers beyond the existing single-input-owner contract.",
+    "Zero-byte requests succeed without IO/gate/EOF probing, including after close; invalid controls still reject.",
+    "Native C++ adapters/spans remain a trusted embedding boundary, must not contain GC-managed borrows; host Runtime/participant lifetime rules remain.",
+    "Windows confirmed consoles require Step 26 wide path, not this raw byte adapter. Explicit-offset overlapped disk handles cannot provide ordered shared-stream position and report unsupported; no host offset is invented.",
+    "Standard-signal coalescing remains an OS limit for unrelated concurrently injected SIGPIPE; preexisting pending signals/masks/dispositions are preserved."
+  ],
+  "unverified": [
+    "Native Windows compilation/runtime, synchronous/overlapped redirect/cancellation/byte-progress and driver behavior",
+    "Native macOS compilation/runtime, poll and pending/sigwait SIGPIPE behavior",
+    "Separate Release build, fresh source/JIT/O2/AOT or editor acceptance for this native-only increment",
+    "Source console APIs and consolidated/four-system final Stage 10 acceptance"
+  ],
+  "remaining_stage_obligations": [
+    "Step 25 single shared input byte queue, UTF-8 decoding and line/CRLF ownership",
+    "Steps 26\u201331 Windows wide console, heterogeneous source print, flush/prompts, terminal controls/modes and full source/shutdown integration",
+    "Composite display",
+    "Revisit complete four-system Step 40; final Steps 41\u201344 acceptance/documentation/Wrench review"
+  ],
+  "dependencies": "No new third-party dependency or mandatory io_uring. Existing C++20 Threads/OS adapters, LLVM 19.1.7, Ryu/date/IANA versions and licenses unchanged. Windows FileModeInformation is dynamically queried through existing OS ntdll; no new install/native-link framework.",
+  "ABI_build_scope": "Native C++ Adapter vtable gains transfer methods; injected host adapters must rebuild/implement them. Existing Runtime archive/CMake native install path is reused. No source/IR/C Runtime operation signature, GC/LLVM backend or source stdlib identity changed.",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.44"
+    ],
+    "LLVM_Clang": "19.1.7"
+  },
+  "next_step": 25,
+  "next_source_change": "Add one native byte queue/UTF-8 decoder and pending logical CRLF continuation to existing Streams::State in src/runtime/console.cpp. Reuse one input lease, Step 24 progress/errors and one Request deadline across bytes/characters/text/lines. Preserve immediate standalone CR and raw-byte ownership. Step 25 has not started.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README edits. Wrench independent review pending; Stage 10 remains INCOMPLETE.",
+  "source_manifests": {
+    "bounded": "step24-source-hashes.json",
+    "bounded_files": 14,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 170,
+    "previous_checkpoint": "step24-blocker-checkpoint-source-hashes.json",
+    "preservation": "step24-preservation.json",
+    "unchanged_prior_entries_verified": 156
+  },
+  "primary_references": [
+    "https://man7.org/linux/man-pages/man2/poll.2.html",
+    "https://man7.org/linux/man-pages/man2/read.2.html",
+    "https://man7.org/linux/man-pages/man2/write.2.html",
+    "https://man7.org/linux/man-pages/man3/pthread_sigmask.3.html",
+    "https://man7.org/linux/man-pages/man2/sigwaitinfo.2.html",
+    "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile",
+    "https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-getoverlappedresult",
+    "https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-cancelsynchronousio",
+    "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryinformationfile"
+  ],
+  "commands": [
+    "cmake -S . -B build/ci-official-debug",
+    "cmake -S . -B build/ci-official-san",
+    "cmake --build build/ci-official-debug -j 2 --target void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "cmake --build build/ci-official-san -j 2 --target void_runtime_console_transfers void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_console_transfers|runtime_console_native_transfers|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "build/ci-official-debug/void_runtime_console_transfers",
+    "python3 tests/runtime/console_transfers.py build/ci-official-debug/void_runtime_console_transfers",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 build/ci-official-san/void_runtime_console_transfers",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 python3 tests/runtime/console_transfers.py build/ci-official-san/void_runtime_console_transfers",
+    "python3 -m py_compile tests/runtime/console_transfers.py",
+    "git diff --check",
+    "git diff --quiet -- README.md"
+  ],
+  "build_artifact_hashes": {
+    "build/ci-official-debug/libvoid_runtime.a": "eee8572e6a31e6d2a9808a6bbd6dd538020ff3e238a2214acc139657d4641fb6",
+    "build/ci-official-debug/void_runtime_console_transfers": "61de117ee53e56612503febe49cf8c60cd355803da2aeed512a20e431ceb88ff",
+    "build/ci-official-san/libvoid_runtime.a": "7a6726f1961ec42de3afc90f256df67b3d9c3c7d8e3ea26d3537bcdabbdacdc2",
+    "build/ci-official-san/void_runtime_console_transfers": "472680e50a7a0ea1f3f52bed3f41d623d844659e7c6d615092421c6bfc26730a"
+  }
+}

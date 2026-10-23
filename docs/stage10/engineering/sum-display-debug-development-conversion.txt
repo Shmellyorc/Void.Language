@@ -1,0 +1,1 @@
+40 sum display checks passed

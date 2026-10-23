@@ -1,0 +1,29 @@
+use "operator_compounds.void" as library
+struct holder:
+    item: library.number
+func entry(input: i32) -> i32:
+    var original = holder(item = library.number(value = 10))
+    var current = original
+    var rhs = func() -> i32:
+        current = holder(item = library.number(value = 90))
+        return 2
+    current.item += rhs()
+    if original.item.value != 12 or current.item.value != 90:
+        return 90
+    var old = [library.number(value = 10)]
+    var items = old
+    var index = func() -> i32:
+        items = [library.number(value = 90)]
+        return 0
+    items[index()] += 2
+    if old[0].value != 12 or items[0].value != 90:
+        return 91
+    var old_entries = {"x": library.number(value = 10)}
+    var entries = old_entries
+    var key = func() -> string:
+        entries = {"x": library.number(value = 90)}
+        return "x"
+    entries[key()] += 2
+    if old_entries["x"].value != 12 or entries["x"].value != 90:
+        return 92
+    return input

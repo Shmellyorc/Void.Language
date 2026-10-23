@@ -1,0 +1,39 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/17 Test   #1: stage10_operator_reload ..........   Passed   54.72 sec
+      Start   2: stage10_operator_keys
+ 2/17 Test   #2: stage10_operator_keys ............   Passed    0.82 sec
+      Start   3: stage10_operator_resolution
+ 3/17 Test   #3: stage10_operator_resolution ......   Passed    2.39 sec
+      Start   5: stage10_source_formatting
+ 4/17 Test   #5: stage10_source_formatting ........   Passed    1.43 sec
+      Start   6: stage10_tooling
+ 5/17 Test   #6: stage10_tooling ..................   Passed    0.09 sec
+      Start   7: stage10_display_reload
+ 6/17 Test   #7: stage10_display_reload ...........   Passed    0.90 sec
+      Start   8: stage10_temporal_ir
+ 7/17 Test   #8: stage10_temporal_ir ..............   Passed    3.52 sec
+      Start   9: format_temporal
+ 8/17 Test   #9: format_temporal ..................   Passed    0.20 sec
+      Start  10: stage10_hooks
+ 9/17 Test  #10: stage10_hooks ....................   Passed    5.68 sec
+      Start  11: stage10_interpolation
+10/17 Test  #11: stage10_interpolation ............   Passed    1.48 sec
+      Start  13: stage10_fields
+11/17 Test  #13: stage10_fields ...................   Passed    0.61 sec
+      Start  14: format_numeric
+12/17 Test  #14: format_numeric ...................   Passed    0.87 sec
+      Start  15: format_zones
+13/17 Test  #15: format_zones .....................   Passed    5.87 sec
+      Start  82: stage10_operator_compounds
+14/17 Test  #82: stage10_operator_compounds .......   Passed    9.80 sec
+      Start 165: stage10_operators_aot
+15/17 Test #165: stage10_operators_aot ............   Passed  339.18 sec
+      Start 170: lsp_stage10_intelligence
+16/17 Test #170: lsp_stage10_intelligence .........   Passed    0.54 sec
+      Start 171: lsp_stage10_source_formatting
+17/17 Test #171: lsp_stage10_source_formatting ....   Passed    1.00 sec
+
+100% tests passed, 0 tests failed out of 17
+
+Total Test time (real) = 429.13 sec

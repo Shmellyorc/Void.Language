@@ -1,0 +1,25 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x0000561ed83974c4 in llvm::SUnit::addPred(llvm::SDep const&, bool) ()
+
+Thread 1 (Thread 0x7fcd74066f80 (LWP 3965211) "voidc"):
+#0  0x0000561ed83974c4 in llvm::SUnit::addPred(llvm::SDep const&, bool) ()
+#1  0x0000561ed839ae33 in llvm::ScheduleDAGInstrs::addChainDependencies(llvm::SUnit*, llvm::ScheduleDAGInstrs::Value2SUsMap&, llvm::PointerUnion<llvm::Value const*, llvm::PseudoSourceValue const*>) ()
+#2  0x0000561ed839e5d8 in llvm::ScheduleDAGInstrs::buildSchedGraph(llvm::AAResults*, llvm::RegPressureTracker*, llvm::PressureDiffs*, llvm::LiveIntervals*, bool) ()
+#3  0x0000561ed84fb4d9 in (anonymous namespace)::SchedulePostRATDList::schedule() ()
+#4  0x0000561ed84fb1e9 in (anonymous namespace)::PostRAScheduler::runOnMachineFunction(llvm::MachineFunction&) ()
+#5  0x0000561ed826191c in llvm::MachineFunctionPass::runOnFunction(llvm::Function&) ()
+#6  0x0000561ed8f40d69 in llvm::FPPassManager::runOnFunction(llvm::Function&) ()
+#7  0x0000561ed8f49e03 in llvm::FPPassManager::runOnModule(llvm::Module&) ()
+#8  0x0000561ed8f41a49 in llvm::legacy::PassManagerImpl::run(llvm::Module&) ()
+#9  0x0000561ed743028d in llvm::orc::SimpleCompiler::operator()(llvm::Module&) ()
+#10 0x0000561ed74309a7 in llvm::orc::IRCompileLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#11 0x0000561ed7430dc4 in llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#12 0x0000561ed7430dc4 in llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#13 0x0000561ed742bdf1 in llvm::orc::BasicIRLayerMaterializationUnit::materialize(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >) ()
+#14 0x0000561ed73fda11 in llvm::orc::MaterializationTask::run() ()
+#15 0x0000561ed73ff9ac in llvm::orc::ExecutionSession::dispatchOutstandingMUs() ()
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]
+[Inferior 1 (process 3965211) killed]

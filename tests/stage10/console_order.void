@@ -1,0 +1,35 @@
+use console
+struct counter:
+    number: i32
+value struct item:
+    amount: i32
+    observed: counter
+func (self item) string() -> string:
+    print("hook:{self.amount}/{self.observed.number}", end = ";")
+    return "item:{self.amount}/{self.observed.number}"
+struct holder:
+    stored: item
+func change(owner: holder) -> string:
+    owner.stored.observed.number = 8
+    owner.stored = item(amount = 99, observed = owner.stored.observed)
+    print("rhs", end = ";")
+    return "tail"
+func separator(observed: counter) -> string:
+    observed.number = 9
+    print("sep", end = ";")
+    return "|"
+func finish(observed: counter) -> string:
+    observed.number = 10
+    print("end", end = ";")
+    return "!"
+func choose(observed: counter) -> console.output:
+    print("file", end = ";")
+    return console.stdout
+func flushing(observed: counter) -> bool:
+    observed.number = 11
+    print("flush", end = ";")
+    return true
+func main():
+    var observed = counter(number = 0)
+    var owner = holder(stored = item(amount = 7, observed = observed))
+    print(owner.stored, change(owner), flush = flushing(observed), end = finish(observed), file = choose(observed), sep = separator(observed))

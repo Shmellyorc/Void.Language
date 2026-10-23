@@ -1,0 +1,8 @@
+source-hashes.json 206 verified
+step30-source-hashes.json 29 verified
+step30-code-freeze.json 24 verified
+Final build artifact hashes verified
+Step37 observations preserved exactly
+debug 27/27, 393.6 seconds; 3205 source; 127 key/mode; 353 driver checks;72 execution records;92 actual PTY checks/8 processes;production build verified
+san 27/27, 463.49 seconds; 3205 source; 127 key/mode; 353 driver checks;72 execution records;92 actual PTY checks/8 processes;production build verified
+HEAD and public README unchanged; diff whitespace checked

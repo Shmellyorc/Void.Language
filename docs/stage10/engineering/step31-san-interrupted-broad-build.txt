@@ -1,0 +1,110 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[  1%] Built target void_zone_objects
+[  1%] Built target void_format_objects
+[  1%] Built target void_native_fixture
+[  1%] Building CXX object CMakeFiles/void_runtime_generated_abi.dir/src/runtime/abi.cpp.o
+[  2%] Built target void_managed_test_abi
+[  2%] Building CXX object CMakeFiles/void_string_test_abi.dir/src/runtime/abi.cpp.o
+[  2%] Built target void_string_test_abi
+[  2%] Built target void_runtime_generated_abi
+[  2%] Built target native_fixture
+[  3%] Built target void_native_test_fixture
+[  4%] Built target void_core
+[  5%] Built target void_runtime
+[  5%] Building CXX object CMakeFiles/void_lsp.dir/src/lsp/positions.cpp.o
+[  5%] Building CXX object CMakeFiles/void_arrays_foundation.dir/tests/arrays/foundation.cpp.o
+[  5%] Linking CXX static library libvoid_lsp.a
+[  5%] Built target void_lsp
+[  5%] Building CXX object CMakeFiles/void_runtime_console.dir/tests/runtime/console.cpp.o
+[  5%] Linking CXX executable void_arrays_foundation
+[  5%] Built target void_arrays_foundation
+[  5%] Built target void_runtime_console_transfers
+[  5%] Building CXX object CMakeFiles/void_runtime_console_keyboard.dir/tests/runtime/console_keyboard.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:63:75: warning: unused variable 'mode' [-Wunused-variable]
+   63 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto mode=c.begin_mode({false,false,true});f->restore_fault={ErrorKind::io_failure,77};check(c.close().os_code==77 && f->mode==0,"shutdown restoration failure not reported");f->restore_fault={};check(!c.close() && f->mode==7,"shutdown restoration retry lost original mode");}
+      |                                                                           ^~~~
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:91:764: warning: unused variable 'a' [-Wunused-variable]
+   91 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:91:804: warning: unused variable 'b' [-Wunused-variable]
+   91 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+[  5%] Linking CXX executable void_runtime_console
+[  5%] Built target void_runtime_console
+[  6%] Built target void_runtime_console_terminal
+[  6%] Built target void_runtime_console_wide
+[  6%] Built target void_runtime_console_input
+[  6%] Built target void_runtime_tests
+[  6%] Built target void_runtime_failures
+[  6%] Built target void_runtime_invariants
+[  6%] Building CXX object CMakeFiles/void_lsp_tests.dir/tests/lsp/positions.cpp.o
+[  6%] Linking CXX executable void_lsp_tests
+[  6%] Built target void_lsp_tests
+[  7%] Building CXX object CMakeFiles/void_sessions_example.dir/examples/sessions.cpp.o
+[  7%] Linking CXX executable void_sessions_example
+[  7%] Built target void_sessions_example
+[  7%] Building CXX object CMakeFiles/void_tooling_example.dir/examples/tooling.cpp.o
+3 warnings generated.
+[  7%] Linking CXX executable void_runtime_console_keyboard
+[  7%] Built target void_runtime_console_keyboard
+[  7%] Built target void_llvm
+[  7%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[  7%] Linking CXX executable void_tooling_example
+[  7%] Built target void_tooling_example
+[  7%] Built target voidc_objects
+[  7%] Building CXX object CMakeFiles/void_operator_keys.dir/tests/stage10/operator_keys.cpp.o
+[  7%] Linking CXX executable void_operator_keys
+[  7%] Built target void_operator_keys
+[  7%] Linking CXX executable void_operator_resolution
+[  7%] Built target void_operator_resolution
+[  7%] Building CXX object CMakeFiles/void_operator_declarations.dir/tests/stage10/operator_declarations.cpp.o
+[  8%] Linking CXX executable voidls
+[  8%] Built target voidls
+[  8%] Building CXX object CMakeFiles/void_source_formatting.dir/tests/stage10/source_formatting.cpp.o
+[  8%] Linking CXX executable void_source_formatting
+[  8%] Built target void_source_formatting
+[  8%] Building CXX object CMakeFiles/void_stage10_tooling.dir/tests/stage10/tooling.cpp.o
+[  8%] Linking CXX executable void_stage10_tooling
+[  8%] Built target void_stage10_tooling
+[  8%] Built target void_display_reload
+[  8%] Linking CXX executable void_temporal_ir
+[  8%] Linking CXX executable void_operator_declarations
+[  8%] Built target void_temporal_ir
+[  8%] Building CXX object CMakeFiles/void_temporal.dir/tests/formatting/temporal.cpp.o
+[  8%] Built target void_operator_declarations
+[  8%] Built target void_stage10_hooks
+[  9%] Built target void_stage10_interpolation
+[  9%] Linking CXX executable void_stage10_conversion
+[  9%] Built target void_stage10_conversion
+[  9%] Linking CXX executable void_temporal
+[  9%] Built target void_stage10_fields
+[  9%] Linking CXX executable void_format_numeric
+[  9%] Built target void_temporal
+[  9%] Linking CXX executable void_format_zones
+[  9%] Built target void_format_numeric
+[  9%] Built target void_gc_buffers
+[  9%] Built target void_format_zones
+[  9%] Built target void_gc_schemas
+[  9%] Building CXX object CMakeFiles/void_runtime_generated.dir/tests/runtime/generated.cpp.o
+[  9%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[  9%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[  9%] Linking CXX executable void_fixed_arrays_tests
+[  9%] Built target void_fixed_arrays_tests
+[  9%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/growable_arrays/tests.cpp.o
+[  9%] Linking CXX executable void_runtime_generated
+[  9%] Built target void_runtime_generated
+[  9%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/arrays/source.cpp.o
+[  9%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/managed/probe.cpp.o
+[  9%] Linking CXX executable void_growable_arrays_tests
+[  9%] Built target void_growable_arrays_tests
+[  9%] Building CXX object CMakeFiles/void_generics_tests.dir/tests/generics/tests.cpp.o
+[  9%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/managed/probe.cpp.o
+[  9%] Linking CXX executable void_arrays_source
+[  9%] Built target void_arrays_source
+[  9%] Building CXX object CMakeFiles/void_generics_tests.dir/tests/managed/probe.cpp.o
+gmake[2]: *** [CMakeFiles/void_generics_tests.dir/build.make:93: CMakeFiles/void_generics_tests.dir/tests/managed/probe.cpp.o] Terminated
+gmake[2]: *** [CMakeFiles/void_generics_tests.dir/build.make:79: CMakeFiles/void_generics_tests.dir/tests/generics/tests.cpp.o] Terminated
+gmake[1]: *** [CMakeFiles/Makefile2:4106: CMakeFiles/void_generics_tests.dir/all] Terminated
+gmake: *** [Makefile:146: all] Terminated
+Subprocess terminated
+CMake Error: Generator: build tool execution failed, command was: /usr/bin/gmake -f Makefile -j2

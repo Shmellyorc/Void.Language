@@ -1,0 +1,26 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:29:13: error: Incorrect argument count: missing required argument 'value'.
+    code: VOID2004
+
+ 29 |     private current: quantity<i32>
+    |             ^^^^^^^
+    Module: /operator_systems.void
+    Required initializer parameter declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:10:30
+
+ 10 | func (self quantity<t>) init(value: t):
+    |                              ^^^^^
+    Module: /operator_systems.void
+    Default construction required for this field. at /home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:29:13
+
+ 29 |     private current: quantity<i32>
+    |             ^^^^^^^
+    Module: /operator_systems.void
+    Hint: Supply an explicit constructed value or every required argument.
+
+/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_systems.void:78:21: error: Unknown identifier 'amount'.
+    code: VOID2002
+
+ 78 |     if text != "é😀 {amount}    007 2024-02-29 q:003":
+    |                     ^^^^^^
+    Module: /operator_systems.void
+    Hint: Declare it with var before use.
+

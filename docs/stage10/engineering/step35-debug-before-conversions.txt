@@ -1,0 +1,33 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_resolution
+ 1/14 Test   #1: stage10_operator_resolution ......   Passed    2.21 sec
+      Start   2: stage10_operator_declarations
+ 2/14 Test   #2: stage10_operator_declarations ....   Passed    1.21 sec
+      Start   9: stage10_fields
+ 3/14 Test   #9: stage10_fields ...................   Passed    0.49 sec
+      Start  20: fixed_arrays_source
+ 4/14 Test  #20: fixed_arrays_source ..............   Passed    5.58 sec
+      Start  21: growable_arrays_source
+ 5/14 Test  #21: growable_arrays_source ...........   Passed   10.65 sec
+      Start  23: generics_source
+ 6/14 Test  #23: generics_source ..................   Passed    6.40 sec
+      Start  25: dictionaries_source
+ 7/14 Test  #25: dictionaries_source ..............   Passed   48.48 sec
+      Start  26: properties_source
+ 8/14 Test  #26: properties_source ................   Passed   21.99 sec
+      Start  78: stage10_operator_compounds
+ 9/14 Test  #78: stage10_operator_compounds .......   Passed    8.82 sec
+      Start  79: stage10_operator_integration
+10/14 Test  #79: stage10_operator_integration .....   Passed    4.87 sec
+      Start 100: async_ir
+11/14 Test #100: async_ir .........................   Passed    0.06 sec
+      Start 101: async_parallel
+12/14 Test #101: async_parallel ...................   Passed    3.53 sec
+      Start 102: async_lifecycle
+13/14 Test #102: async_lifecycle ..................   Passed    6.25 sec
+      Start 161: stage10_operators_aot
+14/14 Test #161: stage10_operators_aot ............   Passed   43.92 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) = 164.44 sec

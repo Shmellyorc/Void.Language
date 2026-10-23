@@ -1,0 +1,13 @@
+/home/shmellyorc/Documents/Void.Language/tests/stage10/console_sum_display.void:42:11: error: Cannot assign readonly reference leaf 'readonly [/console_sum_display.void::branch][].$nested$values[].$nested$values' to storage or a parameter promising mutable access.
+    code: VOID2007
+
+ 42 |     print([branch.nested(shared), branch.nested(shared)])
+    |           ^^^^^^
+    Module: /console_sum_display.void
+    Reference leaf 'readonly [/console_sum_display.void::branch][].$nested$values[].$nested$values' declared here. at /home/shmellyorc/Documents/Void.Language/tests/stage10/console_sum_display.void:14:12
+
+ 14 |     nested(values: [branch])
+    |            ^^^^^^
+    Module: /console_sum_display.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

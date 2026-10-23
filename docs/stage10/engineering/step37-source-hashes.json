@@ -1,0 +1,13 @@
+{
+  "CMakeLists.txt": "0bbcc5090e74da9383877e61929082f8c327667475df9e7968285b6697999c48",
+  "include/void/frontend.hpp": "b042c1b1ad393b1db730529eb696f7c02253b56f12f5c07fac123a14c3139886",
+  "include/void/format.hpp": "95ad32246bace602af0cf975606b0f37186a6dcdb5d96ac17c95cbe0309e148d",
+  "include/void/temporal.hpp": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9",
+  "src/frontend/compiler.cpp": "127bb19ff5167f41cea52856f99a0856d32dbc7f266e39b1ff7710d7027cae65",
+  "src/frontend/generic_tooling.inc": "20dd0b4ff7d77e031621ed0d3dd6c61b337e74bac5d1e5847f4e22ef62c36cf6",
+  "src/frontend/tooling.cpp": "768d030b988b8b9eab1afdc0b733b73d69eed20cf4c1880ebc6a91e3c29f46c8",
+  "src/backend/llvm/backend.cpp": "db4b4d3625cce5d33b115202cd18fb92f6b11e288bcd5e1c026bf74c45085ba6",
+  "tests/stage10/operator_reload.cpp": "0e5943d57cc9109c2e895cb195ead95da9a83492e65ff349e4dccd9f87097a8d",
+  "tests/stage10/operator_format_cache.void": "e3706dcd218605f0c8672383f5b7c541675b2acd58793f8626e171330f6909bf",
+  "tests/stage10/operators.py": "d504e2149629e7ef398d7bc51ce01a67c1bdc1a987dea046a543e1d37e1a650e"
+}

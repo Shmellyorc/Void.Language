@@ -1,0 +1,30 @@
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:579:57: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  579 |                 if(pos<data.size)return {data.bytes[pos]};
+      |                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:583:41: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  583 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:584:44: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  584 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:598:137: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  598 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:666:30: warning: missing field 'error' initializer [-Wmissing-field-initializers]
+  666 |         return {width,data[0]};
+      |                              ^
+5 warnings generated.
+[ 50%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_runtime_console_transfers
+[100%] Built target void_runtime_console_transfers
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_runtime
+[ 66%] Linking CXX executable void_runtime_console
+[100%] Built target void_runtime_console

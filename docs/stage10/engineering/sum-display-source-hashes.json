@@ -1,0 +1,18 @@
+{
+  "docs/WORK_LOG.md": "ec37ea6c309121835dd353960fde2969d2055102b1be22dae442c5ed0761d838",
+  "docs/stage10/DISPLAY_FORMATTING.md": "ecfb948e845d00fce7e63304056787822cc35a1dedbbf9f6988a1b47b2704555",
+  "docs/stage10/EVIDENCE.md": "204dae1f3159dbcbb0da2608c3f4d8c509c94b5ff0a5a40af8e3bb547cb6e8bc",
+  "docs/stage10/IMPLEMENTATION.md": "eff13e69ea8edc3ded3065bb5bc07dc7d817b3243b4af87277692fe9df153c84",
+  "docs/stage10/TEST_PLAN.md": "7d04d461b08c1d5428fea5188f8e0f50fcfff3e841faacaabab9be6295f36d94",
+  "include/void/format.hpp": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b",
+  "src/frontend/capabilities.inc": "6b0e37f03f64ce2ee4f4d699fc4c6462cedfadd5add5716a06283156453c894f",
+  "src/frontend/collection_display.inc": "bc118b9767343dd3f05abe650e4118624c8b724886f4a867af722e9e97fa1697",
+  "src/frontend/compiler.cpp": "a86b7a7bb1692114088f4f69554a42d8cabf733921bf728232b8f6e3ee1b957a",
+  "src/frontend/display_semantics.inc": "8519b88582fcf1805c651a314a0a894e99c6f822ebd6959ded4cb71389137e2e",
+  "tests/stage10/console.cpp": "275d3d56fddb2bbaa92daa2555d41ace04247c0a46bcbac66e9d70326c02c5b8",
+  "tests/stage10/console.py": "ae67633a700a3eaaf97d5d178bddc2302bcc5adebd1286b594ef6ff403be511f",
+  "tests/stage10/console_sum_display.void": "c365a1c615118a3ae74262f29386e53cf7bdf93975540a44482c9167b556f3e3",
+  "tests/stage10/console_sum_failure.void": "03c8bdbaaafaceefac38cbe7442abb34c3155491cd516f9d0eac747060bc0ab3",
+  "tests/stage10/conversion.cpp": "c7924343d0854b99a195291d3d8b5c5423a1c2e4d5687c78b0682fb4222466b2",
+  "tests/stage10/display_reload.cpp": "31f22372aa3ed12638921ab114b4566f45a6c0a429f8c166aa29b3cb058cb417"
+}

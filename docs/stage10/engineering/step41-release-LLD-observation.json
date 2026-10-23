@@ -1,0 +1,26 @@
+{
+  "status": "Complete Release build ultimately returned0 with emitted SDK GVN stack trace preserved; no unchanged retry or flag change was needed",
+  "module": "Pinned SDK libLLVMGlobalISel.a(IRTranslator.cpp.o at1231222)",
+  "pass": "gvn<>",
+  "function": "llvm::IRTranslator::translateGetElementPtr",
+  "top_analysis_frame": "llvm::GVNPass::AnalyzeLoadAvailability",
+  "evidence": "step41-release-LLD-stack.txt",
+  "observed_after_trace": "void_generics_tests and void_collections_tests both reported Built target, and make continued linking subsequent targets. No clang++ error or make Error line observed at this checkpoint.",
+  "cause": "Unexplained. Passing build/tests do not establish the delivered signal, automatic recovery, relation to the earlier Clang crash or a repaired toolchain defect.",
+  "next": "Independent Wrench review of unexplained stack emission; original build returned0 and final Release199/199 passed. No retry was launched.",
+  "sdk_archive_sha256": "81abe53af4942ef4da1cc356c6a9decb90b68fb2d06c8ea8e1476e12310e242e",
+  "primary_source_checks": [
+    {
+      "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-19.1.7/lld/tools/lld/lld.cpp",
+      "finding": "Default standalone driver bypasses LLD-as-library crash recovery; this does not explain the observed build outcome."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-19.1.7/llvm/lib/Support/Unix/Signals.inc",
+      "finding": "Fatal SignalHandler and InfoSignalHandler differ; observed log alone does not identify actual delivered signal or cause. No automatic-recovery or retry claim established."
+    }
+  ],
+  "actual_build_returncode": 0,
+  "build_seconds": 4361.828189273016,
+  "unchanged_retry": "None launched: original build succeeded and continued past the emitted stack trace. Do not claim retry success or an established toolchain repair.",
+  "final_acceptance": "All199 final Release suites pass, including independently linked/native execution. The trace remains an explicit unresolved engineering observation for Wrench."
+}

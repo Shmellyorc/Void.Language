@@ -1,0 +1,31 @@
+-- VOID LLVM: 19.1.7 at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- ASan/UBSan enabled; vptr checking requires an RTTI-enabled LLVM SDK and is unavailable in this ABI
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (9.2s)
+-- Generating done (2.1s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_zone_objects
+[ 25%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 75%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source
+[  0%] Built target void_zone_objects
+[ 16%] Built target void_native_test_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_native_fixture
+[ 50%] Built target void_managed_test_abi
+[ 66%] Built target void_core
+[ 83%] Built target void_runtime
+[ 83%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_operator_integration.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_operator_integration.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_operator_integration.dir/tests/stage10/operator_integration.cpp.o
+[100%] Linking CXX executable void_operator_integration
+[100%] Built target void_operator_integration

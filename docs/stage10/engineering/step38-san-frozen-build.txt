@@ -1,0 +1,90 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  0%] Linking CXX static library libvoid_core.a
+[  0%] Built target void_core
+[  0%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_runtime
+[ 50%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 50%] Linking CXX static library libvoid_core.a
+[ 50%] Built target void_core
+[ 50%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_tooling.dir/tests/stage10/tooling.cpp.o
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_zone_objects
+[  0%] Built target native_fixture
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 33%] Built target void_runtime
+[ 33%] Built target void_core
+[ 66%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/initialization.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/methods.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/structs.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/modules/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/sessions/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_runtime
+[ 50%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 50%] Linking CXX static library libvoid_core.a
+[ 50%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_operator_reload.dir/tests/stage10/operator_reload.cpp.o
+[100%] Linking CXX executable void_operator_reload
+[100%] Built target void_operator_reload
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_runtime
+[ 50%] Built target void_core
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_operator_resolution
+[100%] Built target void_operator_resolution
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_runtime
+[ 50%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+Built target void_format_objects
+Built target void_zone_objects
+Built target void_core
+Built target void_lsp
+Linking CXX executable void_lsp_tests
+Built target void_lsp_tests

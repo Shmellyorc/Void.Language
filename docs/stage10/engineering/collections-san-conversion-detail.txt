@@ -1,0 +1,19 @@
+Start testing: Oct 23 04:21 PDT
+----------------------------------------------------------
+12/199 Testing: stage10_conversion
+12/199 Test: stage10_conversion
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_stage10_conversion"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+"stage10_conversion" start time: Oct 23 04:21 PDT
+Output:
+----------------------------------------------------------
+156 source conversion checks passed
+<end of output>
+Test time = 640.91 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_conversion" end time: Oct 23 04:31 PDT
+"stage10_conversion" time elapsed: 00:10:40
+----------------------------------------------------------
+
+End testing: Oct 23 04:31 PDT

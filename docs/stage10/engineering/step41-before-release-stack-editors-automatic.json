@@ -1,0 +1,62 @@
+{
+  "nvim": {
+    "passed": [
+      "shipped adapter",
+      "console source docs/navigation",
+      "enum pattern navigation/completion",
+      "public print hover/signature",
+      "shared entry preflight",
+      "nested import edits",
+      "standard docs/navigation",
+      "completion selection",
+      "incomplete call signature",
+      "hover",
+      "symbols",
+      "navigation",
+      "dirty repair",
+      "cross-file guarded rename",
+      "stale edit rejection",
+      "stale formatting rejection",
+      "formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "editor": {
+      "build": "g510f61555b",
+      "patch": 0,
+      "prerelease": "dev",
+      "major": 0,
+      "minor": 13,
+      "api_level": 15,
+      "api_prerelease": true,
+      "api_compatible": 0
+    },
+    "selection": "automatic main.void",
+    "executable": "/usr/bin/nvim"
+  },
+  "vim": {
+    "passed": [
+      "shipped adapter",
+      "console source docs/navigation",
+      "enum pattern navigation/completion",
+      "print hover/signature",
+      "hover",
+      "symbols",
+      "incomplete completion",
+      "signature",
+      "definition",
+      "rename disabled",
+      "dirty diagnostics",
+      "guarded formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "editor": "VIM - Vi IMproved 9.2 (2026 Feb 14, compiled Jul 27 2026 10:11:18)",
+    "selection": "automatic main.void",
+    "executable": "/usr/bin/vim.basic"
+  }
+}

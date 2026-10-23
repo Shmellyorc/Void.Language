@@ -187,6 +187,9 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     const auto& object_argument=object;
 #endif
     args.insert(args.end(),{"-working-directory",path_utf8(work),path_utf8(object_argument),path_utf8(config.runtime),path_utf8(config.fixture),"-o",path_utf8(executable.filename())});
+#if defined(__linux__)
+    args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
+#endif
     auto status=execute(args);
     if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+").");
     if(!fs::is_regular_file(executable) || fs::file_size(executable)==0 || !llvm::sys::fs::can_execute(path_utf8(executable)))

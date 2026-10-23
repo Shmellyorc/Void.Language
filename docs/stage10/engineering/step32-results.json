@@ -1,0 +1,87 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 32,
+  "increment_status": "implemented; focused Linux acceptance passed",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "toolchain": "existing LLVM/Clang 19.1.7; Linux x86_64",
+  "changes": [
+    "Owner-contained unary +/-, binary + - * / %, == and < > <= >= declarations in ordinary Function/Structure infrastructure.",
+    "Explicit const operands, exact owner/signature/result/arity/visibility and duplicate validation, including alias-normalized unused generic headers and concrete specialization collisions.",
+    "Independent IR declaration/nominal lexical owner proof, readonly paths and immutable formal binding/place validation; existing snapshot closures and result-effect inference.",
+    "Owning declaration spans/signatures/effects and stable concrete identities; operator declarations are not global function overloads or receiver members."
+  ],
+  "focused_checks": 278,
+  "debug": {
+    "passed": 8,
+    "total": 8,
+    "seconds": 17.63,
+    "log": "step32-debug-accepted.txt",
+    "detail": "step32-debug-detail.txt",
+    "suites": [
+      "stage10_operator_declarations",
+      "stage10_fields",
+      "stage10_hooks",
+      "stage10_display_reload",
+      "generics_source",
+      "lsp_stage10_fields",
+      "lsp_stage10_display",
+      "lsp_sprint6"
+    ]
+  },
+  "strict_sanitizers": {
+    "passed": 3,
+    "total": 3,
+    "seconds": 10.0,
+    "log": "step32-san-accepted.txt",
+    "detail": "step32-san-detail.txt",
+    "suites": [
+      "stage10_operator_declarations",
+      "stage10_fields",
+      "stage10_hooks"
+    ],
+    "asan": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "ubsan": "halt_on_error=1:print_stacktrace=1",
+    "execution": "outside sandbox ptrace; compiler and Runtime instrumented, emitted application code not instrumented to the same extent"
+  },
+  "execution_scope": "All 12 declaration bodies exercised through existing ordinary IR calls in normal/O2 JIT. Source glyph selection is not implemented, and no source operator execution or integrated operator AOT acceptance is claimed.",
+  "dependencies": "none added or changed; no backend/GC/ownership replacement",
+  "source_hashes": "step32-source-hashes.json",
+  "failed_development_attempts": [
+    "Const array syntax passed to existing mutable extent cache helper; fixed.",
+    "Test used Diagnostic.message instead of description; fixed.",
+    "IR checks incorrectly relied on normalized scalar readonly type bits and stripped initialization flags; changed to independent binding/place proof.",
+    "Immutable captured operand initially used ordinary cell path; existing snapshot representation reused.",
+    "Uppercase enum fixture corrected to existing lowercase grammar.",
+    "Safe readonly returned alias initially expected to reject; test now verifies readonly result inference.",
+    "Ordinary IR test attempted private-field extraction outside owner; public getter used instead.",
+    "CTest alias fixture initially assumed repository working directory; repository root is now an explicit argument."
+  ],
+  "not_run": [
+    "Release configuration for this increment",
+    "Integrated source operator AOT (Steps 33\u201334 not implemented)",
+    "Native Windows/macOS",
+    "Native editor host acceptance for operator declarations",
+    "Full Stage 10 consolidated suite"
+  ],
+  "remaining_implementation": [
+    "Step 33 direct-owner exact source resolution, import/owner visibility and ambiguity checks",
+    "Step 34 ordinary source call integration and derived !=",
+    "Step 35 captured-place compounds including %=",
+    "Step 36 recursive custom-equality dictionary-key exclusion",
+    "Remaining Stage 10 console/composite display/tooling/cache/cross-system obligations"
+  ],
+  "next_source_change": "Step 33: shared exact selection over direct nominal operand owners, wired into Semantics::unary_expression/binary_expression with existing contextual literal rules; include necessary ordinary-call plumbing before accepting resolved source expressions.",
+  "commands": {
+    "build_debug": "cmake --build build/ci-official-debug -j2 --target void_operator_declarations voidc voidls void_stage10_fields void_stage10_hooks void_display_reload void_generics_tests",
+    "debug": "ctest --test-dir build/ci-official-debug --output-on-failure -R ^(stage10_operator_declarations|stage10_fields|stage10_hooks|stage10_display_reload|generics_source|lsp_stage10_fields|lsp_stage10_display|lsp_sprint6)$",
+    "build_san": "cmake --build build/ci-official-san -j2 --target void_operator_declarations void_stage10_fields void_stage10_hooks",
+    "san": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R ^(stage10_operator_declarations|stage10_fields|stage10_hooks)$"
+  },
+  "git_hosted_publication": "not performed",
+  "build_notes": "Initial backend header rebuild emitted the existing LLVM/GCC ciso646 C++20 warning. No warning suppression or compiler-stack change. Earlier incomplete builds/failing development attempts are retained separately from final acceptance.",
+  "build_logs": [
+    "step32-debug-build.txt",
+    "step32-debug-test-build.txt",
+    "step32-san-final-build.txt"
+  ]
+}

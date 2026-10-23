@@ -1,0 +1,170 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 40,
+  "increment_status": "bounded currently implemented-system integration accepted on focused Linux Debug/strict/JIT/O2/linked AOT; full four-system Step 40 remains OPEN; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "implemented": [
+    "Combined private/const generic fields, initialization, inheritance/composition, owner operators/compounds, hooks, interpolation and temporal/zone values in operator_systems.void.",
+    "Native property/getter/RHS/operator/setter/derived-equality/hook trace and failed replacement/cleanup/source-provenance assertions in operator_native_systems.void.",
+    "Await-selected places and repeated worker generic/temporal formatted results in operator_systems_async.void.",
+    "Existing probes, allocation sweep, negative policy/effect tests, old leases and restart checks in operator_integration.cpp.",
+    "Existing cache matrix reused for the combined program; source workload measurement added to the existing JIT/AOT runner."
+  ],
+  "development_failures": [
+    "Defaultable generic initializer, compile-time field default, escaped expected braces, no-shadowing and statement-if syntax fixture errors corrected.",
+    "Initial assignment-to-call-result fixture uses the existing supported named-root property chain instead; no grammar feature added.",
+    "Negative readonly value initializer was rejected earlier by S1; managed generic fixture now reaches the intended readonly rejection.",
+    "Expanded AOT matrix exceeded the previous 240-second suite budget (step40-debug-integration-aot.txt). Its new 600-second execution budget allowed the full 344-process-check matrix and workload measurements. Individual process timeout stays 60 seconds; no correctness or safety assertion was disabled.",
+    "Initial focused Debug run passed reload but failed the earlier S1-invalid negative fixture; strict development reproduced that fixture failure (step40-development-tests.txt, step40-san-development.txt). Corrected managed generic fixture reaches readonly rejection (step40-readonly-development.txt).",
+    "Intermediate fixture parser/type/default/no-shadowing failures are retained in step40-fixture-development*.txt, step40-native-development*.txt and step40-workload-development*.txt. They did not demonstrate a production compiler defect.",
+    "Added progress lines and durable per-mode workload JSON to the existing subprocess runner so a suite timeout cannot conceal the completed measurements. Final Debug/strict AOT uses that runner."
+  ],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "native Windows",
+    "native macOS",
+    "separate Release configuration",
+    "fresh native editor/VSIX runs (unchanged adapters; prior Step 39 evidence preserved)",
+    "full four-system and consolidated Stage 10 acceptance"
+  ],
+  "remaining_stage_obligations": [
+    "Console/print/terminal Steps 23\u201331",
+    "Composite display",
+    "Revisit Step 40 integration after those implementations",
+    "Steps 41\u201344 final acceptance/documentation/independent Wrench review"
+  ],
+  "new_dependencies": "none; existing pinned Ryu Boost-1.0/date MIT/IANA versions/notices unchanged",
+  "next_source_change": "Complete approved Runtime-owned console stream state in include/void/runtime.hpp and existing Runtime/native ABI adapters, and composite display through the shared kernel; revisit complete four-system Step 40 before final acceptance.",
+  "governance": "No commits, pushes, branches, hosted CI, public root README edit, publication or production architecture change.",
+  "checks": {
+    "operator_GC_effect_failure_integration": 1143,
+    "operator_format_cache_reload": 248,
+    "normal_O2_JIT_linked_AOT_process_checks": 344,
+    "source_workload_measurements_per_configuration": 8,
+    "preserved_compounds": 730,
+    "preserved_custom_equality_keys": 131,
+    "preserved_operator_resolution": 161,
+    "preserved_fields": 54,
+    "preserved_hooks": 77,
+    "preserved_interpolation": 57,
+    "preserved_temporal_IR_worker": 8,
+    "preserved_temporal_core": 1308,
+    "preserved_numeric_format": 18663,
+    "preserved_display_reload": 132,
+    "preserved_tooling_metadata": 20,
+    "preserved_source_formatting": 321,
+    "preserved_LSP_intelligence": 170,
+    "preserved_LSP_source_formatting": 144
+  },
+  "debug": {
+    "status": "passed",
+    "unique_focused_suites_passed": 18,
+    "combined_integration": {
+      "passed": 1,
+      "seconds": 56.91,
+      "checks": 1143,
+      "log": "step40-debug-integration-aot.txt",
+      "detail": "step40-debug-integration-aot-detail.txt",
+      "note": "The combined integration suite passed; the following AOT suite in that earlier run timed out at its previous budget. It passed on the final rerun below."
+    },
+    "final_run": {
+      "passed": 17,
+      "total": 17,
+      "seconds": 429.13,
+      "log": "step40-debug-accepted.txt",
+      "detail": "step40-debug-detail.txt",
+      "note": "Includes all selected neighbors and final AOT/workloads; the already-passing unchanged combined integration suite was not repeated."
+    },
+    "builds": [
+      "step40-debug-build.txt",
+      "step40-debug-build2.txt",
+      "step40-debug-frozen-build.txt",
+      "step40-debug-neighbor-build.txt"
+    ]
+  },
+  "strict_sanitizers": {
+    "status": "passed",
+    "passed": 18,
+    "total": 18,
+    "seconds": 516.81,
+    "log": "step40-san-accepted.txt",
+    "detail": "step40-san-detail.txt",
+    "builds": [
+      "step40-san-build.txt",
+      "step40-san-frozen-build.txt",
+      "step40-san-neighbor-build.txt"
+    ],
+    "configuration": "RelWithDebInfo ASan/UBSan/leaks, pinned LLVM/Clang 19.1.7; existing RTTI-off vptr exclusion",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "execution": "Outside restricted ptrace runner for actual LeakSanitizer checks; no sanitizer/leak report. Generated JIT/AOT instructions are not equivalently sanitizer-instrumented; compiler/Runtime/native kernels are."
+  },
+  "workloads": {
+    "Debug": "step40-debug-workloads.json",
+    "strict": "step40-san-workloads.json",
+    "source": "tests/stage10/operator_systems_workload.void",
+    "scope": "10000 exact 27-scalar records (270000 total) using custom/default numeric/temporal interpolation; 1000000 decimal fraction places (1000003 bytes), every UTF-8 byte checked. Materialized strings, not console throughput.",
+    "timing": "Each normal/O2 JIT and linked-AOT workload executed once per configuration. Python perf_counter reports process wall time; C++ steady_clock separates LLVM compilation and invocation after source analysis. Large source workload invocation includes UTF-8 conversion and complete byte checking, not isolated numeric renderer latency. Other local test processes ran concurrently; observations are not stable performance guarantees. No speed or memory threshold.",
+    "memory": "JIT getrusage peak RSS includes analysis/compiler/Runtime and sanitizer overhead, not incremental source memory. AOT RSS not sampled by the existing subprocess runner. Every measured JIT run has zero managed objects after explicit collection.",
+    "preserved_native_kernel": {
+      "source": "tests/formatting/workloads.cpp (unchanged)",
+      "Debug": "step40-native-workloads-debug.txt",
+      "strict": "step40-native-workloads-san.txt",
+      "correctness": "1048576 builder bytes, 1000003 precision bytes, 488890 bytes from 100000 integer conversions"
+    }
+  },
+  "small_stack": {
+    "status": "passed unchanged 1 MiB depth probes",
+    "log": "step40-small-stack.txt"
+  },
+  "production_repairs": "none required by this bounded increment; no demonstrated production correctness defect remains in the focused tests. Changes are existing tests/fixtures, test-only measurement/reporting, the expanded AOT suite budget and internal engineering records.",
+  "source_isolation": {
+    "environment": "VOID_STDLIB_ROOT=<repository>/build/step37-stdlib-snapshot",
+    "hashes": "step40-library-hashes.json",
+    "status": "Original and isolated time.void SHA-256 still match the preserved baseline; no loader or library source change."
+  },
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "LLVM_Clang": "19.1.7",
+    "Debug_cpp": "Debug",
+    "strict_cpp": "RelWithDebInfo with strict ASan/UBSan/leaks",
+    "source_modes": [
+      "normal JIT",
+      "O2 JIT",
+      "normal independently linked AOT",
+      "O2 independently linked AOT"
+    ]
+  },
+  "next_step": "remaining console/composite implementation, then revisit complete Step 40 before Steps 41\u201344 final acceptance",
+  "commands": [
+    "cmake --build build/ci-official-debug -j 2 --target void_stage10_fields void_stage10_hooks void_stage10_interpolation void_temporal_ir void_stage10_tooling void_source_formatting void_operator_compounds void_operator_keys void_operator_resolution void_operator_reload void_format_numeric void_temporal void_format_zones void_operator_integration voidls voidc void_display_reload void_format_workloads",
+    "cmake --build build/ci-official-san -j 2 --target void_stage10_fields void_stage10_hooks void_stage10_interpolation void_temporal_ir void_stage10_tooling void_source_formatting void_operator_compounds void_operator_keys void_operator_resolution void_operator_reload void_format_numeric void_temporal void_format_zones void_operator_integration voidls voidc void_display_reload void_format_workloads",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operator_integration|stage10_operators_aot)$' (earlier run: integration passed, old AOT timeout retained)",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-debug --output-on-failure -R '^(stage10_operators_aot|stage10_operator_reload|stage10_operator_compounds|stage10_operator_keys|stage10_fields|stage10_hooks|stage10_interpolation|stage10_temporal_ir|stage10_tooling|stage10_source_formatting|stage10_display_reload|stage10_operator_resolution|format_numeric|format_temporal|format_zones|lsp_stage10_intelligence|lsp_stage10_source_formatting)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" ctest --test-dir build/ci-official-san --output-on-failure -R '^(stage10_operator_integration|stage10_operators_aot|stage10_operator_reload|stage10_operator_compounds|stage10_operator_keys|stage10_fields|stage10_hooks|stage10_interpolation|stage10_temporal_ir|stage10_tooling|stage10_source_formatting|stage10_display_reload|stage10_operator_resolution|format_numeric|format_temporal|format_zones|lsp_stage10_intelligence|lsp_stage10_source_formatting)$'",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" build/ci-official-debug/void_format_workloads",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" build/ci-official-san/void_format_workloads",
+    "VOID_STDLIB_ROOT=\"$PWD/build/step37-stdlib-snapshot\" python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc",
+    "python3 -m py_compile tests/stage10/operators.py",
+    "git diff --check"
+  ],
+  "source_manifests": {
+    "bounded": "step40-source-hashes.json",
+    "bounded_files": 12,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 161,
+    "previous_checkpoint": "step39-checkpoint-source-hashes.json",
+    "preservation": "step40-preservation.json",
+    "unchanged_prior_entries_verified": 149
+  },
+  "workload_artifact_hashes": {
+    "step40-debug-workloads.json": "beda02dcda906937e7d9b645d4b027b1482203a9df015ef3ea6ee3026e9f1417",
+    "step40-san-workloads.json": "ada699e1d9f156f0d480e56da1c2c3366ebeb9fd2e9978ef31a29c27b464056f"
+  }
+}

@@ -1,0 +1,48 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:84:51: error: Type mismatch: expected i64, received i32.
+    code: VOID2001
+
+ 84 |         return _console_redirected(self).progress != 0
+    |                                                   ^^
+    Module: /@stdlib/console.void
+    Expected: i64
+    Received: i32
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:87:51: error: Type mismatch: expected i64, received i32.
+    code: VOID2001
+
+ 87 |         return _console_redirected(self).progress != 0
+    |                                                   ^^
+    Module: /@stdlib/console.void
+    Expected: i64
+    Received: i32
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:93:25: error: Incorrect variant payload arguments.
+    code: VOID2004
+
+ 93 |     return Ok(text_read.text(value = reply.text))
+    |                         ^^^^
+    Module: /@stdlib/console.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/console.void:106:26: error: Incorrect variant payload arguments.
+    code: VOID2004
+
+ 106 |     return Ok(bytes_read.data(value = reply.bytes))
+     |                          ^^^^
+    Module: /@stdlib/console.void
+
+/tmp/void-print27.void:2:12: error: Duplicate declaration or shadowing of 'input'.
+    code: VOID2005
+
+ 2 | func entry(input: i32) -> i32:
+   |            ^^^^^
+    Module: /void-print27.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/tmp/void-print27.void:7:12: error: Unknown identifier 'input'.
+    code: VOID2002
+
+ 7 |     return input
+   |            ^^^^^
+    Module: /void-print27.void
+    Hint: Declare it with var before use.
+

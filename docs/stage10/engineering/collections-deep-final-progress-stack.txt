@@ -1,0 +1,53 @@
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libm.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libz.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libzstd.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libstdc++.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libgcc_s.so.1' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/usr/lib/x86_64-linux-gnu/libc.so.6' as an executable file: Input/output error
+Error while mapping shared library sections:
+Could not open `target:/lib64/ld-linux-x86-64.so.2' as an executable file: Input/output error
+
+warning: Unable to find dynamic linker breakpoint function.
+GDB will be unable to debug shared library initializers
+and track explicitly loaded dynamic code.
+
+warning: Target and debugger are in different PID namespaces; thread lists and other data are likely unreliable.  Connect to gdbserver inside the container.
+0x00005621aea7cef0 in llvm::SUnit::ComputeHeight() ()
+#0  0x00005621aea7cef0 in llvm::SUnit::ComputeHeight() ()
+#1  0x00005621aebe8b74 in llvm::LatencyPriorityQueue::pop() ()
+#2  0x00005621aebe087e in (anonymous namespace)::SchedulePostRATDList::schedule() ()
+#3  0x00005621aebe01c9 in (anonymous namespace)::PostRAScheduler::runOnMachineFunction(llvm::MachineFunction&) ()
+#4  0x00005621ae9468fc in llvm::MachineFunctionPass::runOnFunction(llvm::Function&) ()
+#5  0x00005621af625d49 in llvm::FPPassManager::runOnFunction(llvm::Function&) ()
+#6  0x00005621af62ede3 in llvm::FPPassManager::runOnModule(llvm::Module&) ()
+#7  0x00005621af626a29 in llvm::legacy::PassManagerImpl::run(llvm::Module&) ()
+#8  0x00005621adb14f8d in llvm::orc::SimpleCompiler::operator()(llvm::Module&) ()
+#9  0x00005621adb156a7 in llvm::orc::IRCompileLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#10 0x00005621adb15ac4 in llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#11 0x00005621adb15ac4 in llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#12 0x00005621adb10af1 in llvm::orc::BasicIRLayerMaterializationUnit::materialize(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >) ()
+#13 0x00005621adae2711 in llvm::orc::MaterializationTask::run() ()
+#14 0x00005621adae46ac in llvm::orc::ExecutionSession::dispatchOutstandingMUs() ()
+#15 0x00005621adaf9bb1 in llvm::orc::InProgressFullLookupState::complete(std::unique_ptr<llvm::orc::InProgressLookupState, std::default_delete<llvm::orc::InProgressLookupState> >) ()
+#16 0x00005621adadae3f in llvm::orc::ExecutionSession::OL_applyQueryPhase1(std::unique_ptr<llvm::orc::InProgressLookupState, std::default_delete<llvm::orc::InProgressLookupState> >, llvm::Error) ()
+#17 0x00005621adada08f in llvm::orc::ExecutionSession::lookup(llvm::orc::LookupKind, std::vector<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags>, std::allocator<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags> > > const&, llvm::orc::SymbolLookupSet, llvm::orc::SymbolState, llvm::unique_function<void (llvm::Expected<llvm::DenseMap<llvm::orc::SymbolStringPtr, llvm::orc::ExecutorSymbolDef, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void>, llvm::detail::DenseMapPair<llvm::orc::SymbolStringPtr, llvm::orc::ExecutorSymbolDef> > >)>, std::function<void (llvm::DenseMap<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> >, llvm::DenseMapInfo<llvm::orc::JITDylib*, void>, llvm::detail::DenseMapPair<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> > > > const&)>) ()
+#18 0x00005621adae489e in llvm::orc::ExecutionSession::lookup(std::vector<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags>, std::allocator<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags> > > const&, llvm::orc::SymbolLookupSet, llvm::orc::LookupKind, llvm::orc::SymbolState, std::function<void (llvm::DenseMap<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> >, llvm::DenseMapInfo<llvm::orc::JITDylib*, void>, llvm::detail::DenseMapPair<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> > > > const&)>) ()
+#19 0x00005621adae4e0f in llvm::orc::ExecutionSession::lookup(std::vector<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags>, std::allocator<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags> > > const&, llvm::orc::SymbolStringPtr, llvm::orc::SymbolState) ()
+#20 0x00005621adaffa20 in llvm::orc::LLJIT::lookupLinkerMangled(llvm::orc::JITDylib&, llvm::orc::SymbolStringPtr) ()
+#21 0x00005621ad724d28 in llvm::orc::LLJIT::lookupLinkerMangled (this=0x5621de67e1b0, JD=..., Name=...) at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:164
+#22 0x00005621ad720cfa in llvm::orc::LLJIT::lookup (this=0x5621de67e1b0, JD=..., UnmangledName=...) at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:176
+#23 0x00005621ad6d2e2e in vd::Jit::Impl::load (this=0x5621dfb64e80, module=..., context=..., symbol=..., contract=..., checked=true, runtime=..., suffix=..., isolated=true, object=...) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1552
+#24 0x00005621ad678d0c in vd::Jit::compile (this=0x7ffe84425120, input=..., entry=..., optimize=true, contract=..., runtime=...) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1695
+#25 0x00005621ad6b0e9b in vd::Jit::compile_analysis(vd::ValidatedAnalysis const&, bool, vd::Compatibility, std::shared_ptr<vd::Runtime>, bool)::$_0::operator()() const (this=0x7ffe84424c00) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1705
+#26 0x00005621ad6afaf4 in vd::Jit::compile_analysis (this=0x7ffe84425120, analysis=..., optimize=true, contract=..., runtime=..., async_root=false) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1707
+#27 0x00005621ad6b1034 in vd::Jit::compile (this=0x7ffe84425120, analysis=..., optimize=true, contract=...) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1744
+#28 0x00005621ad661dcc in (anonymous namespace)::run (text=..., want=1) at /home/shmellyorc/Documents/Void.Language/tests/stage10/conversion.cpp:15
+#29 0x00005621ad6610a8 in (anonymous namespace)::collections () at /home/shmellyorc/Documents/Void.Language/tests/stage10/conversion.cpp:76
+#30 0x00005621ad65f30a in main () at /home/shmellyorc/Documents/Void.Language/tests/stage10/conversion.cpp:91
+[Inferior 1 (process 3854714) detached]

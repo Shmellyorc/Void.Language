@@ -1,0 +1,25 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_runtime
+[ 66%] Built target void_core
+[ 66%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_operator_declarations.dir/tests/stage10/operator_declarations.cpp.o
+[100%] Linking CXX executable void_operator_declarations
+[100%] Built target void_operator_declarations
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_fields
+[100%] Built target void_stage10_fields
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target void_stage10_hooks

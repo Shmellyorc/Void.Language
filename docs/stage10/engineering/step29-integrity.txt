@@ -1,0 +1,9 @@
+step29-source-hashes.json: 23 current hashes verified
+source-hashes.json: 200 current hashes verified
+Step37 observations preserved verbatim
+Current/Step29 results identical
+Eight final Runtime/compiler/console-harness artifact hashes verified
+debug: 23/23, counters, 64 source records/four PTYs, ten native cases and production native build verified
+san: 23/23, counters, 64 source records/four PTYs, ten native cases and production native build verified
+Reproduction/repair evidence present; git diff --check PASS; public README and HEAD unchanged
+Stage10 INCOMPLETE; Step29 focused Linux acceptance; native Windows/macOS unverified; next Step30 not started

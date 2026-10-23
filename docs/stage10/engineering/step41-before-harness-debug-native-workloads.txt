@@ -1,0 +1,1 @@
+builder_bytes=1048576 precision_bytes=1000003 scalar_bytes=488890 elapsed_ms=87.806

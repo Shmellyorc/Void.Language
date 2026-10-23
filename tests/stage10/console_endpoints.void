@@ -1,0 +1,31 @@
+use console
+value struct logger:
+    const port: console.output = console.stdout
+value struct initialized_logger:
+    const port: console.output = console.stdout
+func (self initialized_logger) init():
+    self.port = console.stderr
+struct managed_logger:
+    const port: console.output
+func (self managed_logger) init(port: console.output):
+    self.port = port
+struct default_logger:
+    const port: console.output = console.stderr
+func (self default_logger) init():
+    pass
+value struct box<t>:
+    stored: t
+func main():
+    var item = logger()
+    var copied = item
+    var repeated: [logger, 2]
+    var sent = copied.port.write("copy\n")
+    var again = repeated[1].port.write("repeat\n")
+    var initialized = initialized_logger()
+    var replaced = initialized.port.write("value-init\n")
+    var managed = managed_logger(port = console.stdout)
+    var managed_sent = managed.port.write("managed-init\n")
+    var defaulted = default_logger()
+    var default_sent = defaulted.port.write("managed-default\n")
+    var generic = box<console.output>(stored = console.stdout)
+    var generic_sent = generic.stored.write("generic\n")

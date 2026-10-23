@@ -1,0 +1,60 @@
+value struct number:
+    value: i32
+    operator +(const left: number, const right: i32) -> number:
+        return number(value = left.value + right)
+    operator -(const left: number, const right: i32) -> number:
+        return number(value = left.value - right)
+    operator *(const left: number, const right: i32) -> number:
+        return number(value = left.value * right)
+    operator /(const left: number, const right: i32) -> number:
+        return number(value = left.value / right)
+    operator %(const left: number, const right: i32) -> number:
+        return number(value = left.value % right)
+value struct box<t>:
+    value: t
+    operator +(const left: box<t>, const right: t) -> box<t>:
+        return box<t>(value = left.value + right)
+struct owner:
+    private stored: number
+    items: [number]
+    fixed: [number, 2]
+    entries: {string: number}
+func (self owner) init(value: i32):
+    self.stored = number(value = value)
+property (self owner) value: number:
+    get:
+        return self.stored
+    set(value):
+        self.stored = value
+func entry(input: i32) -> i32:
+    var n = number(value = 10)
+    n += 5
+    n -= 2
+    n *= 3
+    n /= 4
+    n %= 5
+    if n.value != 4:
+        return 90
+    var generic = box<i32>(value = input)
+    generic += 2
+    if generic.value != input + 2:
+        return 91
+    var object = owner(value = input)
+    object.items = [number(value = 10)]
+    object.fixed = [number(value = 10), number(value = 3)]
+    object.entries = {"x": number(value = 10)}
+    object.value += 3
+    object.items[0] %= 3
+    object.fixed[1] *= 4
+    object.entries["x"] -= 2
+    if object.value.value != input + 3 or object.items[0].value != 1 or object.fixed[1].value != 12 or object.entries["x"].value != 8:
+        return 92
+    var local = [number(value = 5), number(value = 7)]
+    local[0] += 1
+    var fixed: [number, 2] = [number(value = 5), number(value = 7)]
+    fixed[1] /= 2
+    var entries = {"a": number(value = 20)}
+    entries["a"] %= 6
+    if local[0].value != 6 or fixed[1].value != 3 or entries["a"].value != 2:
+        return 93
+    return input

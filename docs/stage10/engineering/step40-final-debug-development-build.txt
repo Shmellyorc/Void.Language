@@ -1,0 +1,27 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[ 25%] Built target void_managed_test_abi
+[ 25%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 75%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:349:106: error: no member named 'plan_invalidation' in namespace 'vd'
+  349 |         auto a=overlay(source);if(!a.succeeded())throw vd::CompilationError(a.diagnostics);auto plan=vd::plan_invalidation(*before,{"/operator_console_model.void"},a.program.get());check(plan.source_compatibility==vd::SourceCompatibility::restart_required && !plan.dependent_modules.empty(),"combined layout/visibility/operator/spec contract did not invalidate");incompatible.push_back(a.program);
+      |                                                                                                      ~~~~^
+/home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:349:219: error: no member named 'SourceCompatibility' in namespace 'vd'; did you mean 'Compatibility'?
+  349 |         auto a=overlay(source);if(!a.succeeded())throw vd::CompilationError(a.diagnostics);auto plan=vd::plan_invalidation(*before,{"/operator_console_model.void"},a.program.get());check(plan.source_compatibility==vd::SourceCompatibility::restart_required && !plan.dependent_modules.empty(),"combined layout/visibility/operator/spec contract did not invalidate");incompatible.push_back(a.program);
+      |                                                                                                                                                                                                                       ~~~~^~~~~~~~~~~~~~~~~~~
+      |                                                                                                                                                                                                                           Compatibility
+/home/shmellyorc/Documents/Void.Language/include/void/execution.hpp:28:8: note: 'Compatibility' declared here
+   28 | struct Compatibility {
+      |        ^
+/home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:349:240: error: no member named 'restart_required' in 'vd::Compatibility'
+  349 |         auto a=overlay(source);if(!a.succeeded())throw vd::CompilationError(a.diagnostics);auto plan=vd::plan_invalidation(*before,{"/operator_console_model.void"},a.program.get());check(plan.source_compatibility==vd::SourceCompatibility::restart_required && !plan.dependent_modules.empty(),"combined layout/visibility/operator/spec contract did not invalidate");incompatible.push_back(a.program);
+      |                                                                                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~^
+3 errors generated.
+gmake[3]: *** [CMakeFiles/void_console_source.dir/build.make:79: CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:16319: CMakeFiles/void_console_source.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:16326: CMakeFiles/void_console_source.dir/rule] Error 2
+gmake: *** [Makefile:5848: void_console_source] Error 2

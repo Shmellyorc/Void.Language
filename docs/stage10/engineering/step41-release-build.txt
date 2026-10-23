@@ -1,0 +1,1706 @@
+[  1%] Built target void_zone_objects
+[  1%] Built target void_format_objects
+[  1%] Built target void_native_fixture
+[  1%] Built target void_runtime_generated_abi
+[  2%] Built target void_managed_test_abi
+[  2%] Built target void_string_test_abi
+[  3%] Built target void_native_test_fixture
+[  3%] Built target native_fixture
+[  4%] Built target void_core
+[  4%] Built target void_lsp
+[  5%] Built target void_runtime
+[  5%] Linking CXX executable void_arrays_foundation
+[  5%] Linking CXX executable void_lsp_tests
+[  5%] Built target void_lsp_tests
+[  5%] Linking CXX executable void_sessions_example
+[  5%] Built target void_arrays_foundation
+[  6%] Built target void_sessions_example
+[  6%] Linking CXX executable void_tooling_example
+[  6%] Built target void_llvm
+[  7%] Linking CXX executable voidls
+[  7%] Built target void_tooling_example
+[  7%] Built target voidc_objects
+[  7%] Linking CXX executable void_operator_keys
+[  7%] Built target voidls
+[  7%] Linking CXX executable void_operator_resolution
+[  7%] Built target void_operator_keys
+[  7%] Linking CXX executable void_operator_declarations
+[  7%] Built target void_operator_resolution
+[  7%] Linking CXX executable void_source_formatting
+[  7%] Built target void_operator_declarations
+[  7%] Linking CXX executable void_stage10_tooling
+[  7%] Built target void_source_formatting
+[  7%] Built target void_stage10_tooling
+[  7%] Linking CXX executable void_display_reload
+[  7%] Linking CXX executable void_temporal_ir
+[  7%] Built target void_display_reload
+[  7%] Built target void_temporal
+[  7%] Linking CXX executable void_stage10_hooks
+[  7%] Built target void_temporal_ir
+[  7%] Linking CXX executable void_stage10_interpolation
+[  7%] Built target void_stage10_hooks
+[  7%] Linking CXX executable void_stage10_conversion
+[  8%] Built target void_stage10_interpolation
+[  8%] Linking CXX executable void_stage10_fields
+[  8%] Built target void_stage10_conversion
+[  8%] Built target void_format_numeric
+[  8%] Built target void_format_zones
+[  8%] Built target void_gc_buffers
+[  8%] Built target void_gc_schemas
+[  8%] Built target void_runtime_console
+[  8%] Built target void_runtime_console_transfers
+[  8%] Built target void_runtime_console_keyboard
+[  9%] Built target void_runtime_console_terminal
+[  9%] Built target void_runtime_console_wide
+[  9%] Built target void_runtime_console_input
+[  9%] Built target void_runtime_tests
+[  9%] Linking CXX executable void_runtime_generated
+[  9%] Built target void_stage10_fields
+[  9%] Linking CXX executable void_fixed_arrays_tests
+[  9%] Built target void_runtime_generated
+[  9%] Linking CXX executable void_growable_arrays_tests
+[  9%] Built target void_fixed_arrays_tests
+[  9%] Linking CXX executable void_arrays_source
+[  9%] Built target void_growable_arrays_tests
+[ 10%] Linking CXX executable void_generics_tests
+[ 10%] Built target void_arrays_source
+[ 10%] Linking CXX executable void_collections_tests
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Running pass "require<globals-aa>,function(invalidate<aa>),require<profile-summary>,cgscc(devirt<4>(inline,function-attrs<skip-non-recursive-function-attrs>,openmp-opt-cgscc,function<eager-inv;no-rerun>(sroa<modify-cfg>,early-cse<memssa>,speculative-execution<only-if-divergent-target>,jump-threading,correlated-propagation,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>,aggressive-instcombine,libcalls-shrinkwrap,tailcallelim,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,reassociate,constraint-elimination,loop-mssa(loop-instsimplify,loop-simplifycfg,licm<no-allowspeculation>,loop-rotate<header-duplication;no-prepare-for-lto>,licm<allowspeculation>,simple-loop-unswitch<no-nontrivial;trivial>),simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>,loop(loop-idiom,indvars,simple-loop-unswitch<no-nontrivial;trivial>,loop-deletion,loop-unroll-full),sroa<modify-cfg>,vector-combine,mldst-motion<no-split-footer-bb>,gvn<>,sccp,bdce,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>,jump-threading,correlated-propagation,adce,memcpyopt,dse,move-auto-init,loop-mssa(licm<allowspeculation>),coro-elide,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;hoist-common-insts;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>),function-attrs,function(require<should-not-run-function-passes>),coro-split)),function(invalidate<should-not-run-function-passes>),cgscc(devirt<4>())" on module "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/libLLVMGlobalISel.a(IRTranslator.cpp.o at 1231222)"
+1.	Running pass "cgscc(devirt<4>(inline,function-attrs<skip-non-recursive-function-attrs>,openmp-opt-cgscc,function<eager-inv;no-rerun>(sroa<modify-cfg>,early-cse<memssa>,speculative-execution<only-if-divergent-target>,jump-threading,correlated-propagation,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>,aggressive-instcombine,libcalls-shrinkwrap,tailcallelim,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,reassociate,constraint-elimination,loop-mssa(loop-instsimplify,loop-simplifycfg,licm<no-allowspeculation>,loop-rotate<header-duplication;no-prepare-for-lto>,licm<allowspeculation>,simple-loop-unswitch<no-nontrivial;trivial>),simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>,loop(loop-idiom,indvars,simple-loop-unswitch<no-nontrivial;trivial>,loop-deletion,loop-unroll-full),sroa<modify-cfg>,vector-combine,mldst-motion<no-split-footer-bb>,gvn<>,sccp,bdce,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>,jump-threading,correlated-propagation,adce,memcpyopt,dse,move-auto-init,loop-mssa(licm<allowspeculation>),coro-elide,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;hoist-common-insts;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,instcombine<max-iterations=1;no-use-loop-info;no-verify-fixpoint>),function-attrs,function(require<should-not-run-function-passes>),coro-split))" on module "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/libLLVMGlobalISel.a(IRTranslator.cpp.o at 1231222)"
+2.	Running pass "gvn<>" on function "_ZN4llvm12IRTranslator22translateGetElementPtrERKNS_4UserERNS_16MachineIRBuilderE"
+ #0 0x0000564d93675b88 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x337fb88)
+ #1 0x0000564d9367301e llvm::sys::RunSignalHandlers() (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x337d01e)
+ #2 0x0000564d93676768 SignalHandler(int) Signals.cpp:0:0
+ #3 0x00007fec846411e0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x411e0)
+ #4 0x0000564d96917549 llvm::GVNPass::AnalyzeLoadAvailability(llvm::LoadInst*, llvm::MemDepResult, llvm::Value*) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x6621549)
+ #5 0x0000564d9691830f llvm::GVNPass::AnalyzeLoadAvailability(llvm::LoadInst*, llvm::SmallVector<llvm::NonLocalDepResult, 64u>&, llvm::SmallVector<llvm::gvn::AvailableValueInBlock, 64u>&, llvm::SmallVector<llvm::BasicBlock*, 64u>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x662230f)
+ #6 0x0000564d9691c64e llvm::GVNPass::processNonLocalLoad(llvm::LoadInst*) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x662664e)
+ #7 0x0000564d96920598 llvm::GVNPass::processInstruction(llvm::Instruction*) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x662a598)
+ #8 0x0000564d96921ad2 llvm::GVNPass::processBlock(llvm::BasicBlock*) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x662bad2)
+ #9 0x0000564d96920e3d llvm::GVNPass::iterateOnFunction(llvm::Function&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x662ae3d)
+#10 0x0000564d969163bb llvm::GVNPass::runImpl(llvm::Function&, llvm::AssumptionCache&, llvm::DominatorTree&, llvm::TargetLibraryInfo const&, llvm::AAResults&, llvm::MemoryDependenceResults*, llvm::LoopInfo&, llvm::OptimizationRemarkEmitter*, llvm::MemorySSA*) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x66203bb)
+#11 0x0000564d96915e9c llvm::GVNPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x661fe9c)
+#12 0x0000564d95c7010d llvm::detail::PassModel<llvm::Function, llvm::GVNPass, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) PassBuilder.cpp:0:0
+#13 0x0000564d97774d3b llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x747ed3b)
+#14 0x0000564d93f95c8d llvm::detail::PassModel<llvm::Function, llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) AMDGPUTargetMachine.cpp:0:0
+#15 0x0000564d96eda424 llvm::CGSCCToFunctionPassAdaptor::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x6be4424)
+#16 0x0000564d93fb6dcd llvm::detail::PassModel<llvm::LazyCallGraph::SCC, llvm::CGSCCToFunctionPassAdaptor, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) AMDGPUTargetMachine.cpp:0:0
+#17 0x0000564d96ed67c3 llvm::PassManager<llvm::LazyCallGraph::SCC, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x6be07c3)
+#18 0x0000564d95c2ad6d llvm::detail::PassModel<llvm::LazyCallGraph::SCC, llvm::PassManager<llvm::LazyCallGraph::SCC, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) PassBuilder.cpp:0:0
+#19 0x0000564d96ed8b33 llvm::DevirtSCCRepeatedPass::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x6be2b33)
+#20 0x0000564d95c75a7d llvm::detail::PassModel<llvm::LazyCallGraph::SCC, llvm::DevirtSCCRepeatedPass, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) PassBuilder.cpp:0:0
+#21 0x0000564d96ed835c llvm::ModuleToPostOrderCGSCCPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x6be235c)
+#22 0x0000564d95c2b05d llvm::detail::PassModel<llvm::Module, llvm::ModuleToPostOrderCGSCCPassAdaptor, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) PassBuilder.cpp:0:0
+#23 0x0000564d97773eaa llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x747deaa)
+#24 0x0000564d963b3da9 llvm::ModuleInlinerWrapperPass::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x60bdda9)
+#25 0x0000564d958ab8dd llvm::detail::PassModel<llvm::Module, llvm::ModuleInlinerWrapperPass, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) Canonicalization.cpp:0:0
+#26 0x0000564d97773eaa llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x747deaa)
+#27 0x0000564d95789421 llvm::lto::opt(llvm::lto::Config const&, llvm::TargetMachine*, unsigned int, llvm::Module&, bool, llvm::ModuleSummaryIndex*, llvm::ModuleSummaryIndex const*, std::vector<unsigned char, std::allocator<unsigned char>> const&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x5493421)
+#28 0x0000564d9578c732 llvm::lto::thinBackend(llvm::lto::Config const&, unsigned int, std::function<llvm::Expected<std::unique_ptr<llvm::CachedFileStream, std::default_delete<llvm::CachedFileStream>>> (unsigned int, llvm::Twine const&)>, llvm::Module&, llvm::ModuleSummaryIndex const&, llvm::DenseMap<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>>> const&, llvm::DenseMap<unsigned long, llvm::GlobalValueSummary*, llvm::DenseMapInfo<unsigned long, void>, llvm::detail::DenseMapPair<unsigned long, llvm::GlobalValueSummary*>> const&, llvm::MapVector<llvm::StringRef, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, unsigned int, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, unsigned int>>, llvm::SmallVector<std::pair<llvm::StringRef, llvm::BitcodeModule>, 0u>>*, std::vector<unsigned char, std::allocator<unsigned char>> const&)::$_1::operator()(llvm::Module&, llvm::TargetMachine*, std::unique_ptr<llvm::ToolOutputFile, std::default_delete<llvm::ToolOutputFile>>) const LTOBackend.cpp:0:0
+#29 0x0000564d9578c5f6 llvm::lto::thinBackend(llvm::lto::Config const&, unsigned int, std::function<llvm::Expected<std::unique_ptr<llvm::CachedFileStream, std::default_delete<llvm::CachedFileStream>>> (unsigned int, llvm::Twine const&)>, llvm::Module&, llvm::ModuleSummaryIndex const&, llvm::DenseMap<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>>> const&, llvm::DenseMap<unsigned long, llvm::GlobalValueSummary*, llvm::DenseMapInfo<unsigned long, void>, llvm::detail::DenseMapPair<unsigned long, llvm::GlobalValueSummary*>> const&, llvm::MapVector<llvm::StringRef, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, unsigned int, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, unsigned int>>, llvm::SmallVector<std::pair<llvm::StringRef, llvm::BitcodeModule>, 0u>>*, std::vector<unsigned char, std::allocator<unsigned char>> const&) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x54965f6)
+#30 0x0000564d9578255d (anonymous namespace)::InProcessThinBackend::runThinLTOBackendThread(std::function<llvm::Expected<std::unique_ptr<llvm::CachedFileStream, std::default_delete<llvm::CachedFileStream>>> (unsigned int, llvm::Twine const&)>, std::function<llvm::Expected<std::function<llvm::Expected<std::unique_ptr<llvm::CachedFileStream, std::default_delete<llvm::CachedFileStream>>> (unsigned int, llvm::Twine const&)>> (unsigned int, llvm::StringRef, llvm::Twine const&)>, unsigned int, llvm::BitcodeModule, llvm::ModuleSummaryIndex&, llvm::DenseMap<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>>> const&, llvm::DenseSet<llvm::ValueInfo, llvm::DenseMapInfo<llvm::ValueInfo, void>> const&, std::map<unsigned long, llvm::GlobalValue::LinkageTypes, std::less<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValue::LinkageTypes>>> const&, llvm::DenseMap<unsigned long, llvm::GlobalValueSummary*, llvm::DenseMapInfo<unsigned long, void>, llvm::detail::DenseMapPair<unsigned long, llvm::GlobalValueSummary*>> const&, llvm::MapVector<llvm::StringRef, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, unsigned int, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, unsigned int>>, llvm::SmallVector<std::pair<llvm::StringRef, llvm::BitcodeModule>, 0u>>&)::'lambda'(std::function<llvm::Expected<std::unique_ptr<llvm::CachedFileStream, std::default_delete<llvm::CachedFileStream>>> (unsigned int, llvm::Twine const&)>)::operator()(std::function<llvm::Expected<std::unique_ptr<llvm::CachedFileStream, std::default_delete<llvm::CachedFileStream>>> (unsigned int, llvm::Twine const&)>) const LTO.cpp:0:0
+#31 0x0000564d9578173e std::_Function_handler<void (), std::_Bind<(anonymous namespace)::InProcessThinBackend::start(unsigned int, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>>> const&, llvm::DenseSet<llvm::ValueInfo, llvm::DenseMapInfo<llvm::ValueInfo, void>> const&, std::map<unsigned long, llvm::GlobalValue::LinkageTypes, std::less<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValue::LinkageTypes>>> const&, llvm::MapVector<llvm::StringRef, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, unsigned int, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, unsigned int>>, llvm::SmallVector<std::pair<llvm::StringRef, llvm::BitcodeModule>, 0u>>&)::'lambda'(llvm::BitcodeModule, llvm::ModuleSummaryIndex&, llvm::DenseMap<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>>> const&, llvm::DenseSet<llvm::ValueInfo, llvm::DenseMapInfo<llvm::ValueInfo, void>> const&, std::map<unsigned long, llvm::GlobalValue::LinkageTypes, std::less<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValue::LinkageTypes>>> const&, llvm::DenseMap<unsigned long, llvm::GlobalValueSummary*, llvm::DenseMapInfo<unsigned long, void>, llvm::detail::DenseMapPair<unsigned long, llvm::GlobalValueSummary*>> const&, llvm::MapVector<llvm::StringRef, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, unsigned int, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, unsigned int>>, llvm::SmallVector<std::pair<llvm::StringRef, llvm::BitcodeModule>, 0u>>&) (llvm::BitcodeModule, std::reference_wrapper<llvm::ModuleSummaryIndex>, std::reference_wrapper<llvm::DenseMap<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, std::unordered_map<unsigned long, llvm::GlobalValueSummary::ImportKind, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValueSummary::ImportKind>>>>> const>, std::reference_wrapper<llvm::DenseSet<llvm::ValueInfo, llvm::DenseMapInfo<llvm::ValueInfo, void>> const>, std::reference_wrapper<std::map<unsigned long, llvm::GlobalValue::LinkageTypes, std::less<unsigned long>, std::allocator<std::pair<unsigned long const, llvm::GlobalValue::LinkageTypes>>> const>, std::reference_wrapper<llvm::DenseMap<unsigned long, llvm::GlobalValueSummary*, llvm::DenseMapInfo<unsigned long, void>, llvm::detail::DenseMapPair<unsigned long, llvm::GlobalValueSummary*>> const>, std::reference_wrapper<llvm::MapVector<llvm::StringRef, llvm::BitcodeModule, llvm::DenseMap<llvm::StringRef, unsigned int, llvm::DenseMapInfo<llvm::StringRef, void>, llvm::detail::DenseMapPair<llvm::StringRef, unsigned int>>, llvm::SmallVector<std::pair<llvm::StringRef, llvm::BitcodeModule>, 0u>>>)>>::_M_invoke(std::_Any_data const&) LTO.cpp:0:0
+#32 0x0000564d95780e08 std::_Function_handler<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> (), std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<void>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<std::function<void ()>>>, void>>::_M_invoke(std::_Any_data const&) LTO.cpp:0:0
+#33 0x0000564d936c5fc7 std::__future_base::_State_baseV2::_M_do_set(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*) Driver.cpp:0:0
+#34 0x00007fec8469bb96 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x9bb96)
+#35 0x00007fec8469bc19 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0x9bc19)
+#36 0x0000564d9578112f std::__future_base::_Deferred_state<std::thread::_Invoker<std::tuple<std::function<void ()>>>, void>::_M_complete_async() LTO.cpp:0:0
+#37 0x0000564d957811b5 std::_Function_handler<void (), std::shared_future<void> llvm::ThreadPoolInterface::asyncImpl<void>(std::function<void ()>, llvm::ThreadPoolTaskGroup*)::'lambda'()>::_M_invoke(std::_Any_data const&) LTO.cpp:0:0
+#38 0x0000564d95784b84 llvm::StdThreadPool::processTasks(llvm::ThreadPoolTaskGroup*) (/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld+0x548eb84)
+#39 0x0000564d95785f86 void* llvm::thread::ThreadProxy<std::tuple<llvm::StdThreadPool::grow(int)::$_0>>(void*) ThreadPool.cpp:0:0
+#40 0x00007fec84696960 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x96960)
+#41 0x00007fec84719aec (/usr/lib/x86_64-linux-gnu/libc.so.6+0x119aec)
+[ 10%] Built target void_generics_tests
+[ 10%] Linking CXX executable void_dictionaries_tests
+[ 10%] Built target void_collections_tests
+[ 10%] Linking CXX executable void_properties_tests
+[ 10%] Built target void_dictionaries_tests
+[ 10%] Linking CXX executable void_patterns_tests
+[ 10%] Built target void_properties_tests
+[ 10%] Linking CXX executable void_advanced_tests
+[ 11%] Built target void_patterns_tests
+[ 11%] Linking CXX executable void_managed_tests
+[ 11%] Built target void_advanced_tests
+[ 11%] Linking CXX executable void_managed_initialization_tests
+[ 11%] Built target void_managed_tests
+[ 11%] Linking CXX executable void_reference_values_tests
+[ 11%] Built target void_managed_initialization_tests
+[ 11%] Linking CXX executable void_composition_tests
+[ 11%] Built target void_reference_values_tests
+[ 11%] Built target void_composition_tests
+[ 11%] Linking CXX executable void_inheritance_tests
+[ 11%] Linking CXX executable void_interfaces_tests
+[ 11%] Built target void_inheritance_tests
+[ 11%] Linking CXX executable void_strings_tests
+[ 11%] Built target void_interfaces_tests
+[ 11%] Linking CXX executable void_runtime_callbacks
+[ 12%] Built target void_strings_tests
+[ 12%] Built target void_runtime_failures
+[ 12%] Generating runtime-normal.o
+[ 12%] Built target void_runtime_callbacks
+[ 12%] Generating runtime-optimized.o
+[ 12%] Linking CXX executable void_runtime_aot_normal
+[ 12%] Linking CXX executable void_runtime_aot_optimized
+[ 13%] Built target void_runtime_aot_normal
+[ 13%] Built target void_runtime_invariants
+[ 13%] Built target void_runtime_aot_optimized
+[ 13%] Linking CXX executable void_operator_compounds
+[ 13%] Linking CXX executable void_console_source
+[ 13%] Built target void_operator_compounds
+[ 13%] Linking CXX executable void_operator_integration
+[ 13%] Built target void_console_source
+[ 13%] Linking CXX executable void_tests
+[ 14%] Built target void_operator_integration
+[ 14%] Built target void_cache_identity
+[ 14%] Generating managed-library-normal.o
+[ 15%] Linking CXX executable void_managed_aot_normal
+[ 15%] Built target void_managed_aot_normal
+[ 15%] Generating managed-library-optimized.o
+[ 15%] Linking CXX executable void_managed_aot_optimized
+[ 15%] Built target void_managed_aot_optimized
+[ 15%] Generating managed_initialization-library-normal.o
+[ 16%] Built target void_tests
+[ 16%] Generating managed_initialization-library-optimized.o
+[ 16%] Linking CXX executable void_managed_initialization_aot_normal
+[ 17%] Built target void_managed_initialization_aot_normal
+[ 17%] Generating reference_values-library-normal.o
+[ 17%] Linking CXX executable void_managed_initialization_aot_optimized
+[ 17%] Built target void_managed_initialization_aot_optimized
+[ 17%] Linking CXX executable void_reference_values_aot_normal
+[ 17%] Generating reference_values-library-optimized.o
+[ 17%] Built target void_reference_values_aot_normal
+[ 17%] Generating composition-library-normal.o
+[ 17%] Linking CXX executable void_reference_values_aot_optimized
+[ 17%] Linking CXX executable void_composition_aot_normal
+[ 18%] Built target void_reference_values_aot_optimized
+[ 18%] Generating composition-library-optimized.o
+[ 18%] Built target void_composition_aot_normal
+[ 18%] Generating inheritance-reloaded-normal.o
+[ 18%] Generating inheritance-library-normal.o
+[ 19%] Linking CXX executable void_composition_aot_optimized
+[ 19%] Linking CXX executable void_inheritance_aot_normal
+[ 19%] Built target void_composition_aot_optimized
+[ 19%] Generating inheritance-reloaded-optimized.o
+[ 19%] Built target void_inheritance_aot_normal
+[ 19%] Generating inheritance-library-optimized.o
+[ 19%] Generating interfaces-reloaded-normal.o
+[ 19%] Linking CXX executable void_inheritance_aot_optimized
+[ 20%] Generating interfaces-library-normal.o
+[ 20%] Built target void_inheritance_aot_optimized
+[ 20%] Generating interfaces-reloaded-optimized.o
+[ 20%] Linking CXX executable void_interfaces_aot_normal
+[ 20%] Generating interfaces-library-optimized.o
+[ 20%] Built target void_interfaces_aot_normal
+[ 20%] Generating strings-reloaded-normal.o
+[ 20%] Generating strings-library-normal.o
+[ 20%] Linking CXX executable void_interfaces_aot_optimized
+[ 20%] Built target void_interfaces_aot_optimized
+[ 20%] Generating strings-reloaded-optimized.o
+[ 20%] Linking CXX executable void_strings_aot_normal
+[ 20%] Built target void_strings_aot_normal
+[ 20%] Generating strings-library-optimized.o
+[ 20%] Linking CXX executable void_native_tests
+[ 20%] Linking CXX executable void_strings_aot_optimized
+[ 21%] Built target void_strings_aot_optimized
+[ 21%] Linking CXX executable void_async_tests
+[ 21%] Built target void_native_tests
+[ 22%] Built target void_async_tests
+[ 22%] Linking CXX executable void_retention_current
+[ 22%] Linking CXX executable void_sprint6_tests
+[ 22%] Built target void_sprint6_tests
+[ 22%] Linking CXX executable void_sprint4_tests
+[ 22%] Built target void_retention_current
+[ 22%] Linking CXX executable void_native_example
+[ 22%] Built target void_sprint4_tests
+[ 22%] Built target voidc
+[ 22%] Linking CXX executable void_operator_reload
+[ 22%] Built target void_native_example
+[ 22%] Linking CXX executable void_cache_tests
+[ 22%] Built target void_operator_reload
+[ 22%] Generating fixed_arrays-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-main-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_main_normal
+[ 23%] Built target void_fixed_arrays_cli_main_normal
+[ 23%] Generating fixed_arrays-copies-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-copies-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_copies_normal
+[ 23%] Built target void_fixed_arrays_cli_copies_normal
+[ 23%] Generating fixed_arrays-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-order-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_order_normal
+[ 23%] Built target void_fixed_arrays_cli_order_normal
+[ 23%] Generating fixed_arrays-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-numeric-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_numeric_normal
+[ 23%] Built target void_fixed_arrays_cli_numeric_normal
+[ 23%] Generating fixed_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-indexes-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_indexes_normal
+[ 23%] Built target void_fixed_arrays_cli_indexes_normal
+[ 23%] Generating fixed_arrays-index_types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-index_types-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_index_types_normal
+[ 23%] Built target void_fixed_arrays_cli_index_types_normal
+[ 23%] Generating fixed_arrays-empty-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-empty-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_empty_normal
+[ 23%] Built target void_fixed_arrays_cli_empty_normal
+[ 24%] Generating fixed_arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-large-normal.o
+[ 24%] Linking CXX executable void_fixed_arrays_cli_large_normal
+[ 24%] Built target void_fixed_arrays_cli_large_normal
+[ 24%] Generating fixed_arrays-value_fields-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-value_fields-normal.o
+[ 24%] Linking CXX executable void_fixed_arrays_cli_value_fields_normal
+[ 24%] Built target void_cache_tests
+[ 24%] Generating fixed_arrays-bounds_order-normal.o
+[ 24%] Built target void_fixed_arrays_cli_value_fields_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-bounds_order-normal.o
+[ 24%] Generating fixed_arrays-loops-normal.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_bounds_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-loops-normal.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_loops_normal
+[ 25%] Built target void_fixed_arrays_cli_bounds_order_normal
+[ 25%] Generating fixed_arrays-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-main-optimized.o
+[ 25%] Built target void_fixed_arrays_cli_loops_normal
+[ 25%] Generating fixed_arrays-copies-optimized.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_main_optimized
+[ 25%] Built target void_fixed_arrays_cli_main_optimized
+[ 25%] Generating fixed_arrays-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-copies-optimized.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_copies_optimized
+[ 25%] Built target void_fixed_arrays_cli_copies_optimized
+[ 25%] Generating fixed_arrays-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-order-optimized.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_order_optimized
+[ 26%] Built target void_fixed_arrays_cli_order_optimized
+[ 26%] Generating fixed_arrays-indexes-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-indexes-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_indexes_optimized
+[ 26%] Built target void_fixed_arrays_cli_indexes_optimized
+[ 26%] Generating fixed_arrays-index_types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-index_types-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_index_types_optimized
+[ 26%] Built target void_fixed_arrays_cli_index_types_optimized
+[ 26%] Generating fixed_arrays-empty-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-empty-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_empty_optimized
+[ 27%] Built target void_fixed_arrays_cli_empty_optimized
+[ 27%] Generating fixed_arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-large-optimized.o
+[ 27%] Linking CXX executable void_fixed_arrays_cli_large_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-numeric-optimized.o
+[ 27%] Linking CXX executable void_fixed_arrays_cli_numeric_optimized
+[ 27%] Built target void_fixed_arrays_cli_large_optimized
+[ 27%] Generating fixed_arrays-value_fields-optimized.o
+[ 27%] Built target void_fixed_arrays_cli_numeric_optimized
+[ 27%] Generating fixed_arrays-bounds_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-bounds_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-value_fields-optimized.o
+[ 27%] Linking CXX executable void_fixed_arrays_cli_bounds_order_optimized
+[ 27%] Linking CXX executable void_fixed_arrays_cli_value_fields_optimized
+[ 27%] Built target void_fixed_arrays_cli_bounds_order_optimized
+[ 27%] Built target void_fixed_arrays_cli_value_fields_optimized
+[ 27%] Generating fixed_arrays-loops-optimized.o
+[ 27%] Generating growable_arrays-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/fixed_arrays-loops-optimized.o
+[ 27%] Linking CXX executable void_growable_arrays_cli_main_normal
+[ 27%] Linking CXX executable void_fixed_arrays_cli_loops_optimized
+[ 27%] Built target void_growable_arrays_cli_main_normal
+[ 27%] Generating growable_arrays-aliases-normal.o
+[ 27%] Built target void_fixed_arrays_cli_loops_optimized
+[ 27%] Generating growable_arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-selection-normal.o
+[ 27%] Linking CXX executable void_growable_arrays_cli_selection_normal
+[ 27%] Built target void_growable_arrays_cli_selection_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-aliases-normal.o
+[ 27%] Generating growable_arrays-invalidation-normal.o
+[ 27%] Linking CXX executable void_growable_arrays_cli_aliases_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-invalidation-normal.o
+[ 27%] Linking CXX executable void_growable_arrays_cli_invalidation_normal
+[ 27%] Built target void_growable_arrays_cli_aliases_normal
+[ 27%] Generating growable_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-indexes-normal.o
+[ 28%] Built target void_growable_arrays_cli_invalidation_normal
+[ 28%] Linking CXX executable void_growable_arrays_cli_indexes_normal
+[ 28%] Generating growable_arrays-numeric-normal.o
+[ 28%] Built target void_growable_arrays_cli_indexes_normal
+[ 28%] Generating growable_arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-large-normal.o
+[ 28%] Linking CXX executable void_growable_arrays_cli_large_normal
+[ 28%] Built target void_growable_arrays_cli_large_normal
+[ 29%] Generating growable_arrays-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-main-optimized.o
+[ 29%] Linking CXX executable void_growable_arrays_cli_numeric_normal
+[ 29%] Linking CXX executable void_growable_arrays_cli_main_optimized
+[ 29%] Built target void_growable_arrays_cli_numeric_normal
+[ 29%] Generating growable_arrays-aliases-optimized.o
+[ 29%] Built target void_growable_arrays_cli_main_optimized
+[ 29%] Generating growable_arrays-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-selection-optimized.o
+[ 30%] Linking CXX executable void_growable_arrays_cli_selection_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-aliases-optimized.o
+[ 30%] Built target void_growable_arrays_cli_selection_optimized
+[ 30%] Generating growable_arrays-invalidation-optimized.o
+[ 30%] Linking CXX executable void_growable_arrays_cli_aliases_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-invalidation-optimized.o
+[ 30%] Built target void_growable_arrays_cli_aliases_optimized
+[ 30%] Linking CXX executable void_growable_arrays_cli_invalidation_optimized
+[ 30%] Generating growable_arrays-indexes-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-indexes-optimized.o
+[ 30%] Linking CXX executable void_growable_arrays_cli_indexes_optimized
+[ 30%] Built target void_growable_arrays_cli_invalidation_optimized
+[ 30%] Generating growable_arrays-numeric-optimized.o
+[ 30%] Built target void_growable_arrays_cli_indexes_optimized
+[ 30%] Generating growable_arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-large-optimized.o
+[ 30%] Linking CXX executable void_growable_arrays_cli_large_optimized
+[ 30%] Built target void_growable_arrays_cli_large_optimized
+[ 30%] Generating arrays-strings-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-strings-normal.o
+[ 30%] Linking CXX executable void_arrays_cli_strings_normal
+[ 30%] Built target void_arrays_cli_strings_normal
+[ 31%] Generating arrays-values-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/growable_arrays-numeric-optimized.o
+[ 31%] Linking CXX executable void_growable_arrays_cli_numeric_optimized
+[ 31%] Built target void_growable_arrays_cli_numeric_optimized
+[ 31%] Generating arrays-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-nested-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_nested_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-values-normal.o
+[ 31%] Built target void_arrays_cli_nested_normal
+[ 31%] Generating arrays-defaults-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_values_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-defaults-normal.o
+[ 31%] Built target void_arrays_cli_values_normal
+[ 31%] Generating arrays-interfaces-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_defaults_normal
+[ 31%] Built target void_arrays_cli_defaults_normal
+[ 31%] Generating arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-interfaces-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_interfaces_normal
+[ 31%] Built target void_arrays_cli_interfaces_normal
+[ 31%] Generating arrays-tree-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-tree-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_tree_normal
+[ 31%] Built target void_arrays_cli_tree_normal
+[ 31%] Generating arrays-readonly-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-readonly-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_selection_normal
+[ 31%] Linking CXX executable void_arrays_cli_readonly_normal
+[ 31%] Built target void_arrays_cli_selection_normal
+[ 31%] Built target void_arrays_cli_readonly_normal
+[ 31%] Generating arrays-iteration-normal.o
+[ 31%] Generating arrays-ranges-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-ranges-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_ranges_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-iteration-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_iteration_normal
+[ 32%] Built target void_arrays_cli_ranges_normal
+[ 32%] Generating arrays-invalidation-normal.o
+[ 32%] Built target void_arrays_cli_iteration_normal
+[ 32%] Generating arrays-nested_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-invalidation-normal.o
+[ 32%] Linking CXX executable void_arrays_cli_invalidation_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-nested_failure-normal.o
+[ 32%] Linking CXX executable void_arrays_cli_nested_failure_normal
+[ 32%] Built target void_arrays_cli_invalidation_normal
+[ 32%] Generating arrays-large-normal.o
+[ 32%] Built target void_arrays_cli_nested_failure_normal
+[ 32%] Generating arrays-cycles-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-cycles-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-large-normal.o
+[ 32%] Linking CXX executable void_arrays_cli_cycles_normal
+[ 32%] Linking CXX executable void_arrays_cli_large_normal
+[ 32%] Built target void_arrays_cli_cycles_normal
+[ 32%] Built target void_arrays_cli_large_normal
+[ 32%] Generating arrays-empty-normal.o
+[ 32%] Generating arrays-failures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-failures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-empty-normal.o
+[ 32%] Linking CXX executable void_arrays_cli_failures_normal
+[ 32%] Linking CXX executable void_arrays_cli_empty_normal
+[ 33%] Built target void_arrays_cli_failures_normal
+[ 33%] Built target void_arrays_cli_empty_normal
+[ 33%] Generating arrays-strings-optimized.o
+[ 33%] Generating arrays-values-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-strings-optimized.o
+[ 33%] Linking CXX executable void_arrays_cli_strings_optimized
+[ 33%] Built target void_arrays_cli_strings_optimized
+[ 33%] Generating arrays-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-nested-optimized.o
+[ 33%] Linking CXX executable void_arrays_cli_nested_optimized
+[ 33%] Built target void_arrays_cli_nested_optimized
+[ 33%] Generating arrays-defaults-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-values-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-defaults-optimized.o
+[ 33%] Linking CXX executable void_arrays_cli_values_optimized
+[ 33%] Linking CXX executable void_arrays_cli_defaults_optimized
+[ 33%] Built target void_arrays_cli_values_optimized
+[ 33%] Generating arrays-interfaces-optimized.o
+[ 33%] Built target void_arrays_cli_defaults_optimized
+[ 34%] Generating arrays-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-interfaces-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_interfaces_optimized
+[ 34%] Built target void_arrays_cli_interfaces_optimized
+[ 34%] Generating arrays-tree-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-tree-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_tree_optimized
+[ 34%] Built target void_arrays_cli_tree_optimized
+[ 34%] Generating arrays-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-selection-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_selection_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-readonly-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_readonly_optimized
+[ 34%] Built target void_arrays_cli_selection_optimized
+[ 34%] Generating arrays-iteration-optimized.o
+[ 34%] Built target void_arrays_cli_readonly_optimized
+[ 34%] Generating arrays-ranges-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-ranges-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-iteration-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_ranges_optimized
+[ 34%] Linking CXX executable void_arrays_cli_iteration_optimized
+[ 34%] Built target void_arrays_cli_ranges_optimized
+[ 35%] Built target void_arrays_cli_iteration_optimized
+[ 35%] Generating arrays-invalidation-optimized.o
+[ 35%] Generating arrays-nested_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-nested_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-invalidation-optimized.o
+[ 35%] Linking CXX executable void_arrays_cli_nested_failure_optimized
+[ 35%] Linking CXX executable void_arrays_cli_invalidation_optimized
+[ 35%] Built target void_arrays_cli_nested_failure_optimized
+[ 35%] Built target void_arrays_cli_invalidation_optimized
+[ 35%] Generating arrays-large-optimized.o
+[ 35%] Generating arrays-cycles-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-cycles-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-large-optimized.o
+[ 35%] Linking CXX executable void_arrays_cli_cycles_optimized
+[ 36%] Linking CXX executable void_arrays_cli_large_optimized
+[ 37%] Built target void_arrays_cli_cycles_optimized
+[ 37%] Built target void_arrays_cli_large_optimized
+[ 37%] Generating arrays-empty-optimized.o
+[ 37%] Generating arrays-failures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-failures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/arrays-empty-optimized.o
+[ 37%] Linking CXX executable void_arrays_cli_failures_optimized
+[ 37%] Linking CXX executable void_arrays_cli_empty_optimized
+[ 37%] Built target void_arrays_cli_failures_optimized
+[ 37%] Built target void_arrays_cli_empty_optimized
+[ 37%] Generating generics-main-normal.o
+[ 37%] Generating generics-functions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-main-normal.o
+[ 37%] Linking CXX executable void_generics_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-functions-normal.o
+[ 37%] Linking CXX executable void_generics_cli_functions_normal
+[ 37%] Built target void_generics_cli_main_normal
+[ 37%] Generating generics-types-normal.o
+[ 37%] Built target void_generics_cli_functions_normal
+[ 37%] Generating generics-constraints-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-constraints-normal.o
+[ 37%] Linking CXX executable void_generics_cli_constraints_normal
+[ 37%] Linking CXX executable void_generics_cli_types_normal
+[ 37%] Built target void_generics_cli_constraints_normal
+[ 37%] Built target void_generics_cli_types_normal
+[ 37%] Generating generics-initialization-normal.o
+[ 37%] Generating generics-arrays-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-initialization-normal.o
+[ 37%] Linking CXX executable void_generics_cli_initialization_normal
+[ 38%] Built target void_generics_cli_initialization_normal
+[ 38%] Generating generics-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-methods-normal.o
+[ 38%] Linking CXX executable void_generics_cli_methods_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-arrays-normal.o
+[ 38%] Built target void_generics_cli_methods_normal
+[ 38%] Linking CXX executable void_generics_cli_arrays_normal
+[ 38%] Generating generics-failures-normal.o
+[ 38%] Built target void_generics_cli_arrays_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-failures-normal.o
+[ 38%] Generating generics-imports-normal.o
+[ 38%] Linking CXX executable void_generics_cli_failures_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-imports-normal.o
+[ 38%] Linking CXX executable void_generics_cli_imports_normal
+[ 38%] Built target void_generics_cli_failures_normal
+[ 38%] Generating generics-order-normal.o
+[ 38%] Built target void_generics_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-order-normal.o
+[ 38%] Generating generics-large-normal.o
+[ 38%] Linking CXX executable void_generics_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-large-normal.o
+[ 38%] Linking CXX executable void_generics_cli_large_normal
+[ 38%] Built target void_generics_cli_order_normal
+[ 39%] Generating generics-reload-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-reload-normal.o
+[ 39%] Built target void_generics_cli_large_normal
+[ 39%] Linking CXX executable void_generics_cli_reload_normal
+[ 40%] Generating generics-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-main-optimized.o
+[ 40%] Built target void_generics_cli_reload_normal
+[ 40%] Linking CXX executable void_generics_cli_main_optimized
+[ 40%] Generating generics-functions-optimized.o
+[ 40%] Built target void_generics_cli_main_optimized
+[ 40%] Generating generics-types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-functions-optimized.o
+[ 40%] Linking CXX executable void_generics_cli_functions_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-types-optimized.o
+[ 40%] Built target void_generics_cli_functions_optimized
+[ 40%] Linking CXX executable void_generics_cli_types_optimized
+[ 40%] Generating generics-constraints-optimized.o
+[ 40%] Built target void_generics_cli_types_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-constraints-optimized.o
+[ 41%] Generating generics-arrays-optimized.o
+[ 41%] Linking CXX executable void_generics_cli_constraints_optimized
+[ 41%] Built target void_generics_cli_constraints_optimized
+[ 41%] Generating generics-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-initialization-optimized.o
+[ 41%] Linking CXX executable void_generics_cli_initialization_optimized
+[ 41%] Built target void_generics_cli_initialization_optimized
+[ 41%] Generating generics-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-methods-optimized.o
+[ 41%] Linking CXX executable void_generics_cli_methods_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-arrays-optimized.o
+[ 41%] Linking CXX executable void_generics_cli_arrays_optimized
+[ 41%] Built target void_generics_cli_methods_optimized
+[ 41%] Generating generics-failures-optimized.o
+[ 41%] Built target void_generics_cli_arrays_optimized
+[ 41%] Generating generics-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-imports-optimized.o
+[ 41%] Linking CXX executable void_generics_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-failures-optimized.o
+[ 42%] Linking CXX executable void_generics_cli_failures_optimized
+[ 42%] Built target void_generics_cli_imports_optimized
+[ 42%] Generating generics-order-optimized.o
+[ 42%] Built target void_generics_cli_failures_optimized
+[ 42%] Generating generics-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-order-optimized.o
+[ 42%] Linking CXX executable void_generics_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-large-optimized.o
+[ 42%] Built target void_generics_cli_order_optimized
+[ 42%] Generating generics-reload-optimized.o
+[ 42%] Linking CXX executable void_generics_cli_large_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/generics-reload-optimized.o
+[ 42%] Linking CXX executable void_generics_cli_reload_optimized
+[ 42%] Built target void_generics_cli_large_optimized
+[ 42%] Generating collections-main-normal.o
+[ 42%] Built target void_generics_cli_reload_optimized
+[ 42%] Generating collections-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-main-normal.o
+[ 42%] Linking CXX executable void_collections_cli_main_normal
+[ 42%] Built target void_collections_cli_main_normal
+[ 42%] Generating collections-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-order-normal.o
+[ 42%] Linking CXX executable void_collections_cli_order_normal
+[ 42%] Built target void_collections_cli_order_normal
+[ 42%] Generating collections-bounds-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-bounds-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-nested-normal.o
+[ 42%] Linking CXX executable void_collections_cli_bounds_normal
+[ 42%] Linking CXX executable void_collections_cli_nested_normal
+[ 43%] Built target void_collections_cli_bounds_normal
+[ 43%] Built target void_collections_cli_nested_normal
+[ 43%] Generating collections-invalidation-normal.o
+[ 43%] Generating collections-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-invalidation-normal.o
+[ 43%] Linking CXX executable void_collections_cli_large_normal
+[ 43%] Linking CXX executable void_collections_cli_invalidation_normal
+[ 43%] Built target void_collections_cli_invalidation_normal
+[ 43%] Built target void_collections_cli_large_normal
+[ 43%] Generating collections-readonly-normal.o
+[ 44%] Generating collections-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-readonly-normal.o
+[ 45%] Linking CXX executable void_collections_cli_readonly_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-numeric-normal.o
+[ 45%] Built target void_collections_cli_readonly_normal
+[ 45%] Generating collections-main-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_numeric_normal
+[ 45%] Built target void_collections_cli_numeric_normal
+[ 45%] Generating collections-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-main-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_main_optimized
+[ 45%] Built target void_collections_cli_main_optimized
+[ 45%] Generating collections-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-order-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_order_optimized
+[ 45%] Built target void_collections_cli_order_optimized
+[ 45%] Generating collections-bounds-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-bounds-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_bounds_optimized
+[ 45%] Built target void_collections_cli_bounds_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-nested-optimized.o
+[ 45%] Generating collections-invalidation-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_nested_optimized
+[ 45%] Built target void_collections_cli_nested_optimized
+[ 45%] Generating collections-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-invalidation-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_invalidation_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-large-optimized.o
+[ 45%] Linking CXX executable void_collections_cli_large_optimized
+[ 45%] Built target void_collections_cli_invalidation_optimized
+[ 45%] Generating collections-readonly-optimized.o
+[ 46%] Built target void_collections_cli_large_optimized
+[ 46%] Generating collections-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-readonly-optimized.o
+[ 46%] Linking CXX executable void_collections_cli_readonly_optimized
+[ 46%] Built target void_collections_cli_readonly_optimized
+[ 46%] Generating dictionaries-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-main-normal.o
+[ 47%] Linking CXX executable void_dictionaries_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/collections-numeric-optimized.o
+[ 47%] Linking CXX executable void_collections_cli_numeric_optimized
+[ 47%] Built target void_dictionaries_cli_main_normal
+[ 47%] Generating dictionaries-keys-normal.o
+[ 47%] Built target void_collections_cli_numeric_optimized
+[ 47%] Generating dictionaries-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-keys-normal.o
+[ 47%] Linking CXX executable void_dictionaries_cli_keys_normal
+[ 47%] Built target void_dictionaries_cli_keys_normal
+[ 47%] Generating dictionaries-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-order-normal.o
+[ 47%] Linking CXX executable void_dictionaries_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-nested-normal.o
+[ 47%] Linking CXX executable void_dictionaries_cli_nested_normal
+[ 47%] Built target void_dictionaries_cli_order_normal
+[ 48%] Generating dictionaries-large-normal.o
+[ 48%] Built target void_dictionaries_cli_nested_normal
+[ 48%] Generating dictionaries-transactions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-large-normal.o
+[ 48%] Linking CXX executable void_dictionaries_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-transactions-normal.o
+[ 48%] Linking CXX executable void_dictionaries_cli_transactions_normal
+[ 48%] Built target void_dictionaries_cli_large_normal
+[ 48%] Generating dictionaries-literal-normal.o
+[ 48%] Built target void_dictionaries_cli_transactions_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-literal-normal.o
+[ 48%] Generating dictionaries-main-optimized.o
+[ 48%] Linking CXX executable void_dictionaries_cli_literal_normal
+[ 48%] Built target void_dictionaries_cli_literal_normal
+[ 48%] Generating dictionaries-keys-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-main-optimized.o
+[ 48%] Linking CXX executable void_dictionaries_cli_main_optimized
+[ 48%] Built target void_dictionaries_cli_main_optimized
+[ 48%] Generating dictionaries-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-keys-optimized.o
+[ 48%] Linking CXX executable void_dictionaries_cli_keys_optimized
+[ 48%] Built target void_dictionaries_cli_keys_optimized
+[ 48%] Generating dictionaries-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-order-optimized.o
+[ 48%] Linking CXX executable void_dictionaries_cli_order_optimized
+[ 49%] Built target void_dictionaries_cli_order_optimized
+[ 49%] Generating dictionaries-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-nested-optimized.o
+[ 49%] Linking CXX executable void_dictionaries_cli_nested_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-large-optimized.o
+[ 49%] Built target void_dictionaries_cli_nested_optimized
+[ 49%] Linking CXX executable void_dictionaries_cli_large_optimized
+[ 49%] Generating dictionaries-transactions-optimized.o
+[ 49%] Built target void_dictionaries_cli_large_optimized
+[ 49%] Generating dictionaries-literal-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-literal-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/dictionaries-transactions-optimized.o
+[ 49%] Linking CXX executable void_dictionaries_cli_literal_optimized
+[ 49%] Linking CXX executable void_dictionaries_cli_transactions_optimized
+[ 49%] Built target void_dictionaries_cli_literal_optimized
+[ 49%] Built target void_dictionaries_cli_transactions_optimized
+[ 49%] Generating properties-main-normal.o
+[ 50%] Generating properties-generic-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-generic-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-main-normal.o
+[ 50%] Linking CXX executable void_properties_cli_generic_normal
+[ 50%] Linking CXX executable void_properties_cli_main_normal
+[ 50%] Built target void_properties_cli_generic_normal
+[ 50%] Generating properties-order-normal.o
+[ 50%] Built target void_properties_cli_main_normal
+[ 50%] Generating properties-references-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-order-normal.o
+[ 50%] Linking CXX executable void_properties_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-references-normal.o
+[ 50%] Linking CXX executable void_properties_cli_references_normal
+[ 50%] Built target void_properties_cli_order_normal
+[ 50%] Generating properties-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-methods-normal.o
+[ 50%] Built target void_properties_cli_references_normal
+[ 50%] Linking CXX executable void_properties_cli_methods_normal
+[ 50%] Generating properties-callable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-callable-normal.o
+[ 50%] Linking CXX executable void_properties_cli_callable_normal
+[ 50%] Built target void_properties_cli_methods_normal
+[ 50%] Generating properties-selection-normal.o
+[ 50%] Built target void_properties_cli_callable_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-selection-normal.o
+[ 50%] Generating properties-imports-normal.o
+[ 50%] Linking CXX executable void_properties_cli_selection_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-imports-normal.o
+[ 50%] Linking CXX executable void_properties_cli_imports_normal
+[ 51%] Built target void_properties_cli_selection_normal
+[ 51%] Generating properties-failure-normal.o
+[ 51%] Built target void_properties_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-failure-normal.o
+[ 51%] Generating properties-receiver-normal.o
+[ 51%] Linking CXX executable void_properties_cli_failure_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-receiver-normal.o
+[ 51%] Linking CXX executable void_properties_cli_receiver_normal
+[ 51%] Built target void_properties_cli_failure_normal
+[ 52%] Generating properties-main-optimized.o
+[ 52%] Built target void_properties_cli_receiver_normal
+[ 52%] Generating properties-generic-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-generic-optimized.o
+[ 52%] Linking CXX executable void_properties_cli_main_optimized
+[ 52%] Linking CXX executable void_properties_cli_generic_optimized
+[ 52%] Built target void_properties_cli_main_optimized
+[ 52%] Built target void_properties_cli_generic_optimized
+[ 52%] Generating properties-order-optimized.o
+[ 52%] Generating properties-references-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-order-optimized.o
+[ 53%] Linking CXX executable void_properties_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-references-optimized.o
+[ 53%] Linking CXX executable void_properties_cli_references_optimized
+[ 53%] Built target void_properties_cli_order_optimized
+[ 53%] Generating properties-methods-optimized.o
+[ 53%] Built target void_properties_cli_references_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-methods-optimized.o
+[ 53%] Generating properties-callable-optimized.o
+[ 53%] Linking CXX executable void_properties_cli_methods_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-callable-optimized.o
+[ 53%] Linking CXX executable void_properties_cli_callable_optimized
+[ 53%] Built target void_properties_cli_methods_optimized
+[ 53%] Generating properties-selection-optimized.o
+[ 53%] Built target void_properties_cli_callable_optimized
+[ 53%] Generating properties-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-imports-optimized.o
+[ 53%] Linking CXX executable void_properties_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-selection-optimized.o
+[ 53%] Built target void_properties_cli_imports_optimized
+[ 53%] Linking CXX executable void_properties_cli_selection_optimized
+[ 53%] Generating properties-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-failure-optimized.o
+[ 53%] Built target void_properties_cli_selection_optimized
+[ 53%] Linking CXX executable void_properties_cli_failure_optimized
+[ 53%] Generating properties-receiver-optimized.o
+[ 53%] Built target void_properties_cli_failure_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/properties-receiver-optimized.o
+[ 53%] Generating patterns-main-normal.o
+[ 53%] Linking CXX executable void_properties_cli_receiver_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-main-normal.o
+[ 53%] Built target void_properties_cli_receiver_optimized
+[ 53%] Linking CXX executable void_patterns_cli_main_normal
+[ 53%] Generating patterns-results-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-results-normal.o
+[ 53%] Built target void_patterns_cli_main_normal
+[ 53%] Generating patterns-values-normal.o
+[ 53%] Linking CXX executable void_patterns_cli_results_normal
+[ 53%] Built target void_patterns_cli_results_normal
+[ 53%] Generating patterns-interfaces-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-values-normal.o
+[ 53%] Linking CXX executable void_patterns_cli_values_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-interfaces-normal.o
+[ 53%] Linking CXX executable void_patterns_cli_interfaces_normal
+[ 53%] Built target void_patterns_cli_values_normal
+[ 53%] Generating patterns-generic-normal.o
+[ 53%] Built target void_patterns_cli_interfaces_normal
+[ 53%] Generating patterns-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-generic-normal.o
+[ 54%] Linking CXX executable void_patterns_cli_generic_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-large-normal.o
+[ 54%] Linking CXX executable void_patterns_cli_large_normal
+[ 54%] Built target void_patterns_cli_generic_normal
+[ 54%] Generating patterns-nullable-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/nullable.void:9:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 9 |     match result:
+   |     ^^^^^
+    Module: /nullable.void
+
+[ 54%] Built target void_patterns_cli_large_normal
+[ 55%] Generating patterns-control-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-nullable-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/control.void:14:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 14 |     match current:
+    |     ^^^^^
+    Module: /control.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-control-normal.o
+[ 55%] Linking CXX executable void_patterns_cli_nullable_normal
+[ 55%] Linking CXX executable void_patterns_cli_control_normal
+[ 56%] Built target void_patterns_cli_nullable_normal
+[ 56%] Generating patterns-combined-normal.o
+[ 56%] Built target void_patterns_cli_control_normal
+[ 56%] Generating patterns-unmatched-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/unmatched.void:2:12: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 2 |     return match x:
+   |            ^^^^^
+    Module: /unmatched.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-unmatched-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-combined-normal.o
+[ 56%] Linking CXX executable void_patterns_cli_unmatched_normal
+[ 56%] Linking CXX executable void_patterns_cli_combined_normal
+[ 56%] Built target void_patterns_cli_unmatched_normal
+[ 56%] Generating patterns-transactions-normal.o
+[ 56%] Built target void_patterns_cli_combined_normal
+[ 56%] Generating patterns-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-transactions-normal.o
+[ 56%] Linking CXX executable void_patterns_cli_transactions_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-nested-normal.o
+[ 56%] Linking CXX executable void_patterns_cli_nested_normal
+[ 56%] Built target void_patterns_cli_transactions_normal
+[ 56%] Generating patterns-types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-types-normal.o
+[ 56%] Built target void_patterns_cli_nested_normal
+[ 56%] Generating patterns-fields-normal.o
+[ 56%] Linking CXX executable void_patterns_cli_types_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-fields-normal.o
+[ 56%] Linking CXX executable void_patterns_cli_fields_normal
+[ 56%] Built target void_patterns_cli_types_normal
+[ 56%] Generating patterns-relocation-normal.o
+[ 56%] Built target void_patterns_cli_fields_normal
+[ 56%] Generating patterns-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-main-optimized.o
+[ 56%] Linking CXX executable void_patterns_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-relocation-normal.o
+[ 56%] Linking CXX executable void_patterns_cli_relocation_normal
+[ 56%] Built target void_patterns_cli_main_optimized
+[ 57%] Generating patterns-results-optimized.o
+[ 57%] Built target void_patterns_cli_relocation_normal
+[ 57%] Generating patterns-values-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-results-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_results_optimized
+[ 57%] Built target void_patterns_cli_results_optimized
+[ 57%] Generating patterns-interfaces-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-values-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_values_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-interfaces-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_interfaces_optimized
+[ 57%] Built target void_patterns_cli_values_optimized
+[ 57%] Generating patterns-generic-optimized.o
+[ 57%] Built target void_patterns_cli_interfaces_optimized
+[ 57%] Generating patterns-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-generic-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_generic_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-large-optimized.o
+[ 57%] Built target void_patterns_cli_generic_optimized
+[ 57%] Generating patterns-nullable-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/nullable.void:9:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 9 |     match result:
+   |     ^^^^^
+    Module: /nullable.void
+
+[ 57%] Linking CXX executable void_patterns_cli_large_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-nullable-optimized.o
+[ 58%] Built target void_patterns_cli_large_optimized
+[ 58%] Generating patterns-control-optimized.o
+[ 58%] Linking CXX executable void_patterns_cli_nullable_optimized
+/home/shmellyorc/Documents/Void.Language/examples/patterns/control.void:14:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 14 |     match current:
+    |     ^^^^^
+    Module: /control.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-control-optimized.o
+[ 58%] Linking CXX executable void_patterns_cli_control_optimized
+[ 58%] Built target void_patterns_cli_nullable_optimized
+[ 58%] Generating patterns-combined-optimized.o
+[ 58%] Built target void_patterns_cli_control_optimized
+[ 58%] Generating patterns-unmatched-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/unmatched.void:2:12: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 2 |     return match x:
+   |            ^^^^^
+    Module: /unmatched.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-unmatched-optimized.o
+[ 58%] Linking CXX executable void_patterns_cli_unmatched_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-combined-optimized.o
+[ 58%] Built target void_patterns_cli_unmatched_optimized
+[ 58%] Generating patterns-transactions-optimized.o
+[ 58%] Linking CXX executable void_patterns_cli_combined_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-transactions-optimized.o
+[ 58%] Built target void_patterns_cli_combined_optimized
+[ 58%] Generating patterns-nested-optimized.o
+[ 58%] Linking CXX executable void_patterns_cli_transactions_optimized
+[ 58%] Built target void_patterns_cli_transactions_optimized
+[ 58%] Generating patterns-types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-types-optimized.o
+[ 58%] Linking CXX executable void_patterns_cli_nested_optimized
+[ 59%] Linking CXX executable void_patterns_cli_types_optimized
+[ 59%] Built target void_patterns_cli_nested_optimized
+[ 59%] Built target void_patterns_cli_types_optimized
+[ 59%] Generating patterns-fields-optimized.o
+[ 59%] Generating patterns-relocation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-fields-optimized.o
+[ 59%] Linking CXX executable void_patterns_cli_fields_optimized
+[ 59%] Built target void_patterns_cli_fields_optimized
+[ 59%] Generating advanced-closures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/patterns-relocation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-closures-normal.o
+[ 59%] Linking CXX executable void_advanced_cli_closures_normal
+[ 59%] Linking CXX executable void_patterns_cli_relocation_optimized
+[ 59%] Built target void_advanced_cli_closures_normal
+[ 59%] Built target void_patterns_cli_relocation_optimized
+[ 59%] Generating advanced-captures-normal.o
+[ 59%] Generating advanced-callbacks-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-callbacks-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-captures-normal.o
+[ 59%] Linking CXX executable void_advanced_cli_callbacks_normal
+[ 59%] Linking CXX executable void_advanced_cli_captures_normal
+[ 59%] Built target void_advanced_cli_callbacks_normal
+[ 59%] Generating advanced-defer-normal.o
+[ 59%] Built target void_advanced_cli_captures_normal
+[ 59%] Generating advanced-with-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-defer-normal.o
+[ 59%] Linking CXX executable void_advanced_cli_defer_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-with-normal.o
+[ 59%] Built target void_advanced_cli_defer_normal
+[ 59%] Linking CXX executable void_advanced_cli_with_normal
+[ 59%] Generating advanced-events-normal.o
+[ 59%] Built target void_advanced_cli_with_normal
+[ 60%] Generating advanced-cleanup_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-events-normal.o
+[ 60%] Linking CXX executable void_advanced_cli_events_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-cleanup_failure-normal.o
+[ 60%] Built target void_advanced_cli_events_normal
+[ 60%] Linking CXX executable void_advanced_cli_cleanup_failure_normal
+[ 60%] Generating advanced-propagation-normal.o
+[ 60%] Built target void_advanced_cli_cleanup_failure_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-propagation-normal.o
+[ 61%] Generating advanced-event_snapshot-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_propagation_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-event_snapshot-normal.o
+[ 61%] Built target void_advanced_cli_propagation_normal
+[ 61%] Generating advanced-nullable-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_event_snapshot_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-nullable-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_nullable_normal
+[ 61%] Built target void_advanced_cli_event_snapshot_normal
+[ 61%] Generating advanced-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-large-normal.o
+[ 61%] Built target void_advanced_cli_nullable_normal
+[ 61%] Generating advanced-fixed_capture-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-fixed_capture-normal.o
+[ 62%] Linking CXX executable void_advanced_cli_fixed_capture_normal
+[ 63%] Built target void_advanced_cli_large_normal
+[ 63%] Generating advanced-inheritance-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-inheritance-normal.o
+[ 63%] Built target void_advanced_cli_fixed_capture_normal
+[ 63%] Generating advanced-scope-normal.o
+[ 63%] Linking CXX executable void_advanced_cli_inheritance_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-scope-normal.o
+[ 63%] Built target void_advanced_cli_inheritance_normal
+[ 63%] Linking CXX executable void_advanced_cli_scope_normal
+[ 63%] Generating advanced-with_transaction-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-with_transaction-normal.o
+[ 63%] Built target void_advanced_cli_scope_normal
+[ 63%] Generating advanced-combined-normal.o
+[ 63%] Linking CXX executable void_advanced_cli_with_transaction_normal
+[ 63%] Built target void_advanced_cli_with_transaction_normal
+[ 63%] Generating advanced-function_arrays-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-function_arrays-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-combined-normal.o
+[ 63%] Linking CXX executable void_advanced_cli_function_arrays_normal
+[ 64%] Linking CXX executable void_advanced_cli_combined_normal
+[ 64%] Built target void_advanced_cli_function_arrays_normal
+[ 64%] Generating advanced-identity-normal.o
+[ 64%] Built target void_advanced_cli_combined_normal
+[ 64%] Generating advanced-generic_callbacks-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-identity-normal.o
+[ 64%] Linking CXX executable void_advanced_cli_identity_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-generic_callbacks-normal.o
+[ 64%] Linking CXX executable void_advanced_cli_generic_callbacks_normal
+[ 64%] Built target void_advanced_cli_identity_normal
+[ 64%] Generating advanced-dictionary_closures-normal.o
+[ 64%] Built target void_advanced_cli_generic_callbacks_normal
+[ 64%] Generating advanced-construction_cleanup-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-dictionary_closures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-construction_cleanup-normal.o
+[ 64%] Linking CXX executable void_advanced_cli_dictionary_closures_normal
+[ 64%] Linking CXX executable void_advanced_cli_construction_cleanup_normal
+[ 64%] Built target void_advanced_cli_dictionary_closures_normal
+[ 64%] Generating advanced-composite_defaults-normal.o
+[ 64%] Built target void_advanced_cli_construction_cleanup_normal
+[ 64%] Generating advanced-closures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-composite_defaults-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-closures-optimized.o
+[ 64%] Linking CXX executable void_advanced_cli_composite_defaults_normal
+[ 64%] Linking CXX executable void_advanced_cli_closures_optimized
+[ 64%] Built target void_advanced_cli_composite_defaults_normal
+[ 64%] Built target void_advanced_cli_closures_optimized
+[ 64%] Generating advanced-captures-optimized.o
+[ 64%] Generating advanced-callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-callbacks-optimized.o
+[ 64%] Linking CXX executable void_advanced_cli_callbacks_optimized
+[ 64%] Built target void_advanced_cli_callbacks_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-captures-optimized.o
+[ 64%] Generating advanced-defer-optimized.o
+[ 64%] Linking CXX executable void_advanced_cli_captures_optimized
+[ 64%] Built target void_advanced_cli_captures_optimized
+[ 64%] Generating advanced-with-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-defer-optimized.o
+[ 64%] Linking CXX executable void_advanced_cli_defer_optimized
+[ 64%] Built target void_advanced_cli_defer_optimized
+[ 64%] Generating advanced-events-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-with-optimized.o
+[ 65%] Linking CXX executable void_advanced_cli_with_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-events-optimized.o
+[ 65%] Built target void_advanced_cli_with_optimized
+[ 65%] Generating advanced-cleanup_failure-optimized.o
+[ 65%] Linking CXX executable void_advanced_cli_events_optimized
+[ 65%] Built target void_advanced_cli_events_optimized
+[ 66%] Generating advanced-propagation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-cleanup_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-propagation-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_cleanup_failure_optimized
+[ 66%] Linking CXX executable void_advanced_cli_propagation_optimized
+[ 66%] Built target void_advanced_cli_cleanup_failure_optimized
+[ 66%] Generating advanced-event_snapshot-optimized.o
+[ 66%] Built target void_advanced_cli_propagation_optimized
+[ 66%] Generating advanced-nullable-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-nullable-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_nullable_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-event_snapshot-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_event_snapshot_optimized
+[ 66%] Built target void_advanced_cli_nullable_optimized
+[ 66%] Generating advanced-large-optimized.o
+[ 66%] Built target void_advanced_cli_event_snapshot_optimized
+[ 66%] Generating advanced-fixed_capture-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-large-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_large_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-fixed_capture-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_fixed_capture_optimized
+[ 66%] Built target void_advanced_cli_large_optimized
+[ 66%] Generating advanced-inheritance-optimized.o
+[ 66%] Built target void_advanced_cli_fixed_capture_optimized
+[ 66%] Generating advanced-scope-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-inheritance-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_inheritance_optimized
+[ 66%] Built target void_advanced_cli_inheritance_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-scope-optimized.o
+[ 66%] Generating advanced-with_transaction-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_scope_optimized
+[ 66%] Built target void_advanced_cli_scope_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-with_transaction-optimized.o
+[ 66%] Generating advanced-combined-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_with_transaction_optimized
+[ 66%] Built target void_advanced_cli_with_transaction_optimized
+[ 66%] Generating advanced-function_arrays-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-combined-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-function_arrays-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_function_arrays_optimized
+[ 66%] Linking CXX executable void_advanced_cli_combined_optimized
+[ 66%] Built target void_advanced_cli_function_arrays_optimized
+[ 66%] Built target void_advanced_cli_combined_optimized
+[ 66%] Generating advanced-identity-optimized.o
+[ 66%] Generating advanced-generic_callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-generic_callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-identity-optimized.o
+[ 66%] Linking CXX executable void_advanced_cli_identity_optimized
+[ 67%] Linking CXX executable void_advanced_cli_generic_callbacks_optimized
+[ 67%] Built target void_advanced_cli_identity_optimized
+[ 67%] Built target void_advanced_cli_generic_callbacks_optimized
+[ 67%] Generating advanced-construction_cleanup-optimized.o
+[ 67%] Generating advanced-dictionary_closures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-construction_cleanup-optimized.o
+[ 67%] Linking CXX executable void_advanced_cli_construction_cleanup_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-dictionary_closures-optimized.o
+[ 67%] Linking CXX executable void_advanced_cli_dictionary_closures_optimized
+[ 68%] Built target void_advanced_cli_construction_cleanup_optimized
+[ 68%] Generating advanced-composite_defaults-optimized.o
+[ 68%] Built target void_advanced_cli_dictionary_closures_optimized
+[ 68%] Generating managed-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/advanced-composite_defaults-optimized.o
+[ 68%] Linking CXX executable void_managed_cli_main_normal
+[ 68%] Linking CXX executable void_advanced_cli_composite_defaults_optimized
+[ 68%] Built target void_managed_cli_main_normal
+[ 68%] Generating managed-cli-handoffs-normal.o
+[ 68%] Built target void_advanced_cli_composite_defaults_optimized
+[ 68%] Generating managed-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-handoffs-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-order-normal.o
+[ 68%] Linking CXX executable void_managed_cli_handoffs_normal
+[ 68%] Linking CXX executable void_managed_cli_order_normal
+[ 68%] Built target void_managed_cli_handoffs_normal
+[ 68%] Built target void_managed_cli_order_normal
+[ 68%] Generating managed-cli-imports-normal.o
+[ 69%] Generating managed-cli-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-imports-normal.o
+[ 69%] Linking CXX executable void_managed_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-numeric-normal.o
+[ 69%] Linking CXX executable void_managed_cli_numeric_normal
+[ 69%] Built target void_managed_cli_imports_normal
+[ 69%] Generating managed-cli-null_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-null_failure-normal.o
+[ 69%] Built target void_managed_cli_numeric_normal
+[ 69%] Generating managed-cli-main-optimized.o
+[ 69%] Linking CXX executable void_managed_cli_null_failure_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-main-optimized.o
+[ 69%] Built target void_managed_cli_null_failure_normal
+[ 69%] Generating managed-cli-handoffs-optimized.o
+[ 69%] Linking CXX executable void_managed_cli_main_optimized
+[ 69%] Built target void_managed_cli_main_optimized
+[ 69%] Generating managed-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-handoffs-optimized.o
+[ 69%] Linking CXX executable void_managed_cli_order_optimized
+[ 69%] Linking CXX executable void_managed_cli_handoffs_optimized
+[ 69%] Built target void_managed_cli_order_optimized
+[ 69%] Built target void_managed_cli_handoffs_optimized
+[ 69%] Generating managed-cli-imports-optimized.o
+[ 69%] Generating managed-cli-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-imports-optimized.o
+[ 69%] Linking CXX executable void_managed_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-numeric-optimized.o
+[ 69%] Linking CXX executable void_managed_cli_numeric_optimized
+[ 70%] Built target void_managed_cli_imports_optimized
+[ 70%] Generating managed-cli-null_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed-cli-null_failure-optimized.o
+[ 70%] Built target void_managed_cli_numeric_optimized
+[ 70%] Generating managed_initialization-cli-main-normal.o
+[ 70%] Linking CXX executable void_managed_cli_null_failure_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-main-normal.o
+[ 70%] Built target void_managed_cli_null_failure_optimized
+[ 70%] Linking CXX executable void_managed_initialization_cli_main_normal
+[ 70%] Generating managed_initialization-cli-stress-normal.o
+[ 70%] Built target void_managed_initialization_cli_main_normal
+[ 70%] Generating managed_initialization-cli-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-numeric-normal.o
+[ 70%] Linking CXX executable void_managed_initialization_cli_stress_normal
+[ 70%] Linking CXX executable void_managed_initialization_cli_numeric_normal
+[ 70%] Built target void_managed_initialization_cli_stress_normal
+[ 70%] Generating managed_initialization-cli-imports-normal.o
+[ 71%] Built target void_managed_initialization_cli_numeric_normal
+[ 71%] Generating managed_initialization-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-failure-normal.o
+[ 71%] Linking CXX executable void_managed_initialization_cli_imports_normal
+[ 71%] Linking CXX executable void_managed_initialization_cli_failure_normal
+[ 71%] Built target void_managed_initialization_cli_imports_normal
+[ 71%] Built target void_managed_initialization_cli_failure_normal
+[ 71%] Generating managed_initialization-cli-fail_default-normal.o
+[ 71%] Generating managed_initialization-cli-fail_argument-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-fail_default-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-fail_argument-normal.o
+[ 71%] Linking CXX executable void_managed_initialization_cli_fail_default_normal
+[ 71%] Linking CXX executable void_managed_initialization_cli_fail_argument_normal
+[ 71%] Built target void_managed_initialization_cli_fail_default_normal
+[ 71%] Built target void_managed_initialization_cli_fail_argument_normal
+[ 71%] Generating managed_initialization-cli-fail_child-normal.o
+[ 71%] Generating managed_initialization-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-fail_child-normal.o
+[ 72%] Linking CXX executable void_managed_initialization_cli_fail_child_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-main-optimized.o
+[ 72%] Linking CXX executable void_managed_initialization_cli_main_optimized
+[ 72%] Built target void_managed_initialization_cli_fail_child_normal
+[ 72%] Generating managed_initialization-cli-stress-optimized.o
+[ 72%] Built target void_managed_initialization_cli_main_optimized
+[ 72%] Generating managed_initialization-cli-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-stress-optimized.o
+[ 72%] Linking CXX executable void_managed_initialization_cli_numeric_optimized
+[ 72%] Linking CXX executable void_managed_initialization_cli_stress_optimized
+[ 72%] Built target void_managed_initialization_cli_numeric_optimized
+[ 72%] Built target void_managed_initialization_cli_stress_optimized
+[ 72%] Generating managed_initialization-cli-imports-optimized.o
+[ 72%] Generating managed_initialization-cli-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-imports-optimized.o
+[ 72%] Linking CXX executable void_managed_initialization_cli_imports_optimized
+[ 72%] Linking CXX executable void_managed_initialization_cli_failure_optimized
+[ 72%] Built target void_managed_initialization_cli_imports_optimized
+[ 73%] Built target void_managed_initialization_cli_failure_optimized
+[ 73%] Generating managed_initialization-cli-fail_default-optimized.o
+[ 73%] Generating managed_initialization-cli-fail_argument-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-fail_argument-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-fail_default-optimized.o
+[ 73%] Linking CXX executable void_managed_initialization_cli_fail_argument_optimized
+[ 73%] Linking CXX executable void_managed_initialization_cli_fail_default_optimized
+[ 73%] Built target void_managed_initialization_cli_fail_default_optimized
+[ 73%] Built target void_managed_initialization_cli_fail_argument_optimized
+[ 73%] Generating managed_initialization-cli-fail_child-optimized.o
+[ 73%] Generating reference_values-cli-copies-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-copies-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/managed_initialization-cli-fail_child-optimized.o
+[ 73%] Linking CXX executable void_reference_values_cli_copies_normal
+[ 73%] Linking CXX executable void_managed_initialization_cli_fail_child_optimized
+[ 73%] Built target void_reference_values_cli_copies_normal
+[ 73%] Built target void_managed_initialization_cli_fail_child_optimized
+[ 73%] Generating reference_values-cli-readonly-normal.o
+[ 74%] Generating reference_values-cli-initialization-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-initialization-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_initialization_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-readonly-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_readonly_normal
+[ 74%] Built target void_reference_values_cli_initialization_normal
+[ 74%] Generating reference_values-cli-templates-normal.o
+[ 74%] Built target void_reference_values_cli_readonly_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-templates-normal.o
+[ 74%] Generating reference_values-cli-methods-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_templates_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-methods-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_methods_normal
+[ 74%] Built target void_reference_values_cli_templates_normal
+[ 74%] Generating reference_values-cli-staged-normal.o
+[ 74%] Built target void_reference_values_cli_methods_normal
+[ 74%] Generating reference_values-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-staged-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_staged_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-order-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_order_normal
+[ 74%] Built target void_reference_values_cli_staged_normal
+[ 74%] Generating reference_values-cli-imports-normal.o
+[ 74%] Built target void_reference_values_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-imports-normal.o
+[ 74%] Generating reference_values-cli-required-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-required-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_required_normal
+[ 74%] Built target void_reference_values_cli_imports_normal
+[ 74%] Generating reference_values-cli-stress-normal.o
+[ 74%] Built target void_reference_values_cli_required_normal
+[ 74%] Generating reference_values-cli-null_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-null_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-stress-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_null_failure_normal
+[ 74%] Linking CXX executable void_reference_values_cli_stress_normal
+[ 74%] Built target void_reference_values_cli_null_failure_normal
+[ 74%] Generating reference_values-cli-copies-optimized.o
+[ 75%] Built target void_reference_values_cli_stress_normal
+[ 75%] Generating reference_values-cli-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-copies-optimized.o
+[ 75%] Linking CXX executable void_reference_values_cli_copies_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-readonly-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_readonly_optimized
+[ 76%] Built target void_reference_values_cli_copies_optimized
+[ 76%] Generating reference_values-cli-initialization-optimized.o
+[ 76%] Built target void_reference_values_cli_readonly_optimized
+[ 76%] Generating reference_values-cli-templates-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-initialization-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_initialization_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-templates-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_templates_optimized
+[ 76%] Built target void_reference_values_cli_initialization_optimized
+[ 76%] Generating reference_values-cli-methods-optimized.o
+[ 76%] Built target void_reference_values_cli_templates_optimized
+[ 76%] Generating reference_values-cli-staged-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-methods-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_methods_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-staged-optimized.o
+[ 76%] Built target void_reference_values_cli_methods_optimized
+[ 76%] Generating reference_values-cli-order-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_staged_optimized
+[ 76%] Built target void_reference_values_cli_staged_optimized
+[ 76%] Generating reference_values-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-imports-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-order-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_order_optimized
+[ 76%] Built target void_reference_values_cli_imports_optimized
+[ 76%] Generating reference_values-cli-required-optimized.o
+[ 76%] Built target void_reference_values_cli_order_optimized
+[ 76%] Generating reference_values-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-required-optimized.o
+[ 76%] Linking CXX executable void_reference_values_cli_required_optimized
+[ 76%] Built target void_reference_values_cli_required_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-stress-optimized.o
+[ 77%] Generating reference_values-cli-null_failure-optimized.o
+[ 77%] Linking CXX executable void_reference_values_cli_stress_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/reference_values-cli-null_failure-optimized.o
+[ 77%] Linking CXX executable void_reference_values_cli_null_failure_optimized
+[ 77%] Built target void_reference_values_cli_stress_optimized
+[ 77%] Generating composition-cli-main-normal.o
+[ 77%] Built target void_reference_values_cli_null_failure_optimized
+[ 77%] Generating composition-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-main-normal.o
+[ 77%] Linking CXX executable void_composition_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-stress-normal.o
+[ 77%] Built target void_composition_cli_main_normal
+[ 77%] Linking CXX executable void_composition_cli_stress_normal
+[ 77%] Generating composition-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-imports-normal.o
+[ 77%] Linking CXX executable void_composition_cli_imports_normal
+[ 77%] Built target void_composition_cli_stress_normal
+[ 77%] Generating composition-cli-order-normal.o
+[ 77%] Built target void_composition_cli_imports_normal
+[ 77%] Generating composition-cli-staged-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-order-normal.o
+[ 77%] Linking CXX executable void_composition_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-staged-normal.o
+[ 77%] Linking CXX executable void_composition_cli_staged_normal
+[ 78%] Built target void_composition_cli_order_normal
+[ 78%] Generating composition-cli-receiver_order-normal.o
+[ 78%] Built target void_composition_cli_staged_normal
+[ 78%] Generating composition-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-receiver_order-normal.o
+[ 78%] Linking CXX executable void_composition_cli_receiver_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-main-optimized.o
+[ 78%] Built target void_composition_cli_receiver_order_normal
+[ 78%] Linking CXX executable void_composition_cli_main_optimized
+[ 78%] Generating composition-cli-stress-optimized.o
+[ 78%] Built target void_composition_cli_main_optimized
+[ 78%] Generating composition-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-stress-optimized.o
+[ 78%] Linking CXX executable void_composition_cli_imports_optimized
+[ 78%] Linking CXX executable void_composition_cli_stress_optimized
+[ 78%] Built target void_composition_cli_imports_optimized
+[ 78%] Generating composition-cli-order-optimized.o
+[ 78%] Built target void_composition_cli_stress_optimized
+[ 78%] Generating composition-cli-staged-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-staged-optimized.o
+[ 78%] Linking CXX executable void_composition_cli_staged_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-order-optimized.o
+[ 78%] Linking CXX executable void_composition_cli_order_optimized
+[ 79%] Built target void_composition_cli_staged_optimized
+[ 79%] Generating composition-cli-receiver_order-optimized.o
+[ 79%] Built target void_composition_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/composition-cli-receiver_order-optimized.o
+[ 79%] Generating inheritance-cli-main-normal.o
+[ 79%] Linking CXX executable void_composition_cli_receiver_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-main-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_main_normal
+[ 79%] Built target void_composition_cli_receiver_order_optimized
+[ 79%] Generating inheritance-cli-initialization-normal.o
+[ 79%] Built target void_inheritance_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-initialization-normal.o
+[ 79%] Generating inheritance-cli-stress-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_initialization_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-stress-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_stress_normal
+[ 79%] Built target void_inheritance_cli_initialization_normal
+[ 79%] Generating inheritance-cli-order-normal.o
+[ 79%] Built target void_inheritance_cli_stress_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-order-normal.o
+[ 79%] Generating inheritance-cli-imports-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-imports-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_imports_normal
+[ 79%] Built target void_inheritance_cli_order_normal
+[ 79%] Generating inheritance-cli-receiver_order-normal.o
+[ 79%] Built target void_inheritance_cli_imports_normal
+[ 79%] Generating inheritance-cli-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-receiver_order-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_receiver_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-nested-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_nested_normal
+[ 79%] Built target void_inheritance_cli_receiver_order_normal
+[ 79%] Generating inheritance-cli-results-normal.o
+[ 79%] Built target void_inheritance_cli_nested_normal
+[ 79%] Generating inheritance-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-results-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_failure_normal
+[ 79%] Linking CXX executable void_inheritance_cli_results_normal
+[ 80%] Built target void_inheritance_cli_failure_normal
+[ 81%] Generating inheritance-cli-main-optimized.o
+[ 81%] Built target void_inheritance_cli_results_normal
+[ 82%] Generating inheritance-cli-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-initialization-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_main_optimized
+[ 82%] Linking CXX executable void_inheritance_cli_initialization_optimized
+[ 82%] Built target void_inheritance_cli_main_optimized
+[ 82%] Built target void_inheritance_cli_initialization_optimized
+[ 82%] Generating inheritance-cli-stress-optimized.o
+[ 82%] Generating inheritance-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-stress-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_order_optimized
+[ 82%] Linking CXX executable void_inheritance_cli_stress_optimized
+[ 82%] Built target void_inheritance_cli_order_optimized
+[ 82%] Generating inheritance-cli-imports-optimized.o
+[ 82%] Built target void_inheritance_cli_stress_optimized
+[ 82%] Generating inheritance-cli-receiver_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-imports-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-receiver_order-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_receiver_order_optimized
+[ 82%] Built target void_inheritance_cli_imports_optimized
+[ 82%] Generating inheritance-cli-nested-optimized.o
+[ 82%] Built target void_inheritance_cli_receiver_order_optimized
+[ 82%] Generating inheritance-cli-results-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-nested-optimized.o
+[ 83%] Linking CXX executable void_inheritance_cli_nested_optimized
+[ 83%] Built target void_inheritance_cli_nested_optimized
+[ 83%] Generating inheritance-cli-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/inheritance-cli-results-optimized.o
+[ 83%] Linking CXX executable void_inheritance_cli_results_optimized
+[ 83%] Linking CXX executable void_inheritance_cli_failure_optimized
+[ 83%] Built target void_inheritance_cli_results_optimized
+[ 83%] Built target void_inheritance_cli_failure_optimized
+[ 83%] Generating interfaces-cli-main-normal.o
+[ 83%] Generating interfaces-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-main-normal.o
+[ 83%] Linking CXX executable void_interfaces_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-stress-normal.o
+[ 83%] Linking CXX executable void_interfaces_cli_stress_normal
+[ 84%] Built target void_interfaces_cli_main_normal
+[ 84%] Generating interfaces-cli-nullable-normal.o
+[ 84%] Built target void_interfaces_cli_stress_normal
+[ 84%] Generating interfaces-cli-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-nullable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-selection-normal.o
+[ 84%] Linking CXX executable void_interfaces_cli_nullable_normal
+[ 84%] Linking CXX executable void_interfaces_cli_selection_normal
+[ 84%] Built target void_interfaces_cli_nullable_normal
+[ 84%] Generating interfaces-cli-handoffs-normal.o
+[ 84%] Built target void_interfaces_cli_selection_normal
+[ 84%] Generating interfaces-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-handoffs-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-imports-normal.o
+[ 84%] Linking CXX executable void_interfaces_cli_handoffs_normal
+[ 84%] Linking CXX executable void_interfaces_cli_imports_normal
+[ 84%] Built target void_interfaces_cli_handoffs_normal
+[ 84%] Generating interfaces-cli-cycles-normal.o
+[ 84%] Built target void_interfaces_cli_imports_normal
+[ 84%] Generating interfaces-cli-static-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-cycles-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-static-normal.o
+[ 84%] Linking CXX executable void_interfaces_cli_cycles_normal
+[ 84%] Linking CXX executable void_interfaces_cli_static_normal
+[ 84%] Built target void_interfaces_cli_cycles_normal
+[ 84%] Built target void_interfaces_cli_static_normal
+[ 84%] Generating interfaces-cli-main-optimized.o
+[ 84%] Generating interfaces-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-main-optimized.o
+[ 84%] Linking CXX executable void_interfaces_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-stress-optimized.o
+[ 84%] Built target void_interfaces_cli_main_optimized
+[ 85%] Linking CXX executable void_interfaces_cli_stress_optimized
+[ 85%] Generating interfaces-cli-nullable-optimized.o
+[ 85%] Built target void_interfaces_cli_stress_optimized
+[ 86%] Generating interfaces-cli-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-nullable-optimized.o
+[ 86%] Linking CXX executable void_interfaces_cli_nullable_optimized
+[ 86%] Linking CXX executable void_interfaces_cli_selection_optimized
+[ 86%] Built target void_interfaces_cli_nullable_optimized
+[ 86%] Built target void_interfaces_cli_selection_optimized
+[ 86%] Generating interfaces-cli-handoffs-optimized.o
+[ 86%] Generating interfaces-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-handoffs-optimized.o
+[ 86%] Linking CXX executable void_interfaces_cli_imports_optimized
+[ 86%] Linking CXX executable void_interfaces_cli_handoffs_optimized
+[ 86%] Built target void_interfaces_cli_imports_optimized
+[ 86%] Built target void_interfaces_cli_handoffs_optimized
+[ 86%] Generating interfaces-cli-cycles-optimized.o
+[ 86%] Generating interfaces-cli-static-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-static-optimized.o
+[ 86%] Linking CXX executable void_interfaces_cli_static_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/interfaces-cli-cycles-optimized.o
+[ 87%] Linking CXX executable void_interfaces_cli_cycles_optimized
+[ 87%] Built target void_interfaces_cli_static_optimized
+[ 87%] Generating strings-cli-main-normal.o
+[ 87%] Built target void_interfaces_cli_cycles_optimized
+[ 88%] Generating strings-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-main-normal.o
+[ 88%] Linking CXX executable void_strings_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-stress-normal.o
+[ 88%] Linking CXX executable void_strings_cli_stress_normal
+[ 88%] Built target void_strings_cli_main_normal
+[ 88%] Generating strings-cli-initialization-normal.o
+[ 88%] Built target void_strings_cli_stress_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-initialization-normal.o
+[ 88%] Generating strings-cli-unicode-normal.o
+[ 88%] Linking CXX executable void_strings_cli_initialization_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-unicode-normal.o
+[ 88%] Linking CXX executable void_strings_cli_unicode_normal
+[ 88%] Built target void_strings_cli_initialization_normal
+[ 88%] Generating strings-cli-main-optimized.o
+[ 88%] Built target void_strings_cli_unicode_normal
+[ 88%] Generating strings-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-stress-optimized.o
+[ 88%] Linking CXX executable void_strings_cli_main_optimized
+[ 88%] Linking CXX executable void_strings_cli_stress_optimized
+[ 88%] Built target void_strings_cli_main_optimized
+[ 88%] Built target void_strings_cli_stress_optimized
+[ 88%] Generating strings-cli-initialization-optimized.o
+[ 88%] Generating strings-cli-unicode-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-unicode-optimized.o
+[ 88%] Linking CXX executable void_strings_cli_unicode_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/strings-cli-initialization-optimized.o
+[ 88%] Built target void_strings_cli_unicode_optimized
+[ 88%] Generating native-main-normal.o
+[ 88%] Linking CXX executable void_strings_cli_initialization_optimized
+[ 88%] Built target void_strings_cli_initialization_optimized
+[ 88%] Generating native-main-optimized.o
+[ 89%] Linking CXX executable void_native_aot_main_normal
+[ 89%] Built target void_native_aot_main_normal
+[ 89%] Generating native-terminated_nul-normal.o
+[ 89%] Linking CXX executable void_native_aot_terminated_nul_normal
+[ 89%] Built target void_native_aot_terminated_nul_normal
+[ 89%] Generating native-terminated_nul-optimized.o
+[ 89%] Linking CXX executable void_native_aot_main_optimized
+[ 89%] Linking CXX executable void_native_aot_terminated_nul_optimized
+[ 89%] Built target void_native_aot_main_optimized
+[ 89%] Generating native-closed-normal.o
+[ 89%] Built target void_native_aot_terminated_nul_optimized
+[ 89%] Generating native-closed-optimized.o
+[ 89%] Linking CXX executable void_native_aot_closed_normal
+[ 89%] Built target void_native_aot_closed_normal
+[ 89%] Generating native-duplicate-normal.o
+[ 89%] Linking CXX executable void_native_aot_closed_optimized
+[ 90%] Built target void_native_aot_closed_optimized
+[ 90%] Generating native-duplicate-optimized.o
+[ 90%] Linking CXX executable void_native_aot_duplicate_normal
+[ 90%] Built target void_native_aot_duplicate_normal
+[ 90%] Generating native-cleanup_failure-normal.o
+[ 90%] Linking CXX executable void_native_aot_cleanup_failure_normal
+[ 90%] Linking CXX executable void_native_aot_duplicate_optimized
+[ 90%] Built target void_native_aot_cleanup_failure_normal
+[ 90%] Built target void_native_aot_duplicate_optimized
+[ 90%] Generating native-cleanup_failure-optimized.o
+[ 90%] Generating native-integrated-normal.o
+[ 90%] Linking CXX executable void_native_aot_integrated_normal
+[ 90%] Built target void_native_aot_integrated_normal
+[ 90%] Generating native-integrated-optimized.o
+[ 90%] Linking CXX executable void_native_aot_cleanup_failure_optimized
+[ 90%] Built target void_native_aot_cleanup_failure_optimized
+[ 90%] Generating native-integrated_cancel-normal.o
+[ 90%] Linking CXX executable void_native_aot_integrated_cancel_normal
+[ 90%] Linking CXX executable void_native_aot_integrated_optimized
+[ 90%] Built target void_native_aot_integrated_cancel_normal
+[ 90%] Generating native-integrated_cancel-optimized.o
+[ 90%] Built target void_native_aot_integrated_optimized
+[ 91%] Generating native-integrated_failure-normal.o
+[ 91%] Linking CXX executable void_native_aot_integrated_failure_normal
+[ 91%] Linking CXX executable void_native_aot_integrated_cancel_optimized
+[ 91%] Built target void_native_aot_integrated_failure_normal
+[ 91%] Generating native-integrated_failure-optimized.o
+[ 91%] Built target void_native_aot_integrated_cancel_optimized
+[ 91%] Generating async-spawn-normal.o
+[ 91%] Linking CXX executable void_async_aot_spawn_normal
+[ 91%] Built target void_async_aot_spawn_normal
+[ 91%] Generating async-spawn-optimized.o
+[ 91%] Linking CXX executable void_native_aot_integrated_failure_optimized
+[ 91%] Built target void_native_aot_integrated_failure_optimized
+[ 91%] Generating async-spawn_cancel-normal.o
+[ 91%] Linking CXX executable void_async_aot_spawn_cancel_normal
+[ 91%] Built target void_async_aot_spawn_cancel_normal
+[ 91%] Generating async-spawn_cancel-optimized.o
+[ 91%] Linking CXX executable void_async_aot_spawn_optimized
+[ 91%] Linking CXX executable void_async_aot_spawn_cancel_optimized
+[ 91%] Built target void_async_aot_spawn_optimized
+[ 91%] Built target void_async_aot_spawn_cancel_optimized
+[ 91%] Generating async-spawn_failure-normal.o
+[ 91%] Generating async-spawn_failure-optimized.o
+[ 91%] Linking CXX executable void_async_aot_spawn_failure_normal
+[ 91%] Linking CXX executable void_async_aot_spawn_failure_optimized
+[ 91%] Built target void_async_aot_spawn_failure_normal
+[ 91%] Generating async-activation-normal.o
+[ 92%] Built target void_async_aot_spawn_failure_optimized
+[ 93%] Generating async-activation-optimized.o
+[ 93%] Linking CXX executable void_async_aot_activation_normal
+[ 93%] Linking CXX executable void_async_aot_activation_optimized
+[ 93%] Built target void_async_aot_activation_normal
+[ 93%] Generating async-managed-normal.o
+[ 93%] Built target void_async_aot_activation_optimized
+[ 93%] Generating async-managed-optimized.o
+[ 93%] Linking CXX executable void_async_aot_managed_normal
+[ 93%] Linking CXX executable void_async_aot_managed_optimized
+[ 93%] Built target void_async_aot_managed_normal
+[ 93%] Generating async-large-normal.o
+[ 93%] Built target void_async_aot_managed_optimized
+[ 93%] Generating async-large-optimized.o
+[ 93%] Linking CXX executable void_async_aot_large_normal
+[ 93%] Built target void_async_aot_large_normal
+[ 94%] Linking CXX executable void_async_aot_large_optimized
+[ 94%] Generating async-closures-normal.o
+[ 94%] Built target void_async_aot_large_optimized
+[ 94%] Linking CXX executable void_async_aot_closures_normal
+[ 94%] Generating async-closures-optimized.o
+[ 94%] Built target void_async_aot_closures_normal
+[ 95%] Generating async-loops-normal.o
+[ 95%] Linking CXX executable void_async_aot_closures_optimized
+[ 95%] Linking CXX executable void_async_aot_loops_normal
+[ 95%] Built target void_async_aot_closures_optimized
+[ 95%] Generating async-loops-optimized.o
+[ 95%] Built target void_async_aot_loops_normal
+[ 95%] Generating async-values-normal.o
+[ 95%] Linking CXX executable void_async_aot_loops_optimized
+[ 95%] Built target void_async_aot_loops_optimized
+[ 95%] Generating async-values-optimized.o
+[ 95%] Linking CXX executable void_async_aot_values_normal
+[ 95%] Built target void_async_aot_values_normal
+[ 95%] Generating async-methods-normal.o
+[ 96%] Linking CXX executable void_async_aot_methods_normal
+[ 96%] Linking CXX executable void_async_aot_values_optimized
+[ 96%] Built target void_async_aot_methods_normal
+[ 96%] Generating async-methods-optimized.o
+[ 96%] Built target void_async_aot_values_optimized
+[ 96%] Generating async-lifecycle-normal.o
+[ 96%] Linking CXX executable void_async_aot_methods_optimized
+[ 96%] Linking CXX executable void_async_aot_lifecycle_normal
+[ 96%] Built target void_async_aot_methods_optimized
+[ 96%] Generating async-lifecycle-optimized.o
+[ 96%] Built target void_async_aot_lifecycle_normal
+[ 96%] Generating async-lifecycle_exits-normal.o
+[ 96%] Linking CXX executable void_async_aot_lifecycle_exits_normal
+[ 96%] Built target void_async_aot_lifecycle_exits_normal
+[ 96%] Linking CXX executable void_async_aot_lifecycle_optimized
+[ 96%] Generating async-lifecycle_exits-optimized.o
+[ 96%] Built target void_async_aot_lifecycle_optimized
+[ 96%] Generating async-lifecycle_cancelled-normal.o
+[ 96%] Linking CXX executable void_async_aot_lifecycle_exits_optimized
+[ 96%] Linking CXX executable void_async_aot_lifecycle_cancelled_normal
+[ 96%] Built target void_async_aot_lifecycle_exits_optimized
+[ 96%] Generating async-lifecycle_cancelled-optimized.o
+[ 96%] Built target void_async_aot_lifecycle_cancelled_normal
+[ 96%] Generating async-lifecycle_failures-normal.o
+[ 96%] Linking CXX executable void_async_aot_lifecycle_cancelled_optimized
+[ 96%] Linking CXX executable void_async_aot_lifecycle_failures_normal
+[ 96%] Built target void_async_aot_lifecycle_cancelled_optimized
+[ 97%] Built target void_async_aot_lifecycle_failures_normal
+[ 97%] Generating async-lifecycle_failures-optimized.o
+[ 97%] Generating async-lifecycle_primary-normal.o
+[ 97%] Linking CXX executable void_async_aot_lifecycle_primary_normal
+[ 97%] Linking CXX executable void_async_aot_lifecycle_failures_optimized
+[ 97%] Built target void_async_aot_lifecycle_primary_normal
+[ 98%] Generating async-lifecycle_primary-optimized.o
+[ 98%] Built target void_async_aot_lifecycle_failures_optimized
+[ 98%] Generating async-lifecycle_resources-normal.o
+[ 98%] Linking CXX executable void_async_aot_lifecycle_resources_normal
+[ 98%] Linking CXX executable void_async_aot_lifecycle_primary_optimized
+[ 98%] Built target void_async_aot_lifecycle_resources_normal
+[ 98%] Built target void_async_aot_lifecycle_primary_optimized
+[ 98%] Generating async-lifecycle_resources-optimized.o
+[ 98%] Generating async-lifecycle_values-normal.o
+[ 98%] Linking CXX executable void_async_aot_lifecycle_values_normal
+[ 98%] Built target void_async_aot_lifecycle_values_normal
+[ 98%] Linking CXX executable void_async_aot_lifecycle_resources_optimized
+[ 98%] Generating async-lifecycle_values-optimized.o
+[ 98%] Built target void_async_aot_lifecycle_resources_optimized
+[ 99%] Generating retention-growth-normal.o
+[ 99%] Linking CXX executable void_async_aot_lifecycle_values_optimized
+[ 99%] Built target void_async_aot_lifecycle_values_optimized
+[ 99%] Generating retention-growth-optimized.o
+[ 99%] Linking CXX executable void_retention_aot_growth_normal
+[ 99%] Built target void_retention_aot_growth_normal
+[ 99%] Generating retention-workers-normal.o
+[ 99%] Linking CXX executable void_retention_aot_growth_optimized
+[100%] Linking CXX executable void_retention_aot_workers_normal
+[100%] Built target void_retention_aot_growth_optimized
+[100%] Generating retention-workers-optimized.o
+[100%] Built target void_retention_aot_workers_normal
+[100%] Linking CXX executable void_retention_aot_workers_optimized
+[100%] Built target void_retention_aot_workers_optimized

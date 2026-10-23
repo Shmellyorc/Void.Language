@@ -1,0 +1,14 @@
+{
+  "CMakeLists.txt": "e105f7b3cdc992db6749b8b3f2eeac95cbcd149b79ed8f75b2f8d53a29aa909a",
+  "docs/WORK_LOG.md": "928c5d0adbef4f50f49d7ee82c48f216b61cb4feba48a57955e536d17a9c4d82",
+  "docs/stage10/EVIDENCE.md": "d0662f7621d4dd9af791ec77268b15d5127cf30f376a18b95902d561d8fe8889",
+  "docs/stage10/IMPLEMENTATION.md": "e65310363d7b8919c873b8cbf446ddb9ee59404f648fe3734ee5e48078e2c97a",
+  "docs/stage10/TEST_PLAN.md": "5969688998d2a38afc262a62202b35f525a5592d3ba3e6e5413e0a366109f561",
+  "tests/stage10/operator_integration.cpp": "3b1cfb7f2ddf3cc0b2ccff0e2e8a06e2d7e17bb64c07a9d885d684c74b8ad2b4",
+  "tests/stage10/operator_native_systems.void": "95ed27f68749cd908988ded6a90b1a35f955127384bf6a5beaf1391a7f9127e8",
+  "tests/stage10/operator_reload.cpp": "3467ad48f1f755343ca22ebb00ffed1ec264769ed56abd740505421e154a2b81",
+  "tests/stage10/operator_systems.void": "8be1689c1bd901c19e28e31849cf2cd450a17cd43fd716f9b4fc5ea2d24268b1",
+  "tests/stage10/operator_systems_async.void": "f852be2567ae18277857481418e7d914c5cf8d8d701d3a5d7ffc98e81cc6f5f0",
+  "tests/stage10/operator_systems_workload.void": "933581daa4d93b83c5a2a0f25a12a4bd60f6723477453f7809536037148bec12",
+  "tests/stage10/operators.py": "ab3319084085e445857d1fb4d23cb8669f2e49ca273389b01db6a484827f385f"
+}

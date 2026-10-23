@@ -1,0 +1,67 @@
+{
+  "status": "PASS: local preparation checks only",
+  "utc": "2026-10-23T23:56:42.021284+00:00",
+  "command": "python3 docs/stage10/engineering/step42-preparation-checks.py (preparation checks, not native tests)",
+  "checks": [
+    {
+      "check": "Accepted build/test/editor inputs unchanged",
+      "passed": true,
+      "entries": 766,
+      "mismatches": []
+    },
+    {
+      "check": "All Step41 evidence artifacts unchanged",
+      "passed": true,
+      "entries": 256,
+      "mismatches": []
+    },
+    {
+      "check": "Accepted Linux binary/archive/object identities unchanged",
+      "passed": true,
+      "entries": 24,
+      "mismatches": []
+    },
+    {
+      "check": "Historical source/document manifest differences limited to current authorized documentation",
+      "passed": true,
+      "entries": 779,
+      "expected_documentation_changes": [
+        "docs/WORK_LOG.md",
+        "docs/stage10/IMPLEMENTATION.md",
+        "docs/stage10/TEST_PLAN.md"
+      ],
+      "historical_manifest_rewritten": false
+    },
+    {
+      "check": "Projected native inventory exactly preserves platform-eligible suites",
+      "passed": true,
+      "windows_projected": 194,
+      "macos_projected": 199,
+      "native_observed": false
+    },
+    {
+      "check": "Portable source receipt snippet compiles and verifies current Linux inputs; binary receipt snippet compiles",
+      "passed": true,
+      "returncode": 0,
+      "stderr": "",
+      "native_command_execution": false
+    },
+    {
+      "check": "macOS bash command block syntax",
+      "passed": true,
+      "returncode": 0,
+      "stderr": "",
+      "macos_execution": false,
+      "powershell_syntax_execution": "UNVERIFIED: PowerShell unavailable"
+    },
+    {
+      "check": "Root README and Step41 result identities unchanged",
+      "passed": true,
+      "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+      "step41_results_sha256": "e7eb5375aea4eb705ac275aa6043fb9a0bd3c0336cd71ef39869c8750db9b688"
+    }
+  ],
+  "passed": 8,
+  "failed": 0,
+  "native_tests_executed": 0
+}

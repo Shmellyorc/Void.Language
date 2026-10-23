@@ -1,0 +1,101 @@
+use time
+const spec = "000"
+value struct quantity<t>:
+    private const stored: t
+    operator +(const left: quantity<t>, const right: t) -> quantity<t>:
+        return quantity<t>(value = left.stored + right)
+    operator %(const left: quantity<t>, const right: t) -> quantity<t>:
+        return quantity<t>(value = left.stored % right)
+    operator ==(const left: quantity<t>, const right: quantity<t>) -> bool:
+        return left.stored == right.stored
+func (self quantity<t>) init(value: t = 0):
+    self.stored = value
+func (self quantity<t>) read() -> t:
+    return self.stored
+func (self quantity<t>) string() -> string:
+    return "q:{self.stored:000}"
+func (self quantity<t>) format(pattern: string) -> result<string, string>:
+    if pattern == "reject":
+        return Err("quantity-{self.stored}")
+    return format(self.stored, pattern)
+struct base:
+    private const id: i32
+func (self base) init(id: i32):
+    self.id = id
+func (self base) read_id() -> i32:
+    return self.id
+virtual func (self base) string() -> string:
+    return "base:{self.id}"
+struct account extends base:
+    private current: quantity<i32>
+    const history: [quantity<i32>]
+func (self account) init(value: i32, history: [quantity<i32>]):
+    super.init(value)
+    self.current = quantity<i32>(value = value)
+    self.history = history
+property (self account) amount: quantity<i32>:
+    get:
+        return self.current
+    set(value):
+        self.current = value
+override func (self account) string() -> string:
+    return "account:{self.read_id():000}/{self.current:000}"
+value struct component:
+    item: quantity<i32>
+func (self component) string() -> string:
+    return string(self.item)
+struct wrapper:
+    const using component
+func verify(input: i32) -> result<i32, string>:
+    var day = make_date(2024, 2, 29)?
+    var values = [quantity<i32>(value = 10)]
+    var first = account(value = 10, history = values)
+    var current = first
+    var calls = 0
+    var rhs = func() -> i32:
+        calls++
+        current = account(value = 90, history = [])
+        var garbage = "rhs:{day:yyyy-MM-dd}"
+        return 3
+    current.amount += rhs()
+    values[0] %= 3
+    if calls != 1 or first.amount.read() != 13 or current.amount.read() != 90 or first.history[0].read() != 1:
+        return Err("captured owner/property/const alias")
+    var copy = first.amount
+    copy %= 5
+    if copy != quantity<i32>(value = 3) or first.amount.read() != 13:
+        return Err("value copy/derived inequality")
+    if format(copy, spec)? != "003":
+        return Err("constant format policy")
+    var entries = {"item": copy}
+    entries["item"] += 4
+    var fixed: [quantity<i32>, 2] = [copy, entries["item"]]
+    fixed[0] += 1
+    if fixed[0].read() != 4 or fixed[1].read() != 7 or copy.read() != 3:
+        return Err("collection values")
+    var parent: base = first
+    var promoted = wrapper(component = component(item = entries["item"]))
+    if string(parent) != "account:010/013" or string(promoted) != "q:007":
+        return Err("inherited/promoted hooks")
+    var text = "é😀 {{amount}} {entries["item"]:>6|000} {day:yyyy-MM-dd} {copy}"
+    if text != "é😀 {{amount}}    007 2024-02-29 q:003":
+        return Err("interpolation/layout/hook")
+    if format(copy, "reject") is Err(var message):
+        if message != "quantity-3":
+            return Err("recoverable hook reason")
+    else:
+        return Err("failed hook unexpectedly succeeded")
+    var local = make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?)?
+    var selected = find_zone("America/New_York")?
+    var early = resolve_local(local, selected, local_choice.earlier)?
+    var late = resolve_local(local, selected, local_choice.later)?
+    var difference = make_instant(late.seconds)?.difference(make_instant(early.seconds)?)?
+    var minutes = quantity<i64>(value = difference.seconds / 60)
+    minutes %= 7 as i64
+    if "{minutes:000}|{late:yyyy-MM-dd HH:mm:ss zzz VV}" != "004|2026-11-01 01:30:00 -05:00 America/New_York":
+        return Err("temporal/generic operator")
+    return Ok(input)
+func entry(input: i32) -> i32:
+    if verify(input) is Ok(var value):
+        return value
+    return 101

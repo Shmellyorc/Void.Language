@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 22: runtime_console
+1/2 Test #22: runtime_console ..................   Passed    0.01 sec
+    Start 23: runtime_console_endpoints
+2/2 Test #23: runtime_console_endpoints ........   Passed    0.08 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.09 sec

@@ -1,0 +1,24 @@
+
+warning: "target:/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_conversion": could not open as an executable file: Input/output error.
+
+warning: `target:/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_stage10_conversion': can't open to read symbols: Input/output error.
+
+warning: Could not load vsyscall page because no executable was specified
+
+warning: Target and debugger are in different PID namespaces; thread lists and other data are likely unreliable.  Connect to gdbserver inside the container.
+0x000055f93b629290 in ?? ()
+#0  0x000055f93b629290 in ?? ()
+#1  0x00007ffe10413107 in ?? ()
+#2  0x000055f941e8d890 in ?? ()
+#3  0x00007ffe104131b0 in ?? ()
+#4  0x000055f942895920 in ?? ()
+#5  0x0000000000000039 in ?? ()
+#6  0x000055f94228c754 in ?? ()
+#7  0x000055f94228c670 in ?? ()
+#8  0x00007ff8a94a5b58 in ?? ()
+#9  0x000055f943b57130 in ?? ()
+#10 0x0000000000000040 in ?? ()
+#11 0x00007ffe104139d0 in ?? ()
+#12 0x000055f942895920 in ?? ()
+#13 0x00007ffe104139d0 in ?? ()
+[Inferior 1 (process 3846094) detached]

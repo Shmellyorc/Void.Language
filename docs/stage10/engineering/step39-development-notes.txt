@@ -1,0 +1,6 @@
+Observed development errors; this is a written record, not raw process output.
+Initial Vim9 result: Vim(var):E700: Unknown function: Step39FormatRpc
+At tests/stage10/editor.vim, line 106. Corrected function reference to g:Step39FormatRpc.
+The initial result file was overwritten by the next run; final raw result remains in step39-vim-final-result.txt.
+Strict initial target build preceded CMake regeneration and reported no rule to make target void_source_formatting; configured existing build and rebuilt successfully.
+No production check was disabled. Other original failure logs are referenced in step39-results.json.

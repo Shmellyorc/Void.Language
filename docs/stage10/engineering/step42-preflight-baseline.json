@@ -1,0 +1,45 @@
+{
+  "host": "Linux-7.2.6-pikaos-x86_64-with-glibc2.44",
+  "machine": "x86_64",
+  "tools": {
+    "cmake": "/usr/bin/cmake",
+    "ninja": null,
+    "python3": "/usr/bin/python3",
+    "pwsh": null,
+    "xcrun": null,
+    "xcodebuild": null,
+    "wine": "/opt/wine-staging/bin/wine",
+    "ssh": "/usr/bin/ssh"
+  },
+  "step41_result_sha256": "e7eb5375aea4eb705ac275aa6043fb9a0bd3c0336cd71ef39869c8750db9b688",
+  "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "verification": {
+    "step41-full-source-freeze.json": {
+      "entries": 766,
+      "mismatches": []
+    },
+    "step41-source-hashes.json": {
+      "entries": 779,
+      "mismatches": []
+    },
+    "step41_artifacts": {
+      "entries": 256,
+      "mismatches": []
+    },
+    "debug": {
+      "build_directory": "build/ci-official-debug",
+      "entries": 8,
+      "mismatches": []
+    },
+    "release": {
+      "build_directory": "build/ci-official-release-step41",
+      "entries": 8,
+      "mismatches": []
+    },
+    "san": {
+      "build_directory": "build/ci-official-san",
+      "entries": 8,
+      "mismatches": []
+    }
+  }
+}

@@ -27,8 +27,8 @@
             bool value_tail=false;
             if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
             if(end<tokens.size() && (tokens[end].text=="(" || generic) && !value_tail) {
-                result.kind=Pattern::Kind::constructor;result.spelling=take().text;
-                while(accept("."))result.spelling+="."+name().text;
+                result.kind=Pattern::Kind::constructor;result.variant_token=take();result.spelling=result.variant_token.text;
+                while(accept(".")){result.variant_token=name();result.spelling+="."+result.variant_token.text;}
                 if(at("<"))result.type_arguments=type_arguments();
                 if(!accept("("))return result;
                 if(!at(")"))do {

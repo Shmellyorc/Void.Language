@@ -1,0 +1,155 @@
+{
+  "stage_status": "INCOMPLETE",
+  "increment": 23,
+  "increment_status": "bounded native foundation implemented; focused Linux Debug/strict acceptance passed; independent Wrench review pending",
+  "base_head": "ecf0bec6e04ef66e1e50cac4afc1598a945066c0",
+  "changes": [
+    "Added include/void/console.hpp and src/runtime/console.cpp to the existing Runtime archive. No source endpoint token or public console API.",
+    "Lazily published per-Runtime Context sessions over one persistent native process Streams state; independent injected Streams/Adapter contexts for tests.",
+    "Borrowed standard endpoints retain distinct role identities and independent snapshot classification. POSIX fstat/isatty and Windows GetStdHandle/GetFileType/positive GetConsoleMode; no closing/duplication/hidden terminal or mode/code-page changes.",
+    "One shared input gate and one shared stdout/stderr gate; separate per-Runtime closing/admission and standard C++ cancellation tokens. Queued operations reject; granted leases retain state until safely released.",
+    "NativeSafe/unattached gate/wait/drain requirements, thread-bound leases, input-before-output nesting and recursive/self-drain rejection; immutable endpoint metadata uses no GC storage.",
+    "Runtime lookup prepares native state outside the GC mutex and rechecks shutdown before installing a winner. Runtime close cancels/drains before existing native shutdown and heap teardown; existing participant/handle lifetime rules remain.",
+    "Native-only destructors release owned state while still NativeSafe, including final host references dropped during Managed execution. No executable/source callback resource registry."
+  ],
+  "checks": {
+    "native_foundation_identity_lifecycle_GC": 72,
+    "real_POSIX_endpoint_classification_borrowing": 14,
+    "selected_suites_per_configuration": 7
+  },
+  "debug": {
+    "passed": 7,
+    "total": 7,
+    "seconds": 12.97,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants"
+    ],
+    "log": "step23-debug-handoff-tests.txt",
+    "detail": "step23-debug-handoff-detail.txt",
+    "builds": [
+      "step23-debug-final-build.txt",
+      "step23-debug-review-build.txt",
+      "step23-debug-handoff-build.txt"
+    ],
+    "configure": "step23-debug-configure.txt"
+  },
+  "strict_sanitizers": {
+    "passed": 7,
+    "total": 7,
+    "seconds": 5.89,
+    "suites": [
+      "runtime_console",
+      "runtime_console_endpoints",
+      "runtime_coordination",
+      "gc_buffers",
+      "gc_schemas",
+      "runtime_failures",
+      "runtime_invariants"
+    ],
+    "log": "step23-san-handoff-tests.txt",
+    "detail": "step23-san-handoff-detail.txt",
+    "builds": [
+      "step23-san-final-build.txt",
+      "step23-san-review-build.txt",
+      "step23-san-handoff-build.txt"
+    ],
+    "configure": "step23-san-configure.txt",
+    "configuration": "RelWithDebInfo, pinned LLVM/Clang 19.1.7, existing RTTI-off vptr exclusion",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "execution": "Outside restricted ptrace runner for actual LeakSanitizer checking. No sanitizer/leak error. Expected fatal-invariant children retain their existing exit-79 handlers and native leak-negative controls; no assertions or sanitizer options disabled."
+  },
+  "lifecycle_guarantees": [
+    "Process Streams remains shared between Runtime lifetimes; closing a Runtime changes only its own Session. Host mutation/closure of live borrowed standard endpoints is outside the embedding contract.",
+    "Endpoint role identity is independent of destination equality; all stdout/stderr records share one native gate, including aliases of a redirected file.",
+    "A granted native operation pins its Session, adapter and coordinator. Runtime close signals cancellation and waits for admitted operations; queued calls wake and reject. Concurrent closes are idempotent.",
+    "Standalone Context destruction signals cancellation without draining itself. Outstanding Operation leases retain all native state; thread-bound operation release completes native cleanup.",
+    "Drain attempts from the owning operation reject before Runtime admission is changed. Closed acquisition reports Closed even when another session owns the same gate.",
+    "Cancellation handlers are native signal-only callbacks scoped within operation lifetime; no source/GC-managed callbacks or managed object views are stored. Step 24 must translate tokens into per-request OS wakeups, cancelling only owned requests.",
+    "Native resources cannot be transferred from raw source integers: no source console types/operations are introduced. C++ Adapter injection is a trusted embedding boundary.",
+    "No native stream wait holds the Runtime GC mutex. Existing Runtime participants/handles must still be drained before Runtime destruction; this is not permission to destroy beneath attached Managed code."
+  ],
+  "actual_platform_probes": {
+    "Linux": [
+      "stdin pipe, stdout file, stderr PTY",
+      "stdin PTY, stdout/stderr one shared redirected file",
+      "three independently inherited pipes",
+      "closed stdin with redirected outputs",
+      "unchanged borrowed descriptor flags",
+      "Unicode/NUL payload remains available to host reads after Runtime teardown"
+    ],
+    "Windows": "platform implementation present, native execution unverified",
+    "macOS": "POSIX implementation present, native execution unverified"
+  },
+  "development_failures_and_repairs": [
+    "Initial target was absent before CMake regeneration (step23-debug-build.txt); configured existing Debug/sanitizer builds, then built the new Runtime target.",
+    "Initial native/real-endpoint focused Debug and strict 2/2 passed (step23-*-development.txt). Strengthened tests add multi-closer/waiter, lazy publication, callback and thread-affinity cases.",
+    "A new regression reproduced self-drain changing Runtime admission before rejection: step23-self-drain-before.txt contains runtime is closing. check_drain now runs before setting Runtime closing; final regression proves Runtime remains usable after rejected self-drain.",
+    "Review moved platform inspection/static initialization outside the GC mutex and resets native owned state inside the NativeSafe destructor scope.",
+    "Closed-context error precedence is checked before cross-session recursive-gate validation.",
+    "No previously completed Stage 10 production defect is asserted repaired; these corrections complete the new Step 23 foundation."
+  ],
+  "unresolved_observations": [
+    "One early current-revision publication assertion failed without further diagnostics. It did not reproduce with explicit contract checks or a minimal variant without them. A later final-source default-root run failed operator_reload and temporal_ir with _year/year library diagnostics; original library bytes subsequently matched the baseline, and isolated, explicit-original-root and default-root reruns passed. External interference is a hypothesis, not a proven cause. Final acceptance uses the exact baseline library in a verified isolated root. No check was disabled; these earlier observations remain unexplained and retained for independent review."
+  ],
+  "unverified": [
+    "native Windows endpoint/classification/handle-lifetime execution",
+    "native macOS endpoint/classification/lifetime execution",
+    "separate Release configuration",
+    "fresh compiler/JIT/O2/AOT or editor acceptance for this native-only increment (previous Step 40/39 evidence preserved, not claimed to cover these changes)",
+    "real low-level transfer/cancellation/timeout/encoding and source console behavior: subsequent Steps 24\u201331",
+    "consolidated/four-system final Stage 10 acceptance"
+  ],
+  "remaining_stage_obligations": [
+    "Step 24 real low-level reads/writes, partial progress/EOF/errors, checked deadlines and owned-request cancellation",
+    "Steps 25\u201331 shared decoder/line ownership, Windows wide paths, print, flushing/prompts, terminal controls/modes and full source/shutdown integration",
+    "Composite display",
+    "Revisit full four-system Step 40, then final Steps 41\u201344 acceptance/documentation/Wrench review"
+  ],
+  "new_dependencies": "none; uses existing C++20 Threads/Runtime conventions. LLVM/Ryu/date/IANA versions and licenses unchanged.",
+  "ABI_build_scope": "Native C++ Runtime gains a session member/host methods and requires normal dependent C++ rebuilds. No existing source/IR/C Runtime operation signature is changed. New source is compiled into libvoid_runtime and existing install/native-link manifests remain unchanged; no compiler-private source admission relaxation.",
+  "host": {
+    "system": "Linux",
+    "release": "7.2.6-pikaos",
+    "machine": "x86_64",
+    "LLVM_Clang": "19.1.7"
+  },
+  "next_step": 24,
+  "next_source_change": "Extend the existing Adapter in include/void/console.hpp / src/runtime/console.cpp with checked read/write transfers, progress/EOF/native errors, monotonic deadlines and per-owned-request OS cancellation. Do not combine decoder, Windows-wide, print or terminal increments.",
+  "governance": "No commits, pushes, branches, hosted CI, publication or public root README changes. Previous checkpoints and Step 37 observations retained.",
+  "primary_references": [
+    "https://man7.org/linux/man-pages/man3/isatty.3.html",
+    "https://man7.org/linux/man-pages/man2/fstat.2.html",
+    "https://learn.microsoft.com/en-us/windows/console/getstdhandle",
+    "https://learn.microsoft.com/en-us/windows/console/getconsolemode",
+    "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfiletype"
+  ],
+  "commands": [
+    "cmake -S . -B build/ci-official-debug",
+    "cmake -S . -B build/ci-official-san",
+    "cmake --build build/ci-official-debug -j 2 --target void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "cmake --build build/ci-official-san -j 2 --target void_runtime_console void_runtime_tests void_gc_buffers void_gc_schemas void_runtime_failures void_runtime_invariants",
+    "ctest --test-dir build/ci-official-debug --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 ctest --test-dir build/ci-official-san --output-on-failure -R '^(runtime_console|runtime_console_endpoints|runtime_coordination|gc_buffers|gc_schemas|runtime_failures|runtime_invariants)$'",
+    "python3 -m py_compile tests/runtime/console_endpoints.py",
+    "git diff --check"
+  ],
+  "source_manifests": {
+    "bounded": "step23-source-hashes.json",
+    "bounded_files": 12,
+    "cumulative": "source-hashes.json",
+    "cumulative_files": 166,
+    "previous_checkpoint": "step40-checkpoint-source-hashes.json",
+    "preservation": "step23-preservation.json",
+    "unchanged_prior_entries_verified": 154
+  },
+  "source_integrity": "All cumulative entries match final bytes; git diff --check passed. Source/LLVM/IR/formatter/temporal/editor implementations outside the bounded paths are unchanged; prior Step 37 observation text and Step 40 records are retained."
+}

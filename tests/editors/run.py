@@ -10,6 +10,7 @@ with tempfile.TemporaryDirectory(prefix='VOID editor installation é😀 ') as d
     api='## Editor fixture API.\n## @param x input value\nfunc read(x: i32) -> i32:\n    return x\n'
     (root/'app/systems/player.void').write_text(api)
     (root/'standard/io/files.void').write_text(api)
+    (root/'standard/console.void').write_bytes((repo/'stdlib/console.void').read_bytes())
     env['VOID_STDLIB_ROOT']=str(root/'standard')
     env['VOID_STAGE8_EXPLICIT_ENTRY']='1' if a.explicit_entry else ''
     for name in ['nvim','vim']:

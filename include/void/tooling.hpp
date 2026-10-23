@@ -14,6 +14,7 @@ public:
     const auto& references() const { return all_references_; }
     explicit ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis);
     std::optional<AnalyzedDeclaration> declaration(const std::string& identity) const;
+    std::vector<AnalyzedDeclaration> definitions_at(const std::string& module, std::size_t byte_offset) const;
     std::optional<AnalyzedDeclaration> definition_at(const std::string& module, std::size_t byte_offset) const;
     std::vector<AnalyzedReference> references_to(const std::string& identity) const;
     std::vector<AnalyzedDeclaration> declarations_in(const std::string& module) const;

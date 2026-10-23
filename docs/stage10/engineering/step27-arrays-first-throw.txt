@@ -1,0 +1,5 @@
+Catchpoint 1 (throw)
+warning: Could not trace the inferior process.
+warning: ptrace: Operation not permitted
+During startup program exited with code 127.
+No stack.

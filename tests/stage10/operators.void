@@ -1,0 +1,63 @@
+value struct number:
+    value: i32
+    operator +(const left: number, const right: number) -> number:
+        return number(value = left.value + right.value)
+    operator -(const left: number, const right: number) -> number:
+        return number(value = left.value - right.value)
+    operator *(const left: number, const right: number) -> number:
+        return number(value = left.value * right.value)
+    operator /(const left: number, const right: number) -> number:
+        return number(value = left.value / right.value)
+    operator %(const left: number, const right: number) -> number:
+        return number(value = left.value % right.value)
+    operator +(const left: number) -> number:
+        return number(value = left.value)
+    operator -(const left: number) -> number:
+        return number(value = -left.value)
+    operator ==(const left: number, const right: number) -> bool:
+        return left.value == right.value
+    operator <(const left: number, const right: number) -> bool:
+        return left.value < right.value
+    operator >(const left: number, const right: number) -> bool:
+        return left.value > right.value
+    operator <=(const left: number, const right: number) -> bool:
+        return left.value <= right.value
+    operator >=(const left: number, const right: number) -> bool:
+        return left.value >= right.value
+value struct box<t>:
+    value: t
+    operator +(const left: box<t>, const right: box<t>) -> box<t>:
+        return box<t>(value = left.value + right.value)
+struct node:
+    value: i32
+    operator +(const left: node, const right: node?) -> node:
+        if right is null:
+            return node(value = left.value)
+        return node(value = left.value + (right as node).value)
+func plus<t>(const left: t, const right: t) -> t:
+    return left + right
+func entry(input: i32) -> i32:
+    var value = input + 10
+    var left = number(value = value)
+    var right = number(value = 3)
+    if (left + right).value != value + 3 or (left - right).value != value - 3:
+        return 101
+    if (left * right).value != value * 3 or (left / right).value != value / 3:
+        return 102
+    if (left % right).value != value % 3 or (+left).value != value or (-left).value != -value:
+        return 103
+    if not (left == number(value = value)) or left != number(value = value):
+        return 104
+    if not (left > right) or not (left >= right) or not (right < left) or not (right <= left):
+        return 105
+    if left < right or left <= right or right > left or right >= left:
+        return 106
+    var boxed = plus(box<number>(value = left), box<number>(value = right))
+    if boxed.value.value != value + 3:
+        return 107
+    var original = node(value = input)
+    var fresh = original + null
+    fresh.value++
+    if original.value != input or fresh.value != input + 1:
+        return 108
+    return input

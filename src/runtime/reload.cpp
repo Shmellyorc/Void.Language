@@ -1,5 +1,6 @@
 #include "void/execution.hpp"
 #include "void/runtime.hpp"
+#include "void/runtime_abi.hpp"
 #include <stdexcept>
 #include <algorithm>
 namespace vd {
@@ -40,8 +41,9 @@ std::int32_t NativeCode::invoke(std::int32_t value) const {
     std::int32_t result;
     if (runtime_) {
         Runtime::Attachment attachment(*runtime_);
-        Runtime::Managed managed(*runtime_);
-        result = checked_(value, &failure);
+        auto checkpoint=runtime_->console_checkpoint();
+        {Runtime::Managed managed(*runtime_);result = checked_(value, &failure);}
+        finish_console(*runtime_,checkpoint,&failure);
     } else result = checked_(value, &failure);
     if (failure.message) {
         // Copy borrowed generation strings before leaving the owning code lease.

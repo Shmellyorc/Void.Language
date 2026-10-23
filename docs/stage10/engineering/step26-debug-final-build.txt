@@ -1,0 +1,7 @@
+[ 25%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_wide.dir/tests/runtime/console_wide.cpp.o
+[100%] Linking CXX executable void_runtime_console_wide
+[100%] Built target void_runtime_console_wide

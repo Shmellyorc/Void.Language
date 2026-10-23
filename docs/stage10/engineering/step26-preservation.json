@@ -1,0 +1,20 @@
+{
+  "previous_checkpoint": "step25-checkpoint-source-hashes.json",
+  "prior_entries": 173,
+  "unchanged_prior_entries": 165,
+  "changed_prior_entries": [
+    "CMakeLists.txt",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "include/void/console.hpp",
+    "src/runtime/console.cpp"
+  ],
+  "new_entries": [
+    "include/void/detail/console_wide.hpp",
+    "tests/runtime/console_wide.cpp"
+  ],
+  "unexpected_changes": []
+}

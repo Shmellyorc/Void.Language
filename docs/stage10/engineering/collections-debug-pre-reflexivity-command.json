@@ -1,0 +1,21 @@
+[
+  {
+    "group": "conversion",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-debug",
+      "--output-on-failure",
+      "-R",
+      "^(stage10_conversion)$"
+    ],
+    "returncode": 8,
+    "seconds": 289.08606295799837,
+    "suites": [
+      "stage10_conversion"
+    ],
+    "environment": {
+      "VOID_STDLIB_ROOT": "/tmp/void-collections-stdlib-vdjby9p6/stdlib"
+    }
+  }
+]

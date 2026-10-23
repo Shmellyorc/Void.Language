@@ -2,6 +2,7 @@
 #include "void/async.hpp"
 #include "void/format.hpp"
 #include <new>
+#include <algorithm>
 #include <stdexcept>
 namespace vd {
 void Runtime::display_enter(std::string_view hook,void* identity) {
@@ -14,6 +15,21 @@ void Runtime::display_leave() noexcept {
     if(!current_thread_ || current_thread_->display_hooks.empty())std::terminate();
     current_thread_->display_hooks.pop_back();
 }
+void Runtime::collection_scope() {auto& t=thread();t.collection_displays.push_back({{},t.collection_path.size()});}
+void Runtime::collection_scope_leave() noexcept {
+    auto& t=thread();if(t.collection_displays.empty())std::terminate();
+    t.collection_path.resize(t.collection_displays.back().checkpoint);t.collection_displays.pop_back();
+}
+bool Runtime::collection_enter(void* identity) {
+    auto& t=thread();if(!identity || t.collection_displays.empty())throw std::logic_error("Invalid collection display scope");
+    if(std::find(t.collection_path.begin(),t.collection_path.end(),identity)!=t.collection_path.end())return false;
+    t.collection_path.push_back(identity);return true;
+}
+void Runtime::collection_leave(void* identity) {
+    auto& t=thread();if(t.collection_displays.empty() || t.collection_path.size()<=t.collection_displays.back().checkpoint || t.collection_path.back()!=identity)throw std::logic_error("Invalid collection display path");t.collection_path.pop_back();
+}
+void Runtime::collection_append(void* text) {auto& t=thread();if(t.collection_displays.empty())throw std::logic_error("Invalid collection display scope");t.collection_displays.back().bytes.append(string_bytes(text));}
+void Runtime::collection_finish(void** out) {auto& t=thread();if(t.collection_displays.empty())throw std::logic_error("Invalid collection display scope");auto bytes=std::move(t.collection_displays.back().bytes).finish();string_into(out,bytes);}
 Runtime& Runtime::current() {
     if (!current_runtime_) throw std::logic_error("generated code has no runtime attachment");
     return *current_runtime_;
@@ -31,8 +47,9 @@ std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value
         vd::Runtime runtime(256);
         vd::Runtime::Attachment attachment(runtime);
         if(count || witness_count) {vd_runtime_admit_metadata(&runtime,records,count,witnesses,witness_count,failure);if(failure->message) return 0;}
-        vd::Runtime::Managed managed(runtime);
-        vd::NativeCode::LeaseScope native_failures(vd::NativeCode::active_lease());auto result=entry(value,failure);if(failure->message)vd::export_native_failure(failure);return result;
+        auto checkpoint=runtime.console_checkpoint();vd::NativeCode::LeaseScope native_failures(vd::NativeCode::active_lease());std::int32_t result;
+        {vd::Runtime::Managed managed(runtime);result=entry(value,failure);}
+        vd::finish_console(runtime,checkpoint,failure);if(failure->message)vd::export_native_failure(failure);return result;
     } catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed";}
       catch (...) {std::terminate();}
     return 0;
@@ -61,6 +78,16 @@ void vd_display_enter(const char* hook,void* identity,vd::RuntimeFailure* failur
     catch(const std::bad_alloc&){failure->message="Display hook tracking allocation failed";}
     catch(...){std::terminate();}
 }
+bool vd_collection_scope(vd::RuntimeFailure* failure) noexcept {
+    try {vd::Runtime::current().collection_scope();return true;}catch(const std::bad_alloc&){failure->message="Collection display allocation failed";}catch(const std::exception&){failure->message="Collection display extent is unrepresentable";}return false;
+}
+void vd_collection_scope_leave() noexcept {vd::Runtime::current().collection_scope_leave();}
+bool vd_collection_enter(void* value,vd::RuntimeFailure* failure) noexcept {
+    try{return vd::Runtime::current().collection_enter(value);}catch(const std::bad_alloc&){failure->message="Collection display allocation failed";}catch(const std::exception&){failure->message="Invalid collection display path";}return false;
+}
+void vd_collection_leave(void* value,vd::RuntimeFailure* failure) noexcept {try{vd::Runtime::current().collection_leave(value);}catch(const std::exception&){failure->message="Invalid collection display path";}}
+void vd_collection_append(void* value,vd::RuntimeFailure* failure) noexcept {try{vd::Runtime::current().collection_append(value);}catch(const std::bad_alloc&){failure->message="Collection display allocation failed";}catch(const std::length_error&){failure->message="Collection display extent is unrepresentable";}catch(const std::exception&){failure->message="Invalid collection display text";}}
+void vd_collection_finish(void** out,vd::RuntimeFailure* failure) noexcept {try{vd::Runtime::current().collection_finish(out);}catch(const std::bad_alloc&){failure->message="Collection display allocation failed";}catch(const std::length_error&){failure->message="Collection display extent is unrepresentable";}catch(const std::exception&){failure->message="Invalid collection display scope";}}
 void vd_display_leave() noexcept {vd::Runtime::current().display_leave();}
 void vd_display_error(void* text,vd::RuntimeFailure* failure) noexcept {
     try {auto bytes=vd::Runtime::current().string_bytes(text);std::string message="Format rejected: ";
@@ -191,6 +218,8 @@ void vd_runtime_admit_metadata(vd::Runtime* runtime,const vd::RuntimeTypeRecord*
             const auto& r=records[n];
             if(!r.identity || !r.base || !r.shape || (r.count && !r.references)) throw std::invalid_argument("invalid runtime catalog");
             vd::NominalDescriptor d{r.identity,r.base,r.shape,{r.size,{}}};
+            if(r.dictionary_key_forbidden>1)throw std::invalid_argument("invalid dictionary key policy");
+            d.dictionary_key_schema=r.dictionary_key_schema?r.dictionary_key_schema:"";d.dictionary_key_forbidden=r.dictionary_key_forbidden!=0;
             if(r.count) d.layout.references.assign(r.references,r.references+r.count);
             types.push_back(std::move(d));
         }

@@ -1,0 +1,18 @@
+{
+  "previous_manifest": "step38-checkpoint-source-hashes.json",
+  "previous_entries": 152,
+  "bounded_files": 13,
+  "unchanged_prior_manifest_entries_verified": 144,
+  "changed_previous_entries": [
+    "CMakeLists.txt",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/TEST_PLAN.md",
+    "editors/vscode/src/test/host.ts",
+    "editors/vscode/syntaxes/void.tmLanguage.json",
+    "src/frontend/compiler.cpp",
+    "tests/stage10/editor.lua",
+    "tests/stage10/editor.vim"
+  ],
+  "unexpected_byte_changes": [],
+  "historical_stage38_records": "unchanged; source-hashes.json is the current cumulative manifest"
+}

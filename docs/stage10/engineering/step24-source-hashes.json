@@ -1,0 +1,16 @@
+{
+  "CMakeLists.txt": "1c77fcfa6be58027e163e3e8a46f45818fa0e745a24e9489c22b2cf06bee834f",
+  "include/void/console.hpp": "f29b3214a0c4cb7b7b8677850512aff9090900aa9563a536a33c420f8d1d7499",
+  "src/runtime/console.cpp": "f2edcaba9fe3f0cd2530948210e770d5f30f1770ec267759cf187486db016308",
+  "tests/runtime/console.cpp": "a88c1bf2ceb85d75de43a29df1b56e3ba6cf7da121014f6d15b73cf047c9d1ee",
+  "tests/runtime/console_transfers.cpp": "3ba3ec984d0b179d078faab638f07ecf60a173e42b7aa52f9e17a2c20d229a1c",
+  "tests/runtime/console_transfers.py": "2451cb9e95d3fb28cf120eaaae53b3a6ef1c882e3a9fe3a41f5988bccc5a2977",
+  "docs/DECISIONS.md": "bdfc98c5ceae60be6a7ef74e120831212e83a34aeef1bb2a640eda3027a4d370",
+  "docs/WORK_LOG.md": "097520cc01426bdd0280a30c9ac8820cb8d5c59ea35d6ea74c01c5b89ec1a59a",
+  "docs/stage10/CONSOLE_IO.md": "7cbc1c988739766e5a4d77f396ab02c2865db1b9ccad9d3bf8441e748eece00d",
+  "docs/stage10/IMPLEMENTATION.md": "dffe292e57f9cbfd1d5b9fd19699bf71298ebf9437c79d5d120c5d497ecfd83f",
+  "docs/stage10/TEST_PLAN.md": "4e431f2f701c7a8ef40e37ca7509e247962888cad69cf3916235b1222adc0860",
+  "docs/stage10/EVIDENCE.md": "2c3b9349f6fb0394961dbc2da9616455ea210c32b5d8d4b354c905ad66b1abc6",
+  "docs/stage10/engineering/step24-feasibility.md": "07db27686826de9804ec53403d4f4e298424002845b2046dbe76670d12babaa9",
+  "docs/stage10/engineering/step24-posix-feasibility.cpp": "b5e4b83b7df3ffac03c2bbc78fdf921748a38a3873394c7597ac42c4840912f2"
+}

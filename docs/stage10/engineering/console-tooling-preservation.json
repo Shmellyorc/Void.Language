@@ -1,0 +1,30 @@
+{
+  "previous_entries": 213,
+  "current_entries": 217,
+  "unchanged_prior_entries": 198,
+  "changed_prior_entries": [
+    "docs/DEVELOPMENT_STRATEGY.md",
+    "docs/WORK_LOG.md",
+    "docs/stage10/CONSOLE_IO.md",
+    "docs/stage10/DISPLAY_FORMATTING.md",
+    "docs/stage10/EVIDENCE.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/stage10/TEST_PLAN.md",
+    "editors/vscode/src/test/host.ts",
+    "editors/vscode/src/test/runHost.ts",
+    "src/frontend/compiler.cpp",
+    "src/frontend/pattern_semantics.inc",
+    "src/lsp/main.cpp",
+    "stdlib/console.void",
+    "tests/stage10/lsp_display.py",
+    "tests/stage10/tooling.cpp"
+  ],
+  "added_manifest_coverage": [
+    "src/frontend/pattern_parser.inc",
+    "tests/editors/neovim.lua",
+    "tests/editors/run.py",
+    "tests/editors/vim.vim"
+  ],
+  "prior_artifact_hashes_preserved": true,
+  "deep_regression_hash_unchanged": true
+}

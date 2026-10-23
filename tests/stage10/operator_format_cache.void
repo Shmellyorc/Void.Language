@@ -1,0 +1,31 @@
+use time
+const spec = "000"
+value struct number:
+    value: i32
+    operator +(const left: number, const right: number) -> number:
+        return number(value = left.value + right.value)
+    operator %(const left: number, const right: number) -> number:
+        return number(value = left.value % right.value)
+    operator ==(const left: number, const right: number) -> bool:
+        return left.value == right.value
+func (self number) string() -> string:
+    return "number:{self.value:000}"
+func (self number) format(pattern: string) -> result<string, string>:
+    return format(self.value, pattern)
+func work(input: i32) -> result<i32, string>:
+    var original = number(value = input + 10)
+    var changed = original + number(value = 3)
+    changed %= number(value = 5)
+    if changed != number(value = (input + 13) % 5):
+        return Err("operator")
+    if string(original) != "number:{input + 10:000}" or "{original:000}" != format(input + 10, spec)?:
+        return Err("hook")
+    var day = make_date(2024, 2, 29)?
+    if "{day:yyyy-MM-dd}" != "2024-02-29":
+        return Err("date")
+    return Ok(input)
+func entry(input: i32) -> i32:
+    var output = work(input)
+    if output is Ok(var value):
+        return value
+    return 101

@@ -49,6 +49,7 @@ struct ElementSchemaSpec {
     StorageDomain storage_domain;
     std::size_t root=0;
     std::vector<SchemaNode> nodes;
+    bool dictionary_key_use = false; // Admission request; not an equality/hash callback.
 };
 struct SchemaStep {
     enum class Kind { field, element } kind;

@@ -1,0 +1,128 @@
+{
+  "configuration": "san",
+  "source": "struct item:\n    value: i32\nfunc (self item) string() -> string:\n    return \"p:{self.value}\"\nfunc main():\n    var original = item(value = 1)\n    var value: result<item, string> = Ok(original)\n    var copied = value\n    const view = value\n    if copied is Ok(var alias):\n        if alias == original:\n            alias.value = 9\n            print(\"identity\", value, copied, view)\n",
+  "source_sha256": "df36af362ba726213bfd4859c74bdd9f13e61f916c016d8b637b279346834ba9",
+  "commands": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/tmp/VOID-sum-alias-w7_lxlsd/main.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "emit",
+        "/tmp/VOID-sum-alias-w7_lxlsd/main.void",
+        "-o",
+        "/tmp/VOID-sum-alias-w7_lxlsd/normal.o",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout_hex": "57726f7465206e617469766520736f75726365206f626a6563743a202f746d702f564f49442d73756d2d616c6961732d77375f6c786c73642f6e6f726d616c2e6f0a",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+        "--driver-mode=g++",
+        "-pthread",
+        "-ldl",
+        "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+        "-fsanitize=address,undefined",
+        "/tmp/VOID-sum-alias-w7_lxlsd/normal.o",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a",
+        "-o",
+        "/tmp/VOID-sum-alias-w7_lxlsd/normal.bin"
+      ],
+      "status": 0,
+      "stdout_hex": "",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID-sum-alias-w7_lxlsd/normal.bin"
+      ],
+      "status": 0,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/tmp/VOID-sum-alias-w7_lxlsd/main.void"
+      ],
+      "status": 0,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "emit",
+        "/tmp/VOID-sum-alias-w7_lxlsd/main.void",
+        "-o",
+        "/tmp/VOID-sum-alias-w7_lxlsd/O2.o"
+      ],
+      "status": 0,
+      "stdout_hex": "57726f7465206e617469766520736f75726365206f626a6563743a202f746d702f564f49442d73756d2d616c6961732d77375f6c786c73642f4f322e6f0a",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+        "--driver-mode=g++",
+        "-pthread",
+        "-ldl",
+        "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+        "-fsanitize=address,undefined",
+        "/tmp/VOID-sum-alias-w7_lxlsd/O2.o",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a",
+        "-o",
+        "/tmp/VOID-sum-alias-w7_lxlsd/O2.bin"
+      ],
+      "status": 0,
+      "stdout_hex": "",
+      "stderr_hex": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID-sum-alias-w7_lxlsd/O2.bin"
+      ],
+      "status": 0,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a",
+      "stderr_hex": ""
+    }
+  ],
+  "outputs": [
+    {
+      "path": "JIT",
+      "optimized": false,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a"
+    },
+    {
+      "path": "linked AOT",
+      "optimized": false,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a"
+    },
+    {
+      "path": "JIT",
+      "optimized": true,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a"
+    },
+    {
+      "path": "linked AOT",
+      "optimized": true,
+      "stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a"
+    }
+  ],
+  "expected_stdout_hex": "6964656e74697479204f6b28703a3929204f6b28703a3929204f6b28703a39290a"
+}

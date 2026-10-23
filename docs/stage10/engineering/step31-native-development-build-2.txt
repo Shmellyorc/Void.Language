@@ -1,0 +1,25 @@
+gmake: jobserver mkfifo: /tmp/GMfifo5: File exists
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console.dir/tests/runtime/console.cpp.o
+[100%] Linking CXX executable void_runtime_console
+[100%] Built target void_runtime_console
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_runtime_console_keyboard.dir/tests/runtime/console_keyboard.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:63:75: warning: unused variable 'mode' [-Wunused-variable]
+   63 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto mode=c.begin_mode({false,false,true});f->restore_fault={ErrorKind::io_failure,77};check(c.close().os_code==77 && f->mode==0,"shutdown restoration failure not reported");f->restore_fault={};check(!c.close() && f->mode==7,"shutdown restoration retry lost original mode");}
+      |                                                                           ^~~~
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:91:764: warning: unused variable 'a' [-Wunused-variable]
+   91 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.cpp:91:804: warning: unused variable 'b' [-Wunused-variable]
+   91 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+3 warnings generated.
+[100%] Linking CXX executable void_runtime_console_keyboard
+[100%] Built target void_runtime_console_keyboard

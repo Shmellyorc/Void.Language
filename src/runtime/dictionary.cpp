@@ -10,6 +10,17 @@ void room(std::uint64_t version) {if(version==absent)throw std::length_error("di
 std::uint64_t read_word(const char* p) {std::uint64_t value;std::memcpy(&value,p,8);return value;}
 void write_word(char* p,std::uint64_t value) {std::memcpy(p,&value,8);}
 }
+void Runtime::validate_dictionary_key_schema(const RuntimeMetadata& metadata,const ElementSchema& schema) const {
+    for(const auto& [identity,type]:metadata.types)if(type->dictionary_key_forbidden && (type->dictionary_key_schema==schema.identity() || type->dictionary_key_schema+"?"==schema.identity()))throw std::invalid_argument("custom equality type is not an eligible dictionary key");
+    for(const auto& node:schema.spec_.nodes) {
+        if(auto field=std::get_if<SchemaManaged>(&node)) {
+            auto target=metadata.types.find(field->target);
+            if(target!=metadata.types.end() && target->second->dictionary_key_forbidden)throw std::invalid_argument("custom equality managed leaf is not an eligible dictionary key");
+        } else if(auto scalar=std::get_if<SchemaScalar>(&node)) {
+            if(scalar->encoding==ScalarEncoding::f32 || scalar->encoding==ScalarEncoding::f64)throw std::invalid_argument("unsupported dictionary key scalar");
+        } else if(!std::holds_alternative<SchemaRecord>(node) && !std::holds_alternative<SchemaString>(node))throw std::invalid_argument("unsupported dictionary key schema");
+    }
+}
 Runtime::DictionaryLayout Runtime::dictionary_layout(const NativeDictionary& d) {
     require_managed();if(!d.entry || !d.key || d.key->bytes>d.entry->bytes || d.value_offset>d.entry->bytes || d.value_offset>d.hash_offset || (d.key->count && !d.key->fields) || d.hash_offset>d.entry->bytes || d.entry->bytes-d.hash_offset<8)throw std::invalid_argument("invalid dictionary metadata");
     for(std::size_t i=0;i<d.key->count;++i){const auto& f=d.key->fields[i];if((f.kind>7 && f.kind!=10 && f.kind!=11 && f.kind!=12) || f.offset>d.key->bytes || (f.kind<=10?scalar_bytes(f.kind):sizeof(void*))>d.key->bytes-f.offset)throw std::invalid_argument("unsupported dictionary key field");}
@@ -17,7 +28,7 @@ Runtime::DictionaryLayout Runtime::dictionary_layout(const NativeDictionary& d) 
     const auto& hash=d.entry->fields[d.entry->count-1];if(hash.kind!=7 || hash.offset!=d.hash_offset || hash.nullable || hash.extent)throw std::invalid_argument("invalid dictionary hash field");
     for(std::size_t i=0;i<d.key->count;++i){const auto& a=d.entry->fields[i];const auto& b=d.key->fields[i];if(a.offset!=b.offset || a.kind!=b.kind || a.nullable!=b.nullable || a.extent!=b.extent || !a.target || !b.target || std::string_view(a.target)!=b.target)throw std::invalid_argument("dictionary key does not match entry prefix");}
     for(std::size_t i=d.key->count;i+1<d.entry->count;++i)if(d.entry->fields[i].offset<d.value_offset || d.entry->fields[i].offset>=d.hash_offset)throw std::invalid_argument("invalid dictionary value fields");
-    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);auto identity="void.dict.v1/"+std::string(d.entry->key);std::shared_ptr<const NominalDescriptor> header;{std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
+    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);{std::lock_guard lock(mutex_);if(types_)validate_dictionary_key_schema(*types_,*key->schema());}auto identity="void.dict.v1/"+std::string(d.entry->key);std::shared_ptr<const NominalDescriptor> header;{std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
     if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
     if(header->layout.size!=sizeof(DictionaryHeader) || header->layout.references!=std::vector<std::size_t>{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)})throw std::invalid_argument("invalid dictionary header descriptor");
     return {entries,key,header};

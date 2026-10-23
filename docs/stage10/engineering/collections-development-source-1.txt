@@ -1,0 +1,23 @@
+/tmp/collection-smoke.void:3:11: error: Unknown identifier ''.
+    code: VOID2002
+
+ 3 |     print(string(a))
+   |           ^^^^^^
+    Module: /collection-smoke.void
+    Hint: Declare it with var before assignment.
+
+/tmp/collection-smoke.void:4:21: error: Unknown identifier ''.
+    code: VOID2002
+
+ 4 |     print("nested", [[1], [2, 3]])
+   |                     ^^^^^^
+    Module: /collection-smoke.void
+    Hint: Declare it with var before assignment.
+
+/tmp/collection-smoke.void:5:19: error: Expected ']', found ':'.
+    code: VOID1101
+
+ 5 |     var d: [string: i32] = ["z": 4, "a": 2]
+   |                   ^
+    Module: /collection-smoke.void
+

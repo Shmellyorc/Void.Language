@@ -1,0 +1,41 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start   1: stage10_operator_reload
+ 1/18 Test   #1: stage10_operator_reload ..........   Passed   17.03 sec
+      Start   3: stage10_operator_resolution
+ 2/18 Test   #3: stage10_operator_resolution ......   Passed    2.22 sec
+      Start   5: stage10_tooling
+ 3/18 Test   #5: stage10_tooling ..................   Passed    0.03 sec
+      Start  76: lsp_positions
+ 4/18 Test  #76: lsp_positions ....................   Passed    0.00 sec
+      Start  77: lsp_protocol
+ 5/18 Test  #77: lsp_protocol .....................   Passed    0.55 sec
+      Start  78: lsp_stage8
+ 6/18 Test  #78: lsp_stage8 .......................   Passed    0.45 sec
+      Start  79: lsp_stage7
+ 7/18 Test  #79: lsp_stage7 .......................   Passed    0.29 sec
+      Start  80: lsp_demo
+ 8/18 Test  #80: lsp_demo .........................   Passed    0.06 sec
+      Start 147: sessions
+ 9/18 Test #147: sessions .........................   Passed    0.20 sec
+      Start 148: tooling
+10/18 Test #148: tooling ..........................   Passed    0.52 sec
+      Start 149: analysis
+11/18 Test #149: analysis .........................   Passed    0.81 sec
+      Start 166: lsp_sprint6
+12/18 Test #166: lsp_sprint6 ......................   Passed    0.72 sec
+      Start 167: lsp_stage10_fields
+13/18 Test #167: lsp_stage10_fields ...............   Passed    0.07 sec
+      Start 168: lsp_stage10_display
+14/18 Test #168: lsp_stage10_display ..............   Passed    0.87 sec
+      Start 169: lsp_stage10_intelligence
+15/18 Test #169: lsp_stage10_intelligence .........   Passed    0.49 sec
+      Start 171: lsp_sprint4
+16/18 Test #171: lsp_sprint4 ......................   Passed    0.06 sec
+      Start 175: lsp_sprint3
+17/18 Test #175: lsp_sprint3 ......................   Passed    0.13 sec
+      Start 176: lsp_sprint2
+18/18 Test #176: lsp_sprint2 ......................   Passed    0.08 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Total Test time (real) =  24.60 sec
