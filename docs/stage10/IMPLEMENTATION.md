@@ -1,24 +1,24 @@
 # Stage 10 engineering progress and permanent handoff
 
 Updated 24 October 2026 (America/Los_Angeles). **INCOMPLETE.**
-Current Step42 checkpoint: CI97 native console repairs implemented and focused
-Linux verification complete; Golden Wrench review and actual repaired macOS
-execution remain pending. Main CI97 at96bac2ea retains Windows Debug/Release
-194/194 each and Ubuntu Debug/Release199/199 each. Its macOS configurations each
-passed195/199, failing the same four native console suites; Ubuntu Sanitizers
-passed198/199, failing the real PTY keyboard assertion. ThinLTO experiment#2 is a
-separate observation; neither workflow was changed by this repair.
+Current Step42 checkpoint: final macOS Release fixture synchronization repairs
+implemented; Golden Wrench review and repaired native Release verification pending.
+MainCI98 and ThinLTO experiment#3 at9a4985f8 each passed6/7 jobs. All configurations
+except macOS Release are green. Main Release198/199 failed the redirected-input
+terminal fixture; experiment Release198/199 failed the missing-stdin cancelled
+write prefix fixture. These are separate observations, not a ThinLTO cause claim.
 
-Local repaired-console verification is Debug11/11 and strict11/11, plus20/20 native
-keyboard repetitions and two normal/O2 linked source-PTY cases per configuration.
-The harness rebuilds the console Runtime object and focused native drivers while
-preserving accepted CI96/Step41 builds. It is not fresh compiler/JIT, complete
-CMake or native macOS/Windows acceptance. Original1MiB protections and Step41
-artifacts are unchanged. Steps42–44 remain open; Stage10 INCOMPLETE.
-See `engineering/step42-results.json` and
-[CI97 diagnosis, raw evidence and limits](engineering/ci97/DIAGNOSIS.md). The entire
-44-step mission remains authorized. This is a recovery record, not a completion
-claim or a request for new authorization. Boss retains Git and hosted execution.
+The two demonstrated fixture ordering holes are repaired without changing Runtime:
+redirected input is queued before its zero-timeout probe starts, and cancellation
+waits for an actual native writable→not-writable pipe transition. All original
+assertions remain. Focused Linux Debug11/11 and strict11/11 pass, with each changed
+native fixture20/20 per configuration. This is test-driver verification, not native
+macOS Release or full CMake/JIT/AOT acceptance. Both workflows, all production
+sources, original CI97 builds, Step41 evidence and1MiB protections are unchanged.
+Steps42–44 remain open; Stage10 INCOMPLETE. See engineering/step42-results.json and
+[final Release diagnosis, raw records and remaining gates](engineering/ci98/DIAGNOSIS.md).
+Boss controls commits and native/hosted verification. Earlier records below retain
+their historical status and evidence.
 
 Original mission baseline HEAD: `e25816bdb80e3f32613edf77c9cf3258232af966`.
 Step 32 builds on the owner checkpoint `ecf0bec6e04ef66e1e50cac4afc1598a945066c0`;
@@ -1697,3 +1697,52 @@ updated engineering/step42-results.json and raw reproductions. Golden Wrench
 review is pending. Boss controls native macOS Debug/Release observer/tests and
 the next hosted run. No Git mutation or CI dispatch. Step42 and Stage10 remain
 **INCOMPLETE**; Steps43–44 are separate.
+
+
+## Step 42 CI98 final macOS Release investigation — 24 October 2026
+
+Baseline9a4985f89f40c56b8eaa984775faf18c52b69f19. MainCI98/run40091828693 and
+ThinLTO#3/run40091853317 each pass6/7 jobs, all except macOS Release. The independent
+remaining failures are main runtime_console_native_terminal and experimental
+runtime_console_native_transfers. Exact hosted logs/job snapshots are in
+engineering/ci98/. No cache cause or production failure is inferred from their
+occurrence in different workflows.
+
+The terminal fixture launches a child and then writes redirected input, while the
+child deliberately polls once with timeout0. Deterministically withholding delivery
+reproduces the exact empty native report. A same-Context READY-barrier probe then
+shows pipe classification, unsupported cursor query, initial would_block/empty
+read and later intact7265646972656374656400ff. No input loss, hidden queue drain or
+classification defect is demonstrated. The ordinary pipe is now prefilled before
+child launch; parent-owned ends are closed correctly and every original byte,
+no-output and mode assertion remains.
+
+The cancellation fixture's admission/wake-fd checks precede native write progress;
+macOS also lacks Linux's syscall wait. An existing Adapter/Runtime model proves
+admitted1/completed0/closed is legal under that ordering. The native test now first
+checks stdout writable, then waits for poll0/no-revents while the parent retains
+its fresh pipe reader without draining it. This writable→not-writable transition
+proves actual writes used the pipe's writable capacity before GC and cancellation.
+The observer opens no fd and cannot replace the deliberately missing stdin.
+Original EBADF, positive partial prefix, exact parent-observed bytes, GC roots,
+borrowed flags, cancellation and cleanup assertions remain. Actual Linux Debug
+and strict records show initial1/POLLOUT4, later0/revents0 and65536 acceptedW bytes
+for both cancellation modes. That count is local, not a macOS capacity claim.
+
+Only three test files changed; production Runtime, both workflows and all previous
+builds/evidence remain hash-identical. The changed C++ test driver alone was rebuilt
+against accepted Runtime archives. Focused Debug11/11 and strict11/11 pass; each of
+the two native fixtures passes20/20 in each configuration. Both deterministic
+ordering reproductions pass, with unchanged ASan/UBSan/leak settings and the
+established untraced strict profile. Exact diff, source freeze, raw byte/progress
+reports, commands and preservation checks are retained. Original Step41 evidence
+and genuine1MiB protections were preserved, not rerun or promoted to new acceptance.
+No full production rebuild, JIT/AOT matrix or native macOS run occurred here.
+
+Deliverables: [diagnosis/native requirements](engineering/ci98/DIAGNOSIS.md),
+[exact source diff](engineering/ci98/repairs.diff),
+[preservation verification](engineering/ci98/verification.json), raw reproductions
+and updated engineering/step42-results.json. Stop for Golden Wrench review before
+Boss commits or runs native Release verification. No Git mutation, CI dispatch,
+new architecture or next-step implementation. Step42 and Stage10 **INCOMPLETE**;
+Steps43–44 remain separate.

@@ -1,0 +1,104 @@
+{
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+  "tests": [
+    {
+      "label": "console",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console"
+      ],
+      "returncode": 0,
+      "seconds": 0.06372388382442296
+    },
+    {
+      "label": "console_transfers",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_transfers"
+      ],
+      "returncode": 0,
+      "seconds": 0.0326060620136559
+    },
+    {
+      "label": "console_input",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_input"
+      ],
+      "returncode": 0,
+      "seconds": 0.05752512998878956
+    },
+    {
+      "label": "console_keyboard",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_keyboard"
+      ],
+      "returncode": 0,
+      "seconds": 0.03799154213629663
+    },
+    {
+      "label": "console_terminal",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_terminal"
+      ],
+      "returncode": 0,
+      "seconds": 0.032237414037808776
+    },
+    {
+      "label": "console_wide",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_wide"
+      ],
+      "returncode": 0,
+      "seconds": 0.10730219399556518
+    },
+    {
+      "label": "console_endpoints-native",
+      "command": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_endpoints.py",
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console"
+      ],
+      "returncode": 0,
+      "seconds": 0.17847324581816792
+    },
+    {
+      "label": "console_transfers-native",
+      "command": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.py",
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_transfers"
+      ],
+      "returncode": 0,
+      "seconds": 0.8164635039865971
+    },
+    {
+      "label": "console_input-native",
+      "command": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_input.py",
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_input"
+      ],
+      "returncode": 0,
+      "seconds": 0.42061915597878397
+    },
+    {
+      "label": "console_keyboard-native",
+      "command": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py",
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_keyboard"
+      ],
+      "returncode": 0,
+      "seconds": 0.2928675489965826
+    },
+    {
+      "label": "console_terminal-native",
+      "command": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_terminal.py",
+        "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-san/void_runtime_console_terminal"
+      ],
+      "returncode": 0,
+      "seconds": 0.8298344570212066
+    }
+  ]
+}

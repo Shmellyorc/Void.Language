@@ -9,13 +9,16 @@ def check(value, message):
     global checks
     assert value,message
     checks+=1
+def progress_record(path):
+    snapshot=path.with_name(path.name+'.progress.json')
+    return json.loads(snapshot.read_text()) if snapshot.exists() else None
 def descriptor_record(path):
     snapshot=path.with_name(path.name+'.flags.json')
     return json.loads(snapshot.read_text()) if snapshot.exists() else None
 def report(path):
     values=list(map(int,path.read_text().split()))
     check(len(values)==6,('bad report',values))
-    cases.append(dict(case=path.stem,completed=values[0],eof=bool(values[1]),kind=values[2],os_code=values[3],cleanup_code=values[4],child_checks_before_report=values[5],descriptor_flags=descriptor_record(path)))
+    cases.append(dict(case=path.stem,completed=values[0],eof=bool(values[1]),kind=values[2],os_code=values[3],cleanup_code=values[4],child_checks_before_report=values[5],descriptor_flags=descriptor_record(path),native_progress=progress_record(path)))
     return values
 with tempfile.TemporaryDirectory(prefix='VOID transfer 🔧 ') as directory:
     root=Path(directory)
@@ -91,7 +94,7 @@ with tempfile.TemporaryDirectory(prefix='VOID transfer 🔧 ') as directory:
         p=subprocess.Popen([binary,mode,path],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,preexec_fn=(lambda:os.close(0)) if mode=='--closed-input-while-output' else None)
         p.wait(timeout=15)
         p.stdin.close();p.stdin=None;out,err=p.communicate(timeout=5)
-        check(p.returncode==0,(mode,err))
+        check(p.returncode==0,(mode,err,progress_record(path)))
         values=report(path);check(values[2]==kind and values[1]==0,(mode,values))
         if mode in ('--cancel-write','--closed-input-while-output'):check(out==b'W'*values[0] and 0<len(out)<1024*1024,('cancel prefix',values,len(out)))
         else:check(not out and values[0]==0,(mode,'unexpected progress'))

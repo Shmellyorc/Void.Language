@@ -1,0 +1,8 @@
+{
+  "build/step42-ci98-debug/void_runtime_console": "4dd0da548b407da8a8b4cd281bdb1e4d1b4aff65cdb5ae04f12cdf649ad84ca7",
+  "build/step42-ci98-debug/void_runtime_console_input": "4b19d1e844ab4337070cac241214aafff1be06f87f267529d56e06f306c3ab21",
+  "build/step42-ci98-debug/void_runtime_console_terminal": "022cb2c7228aaa37fe678841c8a80994095f8a0101eca326fe402f6ea1a33ca3",
+  "build/step42-ci98-debug/void_runtime_console_wide": "bd95ddcc85640786afb5cd989842ab4b62c6ffa2b2b874cb9df295fa8f1c13ab",
+  "build/step42-ci98-debug/void_runtime_console_keyboard": "a24a5f8bc9854d292d4e5d520890a654480411feb1dceb4eda89a8e4a6d32024",
+  "build/step42-ci98-debug/void_runtime_console_transfers": "fef1f6a2d7ed14130535e3f43fadce8296e825869a1179fdc8ecc80964e4ce79"
+}

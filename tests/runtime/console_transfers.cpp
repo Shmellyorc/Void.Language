@@ -191,6 +191,13 @@ bool in_poll(pid_t tid){std::ifstream in("/proc/self/task/"+std::to_string(tid)+
 #endif
 void cancel_native(const char* path,bool writing,bool missing_input=false){
     auto before=flags();vd::Runtime runtime;auto c=runtime.console_context();std::atomic<bool> started=false;Transfer result;std::atomic<long> tid=0;
+    int initial_write_poll=-1;short initial_write_revents=0;
+    if(writing){
+        pollfd descriptor{STDOUT_FILENO,POLLOUT,0};
+        do{initial_write_poll=poll(&descriptor,1,0);}while(initial_write_poll<0 && errno==EINTR);
+        initial_write_revents=descriptor.revents;
+        check(initial_write_poll==1 && (initial_write_revents&POLLOUT) && !(initial_write_revents&(POLLERR|POLLHUP|POLLNVAL)),"native output pipe not initially writable");
+    }
     auto blocked=std::async(std::launch::async,[&]{
         vd::Runtime::Attachment a(runtime);vd::Runtime::Managed m(runtime);void* root=nullptr;std::size_t offset=0;vd::Runtime::Slot slot{&root,sizeof(root),&offset,1};vd::Runtime::Frame f(runtime,&slot,1);runtime.allocate_into(&root,{8,{}});
         {vd::Runtime::Native native(runtime);
@@ -210,12 +217,31 @@ void cancel_native(const char* path,bool writing,bool missing_input=false){
 #ifdef __linux__
     until([&]{return in_poll(static_cast<pid_t>(tid.load()));});
 #endif
+    int write_poll=-1;short write_revents=0;
+    if(writing){
+        // The parent keeps this fresh pipe's reader open and does not drain it
+        // until we finish. Not-writable therefore proves actual native writes
+        // filled it. Admission (or the first readiness poll) alone proves none.
+        // poll observes only: it creates no fd and cannot reopen missing stdin.
+        until([&]{pollfd descriptor{STDOUT_FILENO,POLLOUT,0};write_poll=poll(&descriptor,1,0);write_revents=descriptor.revents;
+            if(write_poll<0 && errno==EINTR)return false;
+            if(write_poll<0 || (write_revents&(POLLERR|POLLHUP|POLLNVAL)))check(false,"native output progress poll failed");
+            return write_poll==0;
+        });
+    }
     Transfer absent;
     if(missing_input)absent=c->read(1,0).transfer;
     {vd::Runtime::Attachment a(runtime);vd::Runtime::Managed m(runtime);check(runtime.collect(5s)==vd::Runtime::Collection::completed && runtime.snapshot().objects==1,"blocked real IO obstructed precise GC");}
     runtime.close();blocked.get();
     if(missing_input)check(absent.error.kind==ErrorKind::closed && absent.error.os_code==EBADF,"initially absent stdin was mistaken for another operation's wake descriptor");
     check(result.error.kind==ErrorKind::closed && !result.eof,"real readiness wait not cancelled");
+    if(writing){
+        std::ofstream observed(std::string(path)+".progress.json");
+        observed<<"{\"initial_poll_result\":"<<initial_write_poll<<",\"initial_poll_revents\":"<<initial_write_revents<<",\"poll_result\":"<<write_poll<<",\"poll_revents\":"<<write_revents
+                <<",\"completed\":"<<result.completed<<",\"error\":"<<static_cast<unsigned>(result.error.kind)
+                <<",\"missing_input\":"<<(missing_input?"true":"false")<<"}\n";
+        check(bool(observed),"native output progress report failed");
+    }
     if(writing)check(result.completed>0 && result.completed<1024*1024,"cancelled write lost native prefix");
     else check(result.completed==0,"cancelled empty read consumed bytes");
     check(flags_unchanged(before,path) && c->snapshot().admitted==0,"cancelled native resources/borrowed flags");report(path,result);

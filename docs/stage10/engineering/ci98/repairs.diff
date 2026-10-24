@@ -1,0 +1,109 @@
+diff --git a/tests/runtime/console_terminal.py b/tests/runtime/console_terminal.py
+index b8755d8..5030daa 100644
+--- a/tests/runtime/console_terminal.py
++++ b/tests/runtime/console_terminal.py
+@@ -9,8 +9,21 @@ with tempfile.TemporaryDirectory(prefix='VOID terminal29 ') as temporary:
+         master,slave=pty.openpty();fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0));before=termios.tcgetattr(slave)
+         active=termios.tcgetattr(slave)
+         if name!='cooked':active[3]&=~(termios.ICANON|termios.ECHO);active[6][termios.VMIN]=1;active[6][termios.VTIME]=0
+-        termios.tcsetattr(slave,termios.TCSANOW,active);report=pathlib.Path(temporary)/(name+'.txt');start=time.monotonic();child=subprocess.Popen([binary,str(report),mode],stdin=slave if input_tty else subprocess.PIPE,stdout=slave,stderr=slave if error_tty else subprocess.PIPE,env=dict(os.environ,TERM=terminal,**({"TERMINFO":str(database)} if name=="custom" else {})));data=b'';answered=False
+-        if not input_tty:child.stdin.write(b'redirected\x00\xff');child.stdin.close();child.stdin=None
++        termios.tcsetattr(slave,termios.TCSANOW,active);report=pathlib.Path(temporary)/(name+'.txt');start=time.monotonic()
++        # The probe deliberately polls once without waiting. Queue its entire
++        # redirected payload before launch; writing after Popen races that poll.
++        redirected=None
++        if not input_tty:
++            redirected,writer=os.pipe()
++            try:
++                written=os.write(writer,b'redirected\x00\xff')
++                assert written==12
++            finally:os.close(writer)
++        try:
++            child=subprocess.Popen([binary,str(report),mode],stdin=slave if input_tty else redirected,stdout=slave,stderr=slave if error_tty else subprocess.PIPE,env=dict(os.environ,TERM=terminal,**({"TERMINFO":str(database)} if name=="custom" else {})))
++        finally:
++            if redirected is not None:os.close(redirected)
++        data=b'';answered=False
+         try:
+             while child.poll() is None:
+                 assert time.monotonic()-start<10,(name,data)
+diff --git a/tests/runtime/console_transfers.cpp b/tests/runtime/console_transfers.cpp
+index a121795..6e65512 100644
+--- a/tests/runtime/console_transfers.cpp
++++ b/tests/runtime/console_transfers.cpp
+@@ -191,6 +191,13 @@ bool in_poll(pid_t tid){std::ifstream in("/proc/self/task/"+std::to_string(tid)+
+ #endif
+ void cancel_native(const char* path,bool writing,bool missing_input=false){
+     auto before=flags();vd::Runtime runtime;auto c=runtime.console_context();std::atomic<bool> started=false;Transfer result;std::atomic<long> tid=0;
++    int initial_write_poll=-1;short initial_write_revents=0;
++    if(writing){
++        pollfd descriptor{STDOUT_FILENO,POLLOUT,0};
++        do{initial_write_poll=poll(&descriptor,1,0);}while(initial_write_poll<0 && errno==EINTR);
++        initial_write_revents=descriptor.revents;
++        check(initial_write_poll==1 && (initial_write_revents&POLLOUT) && !(initial_write_revents&(POLLERR|POLLHUP|POLLNVAL)),"native output pipe not initially writable");
++    }
+     auto blocked=std::async(std::launch::async,[&]{
+         vd::Runtime::Attachment a(runtime);vd::Runtime::Managed m(runtime);void* root=nullptr;std::size_t offset=0;vd::Runtime::Slot slot{&root,sizeof(root),&offset,1};vd::Runtime::Frame f(runtime,&slot,1);runtime.allocate_into(&root,{8,{}});
+         {vd::Runtime::Native native(runtime);
+@@ -210,12 +217,31 @@ void cancel_native(const char* path,bool writing,bool missing_input=false){
+ #ifdef __linux__
+     until([&]{return in_poll(static_cast<pid_t>(tid.load()));});
+ #endif
++    int write_poll=-1;short write_revents=0;
++    if(writing){
++        // The parent keeps this fresh pipe's reader open and does not drain it
++        // until we finish. Not-writable therefore proves actual native writes
++        // filled it. Admission (or the first readiness poll) alone proves none.
++        // poll observes only: it creates no fd and cannot reopen missing stdin.
++        until([&]{pollfd descriptor{STDOUT_FILENO,POLLOUT,0};write_poll=poll(&descriptor,1,0);write_revents=descriptor.revents;
++            if(write_poll<0 && errno==EINTR)return false;
++            if(write_poll<0 || (write_revents&(POLLERR|POLLHUP|POLLNVAL)))check(false,"native output progress poll failed");
++            return write_poll==0;
++        });
++    }
+     Transfer absent;
+     if(missing_input)absent=c->read(1,0).transfer;
+     {vd::Runtime::Attachment a(runtime);vd::Runtime::Managed m(runtime);check(runtime.collect(5s)==vd::Runtime::Collection::completed && runtime.snapshot().objects==1,"blocked real IO obstructed precise GC");}
+     runtime.close();blocked.get();
+     if(missing_input)check(absent.error.kind==ErrorKind::closed && absent.error.os_code==EBADF,"initially absent stdin was mistaken for another operation's wake descriptor");
+     check(result.error.kind==ErrorKind::closed && !result.eof,"real readiness wait not cancelled");
++    if(writing){
++        std::ofstream observed(std::string(path)+".progress.json");
++        observed<<"{\"initial_poll_result\":"<<initial_write_poll<<",\"initial_poll_revents\":"<<initial_write_revents<<",\"poll_result\":"<<write_poll<<",\"poll_revents\":"<<write_revents
++                <<",\"completed\":"<<result.completed<<",\"error\":"<<static_cast<unsigned>(result.error.kind)
++                <<",\"missing_input\":"<<(missing_input?"true":"false")<<"}\n";
++        check(bool(observed),"native output progress report failed");
++    }
+     if(writing)check(result.completed>0 && result.completed<1024*1024,"cancelled write lost native prefix");
+     else check(result.completed==0,"cancelled empty read consumed bytes");
+     check(flags_unchanged(before,path) && c->snapshot().admitted==0,"cancelled native resources/borrowed flags");report(path,result);
+diff --git a/tests/runtime/console_transfers.py b/tests/runtime/console_transfers.py
+index 9b6b7f9..7c3a059 100644
+--- a/tests/runtime/console_transfers.py
++++ b/tests/runtime/console_transfers.py
+@@ -9,13 +9,16 @@ def check(value, message):
+     global checks
+     assert value,message
+     checks+=1
++def progress_record(path):
++    snapshot=path.with_name(path.name+'.progress.json')
++    return json.loads(snapshot.read_text()) if snapshot.exists() else None
+ def descriptor_record(path):
+     snapshot=path.with_name(path.name+'.flags.json')
+     return json.loads(snapshot.read_text()) if snapshot.exists() else None
+ def report(path):
+     values=list(map(int,path.read_text().split()))
+     check(len(values)==6,('bad report',values))
+-    cases.append(dict(case=path.stem,completed=values[0],eof=bool(values[1]),kind=values[2],os_code=values[3],cleanup_code=values[4],child_checks_before_report=values[5],descriptor_flags=descriptor_record(path)))
++    cases.append(dict(case=path.stem,completed=values[0],eof=bool(values[1]),kind=values[2],os_code=values[3],cleanup_code=values[4],child_checks_before_report=values[5],descriptor_flags=descriptor_record(path),native_progress=progress_record(path)))
+     return values
+ with tempfile.TemporaryDirectory(prefix='VOID transfer 🔧 ') as directory:
+     root=Path(directory)
+@@ -91,7 +94,7 @@ with tempfile.TemporaryDirectory(prefix='VOID transfer 🔧 ') as directory:
+         p=subprocess.Popen([binary,mode,path],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,preexec_fn=(lambda:os.close(0)) if mode=='--closed-input-while-output' else None)
+         p.wait(timeout=15)
+         p.stdin.close();p.stdin=None;out,err=p.communicate(timeout=5)
+-        check(p.returncode==0,(mode,err))
++        check(p.returncode==0,(mode,err,progress_record(path)))
+         values=report(path);check(values[2]==kind and values[1]==0,(mode,values))
+         if mode in ('--cancel-write','--closed-input-while-output'):check(out==b'W'*values[0] and 0<len(out)<1024*1024,('cancel prefix',values,len(out)))
+         else:check(not out and values[0]==0,(mode,'unexpected progress'))

@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "-std=c++20",
+    "-g",
+    "-fno-rtti",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-I/home/shmellyorc/Documents/Void.Language/include",
+    "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.cpp",
+    "/home/shmellyorc/Documents/Void.Language/build/step42-ci97-debug/libvoid_runtime.a",
+    "/home/shmellyorc/Documents/Void.Language/build/step42-ci97-debug/libvoid_native_fixture.a",
+    "-pthread",
+    "-ldl",
+    "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+    "-o",
+    "/home/shmellyorc/Documents/Void.Language/build/step42-ci98-debug/void_runtime_console_transfers"
+  ],
+  "returncode": 0,
+  "seconds": 4.397559900069609,
+  "scope": "Changed transfer test driver only; unchanged accepted Runtime archive and neighboring test binaries"
+}

@@ -9,8 +9,21 @@ with tempfile.TemporaryDirectory(prefix='VOID terminal29 ') as temporary:
         master,slave=pty.openpty();fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0));before=termios.tcgetattr(slave)
         active=termios.tcgetattr(slave)
         if name!='cooked':active[3]&=~(termios.ICANON|termios.ECHO);active[6][termios.VMIN]=1;active[6][termios.VTIME]=0
-        termios.tcsetattr(slave,termios.TCSANOW,active);report=pathlib.Path(temporary)/(name+'.txt');start=time.monotonic();child=subprocess.Popen([binary,str(report),mode],stdin=slave if input_tty else subprocess.PIPE,stdout=slave,stderr=slave if error_tty else subprocess.PIPE,env=dict(os.environ,TERM=terminal,**({"TERMINFO":str(database)} if name=="custom" else {})));data=b'';answered=False
-        if not input_tty:child.stdin.write(b'redirected\x00\xff');child.stdin.close();child.stdin=None
+        termios.tcsetattr(slave,termios.TCSANOW,active);report=pathlib.Path(temporary)/(name+'.txt');start=time.monotonic()
+        # The probe deliberately polls once without waiting. Queue its entire
+        # redirected payload before launch; writing after Popen races that poll.
+        redirected=None
+        if not input_tty:
+            redirected,writer=os.pipe()
+            try:
+                written=os.write(writer,b'redirected\x00\xff')
+                assert written==12
+            finally:os.close(writer)
+        try:
+            child=subprocess.Popen([binary,str(report),mode],stdin=slave if input_tty else redirected,stdout=slave,stderr=slave if error_tty else subprocess.PIPE,env=dict(os.environ,TERM=terminal,**({"TERMINFO":str(database)} if name=="custom" else {})))
+        finally:
+            if redirected is not None:os.close(redirected)
+        data=b'';answered=False
         try:
             while child.poll() is None:
                 assert time.monotonic()-start<10,(name,data)

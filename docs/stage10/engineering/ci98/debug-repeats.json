@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python3",
+    "docs/stage10/engineering/ci98/repeat.py",
+    "debug"
+  ],
+  "returncode": 0,
+  "seconds": 25.53262405190617,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

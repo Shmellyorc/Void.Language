@@ -1,0 +1,5 @@
+{
+  "tests/runtime/console_terminal.py": "a8d0115fba2ea2dac2a5b05d131a504b3d270a191cef4ae31aca817a18a455b3",
+  "tests/runtime/console_transfers.cpp": "bf3351cffc9e39829e76d807918b3538dfd1eb024c90836646d549b17ef80dfc",
+  "tests/runtime/console_transfers.py": "8acf5e0d048fa3997626eccc49a35ae6cc9be45a8dfe7dd2cbda4708cb3f46ac"
+}

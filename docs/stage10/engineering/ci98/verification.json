@@ -1,0 +1,61 @@
+{
+  "baseline": "9a4985f89f40c56b8eaa984775faf18c52b69f19",
+  "source_freeze_matches": true,
+  "modified_test_files": [
+    "tests/runtime/console_terminal.py",
+    "tests/runtime/console_transfers.cpp",
+    "tests/runtime/console_transfers.py"
+  ],
+  "production_changed": false,
+  "workflows_changed": false,
+  "stack_protections_changed": false,
+  "original_CI97_binary_mismatches": [],
+  "preserved_input_count": 739,
+  "preserved_Step41_and_CI97_evidence": true,
+  "patch_sha256": "4656d56d0acd3c788c2fcae0b9df04d288fc4b0667d299f106757c4ec0e8d6aa",
+  "patch_reverse_check": 0,
+  "raw_progress": {
+    "debug": {
+      "cancel-write": {
+        "completed": 65536,
+        "error": 6,
+        "initial_poll_result": 1,
+        "initial_poll_revents": 4,
+        "missing_input": false,
+        "poll_result": 0,
+        "poll_revents": 0
+      },
+      "closed-input-while-output": {
+        "completed": 65536,
+        "error": 6,
+        "initial_poll_result": 1,
+        "initial_poll_revents": 4,
+        "missing_input": true,
+        "poll_result": 0,
+        "poll_revents": 0
+      }
+    },
+    "san": {
+      "cancel-write": {
+        "completed": 65536,
+        "error": 6,
+        "initial_poll_result": 1,
+        "initial_poll_revents": 4,
+        "missing_input": false,
+        "poll_result": 0,
+        "poll_revents": 0
+      },
+      "closed-input-while-output": {
+        "completed": 65536,
+        "error": 6,
+        "initial_poll_result": 1,
+        "initial_poll_revents": 4,
+        "missing_input": true,
+        "poll_result": 0,
+        "poll_revents": 0
+      }
+    }
+  },
+  "native_macOS_execution": false,
+  "full_CMake_JIT_AOT_acceptance": false
+}

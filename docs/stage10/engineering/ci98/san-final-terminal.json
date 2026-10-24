@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python3",
+    "tests/runtime/console_terminal.py",
+    "build/step42-ci98-san/void_runtime_console_terminal"
+  ],
+  "returncode": 0,
+  "seconds": 0.8378044010605663,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

@@ -1,0 +1,21 @@
+{
+  "original_native_fixture": {
+    "status": 0,
+    "rows": [
+      "1 2002 2 ",
+      "0 80 24",
+      "3 80 24",
+      ""
+    ],
+    "delivery": "withheld until after child exit",
+    "stderr_hex": ""
+  },
+  "same_process_later_input": {
+    "status": 0,
+    "stderr_hex": "696e7075745f6b696e643d332071756572795f6572726f723d332066697273745f6572726f723d342066697273745f62797465733d30206c617465723d3732363536343639373236353633373436353634303066660a"
+  },
+  "admission_before_write": {
+    "status": 0,
+    "stdout_hex": "61646d69747465643d3120636f6d706c657465643d30206572726f723d360a"
+  }
+}

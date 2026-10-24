@@ -1,11 +1,11 @@
 {
   "increment": "Stage 10 Step 42 \u2014 native Windows/macOS acceptance preparation",
-  "updated_utc": "2026-10-24T11:26:14.082670+00:00",
-  "status": "CI97 native console repairs locally verified; Golden Wrench review and actual macOS verification pending; Step42 INCOMPLETE",
+  "updated_utc": "2026-10-24T17:39:35.859745+00:00",
+  "status": "CI98/ThinLTO3 macOS Release fixture synchronization repairs locally verified; Golden Wrench review and native Release verification pending; Step42 INCOMPLETE",
   "step42_complete": false,
   "stage_status": "INCOMPLETE",
   "subsequent_steps": "43\u201344 remain separate",
-  "authority": "Boss continuation: CI97 native console repairs and focused Linux Debug/strict verification only. No Git mutations, dispatch, workflow changes or new architecture.",
+  "authority": "Boss authorizes bounded investigation/repair of the two macOS Release failures. Test-only changes; no Git mutation, CI dispatch, workflow edit or new architecture.",
   "baseline": {
     "result": "step41-results.json",
     "result_sha256": "e7eb5375aea4eb705ac275aa6043fb9a0bd3c0336cd71ef39869c8750db9b688",
@@ -68,6 +68,7 @@
       "tests/runtime/console_keyboard.py",
       "tests/runtime/console_posix.hpp",
       "tests/runtime/console_posix.py",
+      "tests/runtime/console_terminal.py",
       "tests/runtime/console_transfers.cpp",
       "tests/runtime/console_transfers.py",
       "tests/stage10/console.py",
@@ -146,7 +147,7 @@
   },
   "platforms": {
     "windows": {
-      "status": "CI97 BASELINE ACCEPTED: Debug194/194 and Release194/194; current repair not executed natively",
+      "status": "CI98/ThinLTO3 baseline Debug/Release green; no current native rerun or production change",
       "native_attempts": [],
       "planned_architecture": "x64",
       "planned_configurations": [
@@ -178,7 +179,7 @@
       }
     },
     "macos": {
-      "status": "CI97 Debug/Release195/199; current console repair native verification pending",
+      "status": "CI98 and ThinLTO3 macOS Debug accepted; Release198/199 in each with different fixture synchronization failures. Current test-only repair native Release verification pending.",
       "native_attempts": [],
       "planned_architecture": "ARM64",
       "planned_configurations": [
@@ -201,56 +202,57 @@
       "native_source_receipts": null,
       "native_binary_identities": null,
       "native_failure_logs": null,
-      "actual_os_sdk_compiler_versions": null
+      "actual_os_sdk_compiler_versions": null,
+      "ci98_baseline": {
+        "commit": "9a4985f89f40c56b8eaa984775faf18c52b69f19",
+        "main_run": 40091828693,
+        "experiment_run": 40091853317,
+        "Debug": "Both jobs green",
+        "Release": "Each198/199; independent native terminal/transfer failures"
+      }
     }
   },
   "inventory": "step42-inventory.json",
   "commands": "ci96/REPAIR_HANDOFF.md",
   "local_verification": {
-    "status": "PASS: Debug11/11 and strict11/11 console suites; native keyboard20/20 per configuration; normal/O2 linked source PTY2/2 each",
+    "status": "PASS: Debug11/11 and strict11/11; each repaired native suite20/20 repetitions per configuration",
     "configurations": {
       "debug": {
-        "status": "PASS: focused Linux harness only",
+        "status": "PASS: focused Linux test drivers",
         "suites_passed": 11,
         "suites_executed": 11,
         "failed": 0,
         "skipped": 0,
-        "native_keyboard_repetitions": 20,
-        "normal_O2_linked_source_PTY_cases": 2,
-        "commands": "debug-tests.json",
-        "build_commands": "debug-build-commands.json",
-        "final_keyboard_build": "debug-final-keyboard-build.json",
+        "repetitions_per_repaired_native_suite": 20,
+        "tests": "debug-tests.json",
+        "repeats": "debug-repeat-records.json",
+        "reproduction": "debug-reproduction-records.json",
+        "build": "debug-build.json",
         "binary_hashes": "debug-final-binary-hashes.json",
-        "changed_runtime_archive_members": [
-          "console.cpp.o"
-        ],
         "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
         "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
       },
       "san": {
-        "status": "PASS: focused Linux harness only",
+        "status": "PASS: focused Linux test drivers",
         "suites_passed": 11,
         "suites_executed": 11,
         "failed": 0,
         "skipped": 0,
-        "native_keyboard_repetitions": 20,
-        "normal_O2_linked_source_PTY_cases": 2,
-        "commands": "san-tests.json",
-        "build_commands": "san-build-commands.json",
-        "final_keyboard_build": "san-final-keyboard-build.json",
+        "repetitions_per_repaired_native_suite": 20,
+        "tests": "san-tests.json",
+        "repeats": "san-repeat-records.json",
+        "reproduction": "san-reproduction-records.json",
+        "build": "san-build.json",
         "binary_hashes": "san-final-binary-hashes.json",
-        "changed_runtime_archive_members": [
-          "console.cpp.o"
-        ],
         "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
         "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
       }
     },
-    "source_freeze": "ci97/repair-source-freeze.json",
-    "verification": "ci97/verification.json",
-    "scope": "Isolated focused native harness replaces only console.cpp.o in copies of accepted CI96 archives. Compiler used for AOT emission is accepted CI96; not a fresh compiler/JIT or full CMake/matrix acceptance.",
-    "stack_protections": "Original source limits, stack scripts and Step41 evidence unchanged; earlier accepted genuine1MiB results retained, not rerun here.",
-    "native_results": "Repaired macOS and Windows unverified"
+    "source_freeze": "ci98/repair-source-freeze.json",
+    "verification": "ci98/verification.json",
+    "scope": "Only C++ transfer test driver rebuilt; production Runtime archives and other focused test binaries are unchanged accepted CI97 artifacts. No full CMake/JIT/AOT/native macOS acceptance claimed.",
+    "stack_protections": "Original Step41 evidence and genuine1MiB protections unchanged; not rerun in this test-only repair.",
+    "native_results": "Repaired macOS Release test synchronization not yet executed natively"
   },
   "confirmed_new_native_defects": [
     {
@@ -915,5 +917,121 @@
       "new_guard_test": "ci97/raw/new-guard-test-before-correction.log; corrected max-read assumption to ordered read_char calls"
     },
     "next": "Golden Wrench review; Boss-controlled macOS observer and Debug/Release native regressions, then remaining Step42 acceptance. Stage10 INCOMPLETE; Steps43/44 separate."
+  },
+  "historical_ci97_local_verification": {
+    "status": "PASS: Debug11/11 and strict11/11 console suites; native keyboard20/20 per configuration; normal/O2 linked source PTY2/2 each",
+    "configurations": {
+      "debug": {
+        "status": "PASS: focused Linux harness only",
+        "suites_passed": 11,
+        "suites_executed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "native_keyboard_repetitions": 20,
+        "normal_O2_linked_source_PTY_cases": 2,
+        "commands": "debug-tests.json",
+        "build_commands": "debug-build-commands.json",
+        "final_keyboard_build": "debug-final-keyboard-build.json",
+        "binary_hashes": "debug-final-binary-hashes.json",
+        "changed_runtime_archive_members": [
+          "console.cpp.o"
+        ],
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+      },
+      "san": {
+        "status": "PASS: focused Linux harness only",
+        "suites_passed": 11,
+        "suites_executed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "native_keyboard_repetitions": 20,
+        "normal_O2_linked_source_PTY_cases": 2,
+        "commands": "san-tests.json",
+        "build_commands": "san-build-commands.json",
+        "final_keyboard_build": "san-final-keyboard-build.json",
+        "binary_hashes": "san-final-binary-hashes.json",
+        "changed_runtime_archive_members": [
+          "console.cpp.o"
+        ],
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+      }
+    },
+    "source_freeze": "ci97/repair-source-freeze.json",
+    "verification": "ci97/verification.json",
+    "scope": "Isolated focused native harness replaces only console.cpp.o in copies of accepted CI96 archives. Compiler used for AOT emission is accepted CI96; not a fresh compiler/JIT or full CMake/matrix acceptance.",
+    "stack_protections": "Original source limits, stack scripts and Step41 evidence unchanged; earlier accepted genuine1MiB results retained, not rerun here.",
+    "native_results": "Repaired macOS and Windows unverified"
+  },
+  "ci98_final_macos_investigation": {
+    "baseline_commit": "9a4985f89f40c56b8eaa984775faf18c52b69f19",
+    "main98": {
+      "run_id": 40091828693,
+      "jobs_passed": 6,
+      "jobs_total": 7,
+      "macOS_Release": "198/199; runtime_console_native_terminal redirected-input empty bytes",
+      "jobs": "ci98/main98-jobs.json",
+      "raw": "ci98/raw/main98-macos-release.log"
+    },
+    "ThinLTO3": {
+      "run_id": 40091853317,
+      "jobs_passed": 6,
+      "jobs_total": 7,
+      "macOS_Release": "198/199; runtime_console_native_transfers closed-input-while-output prefix assertion",
+      "jobs": "ci98/thinlto3-jobs.json",
+      "raw": "ci98/raw/thinlto3-macos-release.log"
+    },
+    "classification": {
+      "redirected_input": "Fixture delivery/poll ordering. Same Context later reads all12 original bytes; no production input loss or classification defect demonstrated.",
+      "cancelled_prefix": "Fixture cancellation/progress ordering. Admission alone permits legal0-byte cancellation; new initial-writable to non-writable native pipe boundary proves progress before close."
+    },
+    "production_repairs": [],
+    "diagnosis": "ci98/DIAGNOSIS.md",
+    "diff": "ci98/repairs.diff",
+    "native_progress": {
+      "debug": {
+        "cancel-write": {
+          "completed": 65536,
+          "error": 6,
+          "initial_poll_result": 1,
+          "initial_poll_revents": 4,
+          "missing_input": false,
+          "poll_result": 0,
+          "poll_revents": 0
+        },
+        "closed-input-while-output": {
+          "completed": 65536,
+          "error": 6,
+          "initial_poll_result": 1,
+          "initial_poll_revents": 4,
+          "missing_input": true,
+          "poll_result": 0,
+          "poll_revents": 0
+        }
+      },
+      "san": {
+        "cancel-write": {
+          "completed": 65536,
+          "error": 6,
+          "initial_poll_result": 1,
+          "initial_poll_revents": 4,
+          "missing_input": false,
+          "poll_result": 0,
+          "poll_revents": 0
+        },
+        "closed-input-while-output": {
+          "completed": 65536,
+          "error": 6,
+          "initial_poll_result": 1,
+          "initial_poll_revents": 4,
+          "missing_input": true,
+          "poll_result": 0,
+          "poll_revents": 0
+        }
+      }
+    },
+    "hosted_numeric_prefix_count": "Not recorded in original failure log; zero count is inferred/model-reproduced, not claimed as a native macOS measurement.",
+    "remaining_native_verification": "Golden Wrench review, then Boss-controlled macOS Release rebuild of transfer test and both original native fixture reruns/repetitions, raw terminal/progress reports and full Release acceptance. Other six green configurations retained as baseline. Stage10 INCOMPLETE; no Steps43/44 work."
   }
 }
