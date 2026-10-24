@@ -1,0 +1,20 @@
+{
+  "command": [
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "-std=c++20",
+    "-g",
+    "-fno-rtti",
+    "-Iinclude",
+    "docs/stage10/engineering/ci97/reproduce_buffered.cpp",
+    "build/step42-ci96-debug/libvoid_runtime.a",
+    "build/step42-ci96-debug/libvoid_native_fixture.a",
+    "-pthread",
+    "-ldl",
+    "-o",
+    "build/step42-ci97-debug/buffered-before"
+  ],
+  "returncode": 0,
+  "seconds": 4.498438870999962,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

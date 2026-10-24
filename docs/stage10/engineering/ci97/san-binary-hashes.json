@@ -1,0 +1,12 @@
+{
+  "build/step42-ci97-san/keyboard-before": "63afe4a83a7f4a74abfc1155750640de1b8ffa67e67fb174e5e30afffba5a9ee",
+  "build/step42-ci97-san/libvoid_runtime.a": "d3118f7d2e0fc2a56453007128d7cd1a0ae6356e50c4aa7e19386706f118a1ce",
+  "build/step42-ci97-san/libvoid_native_fixture.a": "aed9bc9c8c69620b0d2b5a4c06eab93c79c0e9f552aa50bed2ff0e5a5d9c4f1c",
+  "build/step42-ci97-san/console.cpp.o": "e1967d7abc64782cead0416058dfb3e52152989ac2211d03fa8e91ea30e5c88a",
+  "build/step42-ci97-san/void_runtime_console": "906efa41c1bd17882e658edd592c1f12f30d33ad7ddd9853cd85ce6542d761e9",
+  "build/step42-ci97-san/void_runtime_console_transfers": "96d93af80daa462f6c6f81476491bfd8c290fd55c92bf89a2ae2a8a8b9ddbce9",
+  "build/step42-ci97-san/void_runtime_console_input": "4580f24eb020f64fcce46f8f848f6f983dd4d4e79c2618b214596072e8360f02",
+  "build/step42-ci97-san/void_runtime_console_keyboard": "aacd31fbc09e065225a2744462f7aa46db0a683465650b04ed2e0fa19bcf144f",
+  "build/step42-ci97-san/void_runtime_console_terminal": "24d3c7f5d64ab8d11b35cb265bddd8bd7577541caae39ca80f121c6b0673680a",
+  "build/step42-ci97-san/void_runtime_console_wide": "e9fd0bf718985c697f60297bf7dfc979bd19bcbb04aadf6afe64c5bab04f7ccd"
+}

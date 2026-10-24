@@ -1,0 +1,16 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "build/step42-ci96-san",
+    "-R",
+    "^runtime_console_native_keyboard$",
+    "--output-on-failure",
+    "--repeat",
+    "until-fail:20"
+  ],
+  "returncode": 8,
+  "seconds": 0.22732684784568846,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

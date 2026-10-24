@@ -1,0 +1,39 @@
+{
+  "repository": "apple-oss-distributions/xnu",
+  "commit": "f6217f891ac0bb64f3d375211650a4c1ff8ca1ea",
+  "observations": [
+    {
+      "path": "bsd/kern/kern_descrip.c",
+      "symbols": [
+        "fcntl F_GETFL",
+        "OFLAGS"
+      ],
+      "finding": "F_GETFL exposes the fileglob flags, converted to open flags."
+    },
+    {
+      "path": "bsd/kern/sys_generic.c",
+      "symbols": [
+        "dofilewrite",
+        "FWASWRITTEN"
+      ],
+      "finding": "A successful write sets FWASWRITTEN in fileglob flags."
+    },
+    {
+      "path": "bsd/sys/fcntl.h",
+      "symbols": [
+        "FWASWRITTEN"
+      ],
+      "finding": "Kernel-only bookkeeping bit has value 0x00010000."
+    },
+    {
+      "path": "bsd/kern/tty.c",
+      "symbols": [
+        "TIOCSETA",
+        "PENDIN",
+        "ICANON"
+      ],
+      "finding": "A non-flushing return to ICANON sets PENDIN and ORs that state into the resulting local flags."
+    }
+  ],
+  "native_Darwin_execution": false
+}

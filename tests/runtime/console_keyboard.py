@@ -1,7 +1,6 @@
-"""Real POSIX input modes/key bytes, retaining exact original termios state."""
+"""Real POSIX key bytes and configured modes, retaining raw termios snapshots."""
 import json,os,pathlib,pty,select,subprocess,sys,termios,time
-def mode_record(mode):
- return dict(iflag=mode[0],oflag=mode[1],cflag=mode[2],lflag=mode[3],ispeed=mode[4],ospeed=mode[5],cc=[unit.hex() if isinstance(unit,bytes) else unit for unit in mode[6]])
+from console_posix import mode_record, same_termios
 binary=str(pathlib.Path(sys.argv[1]).resolve());records=[];checks=0
 # enum order is the public/native shared contract; byte assertions independently
 # verify characters/unknown sequences, never merely a successful return code.
@@ -22,12 +21,12 @@ for unclosed in [False,True]:
     active=termios.tcgetattr(s);assert not active[3]&(termios.ECHO|termios.ICANON|termios.ISIG),active
     os.write(m,b''.join(payload for payload,_ in cases));sent=True;checks+=1
   tail,errors=p.communicate(timeout=3);data+=tail;assert p.returncode==0 and not errors,(p.returncode,data,errors)
-  assert termios.tcgetattr(s)==original,('mode differs',original,termios.tcgetattr(s));checks+=2
+  assert same_termios(original,termios.tcgetattr(s)),('mode differs',original,termios.tcgetattr(s));checks+=2
   rows=data.splitlines();assert rows[0]==b'READY' and len(rows)==len(cases)+1,rows
   for row,(payload,key) in zip(rows[1:],cases):
    received = b'\n' if payload == b'\r' else payload
    expected=f'{key} 0 0 1 {received.hex()}'.encode();assert row==expected,(row,expected);checks+=1
-  records.append(dict(unclosed=unclosed,stdout_hex=data.hex(),stderr_hex=errors.hex(),restored_exactly=True,original_mode=mode_record(original),restored_mode=mode_record(termios.tcgetattr(s)),seconds=time.monotonic()-start))
+  records.append(dict(unclosed=unclosed,stdout_hex=data.hex(),stderr_hex=errors.hex(),restored_exactly=termios.tcgetattr(s)==original,restored_configuration=True,original_mode=mode_record(original),restored_mode=mode_record(termios.tcgetattr(s)),seconds=time.monotonic()-start))
  finally:
   if p.poll() is None:p.kill()
   p.communicate();os.close(m);os.close(s)
@@ -50,8 +49,8 @@ for echo_newline in [False,True]:
    out,errors=p.communicate(timeout=5)
    assert p.returncode==0 and out==b'1\n' and not errors,(out,errors)
    assert not select.select([m],[],[],0)[0],"unexpected native echo"
-   assert termios.tcgetattr(s)==original
-   checks+=5;records.append(dict(default=True,echo_newline=echo_newline,signals=signals,restored_exactly=True,original_mode=mode_record(original),active_mode=mode_record(active),restored_mode=mode_record(termios.tcgetattr(s)),stdout_hex=out.hex()))
+   assert same_termios(original,termios.tcgetattr(s))
+   checks+=5;records.append(dict(default=True,echo_newline=echo_newline,signals=signals,restored_exactly=termios.tcgetattr(s)==original,restored_configuration=True,original_mode=mode_record(original),active_mode=mode_record(active),restored_mode=mode_record(termios.tcgetattr(s)),stdout_hex=out.hex()))
   finally:
    if p.poll() is None:p.kill()
    p.communicate();os.close(m);os.close(s)
@@ -61,7 +60,7 @@ try:
  import errno
  assert p.returncode==0 and p.stdout==f'6 {errno.EBADF}\n'.encode() and not p.stderr,(p.returncode,p.stdout,p.stderr)
  assert termios.tcgetattr(s)==original
- checks+=3;records.append(dict(closed_input=True,stdout_hex=p.stdout.hex(),restored_exactly=True,original_mode=mode_record(original),restored_mode=mode_record(termios.tcgetattr(s))))
+ checks+=3;records.append(dict(closed_input=True,stdout_hex=p.stdout.hex(),restored_exactly=termios.tcgetattr(s)==original,restored_configuration=True,original_mode=mode_record(original),restored_mode=mode_record(termios.tcgetattr(s))))
 finally:
  os.close(m);os.close(s)
 m,s=pty.openpty();mode=termios.tcgetattr(s);mode[3]&=~termios.ECHO;termios.tcsetattr(s,termios.TCSANOW,mode);original=termios.tcgetattr(s)
@@ -71,7 +70,7 @@ try:
  first=p.stdout.readline();os.write(m,mode[6][termios.VERASE]+b'\n');out,errors=p.communicate(timeout=5)
  assert p.returncode==0 and first==b'AVAILABLE 0\n' and out==b'ab\n' and not errors,(p.returncode,first,out,errors)
  assert termios.tcgetattr(s)==original
- checks+=3;records.append(dict(canonical_editor=True,stdout_hex=(first+out).hex(),original_mode=mode_record(original),restored_mode=mode_record(termios.tcgetattr(s)),restored_exactly=True))
+ checks+=3;records.append(dict(canonical_editor=True,stdout_hex=(first+out).hex(),original_mode=mode_record(original),restored_mode=mode_record(termios.tcgetattr(s)),restored_exactly=termios.tcgetattr(s)==original,restored_configuration=True))
 finally:
  if p.poll() is None:p.kill();p.wait()
  os.close(m);os.close(s)
@@ -91,8 +90,8 @@ try:
  rows=out.splitlines();assert rows[-1]=='DONE:é'.encode(),rows
  assert sorted(rows[:-1])==sorted(('O%d:é🎮'%n).encode() for n in range(32)),rows
  assert sorted(errors.splitlines())==sorted(('E%d:é🎮'%n).encode() for n in range(32)),errors
- assert termios.tcgetattr(s)==original and not select.select([m],[],[],0)[0],'native modes/echo changed'
- checks+=7;records.append(dict(shared_runtimes=3,stdout_hex=(first+out).hex(),stderr_hex=errors.hex(),original_mode=mode_record(original),active_mode=mode_record(active),restored_mode=mode_record(termios.tcgetattr(s)),restored_exactly=True))
+ assert same_termios(original,termios.tcgetattr(s)) and not select.select([m],[],[],0)[0],'native modes/echo changed'
+ checks+=7;records.append(dict(shared_runtimes=3,stdout_hex=(first+out).hex(),stderr_hex=errors.hex(),original_mode=mode_record(original),active_mode=mode_record(active),restored_mode=mode_record(termios.tcgetattr(s)),restored_exactly=termios.tcgetattr(s)==original,restored_configuration=True))
 finally:
  if p.poll() is None:p.kill();p.wait()
  os.close(m);os.close(s)

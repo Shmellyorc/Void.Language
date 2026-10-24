@@ -1,18 +1,24 @@
 # Stage 10 engineering progress and permanent handoff
 
-Updated 23 October 2026 (America/Los_Angeles). **INCOMPLETE.**
-Current Step42 checkpoint: Wrench accepts CI96 repairs for native re-verification.
-CI96 Ubuntu jobs timed out during linking before CTest; job budget raised180→360
-minutes with all seven matrix jobs and test settings unchanged. Focused
-repairs implemented; Linux Debug18/18 and strict18/18 plus both original1MiB
-probes pass. Original Windows
-Debug/Release190/194 each; macOS Debug/Release failed compilation. Repaired-source
-native execution remains UNVERIFIED. Boss reports Wrench accepted Step41's final
-Debug199/199, Release199/199 and strict199/199, original1MiB gates and Linux editors.
-Steps42–44 remain open; Stage10 INCOMPLETE.
-See `engineering/step42-results.json` and the latest recovery entry below. The entire
-44-step mission remains authorized. This is a recovery record, not a request for
-new authorization or Stage10 completion claim. Step41 evidence remains unchanged.
+Updated 24 October 2026 (America/Los_Angeles). **INCOMPLETE.**
+Current Step42 checkpoint: CI97 native console repairs implemented and focused
+Linux verification complete; Golden Wrench review and actual repaired macOS
+execution remain pending. Main CI97 at96bac2ea retains Windows Debug/Release
+194/194 each and Ubuntu Debug/Release199/199 each. Its macOS configurations each
+passed195/199, failing the same four native console suites; Ubuntu Sanitizers
+passed198/199, failing the real PTY keyboard assertion. ThinLTO experiment#2 is a
+separate observation; neither workflow was changed by this repair.
+
+Local repaired-console verification is Debug11/11 and strict11/11, plus20/20 native
+keyboard repetitions and two normal/O2 linked source-PTY cases per configuration.
+The harness rebuilds the console Runtime object and focused native drivers while
+preserving accepted CI96/Step41 builds. It is not fresh compiler/JIT, complete
+CMake or native macOS/Windows acceptance. Original1MiB protections and Step41
+artifacts are unchanged. Steps42–44 remain open; Stage10 INCOMPLETE.
+See `engineering/step42-results.json` and
+[CI97 diagnosis, raw evidence and limits](engineering/ci97/DIAGNOSIS.md). The entire
+44-step mission remains authorized. This is a recovery record, not a completion
+claim or a request for new authorization. Boss retains Git and hosted execution.
 
 Original mission baseline HEAD: `e25816bdb80e3f32613edf77c9cf3258232af966`.
 Step 32 builds on the owner checkpoint `ecf0bec6e04ef66e1e50cac4afc1598a945066c0`;
@@ -1628,3 +1634,66 @@ Golden Wrench accepts the native repairs for re-verification, per Boss. Next:
 Boss reviews this workflow-only correction and controls Git/hosted re-verification.
 Repaired-source Windows/macOS acceptance remains UNVERIFIED. Step42 and Stage10
 remain INCOMPLETE; Steps43–44 remain separate. No Git mutations or CI launch.
+
+
+## Step 42 CI97 native console repairs — 24 October 2026
+
+Boss continues the existing mission following Golden Wrench's review of main
+CI97 and ThinLTO experiment#2. MainCI97 at96bac2ea independently confirms Windows
+Debug/Release194/194 each and Ubuntu Debug/Release199/199 each, with original
+frontend1MiB gates. macOS Debug/Release each195/199 fail native transfers/input/
+keyboard and stage10_console_aot; Ubuntu Sanitizers198/199 reports Escape1b rather
+than Up Arrow1b5b41. The experiment at8485e640 separately repeats that symptom.
+Hosted job metadata, both failing macOS logs, main strict log, experiment Debug
+log and success excerpts are preserved under engineering/ci97/. No cache cause,
+fix or performance result is inferred; main and experimental workflows are intact.
+
+POSIX adapter review found no fcntl mutation or close of borrowed handles: only
+owned wake-pipe descriptors receive those setters. Apple XNU source shows that a
+successful host write sets FWASWRITTEN, exposed by F_GETFL. Transfer/input fixtures
+now distinguish addition of that specific Darwin bookkeeping bit from changed
+configured flags. FD_CLOEXEC, access mode, O_NONBLOCK, O_APPEND, errors and all
+other bits remain checked, with raw before/after snapshots and a Runtime-free
+write control. No production descriptor mutation was added or excused.
+
+XNU also adds PENDIN on a non-flushing return to canonical input. The previous
+mode verifier could turn this successful transition into syntheticEIO. Apple-only
+verification now accounts for that kernel state while checking every configured
+attribute/cc/speed. Nested saved snapshots, LIFO ownership, actual native errors
+and cleanup reports are preserved. No input flush, PENDIN clearing or second
+collector/input architecture was introduced. Python native/source PTY assertions
+share the narrow comparison and retain raw snapshots separately from configured
+restoration. Actual hosted deltas/return codes were not in the old logs; Darwin
+source/model evidence is not a claim of repaired native macOS success.
+
+Original real-PTY repetitions passed20/20 in both local configurations before the
+repair. A read wrapper captured the entire103-byte key batch in one native read,
+including complete arrows, with no observed delivery fragmentation in those two
+batches. A virtual-clock regression then reproduced the bug against both original
+Debug/strict archives: capability lookup advanced31ms while all bytes were already
+queued. Before: key4/1b; after: key5/1b5b41, same four-byte batch and virtual time.
+The decoder now consumes buffered continuations before expiring a native wait;
+unbuffered expiry, cancellation, all original keys and the30ms limit remain.
+A companion guard proves that later readers retain the untouched[Aq suffix.
+No arbitrary sleep or timeout increase was used.
+
+Focused repaired native-console suites pass11/11 Debug and11/11 strict; original
+native-keyboard repetitions pass20/20 each. Independently linked source
+console_keys normal/O2 passes exact original output and terminal restoration in
+both configurations. The emitting compiler is the accepted CI96 binary, not a
+freshly relinked compiler/JIT. Only console.cpp.o differs in copies of the accepted
+Runtime archives. Full CMake, full stage10_console_aot and native Windows/macOS
+acceptance were not rerun. Raw LSan/ptrace launch failure and one unproven strict
+compiler diagnostic are preserved; final strict builds/tests use the established
+untraced profile with ASan/UBSan/leaks unchanged. A new guard-test max-read
+assumption and a recorder filename collision were corrected and recorded; no
+original key expectation was weakened. Original CI96 binaries, Step41 evidence,
+stack scripts/limits, root README, CMake and both workflows match their hashes.
+
+Deliverables: [exact source diff](engineering/ci97/repairs.diff),
+[diagnosis and native observer commands](engineering/ci97/DIAGNOSIS.md),
+[source/binary preservation verification](engineering/ci97/verification.json),
+updated engineering/step42-results.json and raw reproductions. Golden Wrench
+review is pending. Boss controls native macOS Debug/Release observer/tests and
+the next hosted run. No Git mutation or CI dispatch. Step42 and Stage10 remain
+**INCOMPLETE**; Steps43–44 are separate.

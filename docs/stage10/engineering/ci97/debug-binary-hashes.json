@@ -1,0 +1,13 @@
+{
+  "build/step42-ci97-debug/keyboard-before": "7eeab53a573f9a2bb2f7dd8504f1d2f66e5c8832ed2661667ddf799aef535c0c",
+  "build/step42-ci97-debug/libvoid_runtime.a": "02af0450652125609e38c5f0b4b2b24b774247d38d64579e7956d8b97ef84a8b",
+  "build/step42-ci97-debug/libvoid_native_fixture.a": "ce3f3b7b9426a2ef623eeeda3715d8545c56a290b7b5abc775fc039afb006d7d",
+  "build/step42-ci97-debug/console.cpp.o": "9e697f4528b107fc033268ad9bca881f8b773356ee09e3da5c5d69b496e54f75",
+  "build/step42-ci97-debug/host-observe": "9b6acac444c2e4c68e7abd9b1396600dcc07f425d2b9d42120d9d6a6348a8658",
+  "build/step42-ci97-debug/void_runtime_console": "4dd0da548b407da8a8b4cd281bdb1e4d1b4aff65cdb5ae04f12cdf649ad84ca7",
+  "build/step42-ci97-debug/void_runtime_console_transfers": "9138d627a97b4d8ffbab51d38b9ed5c477fe8452ffa34ecf20305d8bd9dff650",
+  "build/step42-ci97-debug/void_runtime_console_input": "4b19d1e844ab4337070cac241214aafff1be06f87f267529d56e06f306c3ab21",
+  "build/step42-ci97-debug/void_runtime_console_keyboard": "565e4579b0bc69bd922f80bd57a8228bd0d4bfe322ca075058a3c4e0e23d10e8",
+  "build/step42-ci97-debug/void_runtime_console_terminal": "022cb2c7228aaa37fe678841c8a80994095f8a0101eca326fe402f6ea1a33ca3",
+  "build/step42-ci97-debug/void_runtime_console_wide": "bd95ddcc85640786afb5cd989842ab4b62c6ffa2b2b874cb9df295fa8f1c13ab"
+}

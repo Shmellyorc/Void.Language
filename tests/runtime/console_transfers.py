@@ -9,13 +9,20 @@ def check(value, message):
     global checks
     assert value,message
     checks+=1
+def descriptor_record(path):
+    snapshot=path.with_name(path.name+'.flags.json')
+    return json.loads(snapshot.read_text()) if snapshot.exists() else None
 def report(path):
     values=list(map(int,path.read_text().split()))
     check(len(values)==6,('bad report',values))
-    cases.append(dict(case=path.stem,completed=values[0],eof=bool(values[1]),kind=values[2],os_code=values[3],cleanup_code=values[4],child_checks_before_report=values[5]))
+    cases.append(dict(case=path.stem,completed=values[0],eof=bool(values[1]),kind=values[2],os_code=values[3],cleanup_code=values[4],child_checks_before_report=values[5],descriptor_flags=descriptor_record(path)))
     return values
 with tempfile.TemporaryDirectory(prefix='VOID transfer 🔧 ') as directory:
     root=Path(directory)
+    path=root/'host-write.txt'
+    host=subprocess.run([binary,'--host-flags',path],capture_output=True,timeout=10)
+    check(host.returncode==0 and host.stdout==b'HOST' and not host.stderr,('plain host write',host.returncode,host.stderr,descriptor_record(path)))
+    check(report(path)[:4]==[4,0,NONE,0],'plain host write result')
     payload=bytes(range(256))*4096+b'\0UTF8: \xf0\x9f\x94\xa7\r\n\xff'
     for label,source in [('pipe',None),('file',root/'input.bin')]:
         path=root/(label+'.txt')
@@ -24,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='VOID transfer 🔧 ') as directory:
             with source.open('rb') as input_file:
                 run=subprocess.run([binary,'--copy',path],stdin=input_file,capture_output=True,timeout=20)
         else:run=subprocess.run([binary,'--copy',path],input=payload,capture_output=True,timeout=20)
-        check(run.returncode==0,(label,run.stderr))
+        check(run.returncode==0,(label,run.stderr,descriptor_record(path)))
         check(run.stdout==payload and run.stderr==b'E\0\xff',(label,'binary transfer changed'))
         result=report(path);check(result[:4]==[len(payload),1,NONE,0],(label,result))
     # Real redirected file output, including host-established shared file position.

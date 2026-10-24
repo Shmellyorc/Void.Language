@@ -1,0 +1,26 @@
+{
+  "src/runtime/console.cpp": {
+    "baseline_blob": "4a02d36a94613f977238817d6958943c8cb47182",
+    "current_head_blob": "4a02d36a94613f977238817d6958943c8cb47182"
+  },
+  "src/runtime/console_keyboard.inc": {
+    "baseline_blob": "cd309e2355c6b70e145ceaa5b4e33a7249e8a6d9",
+    "current_head_blob": "cd309e2355c6b70e145ceaa5b4e33a7249e8a6d9"
+  },
+  "tests/runtime/console_transfers.cpp": {
+    "baseline_blob": "fbd43c65a8fcc3f0f19accf915b73bb701c4e8bf",
+    "current_head_blob": "fbd43c65a8fcc3f0f19accf915b73bb701c4e8bf"
+  },
+  "tests/runtime/console_input.cpp": {
+    "baseline_blob": "071073802230edf36ccda62dd2356c009830d500",
+    "current_head_blob": "071073802230edf36ccda62dd2356c009830d500"
+  },
+  "tests/runtime/console_keyboard.cpp": {
+    "baseline_blob": "ff77536649b79c896375d2e2e64c5602a5cb49ae",
+    "current_head_blob": "ff77536649b79c896375d2e2e64c5602a5cb49ae"
+  },
+  "tests/stage10/console.py": {
+    "baseline_blob": "015dd414e34269932b289807c7d22c2bb200f6dd",
+    "current_head_blob": "015dd414e34269932b289807c7d22c2bb200f6dd"
+  }
+}

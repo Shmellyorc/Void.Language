@@ -1,0 +1,9 @@
+{
+  "command": [
+    "build/step42-ci97-debug/keyboard-before"
+  ],
+  "returncode": 1,
+  "seconds": 0.0035516961943358183,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

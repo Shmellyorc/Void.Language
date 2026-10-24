@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "-std=c++20",
+    "docs/stage10/engineering/ci97/host_observe.cpp",
+    "-o",
+    "build/step42-ci97-debug/host-observe"
+  ],
+  "returncode": 0,
+  "seconds": 0.7299969850573689,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

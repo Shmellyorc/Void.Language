@@ -1,0 +1,5 @@
+{
+  "clang++": "clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin\n",
+  "ld.lld": "LLD 19.1.7 (/home/runner/work/llvm-project/llvm-project/llvm cd708029e0b2869e80abe31ddb175f7c35361f90) (compatible with GNU linkers)\n",
+  "llvm-ar": "LLVM (http://llvm.org/):\n  LLVM version 19.1.7\n  Optimized build.\n"
+}

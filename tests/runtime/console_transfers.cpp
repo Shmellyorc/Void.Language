@@ -1,5 +1,6 @@
 #include "void/console.hpp"
 #include "void/runtime.hpp"
+#include "console_posix.hpp"
 #include <atomic>
 #include <barrier>
 #include <deque>
@@ -147,7 +148,20 @@ void capabilities(){
     vd::Runtime::Attachment a(h.runtime);vd::Runtime::Managed m(h.runtime);rejected=false;try{h.context->read(1);}catch(const std::logic_error&){rejected=true;}check(rejected,"Managed native read accepted");
 }
 #ifndef _WIN32
-std::array<int,6> flags(){std::array<int,6> result{};for(int n=0;n<3;++n){result[2*n]=fcntl(n,F_GETFD);result[2*n+1]=fcntl(n,F_GETFL);}return result;}
+using console_native_test::flags;
+using console_native_test::flags_unchanged;
+void descriptor_invariants(){
+    console_native_test::Flags before{},after{};before.values={0,0,0,1,0,1};after=before;
+    check(console_native_test::same_flags(before,after),"identical descriptor snapshot rejected");
+    for(int bit:{O_NONBLOCK,O_APPEND,O_ACCMODE}){after=before;after.values[3]^=bit;check(!console_native_test::same_flags(before,after),"configured status flag mutation accepted");}
+    after=before;after.values[2]^=FD_CLOEXEC;check(!console_native_test::same_flags(before,after),"descriptor ownership flag mutation accepted");
+    after=before;after.errors[1]=EBADF;check(!console_native_test::same_flags(before,after),"descriptor native error mutation accepted");
+#ifdef __APPLE__
+    after=before;after.values[3]|=0x10000;check(console_native_test::same_flags(before,after),"Darwin host write bookkeeping mistaken for a configured flag");
+    check(!console_native_test::same_flags(after,before),"Darwin write bookkeeping unexpectedly cleared");
+#endif
+}
+
 void report(const char* path,const Transfer& result){std::ofstream out(path);out<<result.completed<<' '<<result.eof<<' '<<static_cast<int>(result.error.kind)<<' '<<result.error.os_code<<' '<<result.error.cleanup_code<<' '<<checks<<'\n';check(bool(out),"probe report failed");}
 void native_records(const char* path,bool reading){
     auto before=flags();vd::Runtime first,second;auto a=first.console_context(),b=second.console_context();
@@ -160,7 +174,7 @@ void native_records(const char* path,bool reading){
     auto left=std::async(std::launch::async,work,a,Stream::output,'A',std::ref(one));
     auto right=std::async(std::launch::async,work,b,Stream::error,'B',std::ref(two));start.arrive_and_wait();left.get();right.get();
     if(reading){one.insert(one.end(),two.begin(),two.end());check(one.size()==200,"native reader counts");auto output=a->write(Stream::output,std::move(one));check(!output.error && output.completed==200,"native reader output");}
-    first.close();second.close();check(flags()==before,"concurrent IO changed flags");report(path,{reading?200u:128u*8193u,false,{}});
+    first.close();second.close();check(flags_unchanged(before,path),"concurrent IO changed flags");report(path,{reading?200u:128u*8193u,false,{}});
 }
 void copy(const char* path,std::int64_t expected){
     auto before=flags();vd::Runtime runtime;auto c=runtime.console_context();std::size_t total=0;bool eof=false;
@@ -170,7 +184,7 @@ void copy(const char* path,std::int64_t expected){
         total+=input.bytes.size();auto out=c->write(Stream::output,std::move(input.bytes));check(!out.error && out.completed==input.transfer.completed,"native copy write failed");
     }
     auto error=c->write(Stream::error,Bytes{'E',0,255});check(!error.error && error.completed==3,"stderr binary write failed");
-    runtime.close();check(flags()==before,"borrowed flags changed by transfers");report(path,{total,eof,{}});
+    runtime.close();check(flags_unchanged(before,path),"borrowed flags changed by transfers");report(path,{total,eof,{}});
 }
 #ifdef __linux__
 bool in_poll(pid_t tid){std::ifstream in("/proc/self/task/"+std::to_string(tid)+"/syscall");long call=-1;in>>call;return in && call==SYS_poll;}
@@ -204,7 +218,7 @@ void cancel_native(const char* path,bool writing,bool missing_input=false){
     check(result.error.kind==ErrorKind::closed && !result.eof,"real readiness wait not cancelled");
     if(writing)check(result.completed>0 && result.completed<1024*1024,"cancelled write lost native prefix");
     else check(result.completed==0,"cancelled empty read consumed bytes");
-    check(flags()==before && c->snapshot().admitted==0,"cancelled native resources/borrowed flags");report(path,result);
+    check(flags_unchanged(before,path) && c->snapshot().admitted==0,"cancelled native resources/borrowed flags");report(path,result);
 }
 void best_effort(){
     struct Blocking final:Script {
@@ -241,7 +255,7 @@ void broken(const char* path,std::string mode){
     sigpending(&pending);check((sigismember(&pending,SIGPIPE)==1)==(mode=="pending"),"Runtime consumed prior pending SIGPIPE or leaked its own");
     if(mode=="pending"){int received=0;sigwait(&set,&received);check(received==SIGPIPE,"host pending signal lost");}
     pthread_sigmask(SIG_SETMASK,&old,nullptr);sigaction(SIGPIPE,&original,nullptr);
-    check(flags()==descriptor_flags,"broken pipe changed descriptors");report(path,result);
+    check(flags_unchanged(descriptor_flags,path),"broken pipe changed descriptors");report(path,result);
 }
 void interrupted_native(const char* path){
     struct sigaction old{},action{};sigemptyset(&action.sa_mask);action.sa_handler=handler;sigaction(SIGUSR1,&action,&old);
@@ -275,6 +289,11 @@ void simple(const char* mode,const char* path){
 int main(int argc,char** argv){try{
 #ifndef _WIN32
     if(argc>=3){std::string mode=argv[1];
+        if(mode=="--host-flags"){
+            auto before=flags();auto count=::write(STDOUT_FILENO,"HOST",4);auto code=count<0?errno:0;
+            check(flags_unchanged(before,argv[2]),"plain host write changed configured flags");
+            report(argv[2],{count<0?0:static_cast<std::size_t>(count),false,code?Error{ErrorKind::io_failure,code}:Error{}});return 0;
+        }
         if(mode=="--records" || mode=="--readers"){native_records(argv[2],mode=="--readers");return 0;}
         if(mode=="--copy"){copy(argv[2],argc>3?std::stoll(argv[3]):-1);return 0;}
         if(mode=="--closed-input-while-output"){cancel_native(argv[2],true,true);return 0;}
@@ -286,7 +305,7 @@ int main(int argc,char** argv){try{
 #endif
     progress();deadlines();cancellation();admission();records();capabilities();
 #ifndef _WIN32
-    best_effort();
+    descriptor_invariants();best_effort();
 #endif
     std::cout<<checks<<" checked console transfer/deadline/cancellation checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

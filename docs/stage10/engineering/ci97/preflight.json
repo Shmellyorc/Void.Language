@@ -1,0 +1,7 @@
+{
+  "head": "8485e6404596cf73deb55302ad3678a23cc0c6a4",
+  "ci97_baseline": "96bac2ea8e4be31d574a5916118feab0ef6b2e7f",
+  "initial_status": "?? docs/VOID_ThinLTO_Report.md\n?? docs/stage10/engineering/ci97/\n",
+  "native_macos_available": false,
+  "native_windows_available": false
+}

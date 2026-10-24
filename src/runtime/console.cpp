@@ -825,8 +825,13 @@ KeyResult Operation::read_key(const Request& original) {
         // Polling retains polling semantics; never turn a zero-timeout request
         // into a 30ms wait. All continuations share the original absolute limit.
         for(;;){
-            if(!sequence.empty())if(auto error=stopped(request,adapter());error){if(error.kind==ErrorKind::timed_out){result.key=sequence.size()==1?Key::escape:Key::unknown;break;}return fail(error);}
-            auto item=reader.peek();
+            // Decode bytes already owned by the shared queue before testing a
+            // continuation wait. Terminfo lookup or scheduling can consume the
+            // budget without any native input delay; splitting that queued key
+            // would report Escape even though the complete sequence arrived.
+            auto item=reader.peek(false);
+            if(!sequence.empty())if(auto error=stopped(request,adapter());error && (item.unavailable || error.kind!=ErrorKind::timed_out)){if(error.kind==ErrorKind::timed_out){result.key=sequence.size()==1?Key::escape:Key::unknown;break;}return fail(error);}
+            if(item.unavailable)item=reader.peek();
             if(item.error || item.unavailable || item.eof){
                 if(item.error && item.error.kind!=ErrorKind::timed_out && item.error.kind!=ErrorKind::would_block)return fail(item.error,item.event);
                 result.key=sequence.size()==1?Key::escape:Key::unknown;break;

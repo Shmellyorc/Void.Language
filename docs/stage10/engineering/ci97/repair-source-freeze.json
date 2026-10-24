@@ -1,0 +1,13 @@
+{
+  "src/runtime/console.cpp": "c994908428fb22b47c618d1e6e310f205ba3bc7494374b84116bba4c3f303312",
+  "src/runtime/console_keyboard.inc": "ecddacc7625c6834353af025529464f08af3cc53d9cb40b9548ab73a44b0d0d2",
+  "tests/runtime/console_keyboard.cpp": "a15abcb44695bb2f5edd2dfdc1d852c99811e564045556a11a10f5437abecd83",
+  "tests/runtime/console_posix.hpp": "da68e7f662d739783610f0dd90180fde80c29da20f812f7f5fd4f3dfbc25540f",
+  "tests/runtime/console_posix.py": "c838fb68165c7aa22d793733b8dd0da898fc1dc1a55adf16169326c714a2affa",
+  "tests/runtime/console_transfers.cpp": "6ff160f1aab6464ebe320116b120ec4ac662a58d9089908e727c03f127ea98cf",
+  "tests/runtime/console_transfers.py": "85c143506aeea5b13046e77e6c6968638a9aad9caaf08df4f7f487b5c3801ae5",
+  "tests/runtime/console_input.cpp": "e87af2b9d497773b7bcf518fc7219e8111d8eced0ac77e464e039204514f7107",
+  "tests/runtime/console_input.py": "b70aafc1764b65d777f7e1fbdc7d8959f9e01cb3eb4c006e8a1264be59a71601",
+  "tests/runtime/console_keyboard.py": "9aec04e75f6d09847c62fcab36134a4f8d3aa9954914cc0d625ead044f629a68",
+  "tests/stage10/console.py": "f97e6fa4e11548975232749e9ebf1f3a380f54d6827101c3dadcee22baf524db"
+}

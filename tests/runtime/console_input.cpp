@@ -1,5 +1,6 @@
 #include "void/console.hpp"
 #include "void/runtime.hpp"
+#include "console_posix.hpp"
 #include "void/utf8.hpp"
 #include <atomic>
 #include <barrier>
@@ -190,11 +191,12 @@ void frame(Context& c,const TextResult& result){
     else frame(c,result.transfer.eof?'F':'T',{reinterpret_cast<const std::uint8_t*>(result.text.data()),result.text.size()});
 }
 void report(const char* path){std::ofstream out(path);out<<checks<<'\n';check(bool(out),"input report");}
-std::array<int,6> flags(){std::array<int,6> out{};for(int n=0;n<3;++n){out[n*2]=fcntl(n,F_GETFD);out[n*2+1]=fcntl(n,F_GETFL);}return out;}
+using console_native_test::flags;
+using console_native_test::flags_unchanged;
 void native_lines(const char* path,std::int64_t count,bool recover=false){
     auto before=flags();vd::Runtime runtime;auto c=runtime.console_context();
     for(std::int64_t n=0;count<0 || n<count;++n){auto r=c->read_line();check(!r.transfer.error || (recover && r.transfer.error.kind==ErrorKind::invalid_encoding),"native line error");frame(*c,r);if(r.transfer.eof)break;}
-    runtime.close();check(flags()==before,"input changed borrowed descriptors");report(path);
+    runtime.close();check(flags_unchanged(before,path),"input changed borrowed descriptors");report(path);
 }
 void live(const char* path,std::string method,bool timeout,bool character){
     vd::Runtime runtime;auto c=runtime.console_context();

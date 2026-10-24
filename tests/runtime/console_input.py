@@ -24,8 +24,11 @@ def exact(pipe,count):
     return result
 def one(pipe):
     header=exact(pipe,9);return chr(header[0]),exact(pipe,int.from_bytes(header[1:],'little'))
+def descriptor_record(path):
+    snapshot=path.with_name(path.name+'.flags.json')
+    return json.loads(snapshot.read_text()) if snapshot.exists() else None
 def record(path):
-    count=int(path.read_text());cases.append(dict(case=path.stem,child_checks_before_report=count))
+    count=int(path.read_text());cases.append(dict(case=path.stem,child_checks_before_report=count,descriptor_flags=descriptor_record(path)))
 with tempfile.TemporaryDirectory(prefix='VOID queued input 🔧 ') as directory:
     root=Path(directory)
     source='\ufeffA\0é🎮\r\nB\n\rCR\r\r\n\nfinal'.encode()
@@ -36,7 +39,7 @@ with tempfile.TemporaryDirectory(prefix='VOID queued input 🔧 ') as directory:
             (root/'input.bin').write_bytes(source)
             with (root/'input.bin').open('rb') as stream:run=subprocess.run([binary,'--lines',path],stdin=stream,capture_output=True,timeout=15)
         else:run=subprocess.run([binary,'--lines',path],input=source,capture_output=True,timeout=15)
-        check(run.returncode==0,(kind,run.stderr));check(frames(run.stdout)==expected,(kind,frames(run.stdout)));record(path)
+        check(run.returncode==0,(kind,run.stderr,descriptor_record(path)));check(frames(run.stdout)==expected,(kind,frames(run.stdout)));record(path)
     # 4096-byte native buffers must split this 7-byte Unicode/NUL cycle at
     # every phase. This also proves lines have no arbitrary one-buffer ceiling.
     path=root/'large-line.txt';large=('é🎮\0'*5000).encode()

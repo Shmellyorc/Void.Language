@@ -1,0 +1,28 @@
+{
+  "command": [
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "-std=c++20",
+    "-O2",
+    "-g",
+    "-DNDEBUG",
+    "-fno-rtti",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-Iinclude",
+    "tests/runtime/console_keyboard.cpp",
+    "build/step42-ci97-san/libvoid_runtime.a",
+    "build/step42-ci97-san/libvoid_native_fixture.a",
+    "-pthread",
+    "-ldl",
+    "--ld-path=.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+    "-o",
+    "build/step42-ci97-san/void_runtime_console_keyboard"
+  ],
+  "returncode": 0,
+  "seconds": 13.766240481985733,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

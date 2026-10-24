@@ -1,0 +1,9 @@
+{
+  "command": [
+    "build/step42-ci97-debug/buffered-before"
+  ],
+  "returncode": 0,
+  "seconds": 0.002959561999887228,
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+}

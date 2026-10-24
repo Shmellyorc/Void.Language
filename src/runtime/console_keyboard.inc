@@ -1,6 +1,13 @@
 #ifndef _WIN32
     static bool same_mode(const termios& a,const termios& b) {
-        return a.c_iflag==b.c_iflag && a.c_oflag==b.c_oflag && a.c_cflag==b.c_cflag && a.c_lflag==b.c_lflag &&
+        auto local_difference=a.c_lflag^b.c_lflag;
+#ifdef __APPLE__
+        // Darwin's tty ioctl adds PENDIN when returning to ICANON, so queued
+        // raw input is reprocessed. It is kernel state, not a failed tcsetattr.
+        // Do not clear it or flush input to manufacture a byte-identical mode.
+        local_difference&=~static_cast<tcflag_t>(PENDIN);
+#endif
+        return a.c_iflag==b.c_iflag && a.c_oflag==b.c_oflag && a.c_cflag==b.c_cflag && !local_difference &&
             std::equal(std::begin(a.c_cc),std::end(a.c_cc),std::begin(b.c_cc)) && cfgetispeed(&a)==cfgetispeed(&b) && cfgetospeed(&a)==cfgetospeed(&b);
     }
 #endif

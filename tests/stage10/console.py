@@ -209,6 +209,8 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
     terminal_records = []
     if os.name == "posix":
         import fcntl, pty, select, struct, termios, time
+        sys.path.insert(0,str(fixtures.parents[0]/"runtime"))
+        from console_posix import mode_record, same_termios
         source = root / "console_terminal.void"
         # The same source fixture also ran with all three endpoints redirected.
         for optimized in (False, True):
@@ -244,7 +246,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                     for foreground in range(16):
                         code = 30+foreground if foreground<8 else 90+foreground-8
                         assert ("\x1b[%dm\x1b[40m" % code).encode() in captured, (foreground,captured)
-                    assert termios.tcgetattr(slave) == mode
+                    assert termios.tcgetattr(slave)==mode
                     checks += 5
                     record = dict(case="console_terminal/PTY", path=label, optimized=optimized, status=child.returncode, stdout_hex=captured.hex(), stderr_hex=errors.hex())
                     outputs.append(record)
@@ -289,9 +291,9 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                         tail, errors = child.communicate(timeout=5)
                         captured += tail
                         assert child.returncode == (1 if key_source=="console_operator_mode_failure" else 0) and captured == expected_keys and (not errors if key_source=="console_keys" else errors==combined_cleanup if key_source=="console_operator_modes" else errors.startswith(combined_cleanup[:-2]+b", 50, 51];") and b"integrated--1" in errors), (label, optimized, child.returncode, captured, errors)
-                        assert termios.tcgetattr(slave) == mode
+                        assert same_termios(mode,termios.tcgetattr(slave)), (mode,termios.tcgetattr(slave))
                         checks += 3
-                        record = dict(case=key_source+"/PTY", path=label, optimized=optimized, status=child.returncode, stdout_hex=captured.hex(), stderr_hex=errors.hex(), restored_exactly=True)
+                        record = dict(case=key_source+"/PTY", path=label, optimized=optimized, status=child.returncode, stdout_hex=captured.hex(), stderr_hex=errors.hex(), restored_exactly=termios.tcgetattr(slave)==mode, restored_configuration=True, original_mode=mode_record(mode), restored_mode=mode_record(termios.tcgetattr(slave)))
                         key_records.append(record)
                         outputs.append(record)
                     finally:

@@ -1,0 +1,19 @@
+{
+  "modified": [
+    "src/runtime/console.cpp",
+    "src/runtime/console_keyboard.inc",
+    "tests/runtime/console_input.cpp",
+    "tests/runtime/console_input.py",
+    "tests/runtime/console_keyboard.cpp",
+    "tests/runtime/console_keyboard.py",
+    "tests/runtime/console_transfers.cpp",
+    "tests/runtime/console_transfers.py",
+    "tests/stage10/console.py"
+  ],
+  "added": [
+    "tests/runtime/console_posix.hpp",
+    "tests/runtime/console_posix.py"
+  ],
+  "preexisting_unrelated_untracked_preserved": "docs/VOID_ThinLTO_Report.md",
+  "diff_sha256": "d03c2a7b8ebfdb8634c7c8270a12b72027adab658356366905e183fa55f1c73e"
+}

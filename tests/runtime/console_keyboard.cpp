@@ -15,14 +15,14 @@ using namespace vd::console;
 namespace {
 std::atomic<unsigned> checks=0;void check(bool value,const char* message){++checks;if(!value)throw std::runtime_error(message);}
 struct Fake:Adapter {
-    std::string pending,output;std::size_t at=0,chunk=4096;unsigned mode=7,restores=0;bool allocation_fault=false,fault_once=false,eof=false,restore_once=false;std::function<void(const Request&)> before;std::function<void()> saving,restoring;std::optional<PhysicalKey> physical;Error fault,restore_fault,apply_fault,payload_fault;mutable std::chrono::steady_clock::time_point clock{};
+    std::string pending,output;std::size_t at=0,chunk=4096;unsigned mode=7,restores=0;bool allocation_fault=false,fault_once=false,eof=false,restore_once=false;std::function<void(const Request&)> before;std::function<void()> saving,restoring,describing;std::optional<PhysicalKey> physical;Error fault,restore_fault,apply_fault,payload_fault;mutable std::chrono::steady_clock::time_point clock{};
     std::array<Endpoint,3> inspect()const override{return {{{Stream::input,Kind::terminal},{Stream::output,Kind::terminal},{Stream::error,Kind::pipe}}};}
     auto now()const noexcept->std::chrono::steady_clock::time_point override{return clock;}
     std::uint64_t capabilities(Stream s)override{return s==Stream::input?text_input|key_input|input_modes:text_output;}
     Error save_mode(InputMode& saved)override{if(saving)saving();saved.native[0]=mode;return {};}
     Error apply_mode(const InputMode&,ModeOptions o)override{mode=(o.echo?1:0)|(o.line_input?2:0)|(o.control_c_as_input?0:4);return apply_fault;}
     Error restore_mode(const InputMode& saved)override{++restores;if(restoring)restoring();if(restore_fault){auto error=restore_fault;if(restore_once)restore_fault={};return error;}mode=saved.native[0];return {};}
-    std::vector<std::pair<std::string,Key>> key_sequences()override{if(allocation_fault)throw std::bad_alloc();return {{"\033[A",Key::up},{"\033[B",Key::down},{"\033OP",Key::f1},{"\033[24~",Key::f12}};}
+    std::vector<std::pair<std::string,Key>> key_sequences()override{if(describing)describing();if(allocation_fault)throw std::bad_alloc();return {{"\033[A",Key::up},{"\033[B",Key::down},{"\033OP",Key::f1},{"\033[24~",Key::f12}};}
     Transfer read(std::span<std::uint8_t> out,const Request& request)override{if(before)before(request);if(fault){auto error=fault;if(fault_once)fault={};return {0,false,error};}if(physical && at==pending.size()){auto key=physical;physical.reset();return {0,false,{},key};}if(at==pending.size()){if(eof)return {0,true};if(request.deadline && !request.polling)clock=*request.deadline;return {0,false,{request.polling?ErrorKind::would_block:ErrorKind::timed_out}};}auto n=std::min({out.size(),chunk,pending.size()-at});std::copy_n(pending.begin()+at,n,out.begin());at+=n;auto key=physical;physical.reset();return {n,false,payload_fault,key};}
     Transfer write(Stream,std::span<const std::uint8_t> bytes,const Request&)override{output.append(bytes.begin(),bytes.end());return {bytes.size()};}
 };
@@ -81,6 +81,12 @@ void run(){
         for(auto [key,text]:{std::pair{Key::character,"é"},{Key::character,"🎮"},{Key::enter,""},{Key::tab,""},{Key::backspace,""},{Key::up,""},{Key::down,""},{Key::f1,""},{Key::f12,""},{Key::unknown,""}}){auto r=c.read_key(true);check(!r.transfer.error && r.key==key && r.character==text && !r.modifiers_known && !r.key_down_known && r.repeat==1,"key decode mismatch");check(f->mode==7,"key read left mode changed");if(key==Key::unknown)check(std::string(r.bytes.begin(),r.bytes.end())=="\033[999~","unknown bytes lost");}
         check(f->output=="é🎮","echo duplicated or changed bytes");check(c.key_available().first==0,"empty availability true");
     }
+    // Terminfo/decoder work may consume the continuation budget after one native
+    // read has already queued the complete sequence. A deadline must not split it.
+    {auto f=std::make_shared<Fake>();f->pending="\033[Aq";f->describing=[&]{f->clock+=std::chrono::milliseconds(31);};Context c(Streams::isolated(f));auto key=c.read_key();check(!key.transfer.error && key.key==Key::up && key.bytes==Bytes{27,'[','A'},"buffered Up Arrow split after terminfo work");check(c.read_char(0).text=="q" && f->mode==7,"buffered continuation lost shared input or restoration");}
+    // With no buffered continuation, the same expired absolute budget still
+    // returns Escape; a later shared reader owns the untouched remaining bytes.
+    {auto f=std::make_shared<Fake>();f->chunk=1;f->pending="\033[Aq";f->describing=[&]{f->clock+=std::chrono::milliseconds(31);};Context c(Streams::isolated(f));auto key=c.read_key();check(!key.transfer.error && key.key==Key::escape && key.bytes==Bytes{27},"unbuffered continuation extended the 30ms deadline");std::string tail;for(unsigned n=0;n<3;++n)tail+=c.read_char(0).text;check(tail=="[Aq" && f->mode==7,"expired continuation discarded input bytes");}
     {auto f=std::make_shared<Fake>();f->clock=std::chrono::steady_clock::time_point::max()-std::chrono::milliseconds(10);f->pending="\033";Context c(Streams::isolated(f));auto k=c.read_key();check(k.key==Key::escape && !k.transfer.error,"escape deadline overflowed near clock limit");}
     for(auto timeout:{-1,0,10,100}){
         auto f=std::make_shared<Fake>();f->pending="\033";Context c(Streams::isolated(f));auto r=c.read_key(false,timeout);check(!r.transfer.error && r.key==Key::escape,"escape continuation failed");auto ms=std::chrono::duration_cast<std::chrono::milliseconds>(f->clock.time_since_epoch()).count();check(ms==(timeout==0?0:timeout==10?10:30),"escape did not retain bounded absolute deadline");

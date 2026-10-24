@@ -1,0 +1,48 @@
+[
+  {
+    "job_id": 120799820608,
+    "name": "Ubuntu 24.04 / Debug",
+    "conclusion": "success",
+    "excerpts": [
+      "2026-10-24T06:17:17.9621834Z clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+      "2026-10-24T06:17:17.9625103Z LLD 19.1.7 (/home/runner/work/llvm-project/llvm-project/llvm cd708029e0b2869e80abe31ddb175f7c35361f90) (compatible with GNU linkers)",
+      "2026-10-24T10:21:42.3732431Z 100% tests passed, 0 tests failed out of 199",
+      "2026-10-24T10:21:42.3732971Z Total Test time (real) = 2776.08 sec",
+      "2026-10-24T10:21:50.9196979Z 100% tests passed, 0 tests failed out of 1",
+      "2026-10-24T10:21:50.9197513Z Total Test time (real) =   8.47 sec"
+    ]
+  },
+  {
+    "job_id": 120799820680,
+    "name": "Windows 2022 / Release",
+    "conclusion": "success",
+    "excerpts": [
+      "2026-10-24T06:17:01.7108138Z clang version 19.1.7\r",
+      "2026-10-24T06:41:20.1684601Z 100% tests passed, 0 tests failed out of 194\r",
+      "2026-10-24T06:41:20.1685295Z Total Test time (real) = 1139.62 sec\r"
+    ]
+  },
+  {
+    "job_id": 120799820701,
+    "name": "Windows 2022 / Debug",
+    "conclusion": "success",
+    "excerpts": [
+      "2026-10-24T06:17:03.2553496Z clang version 19.1.7\r",
+      "2026-10-24T07:00:17.5598822Z 100% tests passed, 0 tests failed out of 194\r",
+      "2026-10-24T07:00:17.5599253Z Total Test time (real) = 2179.05 sec\r"
+    ]
+  },
+  {
+    "job_id": 120799820717,
+    "name": "Ubuntu 24.04 / Release",
+    "conclusion": "success",
+    "excerpts": [
+      "2026-10-24T06:17:51.0650424Z clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+      "2026-10-24T06:17:51.0652043Z LLD 19.1.7 (/home/runner/work/llvm-project/llvm-project/llvm cd708029e0b2869e80abe31ddb175f7c35361f90) (compatible with GNU linkers)",
+      "2026-10-24T08:10:29.7837530Z 100% tests passed, 0 tests failed out of 199",
+      "2026-10-24T08:10:29.7838059Z Total Test time (real) = 676.21 sec",
+      "2026-10-24T08:10:32.1370082Z 100% tests passed, 0 tests failed out of 1",
+      "2026-10-24T08:10:32.1370294Z Total Test time (real) =   2.29 sec"
+    ]
+  }
+]

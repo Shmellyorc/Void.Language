@@ -1,0 +1,1 @@
+Final aggregation rejected missing per-case records: the command wrapper overwrote source-PTY and repeated-keyboard records because both used the same JSON filenames. Recorder output names were separated; only these two bounded checks were repeated to retain complete evidence. No production source or sanitizer setting changed.
