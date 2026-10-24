@@ -6,7 +6,7 @@
 #include <stdexcept>
 namespace t=vd::temporal;
 namespace {unsigned checks=0;
-void check(bool value){if(!value)throw std::runtime_error("temporal check "+std::to_string(checks));++checks;}
+void check(bool value,const std::string& detail={}){if(!value)throw std::runtime_error("temporal check "+std::to_string(checks)+(detail.empty()?"":": "+detail));++checks;}
 template<class F>void reject(F operation){try{operation();}catch(const std::exception&){++checks;return;}throw std::runtime_error("invalid temporal input accepted at "+std::to_string(checks));}
 }
 int main(){try{
@@ -60,7 +60,10 @@ int main(){try{
     check(t::format(t::make_local(t::make_date(1999,12,31),t::make_time(23,59,59,999999999)),"yyyy-MM-dd HH:mm:ss.fff")=="1999-12-31 23:59:59.999");
     for(int year:{1,4,100,400,1600,1900,1970,2000,2024,2100,9999})for(unsigned month=1;month<=12;++month){
         const unsigned lengths[]={31,28,31,30,31,30,31,31,30,31,30,31};auto last=lengths[month-1]+(month==2 && (year%400==0 || (year%4==0 && year%100!=0)));
-        for(unsigned day:{1u,28u,29u,30u,31u})if(day<=last){auto date=t::make_date(year,month,day);auto local=t::make_local(date,t::make_time(23,59,59,999999999));auto point=t::make_instant(t::unix_seconds(local),999999999);auto restored=t::utc_components(point);check(restored.date.year==year && restored.date.month==month && restored.date.day==day && restored.time.hour==23 && restored.time.minute==59 && restored.time.second==59 && restored.time.nanosecond==999999999);check(t::format(point)==t::format(local)+"Z");}else reject([&]{t::make_date(year,month,day);});
+        for(unsigned day:{1u,28u,29u,30u,31u})if(day<=last){auto date=t::make_date(year,month,day);auto local=t::make_local(date,t::make_time(23,59,59,999999999));auto point=t::make_instant(t::unix_seconds(local),999999999);auto restored=t::utc_components(point);check(restored.date.year==year && restored.date.month==month && restored.date.day==day && restored.time.hour==23 && restored.time.minute==59 && restored.time.second==59 && restored.time.nanosecond==999999999,"UTC round-trip expected "+t::format(local)+", seconds="+std::to_string(point.seconds)+", actual="+t::format(restored));check(t::format(point)==t::format(local)+"Z");}else reject([&]{t::make_date(year,month,day);});
     }
+    check(t::unix_seconds(t::make_local(t::make_date(1,1,1),t::make_time(0,0,0)))==-62135596800LL);
+    check(t::unix_seconds(t::make_local(t::make_date(9999,1,1),t::make_time(23,59,59)))==253370851199LL);
+    check(t::unix_seconds(t::make_local(t::make_date(9999,12,31),t::make_time(23,59,59)))==253402300799LL);
     std::cout<<checks<<" temporal core checks passed\n";
 }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}

@@ -15308,3 +15308,25 @@ was justified. The existing CI dispatch runs seven jobs and needs Boss authoriza
 Step42-results.json records preparation and execution gates. Step41 artifacts,
 Stage9 corrections, root README, source limits and all unresolved observations
 remain preserved. Stage10 INCOMPLETE; Steps43–44 separate.
+
+
+## 23 October 2026 — Step42 CI96 native repairs, focused Linux acceptance
+
+Preserved CI96 original Windows190/194 each and both macOS stop-token build
+failures; seven pre-repair files match committed ef6017613ecf92de31380476ed5d9c3fc8cf3dbb.
+Fixed portable civil-time intermediate narrowing (sys_days promoted before time
+addition), added actual SDK stop-token compile/link gates and verified pinned
+libc++19 opt-in, preserved Windows unavailable cache behavior in tests, exact
+legacy CRT result trailers and raw source print, and explicit UTF8 fixtures.
+Debug18/18 and strict ASan/UBSan/leaks18/18 pass, plus original fullfrontend and
+semantic-depth soft/hard1MiB probes. Local cp1252 model passes144 repaired LSP
+checks; pinned libc++19 callbacks compile/link/run; native Windows/macOS repaired
+source remains UNVERIFIED. Step41's256 artifacts and24 binary/archive/object
+identities are unchanged, as are compiler.cpp, source limits and root README.
+The evidence recorder Path serialization failure was repaired and both probes
+rerun; the small traced LSan failure is preserved, strict build/test ran from the
+start in the established untraced profile with all settings unchanged. Source
+diff, exact commands/hashes and pending native probes: stage10/engineering/ci96/.
+No Git mutation, hosted rerun, policy change, publication or new dependency.
+Step42 and Stage10 INCOMPLETE; Wrench review and Boss-controlled native execution
+next, Steps43–44 separate. Existing unexplained/deferred observations preserved.

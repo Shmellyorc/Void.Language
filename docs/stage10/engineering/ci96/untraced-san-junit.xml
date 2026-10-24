@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="18"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1404"
+	timestamp="2026-10-23T19:09:54"
+	>
+	<testcase name="stage10_operator_reload" classname="stage10_operator_reload" time="52.3172" status="run">
+		<properties/>
+		<system-out>248 operator/format compatibility/cache/reload checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_temporal_ir" classname="stage10_temporal_ir" time="3.19416" status="run">
+		<properties/>
+		<system-out>8 temporal IR/worker checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_temporal" classname="format_temporal" time="0.0836844" status="run">
+		<properties/>
+		<system-out>1311 temporal core checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_zones" classname="format_zones" time="0.483107" status="run">
+		<properties/>
+		<system-out>2026e: 344 zones, 253 links, 1720 projections; embedded gap/overlap/history passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console" classname="runtime_console" time="0.0481923" status="run">
+		<properties/>
+		<system-out>347 console foundation identity/lifecycle/GC checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_endpoints" classname="runtime_console_endpoints" time="0.160842" status="run">
+		<properties/>
+		<system-out>14 real POSIX endpoint identity/redirection/borrowing checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_transfers" classname="runtime_console_transfers" time="0.0328422" status="run">
+		<properties/>
+		<system-out>178 checked console transfer/deadline/cancellation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_transfers" classname="runtime_console_native_transfers" time="0.763472" status="run">
+		<properties/>
+		<system-out>210 real POSIX binary/pipe/file/PTY/poll/deadline/cancel/GC/EINTR/SIGPIPE checks passed
+{"native_cases": [{"case": "pipe", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "eof": true, "kind": 0, "os_code": 0}, {"case": "file", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "eof": true, "kind": 0, "os_code": 0}, {"case": "file-output", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "eof": true, "kind": 0, "os_code": 0}, {"case": "empty", "child_checks_before_report": 3, "cleanup_code": 0, "completed": 0, "eof": true, "kind": 0, "os_code": 0}, {"case": "records", "child_checks_before_report": 129, "cleanup_code": 0, "completed": 1048704, "eof": false, "kind": 0, "os_code": 0}, {"case": "readers", "child_checks_before_report": 203, "cleanup_code": 0, "completed": 200, "eof": false, "kind": 0, "os_code": 0}, {"case": "short", "child_checks_before_report": 10, "cleanup_code": 0, "completed": 10, "eof": false, "kind": 0, "os_code"...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_keyboard" classname="runtime_console_keyboard" time="0.0269832" status="run">
+		<properties/>
+		<system-out>127 key/mode checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_terminal" classname="runtime_console_terminal" time="0.0241926" status="run">
+		<properties/>
+		<system-out>482 terminal ownership/presentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_keyboard" classname="runtime_console_native_keyboard" time="0.297314" status="run">
+		<properties/>
+		<system-out>92 native PTY key/mode checks passed
+99 native PTY key/mode integration checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_terminal" classname="runtime_console_native_terminal" time="0.838331" status="run">
+		<properties/>
+		<system-out>77 real POSIX terminal checks; 10 process cases
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_wide" classname="runtime_console_wide" time="0.101723" status="run">
+		<properties/>
+		<system-out>console wide checks: 271656
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_input" classname="runtime_console_input" time="0.0475114" status="run">
+		<properties/>
+		<system-out>2261 shared input/UTF8/line/progress/allocation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_input" classname="runtime_console_native_input" time="0.440525" status="run">
+		<properties/>
+		<system-out>264 real POSIX shared input/UTF8/line/CR/mixed/timeout/GC checks passed
+{"native_cases": [{"case": "pipe", "child_checks_before_report": 17}, {"case": "file", "child_checks_before_report": 17}, {"case": "large-line", "child_checks_before_report": 7}, {"case": "invalid-boundary", "child_checks_before_report": 8}, {"case": "line-lf", "child_checks_before_report": 3}, {"case": "line-other", "child_checks_before_report": 3}, {"case": "char-lf", "child_checks_before_report": 4}, {"case": "char-other", "child_checks_before_report": 4}, {"case": "text-lf", "child_checks_before_report": 4}, {"case": "text-other", "child_checks_before_report": 4}, {"case": "bytes-lf", "child_checks_before_report": 5}, {"case": "bytes-other", "child_checks_before_report": 5}, {"case": "timeout-line", "child_checks_before_report": 6}, {"case": "timeout-char", "child_checks_before_report": 7}, {"case": "malformed", "child_checks_before_report": 11}, {"case": "bytewise", "child_checks_before_report": 3}, {"case": "pty-input", "child_check...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_source" classname="stage10_console_source" time="199.963" status="run">
+		<properties/>
+		<system-out>source console checks: 4463
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_aot" classname="stage10_console_aot" time="1144.37" status="run">
+		<properties/>
+		<system-out>operator_console_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_compound_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_workload: exact normal/O2 JIT and linked AOT verified
+console_sum_display: exact normal/O2 JIT and linked AOT verified
+console_sum_failure: exact normal/O2 JIT and linked AOT verified
+console_collections: exact normal/O2 JIT and linked AOT verified
+console_collection_invalidated: exact normal/O2 JIT and linked AOT verified
+console_collection_failed_hook: exact normal/O2 JIT and linked AOT verified
+console_keys: exact normal/O2 JIT and linked AOT verified
+console_terminal: exact normal/O2 JIT and linked AOT verified
+console_exit: exact normal/O2 JIT and linked AOT verified
+console_zero: exact normal/O2 JIT and linked AOT verified
+console_cleanup_primary: exact normal/O2 JIT and linked AOT verified
+console_clea...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_source_formatting" classname="lsp_stage10_source_formatting" time="0.966948" status="run">
+		<properties/>
+		<system-out>144 source formatting LSP/revision/diagnostic checks passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,72 @@
+[
+  {
+    "label": "untraced-san-configure",
+    "command": [
+      "cmake",
+      "-S",
+      ".",
+      "-B",
+      "build/step42-ci96-san",
+      "-G",
+      "Unix Makefiles",
+      "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+      "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+      "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "-DBUILD_TESTING=ON",
+      "-DVOID_SANITIZERS=ON",
+      "-DVOID_LLVM_RESEARCH=OFF",
+      "-DVOID_RETENTION_BASELINE=OFF"
+    ],
+    "returncode": 0,
+    "seconds": 84.89298325800337,
+    "log": "untraced-san-configure.log"
+  },
+  {
+    "label": "untraced-san-build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/step42-ci96-san",
+      "--target",
+      "voidc",
+      "voidls",
+      "void_operator_reload",
+      "void_temporal",
+      "void_temporal_ir",
+      "void_format_zones",
+      "void_runtime_console",
+      "void_runtime_console_transfers",
+      "void_runtime_console_input",
+      "void_runtime_console_keyboard",
+      "void_runtime_console_terminal",
+      "void_runtime_console_wide",
+      "void_console_source",
+      "void_native_fixture",
+      "void_tests",
+      "--parallel",
+      "3"
+    ],
+    "returncode": 0,
+    "seconds": 1113.346327841049,
+    "log": "untraced-san-build.log"
+  },
+  {
+    "label": "untraced-san-tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/step42-ci96-san",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/ci96/untraced-san-junit.xml",
+      "-R",
+      "^(stage10_operator_reload|format_temporal|stage10_temporal_ir|format_zones|stage10_console_aot|lsp_stage10_source_formatting|stage10_console_source|runtime_console|runtime_console_transfers|runtime_console_input|runtime_console_keyboard|runtime_console_terminal|runtime_console_wide|runtime_console_endpoints|runtime_console_native_transfers|runtime_console_native_input|runtime_console_native_keyboard|runtime_console_native_terminal)$"
+    ],
+    "returncode": 0,
+    "seconds": 1404.180363799911,
+    "log": "untraced-san-tests.log"
+  }
+]

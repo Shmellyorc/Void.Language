@@ -1,0 +1,80 @@
+{
+  "artifacts": [
+    {
+      "id": 12540589696,
+      "name": "tests-Windows-X64-Debug",
+      "size_in_bytes": 23380,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12540589696",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12540589696/zip",
+      "expired": false,
+      "created_at": "2026-10-24T00:30:49Z",
+      "expires_at": "2027-01-21T23:58:56Z",
+      "updated_at": "2026-10-24T00:30:49Z",
+      "digest": "sha256:6e6bac3afb4c044023ebf13ad3602a9b6abac1bd6e3b89460cdbd4a2ae526acd",
+      "workflow_run": {
+        "id": 40042618839,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "ef6017613ecf92de31380476ed5d9c3fc8cf3dbb"
+      }
+    },
+    {
+      "id": 12540465612,
+      "name": "tests-macOS-ARM64-Debug",
+      "size_in_bytes": 17979,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12540465612",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12540465612/zip",
+      "expired": false,
+      "created_at": "2026-10-24T00:02:10Z",
+      "expires_at": "2027-01-21T23:58:56Z",
+      "updated_at": "2026-10-24T00:02:10Z",
+      "digest": "sha256:8f5411e9056ed4205201f42f618e597def7e9e915718f66b1120006046887aff",
+      "workflow_run": {
+        "id": 40042618839,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "ef6017613ecf92de31380476ed5d9c3fc8cf3dbb"
+      }
+    },
+    {
+      "id": 12540117162,
+      "name": "tests-macOS-ARM64-Release",
+      "size_in_bytes": 17989,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12540117162",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12540117162/zip",
+      "expired": false,
+      "created_at": "2026-10-24T00:04:17Z",
+      "expires_at": "2027-01-21T23:58:56Z",
+      "updated_at": "2026-10-24T00:04:17Z",
+      "digest": "sha256:282fd4d58d3324266c57571ea0ed163e1abc49e15196170e247f1444197e44a5",
+      "workflow_run": {
+        "id": 40042618839,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "ef6017613ecf92de31380476ed5d9c3fc8cf3dbb"
+      }
+    },
+    {
+      "id": 12539614515,
+      "name": "tests-Windows-X64-Release",
+      "size_in_bytes": 23161,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12539614515",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12539614515/zip",
+      "expired": false,
+      "created_at": "2026-10-24T00:14:46Z",
+      "expires_at": "2027-01-21T23:58:56Z",
+      "updated_at": "2026-10-24T00:14:46Z",
+      "digest": "sha256:152302f4b8ad442516bd47a150b3cdccabccd807d22b2021a23b3dd48f17bbb8",
+      "workflow_run": {
+        "id": 40042618839,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "ef6017613ecf92de31380476ed5d9c3fc8cf3dbb"
+      }
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+--- before/CMakeLists.txt
++++ after/CMakeLists.txt
+@@ -30,6 +30,7 @@
+ endif()
+ option(VOID_SANITIZERS "Instrument compiler/runtime with ASan and UBSan" OFF)
+ add_library(void_options INTERFACE)
++void_enable_libcxx_stop_token(void_options)
+ # C++ standard-library template objects cross the LLVM/backend/runtime boundary.
+ # A backend-only -fno-rtti produces control-block vtables without typeinfo while
+ # RTTI-enabled callers (including UBSan) expect it. ORC also instantiates futures
+--- before/cmake/LLVMPlatform.cmake
++++ after/cmake/LLVMPlatform.cmake
+@@ -42,3 +42,32 @@
+     set_property(TARGET "${imported}" PROPERTY INTERFACE_LINK_LIBRARIES "${resolved_dependencies}")
+   endforeach()
+ endfunction()
++
++# Pinned libc++ 19 includes stop_token but gates it as experimental. Probe the
++# actual Apple SDK link before enabling its supported opt-in. No replacement
++# cancellation implementation, newer stdlib, or experimental link archive.
++function(void_enable_libcxx_stop_token target)
++  if(NOT APPLE)
++    return()
++  endif()
++  include(CheckCXXSourceCompiles)
++  include(CMakePushCheckState)
++  cmake_push_check_state(RESET)
++  set(CMAKE_REQUIRED_LIBRARIES Threads::Threads)
++  file(READ "${PROJECT_SOURCE_DIR}/cmake/probes/StopToken.cpp" stop_token_probe)
++  check_cxx_source_compiles("${stop_token_probe}" VOID_HAS_STANDARD_STOP_TOKEN)
++  if(NOT VOID_HAS_STANDARD_STOP_TOKEN)
++    set(CMAKE_REQUIRED_DEFINITIONS -D_LIBCPP_ENABLE_EXPERIMENTAL)
++    check_cxx_source_compiles("#include <version>
++#if !defined(_LIBCPP_VERSION) || _LIBCPP_VERSION != 190107
++#error This opt-in is only verified for pinned libc++ 19.1.7
++#endif
++${stop_token_probe}" VOID_HAS_LIBCXX19_EXPERIMENTAL_STOP_TOKEN)
++    if(NOT VOID_HAS_LIBCXX19_EXPERIMENTAL_STOP_TOKEN)
++      message(FATAL_ERROR "The native C++20 stop-token compile/link probe failed; inspect CMakeConfigureLog.yaml. VOID requires real cancellation support.")
++    endif()
++    target_compile_definitions(${target} INTERFACE _LIBCPP_ENABLE_EXPERIMENTAL)
++    message(STATUS "VOID: verified pinned libc++ 19 stop-token experimental opt-in")
++  endif()
++  cmake_pop_check_state()
++endfunction()
+--- /dev/null
++++ after/cmake/probes/StopToken.cpp
+@@ -0,0 +1,21 @@
++// Compile/link with the actual compiler, standard library and target SDK.
++// Also runnable directly to verify ordinary cross-thread cancellation callbacks.
++#include <version>
++#include <atomic>
++#include <stop_token>
++#include <thread>
++
++#if !defined(__cpp_lib_jthread) || __cpp_lib_jthread < 201911L
++#error "The standard library must provide C++20 stop tokens and callbacks"
++#endif
++
++int main() {
++    std::stop_source source;
++    auto token=source.get_token();
++    std::atomic<unsigned> calls=0;
++    std::stop_callback callback(token,[&]{++calls;});
++    std::thread requester([&]{source.request_stop();});
++    requester.join();
++    std::stop_callback late(token,[&]{++calls;});
++    return token.stop_requested() && calls==2 && !source.request_stop()?0:1;
++}
+--- before/src/temporal.cpp
++++ after/src/temporal.cpp
+@@ -36,7 +36,10 @@
+     else {auto sum=std::uint64_t(a.nanosecond)+b.nanosecond;carry=sum>=billion?1:0;ns=static_cast<std::uint32_t>(sum%billion);}
+     return {seconds_sum(a.seconds,b.seconds,subtract,carry),ns};
+ }
+-date::sys_seconds civil_seconds(Local value){make_local(value.date,value.time);return date::sys_days{date::year{value.date.year}/value.date.month/value.date.day}+std::chrono::hours{value.time.hour}+std::chrono::minutes{value.time.minute}+std::chrono::seconds{value.time.second};}
++date::sys_seconds civil_seconds(Local value){make_local(value.date,value.time);
++    // MSVC hours/minutes may have 32-bit reps. Promote the day before adding
++    // them so an intermediate minute count cannot overflow for years 1..9999.
++    return date::sys_seconds{date::sys_days{date::year{value.date.year}/value.date.month/value.date.day}}+std::chrono::hours{value.time.hour}+std::chrono::minutes{value.time.minute}+std::chrono::seconds{value.time.second};}
+ Local project(Instant value){fraction(value.nanosecond);static const auto first=date::sys_days{date::year{1}/1/1}.time_since_epoch().count()*std::int64_t(86400);static const auto last=date::sys_days{date::year{10000}/1/1}.time_since_epoch().count()*std::int64_t(86400)-1;
+     if(value.seconds<first || value.seconds>last)throw std::out_of_range("Calendar projection requires year 1..9999");
+     date::sys_seconds point{std::chrono::seconds{value.seconds}};auto day=date::floor<date::days>(point);date::year_month_day ymd{day};auto time=point-day;date::hh_mm_ss clock{time};
+--- before/tests/formatting/temporal.cpp
++++ after/tests/formatting/temporal.cpp
+@@ -6,7 +6,7 @@
+ #include <stdexcept>
+ namespace t=vd::temporal;
+ namespace {unsigned checks=0;
+-void check(bool value){if(!value)throw std::runtime_error("temporal check "+std::to_string(checks));++checks;}
++void check(bool value,const std::string& detail={}){if(!value)throw std::runtime_error("temporal check "+std::to_string(checks)+(detail.empty()?"":": "+detail));++checks;}
+ template<class F>void reject(F operation){try{operation();}catch(const std::exception&){++checks;return;}throw std::runtime_error("invalid temporal input accepted at "+std::to_string(checks));}
+ }
+ int main(){try{
+@@ -60,7 +60,10 @@
+     check(t::format(t::make_local(t::make_date(1999,12,31),t::make_time(23,59,59,999999999)),"yyyy-MM-dd HH:mm:ss.fff")=="1999-12-31 23:59:59.999");
+     for(int year:{1,4,100,400,1600,1900,1970,2000,2024,2100,9999})for(unsigned month=1;month<=12;++month){
+         const unsigned lengths[]={31,28,31,30,31,30,31,31,30,31,30,31};auto last=lengths[month-1]+(month==2 && (year%400==0 || (year%4==0 && year%100!=0)));
+-        for(unsigned day:{1u,28u,29u,30u,31u})if(day<=last){auto date=t::make_date(year,month,day);auto local=t::make_local(date,t::make_time(23,59,59,999999999));auto point=t::make_instant(t::unix_seconds(local),999999999);auto restored=t::utc_components(point);check(restored.date.year==year && restored.date.month==month && restored.date.day==day && restored.time.hour==23 && restored.time.minute==59 && restored.time.second==59 && restored.time.nanosecond==999999999);check(t::format(point)==t::format(local)+"Z");}else reject([&]{t::make_date(year,month,day);});
++        for(unsigned day:{1u,28u,29u,30u,31u})if(day<=last){auto date=t::make_date(year,month,day);auto local=t::make_local(date,t::make_time(23,59,59,999999999));auto point=t::make_instant(t::unix_seconds(local),999999999);auto restored=t::utc_components(point);check(restored.date.year==year && restored.date.month==month && restored.date.day==day && restored.time.hour==23 && restored.time.minute==59 && restored.time.second==59 && restored.time.nanosecond==999999999,"UTC round-trip expected "+t::format(local)+", seconds="+std::to_string(point.seconds)+", actual="+t::format(restored));check(t::format(point)==t::format(local)+"Z");}else reject([&]{t::make_date(year,month,day);});
+     }
++    check(t::unix_seconds(t::make_local(t::make_date(1,1,1),t::make_time(0,0,0)))==-62135596800LL);
++    check(t::unix_seconds(t::make_local(t::make_date(9999,1,1),t::make_time(23,59,59)))==253370851199LL);
++    check(t::unix_seconds(t::make_local(t::make_date(9999,12,31),t::make_time(23,59,59)))==253402300799LL);
+     std::cout<<checks<<" temporal core checks passed\n";
+ }catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}
+--- before/tests/stage10/console.py
++++ after/tests/stage10/console.py
+@@ -55,8 +55,11 @@
+     read_tail = "Ada🎮 Ok(/@stdlib/console.void::bytes_read.data([10])) Ok(/@stdlib/console.void::text_read.text(é)) Ok(/@stdlib/console.void::bytes_read.data([0])) Ok(/@stdlib/console.void::text_read.eof)\n".encode()
+     display = (b"\nHELLO FROM VOID!\nLevel: 42 true 1.25\n-128 -32768 -2147483648 -9223372036854775808 255 65535 4294967295 18446744073709551615 1.5 2.5\nLoading...a, b\n" + "é🎮\0\0END\nticket:9\n<resource> <resource> null\n2026-10-22 2026/10/22\nwrite\0!".encode())
+     terminal_redirected = b"caps true false false false false false false false true false\nsize unsupported 0\ncursor_position unsupported 0\n" + b"".join(name+b" unsupported 0\n" for name in [b"set_cursor", b"set_cursor_visible", b"set_cursor_visible", b"set_color", b"reset_color", *([b"set_color"]*16), b"clear", b"set_title", b"bell"]) + b"set_title invalid_argument 0\n"
++    # Only the legacy CLI/printf result trailer uses host CRT text newlines.
++    # Source print records remain exact UTF-8 bytes, including LF on Windows.
++    legacy_zero = b"0\r\n" if os.name == "nt" else b"0\n"
+     cases = [
+-        ("operator_console_systems", b"", combined+b"0\n", combined_cleanup, 0),
++        ("operator_console_systems", b"", combined+legacy_zero, combined_cleanup, 0),
+         ("console_operator_systems", "Ada🎮\r\né\0".encode(), combined+prompt_prefix+read_tail, combined_cleanup, 7),
+         ("console_operator_failure", b"", b"", b"Format rejected: integrated--1", 1),
+         ("console_operator_compound_failure", b"", b"", b"Division by zero", 1),
+@@ -305,7 +308,7 @@
+     broken_paths = []
+     if os.name == "posix":
+         source = root / "broken.void"
+-        source.write_text('use console\nfunc done():\n    print("broken-cleanup;", file = console.stderr, end = "")\nfunc again():\n    print("also broken")\nfunc main():\n    defer done()\n    defer again()\n    print("broken")\n')
++        source.write_text('use console\nfunc done():\n    print("broken-cleanup;", file = console.stderr, end = "")\nfunc again():\n    print("also broken")\nfunc main():\n    defer done()\n    defer again()\n    print("broken")\n', encoding="utf-8")
+         obj, executable = root / "broken.o", root / "broken.bin"
+         run([compiler, "emit", source, "-o", obj])
+         run([clang, *flags, obj, runtime, fixture, "-o", executable])
+@@ -354,13 +357,13 @@
+                     child.communicate()
+     # Legacy entry result printing remains CLI behavior, appended after source output.
+     legacy = root / "legacy.void"
+-    legacy.write_text('func entry(n: i32) -> i32:\n    print("legacy", end = ":")\n    return n\n')
++    legacy.write_text('func entry(n: i32) -> i32:\n    print("legacy", end = ":")\n    return n\n', encoding="utf-8")
+     p = run([compiler, "run", legacy, "17"])
+-    assert p.stdout in ((b"legacy:17\n", b"legacy:17\r\n") if os.name == "nt" else (b"legacy:17\n",)) and p.stderr == b""
++    assert p.stdout == (b"legacy:17\r\n" if os.name == "nt" else b"legacy:17\n") and p.stderr == b""
+     checks += 1
+     # Existing native cache identity paths: cold, hit, corrupted entry, source change.
+     cached = root / "cached.void"
+-    cached.write_text('print("cache-v1")\n')
++    cached.write_text('print("cache-v1")\n', encoding="utf-8")
+     for _ in range(2):
+         p = run([compiler, "run", cached, "--cache"])
+         assert p.stdout == b"cache-v1\n"
+@@ -374,29 +377,37 @@
+         assert repaired.stdout == b"cache-v1\n" and b"Debug cache: miss" in repaired.stderr
+         cache_statuses.append(repaired.stderr.decode())
+         checks += 2
+-    cached.write_text('print("cache-v2")\n')
++    cached.write_text('print("cache-v2")\n', encoding="utf-8")
+     assert run([compiler, "run", cached, "--cache"]).stdout == b"cache-v2\n"
+     checks += 1
+     combined_cache=[]
+     cached=root/"operator_console_systems.void"
+     def cached_combined(label, expected):
+         p=run([compiler,"run",cached,"0","--cache"])
+-        assert p.stdout==expected+b"0\n" and p.stderr.endswith(combined_cleanup),(label,p.stdout,p.stderr)
++        assert p.stdout==expected+legacy_zero and p.stderr.endswith(combined_cleanup),(label,p.stdout,p.stderr)
+         combined_cache.append(dict(case=label,stdout_hex=p.stdout.hex(),stderr_hex=p.stderr.hex()));return p
+-    before_files=set((root/".void/cache/v1").iterdir())
++    cache_directory=root/".void/cache/v1"
++    before_files=set(cache_directory.iterdir()) if cache_directory.exists() else set()
+     first=cached_combined("cold",combined);second=cached_combined("hit",combined)
+     if b"Debug cache: unavailable" not in first.stderr:
+         assert b"Debug cache: miss" in first.stderr and b"Debug cache: hit" in second.stderr,(first.stderr,second.stderr)
+         new_files=set((root/".void/cache/v1").iterdir())-before_files;assert len(new_files)==1,new_files
+         next(iter(new_files)).write_bytes(b"corrupt four-system native object")
+         assert b"Debug cache: miss" in cached_combined("corrupt",combined).stderr
+-        model=root/"operator_console_model.void";original=model.read_text()
+-        model.write_text(original.replace('return "q:{self.stored:000}"','return "r:{self.stored:000}"'))
+-        assert b"Debug cache: miss" in cached_combined("hook-body",combined.replace(b"v:q:",b"v:r:")).stderr
+-        model.write_text(original.replace('return "q:{self.stored:000}"','return "q:{self.stored:0000}"'))
+-        assert b"Debug cache: miss" in cached_combined("format-spec",combined.replace(b"v:q:002",b"v:q:0002")).stderr
+-        model.write_text(original)
+-        checks+=7
++        expected_cache=b"Debug cache: miss"
++        checks+=3
++    else:
++        assert b"Debug cache: unavailable" in second.stderr,(first.stderr,second.stderr)
++        assert not cache_directory.exists(),"unavailable fallback created cache storage"
++        expected_cache=b"Debug cache: unavailable"
++        checks+=2
++    model=root/"operator_console_model.void";original=model.read_text(encoding="utf-8")
++    model.write_text(original.replace('return "q:{self.stored:000}"','return "r:{self.stored:000}"'), encoding="utf-8")
++    assert expected_cache in cached_combined("hook-body",combined.replace(b"v:q:",b"v:r:")).stderr
++    model.write_text(original.replace('return "q:{self.stored:000}"','return "q:{self.stored:0000}"'), encoding="utf-8")
++    assert expected_cache in cached_combined("format-spec",combined.replace(b"v:q:002",b"v:q:0002")).stderr
++    model.write_text(original, encoding="utf-8")
++    checks+=4
+     # Actual installed source identity/discovery (no stdlib override).
+     installed = root / "installed"
+     run(["cmake", "--install", Path(compiler).parent, "--prefix", installed, "--component", "compiler"])
+@@ -416,5 +427,5 @@
+     checks += 1
+     assert hashes == {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in stdlib.glob("*.void")}
+     checks += 1
+-Path(runtime).parent.joinpath("step30-output-results.json").write_text(json.dumps(dict(checks=checks, outputs=outputs, cache_statuses=cache_statuses, broken_pipe_paths=broken_paths, installed_console_identity="/@stdlib/console.void", stdlib_snapshot_hashes=hashes, prompt_records=prompt_records, terminal_records=terminal_records, key_records=key_records, integration_records=integration_records, integrated_workloads=workloads, combined_cache=combined_cache, partial_records=partial_records), indent=2)+"\n")
++Path(runtime).parent.joinpath("step30-output-results.json").write_text(json.dumps(dict(checks=checks, outputs=outputs, cache_statuses=cache_statuses, broken_pipe_paths=broken_paths, installed_console_identity="/@stdlib/console.void", stdlib_snapshot_hashes=hashes, prompt_records=prompt_records, terminal_records=terminal_records, key_records=key_records, integration_records=integration_records, integrated_workloads=workloads, combined_cache=combined_cache, partial_records=partial_records), indent=2)+"\n", encoding="utf-8")
+ print("source console JIT/AOT driver checks:", checks)
+--- before/tests/stage10/lsp_source_formatting.py
++++ after/tests/stage10/lsp_source_formatting.py
+@@ -42,7 +42,7 @@
+ '''
+ with tempfile.TemporaryDirectory(prefix='VOID Step39 é😀 ') as directory:
+     file=Path(directory)/'main.void'
+-    file.write_text(source)
++    file.write_text(source, encoding="utf-8")
+     uri=file.as_uri()
+     with Client(Path(sys.argv[1]).resolve(),file) as c:
+         c.request('initialize',{'capabilities':{'textDocument':{'publishDiagnostics':{'versionSupport':True}}}})
+@@ -108,7 +108,7 @@
+                 check(format_doc()==[],'malformed source formatted')
+                 check(not replace(pretty),'malformed repair failed')
+             # Disk refresh must retain a dirty overlay; closing must restore disk.
+-            file.write_text('func entry(input: i32) -> i32:\n    return missing_disk\n')
++            file.write_text('func entry(input: i32) -> i32:\n    return missing_disk\n', encoding="utf-8")
+             c.request('void/refreshProject',{});c.sync()
+             check(format_doc()==[],'refresh replaced dirty overlay')
+             check(query('textDocument/definition','input:>12',1),'refresh lost overlay bindings')
+--- before/tests/stage10/operator_reload.cpp
++++ after/tests/stage10/operator_reload.cpp
+@@ -64,11 +64,23 @@
+ void write(const std::filesystem::path& path,const std::string& source){std::ofstream out(path);out<<source;check(bool(out),"fixture write failed");}
+ auto file_analysis(const std::filesystem::path& path){auto a=vd::analyze_project(path);if(!a.succeeded())throw vd::CompilationError(a.diagnostics);return a.program;}
+ void cache(const std::filesystem::path& directory,const std::filesystem::path& repository,const char* fixture="operator_format_cache.void"){
+-    std::filesystem::remove_all(directory);std::filesystem::create_directories(directory);auto path=directory/"main.void";auto text=vd::read_source(repository/"tests/stage10"/fixture).text();write(path,text);auto a=file_analysis(path);auto build=std::string(vd::compiler_build_identity());check(!build.empty(),"missing actual cache build identity");vd::Jit jit({directory,build});auto old=jit.compile(*a,false);check(jit.cache_status()=="miss" && old->invoke(2)==2,"operator/format cold cache");auto hit=jit.compile(*a,false);check(jit.cache_status()=="hit" && hit->invoke(2)==2 && old->invoke(-3)==-3,"cached Runtime operation binding");
+-    auto edited=replace(text,"return Ok(input)","return Ok(input + 1)");write(path,edited);auto b=file_analysis(path);check(a->compatibility_contract()==b->compatibility_contract(),"body-only cached edit changed contract");auto next=jit.compile(*b,false);check(jit.cache_status()=="miss" && next->invoke(2)==3,"stale body reused");auto next_hit=jit.compile(*b,false);check(jit.cache_status()=="hit" && next_hit->invoke(2)==3,"new body cache hit");vd::ReloadSlot slot(hit);check(jit.replace(slot,*b,false) && slot.invoke(2)==3 && old->invoke(2)==2,"cached reload/old lease");check(jit.replace(slot,*b,false) && jit.cache_status()=="hit","reload forced-Runtime cache hit");
+-    for(const auto& file:std::filesystem::directory_iterator(directory/".void/cache/v1"))write(file.path(),"corrupt");auto retry=jit.compile(*a,false);check(jit.cache_status()=="miss" && retry->invoke(2)==2,"corrupt operator/format fallback");
+-    vd::Jit changed_build({directory,build+"dependency-update"});check(changed_build.compile(*a,false)->invoke(2)==2 && changed_build.cache_status()=="miss","dependency build identity did not invalidate");auto optimized=jit.compile(*a,true);check(optimized->invoke(2)==2 && jit.cache_status()=="disabled","optimized execution/cache policy");
+-    auto changed_spec=replace(edited,"const spec = \"000\"","const spec = \"00\"");write(path,changed_spec);auto specification=file_analysis(path);check(!jit.replace(slot,*specification,false) && slot.invoke(2)==3,"format constant bypassed restart");auto different=jit.compile(*specification,false);check(jit.cache_status()=="miss" && different->invoke(2)==101,"stale format specification reused");write(path,edited);
++    // Windows deliberately has no persistent native store; still exercise every
++    // execution, edit, reload and retained-generation assertion via its fallback.
++#ifdef _WIN32
++    const std::string cold="unavailable",warm="unavailable";
++#else
++    const std::string cold="miss",warm="hit";
++#endif
++    std::filesystem::remove_all(directory);std::filesystem::create_directories(directory);auto path=directory/"main.void";auto text=vd::read_source(repository/"tests/stage10"/fixture).text();write(path,text);auto a=file_analysis(path);auto build=std::string(vd::compiler_build_identity());check(!build.empty(),"missing actual cache build identity");vd::Jit jit({directory,build});auto old=jit.compile(*a,false);check(jit.cache_status()==cold && old->invoke(2)==2,"operator/format cold cache");auto hit=jit.compile(*a,false);check(jit.cache_status()==warm && hit->invoke(2)==2 && old->invoke(-3)==-3,"cached Runtime operation binding");
++    auto edited=replace(text,"return Ok(input)","return Ok(input + 1)");write(path,edited);auto b=file_analysis(path);check(a->compatibility_contract()==b->compatibility_contract(),"body-only cached edit changed contract");auto next=jit.compile(*b,false);check(jit.cache_status()==cold && next->invoke(2)==3,"stale body reused");auto next_hit=jit.compile(*b,false);check(jit.cache_status()==warm && next_hit->invoke(2)==3,"new body cache hit");vd::ReloadSlot slot(hit);check(jit.replace(slot,*b,false) && slot.invoke(2)==3 && old->invoke(2)==2,"cached reload/old lease");check(jit.replace(slot,*b,false) && jit.cache_status()==warm,"reload forced-Runtime cache hit");
++#ifdef _WIN32
++    check(!std::filesystem::exists(directory/".void"),"unavailable cache created persistent storage");
++#else
++    for(const auto& file:std::filesystem::directory_iterator(directory/".void/cache/v1"))write(file.path(),"corrupt");
++#endif
++    auto retry=jit.compile(*a,false);check(jit.cache_status()==cold && retry->invoke(2)==2,"corrupt operator/format fallback");
++    vd::Jit changed_build({directory,build+"dependency-update"});check(changed_build.compile(*a,false)->invoke(2)==2 && changed_build.cache_status()==cold,"dependency build identity did not invalidate");auto optimized=jit.compile(*a,true);check(optimized->invoke(2)==2 && jit.cache_status()=="disabled","optimized execution/cache policy");
++    auto changed_spec=replace(edited,"const spec = \"000\"","const spec = \"00\"");write(path,changed_spec);auto specification=file_analysis(path);check(!jit.replace(slot,*specification,false) && slot.invoke(2)==3,"format constant bypassed restart");auto different=jit.compile(*specification,false);check(jit.cache_status()==cold && different->invoke(2)==101,"stale format specification reused");write(path,edited);
+     vd::ToolingSession session(path);auto revision=vd::ToolingSession::analyze(session.select());check(session.accept(revision),"revision acceptance");if(revision->result().succeeded() && b->compatibility_contract()!=revision->result().program->compatibility_contract()){write(directory/"before.contract",b->compatibility_contract());write(directory/"revision.contract",revision->result().program->compatibility_contract());}check(revision->result().succeeded(),"fresh revision analysis failed");check(b->compatibility_contract()==revision->result().program->compatibility_contract(),"fresh revision contract differs");for(unsigned repeat=0;repeat<3;++repeat)check(jit.replace(slot,session,*revision,false),"current cached revision rejected");session.refresh();check(!jit.replace(slot,session,*revision,false) && slot.invoke(2)==3,"stale cached analysis publication");
+ }
+ }

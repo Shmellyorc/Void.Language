@@ -1,0 +1,31 @@
+[
+  {
+    "label": "frontend-1m-final",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/step42-ci96-debug",
+      "-R",
+      "^frontend$",
+      "--output-on-failure"
+    ],
+    "returncode": 0,
+    "seconds": 9.48308405908756,
+    "stack_soft": 1048576,
+    "stack_hard": 1048576,
+    "log": "frontend-1m-final.log"
+  },
+  {
+    "label": "semantic-depth-1m-final",
+    "command": [
+      "python3",
+      "tests/integration/semantic_depth.py",
+      "build/step42-ci96-debug/voidc"
+    ],
+    "returncode": 0,
+    "seconds": 0.6073246699525043,
+    "stack_soft": 1048576,
+    "stack_hard": 1048576,
+    "log": "semantic-depth-1m-final.log"
+  }
+]

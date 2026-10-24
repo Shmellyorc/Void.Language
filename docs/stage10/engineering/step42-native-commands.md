@@ -1,5 +1,9 @@
 # Step 42 native acceptance preparation — 23 October 2026
 
+**Historical preparation, before CI96. Current repairs and replacement source
+receipt: [CI96 handoff](ci96/REPAIR_HANDOFF.md). The original766-input receipt below
+correctly rejects the subsequently authorized repairs.**
+
 **PREPARED, NOT EXECUTED. Windows and macOS: UNVERIFIED. Stage 10: INCOMPLETE.**
 Boss reports Golden Wrench accepted Step 41. Its final Linux results remain
 Debug 199/199, Release 199/199 and strict ASan/UBSan/leaks 199/199. This record

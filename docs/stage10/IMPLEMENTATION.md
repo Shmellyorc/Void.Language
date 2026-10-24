@@ -1,10 +1,14 @@
 # Stage 10 engineering progress and permanent handoff
 
 Updated 23 October 2026 (America/Los_Angeles). **INCOMPLETE.**
-Current Step42 checkpoint: native acceptance inventory and commands prepared;
-Windows/macOS execution UNVERIFIED, awaiting Boss-authorized hosts/hosted execution.
-Boss reports Wrench accepted Step41: final repaired-source unfiltered Debug199/199,
-Release199/199 and strict199/199 pass, with original1MiB gates and Linux editor controls.
+Current Step42 checkpoint: Wrench accepts CI96 repairs for native re-verification.
+CI96 Ubuntu jobs timed out during linking before CTest; job budget raised180→360
+minutes with all seven matrix jobs and test settings unchanged. Focused
+repairs implemented; Linux Debug18/18 and strict18/18 plus both original1MiB
+probes pass. Original Windows
+Debug/Release190/194 each; macOS Debug/Release failed compilation. Repaired-source
+native execution remains UNVERIFIED. Boss reports Wrench accepted Step41's final
+Debug199/199, Release199/199 and strict199/199, original1MiB gates and Linux editors.
 Steps42–44 remain open; Stage10 INCOMPLETE.
 See `engineering/step42-results.json` and the latest recovery entry below. The entire
 44-step mission remains authorized. This is a recovery record, not a request for
@@ -575,7 +579,7 @@ entire Stage 10 mission.
 | 39 | Existing-parser syntax gate and physical/expanded token preservation implement conservative formatting; compiler/LSP/native-editor diagnostics, literals, UTF-16 and dirty-revision regressions added. Focused Step 39 and subsequent console/composite tooling evidence below; final-stage acceptance remains open. |
 | 40 | Earlier partial evidence preserved. Completed-system field/operator/display/temporal/console/composite scenarios now pass focused Linux Debug/strict25/25, normal/O2 JIT, independent AOT, production native build, real PTYs/partial progress, GC/failure/reload/cache and workloads. Independent Wrench review pending; this is not Step41 or full-stage acceptance. |
 | 41 | Complete unfiltered Linux Debug199/199, fresh Release199/199 and strict199/199; unchanged1MiB frontend/depth gates and actual Linux editor hosts pass. Evidence below; Wrench review pending. |
-| 42 | Native inventory, platform gaps and exact Debug/Release commands prepared; native Windows/macOS execution UNVERIFIED. Boss authorization/hosts required; engineering/step42-results.json. |
+| 42 | CI96 native Windows190/194 each and macOS build failures preserved; eight source/test/build changes focused-tested: Linux Debug18/18, strict18/18 and both1MiB probes. Repaired native source UNVERIFIED; Wrench review and Boss-controlled native reruns required. |
 | 43 | Engineering progress and evidence recorded; final feature documentation/examples open. |
 | 44 | Incomplete. Not a completed Stage 10 handoff and not independently Wrench-reviewed. |
 
@@ -1522,3 +1526,105 @@ Clang crash/reproducer, deep collection cost, Release LLD GVN observation (origi
 build exit0, no retry, cause unknown), deferred usability/optimization and editor
 observations remain preserved. Historical Step41 wording above describes its dated
 checkpoints; the current checkpoint is this entry.
+
+
+## Step 42 CI96 native repairs — 23 October 2026 (focused Linux verified)
+
+Original source ef6017613ecf92de31380476ed5d9c3fc8cf3dbb and complete decoded
+native job logs are preserved under engineering/ci96/. All seven pre-repair source
+files match the committed Git blob identities. Windows Debug/Release each190/194,
+four identical failures; macOS ARM64 both configured but failed stop_token compile.
+Those original results are not repaired-source acceptance.
+
+The test now explicitly expects unavailable Windows native caching, retaining
+behavior/edit/reload/lease checks and no persistent files. No speculative Windows
+cache was added. The source console cache regression also avoids iterating a
+nonexistent store and runs hook/spec edits through fallback. Only the legacy
+CLI/printf result trailer expects native Windows CRT CRLF; source print stays raw
+UTF-8/LF with independent JIT/AOT exact-byte assertions. Relevant Python fixture
+reads/writes now specify UTF-8; the original cp1252 failure reproduces, while the
+fixed fixture passes144 checks against the accepted Linux server.
+
+Temporal civil_seconds now promotes sys_days to64-bit sys_seconds before adding
+hours/minutes. MSVC's32-bit minute representation narrowed the old intermediate:
+the precise width model maps9999-01-01T23:59:59 to1832-11-16/-4327186561 seconds;
+the repair gives9999-01-01/253370851199. This is an ABI-width reproduction, not
+native component output absent from original check1195. All original round-trips
+remain, with richer diagnostics and explicit year1/year9999 epoch endpoints.
+
+Pinned libc++190107 hides stop_token behind its experimental gate. The same pinned
+headers reproduce the missing types on Linux; its supported experimental opt-in
+compiles, links and runs cross-thread callbacks without an experimental archive.
+Native Apple CMake now compile/links the standard probe, then only if necessary the
+pinned opt-in, propagating its definition through existing void_options. Unsupported
+compile/link remains fatal. Existing std cancellation, lifetime, buffer and shutdown
+machinery is unchanged. Actual Apple SDK compile/link/run still needs native access.
+
+Fresh build/step42-ci96-debug and -san configurations preserve all accepted Step41
+binaries and archives. Focused Linux Debug18/18 and strict18/18 pass on matching sources; exact phase
+commands/statuses are in engineering/ci96/linux-commands.json and
+linux-untraced-commands.json. Both unchanged genuine1MiB probes pass. The evidence
+recorder Path serialization error after the first frontend probe is preserved;
+its repair reran both probes with complete exit records. No strict build/test
+started under the traced profile. A small strict
+probe reproduced the known sandbox LeakSanitizer/ptrace issue; the established
+untraced execution profile passes unchanged ASan/UBSan/leak options. No debugger,
+security policy/suppression, native-host simulation credit or Git/CI action was used.
+
+Current handoff: engineering/ci96/REPAIR_HANDOFF.md, repairs.diff, source-changes.json
+and767-input final-source-freeze.json. Final local evidence: Debug18/18, strict18/18;1311 temporal core,248 compatibility/
+cache/reload and144 source-formatting LSP checks per configuration, plus both1MiB
+probes. All767 frozen inputs,256 historical Step41 artifacts and24 accepted Linux
+binary/archive/object identities match; original compiler.cpp and root README are
+unchanged. Next: Wrench review, then Boss-controlled actual native SDK/chrono probes,
+four-suite reruns and remaining native acceptance. Step42
+and Stage10 INCOMPLETE; Steps43–44 separate. Historical Step37/Clang/LLD observations
+and deferred objectives remain unchanged.
+
+
+### Historical CI96 verification recovery checkpoint (superseded below)
+
+Debug18/18 passes (1336.82s), zero failures/skips. Both original standalone1MiB
+probes now have clean recorded exit0: frontend9.48s and semantic-depth0.61s, soft/
+hard1048576 bytes. The evidence recorder PosixPath serialization error after the
+first frontend run is preserved and fixed; no strict build/test had started there.
+Actual strict configure passes under the established untraced profile; selected
+targets are building in build/step42-ci96-san. Local tool session12014 is active;
+do not start a duplicate build. See engineering/ci96/recovery.json and
+linux-untraced-commands.json. After strict completion and verified18-case JUnit,
+run engineering/ci96/finalize.py to aggregate final hashes and handoff. It refuses
+incomplete acceptance. All767 code inputs remain frozen; no repaired native source
+has executed. Step42/Stage10 INCOMPLETE.
+
+
+### CI96 final bounded repair handoff
+
+Focused Linux Debug18/18 and strict18/18 are complete, zero final failures/skips.
+Both original1MiB probes pass. The active acceptance runner has finished; no new
+build/test should be started to repeat these results. Final source/binary/evidence
+hashes and native limitations are in engineering/step42-results.json. All767
+frozen inputs,256 Step41 artifacts and24 original binary/archive/object hashes
+match their appropriate current/historical manifests. Repaired Windows/macOS
+source remains UNVERIFIED. Next: Golden Wrench review, then Boss-controlled native
+SDK/chrono probes, four-suite reruns and remaining Step42 gates. Step42 and Stage10
+INCOMPLETE; Steps43–44 remain separate.
+
+
+### CI96 Ubuntu job-budget correction — Boss review
+
+Boss confirms all three CI96 Ubuntu jobs (Debug, Release, Sanitizers) were
+cancelled at approximately three hours while still linking native targets, before
+CTest started. These runs do not establish acceptance or CTest failures. The
+earlier in-progress CI96 job snapshot and all original failure logs are preserved.
+
+`.github/workflows/ci.yml` now allows360 minutes instead of180. Exact byte
+comparison verifies this is the only workflow change: the seven-job matrix, all
+CTest deadlines, original1MiB limits, sanitizer settings, assertions and optimization
+flags remain unchanged. All767 frozen production/test/build inputs and historical
+repair deliverables match their hashes. No local build or test matrix was repeated.
+See `engineering/ci96-timeout/verification.json` and `workflow.diff`.
+
+Golden Wrench accepts the native repairs for re-verification, per Boss. Next:
+Boss reviews this workflow-only correction and controls Git/hosted re-verification.
+Repaired-source Windows/macOS acceptance remains UNVERIFIED. Step42 and Stage10
+remain INCOMPLETE; Steps43–44 remain separate. No Git mutations or CI launch.

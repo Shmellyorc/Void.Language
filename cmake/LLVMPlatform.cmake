@@ -42,3 +42,32 @@ function(void_resolve_llvm_dia)
     set_property(TARGET "${imported}" PROPERTY INTERFACE_LINK_LIBRARIES "${resolved_dependencies}")
   endforeach()
 endfunction()
+
+# Pinned libc++ 19 includes stop_token but gates it as experimental. Probe the
+# actual Apple SDK link before enabling its supported opt-in. No replacement
+# cancellation implementation, newer stdlib, or experimental link archive.
+function(void_enable_libcxx_stop_token target)
+  if(NOT APPLE)
+    return()
+  endif()
+  include(CheckCXXSourceCompiles)
+  include(CMakePushCheckState)
+  cmake_push_check_state(RESET)
+  set(CMAKE_REQUIRED_LIBRARIES Threads::Threads)
+  file(READ "${PROJECT_SOURCE_DIR}/cmake/probes/StopToken.cpp" stop_token_probe)
+  check_cxx_source_compiles("${stop_token_probe}" VOID_HAS_STANDARD_STOP_TOKEN)
+  if(NOT VOID_HAS_STANDARD_STOP_TOKEN)
+    set(CMAKE_REQUIRED_DEFINITIONS -D_LIBCPP_ENABLE_EXPERIMENTAL)
+    check_cxx_source_compiles("#include <version>
+#if !defined(_LIBCPP_VERSION) || _LIBCPP_VERSION != 190107
+#error This opt-in is only verified for pinned libc++ 19.1.7
+#endif
+${stop_token_probe}" VOID_HAS_LIBCXX19_EXPERIMENTAL_STOP_TOKEN)
+    if(NOT VOID_HAS_LIBCXX19_EXPERIMENTAL_STOP_TOKEN)
+      message(FATAL_ERROR "The native C++20 stop-token compile/link probe failed; inspect CMakeConfigureLog.yaml. VOID requires real cancellation support.")
+    endif()
+    target_compile_definitions(${target} INTERFACE _LIBCPP_ENABLE_EXPERIMENTAL)
+    message(STATUS "VOID: verified pinned libc++ 19 stop-token experimental opt-in")
+  endif()
+  cmake_pop_check_state()
+endfunction()

@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-24T02:14:50.482108+00:00",
+  "status": "Focused Linux acceptance complete; native repaired source UNVERIFIED",
+  "active_session_id": null,
+  "active_command": "python3 docs/stage10/engineering/ci96/run-linux-focused.py --san-only",
+  "profile": "Established untraced require_escalated execution profile, sanitizer settings unchanged",
+  "source_freeze": "final-source-freeze.json",
+  "changed_or_added_sources": 8,
+  "frozen_inputs": 767,
+  "completed": {
+    "Debug": "18/18, zero failures/skips,1336.82s",
+    "stack": "Both original probes exit0 at soft/hard1048576",
+    "native": "No repaired-source native execution"
+  },
+  "stopped_sessions": {
+    "28059": "Evidence recorder TypeError after Debug18/18 and initial frontend run; fixed, both standalone probes rerun",
+    "56440": "Conservative wait-controller stopped at recorder failure; no builds/tests started",
+    "31862": "Final original1MiB probes completed exit0"
+  },
+  "next": "Wrench review, then Boss-controlled native probes and reruns; Step42 INCOMPLETE",
+  "finalizer_session_id": 73450,
+  "finalizer_command": "python3 docs/stage10/engineering/ci96/finalize.py --wait"
+}

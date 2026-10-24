@@ -1,0 +1,10 @@
+{
+  "CMakeLists.txt": "0712228cef2f0b5349b8479c3facc8aa59db64bd48304da8cea524ea7642fe6c",
+  "cmake/LLVMPlatform.cmake": "6d700f09723c88967f75e2cf690a9580d54af7f04c5f05a876fed8c247180d21",
+  "cmake/probes/StopToken.cpp": "5223249d6416c02d5ee8f9cf08c8a41a67d97596cb4277f3f584dc86607640a7",
+  "src/temporal.cpp": "b17a8f180eb99e20bdd4ae7d126466f7418b6fe2dfadf2da1e0e21a2e9e6584a",
+  "tests/formatting/temporal.cpp": "43e2b906be5a6a13aba556f95cc01a0a2f833df491fd5ea9a92e2b00b66626d2",
+  "tests/stage10/operator_reload.cpp": "edf2f38d0c186d863c1535dd64a0d1a8b527bfc8e8a455787c21d693a3976f4f",
+  "tests/stage10/console.py": "39b95cc8c56a7a9128e68f62e628dadf27c3eb90b2178b660cf137374e5280b8",
+  "tests/stage10/lsp_source_formatting.py": "f75895ad371dfa9680680e75a764f7ed71e309c7ebc72be9b76f9fcd0eab0e14"
+}

@@ -30,6 +30,7 @@ if(VOID_LINKER)
 endif()
 option(VOID_SANITIZERS "Instrument compiler/runtime with ASan and UBSan" OFF)
 add_library(void_options INTERFACE)
+void_enable_libcxx_stop_token(void_options)
 # C++ standard-library template objects cross the LLVM/backend/runtime boundary.
 # A backend-only -fno-rtti produces control-block vtables without typeinfo while
 # RTTI-enabled callers (including UBSan) expect it. ORC also instantiates futures

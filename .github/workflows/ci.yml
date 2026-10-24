@@ -20,7 +20,7 @@ jobs:
           - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
           - {os: macos-latest, platform: macOS ARM64, configuration: Release}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     env:
       ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
       UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86

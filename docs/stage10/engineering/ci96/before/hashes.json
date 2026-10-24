@@ -1,0 +1,11 @@
+{
+  "tests/stage10/operator_reload.cpp": "3467ad48f1f755343ca22ebb00ffed1ec264769ed56abd740505421e154a2b81",
+  "tests/stage10/lsp_source_formatting.py": "6eda145828c0014c92bbd1ca2fad0031422e321d3d05ed1bf0fd5a432f5ada12",
+  "tests/stage10/console.py": "7de7f31da579e49aae3294c940216d07b333e56e65434c537aef3ce2066feb22",
+  "tests/formatting/temporal.cpp": "106229efe53e4e39a491c13de95f39ac340704b47a830174f5465a21c6ada072",
+  "src/temporal.cpp": "715a56a1d0ddc96ffbc58d215e240b577249ca271adfccdbcf369579a0c6a113",
+  "CMakeLists.txt": "c8c821deca2c68ed197f4cf1ac05caf547c077a36fa79c07e89066f6c7672e47",
+  "cmake/LLVMPlatform.cmake": "e39b8f0d3561f54ea29e20b3d39aaa130b2cecbf9deb6e43cbfcccb0dffee693",
+  "docs/stage10/IMPLEMENTATION.md": "ff079d181a99c306a2a575b0a26527880ac9ac88771d07079f87cfe78ceca9fd",
+  "docs/stage10/engineering/step42-results.json": "d17eac4a77b54a28c57705e51a682bf04708c5f65d92a5dcb897af641e28efc5"
+}

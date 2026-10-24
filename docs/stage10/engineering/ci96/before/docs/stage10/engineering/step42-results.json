@@ -1,0 +1,259 @@
+{
+  "increment": "Stage 10 Step 42 \u2014 native Windows/macOS acceptance preparation",
+  "updated_utc": "2026-10-23T23:56:42.083700+00:00",
+  "status": "PREPARED; native execution UNVERIFIED; awaiting Boss authorization and native hosts/hosted execution",
+  "step42_complete": false,
+  "stage_status": "INCOMPLETE",
+  "subsequent_steps": "43\u201344 remain separate",
+  "authority": "Boss authorizes preparation; Boss reports Golden Wrench accepted Step41. Git mutations and hosted execution require separate Boss authorization.",
+  "baseline": {
+    "result": "step41-results.json",
+    "result_sha256": "e7eb5375aea4eb705ac275aa6043fb9a0bd3c0336cd71ef39869c8750db9b688",
+    "accepted_Linux": {
+      "Debug": "199/199",
+      "Release": "199/199",
+      "strict_ASan_UBSan_leaks": "199/199",
+      "total": 597,
+      "final_failures": 0,
+      "final_skips": 0
+    },
+    "code_freeze": "step41-full-source-freeze.json",
+    "code_freeze_sha256": "62437fdbff0a9f5a27d849ae35e439f7a1fb2da80a64d84d7b9ef6272c464708",
+    "repaired_compiler_cpp_sha256": "9a54df7f1778446fc3d593829978b4180df2ffd4a55f92ebaae156fc37f81d32",
+    "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "initial_integrity_verification": {
+      "step41-full-source-freeze.json": {
+        "entries": 766,
+        "mismatches": []
+      },
+      "step41-source-hashes.json": {
+        "entries": 779,
+        "mismatches": []
+      },
+      "step41_artifacts": {
+        "entries": 256,
+        "mismatches": []
+      },
+      "debug": {
+        "build_directory": "build/ci-official-debug",
+        "entries": 8,
+        "mismatches": []
+      },
+      "release": {
+        "build_directory": "build/ci-official-release-step41",
+        "entries": 8,
+        "mismatches": []
+      },
+      "san": {
+        "build_directory": "build/ci-official-san",
+        "entries": 8,
+        "mismatches": []
+      }
+    },
+    "historical_evidence_modified": false,
+    "current_historical_source_manifest_differences": [
+      "docs/WORK_LOG.md",
+      "docs/stage10/IMPLEMENTATION.md",
+      "docs/stage10/TEST_PLAN.md"
+    ],
+    "scope": "Only current internal documentation changes; accepted Step41 code and test files plus artifacts remain identical."
+  },
+  "local_host": {
+    "platform": "Linux-7.2.6-pikaos-x86_64-with-glibc2.44",
+    "architecture": "x86_64",
+    "tool_discovery": {
+      "cmake": "/usr/bin/cmake",
+      "ninja": null,
+      "python3": "/usr/bin/python3",
+      "pwsh": null,
+      "xcrun": null,
+      "xcodebuild": null,
+      "wine": "/opt/wine-staging/bin/wine",
+      "ssh": "/usr/bin/ssh"
+    },
+    "native_Windows_host_available": false,
+    "native_macOS_host_available": false,
+    "host_access_scope": "No native endpoint supplied in this session; local execution environment is Linux only. SSH executable presence supplies no host or execution authorization. Wine was not used.",
+    "process_inspection": "No cmake build, CTest, Ninja, voidc or clang-19 acceptance process found; no duplicate builds/tests started."
+  },
+  "infrastructure_review": {
+    "workflows": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/windows-path-probe.yml",
+      ".github/workflows/phase23-stack-probe.yml"
+    ],
+    "build_sources": [
+      "CMakeLists.txt",
+      "cmake/LLVMPlatform.cmake",
+      "tools/ci/llvm_sdk.py"
+    ],
+    "native_console_sources": [
+      "src/runtime/console.cpp",
+      "src/runtime/console_presentation.inc",
+      "src/runtime/console_keyboard.inc",
+      "src/runtime/console_terminfo.inc"
+    ],
+    "historical_Windows_acceptance": "docs/stage9/WINDOWS_ENGINEERING_RECORD.md \u2014 CI95 WindowsDebug160/160 and Release160/160 at Stage9 source; not current Stage10 acceptance",
+    "preserved_Windows_requirements": [
+      "Complete LLVM19.1.7 development SDK, clang-cl plus x64 MSVC/Windows SDK environment",
+      "Real DIA dependency, /MD, iterator-level0, RTTI compatibility",
+      "Both longPathAware manifests; record LongPathsEnabled, do not change policy",
+      "Stage8 identity/URI and Stage9 native staging/ACL/restricted-token/Unicode/8.3/reparse/hardlink tests intact"
+    ],
+    "dispatch_constraint": "Compiler foundation workflow_dispatch runs all seven fixed matrix jobs (three Linux, two Windows, two macOS); no native-only dispatch input. No workflow change or dispatch performed.",
+    "optional_probe_scope": "Windows path workflow is observational; phase23 probe is optional machine-code research, not frontend1MiB acceptance."
+  },
+  "dependencies": {
+    "LLVM_Clang": "19.1.7 EXACT; unchanged",
+    "Windows_SDK_asset": "clang+llvm-19.1.7-x86_64-pc-windows-msvc.tar.xz",
+    "macOS_ARM64_SDK_asset": "LLVM-19.1.7-macOS-ARM64.tar.xz",
+    "formatter_temporal": {
+      "date": {
+        "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+        "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+      },
+      "ryu": {
+        "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+        "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+      },
+      "tzdata2026e": {
+        "revision": "2026e",
+        "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      }
+    },
+    "timezone_policy": "Embedded versioned rules; USE_OS_TZDB=0, HAS_REMOTE_API=0, AUTO_DOWNLOAD=0. No machine-dependent timezone substitution.",
+    "new_dependencies": [],
+    "licenses_changed": false,
+    "native_installed_SDK_identities": null
+  },
+  "platforms": {
+    "windows": {
+      "status": "UNVERIFIED",
+      "native_attempts": [],
+      "planned_architecture": "x64",
+      "planned_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "planned_generator": "Ninja",
+      "planned_compiler": "Windows clang-cl19.1.7",
+      "planned_VOID_CLANG": "Pinned SDK clang19.1.7 native AOT driver",
+      "planned_VOID_LINKER": "empty (Linux-only override not used)",
+      "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+      "projected_suites_per_configuration": 194,
+      "actual_discovered": null,
+      "actual_executed": null,
+      "actual_passed": null,
+      "actual_failed": null,
+      "actual_skipped": null,
+      "actual_build_exit_codes": null,
+      "actual_compiler_configuration": null,
+      "native_source_receipts": null,
+      "native_binary_identities": null,
+      "native_failure_logs": null,
+      "actual_os_sdk_compiler_versions": null
+    },
+    "macos": {
+      "status": "UNVERIFIED",
+      "native_attempts": [],
+      "planned_architecture": "ARM64",
+      "planned_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "planned_generator": "Ninja",
+      "planned_compiler": "macOS ARM64 clang/clang++19.1.7",
+      "planned_VOID_CLANG": "Pinned SDK clang19.1.7 native AOT driver",
+      "planned_VOID_LINKER": "empty (Linux-only override not used)",
+      "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+      "projected_suites_per_configuration": 199,
+      "actual_discovered": null,
+      "actual_executed": null,
+      "actual_passed": null,
+      "actual_failed": null,
+      "actual_skipped": null,
+      "actual_build_exit_codes": null,
+      "actual_compiler_configuration": null,
+      "native_source_receipts": null,
+      "native_binary_identities": null,
+      "native_failure_logs": null,
+      "actual_os_sdk_compiler_versions": null
+    }
+  },
+  "inventory": "step42-inventory.json",
+  "commands": "step42-native-commands.md",
+  "local_verification": {
+    "status": "8/8 local preparation checks; zero native tests",
+    "results": "step42-preparation-checks.json",
+    "log": "step42-preparation-checks.log",
+    "command": "python3 docs/stage10/engineering/step42-preparation-checks.py",
+    "returncode": 0,
+    "checks": [
+      "766 unchanged accepted build/test/editor input hashes",
+      "256 preserved Step41 evidence artifact hashes",
+      "24 unchanged accepted Linux binary/archive/object hashes",
+      "Historical779-entry manifest differs only in three authorized internal docs",
+      "Windows194/macOS199 projected inventory has exactly the five UNIX-only registration differences",
+      "Portable source receipt compiles and verifies actual Linux inputs; binary receipt compiles",
+      "macOS bash command block passes bash -n (syntax only)",
+      "Root README and accepted Step41 results hashes unchanged"
+    ],
+    "PowerShell_parser": "UNVERIFIED: unavailable locally",
+    "native_commands": "Not executed; bash syntax and Linux receipt checks do not certify Windows/macOS execution."
+  },
+  "confirmed_new_native_defects": [],
+  "production_repairs": [],
+  "test_build_workflow_changes": [],
+  "remaining_native_gates": [
+    "Boss-authorized exact source snapshot must include current uncommitted Stage10 work and match accepted766 inputs; HEAD alone is insufficient",
+    "Fresh native compiler/Runtime/voidc/voidls Debug and Release builds; actual CTest inventory, unfiltered complete JUnit and preserved full logs",
+    "Genuine1MiB fullfrontend and unchanged semantic_depth124/400/recovery checks: verify Windows PE StackReserve, macOS both RLIMIT values",
+    "Native normal/O2 JIT, independent AOT, production native build/install/relocation/embedded zones and stdlib source discovery",
+    "Native console/PTY/ConPTY and state snapshots, Unicode/UTF16/raw redirected data, partial errors, canonical editor state, restoration",
+    "Borrowed synchronous/overlapped Windows handles, queued/entered cancellation, buffers, GC/shutdown races and unrelated host I/O",
+    "Darwin SIGPIPE/signals, ncurses/terminfo modes/PTY restoration and canonical /var aliases",
+    "Windows extra-volume transfer if actual second volume available; otherwise retain UNVERIFIED",
+    "Real native editor hosts and optional installed Vim/Neovim adapters; POSIX menu harnesses do not establish Windows menus",
+    "Final native source/binary/SDK/artifact hashes and exact build/compiler/OS configurations"
+  ],
+  "coverage_gaps": [
+    "Five POSIX-only CTest registrations are absent on Windows, not skipped successful tests",
+    "runtime_console_wide injected adapter checks do not establish real ReadConsoleW/WriteConsoleW behavior",
+    "No automated CreatePseudoConsole/ConPTY driver exists in current tests; additional genuine host evidence required even after green Windows CTest",
+    "Linux-only GC --wrap hooks are not available on these platforms; portable GC tests remain",
+    "Native configurations use existing sanitizerOFF platform settings; Linux strict acceptance is separate",
+    "Native actual tool versions, architectures, binary hashes, failure logs, test counts and performance/memory measurements are unavailable until execution"
+  ],
+  "historical_observations_preserved": [
+    "Step37 publication/default-root _year/year anomalies remain unexplained; later passing probes do not establish a fix",
+    "Original transient pinned Clang19.1.7 crash and reproducer preserved",
+    "Deep-collection compilation cost retained; no speculative optimization",
+    "Release LLD GVN stack emission: original complete build exited0, no unchanged retry, actual cause/signal unknown",
+    "Boss native Linux SIGSEGV and repaired successful original1MiB GDB transcripts remain preserved",
+    "Deferred compiler usability/cache/native-size/IANA compaction/incremental objectives and F12/F2/hover/documentation observations remain deferred"
+  ],
+  "governance": {
+    "Git_mutations": false,
+    "hosted_CI_dispatched": false,
+    "security_or_registry_policy_changes": false,
+    "Daybreak_application": false,
+    "public_README_changed": false,
+    "production_or_test_source_changes": false,
+    "accepted_Step41_reopened": false
+  },
+  "next_concrete_action": "Boss selects and authorizes native hosts, existing full seven-job CI, or a reviewed native-only selection change, against the exact prepared snapshot. Execute the runbook sequentially; retain actual native evidence and reproduce failures before minimal repairs. Stop for Wrench review; Step42 remains open.",
+  "deliverable_hashes": {
+    "step42-native-commands.md": "db181f209908ccd54b53ed0f7a5a695ac83d355d46ed5b01b3300191a695d658",
+    "step42-inventory.json": "581bd7443cab6076f64383b6ae285d0343b4f8c9f7f38bb5d7c1b6ef4d86fd11",
+    "step42-preflight-baseline.json": "4eda33968c403f46deb4c60a9681bb472e1600caef30a405287eb3a3f821e5f0",
+    "step42-source-receipt-linux.json": "1379b8f45c8deb243a1789fadc859e05fca2fd014b04fecf3571f4a0a11bfb45",
+    "step42-preparation-checks.py": "7a354ec6ce35a6115c2e2b4bd3e8f0e941bebc8c6752e59139cf102865bb796e",
+    "step42-preparation-checks.json": "76eb6682d13e3ee2b7fc4210e8a31ab17bf2ff28652039a3757c56f8a20688dc",
+    "step42-preparation-checks.log": "76eb6682d13e3ee2b7fc4210e8a31ab17bf2ff28652039a3757c56f8a20688dc"
+  },
+  "current_documentation_hashes": {
+    "docs/stage10/IMPLEMENTATION.md": "ff079d181a99c306a2a575b0a26527880ac9ac88771d07079f87cfe78ceca9fd",
+    "docs/stage10/TEST_PLAN.md": "f500bcdba687cf9893e271b2bb9b457da2310f11f19099bbf77a6d7bbe203109",
+    "docs/WORK_LOG.md": "bdadd0e09b147f67b2bc44fd03e6e468972996ffa8a72674721fed4db7828b95"
+  }
+}

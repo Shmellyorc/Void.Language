@@ -36,7 +36,10 @@ template<class A,class B> A combine(A a,B b,bool subtract){fraction(a.nanosecond
     else {auto sum=std::uint64_t(a.nanosecond)+b.nanosecond;carry=sum>=billion?1:0;ns=static_cast<std::uint32_t>(sum%billion);}
     return {seconds_sum(a.seconds,b.seconds,subtract,carry),ns};
 }
-date::sys_seconds civil_seconds(Local value){make_local(value.date,value.time);return date::sys_days{date::year{value.date.year}/value.date.month/value.date.day}+std::chrono::hours{value.time.hour}+std::chrono::minutes{value.time.minute}+std::chrono::seconds{value.time.second};}
+date::sys_seconds civil_seconds(Local value){make_local(value.date,value.time);
+    // MSVC hours/minutes may have 32-bit reps. Promote the day before adding
+    // them so an intermediate minute count cannot overflow for years 1..9999.
+    return date::sys_seconds{date::sys_days{date::year{value.date.year}/value.date.month/value.date.day}}+std::chrono::hours{value.time.hour}+std::chrono::minutes{value.time.minute}+std::chrono::seconds{value.time.second};}
 Local project(Instant value){fraction(value.nanosecond);static const auto first=date::sys_days{date::year{1}/1/1}.time_since_epoch().count()*std::int64_t(86400);static const auto last=date::sys_days{date::year{10000}/1/1}.time_since_epoch().count()*std::int64_t(86400)-1;
     if(value.seconds<first || value.seconds>last)throw std::out_of_range("Calendar projection requires year 1..9999");
     date::sys_seconds point{std::chrono::seconds{value.seconds}};auto day=date::floor<date::days>(point);date::year_month_day ymd{day};auto time=point-day;date::hh_mm_ss clock{time};

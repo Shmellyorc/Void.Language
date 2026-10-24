@@ -1,0 +1,192 @@
+{
+  "scope": "Linux reproducibility and feature probes ONLY; no Windows/macOS execution",
+  "temporal_width": {
+    "source": "probes/temporal-width.cpp",
+    "standard_representation": "explicit32-bit hours/minutes matching MSVC source aliases; not Windows execution",
+    "before": {
+      "returncode": 1,
+      "seconds": -4327186561,
+      "date": "1832-11-16",
+      "log": "temporal-width-before.log"
+    },
+    "after": {
+      "returncode": 0,
+      "seconds": 253370851199,
+      "date": "9999-01-01",
+      "log": "temporal-width-after.log"
+    },
+    "before_UBSan": {
+      "returncode": 1,
+      "log": "temporal-width-before-ubsan.log",
+      "meaning": "Expected mismatch; duration_cast narrowing has no required UBSan diagnostic"
+    },
+    "traced_strict_after": {
+      "returncode": 86,
+      "log": "temporal-width-after-san.log",
+      "meaning": "Known LeakSanitizer/ptrace environment failure; not acceptance"
+    },
+    "untraced_strict_after": {
+      "returncode": 0,
+      "log": "temporal-width-after-untraced-san.log",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "profile": "Existing approved untraced exec profile; no debugger or policy/flag change"
+    },
+    "native_Linux_control": {
+      "source": "probes/temporal-native.cpp",
+      "returncode": 0,
+      "hours_rep_bytes": 8,
+      "minutes_rep_bytes": 8,
+      "before_and_after_seconds": 253370851199,
+      "log": "temporal-native-linux.log"
+    },
+    "native_Windows_control": "UNVERIFIED: exact command retained in REPAIR_HANDOFF.md"
+  },
+  "libcxx_stop_token": {
+    "source": "../../../../cmake/probes/StopToken.cpp",
+    "library_version": 190107,
+    "compiler": "Pinned Clang19.1.7",
+    "before_compile": {
+      "returncode": 1,
+      "log": "stop-token-libcxx19-before.log",
+      "macros": "stop-token-macros-before.log",
+      "__cpp_lib_jthread": null,
+      "_LIBCPP_HAS_NO_EXPERIMENTAL_STOP_TOKEN": true
+    },
+    "supported_opt_in": {
+      "definition": "_LIBCPP_ENABLE_EXPERIMENTAL",
+      "compile_link_returncode": 0,
+      "execution_returncode": 0,
+      "log": "stop-token-libcxx19-after.log",
+      "macros": "stop-token-macros-after.log",
+      "__cpp_lib_jthread": 201911,
+      "experimental_archive_linked": false
+    },
+    "Apple_native_compile_link_execution": "UNVERIFIED; actual SDK probe and CMake gate required"
+  },
+  "fixture_encoding": {
+    "source": "probes/fixture-encoding.py",
+    "locale_model": "Only unspecified Path.write_text encoding defaults to cp1252, reproducing Windows codec failure on Linux",
+    "before": {
+      "returncode": 1,
+      "log": "fixture-cp1252-before.log",
+      "failure": "UnicodeEncodeError on original emoji source fixture"
+    },
+    "after": {
+      "returncode": 0,
+      "checks": 144,
+      "log": "fixture-cp1252-after.log",
+      "server": "Unchanged accepted Step41 Debug voidls"
+    },
+    "Windows_execution": false
+  },
+  "reproduction_commands": [
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-O0",
+      "-Ithird_party/date/include",
+      "docs/stage10/engineering/ci96/probes/temporal-width.cpp",
+      "-o",
+      "/tmp/void-ci96-width"
+    ],
+    [
+      "/tmp/void-ci96-width"
+    ],
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-O0",
+      "-DVOID_REPRO_SAFE",
+      "-Ithird_party/date/include",
+      "docs/stage10/engineering/ci96/probes/temporal-width.cpp",
+      "-o",
+      "/tmp/void-ci96-width-safe"
+    ],
+    [
+      "/tmp/void-ci96-width-safe"
+    ],
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-O1",
+      "-fsanitize=undefined",
+      "-fno-sanitize-recover=undefined",
+      "-Ithird_party/date/include",
+      "docs/stage10/engineering/ci96/probes/temporal-width.cpp",
+      "-o",
+      "/tmp/void-ci96-width-ubsan"
+    ],
+    [
+      "/tmp/void-ci96-width-ubsan"
+    ],
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-O1",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-DVOID_REPRO_SAFE",
+      "-Ithird_party/date/include",
+      "docs/stage10/engineering/ci96/probes/temporal-width.cpp",
+      "-o",
+      "/tmp/void-ci96-width-san"
+    ],
+    [
+      "/tmp/void-ci96-width-san"
+    ],
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-stdlib=libc++",
+      "-pthread",
+      "cmake/probes/StopToken.cpp",
+      "-L/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/x86_64-unknown-linux-gnu",
+      "-Wl,-rpath,/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/x86_64-unknown-linux-gnu",
+      "-o",
+      "/tmp/void-ci96-stop-before"
+    ],
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-stdlib=libc++",
+      "-pthread",
+      "-D_LIBCPP_ENABLE_EXPERIMENTAL",
+      "cmake/probes/StopToken.cpp",
+      "-L/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/x86_64-unknown-linux-gnu",
+      "-Wl,-rpath,/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/x86_64-unknown-linux-gnu",
+      "-o",
+      "/tmp/void-ci96-stop-after"
+    ],
+    [
+      "/tmp/void-ci96-stop-after"
+    ],
+    [
+      "python3",
+      "docs/stage10/engineering/ci96/probes/fixture-encoding.py",
+      "docs/stage10/engineering/ci96/before/tests/stage10/lsp_source_formatting.py"
+    ],
+    [
+      "python3",
+      "docs/stage10/engineering/ci96/probes/fixture-encoding.py",
+      "tests/stage10/lsp_source_formatting.py"
+    ],
+    [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-std=c++20",
+      "-Ithird_party/date/include",
+      "docs/stage10/engineering/ci96/probes/temporal-native.cpp",
+      "-o",
+      "/tmp/void-ci96-temporal-native"
+    ],
+    [
+      "/tmp/void-ci96-temporal-native"
+    ]
+  ],
+  "sdk_header_sha256": {
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/c++/v1/stop_token": "9ff21c71b5b4701dcea75247d13c2396c299ae22adc6fcc05ee4ec41ec908ac3",
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/c++/v1/__config": "e725bdfb2081f51b8f9c9bae96057e4d2fdd4059d787290841040f685bd28cf6",
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/c++/v1/__stop_token/stop_source.h": "2aaa910571c9749a189a087e6d825bf9e9a7e4535fefc086357c86ca5ac9298c",
+    ".toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/c++/v1/__stop_token/stop_state.h": "8d48a3cd2a1b735ec773ca291c47fc09939c214d977a241a1aa0d2b961fd8f02"
+  }
+}

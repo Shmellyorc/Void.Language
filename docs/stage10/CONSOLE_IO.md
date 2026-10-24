@@ -83,7 +83,10 @@ do not promise output rollback.
 failure channel, with operation, stream, portable error kind, OS code and completed
 byte count. Code that needs to recover formats a string and uses `.write()`.
 This avoids introducing another print family. Existing legacy `entry(i32)` CLI
-result printing stays CLI behavior; it is not silently converted into source print.
+result printing stays CLI behavior; it is not silently converted into source print. Its legacy
+result trailer retains native CRT text newlines (Windows CRLF, POSIX LF), through
+CLI std::cout and independently emitted printf. Source print records remain exact
+UTF-8/LF bytes on every platform; tests must not normalize entire output streams.
 
 ## Standard streams and error values
 

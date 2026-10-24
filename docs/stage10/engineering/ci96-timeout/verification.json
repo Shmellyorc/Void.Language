@@ -1,0 +1,36 @@
+{
+  "authority": "Boss reports Golden Wrench accepts CI96 repairs for native re-verification; Boss authorizes only the job-budget correction before pushing.",
+  "original_run_id": 40042618839,
+  "original_run_commit": "ef6017613ecf92de31380476ed5d9c3fc8cf3dbb",
+  "ubuntu_timeout": {
+    "provenance": "Boss-confirmed native CI96 observation; no fresh remote log retrieval in this increment. Historical ci96/jobs.json remains the earlier in-progress snapshot.",
+    "configurations": [
+      "Debug",
+      "Release",
+      "Sanitizers"
+    ],
+    "outcome": "All three jobs cancelled at approximately three hours while linking native targets, before CTest started.",
+    "acceptance": "NOT COMPLETED; cancellation is not a CTest failure or a passing acceptance run."
+  },
+  "workflow": {
+    "path": ".github/workflows/ci.yml",
+    "previous_timeout_minutes": 180,
+    "revised_timeout_minutes": 360,
+    "matrix_jobs": 7,
+    "before_sha256": "efb35464c11f409e1d2191f66b61cd5c5e8fa6ef9a5d4a5096443e9c74ff78c5",
+    "after_sha256": "6e8190d2eae73d3c4040564c1800b900ba753e038a47f9c4375f0c9ebcce3334",
+    "diff": "ci96-timeout/workflow.diff"
+  },
+  "verification": {
+    "exact_single_substitution": true,
+    "matrix_and_all_other_workflow_bytes_unchanged": true,
+    "frozen_production_test_build_inputs_unchanged": 767,
+    "historical_deliverable_hashes_verified": 66,
+    "local_builds_or_test_matrices_run": false,
+    "reason": "Workflow-only job-budget change; no compiler, Runtime, test, CTest deadline, 1 MiB guard, sanitizer, assertion or optimization changes."
+  },
+  "native_reverification": "UNVERIFIED; Boss controls Git and hosted execution. No commit, push, branch or CI launch performed.",
+  "step42_complete": false,
+  "stage_status": "INCOMPLETE",
+  "updated_utc": "2026-10-24T06:03:02.723308+00:00"
+}

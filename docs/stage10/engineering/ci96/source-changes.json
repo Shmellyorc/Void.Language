@@ -1,0 +1,34 @@
+{
+  "CMakeLists.txt": {
+    "before": "c8c821deca2c68ed197f4cf1ac05caf547c077a36fa79c07e89066f6c7672e47",
+    "after": "0712228cef2f0b5349b8479c3facc8aa59db64bd48304da8cea524ea7642fe6c"
+  },
+  "cmake/LLVMPlatform.cmake": {
+    "before": "e39b8f0d3561f54ea29e20b3d39aaa130b2cecbf9deb6e43cbfcccb0dffee693",
+    "after": "6d700f09723c88967f75e2cf690a9580d54af7f04c5f05a876fed8c247180d21"
+  },
+  "cmake/probes/StopToken.cpp": {
+    "before": null,
+    "after": "5223249d6416c02d5ee8f9cf08c8a41a67d97596cb4277f3f584dc86607640a7"
+  },
+  "src/temporal.cpp": {
+    "before": "715a56a1d0ddc96ffbc58d215e240b577249ca271adfccdbcf369579a0c6a113",
+    "after": "b17a8f180eb99e20bdd4ae7d126466f7418b6fe2dfadf2da1e0e21a2e9e6584a"
+  },
+  "tests/formatting/temporal.cpp": {
+    "before": "106229efe53e4e39a491c13de95f39ac340704b47a830174f5465a21c6ada072",
+    "after": "43e2b906be5a6a13aba556f95cc01a0a2f833df491fd5ea9a92e2b00b66626d2"
+  },
+  "tests/stage10/console.py": {
+    "before": "7de7f31da579e49aae3294c940216d07b333e56e65434c537aef3ce2066feb22",
+    "after": "39b95cc8c56a7a9128e68f62e628dadf27c3eb90b2178b660cf137374e5280b8"
+  },
+  "tests/stage10/lsp_source_formatting.py": {
+    "before": "6eda145828c0014c92bbd1ca2fad0031422e321d3d05ed1bf0fd5a432f5ada12",
+    "after": "f75895ad371dfa9680680e75a764f7ed71e309c7ebc72be9b76f9fcd0eab0e14"
+  },
+  "tests/stage10/operator_reload.cpp": {
+    "before": "3467ad48f1f755343ca22ebb00ffed1ec264769ed56abd740505421e154a2b81",
+    "after": "edf2f38d0c186d863c1535dd64a0d1a8b527bfc8e8a455787c21d693a3976f4f"
+  }
+}

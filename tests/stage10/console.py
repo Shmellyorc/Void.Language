@@ -55,8 +55,11 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
     read_tail = "Ada🎮 Ok(/@stdlib/console.void::bytes_read.data([10])) Ok(/@stdlib/console.void::text_read.text(é)) Ok(/@stdlib/console.void::bytes_read.data([0])) Ok(/@stdlib/console.void::text_read.eof)\n".encode()
     display = (b"\nHELLO FROM VOID!\nLevel: 42 true 1.25\n-128 -32768 -2147483648 -9223372036854775808 255 65535 4294967295 18446744073709551615 1.5 2.5\nLoading...a, b\n" + "é🎮\0\0END\nticket:9\n<resource> <resource> null\n2026-10-22 2026/10/22\nwrite\0!".encode())
     terminal_redirected = b"caps true false false false false false false false true false\nsize unsupported 0\ncursor_position unsupported 0\n" + b"".join(name+b" unsupported 0\n" for name in [b"set_cursor", b"set_cursor_visible", b"set_cursor_visible", b"set_color", b"reset_color", *([b"set_color"]*16), b"clear", b"set_title", b"bell"]) + b"set_title invalid_argument 0\n"
+    # Only the legacy CLI/printf result trailer uses host CRT text newlines.
+    # Source print records remain exact UTF-8 bytes, including LF on Windows.
+    legacy_zero = b"0\r\n" if os.name == "nt" else b"0\n"
     cases = [
-        ("operator_console_systems", b"", combined+b"0\n", combined_cleanup, 0),
+        ("operator_console_systems", b"", combined+legacy_zero, combined_cleanup, 0),
         ("console_operator_systems", "Ada🎮\r\né\0".encode(), combined+prompt_prefix+read_tail, combined_cleanup, 7),
         ("console_operator_failure", b"", b"", b"Format rejected: integrated--1", 1),
         ("console_operator_compound_failure", b"", b"", b"Division by zero", 1),
@@ -305,7 +308,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
     broken_paths = []
     if os.name == "posix":
         source = root / "broken.void"
-        source.write_text('use console\nfunc done():\n    print("broken-cleanup;", file = console.stderr, end = "")\nfunc again():\n    print("also broken")\nfunc main():\n    defer done()\n    defer again()\n    print("broken")\n')
+        source.write_text('use console\nfunc done():\n    print("broken-cleanup;", file = console.stderr, end = "")\nfunc again():\n    print("also broken")\nfunc main():\n    defer done()\n    defer again()\n    print("broken")\n', encoding="utf-8")
         obj, executable = root / "broken.o", root / "broken.bin"
         run([compiler, "emit", source, "-o", obj])
         run([clang, *flags, obj, runtime, fixture, "-o", executable])
@@ -354,13 +357,13 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                     child.communicate()
     # Legacy entry result printing remains CLI behavior, appended after source output.
     legacy = root / "legacy.void"
-    legacy.write_text('func entry(n: i32) -> i32:\n    print("legacy", end = ":")\n    return n\n')
+    legacy.write_text('func entry(n: i32) -> i32:\n    print("legacy", end = ":")\n    return n\n', encoding="utf-8")
     p = run([compiler, "run", legacy, "17"])
-    assert p.stdout in ((b"legacy:17\n", b"legacy:17\r\n") if os.name == "nt" else (b"legacy:17\n",)) and p.stderr == b""
+    assert p.stdout == (b"legacy:17\r\n" if os.name == "nt" else b"legacy:17\n") and p.stderr == b""
     checks += 1
     # Existing native cache identity paths: cold, hit, corrupted entry, source change.
     cached = root / "cached.void"
-    cached.write_text('print("cache-v1")\n')
+    cached.write_text('print("cache-v1")\n', encoding="utf-8")
     for _ in range(2):
         p = run([compiler, "run", cached, "--cache"])
         assert p.stdout == b"cache-v1\n"
@@ -374,29 +377,37 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
         assert repaired.stdout == b"cache-v1\n" and b"Debug cache: miss" in repaired.stderr
         cache_statuses.append(repaired.stderr.decode())
         checks += 2
-    cached.write_text('print("cache-v2")\n')
+    cached.write_text('print("cache-v2")\n', encoding="utf-8")
     assert run([compiler, "run", cached, "--cache"]).stdout == b"cache-v2\n"
     checks += 1
     combined_cache=[]
     cached=root/"operator_console_systems.void"
     def cached_combined(label, expected):
         p=run([compiler,"run",cached,"0","--cache"])
-        assert p.stdout==expected+b"0\n" and p.stderr.endswith(combined_cleanup),(label,p.stdout,p.stderr)
+        assert p.stdout==expected+legacy_zero and p.stderr.endswith(combined_cleanup),(label,p.stdout,p.stderr)
         combined_cache.append(dict(case=label,stdout_hex=p.stdout.hex(),stderr_hex=p.stderr.hex()));return p
-    before_files=set((root/".void/cache/v1").iterdir())
+    cache_directory=root/".void/cache/v1"
+    before_files=set(cache_directory.iterdir()) if cache_directory.exists() else set()
     first=cached_combined("cold",combined);second=cached_combined("hit",combined)
     if b"Debug cache: unavailable" not in first.stderr:
         assert b"Debug cache: miss" in first.stderr and b"Debug cache: hit" in second.stderr,(first.stderr,second.stderr)
         new_files=set((root/".void/cache/v1").iterdir())-before_files;assert len(new_files)==1,new_files
         next(iter(new_files)).write_bytes(b"corrupt four-system native object")
         assert b"Debug cache: miss" in cached_combined("corrupt",combined).stderr
-        model=root/"operator_console_model.void";original=model.read_text()
-        model.write_text(original.replace('return "q:{self.stored:000}"','return "r:{self.stored:000}"'))
-        assert b"Debug cache: miss" in cached_combined("hook-body",combined.replace(b"v:q:",b"v:r:")).stderr
-        model.write_text(original.replace('return "q:{self.stored:000}"','return "q:{self.stored:0000}"'))
-        assert b"Debug cache: miss" in cached_combined("format-spec",combined.replace(b"v:q:002",b"v:q:0002")).stderr
-        model.write_text(original)
-        checks+=7
+        expected_cache=b"Debug cache: miss"
+        checks+=3
+    else:
+        assert b"Debug cache: unavailable" in second.stderr,(first.stderr,second.stderr)
+        assert not cache_directory.exists(),"unavailable fallback created cache storage"
+        expected_cache=b"Debug cache: unavailable"
+        checks+=2
+    model=root/"operator_console_model.void";original=model.read_text(encoding="utf-8")
+    model.write_text(original.replace('return "q:{self.stored:000}"','return "r:{self.stored:000}"'), encoding="utf-8")
+    assert expected_cache in cached_combined("hook-body",combined.replace(b"v:q:",b"v:r:")).stderr
+    model.write_text(original.replace('return "q:{self.stored:000}"','return "q:{self.stored:0000}"'), encoding="utf-8")
+    assert expected_cache in cached_combined("format-spec",combined.replace(b"v:q:002",b"v:q:0002")).stderr
+    model.write_text(original, encoding="utf-8")
+    checks+=4
     # Actual installed source identity/discovery (no stdlib override).
     installed = root / "installed"
     run(["cmake", "--install", Path(compiler).parent, "--prefix", installed, "--component", "compiler"])
@@ -416,5 +427,5 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
     checks += 1
     assert hashes == {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in stdlib.glob("*.void")}
     checks += 1
-Path(runtime).parent.joinpath("step30-output-results.json").write_text(json.dumps(dict(checks=checks, outputs=outputs, cache_statuses=cache_statuses, broken_pipe_paths=broken_paths, installed_console_identity="/@stdlib/console.void", stdlib_snapshot_hashes=hashes, prompt_records=prompt_records, terminal_records=terminal_records, key_records=key_records, integration_records=integration_records, integrated_workloads=workloads, combined_cache=combined_cache, partial_records=partial_records), indent=2)+"\n")
+Path(runtime).parent.joinpath("step30-output-results.json").write_text(json.dumps(dict(checks=checks, outputs=outputs, cache_statuses=cache_statuses, broken_pipe_paths=broken_paths, installed_console_identity="/@stdlib/console.void", stdlib_snapshot_hashes=hashes, prompt_records=prompt_records, terminal_records=terminal_records, key_records=key_records, integration_records=integration_records, integrated_workloads=workloads, combined_cache=combined_cache, partial_records=partial_records), indent=2)+"\n", encoding="utf-8")
 print("source console JIT/AOT driver checks:", checks)

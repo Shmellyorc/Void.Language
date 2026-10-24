@@ -1,0 +1,48 @@
+[
+  {
+    "job_id": 120716958457,
+    "preserved_log": "job-120716958457.json",
+    "decoded_utf8_sha256": "25d234915561c00b34562fc753a41f07d618679c6fb6d23c494e8100e72ffda9",
+    "excerpts": [
+      "2026-10-24T00:03:55.5470703Z operator/format cold cache",
+      "2026-10-24T00:04:02.6638849Z temporal check 1195",
+      "2026-10-24T00:11:36.6891566Z     assert p.stdout == stdout, (name, optimized, \"JIT stdout\", p.stdout, stdout)",
+      "2026-10-24T00:11:36.6894240Z AssertionError: ('operator_console_systems', False, 'JIT stdout', b'[Ok(/operator_console_model.void::packet.data(v:q:002/9))]|{item: Ok(/operator_console_model.void::packet.data(v:q:002/9))}\\n[Ok(/operator_console_model.void::packet.data(v:q:002/9)), Ok(/operator_console_model.void::packet.data(v:q:002/9))] [/operator_console_model.void::branch.nested(<cycle>)] Ok(2024-02-29)\\naccount:010/010 q:008\\n002|Ok(2024-02-29)|00:00:01:05.500\\nOk(2026-11-01 01:30:00 -05:00 America/New_York)\\n0\\r\\n', b'[Ok(/operator_console_model.void::packet.data(v:q:002/9))]|{item: Ok(/operator_console_model.void::packet.data(v:q:002/9))}\\n[Ok(/operator_console_model.void::packet.data(v:q:002/9)), Ok(/operator_console_model.void::packet.data(v:q:002/9))] [/operator_console_model.void::branch.nested(<cycle>)] Ok(2024-02-29)\\naccount:010/010 q:008\\n002|Ok(2024-02-29)|00:00:01:05.500\\nOk(2026-11-01 01:30:00 -05:00 America/New_York)\\n0\\n')",
+      "2026-10-24T00:13:27.5225864Z UnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f600' in position 3: character maps to <undefined>",
+      "2026-10-24T00:14:44.2289797Z 98% tests passed, 4 tests failed out of 194"
+    ]
+  },
+  {
+    "job_id": 120716958536,
+    "preserved_log": "job-120716958536.json",
+    "decoded_utf8_sha256": "23bb7c7a9c693e3f01984170a6bb8b8ecec032044cd1d0a1ad9abffc5f9eea2a",
+    "excerpts": [
+      "2026-10-24T00:06:37.0280106Z operator/format cold cache",
+      "2026-10-24T00:06:52.6253073Z temporal check 1195",
+      "2026-10-24T00:24:38.7432822Z     assert p.stdout == stdout, (name, optimized, \"JIT stdout\", p.stdout, stdout)",
+      "2026-10-24T00:24:38.7439166Z AssertionError: ('operator_console_systems', False, 'JIT stdout', b'[Ok(/operator_console_model.void::packet.data(v:q:002/9))]|{item: Ok(/operator_console_model.void::packet.data(v:q:002/9))}\\n[Ok(/operator_console_model.void::packet.data(v:q:002/9)), Ok(/operator_console_model.void::packet.data(v:q:002/9))] [/operator_console_model.void::branch.nested(<cycle>)] Ok(2024-02-29)\\naccount:010/010 q:008\\n002|Ok(2024-02-29)|00:00:01:05.500\\nOk(2026-11-01 01:30:00 -05:00 America/New_York)\\n0\\r\\n', b'[Ok(/operator_console_model.void::packet.data(v:q:002/9))]|{item: Ok(/operator_console_model.void::packet.data(v:q:002/9))}\\n[Ok(/operator_console_model.void::packet.data(v:q:002/9)), Ok(/operator_console_model.void::packet.data(v:q:002/9))] [/operator_console_model.void::branch.nested(<cycle>)] Ok(2024-02-29)\\naccount:010/010 q:008\\n002|Ok(2024-02-29)|00:00:01:05.500\\nOk(2026-11-01 01:30:00 -05:00 America/New_York)\\n0\\n')",
+      "2026-10-24T00:28:46.7347843Z UnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f600' in position 3: character maps to <undefined>",
+      "2026-10-24T00:30:46.1574404Z 98% tests passed, 4 tests failed out of 194"
+    ]
+  },
+  {
+    "job_id": 120716958543,
+    "preserved_log": "job-120716958543.json",
+    "decoded_utf8_sha256": "5a4f111c17a47cf3900ef7e9c2365dc935dd0e0a505192c3a0746abcc3f90927",
+    "excerpts": [
+      "2026-10-24T00:02:03.2406740Z /Users/runner/work/Void.Language/Void.Language/include/void/console.hpp:74:10: error: no type named 'stop_token' in namespace 'std'",
+      "2026-10-24T00:02:03.2712220Z /Users/runner/work/Void.Language/Void.Language/include/void/console.hpp:176:10: error: no type named 'stop_token' in namespace 'std'",
+      "2026-10-24T00:02:03.7698000Z /Users/runner/work/Void.Language/Void.Language/include/void/console.hpp:74:10: error: no type named 'stop_token' in namespace 'std'",
+      "2026-10-24T00:02:03.8018470Z /Users/runner/work/Void.Language/Void.Language/include/void/console.hpp:176:10: error: no type named 'stop_token' in namespace 'std'"
+    ]
+  },
+  {
+    "job_id": 120716958546,
+    "preserved_log": "job-120716958546.json",
+    "decoded_utf8_sha256": "e3e398248f8d7137b56d7bb1cc76b8206ed63ff4c5b88cba193d25b994e2eeaf",
+    "excerpts": [
+      "2026-10-24T00:03:24.9504220Z /Users/runner/work/Void.Language/Void.Language/include/void/console.hpp:74:10: error: no type named 'stop_token' in namespace 'std'",
+      "2026-10-24T00:03:24.9812800Z /Users/runner/work/Void.Language/Void.Language/include/void/console.hpp:176:10: error: no type named 'stop_token' in namespace 'std'"
+    ]
+  }
+]

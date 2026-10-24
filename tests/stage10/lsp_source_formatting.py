@@ -42,7 +42,7 @@ last"""
 '''
 with tempfile.TemporaryDirectory(prefix='VOID Step39 é😀 ') as directory:
     file=Path(directory)/'main.void'
-    file.write_text(source)
+    file.write_text(source, encoding="utf-8")
     uri=file.as_uri()
     with Client(Path(sys.argv[1]).resolve(),file) as c:
         c.request('initialize',{'capabilities':{'textDocument':{'publishDiagnostics':{'versionSupport':True}}}})
@@ -108,7 +108,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Step39 é😀 ') as directory:
                 check(format_doc()==[],'malformed source formatted')
                 check(not replace(pretty),'malformed repair failed')
             # Disk refresh must retain a dirty overlay; closing must restore disk.
-            file.write_text('func entry(input: i32) -> i32:\n    return missing_disk\n')
+            file.write_text('func entry(input: i32) -> i32:\n    return missing_disk\n', encoding="utf-8")
             c.request('void/refreshProject',{});c.sync()
             check(format_doc()==[],'refresh replaced dirty overlay')
             check(query('textDocument/definition','input:>12',1),'refresh lost overlay bindings')

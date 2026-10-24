@@ -1,0 +1,118 @@
+name: Compiler foundation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    name: ${{ matrix.platform }} / ${{ matrix.configuration }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Debug}
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Release}
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Sanitizers}
+          - {os: windows-2022, platform: Windows 2022, configuration: Debug}
+          - {os: windows-2022, platform: Windows 2022, configuration: Release}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Release}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Linux development dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+      - name: Windows native SDK environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify macOS ARM64 runner
+        if: runner.os == 'macOS'
+        run: python -c "import platform; assert platform.machine().lower() in ('arm64', 'aarch64'), 'macOS CI requires ARM64'"
+      - name: Cache complete official LLVM SDK
+        uses: actions/cache@v5
+        with:
+          path: .toolchains/llvm-19.1.7
+          key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install and verify LLVM development SDK
+        run: python tools/ci/llvm_sdk.py
+      - name: Configure ${{ matrix.configuration }}
+        run: cmake -S . -B build/${{ matrix.configuration }} -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration == 'Sanitizers' && 'RelWithDebInfo' || matrix.configuration }} -DVOID_SANITIZERS=${{ matrix.configuration == 'Sanitizers' && 'ON' || 'OFF' }} -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
+      - name: Build ${{ matrix.configuration }}
+        run: cmake --build build/${{ matrix.configuration }} --parallel 3
+      - name: Execute ${{ matrix.configuration }} tests
+        run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure
+      - name: Frontend Debug and Release small-stack regression
+        if: runner.os == 'Linux' && (matrix.configuration == 'Debug' || matrix.configuration == 'Release')
+        shell: bash
+        run: |
+          ulimit -s 1024
+          ctest --test-dir build/${{ matrix.configuration }} -R '^frontend$' --output-on-failure
+      - name: Extension Node.js toolchain
+        if: matrix.configuration == 'Debug'
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+      - name: Linux editor display dependencies
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgtk-3-0 libnss3 libgbm1 libasound2t64
+      - name: Install extension dependencies
+        if: matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        run: npm ci
+      - name: Type-check, build and test extension
+        if: matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_TEST_SERVER: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
+        run: npm test
+      - name: Real editor integration (Linux)
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls
+        run: xvfb-run -a npm run test:host
+      - name: Real editor integration (Windows and macOS)
+        if: runner.os != 'Linux' && matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
+        run: npm run test:host
+      - name: Package local editor extension
+        if: matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        run: npm run package
+      - name: Preserve local editor package
+        if: matrix.configuration == 'Debug'
+        uses: actions/upload-artifact@v6
+        with:
+          name: void-editor-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
+          path: editors/vscode/dist/*.vsix
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: tests-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
+          path: |
+            build/**/Testing/Temporary/LastTest.log
+            build/**/CMakeFiles/CMakeConfigureLog.yaml
+            build/**/CMakeFiles/CMakeError.log
+            build/**/CMakeFiles/CMakeOutput.log
+          if-no-files-found: ignore

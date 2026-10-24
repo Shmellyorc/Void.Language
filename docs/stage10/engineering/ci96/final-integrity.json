@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-24T02:36:31.537184+00:00",
+  "status": "VERIFIED",
+  "current_frozen_inputs": 767,
+  "changed_or_added_code_test_build_paths": 8,
+  "preserved_Step41_artifacts": 256,
+  "preserved_Step41_binary_archive_object_identities": 24,
+  "matching_current_binary_archive_object_identities": 22,
+  "focused_Linux": {
+    "Debug": "18/18",
+    "strict_ASan_UBSan_leaks": "18/18",
+    "final_failures": 0,
+    "final_skips": 0,
+    "original_1MiB_probes": "2/2, soft/hard1048576 bytes"
+  },
+  "current_artifact_and_documentation_hashes_match": true,
+  "new_LLVM_crash_emission_in_build_logs": false,
+  "compiler_cpp_unchanged": true,
+  "root_README_unchanged": true,
+  "repaired_native_execution": "UNVERIFIED",
+  "step42_complete": false,
+  "stage_status": "INCOMPLETE"
+}

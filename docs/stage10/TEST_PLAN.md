@@ -850,3 +850,24 @@ Native macOS must establish actual ARM64, original1MiB RLIMIT, Darwin signals,
 terminfo/PTY restoration and canonical /var identities. No tests are skipped to
 convert missing coverage into acceptance. Step42 results distinguish local
 preparation checks from still-unexecuted platform gates; Steps43–44 remain separate.
+
+
+## Step42 CI96 repair verification
+
+Preserve original native Windows Debug/Release190/194 and macOS build failures;
+engineering/ci96/ contains complete decoded job logs and committed source identities.
+Focused Linux repairs do not certify repaired native binaries. Exact pending Apple
+SDK/compiler/libc++ macro/availability compile-link-run commands are in
+engineering/ci96/REPAIR_HANDOFF.md. CMake must use real std stop-token callbacks;
+failed standard and pinned opt-in link probes are fatal, never no-op cancellation.
+
+Re-run operator_reload, format_temporal, console_aot and LSP source formatting in
+both native configurations, then complete remaining native gates. Verify Windows
+unavailable cache/no storage plus behavior/edits/reload/old leases, all original
+calendar round-trips and explicit year1/9999 boundaries, separate exact JIT/AOT
+legacy CRT trailers with source print bytes unchanged, and UTF-8 fixtures retaining
+Unicode/UTF-16/revision assertions. Native classic/Terminal/ConPTY and actual macOS
+PTY/SIGPIPE/restoration remain explicit gates. No blanket newline normalization,
+Windows persistence implementation, larger stacks or disabled tests is permitted.
+Accepted Step41 Linux597/597 remains historical; fresh focused repair builds use
+separate directories and preserve all originals. No hosted rerun is authorized here.

@@ -1,0 +1,762 @@
+{
+  "increment": "Stage 10 Step 42 \u2014 native Windows/macOS acceptance preparation",
+  "updated_utc": "2026-10-24T02:33:22.643763+00:00",
+  "status": "CI96 repairs focused-tested on Linux; repaired Windows/macOS source UNVERIFIED; Step42 INCOMPLETE",
+  "step42_complete": false,
+  "stage_status": "INCOMPLETE",
+  "subsequent_steps": "43\u201344 remain separate",
+  "authority": "Boss authorizes CI96 native failure repairs only; no Git mutations or hosted rerun. Golden Wrench accepted Step41.",
+  "baseline": {
+    "result": "step41-results.json",
+    "result_sha256": "e7eb5375aea4eb705ac275aa6043fb9a0bd3c0336cd71ef39869c8750db9b688",
+    "accepted_Linux": {
+      "Debug": "199/199",
+      "Release": "199/199",
+      "strict_ASan_UBSan_leaks": "199/199",
+      "total": 597,
+      "final_failures": 0,
+      "final_skips": 0
+    },
+    "code_freeze": "step41-full-source-freeze.json",
+    "code_freeze_sha256": "62437fdbff0a9f5a27d849ae35e439f7a1fb2da80a64d84d7b9ef6272c464708",
+    "repaired_compiler_cpp_sha256": "9a54df7f1778446fc3d593829978b4180df2ffd4a55f92ebaae156fc37f81d32",
+    "root_README_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "initial_integrity_verification": {
+      "step41-full-source-freeze.json": {
+        "entries": 766,
+        "mismatches": []
+      },
+      "step41-source-hashes.json": {
+        "entries": 779,
+        "mismatches": []
+      },
+      "step41_artifacts": {
+        "entries": 256,
+        "mismatches": []
+      },
+      "debug": {
+        "build_directory": "build/ci-official-debug",
+        "entries": 8,
+        "mismatches": []
+      },
+      "release": {
+        "build_directory": "build/ci-official-release-step41",
+        "entries": 8,
+        "mismatches": []
+      },
+      "san": {
+        "build_directory": "build/ci-official-san",
+        "entries": 8,
+        "mismatches": []
+      }
+    },
+    "historical_evidence_modified": false,
+    "current_historical_source_manifest_differences": [
+      "CMakeLists.txt",
+      "cmake/LLVMPlatform.cmake",
+      "docs/WORK_LOG.md",
+      "docs/stage10/CONSOLE_IO.md",
+      "docs/stage10/IMPLEMENTATION.md",
+      "docs/stage10/TEST_PLAN.md",
+      "src/temporal.cpp",
+      "tests/formatting/temporal.cpp",
+      "tests/stage10/console.py",
+      "tests/stage10/lsp_source_formatting.py",
+      "tests/stage10/operator_reload.cpp"
+    ],
+    "scope": "Step41 evidence/freeze are historical and unmodified. Current authorized repair/documentation deltas are explicitly listed; see ci96/source-changes.json."
+  },
+  "local_host": {
+    "platform": "Linux-7.2.6-pikaos-x86_64-with-glibc2.44",
+    "architecture": "x86_64",
+    "tool_discovery": {
+      "cmake": "/usr/bin/cmake",
+      "ninja": null,
+      "python3": "/usr/bin/python3",
+      "pwsh": null,
+      "xcrun": null,
+      "xcodebuild": null,
+      "wine": "/opt/wine-staging/bin/wine",
+      "ssh": "/usr/bin/ssh"
+    },
+    "native_Windows_host_available": false,
+    "native_macOS_host_available": false,
+    "host_access_scope": "No native endpoint supplied in this session; local execution environment is Linux only. SSH executable presence supplies no host or execution authorization. Wine was not used.",
+    "process_inspection": "No cmake build, CTest, Ninja, voidc or clang-19 acceptance process found; no duplicate builds/tests started."
+  },
+  "infrastructure_review": {
+    "workflows": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/windows-path-probe.yml",
+      ".github/workflows/phase23-stack-probe.yml"
+    ],
+    "build_sources": [
+      "CMakeLists.txt",
+      "cmake/LLVMPlatform.cmake",
+      "tools/ci/llvm_sdk.py"
+    ],
+    "native_console_sources": [
+      "src/runtime/console.cpp",
+      "src/runtime/console_presentation.inc",
+      "src/runtime/console_keyboard.inc",
+      "src/runtime/console_terminfo.inc"
+    ],
+    "historical_Windows_acceptance": "docs/stage9/WINDOWS_ENGINEERING_RECORD.md \u2014 CI95 WindowsDebug160/160 and Release160/160 at Stage9 source; not current Stage10 acceptance",
+    "preserved_Windows_requirements": [
+      "Complete LLVM19.1.7 development SDK, clang-cl plus x64 MSVC/Windows SDK environment",
+      "Real DIA dependency, /MD, iterator-level0, RTTI compatibility",
+      "Both longPathAware manifests; record LongPathsEnabled, do not change policy",
+      "Stage8 identity/URI and Stage9 native staging/ACL/restricted-token/Unicode/8.3/reparse/hardlink tests intact"
+    ],
+    "dispatch_constraint": "Compiler foundation workflow_dispatch runs all seven fixed matrix jobs (three Linux, two Windows, two macOS); no native-only dispatch input. No workflow change or dispatch performed.",
+    "optional_probe_scope": "Windows path workflow is observational; phase23 probe is optional machine-code research, not frontend1MiB acceptance."
+  },
+  "dependencies": {
+    "LLVM_Clang": "19.1.7 EXACT; unchanged",
+    "Windows_SDK_asset": "clang+llvm-19.1.7-x86_64-pc-windows-msvc.tar.xz",
+    "macOS_ARM64_SDK_asset": "LLVM-19.1.7-macOS-ARM64.tar.xz",
+    "formatter_temporal": {
+      "date": {
+        "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+        "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+      },
+      "ryu": {
+        "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+        "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+      },
+      "tzdata2026e": {
+        "revision": "2026e",
+        "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+      }
+    },
+    "timezone_policy": "Embedded versioned rules; USE_OS_TZDB=0, HAS_REMOTE_API=0, AUTO_DOWNLOAD=0. No machine-dependent timezone substitution.",
+    "new_dependencies": [],
+    "licenses_changed": false,
+    "native_installed_SDK_identities": null
+  },
+  "platforms": {
+    "windows": {
+      "status": "UNVERIFIED",
+      "native_attempts": [],
+      "planned_architecture": "x64",
+      "planned_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "planned_generator": "Ninja",
+      "planned_compiler": "Windows clang-cl19.1.7",
+      "planned_VOID_CLANG": "Pinned SDK clang19.1.7 native AOT driver",
+      "planned_VOID_LINKER": "empty (Linux-only override not used)",
+      "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+      "projected_suites_per_configuration": 194,
+      "actual_discovered": null,
+      "actual_executed": null,
+      "actual_passed": null,
+      "actual_failed": null,
+      "actual_skipped": null,
+      "actual_build_exit_codes": null,
+      "actual_compiler_configuration": null,
+      "native_source_receipts": null,
+      "native_binary_identities": null,
+      "native_failure_logs": null,
+      "actual_os_sdk_compiler_versions": null
+    },
+    "macos": {
+      "status": "UNVERIFIED",
+      "native_attempts": [],
+      "planned_architecture": "ARM64",
+      "planned_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "planned_generator": "Ninja",
+      "planned_compiler": "macOS ARM64 clang/clang++19.1.7",
+      "planned_VOID_CLANG": "Pinned SDK clang19.1.7 native AOT driver",
+      "planned_VOID_LINKER": "empty (Linux-only override not used)",
+      "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+      "projected_suites_per_configuration": 199,
+      "actual_discovered": null,
+      "actual_executed": null,
+      "actual_passed": null,
+      "actual_failed": null,
+      "actual_skipped": null,
+      "actual_build_exit_codes": null,
+      "actual_compiler_configuration": null,
+      "native_source_receipts": null,
+      "native_binary_identities": null,
+      "native_failure_logs": null,
+      "actual_os_sdk_compiler_versions": null
+    }
+  },
+  "inventory": "step42-inventory.json",
+  "commands": "ci96/REPAIR_HANDOFF.md",
+  "local_verification": {
+    "status": "PASS: Debug18/18 and strict18/18, plus both original genuine1MiB probes",
+    "configurations": {
+      "debug": {
+        "build_directory": "build/step42-ci96-debug",
+        "configuration": "Debug",
+        "sanitizers": "OFF",
+        "compiler": "Pinned LLVM/Clang19.1.7",
+        "console_compile_command": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++  -I/home/shmellyorc/Documents/Void.Language/include -g -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic -o CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o -c /home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp",
+        "CMakeCache_sha256": "587f06d7a75b76869efbc8561c4cfb87865b4012d6423ce8e7f9e1957c9de468",
+        "compile_commands_sha256": "9e59c11e2820fe05f20205c8fea82bef330572973b870db492761358e4ec3079",
+        "generator": "Unix Makefiles",
+        "phases": [
+          {
+            "label": "debug-configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build/step42-ci96-debug",
+              "-G",
+              "Unix Makefiles",
+              "-DCMAKE_BUILD_TYPE=Debug",
+              "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+              "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+              "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+              "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+              "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+              "-DBUILD_TESTING=ON",
+              "-DVOID_SANITIZERS=OFF",
+              "-DVOID_LLVM_RESEARCH=OFF",
+              "-DVOID_RETENTION_BASELINE=OFF"
+            ],
+            "returncode": 0,
+            "seconds": 87.97731254098471,
+            "log": "debug-configure.log"
+          },
+          {
+            "label": "debug-build",
+            "command": [
+              "cmake",
+              "--build",
+              "build/step42-ci96-debug",
+              "--target",
+              "voidc",
+              "voidls",
+              "void_operator_reload",
+              "void_temporal",
+              "void_temporal_ir",
+              "void_format_zones",
+              "void_runtime_console",
+              "void_runtime_console_transfers",
+              "void_runtime_console_input",
+              "void_runtime_console_keyboard",
+              "void_runtime_console_terminal",
+              "void_runtime_console_wide",
+              "void_console_source",
+              "void_native_fixture",
+              "void_tests",
+              "--parallel",
+              "3"
+            ],
+            "returncode": 0,
+            "seconds": 692.5944138959749,
+            "log": "debug-build.log"
+          },
+          {
+            "label": "debug-tests",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "build/step42-ci96-debug",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/ci96/debug-junit.xml",
+              "-R",
+              "^(stage10_operator_reload|format_temporal|stage10_temporal_ir|format_zones|stage10_console_aot|lsp_stage10_source_formatting|stage10_console_source|runtime_console|runtime_console_transfers|runtime_console_input|runtime_console_keyboard|runtime_console_terminal|runtime_console_wide|runtime_console_endpoints|runtime_console_native_transfers|runtime_console_native_input|runtime_console_native_keyboard|runtime_console_native_terminal)$"
+            ],
+            "returncode": 0,
+            "seconds": 1336.8234285219805,
+            "log": "debug-tests.log"
+          }
+        ],
+        "passed": 18,
+        "executed": 18,
+        "failed": 0,
+        "skipped": 0,
+        "case_seconds": {
+          "stage10_operator_reload": 44.8166,
+          "stage10_temporal_ir": 2.77174,
+          "format_temporal": 0.207295,
+          "format_zones": 5.674,
+          "runtime_console": 0.0142178,
+          "runtime_console_endpoints": 0.101489,
+          "runtime_console_transfers": 0.0178799,
+          "runtime_console_native_transfers": 0.485316,
+          "runtime_console_keyboard": 0.00604239,
+          "runtime_console_terminal": 0.00702087,
+          "runtime_console_native_keyboard": 0.158873,
+          "runtime_console_native_terminal": 0.783083,
+          "runtime_console_wide": 0.103487,
+          "runtime_console_input": 0.0246069,
+          "runtime_console_native_input": 0.165277,
+          "stage10_console_source": 184.728,
+          "stage10_console_aot": 1095.56,
+          "lsp_stage10_source_formatting": 1.14676
+        },
+        "binary_archive_object_sha256": {
+          "voidc": "068b8f1578060dc3dfda1957d83a51b0d1fbf6f7afa1f1b22f4166922179046e",
+          "voidls": "5ec4f4846f5ad26e2e81ca0545891b451e0cea867b336234e5e1e973d595bd3e",
+          "void_tests": "6fe4a700eef0bdcda3ec72cabfd27fae8c9d4bd30e51d5b26cbd97fbbf53db52",
+          "void_operator_reload": "370cbf20ac1b79187ccad6cf82178d9f3ac2eafa85733dafe5296ec83ad221a4",
+          "void_temporal": "546815b39bee3c0dd07d0418cfc87d6499c22f3fc73c5d587e228acb16d7b1f1",
+          "void_temporal_ir": "607e8e4e524a102ff674c0004d9ff4c9144c6d53a414c51008afa9c3c6dec820",
+          "void_console_source": "768cb7d423f6329a6f6d94da7962a66d1abe36b655147753bac4061d7d53ea9f",
+          "libvoid_core.a": "4db2194dec355753ef4f1d4369c82035afc39891ece2e108324c002827c1ee6c",
+          "libvoid_runtime.a": "0dbae1aedd091037ab1711d4db239baa1aadb91d73641d624a9ec52d76f9c2df",
+          "libvoid_native_fixture.a": "ce3f3b7b9426a2ef623eeeda3715d8545c56a290b7b5abc775fc039afb006d7d",
+          "CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o": "19e40ae687f5df30de44c07f8dcf9cba8d8a5da1f10d255df69d0b80dd892f98"
+        },
+        "junit": "debug-junit.xml",
+        "console_raw": "debug-console-output-results.json",
+        "console_driver_checks": 616,
+        "console_output_records": 120,
+        "combined_cache_cases": [
+          "cold",
+          "hit",
+          "corrupt",
+          "hook-body",
+          "format-spec"
+        ],
+        "scope": "Focused Linux only, including normal/O2 JIT, independently linked AOT and production native applications"
+      },
+      "san": {
+        "build_directory": "build/step42-ci96-san",
+        "configuration": "RelWithDebInfo",
+        "sanitizers": "ASan/UBSan/leaks ON",
+        "compiler": "Pinned LLVM/Clang19.1.7",
+        "console_compile_command": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++  -I/home/shmellyorc/Documents/Void.Language/include -O2 -g -DNDEBUG -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -o CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o -c /home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp",
+        "CMakeCache_sha256": "f9322acc552a4a69cb01c2fc0424c5dea8336f3001f4bae3a0922adb693f706e",
+        "compile_commands_sha256": "a84f50e71e55d5584ebdfe7cab09d5f2b932a73b3b4dec8b99ee5aadcaab2229",
+        "generator": "Unix Makefiles",
+        "phases": [
+          {
+            "label": "untraced-san-configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build/step42-ci96-san",
+              "-G",
+              "Unix Makefiles",
+              "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+              "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+              "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+              "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+              "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+              "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+              "-DBUILD_TESTING=ON",
+              "-DVOID_SANITIZERS=ON",
+              "-DVOID_LLVM_RESEARCH=OFF",
+              "-DVOID_RETENTION_BASELINE=OFF"
+            ],
+            "returncode": 0,
+            "seconds": 84.89298325800337,
+            "log": "untraced-san-configure.log"
+          },
+          {
+            "label": "untraced-san-build",
+            "command": [
+              "cmake",
+              "--build",
+              "build/step42-ci96-san",
+              "--target",
+              "voidc",
+              "voidls",
+              "void_operator_reload",
+              "void_temporal",
+              "void_temporal_ir",
+              "void_format_zones",
+              "void_runtime_console",
+              "void_runtime_console_transfers",
+              "void_runtime_console_input",
+              "void_runtime_console_keyboard",
+              "void_runtime_console_terminal",
+              "void_runtime_console_wide",
+              "void_console_source",
+              "void_native_fixture",
+              "void_tests",
+              "--parallel",
+              "3"
+            ],
+            "returncode": 0,
+            "seconds": 1113.346327841049,
+            "log": "untraced-san-build.log"
+          },
+          {
+            "label": "untraced-san-tests",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "build/step42-ci96-san",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/ci96/untraced-san-junit.xml",
+              "-R",
+              "^(stage10_operator_reload|format_temporal|stage10_temporal_ir|format_zones|stage10_console_aot|lsp_stage10_source_formatting|stage10_console_source|runtime_console|runtime_console_transfers|runtime_console_input|runtime_console_keyboard|runtime_console_terminal|runtime_console_wide|runtime_console_endpoints|runtime_console_native_transfers|runtime_console_native_input|runtime_console_native_keyboard|runtime_console_native_terminal)$"
+            ],
+            "returncode": 0,
+            "seconds": 1404.180363799911,
+            "log": "untraced-san-tests.log"
+          }
+        ],
+        "passed": 18,
+        "executed": 18,
+        "failed": 0,
+        "skipped": 0,
+        "case_seconds": {
+          "stage10_operator_reload": 52.3172,
+          "stage10_temporal_ir": 3.19416,
+          "format_temporal": 0.0836844,
+          "format_zones": 0.483107,
+          "runtime_console": 0.0481923,
+          "runtime_console_endpoints": 0.160842,
+          "runtime_console_transfers": 0.0328422,
+          "runtime_console_native_transfers": 0.763472,
+          "runtime_console_keyboard": 0.0269832,
+          "runtime_console_terminal": 0.0241926,
+          "runtime_console_native_keyboard": 0.297314,
+          "runtime_console_native_terminal": 0.838331,
+          "runtime_console_wide": 0.101723,
+          "runtime_console_input": 0.0475114,
+          "runtime_console_native_input": 0.440525,
+          "stage10_console_source": 199.963,
+          "stage10_console_aot": 1144.37,
+          "lsp_stage10_source_formatting": 0.966948
+        },
+        "binary_archive_object_sha256": {
+          "voidc": "6ca5aeaf281cce6fd6b2f3bef0423e0ce41fa706b70574e1dab254a253e7d891",
+          "voidls": "c9a2c8fd172e9749ccc55c3b1bbe3b63d4844e6c34ef43f39ade1406abd6be9f",
+          "void_tests": "b373fbf661d575804dafa9877c40fd147f0632738f0c502717b30139fbbbd616",
+          "void_operator_reload": "919e164d5bbe7fde9403fa535e799fb91b6e04b1ac6db624b7635a0688ff82dc",
+          "void_temporal": "ad38fd9576ca31952d45a52b493b8a87870bb0460e314b3ccad0be2025885d93",
+          "void_temporal_ir": "a36202e2b2c00c6e5bbb41d59a78612bceb423b9efc8ed1453aa34a9f92d38da",
+          "void_console_source": "dfd261d58aeb73ee2114e4c4795d856a39dc6d92701bdc93879b46e4b072b76e",
+          "libvoid_core.a": "fa193976d822b675d5a80c6384ef95f4b781353eda73c26926b1d3ef3a3ce05a",
+          "libvoid_runtime.a": "4c51ac09a6129c72667bde73cf803835702660f167c958474a7b3716ddcc4971",
+          "libvoid_native_fixture.a": "aed9bc9c8c69620b0d2b5a4c06eab93c79c0e9f552aa50bed2ff0e5a5d9c4f1c",
+          "CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o": "75d26dc7667a219217485efcdc0dc5f34a59bf3ce6cd215dcf37d0651540c32e"
+        },
+        "junit": "untraced-san-junit.xml",
+        "console_raw": "san-console-output-results.json",
+        "console_driver_checks": 616,
+        "console_output_records": 120,
+        "combined_cache_cases": [
+          "cold",
+          "hit",
+          "corrupt",
+          "hook-body",
+          "format-spec"
+        ],
+        "scope": "Focused Linux only, including normal/O2 JIT, independently linked AOT and production native applications"
+      }
+    },
+    "stack_probes": [
+      {
+        "label": "frontend-1m-final",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build/step42-ci96-debug",
+          "-R",
+          "^frontend$",
+          "--output-on-failure"
+        ],
+        "returncode": 0,
+        "seconds": 9.48308405908756,
+        "stack_soft": 1048576,
+        "stack_hard": 1048576,
+        "log": "frontend-1m-final.log"
+      },
+      {
+        "label": "semantic-depth-1m-final",
+        "command": [
+          "python3",
+          "tests/integration/semantic_depth.py",
+          "build/step42-ci96-debug/voidc"
+        ],
+        "returncode": 0,
+        "seconds": 0.6073246699525043,
+        "stack_soft": 1048576,
+        "stack_hard": 1048576,
+        "log": "semantic-depth-1m-final.log"
+      }
+    ],
+    "probes": "ci96/probes-results.json",
+    "source_freeze": "ci96/final-source-freeze.json",
+    "source_freeze_inputs": 767,
+    "source_freeze_sha256": "587598f00e563ddcc3d58635db54cfa3a66b864c0c1f6057842360c8454b998c",
+    "original_recorder_failure": {
+      "log": "ci96/recorder-failure.log",
+      "cause": "Path not serialized to str after first frontend probe; recorder repaired, both1MiB probes rerun with complete exit records; no production defect",
+      "Debug_tests_already_passed": true,
+      "traced_strict_build_or_test_started": false
+    },
+    "strict_profile": "Established untraced exec profile from the start of this strict build/test; no disabled/suppressed checks",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "preserved_Step41_artifacts": 256,
+    "preserved_Step41_binary_archive_object_identities": 24,
+    "native_results": "UNVERIFIED",
+    "full_597_suite_matrix_repeated": false,
+    "unique_configuration_suite_outcomes": 36
+  },
+  "confirmed_new_native_defects": [
+    {
+      "boundary": "Windows cache assertion",
+      "kind": "test harness",
+      "evidence": "CI96 both configurations: operator/format cold cache; production NativeCache intentionally unavailable"
+    },
+    {
+      "boundary": "Windows temporal civil-to-seconds",
+      "kind": "production implementation",
+      "evidence": "Native check1195 plus MSVC32-bit hours/minutes source and exact narrowing reproduction; native actual component values not printed in original CI"
+    },
+    {
+      "boundary": "Windows legacy console trailer",
+      "kind": "test expectation",
+      "evidence": "CI96 JIT actual raw records end in native CRT0CRLF, expected0LF; independent AOT emittedprintf needs same host-specific check"
+    },
+    {
+      "boundary": "Windows LSP source fixture",
+      "kind": "test harness encoding",
+      "evidence": "CI96 cp1252 UnicodeEncodeError on emoji; controlled default reproduces and UTF8 repair passes144 checks"
+    },
+    {
+      "boundary": "macOS SDK stop_token",
+      "kind": "build feature gate",
+      "evidence": "CI96 missing std types; pinned libc++190107 compile/link model reproduces default gate and supported opt-in passes without new archive"
+    }
+  ],
+  "production_repairs": [
+    {
+      "path": "src/temporal.cpp",
+      "change": "Promote sys_days to sys_seconds before adding hours/minutes; preserve year1..9999 and all units/validation"
+    },
+    {
+      "paths": [
+        "CMakeLists.txt",
+        "cmake/LLVMPlatform.cmake",
+        "cmake/probes/StopToken.cpp"
+      ],
+      "change": "Actual Apple std stop-token compile/link gate; if needed, verify pinned190107 supported experimental opt-in and propagate existing void_options. No new cancellation implementation or stdlib."
+    }
+  ],
+  "test_build_workflow_changes": {
+    "source_changes": "ci96/source-changes.json",
+    "code_diff": "ci96/repairs.diff",
+    "tests": [
+      "Explicit Windows unavailable statuses, ordinary execution/reload/leases and no persistent cache files",
+      "Known legacy result trailer only uses native CRT newline expectation, independently for JIT/AOT; no normalization",
+      "Absent cache directory safe and hook/spec fallback behavior exercised",
+      "Explicit UTF8 source fixture/repair/model/record I/O; Unicode/UTF16 assertions retained",
+      "Original temporal round-trips with precise diagnostics and exact year1/9999 seconds boundaries"
+    ],
+    "workflow_changes": [],
+    "native_cache_production_changed": false,
+    "CLI_or_AOT_output_production_changed": false,
+    "source_limits_or_optimization_changed": false
+  },
+  "remaining_native_gates": [
+    "Actual macOS SDK standard/opt-in stop-token compile/link/run and native CMake detection",
+    "Native Windows chrono aliases and exact old/new component probe",
+    "Both native configurations: rerun four CI96 failures, then complete unfiltered suites and remaining host/editor/packaging gates",
+    "Boss-authorized exact source snapshot must include current uncommitted Stage10 work and match accepted766 inputs; HEAD alone is insufficient",
+    "Fresh native compiler/Runtime/voidc/voidls Debug and Release builds; actual CTest inventory, unfiltered complete JUnit and preserved full logs",
+    "Genuine1MiB fullfrontend and unchanged semantic_depth124/400/recovery checks: verify Windows PE StackReserve, macOS both RLIMIT values",
+    "Native normal/O2 JIT, independent AOT, production native build/install/relocation/embedded zones and stdlib source discovery",
+    "Native console/PTY/ConPTY and state snapshots, Unicode/UTF16/raw redirected data, partial errors, canonical editor state, restoration",
+    "Borrowed synchronous/overlapped Windows handles, queued/entered cancellation, buffers, GC/shutdown races and unrelated host I/O",
+    "Darwin SIGPIPE/signals, ncurses/terminfo modes/PTY restoration and canonical /var aliases",
+    "Windows extra-volume transfer if actual second volume available; otherwise retain UNVERIFIED",
+    "Real native editor hosts and optional installed Vim/Neovim adapters; POSIX menu harnesses do not establish Windows menus",
+    "Final native source/binary/SDK/artifact hashes and exact build/compiler/OS configurations"
+  ],
+  "coverage_gaps": [
+    "Five POSIX-only CTest registrations are absent on Windows, not skipped successful tests",
+    "runtime_console_wide injected adapter checks do not establish real ReadConsoleW/WriteConsoleW behavior",
+    "No automated CreatePseudoConsole/ConPTY driver exists in current tests; additional genuine host evidence required even after green Windows CTest",
+    "Linux-only GC --wrap hooks are not available on these platforms; portable GC tests remain",
+    "Native configurations use existing sanitizerOFF platform settings; Linux strict acceptance is separate",
+    "Native actual tool versions, architectures, binary hashes, failure logs, test counts and performance/memory measurements are unavailable until execution"
+  ],
+  "historical_observations_preserved": [
+    "Step37 publication/default-root _year/year anomalies remain unexplained; later passing probes do not establish a fix",
+    "Original transient pinned Clang19.1.7 crash and reproducer preserved",
+    "Deep-collection compilation cost retained; no speculative optimization",
+    "Release LLD GVN stack emission: original complete build exited0, no unchanged retry, actual cause/signal unknown",
+    "Boss native Linux SIGSEGV and repaired successful original1MiB GDB transcripts remain preserved",
+    "Deferred compiler usability/cache/native-size/IANA compaction/incremental objectives and F12/F2/hover/documentation observations remain deferred"
+  ],
+  "governance": {
+    "Git_mutations": false,
+    "hosted_CI_dispatched": false,
+    "security_or_registry_policy_changes": false,
+    "Daybreak_application": false,
+    "public_README_changed": false,
+    "production_or_test_source_changes": true,
+    "accepted_Step41_reopened": false
+  },
+  "next_concrete_action": "Golden Wrench reviews these eight source/test/build changes and local evidence. Boss controls commits and native execution: run actual SDK/chrono probes, four-suite Debug/Release repair checks, then remaining Step42 acceptance. No further local production repair is warranted without a demonstrated defect.",
+  "deliverable_hashes": {
+    "ci96/REPAIR_HANDOFF.md": "97b559245b9b67469efaaf73933e2d9a3a38b50d9675dc6ed8a481fab5c948be",
+    "ci96/artifacts.json": "350a3cb7905bbd209745ef541076632960f613e5433af533a0ed09af8d0468da",
+    "ci96/before/CMakeLists.txt": "c8c821deca2c68ed197f4cf1ac05caf547c077a36fa79c07e89066f6c7672e47",
+    "ci96/before/CONSOLE_IO.md": "8cd6f48e21e24880fd689960f41c900e157f3d357497807c613957178f3d3bed",
+    "ci96/before/cmake/LLVMPlatform.cmake": "e39b8f0d3561f54ea29e20b3d39aaa130b2cecbf9deb6e43cbfcccb0dffee693",
+    "ci96/before/docs/stage10/IMPLEMENTATION.md": "ff079d181a99c306a2a575b0a26527880ac9ac88771d07079f87cfe78ceca9fd",
+    "ci96/before/docs/stage10/engineering/step42-results.json": "d17eac4a77b54a28c57705e51a682bf04708c5f65d92a5dcb897af641e28efc5",
+    "ci96/before/hashes.json": "d54f88caaa58fb6482df57303ea30d0619507d26c14cff6df40d913f341098e8",
+    "ci96/before/native-commands.md": "db181f209908ccd54b53ed0f7a5a695ac83d355d46ed5b01b3300191a695d658",
+    "ci96/before/src/temporal.cpp": "715a56a1d0ddc96ffbc58d215e240b577249ca271adfccdbcf369579a0c6a113",
+    "ci96/before/tests/formatting/temporal.cpp": "106229efe53e4e39a491c13de95f39ac340704b47a830174f5465a21c6ada072",
+    "ci96/before/tests/stage10/console.py": "7de7f31da579e49aae3294c940216d07b333e56e65434c537aef3ce2066feb22",
+    "ci96/before/tests/stage10/lsp_source_formatting.py": "6eda145828c0014c92bbd1ca2fad0031422e321d3d05ed1bf0fd5a432f5ada12",
+    "ci96/before/tests/stage10/operator_reload.cpp": "3467ad48f1f755343ca22ebb00ffed1ec264769ed56abd740505421e154a2b81",
+    "ci96/committed-source-blobs.json": "e1dbc16a28076fe24d0f3805eb3bd5e072c1480c3244a83d6243926dfcbe31e2",
+    "ci96/debug-build.log": "473583abb2ba517e00a7f75fa1bdd10346387438358bb938d43f3c95a7aebe9d",
+    "ci96/debug-configure.log": "8498775885e2f67663eea48369a371fe216e6d89a9b35f268d87853e419d325e",
+    "ci96/debug-console-output-results.json": "0e931dbb4cc52c944be7d0f8af39cf22cae49528361a4feafd86fd80a358d842",
+    "ci96/debug-junit.xml": "45cd905705124eb8c7fe31ae41de9fe692d55d19e7403a1b5c0bca0a9b366467",
+    "ci96/debug-tests.log": "f638421e4435478b609dfaab639c6180277ec15d1e1bc7569fa5fcaa8e42eac0",
+    "ci96/final-source-freeze.json": "587598f00e563ddcc3d58635db54cfa3a66b864c0c1f6057842360c8454b998c",
+    "ci96/finalize.py": "a3212b442faa6719d25cb608830dea9e729755a2cd0f289d550ee3e040595a50",
+    "ci96/fixture-cp1252-after.log": "169edf4bfa8fb8f3722cec78b88a852d9e89e0f96138e443c4b265f39d7f5762",
+    "ci96/fixture-cp1252-before.log": "34527021aa41d1afc5da2376a54663d2eaa3463791e4958f5f0ffa595f5115d2",
+    "ci96/frontend-1m-final.log": "a43af8400373be4b3086d03c6212dbeac0df6739d009af34ad0dc2fa304b6ef4",
+    "ci96/frontend-1m.log": "f5683a4e7a1c612443c7dbbc20683a940b6f726df0d6d02f11380fa0eaef6738",
+    "ci96/job-120716958457.json": "3676d54bd3439e5529b74bcf2d7fea18bbc44dfabaf80aa50c23d663ae816f40",
+    "ci96/job-120716958536.json": "fc46335eb92d7e5650c15f2e74cc740a7f74cf1f2c987ae44d6405ffc577a6d8",
+    "ci96/job-120716958543.json": "024ba0c4ea956b23ccc128a9a10e6bb3f6ffcd97d61c5ca95ef866095e4d4142",
+    "ci96/job-120716958546.json": "26e8046652ab59d2f8fdbc47677c8f79b7be67fc2400a33b54515e6c2fb5caf7",
+    "ci96/jobs.json": "548bc66354ac16d6f9bc2c6f236840fd294d1dae7cb2057f948a7770fedf0e68",
+    "ci96/linux-before-recorder-repair.json": "5c14033dea4df309f3111b111d2d97d5a366fff1e4b68ecfda8f0a6c59d2f522",
+    "ci96/linux-commands.json": "9e19f2f374bce89cb8cadd450b9b929db8213d10bfa0a5c66726316237d1cb82",
+    "ci96/linux-untraced-commands.json": "5672ed11b8a220f8f474e4d9d630beb65c465bfcc09f2a72683ed5df43a5b8ad",
+    "ci96/original-failures.json": "a16ea208064e1b12f9db3799aa8378a36aa6172afceeabf83d955bfa1a916407",
+    "ci96/probes/fixture-encoding.py": "42a8dff1c25de5270d34737646a5af76e22dec8527a5338c4decc39dcba663fc",
+    "ci96/probes/temporal-native.cpp": "c9471073e639daf3409dd94c5b9470bc9e84f13b7a8ecf1669ab58e10c8e54a6",
+    "ci96/probes/temporal-width.cpp": "e1f2cb5da615e8d82dedb4a3f70a12c58bb3f4fa41b997f7b3350c24729c4f7d",
+    "ci96/probes-results.json": "71a600518502153caae008dbe412d8dbb3f372fe17ba880a968e3f6f0552f124",
+    "ci96/recorder-failure.log": "039804dd7d754190fb05721c6682589c786d05d1bf8c0c38ae622d6576e42f4c",
+    "ci96/recovery.json": "f1e64577f726feac4838b18f3b67be4af6dc95d64bb01bd95bc6dac6400408ad",
+    "ci96/repair-source-freeze.json": "53a1a39c6b45711cf5c9bf59e2ff9952f98239e5ab6c872dbea0166454cba386",
+    "ci96/repairs.diff": "76a065ae4f8bfd00840a49f4fec81c287a86ad348c5ea24d141435575f3d8e04",
+    "ci96/run-linux-focused-before-recorder-repair.py": "b333bb27e59513bb8eb0da7c99c6cb0dd263bf986ebad072538f4ebce38ef3ea",
+    "ci96/run-linux-focused.py": "4b83e4fb8e2fb8af35306879938b39b877e51b23685beb19a39812b59be8b917",
+    "ci96/run-untraced-when-ready.py": "becc0edcdeb32f201ada4e57169da3ac33bd0f10739954d70211d71fc26b6226",
+    "ci96/run.json": "c2c7f7983445b1c1ab12f88d7805256cca39f960848a7ef4051405e22367b1a4",
+    "ci96/san-console-output-results.json": "23072584a8fda6d9ac5e29e7d7e6ad357935ae41efebe8c205409c6e999fcfa2",
+    "ci96/semantic-depth-1m-final.log": "61bf5142eb36042663df0aa695203fbbac5534823ff7329f241720e97f790a3b",
+    "ci96/source-changes.json": "a5904f8960525b75818ba98975061177b5d7b58996c1ecc350b5125cc75a9088",
+    "ci96/stack-final-commands.json": "7c381ad7305e058e0f1af3b12a2b94190ea7399f13f9bb230a87863de1fa8849",
+    "ci96/stop-token-libcxx19-after.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ci96/stop-token-libcxx19-before.log": "9351bc8885467c8f8a58dd48c09b2d0da6fe0e891bc0b7eb4f87ab8aadf9bbc3",
+    "ci96/stop-token-macros-after.log": "1bb8aa20dfdfbcfdcd37c4c474fd16a4bd8d1e75129d518b6019fc0976e78e80",
+    "ci96/stop-token-macros-before.log": "11a74e25bc23aadea2e98faaea9c5b9e5e61944fe259d4ac1074058082c8a945",
+    "ci96/temporal-native-linux.log": "92aba63332288a65b701ce3f22e579782995ff67df6e7ba3a18f0adab3308528",
+    "ci96/temporal-width-after-san.log": "b5bdd6fcf970498582ea75d05fc3e77f2928ab4c9ecb09e3a52eeeae17844ec6",
+    "ci96/temporal-width-after-untraced-san.log": "89b1af1e701b4313e4263e0c64f92a3f8514aa0e8ffbe63209c6f9f60996c5ce",
+    "ci96/temporal-width-after.log": "89b1af1e701b4313e4263e0c64f92a3f8514aa0e8ffbe63209c6f9f60996c5ce",
+    "ci96/temporal-width-before-ubsan.log": "81cfab3df55f068dd49b2b9dc02cc1968a56393dbf25fb7334f045652ff336f4",
+    "ci96/temporal-width-before.log": "81cfab3df55f068dd49b2b9dc02cc1968a56393dbf25fb7334f045652ff336f4",
+    "ci96/untraced-san-build.log": "edc22dd994a52b2e3719475797a639201c4d13527014abfa9bdcf94ee374ad93",
+    "ci96/untraced-san-configure.log": "452b68c4fb11206d3031158485a2f1e24c191ffa3d13463d7516aa35d5e428a8",
+    "ci96/untraced-san-junit.xml": "1f4d67a8878fc36fdd22ab612d129915cfe9995684d167fa16580ba3de9fa338",
+    "ci96/untraced-san-tests.log": "d4b8a7805c2c8412c4609051af5b0ecc14ea161496cc4b0680df9fceb1890990",
+    "ci96/final-integrity.json": "22796bd51e218cb150c05a85839474c6d346d92967f1b3bc311454924d421b70"
+  },
+  "current_documentation_hashes": {
+    "docs/stage10/IMPLEMENTATION.md": "17281f028dc21877b820e222032217ca0ab4052cb8df51de1e48f0064cf2742d",
+    "docs/stage10/TEST_PLAN.md": "bd8d7ec41d0a2a7497e5be38a8c49c4818bec76da9f94016c1297818acf407b3",
+    "docs/stage10/CONSOLE_IO.md": "bebaf5dceba69cd652b4a5fede6b751af66797771f68e66969f1ea272d50608e",
+    "docs/WORK_LOG.md": "b113efa04e6a175d1efe03a1787dfa1bccfbefd4fceea74a6370991a6ca2506f",
+    "docs/stage10/engineering/step42-native-commands.md": "93b4307f6559f17c1895f01bf648dfe4572885c7d7b3db4f1df6fe3471504fff"
+  },
+  "historical_preparation_result": "ci96/before/docs/stage10/engineering/step42-results.json",
+  "historical_preparation_verification": {
+    "status": "8/8 local preparation checks; zero native tests",
+    "results": "step42-preparation-checks.json",
+    "log": "step42-preparation-checks.log",
+    "command": "python3 docs/stage10/engineering/step42-preparation-checks.py",
+    "returncode": 0,
+    "checks": [
+      "766 unchanged accepted build/test/editor input hashes",
+      "256 preserved Step41 evidence artifact hashes",
+      "24 unchanged accepted Linux binary/archive/object hashes",
+      "Historical779-entry manifest differs only in three authorized internal docs",
+      "Windows194/macOS199 projected inventory has exactly the five UNIX-only registration differences",
+      "Portable source receipt compiles and verifies actual Linux inputs; binary receipt compiles",
+      "macOS bash command block passes bash -n (syntax only)",
+      "Root README and accepted Step41 results hashes unchanged"
+    ],
+    "PowerShell_parser": "UNVERIFIED: unavailable locally",
+    "native_commands": "Not executed; bash syntax and Linux receipt checks do not certify Windows/macOS execution."
+  },
+  "original_CI96": {
+    "run_id": 40042618839,
+    "run_number": 96,
+    "commit": "ef6017613ecf92de31380476ed5d9c3fc8cf3dbb",
+    "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/40042618839",
+    "source_blob_verification": "ci96/committed-source-blobs.json: all7 pre-repair files match exact Git blob SHA1",
+    "original_logs": "ci96/job-ID.json; full decoded log strings retained, with BOM/CRLF intact",
+    "original_failures": "ci96/original-failures.json",
+    "upstream_artifact_metadata": "ci96/artifacts.json; upstream digests only, ZIP bytes not locally verified",
+    "windows": {
+      "Debug": {
+        "job_id": 120716958536,
+        "build": "PASS",
+        "executed": 194,
+        "passed": 190,
+        "failed": 4
+      },
+      "Release": {
+        "job_id": 120716958457,
+        "build": "PASS",
+        "executed": 194,
+        "passed": 190,
+        "failed": 4
+      },
+      "identical_failures": [
+        "stage10_operator_reload",
+        "format_temporal",
+        "stage10_console_aot",
+        "lsp_stage10_source_formatting"
+      ]
+    },
+    "macos_ARM64": {
+      "Debug": {
+        "job_id": 120716958543,
+        "configure": "PASS",
+        "build": "FAIL: missing std::stop_token",
+        "executed": 0
+      },
+      "Release": {
+        "job_id": 120716958546,
+        "configure": "PASS",
+        "build": "FAIL: missing std::stop_token",
+        "executed": 0
+      },
+      "SDKROOT": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+      "compiler": "Clang19.1.7, -arch arm64, -std=c++20, -fno-rtti"
+    },
+    "editor_followups": "Skipped after native failures; no native editor acceptance claimed",
+    "run_snapshot_scope": "Native jobs completed at fetch; Linux jobs then still in progress. No overall CI96 completion claim."
+  },
+  "repair_sources": {
+    "freeze": "ci96/final-source-freeze.json",
+    "inputs": 767,
+    "changed_or_added_vs_accepted_Step41": 8,
+    "details": "ci96/source-changes.json",
+    "accepted_compiler_cpp_unchanged": true
+  },
+  "final_integrity_audit": {
+    "path": "ci96/final-integrity.json",
+    "sha256": "22796bd51e218cb150c05a85839474c6d346d92967f1b3bc311454924d421b70"
+  }
+}

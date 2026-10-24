@@ -1,0 +1,80 @@
+[
+  {
+    "label": "debug-configure",
+    "command": [
+      "cmake",
+      "-S",
+      ".",
+      "-B",
+      "build/step42-ci96-debug",
+      "-G",
+      "Unix Makefiles",
+      "-DCMAKE_BUILD_TYPE=Debug",
+      "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+      "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "-DBUILD_TESTING=ON",
+      "-DVOID_SANITIZERS=OFF",
+      "-DVOID_LLVM_RESEARCH=OFF",
+      "-DVOID_RETENTION_BASELINE=OFF"
+    ],
+    "returncode": 0,
+    "seconds": 87.97731254098471,
+    "log": "debug-configure.log"
+  },
+  {
+    "label": "debug-build",
+    "command": [
+      "cmake",
+      "--build",
+      "build/step42-ci96-debug",
+      "--target",
+      "voidc",
+      "voidls",
+      "void_operator_reload",
+      "void_temporal",
+      "void_temporal_ir",
+      "void_format_zones",
+      "void_runtime_console",
+      "void_runtime_console_transfers",
+      "void_runtime_console_input",
+      "void_runtime_console_keyboard",
+      "void_runtime_console_terminal",
+      "void_runtime_console_wide",
+      "void_console_source",
+      "void_native_fixture",
+      "void_tests",
+      "--parallel",
+      "3"
+    ],
+    "returncode": 0,
+    "seconds": 692.5944138959749,
+    "log": "debug-build.log"
+  },
+  {
+    "label": "debug-tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/step42-ci96-debug",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/shmellyorc/Documents/Void.Language/docs/stage10/engineering/ci96/debug-junit.xml",
+      "-R",
+      "^(stage10_operator_reload|format_temporal|stage10_temporal_ir|format_zones|stage10_console_aot|lsp_stage10_source_formatting|stage10_console_source|runtime_console|runtime_console_transfers|runtime_console_input|runtime_console_keyboard|runtime_console_terminal|runtime_console_wide|runtime_console_endpoints|runtime_console_native_transfers|runtime_console_native_input|runtime_console_native_keyboard|runtime_console_native_terminal)$"
+    ],
+    "returncode": 0,
+    "seconds": 1336.8234285219805,
+    "log": "debug-tests.log"
+  },
+  {
+    "label": "evidence-recorder",
+    "returncode": 1,
+    "log": "recorder-failure.log",
+    "cause": "Path in the standalone frontend command list was not serialized to str; production tests had passed",
+    "frontend_probe_log": "frontend-1m.log",
+    "strict_started": false
+  }
+]
