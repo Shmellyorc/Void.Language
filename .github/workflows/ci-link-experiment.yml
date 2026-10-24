@@ -1,0 +1,330 @@
+# Run control and thinlto-cache on the SAME immutable commit via the dispatch ref.
+# Compare matching OS/configuration and identity.json toolchains; hosted runner noise remains.
+# Cache starts empty before configure; build is probe-primed, voidc relink is a warm pass.
+# Boss approved repeating the pinned Linux LLD selection for early CMake checks in cache mode.
+name: Compiler link experiment
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Link experiment mode (compare both modes on the same commit)
+        type: choice
+        required: true
+        default: control
+        options:
+          - control
+          - thinlto-cache
+permissions:
+  contents: read
+jobs:
+  build:
+    name: ${{ inputs.mode }} / ${{ matrix.platform }} / ${{ matrix.configuration }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Debug}
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Release}
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Sanitizers}
+          - {os: windows-2022, platform: Windows 2022, configuration: Debug}
+          - {os: windows-2022, platform: Windows 2022, configuration: Release}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Release}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 360
+    env:
+      EXPERIMENT_MODE: ${{ inputs.mode }}
+      EXPERIMENT_CONFIGURATION: ${{ matrix.configuration }}
+      EXPERIMENT_DIR: ${{ github.workspace }}/build/link-experiment
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Prepare isolated link experiment
+        shell: python {0}
+        run: |
+          import os
+          from pathlib import Path
+          import tempfile
+          import textwrap
+
+          cache = Path(tempfile.mkdtemp(prefix='void-thinlto-', dir=os.environ['RUNNER_TEMP'])).resolve()
+          helper = cache.parent / (cache.name + '.py')
+          helper.write_text(textwrap.dedent(r'''
+          import csv
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import platform
+          import shutil
+          import subprocess
+          import sys
+          import time
+
+          phase = sys.argv[1]
+          configuration = os.environ['EXPERIMENT_CONFIGURATION']
+          mode = os.environ['EXPERIMENT_MODE']
+          build = Path('build') / configuration
+          evidence = Path(os.environ['EXPERIMENT_DIR'])
+          cache = Path(os.environ['THINLTO_CACHE_DIR'])
+          evidence.mkdir(parents=True, exist_ok=True)
+
+          def save(name, value):
+              (evidence / name).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+
+          def cache_size():
+              files = [p for p in cache.rglob('*') if p.is_file()]
+              return {'directory': str(cache), 'files': len(files),
+                      'bytes': sum(p.stat().st_size for p in files)}
+
+          def identity():
+              commands = [['git', 'rev-parse', 'HEAD'], ['git', 'status', '--short'],
+                          ['cmake', '--version'], ['ninja', '--version']]
+              for key in ('CC', 'CXX', 'VOID_CLANG', 'VOID_LINKER'):
+                  if os.environ.get(key):
+                      commands.append([os.environ[key], '--version'])
+              if platform.system() == 'Linux':
+                  commands += [['lscpu'], ['cat', '/proc/meminfo']]
+              elif platform.system() == 'Darwin':
+                  commands += [['xcodebuild', '-version'], ['xcrun', '--show-sdk-path'],
+                               ['xcrun', 'ld', '-v'], ['sysctl', 'hw'], ['vm_stat']]
+              else:
+                  commands += [['where.exe', 'link'], ['link.exe'],
+                               ['powershell', '-NoProfile', '-Command',
+                                'Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; '
+                                'Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors | ConvertTo-Json']]
+              records = []
+              for command in commands:
+                  try:
+                      result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors='replace')
+                      records.append({'argv': command, 'exit_code': result.returncode, 'output': result.stdout})
+                  except OSError as error:
+                      records.append({'argv': command, 'error': str(error)})
+              save('identity.json', {
+                  'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+                  'dispatch_sha': os.environ.get('GITHUB_SHA'), 'mode': mode, 'configuration': configuration,
+                  'run_id': os.environ.get('GITHUB_RUN_ID'), 'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),
+                  'runner_os': os.environ.get('RUNNER_OS'), 'runner_arch': os.environ.get('RUNNER_ARCH'),
+                  'platform': platform.platform(), 'logical_cpus': os.cpu_count(),
+                  'environment': {key: os.environ.get(key) for key in
+                                  ('CC', 'CXX', 'LLVM_DIR', 'VOID_CLANG', 'VOID_LINKER', 'SDKROOT',
+                                   'VCToolsVersion', 'WindowsSDKVersion', 'ASAN_OPTIONS', 'UBSAN_OPTIONS')},
+                  'workflow_sha256': hashlib.sha256(Path('.github/workflows/ci-link-experiment.yml').read_bytes()).hexdigest(),
+                  'tools_and_host': records,
+              })
+
+          def link_targets():
+              result = subprocess.run(['ninja', '-C', str(build), '-t', 'targets', 'all'],
+                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+              (evidence / 'ninja-targets.txt').write_text(result.stdout, encoding='utf-8')
+              result.check_returncode()
+              return {line.rsplit(': ', 1)[0] for line in result.stdout.splitlines()
+                      if ': ' in line and 'EXECUTABLE_LINKER' in line.rsplit(': ', 1)[1]}
+
+          def link_times(label, previous):
+              log = build / '.ninja_log'
+              if not log.exists():
+                  return
+              shutil.copy2(log, evidence / f'{label}.ninja_log')
+              targets = link_targets()
+              with (evidence / f'{label}-links.csv').open('w', newline='', encoding='utf-8') as output:
+                  writer = csv.writer(output)
+                  writer.writerow(['output', 'start_ms', 'end_ms', 'duration_ms'])
+                  for line in log.read_text(encoding='utf-8').splitlines():
+                      fields = line.split('\t')
+                      if line not in previous and len(fields) == 5 and fields[3] in targets:
+                          writer.writerow([fields[3], fields[0], fields[1], int(fields[1]) - int(fields[0])])
+
+          previous = set()
+          if phase == 'configure':
+              identity()
+              # Fresh build and cache: the ORC probe may prime SDK entries before the full build.
+              assert not (build / 'CMakeCache.txt').exists() and not (build / '.ninja_log').exists()
+              assert cache_size()['files'] == 0
+              command = ['cmake', '-S', '.', '-B', str(build), '-G', 'Ninja',
+                         '-DCMAKE_BUILD_TYPE=' + ('RelWithDebInfo' if configuration == 'Sanitizers' else configuration),
+                         '-DVOID_SANITIZERS=' + ('ON' if configuration == 'Sanitizers' else 'OFF'),
+                         '-DLLVM_DIR=' + os.environ['LLVM_DIR'], '-DVOID_CLANG=' + os.environ['VOID_CLANG'],
+                         '-DVOID_LINKER=' + os.environ.get('VOID_LINKER', ''),
+                         '--trace-format=json-v1', '--trace-source=' + str(Path('CMakeLists.txt').resolve()),
+                         '--trace-redirect=' + str(evidence / 'configure-trace.jsonl')]
+              if mode == 'thinlto-cache' and platform.system() != 'Windows':
+                  flag = ('-Wl,--thinlto-cache-dir=' if platform.system() == 'Linux' else '-Wl,-cache_path_lto,')
+                  # CMake parses this string as linker flags; quote the directory for paths with spaces.
+                  flags = flag + '"' + cache.as_posix() + '"'
+                  if platform.system() == 'Linux':
+                      # Compiler checks precede the project's LLD selection. Boss approved
+                      # repeating that same pinned linker here so GNU ld never sees the cache flag.
+                      flags = '--ld-path="' + os.environ['VOID_LINKER'] + '" ' + flags
+                  command.append('-DCMAKE_EXE_LINKER_FLAGS:STRING=' + flags)
+          elif phase in ('build', 'relink'):
+              if phase == 'relink':
+                  # Relink representative voidc after acceptance. Building only this target
+                  # avoids regenerating its downstream AOT fixtures; objects/cache stay warm.
+                  targets = {t for t in link_targets() if Path(t).name in ('voidc', 'voidc.exe')}
+                  assert len(targets) == 1, 'Expected exactly one voidc executable'
+                  previous = set((build / '.ninja_log').read_text(encoding='utf-8').splitlines())
+                  save('relink-targets.json', sorted(targets))
+                  for target in targets:
+                      (build / target).unlink(missing_ok=True)
+              command = ['cmake', '--build', str(build), '--parallel', '3']
+              if phase == 'relink':
+                  command += ['--target', 'voidc']
+          else:
+              raise ValueError(phase)
+
+          metrics = {'argv': command, 'cache_before': cache_size(), 'phase': phase}
+          # POSIX child CPU totals include reaped descendants; peak RSS is a maximum, not a sum.
+          try:
+              import resource
+          except ImportError:
+              resource = None
+          start = time.perf_counter()
+          try:
+              with (evidence / f'{phase}.log').open('w', encoding='utf-8') as log:
+                  print(json.dumps(command), flush=True)
+                  process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                             text=True, errors='replace', bufsize=1)
+                  for line in process.stdout:
+                      log.write(line)
+                      log.flush()
+                      print(line, end='', flush=True)
+                  metrics['exit_code'] = process.wait()
+          finally:
+              metrics['wall_seconds'] = time.perf_counter() - start
+              metrics['cache_after'] = cache_size()
+              if resource:
+                  usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+                  metrics['child_resources'] = {'user_seconds': usage.ru_utime, 'system_seconds': usage.ru_stime,
+                                               'max_rss_bytes': usage.ru_maxrss * (1 if platform.system() == 'Darwin' else 1024),
+                                               'note': 'Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak.'}
+              else:
+                  metrics['child_resources'] = {'note': 'POSIX rusage unavailable on Windows; host CPU/memory is in identity.json.'}
+              if phase == 'configure':
+                  trace = evidence / 'configure-trace.jsonl'
+                  probe_start = None
+                  metrics['orc_probe_seconds'] = None
+                  if trace.exists():
+                      for line in trace.read_text(encoding='utf-8').splitlines():
+                          event = json.loads(line)
+                          if probe_start is not None:
+                              metrics['orc_probe_seconds'] = event['time'] - probe_start
+                              break
+                          if event.get('cmd') == 'check_cxx_source_runs' and 'VOID_LLVM_ORC_RUNS' in event.get('args', []):
+                              probe_start = event['time']
+                  metrics['orc_probe_note'] = 'CMake trace call-to-return wall time; null means the probe did not return.'
+              save(f'{phase}.json', metrics)
+              if phase in ('build', 'relink'):
+                  link_times(phase, previous)
+          sys.exit(metrics['exit_code'])
+          ''').lstrip(), encoding='utf-8')
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
+              env.write(f'THINLTO_CACHE_DIR={cache.as_posix()}\nLINK_EXPERIMENT_HELPER={helper.as_posix()}\n')
+      - name: Linux development dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+      - name: Windows native SDK environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify macOS ARM64 runner
+        if: runner.os == 'macOS'
+        run: python -c "import platform; assert platform.machine().lower() in ('arm64', 'aarch64'), 'macOS CI requires ARM64'"
+      - name: Cache complete official LLVM SDK
+        uses: actions/cache@v5
+        with:
+          path: .toolchains/llvm-19.1.7
+          key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install and verify LLVM development SDK
+        run: python tools/ci/llvm_sdk.py
+      - name: Configure ${{ matrix.configuration }}
+        run: python "${{ env.LINK_EXPERIMENT_HELPER }}" configure
+      - name: Build ${{ matrix.configuration }}
+        run: python "${{ env.LINK_EXPERIMENT_HELPER }}" build
+      - name: Execute ${{ matrix.configuration }} tests
+        run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure --output-junit ctest-results.xml
+      - name: Frontend Debug and Release small-stack regression
+        if: runner.os == 'Linux' && (matrix.configuration == 'Debug' || matrix.configuration == 'Release')
+        shell: bash
+        run: |
+          ulimit -s 1024
+          ctest --test-dir build/${{ matrix.configuration }} -R '^frontend$' --output-on-failure
+      - name: Extension Node.js toolchain
+        if: matrix.configuration == 'Debug'
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+      - name: Linux editor display dependencies
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgtk-3-0 libnss3 libgbm1 libasound2t64
+      - name: Install extension dependencies
+        if: matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        run: npm ci
+      - name: Type-check, build and test extension
+        if: matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_TEST_SERVER: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
+        run: npm test
+      - name: Real editor integration (Linux)
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls
+        run: xvfb-run -a npm run test:host
+      - name: Real editor integration (Windows and macOS)
+        if: runner.os != 'Linux' && matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
+        run: npm run test:host
+      - name: Package local editor extension
+        if: matrix.configuration == 'Debug'
+        working-directory: editors/vscode
+        run: npm run package
+      - name: Preserve local editor package
+        if: always() && matrix.configuration == 'Debug'
+        uses: actions/upload-artifact@v6
+        with:
+          name: void-editor-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
+          path: editors/vscode/dist/*.vsix
+      - name: Measure warm voidc relink after acceptance
+        run: python "${{ env.LINK_EXPERIMENT_HELPER }}" relink
+      - name: Preserve link experiment diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: link-experiment-${{ inputs.mode }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}-${{ github.sha }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: |
+            build/link-experiment/
+            build/**/CMakeCache.txt
+            build/**/build.ninja
+            build/**/CMakeFiles/rules.ninja
+            build/**/.ninja_log
+            build/**/ctest-results.xml
+            build/**/Testing/
+          if-no-files-found: ignore
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: tests-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
+          path: |
+            build/**/Testing/Temporary/LastTest.log
+            build/**/CMakeFiles/CMakeConfigureLog.yaml
+            build/**/CMakeFiles/CMakeError.log
+            build/**/CMakeFiles/CMakeOutput.log
+          if-no-files-found: ignore
