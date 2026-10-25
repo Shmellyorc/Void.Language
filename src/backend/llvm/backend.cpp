@@ -40,6 +40,20 @@
 #include <stdexcept>
 namespace vd {
 namespace {
+std::string global_contract(const ValidatedAnalysis& analysis) {
+    auto field = [](std::string_view text) { return std::to_string(text.size()) + ":" + std::string(text); };
+    return "void.globals.v1" + field(analysis.entry_identity()) + field(analysis.compatibility_contract());
+}
+std::string global_contract(const ir::Module& input) {
+    if (input.globals.empty()) return {};
+    if (input.analysis) return global_contract(*input.analysis);
+    std::string out = "void.globals.v1";
+    auto field = [&](std::string_view text) { out += std::to_string(text.size()) + ":" + std::string(text); };
+    field(input.identity);
+    for (const auto& value : input.globals) { field(value.identity); field(value.visibility); field(value.syntax); field(ir::type_name(value.cell)); field(ir::capability_key(value.cell)); }
+    field(input.analysis ? input.analysis->compatibility_contract() : input.constant_contract);
+    return out;
+}
 void initialize() {
     static std::once_flag once;
     std::call_once(once, [] {
@@ -294,6 +308,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto* record=new llvm::GlobalVariable(*module,dictionary_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(dictionary_record_type,{element_record(entry),element_record(ir::dictionary_key(t)),llvm::ConstantInt::get(size_type,field_offset(entry,1)),llvm::ConstantInt::get(size_type,field_offset(entry,2))}),"dictionary.layout");dictionary_records.emplace(t,record);return record;
     };
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
+    std::set<std::string> source_entries{input.entry_symbol};
+    for (const auto& entry : input.functions) if (entry.name == input.entry_symbol && entry.source_name == "$app_adapter")
+        for (const auto& block : entry.blocks) for (const auto& instruction : block.instructions) if (instruction.op == ir::Op::call) source_entries.insert(instruction.callee);
     std::map<std::string, llvm::Function*> functions;
     for (const auto& name : input.imports)
         functions[name] = llvm::Function::Create(signature, llvm::Function::ExternalLinkage, name, *module);
@@ -724,6 +741,13 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             blocks[0]=ready;b.SetInsertPoint(ready);
         }
         if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
+        if (!async && !input.globals.empty() && source_entries.contains(f.name)) {
+            b.CreateCall(module->getOrInsertFunction("vd_globals_ready", b.getVoidTy(), b.getPtrTy()), {failure});
+            auto* invalid = llvm::BasicBlock::Create(context, "globals.entry_early", fn);
+            auto* ready = llvm::BasicBlock::Create(context, "globals.entry_ready", fn);
+            b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(), failure)), invalid, ready);
+            b.SetInsertPoint(invalid); return_failure(); blocks[0] = ready; b.SetInsertPoint(ready);
+        }
         llvm::SwitchInst* resume_states=nullptr;unsigned resume_serial=0;
         if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Invalid async resume state"),failure);return_failure();}
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
@@ -1023,6 +1047,14 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     b.CreateCall(abi,arguments);
                     fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),b.CreateStructGEP(failure_type,failure,0))),"Managed construction allocation failed");
                     v=b.CreateLoad(type(instruction.type),storage); break;
+                }
+                case Op::global_cell: {
+                    auto found = std::find_if(input.globals.begin(), input.globals.end(), [&](const auto& g) { return g.identity == instruction.callee; });
+                    auto* storage = value_roots[n].at(values.size());
+                    b.CreateCall(module->getOrInsertFunction("vd_global_cell", b.getVoidTy(), b.getPtrTy(), size_type, b.getPtrTy(), b.getPtrTy()),
+                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalStringPtr(found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
+                    selected_failure();
+                    v = b.CreateLoad(b.getPtrTy(), storage); break;
                 }
                 case Op::gc_allocate: {
                     auto object = ir::Type(instruction.type.definition);
@@ -1484,6 +1516,46 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         }
     }
 #include "async_start.inc"
+    if (!input.globals.empty()) {
+        // The host adapter owns startup. Calls between source functions use the
+        // ordinary bodies, and every cell access still checks readiness/owner.
+        auto declaration = std::find_if(input.functions.begin(), input.functions.end(), [&](const auto& f) { return f.name == exported_entry; });
+        auto* body = module->getFunction(native_symbol(*declaration, suffix));
+        auto name = body->getName().str(); body->setName(name + "$global_body");
+        auto* wrapper = llvm::Function::Create(body->getFunctionType(), llvm::GlobalValue::ExternalLinkage, name, *module);
+        if (auto* metadata = body->getMetadata("func_sanitize")) wrapper->setMetadata("func_sanitize", metadata);
+        b.SetCurrentDebugLocation(llvm::DebugLoc());
+        auto* start = llvm::BasicBlock::Create(context, "globals.begin", wrapper);
+        auto* initialize = llvm::BasicBlock::Create(context, "globals.initialize", wrapper);
+        auto* finish = llvm::BasicBlock::Create(context, "globals.finish", wrapper);
+        auto* run = llvm::BasicBlock::Create(context, "globals.run", wrapper);
+        auto* failed = llvm::BasicBlock::Create(context, "globals.failed", wrapper);
+        b.SetInsertPoint(start);
+        auto* failure = wrapper->getArg(wrapper->arg_size() - 1);
+        auto contract = global_contract(input);
+        auto* state = b.CreateCall(module->getOrInsertFunction("vd_globals_begin", b.getInt32Ty(), b.getPtrTy(), size_type, size_type, b.getPtrTy()),
+            {b.CreateGlobalStringPtr(contract), llvm::ConstantInt::get(size_type, contract.size()), llvm::ConstantInt::get(size_type, input.globals.size()), failure});
+        auto* dispatch = llvm::BasicBlock::Create(context, "globals.dispatch", wrapper);
+        b.CreateCondBr(b.CreateICmpSLT(state, b.getInt32(0)), failed, dispatch);
+        b.SetInsertPoint(dispatch); b.CreateCondBr(b.CreateICmpEQ(state, b.getInt32(1)), initialize, run);
+        b.SetInsertPoint(initialize);
+        auto check = [&] {
+            auto* next = llvm::BasicBlock::Create(context, "globals.next", wrapper);
+            b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(), failure)), finish, next); b.SetInsertPoint(next);
+        };
+        for (std::size_t n = 0; n < input.globals.size(); ++n) {
+            auto* cell = b.CreateCall(functions.at(input.globals[n].initializer), {failure}); check();
+            b.CreateCall(module->getOrInsertFunction("vd_global_publish", b.getVoidTy(), size_type, b.getPtrTy(), b.getPtrTy()),
+                {llvm::ConstantInt::get(size_type, n), cell, failure}); check();
+        }
+        b.CreateBr(finish); b.SetInsertPoint(finish);
+        b.CreateCall(module->getOrInsertFunction("vd_globals_finish", b.getVoidTy(), b.getPtrTy()), {failure});
+        b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(), failure)), failed, run);
+        b.SetInsertPoint(run);
+        std::vector<llvm::Value*> args; for (auto& argument : wrapper->args()) args.push_back(&argument);
+        b.CreateRet(b.CreateCall(body, args));
+        b.SetInsertPoint(failed); b.CreateRet(llvm::Constant::getNullValue(wrapper->getReturnType()));
+    }
     debug.finalize();
 #ifdef VOID_LLVM_RESEARCH
     if(inventory) for(auto& function:*module) if(!function.isDeclaration()) {
@@ -1501,6 +1573,7 @@ struct Jit::Impl {
     std::string cache_status="disabled", target_identity, captured;
     bool custom_bindings=false, capture=false, canonical=false;
     std::shared_ptr<Runtime> source_runtime;
+    bool replacing_globals = false;
     std::shared_ptr<std::atomic<std::size_t>> live=std::make_shared<std::atomic<std::size_t>>(0);
     struct Generation {
         std::shared_ptr<llvm::orc::LLJIT> jit;
@@ -1596,6 +1669,8 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);
     bind("vd_gc_witness",vd_gc_witness);
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
+    bind("vd_globals_ready",vd_globals_ready); bind("vd_globals_begin",vd_globals_begin); bind("vd_globals_finish",vd_globals_finish);
+    bind("vd_global_publish",vd_global_publish); bind("vd_global_cell",vd_global_cell);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
     bind("vd_native_fixture_call",vd_native_fixture_call);bind("vd_native_sink_call",vd_native_sink_call);bind("vd_worker_checkpoint",vd_worker_checkpoint);bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
@@ -1622,8 +1697,8 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         return compile(coordinated,entry,optimize,std::move(contract),std::move(runtime));
     }
     if (input.coordinated && input.analysis && !runtime) {
-        if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256);
-        runtime=impl_->source_runtime;
+        if (!input.globals.empty()) runtime = std::make_shared<Runtime>(256);
+        else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256); runtime=impl_->source_runtime; }
     }
     std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
     if (input.coordinated != static_cast<bool>(runtime)) throw std::invalid_argument("coordinated IR requires an explicit runtime owner");
@@ -1635,6 +1710,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         if (f.name == input.identity + "::" + entry && !f.module_identity.empty()) selected = &f;
     if (!selected) throw std::invalid_argument("entry function does not exist");
     if(selected->asynchronous!=input.async_root)throw std::invalid_argument("Async entry requires the explicit scheduler root adapter");
+    if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals, false);
     contract.async_root=input.async_root;
     if (selected->parameters != std::vector<ir::Type>{ir::Type::i32} || selected->result != ir::Type::i32)
         throw std::invalid_argument("host invocation requires i32(i32), not the selected function signature");
@@ -1692,7 +1768,9 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
-    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),suffix,!selected->module_identity.empty());
+    auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty());
+    if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals);
+    return result;
 }
 const std::string& Jit::cache_status() const {return impl_->cache_status;}
 std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract,std::shared_ptr<Runtime> runtime,bool async_root) {
@@ -1721,7 +1799,13 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
         try {
             auto object=llvm::MemoryBuffer::getMemBufferCopy(artifact->object);
             auto owner=runtime;
-            if(artifact->coordinated && !owner){if(!impl_->source_runtime)impl_->source_runtime=std::make_shared<Runtime>(256);owner=impl_->source_runtime;}
+            const bool globals = std::any_of(analysis.declarations().begin(), analysis.declarations().end(), [](const auto& d) { return d.kind == AnalyzedDeclaration::Kind::global_variable; });
+            if (globals && !artifact->coordinated) throw std::runtime_error("global cache coordination mismatch");
+            if (artifact->coordinated && !owner) {
+                if (globals) owner = std::make_shared<Runtime>(256);
+                else { if (!impl_->source_runtime) impl_->source_runtime = std::make_shared<Runtime>(256); owner = impl_->source_runtime; }
+            }
+            if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals, false);
             if(bool(owner)!=artifact->coordinated)throw std::runtime_error("cache coordination mismatch");
             auto expected=analysis.entry_symbol();
             if(contract.function_id.empty())contract.function_id=expected;
@@ -1729,7 +1813,8 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             contract.source_contract=analysis.compatibility_contract();contract.constant_contract=analysis.constant_contract();
             contract.analysis=analysis.shared_from_this();contract.runtime_identity=reinterpret_cast<std::uintptr_t>(owner.get());
             ir::Function entry;entry.name=expected;entry.module_identity=analysis.entry_identity();
-            auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,std::move(owner),"__cache",true,std::move(object));
+            auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,owner,"__cache",true,std::move(object));
+            if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals);
             impl_->cache_status="hit";return result;
         } catch(const std::exception&) { /* Discard candidate; compile once normally. */ }
     }
@@ -1749,6 +1834,7 @@ std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,con
     contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
     contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;contract.async_root=current.compatibility().async_root;
     if(!(current.compatibility()==contract))return {};
+    struct Replacement { bool& flag; explicit Replacement(bool& value) : flag(value) { flag = true; } ~Replacement() { flag = false; } } replacement(impl_->replacing_globals);
     return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner(),current.compatibility().async_root);
 }
 bool Jit::replace(ReloadSlot& slot,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {

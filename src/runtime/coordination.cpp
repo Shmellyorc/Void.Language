@@ -321,7 +321,11 @@ console::Error Runtime::close() {
     std::shared_ptr<console::Context> context;
     {std::lock_guard lock(mutex_);if(console_context_)console_context_->check_drain();closing_ = true;context=console_context_;changed_.notify_all();}
     auto error=context?context->close():console::Error{}; // Wake/cancel/drain without the GC mutex.
-    native_shutdown(*this);return error;
+    native_shutdown(*this);
+    std::vector<std::unique_ptr<Handle>> roots;
+    { std::lock_guard lock(mutex_); roots.swap(globals_); }
+    roots.clear(); // Native providers drain while global roots remain valid.
+    return error;
 }
 Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
     : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {

@@ -11,6 +11,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         for (auto& f:u->functions) { functions.emplace(f.symbol,&f); function_units.emplace(f.symbol,u.get()); }
         for (auto& s:u->structures) structures.emplace(s.definition->identity,std::pair{u.get(),&s});
     }
+    std::map<std::string, Global*> globals;
+    for (auto& [id, owner] : units) for (auto& value : owner->globals) globals.emplace(value.identity, &value);
     struct Edges {std::set<std::string> calls;std::set<Expr*> spawns;bool unsafe=false;};
     std::map<std::string,Edges> graph;for(const auto& [name,f]:functions)graph.try_emplace(name);
     auto leaf_related=[&](Type type,const ir::ReferencePath& path) {
@@ -108,7 +110,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (auto found=functions.find(symbol);found!=functions.end()) {
                     auto& target=*found->second;
                     auto result=call(target,arguments,e.token,!e.virtual_slot.empty() && !e.super_call);
-                    if (e.kind==Expr::Kind::method_call && target.receiver->type.kind==Type::aggregate && e.receiver_addressable && !e.selected_receiver) {
+                    if (e.kind==Expr::Kind::method_call && target.receiver->type.kind==Type::aggregate && e.receiver_addressable && !e.selected_receiver && !e.receiver_global) {
                         auto after=ir::instantiate_result(target.reference_effects.receiver_after,arguments);
                         ReferenceFacts prefixed;
                         for (const auto& [leaf,fact]:after) {
@@ -118,6 +120,10 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         auto root=f.locals.at(e.slot); bool inline_place=root.kind==Type::aggregate;
                         for (auto field:e.field_indexes) { inline_place&=root.kind==Type::aggregate; root=ir::field_type(root,field); }
                         if (inline_place) local_changed|=ir::join_facts(locals[e.slot],prefixed);
+                    }
+                    if (e.kind == Expr::Kind::method_call && e.receiver_global && target.receiver->type.kind == Type::aggregate && target.receiver_mutates) {
+                        auto after = arguments[0]; ir::join_facts(after, ir::instantiate_result(target.reference_effects.receiver_after, arguments));
+                        retain(after, e.parts[0]->type, e.token);
                     }
                     if(e.kind==Expr::Kind::method_call && target.receiver_mutates && target.receiver->type.kind==Type::aggregate && e.selected_receiver) {
                         auto after=arguments[0];ir::join_facts(after,ir::instantiate_result(target.reference_effects.receiver_after,arguments));
@@ -150,7 +156,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         // Only inline aliases denote the receiver's own value
                         // storage. Crossing a reference is a referent effect.
                         auto type=f.receiver ? f.receiver->type : Type::none;
-                        bool inline_place=f.receiver && e.receiver_addressable && e.slot==f.receiver->slot;
+                        bool inline_place=f.receiver && e.receiver_addressable && !e.receiver_global && e.slot==f.receiver->slot;
                         for (auto field:e.field_indexes) {
                             inline_place&=type.kind==Type::aggregate;
                             if (type.kind==Type::aggregate || type.kind==Type::managed_ref) type=ir::field_type(type,field);
@@ -183,6 +189,11 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         expression=[&](Expr& e)->ReferenceFacts {
             using K=Expr::Kind;
             auto& edges=graph[f.symbol];
+            if (e.kind == K::global) {
+                edges.unsafe = true;
+                auto type = globals.at(e.target)->type;
+                if (ir::capability_key(e.type) != ir::capability_key(type)) { e.type = type; changed = true; }
+            }
             if(e.kind==K::spawned){edges.spawns.insert(&e);edges.unsafe=true;}
             if(e.kind==K::awaited || e.kind==K::task_cancel || e.kind==K::function_call || e.asynchronous_call || e.interface_call || !e.virtual_slot.empty())edges.unsafe=true;
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
@@ -327,6 +338,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 }
                 invoke(e,e.setter,{evaluated.at(e.parts[0].get()),value});return;
             }
+            if(e.kind==Expr::Kind::global) { retain(value, e.type, e.token); return; }
             if(e.kind==Expr::Kind::name) {
                 local_changed|=ir::join_facts(locals[e.slot],value);
                 if(f.receiver && e.slot==f.receiver->slot && !f.receiver_mutates){f.receiver_mutates=true;changed=true;}
@@ -463,6 +475,14 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         for(const auto& [slot,cell]:f.captured_locals){
             auto stored=ir::field_type(cell,0);auto combined=ir::reference_facts(stored);ir::join_facts(combined,locals[slot]);auto profile=ir::fact_type(stored,combined);
             if(ir::capability_key(stored)!=ir::capability_key(profile)){std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=profile;changed=true;}
+        }
+        if (f.global_initializer) {
+            auto value = std::find_if(unit.globals.begin(), unit.globals.end(), [&](const auto& g) { return g.initializer == &f; });
+            auto type = ir::fact_type(value->type, locals.at(f.body.front().slot));
+            if (ir::capability_key(type) != ir::capability_key(value->type)) {
+                value->type = type; std::const_pointer_cast<ir::ValueType>(value->cell.definition)->fields[0].type = type; changed = true;
+            }
+            f.result = type;
         }
         if (report) {
             for (unsigned n=0;n<locals.size();++n) f.locals[n]=ir::fact_type(f.locals[n],locals[n]);

@@ -1,5 +1,16 @@
 # VOID 2.0 — Boss-approved completeness direction and implementation ledger
 
+## Stage 11 runtime globals — authorized 25 October 2026
+
+Boss authorized complete file-level runtime globals, including direct project-root
+visibility, eager startup, precise Runtime ownership, reload/cache and compiler-owned
+tooling. [Current contract](RUNTIME_GLOBALS.md) and
+[engineering handoff](stage11/IMPLEMENTATION.md) track implementation and verification.
+Earlier Stage-11-unauthorized statements below are historical and superseded for
+this approved scope. Standard-library expansion remains outside this mission.
+Git operations, native Windows/macOS and final hosted CI remain Boss-controlled.
+
+
 ## Stage 9 authorization — 21 October 2026
 
 Boss authorized the complete three-milestone application workflow: automatic

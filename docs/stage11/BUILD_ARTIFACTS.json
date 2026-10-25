@@ -1,0 +1,41 @@
+{
+  "debug": {
+    "build_directory": "/home/shmellyorc/Documents/Void.Language/build/step42-ci96-debug",
+    "source_freeze_revision": 10,
+    "sha256": {
+      "voidc": "ecc6d14b39becc2db13af7a70f3b720e4e6c2fe33d42aba7e54c384132255728",
+      "voidls": "7b236fb21f01a99650f3a6fa6b4162a07b3034464dfde0c3355d196ee14f83b1",
+      "void_globals": "a1e9a74b51c4e17491047bc67c5b6468b7d707e4b8a6ede1bb102bcae8f6a0fc",
+      "void_tests": "50f9ed19932f8796b333ef3ebe25505e35f4e5104b2e4e4bbd4421d589bb0598",
+      "libvoid_core.a": "8501e29c8d463dd091bed4da223588aa2eed91d1dc6b762f5a351291f2d92d39",
+      "libvoid_runtime.a": "41763895b5766ea9cdd4ed161e808d0f740bec66ad7552d4bae12220ffe115a0",
+      "libvoid_llvm.a": "2f47fdd70e59eeeae3f92f17fc20616d73a451f8f43bb72b298c7dcaf8b6d3d2"
+    }
+  },
+  "release": {
+    "build_directory": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+    "source_freeze_revision": 10,
+    "sha256": {
+      "voidc": "9dd165807caf2b49b2eda7a1c8935e8b85d4f8975cf8edc7e57be0073ae81358",
+      "voidls": "9858c13a19b8f37fd5bc5c411cbe45c5b015d248b63217ecd9d4ed36801119b0",
+      "void_globals": "944eaaa3ec352eae22afaad075e6dd56525bfa9f46cb0b6c7cede1f28d6d7842",
+      "void_tests": "5894d77d58f452d8b0d20f5df7c679f18914dfd748c563a42d94b0052bb69dd7",
+      "libvoid_core.a": "40c29fe42147f12012a0539cb477a37a77439fd9a9246e8169a12abe4193615d",
+      "libvoid_runtime.a": "da590b8f30af4fd6f5351814a72fc8e3891d2928341927adffb2388df7795767",
+      "libvoid_llvm.a": "52e0e50028ced5e5298d0326eb5d82eedbe875e0fd30c877aa63ab2f4386e112"
+    }
+  },
+  "san": {
+    "build_directory": "/home/shmellyorc/Documents/Void.Language/build/step42-ci96-san",
+    "source_freeze_revision": 10,
+    "sha256": {
+      "voidc": "c6ab78a5161ddb5df8f89238823337d8d42d1277dba61b6b9670831efd060027",
+      "voidls": "b679c22ff73e34d3989b89a039acbf2f578e21f87a363ffee43262c32e95d709",
+      "void_globals": "d57182561e083bf250e568f669b7dffd0946050df02c7cb4922d93872e6c6d49",
+      "void_tests": "7d4f2287c1bf42c2ec5e5df7608bfdf5522899bd95db5c3da09d2eb997f03779",
+      "libvoid_core.a": "49e66ed47cb91d503ae7da47fc9d3b161de147ed6c3a37a226bc7318929666f7",
+      "libvoid_runtime.a": "82397e882118590149f597faca9e1813d29d9787dee817bc1f3e8192528a318f",
+      "libvoid_llvm.a": "b94cad01247a2f2922ef2fc76ec105a4b30851196d38404cbc9e53212d0d5331"
+    }
+  }
+}

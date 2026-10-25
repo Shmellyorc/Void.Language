@@ -1,5 +1,16 @@
 # VOID 2.0: Development Strategy and Compiler Architecture Roadmap
 
+## Stage 11 runtime globals — authorized 25 October 2026
+
+Boss authorized complete file-level runtime globals, including direct project-root
+visibility, eager startup, precise Runtime ownership, reload/cache and compiler-owned
+tooling. [Current contract](RUNTIME_GLOBALS.md) and
+[engineering handoff](stage11/IMPLEMENTATION.md) track implementation and verification.
+Earlier Stage-11-unauthorized statements below are historical and superseded for
+this approved scope. Standard-library expansion remains outside this mission.
+Git operations, native Windows/macOS and final hosted CI remain Boss-controlled.
+
+
 ## Current Stage 10 handoff — 24 October 2026
 
 Experiment #4 passed 7/7 jobs and 1,383/1,383 CTest executions at

@@ -1,5 +1,6 @@
 #pragma once
 #include "void/format.hpp"
+#include "void/execution.hpp"
 #include "void/heap.hpp"
 #include "void/buffer.hpp"
 #include "void/console.hpp"
@@ -48,6 +49,14 @@ public:
     static Runtime& current(); // Internal generated-code TLS boundary.
     static Runtime* attached() noexcept { return current_runtime_; }
     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
+    // One explicitly admitted application owns these persistent precise roots.
+    void admit_globals(std::string_view contract, bool replacement = false, bool commit = true);
+    void cleanup_failed_globals();
+    void require_globals_ready() const;
+    int globals_begin(std::string_view contract, std::size_t count, RuntimeFailure&);
+    void globals_finish(RuntimeFailure&);
+    void global_publish(std::size_t, void*);
+    void* global_cell(std::size_t);
     void poll();
     void display_enter(std::string_view,void* identity);
     std::array<std::int64_t,3> monotonic_sample();
@@ -210,6 +219,12 @@ private:
     std::shared_ptr<const TypeCatalog> types_ = {};
     std::vector<Thread*> threads_;
     std::vector<Handle*> handles_;
+    std::vector<std::unique_ptr<Handle>> globals_;
+    std::string global_contract_;
+    std::thread::id global_owner_ = {};
+    unsigned global_state_ = 0; // 0 unstarted, 1 initializing, 2 ready, 3 failed.
+    bool global_admitted_ = false;
+    OwnedRuntimeFailure global_failure_;
     std::thread::id async_owner_ = {};
     bool closing_ = false;
     bool requested_ = false;

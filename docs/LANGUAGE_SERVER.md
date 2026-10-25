@@ -1,5 +1,17 @@
 # Minimal VOID language server (Phase 10)
 
+## Stage 11 compiler-owned global symbols
+
+Global declarations/references use the shared compiler's mutable-variable records
+for hover, completion on both assignment sides, definition, references and guarded
+rename. Root visibility, import aliases, UTF-16 ranges, unsaved overlays, invalid
+snapshot rejection and installed-source protection follow ordinary compiler rules.
+Project rename validation excludes installed standard sources from editable overlays
+and rechecks their disk snapshots. Existing Vim rename restrictions remain. The
+separate result/Ok/Err/parameter-documentation hover repair is outside this assignment.
+See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md) and [verification](stage11/IMPLEMENTATION.md).
+
+
 # Stage 7 language service — current contract
 
 Boss authorized Stage 7 production engineering on 20 October 2026.

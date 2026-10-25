@@ -1,5 +1,17 @@
 # Phase 15 runtime foundation
 
+## Stage 11 global roots
+
+Runtime globals use complete typed managed cells and this Runtime's existing
+persistent Handles, Frame/Slot maps and precise Heap. The Runtime registers null
+handles before initialization and publishes complete cells in deterministic order.
+No global contains a generation-owned code address. Failed startup drains native
+providers before dropping handles; Runtime close preserves that same ordering.
+Scalars and reference-bearing globals share the same coordinated path. The
+[global contract](RUNTIME_GLOBALS.md) and [evidence](stage11/IMPLEMENTATION.md)
+record lifetime, application isolation and acceptance separately.
+
+
 Stage 8 Sprint 5 adds host memory snapshots of the existing Heap payload, buckets,
 Runtime catalog and Handle registries. Completed execution-frame roots now clear
 only after native resume returns or acquired worker publication; ordinary precise

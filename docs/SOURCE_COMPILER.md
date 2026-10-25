@@ -1,5 +1,16 @@
 # First real source compiler
 
+## Stage 11 shared runtime globals
+
+The frontend registers outermost variables separately from executable script
+statements and resolves one canonical binding across root visibility and imports.
+Ordinary typed initializer functions and explicit global metadata lower through
+the shared IR validator and LLVM backend. Guarded Runtime cell lookup preserves
+readiness, owner access, GC and value-place semantics. JIT and linked AOT initialize
+before selected entry; checking and tooling never execute startup. See the
+[global contract](RUNTIME_GLOBALS.md) and [engineering record](stage11/IMPLEMENTATION.md).
+
+
 The [Stage 8 ergonomics contract](STAGE8_ERGONOMICS.md) and
 [local acceptance](stage8/SPRINT6_ACCEPTANCE.md) describe the current bounded
 has/if/multiline-call/string-interpolation extensions. Historical phase-only
@@ -395,8 +406,9 @@ The selected source may contain executable top-level statements or synchronous
 zero-argument main, with no result or i32. These competing entry forms reject
 when combined. Top-level fallthrough/bare return yields 0; an i32 return supplies
 status. Explicitly typed main requires a return on every reachable path. Imported
-executable statements reject. Top-level variables remain body locals. Declaration-
-only legacy entry programs retain their printed numeric adapter and precedence
+executable statements reject. Stage 11 makes outermost `var` declarations runtime
+globals; bindings inside top-level blocks remain body locals. Declaration-only
+legacy entry programs retain their printed numeric adapter and precedence
 over an ordinary main helper. Numeric input remains exclusive to legacy entry.
 
 Implementation and local acceptance status are maintained in the linked contract;

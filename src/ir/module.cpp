@@ -423,10 +423,25 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& 
 #include "fixed_ownership.inc"
 void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
     for(const auto& symbol:m.imports)if(symbol.starts_with("vd_native_fixture_call"))throw std::invalid_argument("VOID IR: native bridge requires its verified typed descriptor");
+    for (const auto& symbol : m.imports) if (symbol.starts_with("vd_global")) throw std::invalid_argument("VOID IR: global bridge requires validated typed global operations");
     if (results) results->clear();
     InstructionTypes qualified_types;
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
+    if (!m.globals.empty() && (m.root_identity != m.identity || !m.source_imports.contains(m.root_identity))) fail("invalid global source scope graph");
+    std::map<std::string, const Global*> globals;
+    for (const auto& value : m.globals) {
+        if (!m.coordinated || value.identity.empty() || !globals.emplace(value.identity, &value).second || value.module_identity.empty() ||
+            value.cell.kind != Type::managed_ref || value.cell.nullable || value.cell.readonly || !readonly_paths(value.cell).empty() || !value.cell.definition || value.cell.definition->fields.size() != 1 ||
+            value.cell.definition->module_identity != value.module_identity || value.cell.definition->identity != value.identity + "::$global_cell" ||
+            (value.visibility != "public" && value.visibility != "private" && value.visibility != "internal")) fail("invalid global declaration");
+        auto initializer = std::find_if(m.functions.begin(), m.functions.end(), [&](const auto& f) { return f.name == value.initializer; });
+        if (initializer == m.functions.end() || !initializer->parameters.empty() || initializer->result != value.cell || initializer->asynchronous || initializer->module_identity != value.module_identity)
+            fail("invalid global initializer");
+        if (!m.source_imports.contains(value.module_identity) || !value.identity.starts_with(value.module_identity + "::") ||
+            std::none_of(m.nominal_types.begin(), m.nominal_types.end(), [&](auto type) { return type == value.cell && type.definition == value.cell.definition; }))
+            fail("global cell missing from admitted nominal universe");
+    }
     if(!m.interface_requirements.empty() && (m.root_identity!=m.identity || !m.source_imports.contains(m.root_identity))) fail("invalid interface source scope graph");
     std::map<std::string,const ValueType*> definitions;
     std::set<const ValueType*> visiting, checked,dictionary_entries;
@@ -1122,6 +1137,15 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::negate:
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
                 case Op::logical_not: expect(i.a, Type::boolean); result = Type::boolean; break;
+                case Op::global_cell: {
+                    auto found = globals.find(i.callee);
+                    if (found == globals.end()) fail("unknown global identity");
+                    const auto& value = *found->second;
+                    bool imported = m.source_imports.contains(f.module_identity) && m.source_imports.at(f.module_identity).contains(value.module_identity);
+                    bool root = value.module_identity == m.root_identity && value.module_identity.starts_with("/@stdlib/") == f.module_identity.starts_with("/@stdlib/");
+                    if (f.module_identity != value.module_identity && (value.visibility == "private" || (!imported && !root) || (value.visibility == "internal" && value.module_identity.starts_with("/@stdlib/") != f.module_identity.starts_with("/@stdlib/")))) fail("inaccessible global");
+                    result = value.cell; break;
+                }
                 case Op::load: result = slot(i.a); break;
                 case Op::store:
                     if (f.receiver && f.parameters[0].kind==Type::aggregate && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
@@ -1199,6 +1223,48 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         validate_construction(f,m,body_types);
         validate_fixed_ownership(f,m,body_types);
     }
+    for (const auto& global : m.globals) {
+        std::set<std::string> seen;
+        std::vector<std::string> pending{global.initializer};
+        while (!pending.empty()) {
+            auto name = pending.back(); pending.pop_back();
+            if (!seen.insert(name).second || !functions.contains(name)) continue;
+            const auto& function = *functions.at(name);
+            if (function.asynchronous || function.worker) fail("asynchronous global startup");
+            for (const auto& block : function.blocks) for (const auto& instruction : block.instructions) {
+                switch (instruction.op) {
+                case Op::async_call: case Op::await: case Op::async_cancel: case Op::async_group_enter: case Op::async_group_join: case Op::async_drain:
+                    fail("task operation during global startup"); break;
+                case Op::native_call:
+                    if (native_binding(instruction.callee).name == "register") fail("native callback registration during global startup");
+                    break;
+                case Op::call: case Op::base_init:
+                    pending.push_back(instruction.callee); break;
+                case Op::function_call: case Op::cleanup_call: {
+                    auto function_index = static_cast<std::size_t>(&function - m.functions.data());
+                    auto block_index = static_cast<std::size_t>(&block - function.blocks.data());
+                    auto signature = qualified_types[function_index][block_index][instruction.a];
+                    for (const auto& candidate : m.functions) {
+                        const auto first = candidate.closure ? 1u : 0u;
+                        if (!signature.definition || !signature.definition->callable || candidate.receiver || candidate.asynchronous ||
+                            candidate.parameters.size() != signature.definition->call_parameters.size() + first || candidate.result != Type(*signature.definition->call_result)) continue;
+                        bool matches = true;
+                        for (unsigned n = first; n < candidate.parameters.size(); ++n) matches &= candidate.parameters[n] == Type(signature.definition->call_parameters[n-first]);
+                        if (matches) pending.push_back(candidate.name);
+                    }
+                    break;
+                }
+                case Op::interface_call:
+                    for (const auto& binding : m.interface_bindings) if (auto route = binding.methods.find(instruction.callee); route != binding.methods.end()) pending.push_back(route->second.second);
+                    break;
+                case Op::virtual_call:
+                    for (const auto& target : virtual_targets(m, *functions.at(instruction.callee))) pending.push_back(target.implementation);
+                    break;
+                default: break;
+                }
+            }
+        }
+    }
     if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry!=functions.end() && entry->second->worker)fail("worker cannot be a root adapter");if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
     if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
     std::map<std::string,ReferenceEffects> worker_effects;
@@ -1225,6 +1291,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
+                case Op::global_cell:fail("worker cannot access runtime globals");break;
                 case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;

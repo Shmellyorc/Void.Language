@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1250"
+	timestamp="2026-10-25T11:41:11"
+	>
+	<testcase name="stage10_console_aot" classname="stage10_console_aot" time="1250.55" status="run">
+		<properties/>
+		<system-out>operator_console_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_compound_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_workload: exact normal/O2 JIT and linked AOT verified
+console_sum_display: exact normal/O2 JIT and linked AOT verified
+console_sum_failure: exact normal/O2 JIT and linked AOT verified
+console_collections: exact normal/O2 JIT and linked AOT verified
+console_collection_invalidated: exact normal/O2 JIT and linked AOT verified
+console_collection_failed_hook: exact normal/O2 JIT and linked AOT verified
+console_keys: exact normal/O2 JIT and linked AOT verified
+console_terminal: exact normal/O2 JIT and linked AOT verified
+console_exit: exact normal/O2 JIT and linked AOT verified
+console_zero: exact normal/O2 JIT and linked AOT verified
+console_cleanup_primary: exact normal/O2 JIT and linked AOT verified
+console_clea...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

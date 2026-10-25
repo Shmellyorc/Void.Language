@@ -14,7 +14,7 @@ struct AnalyzedParameter {
     std::optional<SourceSpan> default_source = {};
 };
 struct AnalyzedDeclaration {
-    enum class Kind { function, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias, operator_function } kind;
+    enum class Kind { function, global_variable, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias, operator_function } kind;
     std::string identity, module, visibility;
     SourceSpan source;
     std::vector<ir::Type> parameters;

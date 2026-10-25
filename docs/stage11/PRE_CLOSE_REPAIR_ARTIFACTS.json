@@ -1,0 +1,38 @@
+{
+  "debug": {
+    "build_directory": "/home/shmellyorc/Documents/Void.Language/build/step42-ci96-debug",
+    "sha256": {
+      "voidc": "915709343cda790bd510c477b9c3fde59f222ed6fcba60c8664a082a60513cff",
+      "voidls": "1c4b9ca02b69f20b52abf193d85fac18b35873a707c05b4c24807f7ba1d297f3",
+      "void_globals": "1fa5f4c99a8a7868e088fcc4b9d0900a1a2b5140d16483c3315ff94c4c884e3a",
+      "void_tests": "692e6c8804ffd74caae0ebea8e4e28ab4e8b3d32138accdd241a42af3976a1f9",
+      "libvoid_core.a": "8115992eed00a9d73214e6f8ce3b115a57a4ed4e0dcb4979153277331d94dc01",
+      "libvoid_runtime.a": "48ffe67272912fa14a486f8fefb9343fb3e9c662e8121706bf7661e920e38f00",
+      "libvoid_llvm.a": "2f47fdd70e59eeeae3f92f17fc20616d73a451f8f43bb72b298c7dcaf8b6d3d2"
+    }
+  },
+  "release": {
+    "build_directory": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41",
+    "sha256": {
+      "voidc": "ab514c0f2d74327464f42244c00336f3a7278b5b8202096af2cb1a8be56d9beb",
+      "voidls": "cc8a8e52ce45a8e562650c9db96e9dd23a24bd2ee1a391710e470469e123babd",
+      "void_globals": "c41d860cd329e3fffd4ccc7ac9a963e79ba1235998b1ae2935e24c2f73a6354f",
+      "void_tests": "f1e9faa9d39635a672f0968be9cd31d692910bf58a5d7100e58bcb4f4cec9ec2",
+      "libvoid_core.a": "819223f5545927d9b742caf3892e047efe383175e0b6abba9bfbde8b2bb07285",
+      "libvoid_runtime.a": "6cf993e24bdac0f76ecefa788ab288fa2d808579a5db4dde833f16ebab185ebd",
+      "libvoid_llvm.a": "52e0e50028ced5e5298d0326eb5d82eedbe875e0fd30c877aa63ab2f4386e112"
+    }
+  },
+  "san": {
+    "build_directory": "/home/shmellyorc/Documents/Void.Language/build/step42-ci96-san",
+    "sha256": {
+      "voidc": "09f2fcfda4eb1b2c4ea82b16ca588f562a8a196a18f64f9980f55e2ba99bdfca",
+      "voidls": "44fa6a32ae347c506958abae593c4a94eb0040feeaa7b4be787540c86380b678",
+      "void_globals": "b3c810df41e08d42c235ec51ac9a84ef1e11485337dbec53aafcde828f40d8ee",
+      "void_tests": "c7a7fa493ca33357db7f0feb19d1d668382494e5f9283a592e6251529562e2eb",
+      "libvoid_core.a": "a2fc35524c002b36638f3694ebb5b35cd5e351c9adfc6d1e55eec35269649bfc",
+      "libvoid_runtime.a": "373f53282a0f9f4ddb04341dd4fb1961e95848d74e6cb5e1b3baaac90e8e5cdf",
+      "libvoid_llvm.a": "b94cad01247a2f2922ef2fc76ec105a4b30851196d38404cbc9e53212d0d5331"
+    }
+  }
+}

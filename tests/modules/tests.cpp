@@ -311,7 +311,11 @@ void local_libraries(const fs::path& output) {
     auto collision=vd::analyze_project(f.root/"main.void",{{"/main.void",vd::SourceFile("main.void",main)},{"/libs/raylib/Graphics.void",vd::SourceFile("case.void","")}});
     require(!collision.program,"local library overlay case collision admitted");
     reject("use lib/raylib as rl\nfunc entry(x: i32) -> i32:\n    return rl.secret(x)\n");
-    f.file("libs/empty/empty.void","var forbidden = 1\n");reject("use lib/empty\n");
+    f.file("libs/empty/empty.void","var shared = 1\n");
+    auto globals=vd::analyze_project(f.root/"main.void",{{"/main.void",vd::SourceFile("main.void","use lib/empty as library\nfunc entry(x: i32) -> i32:\n    library.shared += x\n    return library.shared\n")}});
+    require(bool(globals.program),"local library runtime globals rejected");
+    for(bool optimized:{false,true}){vd::Jit jit;auto code=jit.compile(*globals.program,optimized);require(code->invoke(2)==3 && code->invoke(3)==6,"local library global storage was not shared");}
+    f.file("libs/empty/empty.void","var shared = 1\npass\n");reject("use lib/empty\n");
     f.file("libs/raylib/redirect.void","use \"../../../outside.void\"\n");reject("use lib/raylib/redirect\n");
     // Application selection belongs only to the selected root, never library main.
     f.file("main.void","use lib/raylib as rl\nconst root_bonus = 3\nfunc main() -> i32:\n    return rl.read(1)\n");

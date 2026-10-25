@@ -1,0 +1,29 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00005555580118af in llvm::CallBase::getMemoryEffects() const ()
+
+Thread 1 (Thread 0x7ffff7d5cfc0 (LWP 142044) "void_console_so"):
+#0  0x00005555580118af in llvm::CallBase::getMemoryEffects() const ()
+#1  0x000055555770ae9b in (anonymous namespace)::eliminateDeadStores(llvm::Function&, llvm::AAResults&, llvm::MemorySSA&, llvm::DominatorTree&, llvm::PostDominatorTree&, llvm::TargetLibraryInfo const&, llvm::LoopInfo const&) [clone .llvm.6014830315340998214] ()
+#2  0x0000555557709411 in llvm::DSEPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) ()
+#3  0x000055555663a78d in llvm::detail::PassModel<llvm::Function, llvm::DSEPass, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) ()
+#4  0x00005555580699e5 in llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) ()
+#5  0x0000555556626cbd in llvm::detail::PassModel<llvm::Function, llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) ()
+#6  0x0000555557bf0ff4 in llvm::CGSCCToFunctionPassAdaptor::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) ()
+#7  0x000055555664a20d in llvm::detail::PassModel<llvm::LazyCallGraph::SCC, llvm::CGSCCToFunctionPassAdaptor, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) ()
+#8  0x0000555557bed493 in llvm::PassManager<llvm::LazyCallGraph::SCC, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) ()
+#9  0x000055555662666d in llvm::detail::PassModel<llvm::LazyCallGraph::SCC, llvm::PassManager<llvm::LazyCallGraph::SCC, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) ()
+#10 0x0000555557bef7d3 in llvm::DevirtSCCRepeatedPass::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) ()
+#11 0x000055555664a69d in llvm::detail::PassModel<llvm::LazyCallGraph::SCC, llvm::DevirtSCCRepeatedPass, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&) ()
+#12 0x0000555557bef01f in llvm::ModuleToPostOrderCGSCCPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) ()
+#13 0x000055555662695d in llvm::detail::PassModel<llvm::Module, llvm::ModuleToPostOrderCGSCCPassAdaptor, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) ()
+#14 0x0000555558068e97 in llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) ()
+#15 0x00005555567ab359 in llvm::ModuleInlinerWrapperPass::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) ()
+#16 0x000055555662b7cd in llvm::detail::PassModel<llvm::Module, llvm::ModuleInlinerWrapperPass, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) ()
+#17 0x0000555558068e97 in llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) ()
+#18 0x0000555556096094 in vd::(anonymous namespace)::finish (module=..., optimize=true) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:87
+#19 0x000055555605d309 in vd::Jit::compile (this=0x7fffffffc9d8, input=..., entry="/main.void::entry", optimize=true, contract=..., runtime=std::shared_ptr<vd::Runtime> (use count 2, weak count 0) = {...}) at /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1770
+#20 0x0000555555ffaca8 in (anonymous namespace)::execution () at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:73
+#21 0x0000555555ff4369 in main (argc=1, argv=0x7fffffffdc98) at /home/shmellyorc/Documents/Void.Language/tests/stage10/console.cpp:405

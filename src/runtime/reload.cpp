@@ -46,6 +46,7 @@ std::int32_t NativeCode::invoke(std::int32_t value) const {
         finish_console(*runtime_,checkpoint,&failure);
     } else result = checked_(value, &failure);
     if (failure.message) {
+        if (runtime_) runtime_->cleanup_failed_globals();
         // Copy borrowed generation strings before leaving the owning code lease.
         std::string message = failure.message;
         for (std::uint32_t i = 0; i < failure.count && i < 32; ++i) message += failure.frames[i];

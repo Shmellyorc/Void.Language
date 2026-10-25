@@ -30,8 +30,8 @@ int main(int argc,char** argv){try{
         write(file,program);
     }
     // Top-level application bodies share managed cleanup and callback lowering.
-    std::string top;bool body=false;std::istringstream lines(program);std::string line;
-    while(std::getline(lines,line)){if(line=="func main() -> i32:"){body=true;continue;}top+=(body?line.substr(std::min<std::size_t>(4,line.size())):line)+"\n";}
+    std::string top;std::istringstream lines(program);std::string line;
+    while(std::getline(lines,line)){if(line=="func main() -> i32:"){top+="if true:\n";continue;}top+=line+"\n";}
     write(file,top);auto top_analysis=analysis(file,sink);
     for(bool optimize:{false,true}){vd::Jit jit;auto code=jit.compile(*top_analysis,optimize);require(code->invoke(0)==7 && !vd::native_sink_live(),"top-level native cleanup");empty(*code->runtime_owner());}
     // Failure unwinding must execute the source defer before releasing roots.

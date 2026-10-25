@@ -416,7 +416,7 @@ class Server {
         }
         if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
         if(module.starts_with("/@stdlib/") || definition->module.starts_with("/@stdlib/"))throw std::invalid_argument("Installed standard sources are read-only");
-        if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, constant or uncaptured local binding");
+        if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, global, constant or uncaptured local binding");
         if(!disk_current(*current->result().program))throw std::invalid_argument("Disk sources changed; refresh before rename");
         if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",name_of(*definition)}};
         auto replacement=string(params,"newName");if(!vd::valid_editor_identifier(replacement) || replacement=="entry" || replacement=="init" || replacement=="deinit" || replacement=="call")throw std::invalid_argument("Expected a non-reserved VOID identifier");
@@ -434,6 +434,7 @@ class Server {
             return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(offset)+delta);
         };
         vd::SourceOverrides overlays;for(const auto& m:current->result().program->modules()) {
+            if(m.identity.starts_with("/@stdlib/"))continue; // Installed sources are reread and checked, never editable overlays.
             auto text=m.source.text();if(auto found=edits.find(m.identity);found!=edits.end())for(auto it=found->second.rbegin();it!=found->second.rend();++it)text.replace(it->begin,it->end-it->begin,replacement);
             overlays.emplace(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
         }

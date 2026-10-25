@@ -308,7 +308,7 @@ struct Expr {
     bool event=false, asynchronous_call=false;
     std::string event_owner,native_symbol;
     Type environment=Type::none;
-    enum class Kind { spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, choice, has, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
+    enum class Kind { global, spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, choice, has, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -325,7 +325,7 @@ struct Expr {
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
     unsigned slot = 0;
-    bool receiver_addressable = false, receiver_readonly = false, implicit = false;
+    bool receiver_addressable = false, receiver_readonly = false, receiver_global = false, implicit = false;
     std::string virtual_slot;
     bool super_call = false, interface_call = false, property = false, receiver_writes = false, selected_receiver = false, setter_mutates = false;
     std::string setter;
@@ -402,6 +402,7 @@ struct GenericParameter { Token token; std::optional<Type> constraint; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
     bool collection_adapter=false;
+    bool global_initializer=false;
     bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
     Type task=Type::none;
     unsigned binding_ordinal=0;
@@ -466,6 +467,13 @@ std::string editor_signature(const Function& f) {
     return out;
 }
 
+struct Global {
+    Token token;
+    std::string identity, visibility, syntax;
+    Function* initializer = nullptr;
+    Type type = Type::none, cell = Type::none;
+    unsigned state = 0;
+};
 struct Constant {
     Statement declaration;
     bool file_private = false;
@@ -568,6 +576,9 @@ struct Unit {
     std::vector<Import> imports;
     std::list<Function> functions, generic_functions;
     std::vector<Constant> constants;
+    std::list<Global> globals;
+    std::map<std::string, Global*> global_names;
+    std::function<void(Global&)> resolve_global;
     std::list<Structure> structures, generic_structures;
     std::list<FunctionSyntax> function_types;
     std::list<ResultSyntax> results;
@@ -641,7 +652,7 @@ class Parser {
         }
         bool line_start = p == 0 || tokens[std::min(p, tokens.size()) - 1].kind == TokenKind::newline;
         while (peek().kind != TokenKind::end) {
-            if (declaration && current_depth == 0 && line_start && (at("func") || at("property") || at("interface") || at("const") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
+            if (declaration && current_depth == 0 && line_start && (at("func") || at("property") || at("interface") || at("const") || at("var") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
             if (!declaration && current_depth <= baseline) {
                 if (peek().kind == TokenKind::dedent) return;
                 if (line_start && p > start) return;
@@ -1049,7 +1060,7 @@ public:
             if (peek().kind == TokenKind::invalid) throw Poison{};
             if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
             if (accept("use")) {
-                if (!unit.functions.empty() || !unit.constants.empty() || !unit.structures.empty() || unit.application_body) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
+                if (!unit.functions.empty() || !unit.constants.empty() || !unit.globals.empty() || !unit.structures.empty() || unit.application_body) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
                 Import import; import.path = take();
                 if(import.path.kind!=TokenKind::path) {
                     auto segment=[&](const Token& t) {return !t.text.empty() && letter(t.text[0]) && std::all_of(t.text.begin(),t.text.end(),[](char c){return letter(c)||digit(c);});};
@@ -1065,6 +1076,18 @@ public:
             Function f;
             if (accept("private")) { f.file_private = true; f.visibility = "private"; }
             else if (!accept("public") && accept("internal")) f.visibility = "internal"; // All graph files belong to this project.
+            if (at("var")) {
+                auto begin = p;
+                auto declaration = statement();
+                Global global; global.token = declaration.token; global.visibility = f.visibility;
+                for (auto n = begin; n < p; ++n) global.syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
+                f.token = global.token; f.token.source_width = global.token.text.size(); f.token.text = "$global$" + global.token.text;
+                f.global_initializer = true; f.visibility = "private";
+                declaration.token.text = declaration.name = "$value$" + global.token.text;
+                f.body.push_back(std::move(declaration));
+                unit.functions.push_back(std::move(f)); global.initializer = &unit.functions.back();
+                unit.globals.push_back(std::move(global)); continue;
+            }
             if (at("const")) {
                 auto declaration = statement();
                 unit.constants.push_back({std::move(declaration), f.file_private, f.visibility,0,Type::none,0,{}}); continue;
@@ -1212,7 +1235,7 @@ public:
                 diagnostics.add(e); unit.parse_failed = true;
                 auto declaration = start;
                 if (tokens[declaration].text == "private" || tokens[declaration].text == "public" || tokens[declaration].text == "internal") ++declaration;
-                if (declaration + 1 < tokens.size() && (tokens[declaration].text == "func" || tokens[declaration].text == "const") && tokens[declaration + 1].kind == TokenKind::name && !reserved.contains(tokens[declaration + 1].text))
+                if (declaration + 1 < tokens.size() && (tokens[declaration].text == "func" || tokens[declaration].text == "const" || tokens[declaration].text == "var") && tokens[declaration + 1].kind == TokenKind::name && !reserved.contains(tokens[declaration + 1].text))
                     unit.invalid_declarations.insert(tokens[declaration + 1].text);
                 synchronize(start, true);
             }
@@ -1393,6 +1416,40 @@ class Semantics {
         if (candidates.size() > 1) error(source, e.token, Code::ambiguous, "Ambiguous imported constant '" + e.token.text + "'.", "Use explicit aliases.");
         return candidates.empty() ? std::pair<Unit*, Constant*>{nullptr, nullptr} : candidates.begin()->second;
     }
+    std::pair<Unit*, Global*> global(const Expr& e) {
+        std::map<std::string, std::pair<Unit*, Global*>> candidates;
+        auto add = [&](Unit* owner) {
+            if (owner->invalid_declarations.contains(e.token.text)) throw Poison{};
+            auto found = owner->global_names.find(e.token.text);
+            if (found != owner->global_names.end() && source_visible(found->second->visibility, owner->identity, unit.identity))
+                candidates.emplace(owner->identity, std::make_pair(owner, found->second));
+        };
+        if (!e.qualifier.empty()) {
+            auto found = unit.qualifiers.find(e.qualifier);
+            if (found == unit.qualifiers.end()) return {};
+            if (found->second.size() != 1) error(source, e.qualifier_token, Code::ambiguous, "Ambiguous import qualifier.");
+            add(found->second.front());
+        } else {
+            add(&unit);
+            if (!candidates.empty()) return candidates.begin()->second;
+            if (unit.declarations.contains(e.token.text) || unit.constant_names.contains(e.token.text) || unit.structure_names.contains(e.token.text)) return {};
+            if (e.kind == Expr::Kind::call && same_library(unit.identity, root.identity) && root.structure_names.contains(e.token.text) && source_visible(root.structure_names.at(e.token.text)->visibility, root.identity, unit.identity)) return {};
+            if (same_library(unit.identity, root.identity)) add(&root);
+            for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) add(units.at(import.target).get());
+        }
+        if (candidates.size() > 1) error(source, e.token, Code::ambiguous, "Ambiguous imported global '" + e.token.text + "'.", "Use explicit aliases.");
+        if (candidates.empty()) return {};
+        auto result = candidates.begin()->second;
+        if (e.qualifier.empty() && same_library(unit.identity, root.identity) && root.constant_names.contains(e.token.text) && source_visible(root.constant_names.at(e.token.text)->visibility, root.identity, unit.identity))
+            error(source, e.token, Code::ambiguous, "Ambiguous imported declaration '" + e.token.text + "'.", "Use explicit aliases.");
+        if (e.qualifier.empty()) for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) {
+            auto& owner = *units.at(import.target);
+            if ((owner.constant_names.contains(e.token.text) && source_visible(owner.constant_names.at(e.token.text)->visibility, owner.identity, unit.identity)) ||
+                (owner.declarations.contains(e.token.text) && source_visible(owner.declarations.at(e.token.text)->visibility, owner.identity, unit.identity)))
+                error(source, e.token, Code::ambiguous, "Ambiguous imported declaration '" + e.token.text + "'.", "Use explicit aliases.");
+        }
+        return result;
+    }
     const Function& resolve(const Expr& e) {
         if (e.qualifier.empty() && unit.invalid_declarations.contains(e.token.text)) throw Poison{};
         if (!e.qualifier.empty()) {
@@ -1520,7 +1577,7 @@ class Semantics {
     }
     bool module_call(const Expr& e) {
         const auto& base = *e.parts[0];
-        if (base.kind != Expr::Kind::name || lookup(base.token.text)) return false;
+        if (base.kind != Expr::Kind::name || lookup(base.token.text) || global(base).second) return false;
         if (unit.qualifiers.contains(base.token.text) || unit.failed_qualifiers.contains(base.token.text)) return true;
         // Retain the established unknown-qualifier diagnostics for a.b().
         return !constant(base).second;
@@ -1719,6 +1776,7 @@ class Semantics {
         const Expr* base = e.parts[0].get(); std::vector<unsigned> path;
         while (base->kind == Expr::Kind::field) { path.push_back(base->slot); base = base->parts[0].get(); }
         if (base->kind == Expr::Kind::literal && !base->target.empty()) e.receiver_readonly = true;
+        if (base->kind == Expr::Kind::global) { e.receiver_addressable = true; e.receiver_global = true; e.field_indexes.assign(path.rbegin(), path.rend()); }
         if (base->kind == Expr::Kind::name) {
             if (auto* v = lookup(base->token.text)) {
                 e.receiver_addressable = true; e.receiver_readonly = v->readonly; e.slot = v->slot;
@@ -1988,7 +2046,9 @@ class Semantics {
             return {};
         }
         if (e.kind == K::conversion) return e.type;
+        if (e.kind == K::global) return e.type;
         if (e.kind == K::name) {
+            if (auto [owner, value] = global(e); value) { if (value->type == Type::none) owner->resolve_global(*value); return value->type; }
             if (auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr) return v->type;
             auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
             return {};
@@ -2170,11 +2230,13 @@ class Semantics {
             for(const auto& [id,u]:units) {
                 for(const auto& [name,f]:u->declarations) names.insert(name);
                 for(const auto& [name,c]:u->constant_names) names.insert(name);
+                for(const auto& [name,value]:u->global_names) names.insert(name);
                 for(const auto& [name,structure]:u->structure_names)names.insert(name);
             }
             for(const auto& name:names) {
                 if(!valid_editor_identifier(name) || candidates.contains(name)) continue;
                 Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
+                try { auto [owner, value] = global(test); if (value) { if (value->type == Type::none) owner->resolve_global(*value); if (auto* candidate = add(name, value->type, 6)) candidate->documentation = source_documentation(owner->source, value->token.offset); continue; } } catch (const CompilationError&) {} catch (const Poison&) {}
                 try {auto& f=resolve(test);if(auto* candidate=add(name,f.result,3))for(const auto& [id,u]:units)if(u->declarations.contains(f.token.text) && u->declarations.at(f.token.text)==&f)candidate->documentation=source_documentation(u->source,f.token.offset);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
                 try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);if(auto* candidate=add(name,c->type,21))candidate->documentation=source_documentation(owner->source,c->declaration.token.offset);continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
                 try {auto [owner,structure]=structure_lookup(unit,root,units,e.qualifier.empty()?name:e.qualifier+"."+name,e.token);
@@ -2223,6 +2285,7 @@ class Semantics {
         case Expr::Kind::array_index: return index_expression(e);
         case Expr::Kind::array_slice: return slice_expression(e);
         case Expr::Kind::literal: return literal_expression(e, expected);
+        case Expr::Kind::global: return e.type;
         case Expr::Kind::name: return name_expression(e);
         case Expr::Kind::field: return field_expression(e, expected);
         case Expr::Kind::call:
@@ -2465,6 +2528,12 @@ class Semantics {
         return e.type = target;
     }
     VOID_SEMANTIC_HANDLER Type name_expression(Expr& e) {
+        if (!(e.qualifier.empty() && lookup(e.token.text))) if (auto [owner, value] = global(e); value) {
+            if (!current) error(source, e.token, Code::constant_call, "A compile-time expression cannot read a runtime global.");
+            if (value->type == Type::none) owner->resolve_global(*value);
+            e.kind = Expr::Kind::global; e.target = value->identity;
+            return e.type = value->type;
+        }
         if(!(e.qualifier.empty() && lookup(e.token.text))) {
             bool candidate=false;
             if(e.qualifier.empty() && !unit.constant_names.contains(e.token.text) && !(same_library(unit.identity,root.identity) && root.constant_names.contains(e.token.text) && (!root.constant_names.at(e.token.text)->file_private || &root==&unit))){for(const auto& [id,u]:units)candidate|=u->declarations.contains(e.token.text);}
@@ -2697,6 +2766,15 @@ class Semantics {
         return e.type=call_arguments(e,target,0);
     }
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (!(e.qualifier.empty() && (lookup(e.token.text) || (current && current->substitutions.contains(e.token.text))))) if (auto [owner, value] = global(e); value) {
+            auto target = std::make_unique<Expr>(Expr::Kind::name, e.token);
+            target->qualifier = e.qualifier; target->qualifier_token = e.qualifier_token;
+            auto type = expression(*target);
+            e.parts.insert(e.parts.begin(), std::move(target));
+            if (type.definition && type.definition->callable) { e.kind = Expr::Kind::function_call; return function_invocation(e); }
+            e.kind = Expr::Kind::method_call; e.token.source_width = e.token.text.size(); e.token.text = "call";
+            return resolved_method_expression(e, type);
+        }
         if(e.target=="$console.print" || (e.target.starts_with("$console.") && !e.target.empty()))return e.type;
         if(unit.identity==console::source_module && e.qualifier.empty())for(unsigned n=0;n<console::source_operations.size();++n)if(e.token.text==console::source_operations[n].name)return console_call(e,n);
         if(e.token.text=="print" && display_prelude(e))return print_call(e);
@@ -2928,31 +3006,8 @@ class Semantics {
             error(source,e.parts[1]->token,Code::zero_divisor,"Division or remainder by zero.","Use a nonzero divisor.");
         return e.type = (e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") ? Type::boolean : left;
     }
-    unsigned sequence(std::vector<Statement>& body, bool nested = true) {
-        if (nested) scopes.emplace_back();
-        unsigned flow = next_flow;
-        for (auto& s : body) {
-            if (diagnostics.full()) break;
-            unsigned result = next_flow;
-            auto old_zero = suppress_zero;
-            try { result = statement(s); }
-            catch (const CompilationError& failure) { diagnostics.add(failure); }
-            catch (const Poison&) {}
-            suppress_zero = old_zero;
-            // An invalid return remains a return for flow recovery, never valid IR.
-            if (s.kind == Statement::Kind::returned) result = return_flow;
-            if (flow & next_flow) flow = (flow & ~next_flow) | result;
-        }
-        if (nested) scopes.pop_back();
-        return flow;
-    }
-    unsigned statement(Statement& s) {
-        using K = Statement::Kind;
-        unsigned flow = next_flow;
-        switch (s.kind) {
-        case K::no_op: break;
-        case K::variable: {
-            if (s.invalid) { s.slot = declare(s.token, error_type); invalid_function = true; break; }
+    VOID_SEMANTIC_HANDLER void variable_statement(Statement& s) {
+            if (s.invalid) { s.slot = declare(s.token, error_type); invalid_function = true; return; }
             if (s.annotation) s.annotation = resolve_type(*s.annotation,unit,root,units,s.token);
             Type t = s.expression ? expression(*s.expression, s.annotation) : s.annotation.value_or(Type::none);
             if (t == Type::none) {
@@ -2980,8 +3035,32 @@ class Semantics {
 
             }
             if (!ir::reference_value(t) && t.kind!=Type::growable_array && t.kind!=Type::dictionary) t.readonly=false;
-            s.slot = declare(s.token, t, s.readonly); break;
+            s.slot = declare(s.token, t, s.readonly); return;
+    }
+    unsigned sequence(std::vector<Statement>& body, bool nested = true) {
+        if (nested) scopes.emplace_back();
+        unsigned flow = next_flow;
+        for (auto& s : body) {
+            if (diagnostics.full()) break;
+            unsigned result = next_flow;
+            auto old_zero = suppress_zero;
+            try { result = statement(s); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
+            catch (const Poison&) {}
+            suppress_zero = old_zero;
+            // An invalid return remains a return for flow recovery, never valid IR.
+            if (s.kind == Statement::Kind::returned) result = return_flow;
+            if (flow & next_flow) flow = (flow & ~next_flow) | result;
         }
+        if (nested) scopes.pop_back();
+        return flow;
+    }
+    unsigned statement(Statement& s) {
+        using K = Statement::Kind;
+        unsigned flow = next_flow;
+        switch (s.kind) {
+        case K::no_op: break;
+        case K::variable: variable_statement(s); break;
         case K::scoped:{
             auto& call=*s.expression;
             if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_names.contains("tasks")){
@@ -3001,11 +3080,35 @@ class Semantics {
             if(s.expression->kind==Expr::Kind::lambda)expression(*s.expression);else deferred_call(s);
             current->cleanup_type=unit.make_cleanup();break;
         case K::assignment: {
+            if (diagnostics.editor && diagnostics.editor->module == unit.identity) {
+                auto cursor = [&](const Token& token) { return token.text == "_void_editor_cursor_" && token.offset == diagnostics.editor->offset; };
+                if (cursor(s.token) || std::any_of(s.fields.begin(), s.fields.end(), cursor)) {
+                    auto target = std::make_unique<Expr>(Expr::Kind::name, s.token);
+                    for (const auto& field : s.fields) { auto child = std::make_unique<Expr>(Expr::Kind::field, field); child->parts.push_back(std::move(target)); target = std::move(child); }
+                    expression(*target); // Use the ordinary binding/member completion path on LHS too.
+                }
+            }
             auto* variable = lookup(s.name);
-            if ((variable && variable->readonly) || (!variable && visible_names.contains(s.name)))
+            bool global_selection = false;
+            if (!variable) {
+                Expr probe(Expr::Kind::name, s.token);
+                if (!s.fields.empty() && unit.qualifiers.contains(s.name)) {
+                    probe.qualifier = s.name; probe.qualifier_token = s.token; probe.token = s.fields.front();
+                }
+                if (global(probe).second) {
+                    if (!s.selection) {
+                        auto target = std::make_unique<Expr>(Expr::Kind::name, s.token);
+                        for (const auto& field : s.fields) { auto child = std::make_unique<Expr>(Expr::Kind::field, field); child->parts.push_back(std::move(target)); target = std::move(child); }
+                        if (s.index) { auto child = std::make_unique<Expr>(Expr::Kind::array_index, s.index->token); child->parts.push_back(std::move(target)); child->parts.push_back(std::move(s.index)); target = std::move(child); }
+                        s.selection = std::move(target); s.fields.clear();
+                    }
+                    global_selection = true;
+                }
+            }
+            if ((variable && variable->readonly) || (!variable && !global_selection && visible_names.contains(s.name)))
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
-            if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
-            auto t = variable->type; s.slot = variable->slot;
+            if (!variable && !global_selection) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
+            auto t = variable ? variable->type : Type(Type::none); if (variable) s.slot = variable->slot;
             if(!s.selection && !s.fields.empty()) {
                 auto probe=t;
                 for(const auto& field:s.fields) {
@@ -3141,6 +3244,8 @@ public:
         : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), defaults(std::move(defs)), diagnostics(d) {
         for (const auto& [id,owner] : units) for (const auto& [name,structure] : owner->structure_names)
             if (owner.get() == &unit || (source_visible(structure->visibility,id,unit.identity) && ((owner.get() == &root && same_library(unit.identity,root.identity)) || std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i) { return !i.explicit_alias && i.target == id; })))) visible_names.insert(name);
+        for (const auto& [id, owner] : units) for (const auto& [name, value] : owner->global_names)
+            if (owner.get() == &unit || (source_visible(value->visibility, id, unit.identity) && ((owner.get() == &root && same_library(id, unit.identity)) || std::any_of(unit.imports.begin(), unit.imports.end(), [&](const auto& i) { return !i.explicit_alias && i.target == id; })))) visible_names.insert(name);
         for (const auto& [name, c] : root.constant_names) if (same_library(unit.identity,root.identity) && (!c->file_private || &root == &unit)) visible_names.insert(name);
         for (const auto& [name, c] : unit.constant_names) { (void)c; visible_names.insert(name); }
         for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty())
@@ -3252,6 +3357,15 @@ public:
             defaults(*owner,nested); return nested.defaults;
         }
         throw std::logic_error("Missing owned value type");
+    }
+    void analyze_global(Global& value) {
+        auto& f = *value.initializer;
+        current = &f; scopes = {{}}; invalid_function = false;
+        variable_statement(f.body.front());
+        value.type = f.locals.at(f.body.front().slot); f.result = value.type;
+        Statement returned(Statement::Kind::returned, value.token);
+        returned.expression = std::make_unique<Expr>(Expr::Kind::name, f.body.front().token);
+        statement(returned); f.body.push_back(std::move(returned)); f.analyzed = true;
     }
     void analyze_one(Function& f) {
             if(f.interface_requirement) {
@@ -3399,7 +3513,7 @@ class Lowering {
         }
         if(i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::dict_new || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format)module.coordinated=true;
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::global_cell || i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -3487,7 +3601,15 @@ class Lowering {
         }
         return place;
     }
+    unsigned global_cell(const Expr& e) {
+        ir::Instruction read{ir::Op::global_cell}; read.callee = e.target;
+        return emit(read, e.token);
+    }
     ir::Place place(const Expr& e) {
+        if (e.kind == Expr::Kind::global) {
+            auto type = std::find_if(module.globals.begin(), module.globals.end(), [&](const auto& g) { return g.identity == e.target; })->cell;
+            return {snapshot(global_cell(e), type, e.token), {0}};
+        }
         if (e.kind==Expr::Kind::name) return {e.slot,{}};
         if (e.kind==Expr::Kind::field) {
             if (e.parts[0]->type.kind==Type::managed_ref) {
@@ -3525,6 +3647,10 @@ class Lowering {
     }
     Selection select_expression(const Expr& e) {
         auto token=e.token;
+        if (e.kind == Expr::Kind::global) {
+            auto selected = place(e);
+            return {e.type, [=, this] { return read_place(selected, token); }, [=, this](unsigned value) { write_place(selected, value, token); }};
+        }
         if(e.kind==Expr::Kind::name) {
             auto slot=e.slot;return {e.type,[=,this]{return emit({ir::Op::load,slot},token);},[=,this](unsigned value){emit({ir::Op::store,slot,value},token);}};
         }
@@ -3537,11 +3663,14 @@ class Lowering {
             std::optional<unsigned> owner;if(managed)owner=snapshot(parent->read(),parent->type,token);
             auto value_slot=std::make_shared<std::optional<unsigned>>();
             const bool setter_mutates=e.setter_mutates;
+            std::optional<ir::Place> global_receiver;
+            if (e.receiver_global && !e.selected_receiver && parent->type.kind == Type::aggregate) global_receiver = place(*e.parts[0]);
             auto invoke=[=,this](const std::string& target,std::optional<unsigned> value) {
-                auto slot=owner.value_or(~0u);if(!owner)slot=snapshot(parent->read(),parent->type,token);
-                ir::Instruction call{ir::Op::call};call.callee=target;call.receiver=ir::Place{slot,{}};if(value)call.arguments={*value};
+                auto slot=owner.value_or(~0u);
+                if(!owner && !global_receiver)slot=snapshot(parent->read(),parent->type,token);
+                ir::Instruction call{ir::Op::call};call.callee=target;call.receiver=global_receiver.value_or(ir::Place{slot,{}});if(value)call.arguments={*value};
                 auto result=emit(call,token);
-                if(value && !managed && setter_mutates)parent->write(emit({ir::Op::load,slot},token));
+                if(value && !managed && setter_mutates && !global_receiver)parent->write(emit({ir::Op::load,slot},token));
                 return result;
             };
             auto type=e.type;auto getter=e.target,setter=e.setter;
@@ -3756,6 +3885,7 @@ class Lowering {
         case K::spawned:return spawned(e);
         case K::task_cancel: return emit({ir::Op::async_cancel,expression(*e.parts[0])},e.token);
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
+        case K::global: return extract_managed(global_cell(e), 0, e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: return frontend_case([&]() -> unsigned {
             if(e.target=="$console.print")return frontend_case([&]() -> unsigned {
@@ -4564,7 +4694,18 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             c.state = 3; unit->invalid_declarations.insert(token.text);
         } else unit->constant_names.emplace(token.text, &c);
     }
+    for (auto& [id, unit] : units) for (auto& value : unit->globals) {
+        value.identity = id + "::" + value.token.text;
+        if (unit->constant_names.contains(value.token.text) || unit->structure_names.contains(value.token.text) || unit->declarations.contains(value.token.text) || !unit->global_names.emplace(value.token.text, &value).second)
+            error(unit->source, value.token, Code::duplicate, "Duplicate declaration '" + value.token.text + "'.");
+    }
     for (auto& [id, unit] : units) {
+        if (unit.get() != &root && same_library(id,root.identity)) for (const auto& [name, value] : root.global_names) if (value->visibility != "private") {
+            if (unit->global_names.contains(name) || unit->constant_names.contains(name) || unit->structure_names.contains(name) || unit->declarations.contains(name))
+                error(unit->source, unit->global_names.contains(name) ? unit->global_names.at(name)->token : Token{TokenKind::name, name, 0}, Code::duplicate, "Declaration shadows project-root global '" + name + "'.");
+        }
+        for (const auto& [name, value] : unit->global_names) if ((same_library(id, root.identity) && root.constant_names.contains(name) && !root.constant_names.at(name)->file_private) || (same_library(id, root.identity) && root.structure_names.contains(name) && root.structure_names.at(name)->visibility != "private"))
+            error(unit->source, value->token, Code::duplicate, "Global shadows a project-root declaration.");
         if (unit.get() != &root && same_library(id,root.identity)) for (const auto& [name, c] : root.constant_names) if (!c->file_private) {
             try {
             if (unit->constant_names.contains(name)) error(unit->source, unit->constant_names.at(name)->declaration.token, Code::duplicate, "Declaration shadows project-root constant '" + name + "'.", {}, {{span(root.source, c->declaration.token), "Previously declared"}});
@@ -4590,7 +4731,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             auto alias = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.target).stem());
             try {
             if (!import.explicit_alias && !identifier(alias)) continue;
-            if (unit->structure_names.contains(alias) || (same_library(id,root.identity) && root.structure_names.contains(alias) && root.structure_names.at(alias)->visibility != "private") || (import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (same_library(id,root.identity) && root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
+            if (unit->global_names.contains(alias) || (same_library(id,root.identity) && root.global_names.contains(alias) && root.global_names.at(alias)->visibility!="private") || unit->structure_names.contains(alias) || (same_library(id,root.identity) && root.structure_names.contains(alias) && root.structure_names.at(alias)->visibility != "private") || (import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (same_library(id,root.identity) && root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
                 error(unit->source, import.alias, Code::alias_conflict, "Import alias '" + alias + "' conflicts with " + (unit->declarations.contains(alias) ? "a function declaration." : "a constant declaration."), "Choose a distinct explicit alias with as.");
             auto* target = units.at(import.target).get();
             auto& targets = unit->qualifiers[alias];
@@ -4947,6 +5088,32 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const CompilationError& failure) { diagnostics.add(failure); }
         catch (const Poison&) {}
     }
+    for (auto& [id, owner] : units) for (auto& value : owner->globals) if (value.initializer->body.front().annotation) {
+        try { value.type = resolve_type(*value.initializer->body.front().annotation, *owner, root, units, value.token); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); value.state = 3; }
+        catch (const Poison&) { value.state = 3; }
+    }
+    for (auto& [id, owner] : units) owner->resolve_global = [&, u = owner.get()](Global& value) {
+        if (value.state == 2) return;
+        if (value.state == 1) {
+            if (value.type != Type::none) return;
+            error(u->source, value.token, Code::initializer, "Global type inference cycle requires an explicit type annotation.");
+        }
+        if (value.state == 3) throw Poison{};
+        Depth guard(diagnostics.semantic_depth(), u->source, value.token, 128);
+        value.state = 1;
+        try {
+            if (value.initializer->body.front().annotation) value.type = resolve_type(*value.initializer->body.front().annotation, *u, root, units, value.token);
+            Semantics(*u, units, root, evaluate, diagnostics, defaults).analyze_global(value);
+            value.cell = u->make_capture_record(value.identity + "::$global_cell", value.type, true);
+            value.state = 2;
+        } catch (...) { value.state = 3; throw; }
+    };
+    for (auto& [id, owner] : units) for (auto& value : owner->globals) {
+        try { owner->resolve_global(value); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
     bool pending_bodies=true;
     while(pending_bodies && !diagnostics.full()) {
         pending_bodies=false;
@@ -4963,18 +5130,32 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     std::vector<std::string> pending;
     for (auto& [id,u] : units) for (auto& f : u->functions) {
         functions.emplace(f.symbol,&f);
-        if (f.initializer) pending.push_back(f.symbol);
+        if (f.initializer || f.global_initializer) pending.push_back(f.symbol);
         std::vector<const Statement*> statements; for (const auto& s : f.body) statements.push_back(&s);
         while (!statements.empty()) {
             auto* statement=statements.back(); statements.pop_back();
             for (const auto& child : statement->body) statements.push_back(&child);
             for (const auto& child : statement->otherwise) statements.push_back(&child);
-            std::vector<const Expr*> expressions; if(statement->index) expressions.push_back(statement->index.get()); if (statement->expression) expressions.push_back(statement->expression.get());
+            if (statement->kind == Statement::Kind::deferred && statement->expression && !statement->expression->target.empty()) dependencies[f.symbol].insert(statement->expression->target);
+            if (!statement->compound_target.empty()) dependencies[f.symbol].insert(statement->compound_target);
+            std::vector<const Expr*> expressions; if (statement->selection) expressions.push_back(statement->selection.get()); if (statement->compound_conversion) expressions.push_back(statement->compound_conversion.get()); if(statement->index) expressions.push_back(statement->index.get()); if (statement->expression) expressions.push_back(statement->expression.get());
             while (!expressions.empty()) {
                 auto* e=expressions.back(); expressions.pop_back();
                 for (const auto& part : e->parts) expressions.push_back(part.get());
                 for (const auto& part : e->omitted) expressions.push_back(part.get());
-                if (e->kind==Expr::Kind::call || e->kind==Expr::Kind::method_call) dependencies[f.symbol].insert(e->target);
+                if (e->kind==Expr::Kind::call || e->kind==Expr::Kind::method_call || e->property) dependencies[f.symbol].insert(e->target);
+                if (e->property && !e->setter.empty()) dependencies[f.symbol].insert(e->setter);
+                if (e->kind == Expr::Kind::function_call && !e->parts.empty()) {
+                    auto signature = e->parts[0]->type;
+                    for (const auto& [id, owner] : units) for (const auto& candidate : owner->functions) {
+                        if (candidate.global_initializer || candidate.asynchronous || candidate.receiver || !signature.definition || !signature.definition->callable) continue;
+                        auto first = candidate.anonymous ? 1u : 0u;
+                        if (candidate.parameters.size() != signature.definition->call_parameters.size() + first || candidate.result != Type(*signature.definition->call_result)) continue;
+                        bool matches = true;
+                        for (unsigned n = first; n < candidate.parameters.size(); ++n) matches &= candidate.parameters[n].type == Type(signature.definition->call_parameters[n-first]);
+                        if (matches) dependencies[f.symbol].insert(candidate.symbol);
+                    }
+                }
                 if(!e->virtual_slot.empty() && !e->super_call) for(const auto& [id,owner]:units) for(const auto& target:owner->functions)
                     if(target.virtual_slot==e->virtual_slot) dependencies[f.symbol].insert(target.symbol);
                 if (!e->initializer.empty()) dependencies[f.symbol].insert(e->initializer);
@@ -5000,6 +5181,19 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         const auto& selected=*functions.at(route.second);
         if(!selected.virtual_slot.empty()) for(const auto& [name,target]:functions) if(target->virtual_slot==selected.virtual_slot) dependencies[requirement].insert(name);
     }
+    std::set<std::string> startup;
+    std::vector<std::string> startup_pending;
+    for (const auto& [name, function] : functions) if (function->global_initializer) startup_pending.push_back(name);
+    while (!startup_pending.empty()) {
+        auto name = startup_pending.back(); startup_pending.pop_back();
+        if (!functions.contains(name) || !startup.insert(name).second) continue;
+        const auto& function = *functions.at(name);
+        if (function.asynchronous || (!function.native_symbol.empty() && native_binding(function.native_symbol).name == "register")) {
+            for (const auto& [id, owner] : units) if (owner->declarations.contains(function.token.text) && owner->declarations.at(function.token.text) == &function)
+                error(owner->source, function.token, Code::initializer, "Global initialization requires synchronous calls without native callback registration.");
+        }
+        for (const auto& target : dependencies[name]) startup_pending.push_back(target);
+    }
     std::set<std::string> frozen;
     while (!pending.empty()) {
         auto key=pending.back(); pending.pop_back();
@@ -5017,11 +5211,29 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     (void)string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
-    for(auto& [id,u]:units) {u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
     auto strings=string_pool(units);
+    std::map<std::string, std::set<std::string>> reach;
+    for (const auto& [id, unit] : units) {
+        std::vector<std::string> pending{id};
+        while (!pending.empty()) { auto key = pending.back(); pending.pop_back(); if (!reach[id].insert(key).second) continue; for (const auto& import : units.at(key)->imports) if (!import.target.empty()) pending.push_back(import.target); }
+    }
+    std::set<std::string> emitted;
+    while (emitted.size() < units.size()) {
+        for (const auto& [id, unit] : units) if (!emitted.contains(id)) {
+            bool ready = true;
+            for (const auto& dependency : reach[id]) if (!emitted.contains(dependency) && !reach[dependency].contains(id)) ready = false;
+            if (!ready) continue;
+            for (const auto& [member, owner] : units) if (!emitted.contains(member) && reach[id].contains(member) && reach[member].contains(id)) {
+                for (const auto& value : owner->globals) module.globals.push_back({value.identity, member, value.visibility, value.cell, value.initializer->symbol, value.syntax, owner->source.location(value.token.offset)});
+                emitted.insert(member);
+            }
+            break;
+        }
+    }
     for(const auto& [id,unit]:units)for(auto type:unit->synthetic_types){module.nominal_types.push_back(type);if(type.kind==Type::managed_ref)module.coordinated=true;}
     for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) {
         module.nominal_types.emplace_back(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate);
@@ -5044,6 +5256,14 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
             }
             if (!f.initializer || f.receiver->type.kind!=Type::managed_ref) {
                 auto lowered = lowering.lower(f); lowered.module_identity = id;
+                if (f.global_initializer) {
+                    auto value = std::find_if(unit->globals.begin(), unit->globals.end(), [&](const auto& g) { return g.initializer == &f; });
+                    lowered.result = value->cell;
+                    for (auto& block : lowered.blocks) if (block.end.kind == ir::Terminator::Kind::return_value) {
+                        ir::Instruction construct{ir::Op::gc_construct}; construct.type = value->cell; construct.arguments = {block.end.value}; construct.source = value->initializer->body.front().expression ? unit->source.location(value->token.offset) : lowered.source;
+                        block.end.value = block.instructions.size(); block.instructions.push_back(std::move(construct));
+                    }
+                }
                 if(f.receiver && f.token.text=="deinit"){
                     auto wrapper=lowered;wrapper.locals={lowered.parameters[0]};wrapper.blocks.clear();wrapper.cleanup_entry.reset();wrapper.closure=wrapper.bound_receiver=false;
                     const auto body_suffix="::$body$"+Type::key(lowered.parameters[0]);lowered.name+=body_suffix;lowered.display_name=lowered.source_name;lowered.source_name+=body_suffix;lowered.method_name+=body_suffix;lowered.visibility="private";lowered.virtual_slot.clear();lowered.overriding=false;
@@ -5060,13 +5280,13 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     }
     const auto& selected=*units.at(entry);
     const auto* application=application_entry(selected);
-    if(application) {
+    if(application || (!selected.globals.empty() && !selected.declarations.contains("entry") && !selected.declarations.contains("main"))) {
         module.application=true;module.entry_symbol=entry+"::$app_adapter";
-        ir::Function adapter;adapter.name=module.entry_symbol;adapter.source_name="$app_adapter";adapter.module_identity=entry;adapter.source=selected.source.location(application->token.offset);
+        ir::Function adapter;adapter.name=module.entry_symbol;adapter.source_name="$app_adapter";adapter.module_identity=entry;adapter.source=selected.source.location(application ? application->token.offset : 0);
         adapter.parameters={Type::i32};adapter.result=Type::i32;adapter.locals={Type::i32};
-        ir::Instruction call{ir::Op::call};call.callee=application->symbol;call.type=application->result;
-        ir::Block body;body.instructions.push_back(call);
-        if(application->result==Type::none){body.instructions.push_back({ir::Op::constant,0});body.end={ir::Terminator::Kind::return_value,1};}
+        ir::Instruction call{ir::Op::call};call.callee=application ? application->symbol : "";call.type=application ? application->result : Type(Type::none);
+        ir::Block body; if (application) body.instructions.push_back(call);
+        if(!application || application->result==Type::none){body.instructions.push_back({ir::Op::constant,0});body.end={ir::Terminator::Kind::return_value,application ? 1u : 0u};}
         else body.end={ir::Terminator::Kind::return_value,0};
         adapter.blocks.push_back(std::move(body));module.functions.push_back(std::move(adapter));
     }
@@ -5093,8 +5313,8 @@ struct AnalysisAccess {
         result->entry_ = entry;
         const auto& selected=*units.at(entry);
         const auto* app=application_entry(selected);
-        result->application_=app!=nullptr;
-        result->entry_symbol_=entry+(app?"::$app_adapter":"::entry");
+        result->application_=app!=nullptr || (!selected.globals.empty() && !selected.declarations.contains("entry") && !selected.declarations.contains("main"));
+        result->entry_symbol_=entry+(result->application_?"::$app_adapter":"::entry");
         // Builtin declaration snapshots provide stable canonical hover/reference
         // identity, but never masquerade as filesystem navigation/edit targets.
         for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})for(const auto& api:numeric::members()) {
@@ -5337,6 +5557,11 @@ struct AnalysisAccess {
                 if(auto base=structure.definition->base.lock()) record.base_identity=base->identity;
                 declaration(std::move(record));
             }
+            for (const auto& value : unit->globals) {
+                AnalyzedDeclaration record{AnalyzedDeclaration::Kind::global_variable, value.identity, id, value.visibility, location(value.token), {}, value.type, value.syntax};
+                record.rename_safe = true; record.signature = value.visibility + " var " + value.token.text + ": " + ir::type_name(value.type);
+                declaration(std::move(record));
+            }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
                 AnalyzedDeclaration constant_record{AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || ir::collection_type(c.type) || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}};
@@ -5350,7 +5575,7 @@ struct AnalysisAccess {
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 if(!f.operator_glyph.empty()){method_record.owner=Type::key(f.operator_owner);method_record.operator_glyph=f.operator_glyph;method_record.editor_symbol_kind=25;}
                 if(f.accessor)method_record.editor_symbol_kind=7;
-                method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application";
+                method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application" && !f.global_initializer;
                 if(!f.operator_glyph.empty() || f.receiver)method_record.signature=editor_signature(f);
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
@@ -5376,12 +5601,12 @@ struct AnalysisAccess {
                 if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;
                     if(f.accessor)for(const auto& other:unit->functions)if(other.accessor && other.token.offset==f.token.offset)r.end=std::max(r.end,other.source_end);
                     method_record.extent=r;}
-                declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && f.token.text!="$application");
+                declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && !f.global_initializer && f.token.text!="$application");
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
                 for(const auto& binding:f.editor_bindings) {
-                    if(!f.generic_origin.empty() || f.display_adapter)continue;
+                    if(!f.generic_origin.empty() || f.display_adapter || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
                     if(binding.readonly && std::none_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;})) continue;
                     auto key=source_identity(f.symbol)+"::local::"+std::to_string(binding.slot);
                     auto kind=std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;}) ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;

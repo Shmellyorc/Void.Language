@@ -1,5 +1,16 @@
 # Stage 9 application workflow — 21 October 2026
 
+## Stage 11 global declaration integration
+
+File-level globals coexist with main or legacy entry and initialize before the
+selected entry runs. They no longer count as executable script statements for
+entry competition. A selected file containing only globals and ordinary helpers
+initializes and exits zero; invalid main signatures retain their existing entry
+error. Remaining script statements retain their order after all outermost
+initializers; nested block vars remain lexical. Selection/discovery, arguments,
+status policy and native publication are unchanged. See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md).
+
+
 Boss authorized all three milestones as one mission. This supersedes Sprint 4's
 mandatory application flag and the research proposal's optional compatibility
 flag. Entry language semantics, native admission and source identities are unchanged.

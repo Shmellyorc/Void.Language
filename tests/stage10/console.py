@@ -158,7 +158,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                 reader = threading.Thread(target=read_prompt, daemon=True)
                 reader.start()
                 try:
-                    received = observed.get(timeout=60)
+                    received = observed.get(timeout=180)
                     assert received == prefix, (label, case, received)
                     reader.join(timeout=1)
                     if payload:
@@ -180,6 +180,8 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                         child.kill()
                     child.communicate()
                     reader.join(timeout=1)
+    # Startup includes Debug/O2 compilation under consolidated acceptance load.
+    # Keep exact prompt-before-input checks; source startup has a separate budget.
     # Full four-system prompt must be visible before the host supplies input.
     source = root / "console_operator_systems.void"
     for optimized in (False, True):
@@ -191,7 +193,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
             ready=queue.Queue();prefix=combined+prompt_prefix
             reader=threading.Thread(target=lambda:ready.put(child.stdout.read(len(prefix))),daemon=True);reader.start()
             try:
-                assert ready.get(timeout=60)==prefix,(label,"integrated prompt bytes")
+                assert ready.get(timeout=180)==prefix,(label,"integrated prompt bytes")
                 reader.join(1)
                 tail,errors=child.communicate("Ada🎮\r\né\0".encode(),timeout=60)
                 assert child.returncode==7 and tail==read_tail and errors==combined_cleanup,(label,tail,errors)

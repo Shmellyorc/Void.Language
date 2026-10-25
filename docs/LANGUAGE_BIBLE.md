@@ -1,5 +1,18 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+## Stage 11 runtime globals — Boss authorization, 25 October 2026
+
+Outermost `var` now has the approved shared Runtime-storage semantics described in
+[RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md). Root public/internal globals follow the
+existing direct project-root constant visibility convention; ordinary modules use
+normal imports/aliases/visibility. Globals initialize eagerly before selected entry,
+remain across calls/compatible reload, and start fresh in new applications. Local
+block bindings, fields, module const, deep readonly and value/reference copies keep
+their existing contracts. Earlier runtime-global future/open statements below are
+superseded for this scope. [Engineering evidence and review gate](stage11/IMPLEMENTATION.md)
+remain separate from language authorization; library expansion is outside this mission.
+
+
 **Implementation versus design:** See the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). This Bible preserves future design as well as implemented contracts; examples are not all executable language features.
 
 **Stage 6 Delivery 4 implemented subset:** Explicit host opt-in to one trusted,
@@ -456,7 +469,9 @@ fallback. There is no recursive search for files containing `main()`. The entry'
 parent establishes the project root and its compile-time project constants.
 Application mode and selected-entry top-level execution follow the implemented
 Sprint 4 contract; imported executable top-level statements remain forbidden.
-External-package identities and runtime file globals remain future work.
+External-package identities remain future work. Stage 11 implements runtime file
+globals with selected-root visibility, ordinary imports and eager startup; see
+[RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md).
 
 ```text
 my_game/                    <- virtual project root: /
@@ -2759,7 +2774,11 @@ This example illustrates:
 - Default float formatting, custom zero padding, and automatic interpolation.
 - No `class`, `new`, `this`, or `namespace`.
 
-**Unsettled technical detail:** `town` is a mutable module-level instance, while root constants have special global visibility. The initialization/access rules of ordinary cross-module globals remain to be specified. That does not affect the agreed file-private callback pattern.
+**Stage 11 resolution:** `town` may be a runtime module global. Selected-entry
+public/internal globals follow the root-constant visibility convention; ordinary
+module globals follow imports/aliases and initialize eagerly. Private globals
+remain file-private. See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md). This does not
+approve module-as-scene adapters or change the file-private callback pattern.
 
 ## 58. Example: `result` and optional values
 
@@ -3236,7 +3255,8 @@ zero-argument synchronous main, status without automatic printing, and preserved
 legacy entry precedence. Top-level fallthrough/bare return yields 0; i32 return
 supplies status. Explicit `main() -> i32` requires a return on every reachable
 path. Imported executable statements and competing top-level/main forms reject.
-Top-level locals are not runtime module globals. See
+At that stage top-level vars were body locals. Stage 11 supersedes that rule for
+outermost `var`; block-local bindings retain lexical scope. See
 [the implementation contract](STAGE8_APPLICATION_NATIVE.md) and
 [owner decisions](DECISIONS.md) for exact scope and verification status.
 This supersedes conflicting recommendations in the historical discussion below;

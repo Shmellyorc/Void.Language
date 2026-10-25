@@ -1,0 +1,9 @@
+struct box:
+    value: i32
+func freeze(const item: box) -> box:
+    return item
+var original = box(value = 1)
+var frozen = freeze(original)
+func main():
+    original.value = 2
+    print(frozen.value)

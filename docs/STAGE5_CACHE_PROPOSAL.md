@@ -1,5 +1,16 @@
 # Stage 5: persistent Debug cache proposal
 
+## Stage 11 global application isolation
+
+Global-bearing initial compilations and cache hits receive fresh application
+Runtimes. Compatible replacement explicitly preserves the current Runtime and
+its cells. Independent explicit-Runtime admission rejects reuse, even with matching
+VFS names/contracts. Cached objects contain guarded Runtime calls and immutable
+metadata, never cells/handles. Exact global initialization/dependency contracts
+participate in reload/cache identity; initialization is never replayed by a hit.
+See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md) and [evidence](stage11/IMPLEMENTATION.md).
+
+
 18 October 2026. **Delivered Stage 5 subset is hosted-verified and owner-LOCKED** at
 `4627687b3a18349633715e4294bc915cf74ddd41`, [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484):
 seven successful configurations, 82/82 suites each (574/574 total), verified in

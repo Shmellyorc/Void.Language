@@ -41,12 +41,12 @@ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
         ('func main() -> i32:\n    if false:\n        return 1\n','Missing return'),
         ('func main() -> string:\n    return "bad"\n','entry'),
         ('func main(value: i32) -> i32:\n    return value\n','entry'),
-        ('func main():\n    pass\nvar x = 1\n','compete'),
+        ('func main():\n    pass\npass\n','compete'),
         ('return "bad"\n','Type mismatch'),
-        ('var local = 1\nfunc helper() -> i32:\n    return local\nreturn helper()\n','local')]:
+        ('if true:\n    var local = 1\nfunc helper() -> i32:\n    return local\nreturn helper()\n','local')]:
         write(text);run([compiler,'run',source],1,diagnostic=diagnostic)
     # Imported executable statements reject under check as well as execution.
-    (root/'library.void').write_text('var value = 7\n',encoding='utf-8')
+    (root/'library.void').write_text('var value = 7\npass\n',encoding='utf-8')
     write('use "/library.void" as library\nfunc main():\n    pass\n')
     run([compiler,'check',source],1,diagnostic='Imported modules')
     # Explicit file selection, no arbitrary public function entry scan.
@@ -79,7 +79,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
     run([compiler,'check',sink],1)
     top=root/'sink-top.void'
     text=sink.read_text(encoding='utf-8');prefix,body=text.split('func main() -> i32:\n')
-    top.write_text(prefix+''.join(line[4:] if line.startswith('    ') else line for line in body.splitlines(keepends=True)),encoding='utf-8')
+    top.write_text(prefix+'if true:\n'+body,encoding='utf-8')
     for example in [sink,top]:
         for mode in ['normal','optimized']:
             obj=root/f'sink-{example.stem}-{mode}.obj';exe=root/f'sink-{example.stem}-{mode}.exe'

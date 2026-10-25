@@ -1,5 +1,18 @@
 # Architectural decisions
 
+## 25 October 2026 — runtime globals authorized
+
+Boss approves outermost `var` in every module; selected-entry public/internal
+root visibility; ordinary imported/aliased globals; eager dependency-first SCC and
+source-order initialization; initializer hoisting before script statements; failed
+startup without replay; fresh applications and compatible-reload persistence;
+Runtime precise roots, worker rejection and compiler-owned tooling. These decisions
+supersede conflicting Stage 11 research recommendations. No global/nonlocal syntax,
+implicit atomics, async startup, standard-library expansion or package manager is
+approved. [Contract](RUNTIME_GLOBALS.md), [implementation/evidence](stage11/IMPLEMENTATION.md).
+Git, native platform verification, final hosted CI and acceptance remain Boss-controlled.
+
+
 ## Stage 9 authorization — 21 October 2026
 
 Boss authorized the complete three-milestone application workflow: automatic

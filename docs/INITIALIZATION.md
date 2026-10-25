@@ -1,5 +1,16 @@
 # Phase 14: custom initialization for value structs
 
+## Stage 11 file-level initialization
+
+File-level `var` uses the same type/default/construction rules as local `var`, with
+once-per-application eager initialization before selected entry. Dependency-first
+import components and lexical declarations determine order; unready reads fail.
+Local bindings and struct fields keep their existing execution order. Global
+initializer effects are hoisted before remaining script statements, including
+interleaved source. See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md) for migration,
+owned failures, native cleanup and frozen reload dependencies.
+
+
 **Stage 8 Sprint 2 update (20 October 2026):**
 [The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
 ordinary named/default-call exclusions below. Existing constructor, readonly,

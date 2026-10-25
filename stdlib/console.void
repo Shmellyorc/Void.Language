@@ -2,15 +2,20 @@
 ## Borrowed standard input endpoint; all reads share one Runtime queue.
 value struct input:
     internal const _id: i64
+
 ## Borrowed standard output endpoint; complete records are serialized.
 value struct output:
     internal const _id: i64
+
 ## Standard input; redirection preserves raw UTF-8 bytes.
 const stdin = input(_id = 0)
+
 ## Standard output; use explicit flush for prompts.
 const stdout = output(_id = 1)
+
 ## Standard error; capabilities are detected independently from stdout.
 const stderr = output(_id = 2)
+
 enum io_error_kind:
     invalid_argument
     invalid_encoding
@@ -21,6 +26,7 @@ enum io_error_kind:
     broken_pipe
     interrupted
     io_failure
+
 value struct io_error:
     const operation: string
     const stream: string
@@ -31,14 +37,17 @@ value struct io_error:
     const partial: [u8]
     const cleanup_code: i64
     const partial_utf16_units: i64
+
 ## A text chunk (including an empty line), or distinct end of input.
 enum text_read:
     text(value: string)
     eof
+
 ## A byte chunk, or distinct end of input.
 enum bytes_read:
     data(value: [u8])
     eof
+
 private value struct _reply:
     kind: i64
     os_code: i64
@@ -50,6 +59,7 @@ private value struct _reply:
     bytes: [u8]
     first: i64
     second: i64
+
 private func _error(reply: _reply, operation: string, stream: string) -> io_error:
     var kind = io_error_kind.io_failure
     if reply.kind == 1:
@@ -69,10 +79,12 @@ private func _error(reply: _reply, operation: string, stream: string) -> io_erro
     if reply.kind == 8:
         kind = io_error_kind.interrupted
     return io_error(operation = operation, stream = stream, kind = kind, os_code = reply.os_code, message = reply.text, bytes_transferred = reply.progress, partial = reply.bytes, cleanup_code = reply.cleanup_code, partial_utf16_units = reply.partial_utf16_units)
+
 private func _stream(self: output) -> string:
     if self._id == 1:
         return "stdout"
     return "stderr"
+
 ## Write UTF-8 text completely or return checked progress and an I/O error.
 ## @param text Exact Unicode text, including embedded NUL.
 func (self output) write(text: string) -> result<i64, io_error>:
@@ -80,41 +92,50 @@ func (self output) write(text: string) -> result<i64, io_error>:
     if reply.kind != 0:
         return Err(_error(reply, "write", _stream(self)))
     return Ok(reply.progress)
+
 ## Write exact bytes; redirected output is binary. Failures retain partial progress.
 func (self output) write_bytes(const bytes: [u8]) -> result<i64, io_error>:
     var reply = _console_write_bytes(self, bytes)
     if reply.kind != 0:
         return Err(_error(reply, "write_bytes", _stream(self)))
     return Ok(reply.progress)
+
 ## Drain VOID-owned output. This is not a durable-storage guarantee.
 func (self output) flush() -> result<bool, io_error>:
     var reply = _console_flush(self)
     if reply.kind != 0:
         return Err(_error(reply, "flush", _stream(self)))
     return Ok(true)
+
 property (self output) is_redirected: bool:
     get:
         return _console_redirected(self).progress != (0 as i64)
+
 property (self input) is_redirected: bool:
     get:
         return _console_redirected(self).progress != (0 as i64)
+
 private func _text(reply: _reply, operation: string) -> result<text_read, io_error>:
     if reply.kind != 0:
         return Err(_error(reply, operation, "stdin"))
     if reply.eof:
         return Ok(text_read.eof)
     return Ok(text_read.text(reply.text))
+
 ## Read one Unicode scalar through the shared input queue.
 ## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
 func (self input) read_char(timeout_ms: i64 = -1) -> result<text_read, io_error>:
     return _text(_console_read_char(self, timeout_ms), "read_char")
+
 ## Read up to max_scalars Unicode scalars through the shared input queue.
 func (self input) read_text(max_scalars: i64, timeout_ms: i64 = -1) -> result<text_read, io_error>:
     return _text(_console_read_text(self, max_scalars, timeout_ms), "read_text")
+
 ## Read a line without its LF, CRLF or CR terminator. Standalone CR completes immediately.
 ## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
 func (self input) read_line(timeout_ms: i64 = -1) -> result<text_read, io_error>:
     return _text(_console_read_line(self, timeout_ms), "read_line")
+
 ## Read raw bytes with precise queue ownership; EOF is distinct from empty data.
 func (self input) read_bytes(max_bytes: i64, timeout_ms: i64 = -1) -> result<bytes_read, io_error>:
     var reply = _console_read_bytes(self, max_bytes, timeout_ms)
@@ -123,6 +144,7 @@ func (self input) read_bytes(max_bytes: i64, timeout_ms: i64 = -1) -> result<byt
     if reply.eof:
         return Ok(bytes_read.eof)
     return Ok(bytes_read.data(reply.bytes))
+
 # Live per-endpoint capability snapshots.
 value struct terminal_capabilities:
     const text_input: bool
@@ -136,12 +158,15 @@ value struct terminal_capabilities:
     const clear: bool
     const title: bool
     const bell: bool
+
 value struct terminal_size:
     const columns: i64
     const rows: i64
+
 value struct terminal_position:
     const column: i64
     const row: i64
+
 enum color:
     black
     red
@@ -159,6 +184,7 @@ enum color:
     bright_magenta
     bright_cyan
     bright_white
+
 private func _color_code(value: color) -> i64:
     match value:
         color.black:
@@ -194,56 +220,70 @@ private func _color_code(value: color) -> i64:
         color.bright_white:
             return 15
     return -1
+
 private func _flag(mask: i64, bit: i64) -> bool:
     return mask / bit % 2 != 0
+
 private func _capabilities(reply: _reply) -> terminal_capabilities:
     var mask = reply.progress
     return terminal_capabilities(text_input = _flag(mask, 1), text_output = _flag(mask, 2), key_input = _flag(mask, 4), input_modes = _flag(mask, 8), size = _flag(mask, 16), cursor_position = _flag(mask, 32), cursor_visibility = _flag(mask, 64), color = _flag(mask, 128), clear = _flag(mask, 256), title = _flag(mask, 512), bell = _flag(mask, 1024))
+
 ## Snapshot actual standard-input capabilities without opening a terminal.
 func (self input) capabilities() -> terminal_capabilities:
     return _capabilities(_console_capabilities(self))
+
 ## Snapshot this endpoint's supported capabilities; individual operations can still fail.
 func (self output) capabilities() -> terminal_capabilities:
     return _capabilities(_console_capabilities(self))
+
 private func _ack(reply: _reply, operation: string, stream: string) -> result<bool, io_error>:
     if reply.kind != 0:
         return Err(_error(reply, operation, stream))
     return Ok(true)
+
 ## Query current terminal columns and rows; redirected/unsupported endpoints return Err.
 func (self output) size() -> result<terminal_size, io_error>:
     var reply = _console_size(self)
     if reply.kind != 0:
         return Err(_error(reply, "size", _stream(self)))
     return Ok(terminal_size(columns = reply.first, rows = reply.second))
+
 ## Query the live cursor using the owned accessible input channel and a bounded wait. No hidden terminal.
 func (self output) cursor_position() -> result<terminal_position, io_error>:
     var reply = _console_position(self)
     if reply.kind != 0:
         return Err(_error(reply, "cursor_position", _stream(self)))
     return Ok(terminal_position(column = reply.first, row = reply.second))
+
 ## Move to zero-based column and row; unsupported endpoints emit no controls.
 ## @param column Zero-based column.
 ## @param row Zero-based row.
 func (self output) set_cursor(column: i64, row: i64) -> result<bool, io_error>:
     return _ack(_console_cursor(self, column, row), "set_cursor", _stream(self))
+
 ## Set cursor visibility when supported by this endpoint.
 func (self output) set_cursor_visible(visible: bool) -> result<bool, io_error>:
     var flag: i64 = 0
     if visible:
         flag = 1
     return _ack(_console_visible(self, flag), "set_cursor_visible", _stream(self))
+
 ## Select foreground and background from the approved 16-color palette.
 func (self output) set_color(foreground: color, background: color) -> result<bool, io_error>:
     return _ack(_console_color(self, _color_code(foreground), _color_code(background)), "set_color", _stream(self))
+
 ## Restore terminal default colors when supported.
 func (self output) reset_color() -> result<bool, io_error>:
     return _ack(_console_reset(self), "reset_color", _stream(self))
+
 ## Clear the visible display and home the cursor when supported.
 func (self output) clear() -> result<bool, io_error>:
     return _ack(_console_clear(self), "clear", _stream(self))
+
 ## Set a safe terminal title; control characters and escape injection are rejected.
 func (self output) set_title(text: string) -> result<bool, io_error>:
     return _ack(_console_title(self, text), "set_title", _stream(self))
+
 ## Request a terminal bell when supported.
 func (self output) bell() -> result<bool, io_error>:
     return _ack(_console_bell(self), "bell", _stream(self))
@@ -251,11 +291,14 @@ func (self output) bell() -> result<bool, io_error>:
 # Native-owned saved terminal state; managed aliases share one close identity.
 struct terminal_session:
     internal _token: i64
+
 ## Restore this scoped input mode; failures remain recoverable and restoration can be retried.
 func (self terminal_session) close() -> result<bool, io_error>:
     return _ack(_console_end_mode(self), "close_mode", "stdin")
+
 func (self terminal_session) deinit():
     _console_restore(self)
+
 ## Begin a scoped input mode on owned terminal input; close restores the saved state.
 func (self input) begin_mode(echo: bool = true, line_input: bool = true, control_c_as_input: bool = false) -> result<terminal_session, io_error>:
     var flags: i64 = 0
@@ -271,6 +314,7 @@ func (self input) begin_mode(echo: bool = true, line_input: bool = true, control
         return Err(_error(reply, "begin_mode", "stdin"))
     session._token = reply.first
     return Ok(session)
+
 enum key:
     character
     enter
@@ -300,6 +344,7 @@ enum key:
     f11
     f12
     unknown
+
 value struct key_event:
     const character: string
     const key: key
@@ -311,6 +356,7 @@ value struct key_event:
     const key_down: bool
     const repeat_count: i64
     const bytes: [u8]
+
 private func _key(code: i64) -> key:
     if code == 0:
         return key.character
@@ -369,6 +415,7 @@ private func _key(code: i64) -> key:
     if code == 27:
         return key.unknown
     return key.unknown
+
 ## Read one key event through shared input ownership; unsupported redirected input returns Err.
 func (self input) read_key(echo: bool = false, timeout_ms: i64 = -1) -> result<key_event, io_error>:
     var flag: i64 = 0
@@ -378,6 +425,7 @@ func (self input) read_key(echo: bool = false, timeout_ms: i64 = -1) -> result<k
     if reply.kind != 0:
         return Err(_error(reply, "read_key", "stdin"))
     return Ok(key_event(character = reply.text, key = _key(reply.first), shift = _flag(reply.second, 1), alt = _flag(reply.second, 2), control = _flag(reply.second, 4), modifiers_known = _flag(reply.second, 8), key_down_known = _flag(reply.second, 16), key_down = _flag(reply.second, 32), repeat_count = reply.second / 256, bytes = reply.bytes))
+    
 ## Check for a complete available key without consuming unrelated input.
 func (self input) key_available() -> result<bool, io_error>:
     var reply = _console_available(self)

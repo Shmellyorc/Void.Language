@@ -1,5 +1,16 @@
 # Stage 6 Deliveries 1–5: async, lifecycle, workers and native integration
 
+## Stage 11 globals and owner execution
+
+Runtime-global access belongs to the initializing application's owner thread.
+Worker-reachable reads/writes reject through source effects and independent IR,
+including helper/method/property/operator indirection. Safe scalar, immutable-string
+and supported value snapshots can still be evaluated on the owner and transferred
+to workers. Owner async activations keep ordinary interleaving; globals add no
+atomics or scheduler. Startup itself remains synchronous and excludes task creation
+and native callback registration. See [runtime globals](RUNTIME_GLOBALS.md).
+
+
 ## Stage 8 Sprint 5 completed-frame lifetime
 
 The [Sprint 5 contract](STAGE8_ASYNC_RETENTION.md) supersedes historical blanket
@@ -256,8 +267,8 @@ rejected within a worker's reachable source graph. The independent typed-IR
 validator repeats the transfer, effect and worker-entry proof. Compiler-created
 reached defer/deinit callbacks remain supported with their known source targets;
 ordinary indirect source invocation is deferred. There is no second effect lattice.
-Current module constants are immutable templates; this does not approve future
-mutable globals. `jobs.spawn`, nested spawn, synchronous worker task waits and
+Module constants remain immutable templates. Stage 11 adds runtime globals
+under the owner-only access rules above. `jobs.spawn`, nested spawn, synchronous worker task waits and
 shared-reference parallelism remain deferred.
 
 The existing Runtime owns all precise roots and coordination. Private typed-IR

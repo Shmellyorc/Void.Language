@@ -1,10 +1,82 @@
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
 #include "void/format.hpp"
+#include "void/native_runtime.hpp"
 #include <new>
 #include <algorithm>
 #include <stdexcept>
 namespace vd {
+void Runtime::admit_globals(std::string_view contract, bool replacement, bool commit) {
+    std::lock_guard lock(mutex_);
+    if (closing_ || (global_admitted_ && (!replacement || global_contract_ != contract)))
+        throw std::invalid_argument("Runtime already owns an independent or incompatible global program");
+    if (commit) { global_contract_ = contract; global_admitted_ = true; }
+}
+int Runtime::globals_begin(std::string_view contract, std::size_t count, RuntimeFailure& failure) {
+    require_managed();
+    {
+        std::lock_guard lock(mutex_);
+        if (global_admitted_ && global_contract_ != contract) throw std::logic_error("Incompatible global program admission");
+        if (global_owner_ != std::thread::id{} && global_owner_ != std::this_thread::get_id()) throw std::logic_error("Runtime globals require their application owner thread");
+        if (global_state_ == 3) { failure = global_failure_.value(); return -1; }
+        if (global_state_ == 2) return 0;
+        if (global_state_ == 1) throw std::logic_error("Reentrant entry during global initialization");
+        global_contract_ = contract; global_admitted_ = true;
+        global_owner_ = std::this_thread::get_id(); global_state_ = 1;
+    }
+    try {
+        std::vector<std::unique_ptr<Handle>> roots;
+        roots.reserve(count);
+        for (std::size_t n = 0; n < count; ++n) roots.push_back(std::make_unique<Handle>(*this));
+        std::lock_guard lock(mutex_);
+        if (closing_) throw std::logic_error("Runtime closed during global root setup");
+        globals_.swap(roots);
+    } catch (...) {
+        failure.message = "Global root allocation failed"; globals_finish(failure); return -1;
+    }
+    return 1;
+}
+void Runtime::globals_finish(RuntimeFailure& failure) {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    if (global_state_ != 1 || global_owner_ != std::this_thread::get_id()) throw std::logic_error("Invalid global initialization completion");
+    if (failure.message) { global_failure_.assign(failure); failure = global_failure_.value(); global_state_ = 3; }
+    else {
+        for (const auto& cell : globals_) if (!cell->value_) throw std::logic_error("Incomplete global initialization publication");
+        global_state_ = 2;
+    }
+}
+void Runtime::global_publish(std::size_t id, void* cell) {
+    require_managed();
+    {
+        std::lock_guard lock(mutex_);
+        if (global_owner_ != std::this_thread::get_id() || global_state_ != 1 || id >= globals_.size() || globals_[id]->value_ || !cell || !heap_.contains(cell))
+            throw std::logic_error("Invalid global publication");
+        globals_[id]->value_ = cell;
+    }
+}
+void* Runtime::global_cell(std::size_t id) {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    if (global_owner_ != std::this_thread::get_id()) throw std::logic_error("Runtime globals require their application owner thread");
+    if ((global_state_ != 1 && global_state_ != 2) || id >= globals_.size() || !globals_[id]->value_)
+        throw std::logic_error("Runtime global is not initialized");
+    return globals_[id]->value_;
+}
+void Runtime::require_globals_ready() const {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    if (global_state_ != 2 || global_owner_ != std::this_thread::get_id())
+        throw std::logic_error("Selected entry cannot run before global initialization completes on its owner thread");
+}
+void Runtime::cleanup_failed_globals() {
+    if (current_runtime_ == this && is_managed()) throw std::logic_error("Global failure cleanup requires NativeSafe state");
+    { std::lock_guard lock(mutex_); if (global_state_ != 3) return; }
+    native_shutdown(*this);
+    std::vector<std::unique_ptr<Handle>> roots;
+    { std::lock_guard lock(mutex_); roots.swap(globals_); }
+    roots.clear();
+}
 void Runtime::display_enter(std::string_view hook,void* identity) {
     auto& active=thread().display_hooks;
     if(active.size()>=64)throw std::length_error("Display hook nesting limit exceeded");
@@ -261,4 +333,29 @@ void vd_gc_native_enter(void* guard) noexcept {
     try { new (guard) vd::Runtime::Native(vd::Runtime::current()); } catch (...) { std::terminate(); }
 }
 void vd_gc_native_leave(void* guard) noexcept { static_cast<vd::Runtime::Native*>(guard)->~Native(); }
+}
+
+extern "C" int vd_globals_begin(const char* contract, std::size_t bytes, std::size_t count, vd::RuntimeFailure* failure) noexcept {
+    try { return vd::Runtime::current().globals_begin(std::string_view(contract, bytes), count, *failure); }
+    catch (const std::exception& error) { vd::RuntimeFailure value; value.message = error.what(); vd::retain_native_failure(value, failure); return -1; }
+}
+extern "C" void vd_globals_finish(vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().globals_finish(*failure); }
+    catch (const std::exception& error) { vd::RuntimeFailure value; value.message = error.what(); vd::retain_native_failure(value, failure); }
+}
+extern "C" void vd_global_publish(std::size_t id, void* cell, vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().global_publish(id, cell); }
+    catch (const std::exception& error) { vd::RuntimeFailure value; value.message = error.what(); vd::retain_native_failure(value, failure); }
+}
+extern "C" void vd_global_cell(void** out, std::size_t id, const char* declaration, vd::RuntimeFailure* failure) noexcept {
+    try { *out = vd::Runtime::current().global_cell(id); }
+    catch (const std::exception& error) {
+        try { std::string message = std::string(error.what()) + ": " + declaration; vd::RuntimeFailure value; value.message = message.c_str(); vd::retain_native_failure(value, failure); }
+        catch (...) { failure->message = "Runtime global access failed"; }
+    }
+}
+
+extern "C" void vd_globals_ready(vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().require_globals_ready(); }
+    catch (const std::exception& error) { vd::RuntimeFailure value; value.message = error.what(); vd::retain_native_failure(value, failure); }
 }

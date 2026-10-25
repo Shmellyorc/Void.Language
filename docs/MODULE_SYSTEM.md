@@ -1,5 +1,15 @@
 # Module system and multi-file native compilation
 
+## Stage 11 runtime global declarations
+
+Outermost `var` is a declaration in every module, including imported modules.
+Imported executable statements remain forbidden. Public/internal globals of the
+selected project entry are directly visible to other project modules, preserving
+the standard/project boundary and private ownership. Other globals follow ordinary
+imports and aliases. Canonical module identity deduplicates their shared storage.
+See [runtime globals](RUNTIME_GLOBALS.md) for initialization order, failure and reload.
+
+
 **Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
 supersedes the historical import/discovery exclusions below. It specifies separate
 standard/project source domains, importer-relative bare quoted imports, bounded
@@ -165,8 +175,9 @@ All discovered bodies are validated, including unused functions.
 Function-only cycles and cross-file mutual recursion are supported, including
 forward references and self-imports. Module and project constants now use a
 separate compile-time dependency walk; see VALUE_SEMANTICS.md. Runtime global
-initialization remains unsupported. Unsupported top-level declarations still
-receive diagnostics.
+initialization was unsupported at that phase; Stage 11 now implements it through
+the same source graph and typed IR (see the current contract above). Unsupported
+top-level declarations still receive diagnostics.
 
 The same AST lowering emits one validated VOID IR unit containing the reachable
 graph. Each function carries its declaring module identity and source name; calls
@@ -184,6 +195,8 @@ the entry snapshot and IR, so CLI entry diagnostics need not reread changed file
 
 This phase does not implement file watching, incremental recompilation, automatic
 source hot reload, incremental dependency fingerprints or global initialization.
+Stage 11 subsequently adds global initialization and compatible Runtime reuse as
+described in [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md).
 Const-containing source files now carry an exact conservative restart contract (VALUE_SEMANTICS.md).
 The module replacement proof checks stable identities and active old leases;
 it is not a claim of a live source-reload product.
