@@ -1,5 +1,22 @@
 # VOID documentation
 
+## STAGE 10: OFFICIALLY LOCKED, October 25, 2026
+
+**Boss officially approves the release lock** at commit
+`d507240484f94aa4782bdb8828ea1ba0017bcda6`.
+[Final CI 40198872407](https://github.com/Shmellyorc/Void.Language/actions/runs/40198872407)
+passed **7/7 jobs and 1,383/1,383 main CTest executions** using
+`ci-link-experiment.yml`, `mode=thinlto-cache`. Golden Wrench accepted all five
+measured Windows console boundaries; targeted native Windows/macOS 1 MiB stack
+verification passed. [Official acceptance](stage10/ACCEPTANCE.md) records scope
+and evidence.
+
+Native Windows/macOS Vim/Neovim host execution and physical second-volume Windows
+verification remain **Boss-accepted release exclusions, not passing tests**.
+This section supersedes earlier dated incomplete/unverified statuses for accepted
+scope; historical failures, evidence and reviews remain preserved below.
+**Stage 11 is not authorized.**
+
 ## Current Stage 10 handoff — 24 October 2026
 
 ThinLTO experiment [#4](https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209)

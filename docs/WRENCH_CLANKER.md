@@ -1,5 +1,21 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## STAGE 10: OFFICIALLY LOCKED, October 25, 2026
+
+**Boss officially approves the release lock** at
+`d507240484f94aa4782bdb8828ea1ba0017bcda6`.
+[Final CI 40198872407](https://github.com/Shmellyorc/Void.Language/actions/runs/40198872407)
+used `ci-link-experiment.yml`, `mode=thinlto-cache`: **7/7 jobs and 1,383/1,383
+main CTest executions passed**. Golden Wrench accepted all five measured Windows
+native console boundaries; targeted Windows/macOS 1 MiB stack verification passed.
+[Official acceptance and evidence](stage10/ACCEPTANCE.md) define the locked scope.
+
+Native Windows/macOS Vim/Neovim host execution and physical second-volume Windows
+verification were not completed. **Boss accepts these as release exclusions,
+not passing tests.** Earlier dated incomplete/unverified/review-only statuses
+below are superseded for accepted scope; all original failures and evidence remain
+history. Boss controls Git and release decisions. **Do not begin Stage 11.**
+
 ## 25 October 2026 — Golden Wrench final Windows native review
 
 The [final Windows native review](stage10/engineering/windows-console-final/windows10-vm-2026-10-25/FINAL_WRENCH_REVIEW_2026-10-25.md) accepts five measured native boundaries: real physical keyboard metadata and Unicode (100/100 matching KeyResults), Console Host/Terminal-ConPTY, exact in-child nested restoration, Win32 UTF-16/error/partial progress and native borrowed-handle cancellation/GC lifetime. Private evidence manifests verified **228/228 + 2,431/2,431**; final focused Windows CTests **6/6** and fresh native mode tests **4/4**. Original failures/coverage exclusions are preserved. **GO for Boss-controlled final seven-job CI. Stage 10 is not locked or complete; Boss retains release authority.** Older Windows "UNVERIFIED" paragraphs below are historical checkpoints, not an overwrite of the new evidence.

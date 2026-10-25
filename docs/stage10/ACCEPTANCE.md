@@ -1,5 +1,31 @@
 # Stage 10 final engineering acceptance — 24 October 2026
 
+## STAGE 10: OFFICIALLY LOCKED, October 25, 2026
+
+**Boss officially authorizes the Stage 10 release lock** at commit
+`d507240484f94aa4782bdb8828ea1ba0017bcda6`.
+[Final CI run 40198872407](https://github.com/Shmellyorc/Void.Language/actions/runs/40198872407)
+used `ci-link-experiment.yml`, `mode=thinlto-cache`, and passed **7/7 jobs,
+1,383/1,383 main CTest executions**: Ubuntu Debug, Release and strict sanitizers;
+Windows Debug/Release; macOS ARM64 Debug/Release.
+
+[Golden Wrench's final native review](engineering/windows-console-final/windows10-vm-2026-10-25/FINAL_WRENCH_REVIEW_2026-10-25.md)
+accepted all five measured Windows console boundaries: physical keyboard metadata
+and Unicode, Console Host/Terminal-ConPTY, in-child nested restoration, Win32
+UTF-16/error/partial progress, and borrowed-handle cancellation/GC lifetime.
+Targeted native Windows/macOS **1 MiB stack verification passed**; the separate
+CI #1/#2 identities and receipts remain recorded below.
+
+**Boss-accepted release exclusions, not passing tests:** native Windows/macOS
+Vim/Neovim host execution and physical second-volume Windows verification were
+not completed. The lock does not certify those observations.
+
+This current decision supersedes earlier INCOMPLETE, UNVERIFIED and NOT LOCKED
+status statements only for the accepted scope above. All dated checkpoints,
+historical failures, evidence and original reviews remain preserved. The main
+CI workflow is unchanged. Boss retains Git and release control; **Stage 11 is
+not authorized**.
+
 ## 25 October 2026 — independent final Windows native acceptance review
 
 The [Golden Wrench final Windows review](engineering/windows-console-final/windows10-vm-2026-10-25/FINAL_WRENCH_REVIEW_2026-10-25.md) **ACCEPTS the five measured Windows native behavior boundaries** after independently checking both final/private evidence manifests (**228 + 2,431 SHA-256 entries**), matching **100/100 human-origin KEY_EVENT/KeyResult records** (60 earlier + 40 new), final **Debug/Release 6/6** focused CTests, **4/4** real-host mode/restoration matrices and accepted Windows Terminal/ConPTY, Win32 wide-I/O and borrowed-handle cancellation observations. Four new real Alt+0233 Unicode sessions passed on both hosts and both configurations. Source/test inputs match reviewed GitHub `main` `6175e83` after Windows CRLF normalization; the older local HEAD is **not** presented as a clean current checkout. Prior failed attempts and unexecuted human cross-product coverage remain explicit.
