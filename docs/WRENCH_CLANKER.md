@@ -1,5 +1,10 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## 25 October 2026 — Golden Wrench final Windows native review
+
+The [final Windows native review](stage10/engineering/windows-console-final/windows10-vm-2026-10-25/FINAL_WRENCH_REVIEW_2026-10-25.md) accepts five measured native boundaries: real physical keyboard metadata and Unicode (100/100 matching KeyResults), Console Host/Terminal-ConPTY, exact in-child nested restoration, Win32 UTF-16/error/partial progress and native borrowed-handle cancellation/GC lifetime. Private evidence manifests verified **228/228 + 2,431/2,431**; final focused Windows CTests **6/6** and fresh native mode tests **4/4**. Original failures/coverage exclusions are preserved. **GO for Boss-controlled final seven-job CI. Stage 10 is not locked or complete; Boss retains release authority.** Older Windows "UNVERIFIED" paragraphs below are historical checkpoints, not an overwrite of the new evidence.
+
+
 ## Latest native verification — 25 October 2026
 
 [Windows 10 VM evidence](stage10/engineering/windows-console-final/windows10-vm-2026-10-25/WRENCH_REVIEW.md) independently preserves native Debug/Release console CTests **4/4**, genuine attached classic Console Host **10/10 scripted input** cases and four separately **Boss-attested physical Up** cases. Prior full CI #4 remained **7/7, 1,383/1,383**; Windows and macOS targeted native **1 MiB stack gates have both passed**. Neither full CI nor stack tests were rerun for the VM evidence. A one-line `docs/` observer status-scope correction is reviewed separately; no compiler/Runtime/test/workflow change follows.

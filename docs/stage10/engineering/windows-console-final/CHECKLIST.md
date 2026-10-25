@@ -1,5 +1,10 @@
 # Stage 10 Windows console host checklist — 24 October 2026
 
+## 25 October 2026 — final Windows native closeout (supersedes earlier open host observations)
+
+The [Golden Wrench final review](windows10-vm-2026-10-25/FINAL_WRENCH_REVIEW_2026-10-25.md) accepts the five measured Windows host/runtime axes after independent manifest validation (**228 final + 2,431 Round 2 entries**), **100/100** actual human-origin event/result matches (including four new `é` sessions, Debug/Release and Console Host/Terminal), focused **6/6** native CTests and fresh **4/4** real-host restoration checks. Previously accepted real Win32 read/write, partial-progress, native cancellation and ConPTY receipts remain in the preserved private evidence. Later results supersede the older dated "NOT EXECUTED" text for those measured boundaries only; all failed and unexecuted cases remain documented. **Stage 10 remains INCOMPLETE until Boss-controlled final hosted verification and release review. No raw private ZIP is published.**
+
+
 ## Executed Windows 10 VM checkpoint — 25 October 2026
 
 The [Golden Wrench VM review](windows10-vm-2026-10-25/WRENCH_REVIEW.md) now records genuine attached **classic Console Host** results: native Debug/Release builds, focused CTests **4/4**, ten scripted native console flows **10/10** (explicit output CP 65001), and four Boss-attested physical Up-arrow tests **4/4** (Debug/Release × closed/unclosed). Original native reports, machine receipts, successes and prior failures are preserved **privately by Boss**, not published with machine-identifying paths. The raw-archive digest and public derived results are [recorded here](windows10-vm-2026-10-25/evidence-manifest.json). The corrected read-only observer's one-line native-exit-status fix is prepared in `observe.ps1`, based on the successful evidence-only Windows copy.

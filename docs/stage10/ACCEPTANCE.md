@@ -1,5 +1,12 @@
 # Stage 10 final engineering acceptance — 24 October 2026
 
+## 25 October 2026 — independent final Windows native acceptance review
+
+The [Golden Wrench final Windows review](engineering/windows-console-final/windows10-vm-2026-10-25/FINAL_WRENCH_REVIEW_2026-10-25.md) **ACCEPTS the five measured Windows native behavior boundaries** after independently checking both final/private evidence manifests (**228 + 2,431 SHA-256 entries**), matching **100/100 human-origin KEY_EVENT/KeyResult records** (60 earlier + 40 new), final **Debug/Release 6/6** focused CTests, **4/4** real-host mode/restoration matrices and accepted Windows Terminal/ConPTY, Win32 wide-I/O and borrowed-handle cancellation observations. Four new real Alt+0233 Unicode sessions passed on both hosts and both configurations. Source/test inputs match reviewed GitHub `main` `6175e83` after Windows CRLF normalization; the older local HEAD is **not** presented as a clean current checkout. Prior failed attempts and unexecuted human cross-product coverage remain explicit.
+
+This final review supersedes the older Windows "UNVERIFIED" historical status summaries **only for tested native boundaries**; do not delete the earlier records. No production repair was demonstrated. **Stage 10 remains INCOMPLETE / NOT LOCKED** pending Boss-authorized final cross-platform CI and Boss's decision on remaining separately identified acceptance scope. The private Windows archive is **not** a publication artifact.
+
+
 ## 25 October 2026 — native Windows 10 Console Host observations
 
 [Independent VM evidence review](engineering/windows-console-final/windows10-vm-2026-10-25/WRENCH_REVIEW.md) records successful Debug/Release builds, focused console CTests **4/4**, genuine attached classic Console Host flows with **scripted input 10/10**, and **four Boss-attested physical Up-arrow runs**, each with two observed key rows and native child exit 0. This is a separate Windows 10 VM at commit `046fcf152a786ce6fe27d58ea4bfb709028f4a21`, not a new hosted CI matrix. Complete original native evidence, including earlier failed attempts, is preserved **privately by Boss**. Public path-free summaries and the unchanged raw-archive SHA-256 are available in [the VM evidence manifest](engineering/windows-console-final/windows10-vm-2026-10-25/evidence-manifest.json). A narrow one-line docs-only PowerShell observer exit-status correction is provided; the successful probes used the corrected evidence copy.
