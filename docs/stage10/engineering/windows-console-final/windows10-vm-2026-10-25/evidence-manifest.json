@@ -1,0 +1,85 @@
+{
+  "source_commit": "046fcf152a786ce6fe27d58ea4bfb709028f4a21",
+  "user_uploaded_zip_sha256": "d61e4769b3a3ba080976cadc8ec0e116fd27d2256b29625ecc7f2c70049199a8",
+  "user_uploaded_zip_entry_count": 3670,
+  "curated_archive_sha256": "f43d68604a06d6319c68767a6ff76c9eb08a65c28fdcde5d4bb0f9fa7becd4cc",
+  "curated_archive_native_files": 406,
+  "curated_archive_toolchain_files": 9,
+  "frozen_evidence_sha256_checks": 366,
+  "frozen_evidence_mismatches": [],
+  "ctest_configurations": [
+    {
+      "configuration": "Debug",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Existing injected regression tests; not physical console evidence"
+    },
+    {
+      "configuration": "Release",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Existing injected regression tests; not physical console evidence"
+    }
+  ],
+  "automatic_native_flows_passed": 10,
+  "boss_attested_physical_Up_checks_passed": 4,
+  "observer_original_windows_sha256": "1ff30510fcf5cb278c73cae7e5be55f00552df9f5f2e3301eeebb7ac92faec6f",
+  "observer_successful_evidence_copy_windows_sha256": "aee926ce9481d1a965b27e14600b5124210f2151a72548a692428e9b10a69f37",
+  "observer_original_git_blob_sha": "9b920fc8175e2a420e0ad7742723af96aa632917",
+  "builds_verified_sha256": [
+    {
+      "configuration": "Debug",
+      "filename": "voidc.exe",
+      "sha256": "c1fc2bba74d2e114dd7c17646a35504f5e9be0bdcf385e6cca82bea5538f2bc7"
+    },
+    {
+      "configuration": "Debug",
+      "filename": "void_runtime_console_keyboard.exe",
+      "sha256": "b4bb65e30665b7484a8b6810fe5090b70c53207d9a493c95ad0618cede815ea4"
+    },
+    {
+      "configuration": "Debug",
+      "filename": "void_runtime_console_terminal.exe",
+      "sha256": "1911e0815e72391a72dba119627e6732676a769093a90e6127ade85df6969ed6"
+    },
+    {
+      "configuration": "Release",
+      "filename": "voidc.exe",
+      "sha256": "509c02056b3b0c030907d3a9ab73e7ba04c9fd50ba39a71a75890f6888ef0328"
+    },
+    {
+      "configuration": "Release",
+      "filename": "void_runtime_console_keyboard.exe",
+      "sha256": "c5df34133599937150d953d55a1175019f991c51d6fb9d3e3bafd010aff4eb90"
+    },
+    {
+      "configuration": "Release",
+      "filename": "void_runtime_console_terminal.exe",
+      "sha256": "7fbc3c67c4f77de1cded384426e9a514dfb2b1cdb1eb081cd0954154af0671bf"
+    }
+  ],
+  "files_added_under_docs": 5,
+  "existing_docs_files_updated_by_patch": [
+    "docs/stage10/ACCEPTANCE.md",
+    "docs/stage10/engineering/windows-console-final/CHECKLIST.md",
+    "docs/stage10/engineering/native-final/HANDOFF.md",
+    "docs/WRENCH_CLANKER.md",
+    "docs/stage10/engineering/windows-console-final/observe.ps1"
+  ],
+  "production_code_test_workflow_readme_changed": false,
+  "stage10_locked": false,
+  "manual_publication_review": "Approved public scope: reviewer summary, results, hashes; complete raw native archive retained privately without byte modification.",
+  "publication": {
+    "visibility": "public derived results; original byte-for-byte evidence privately held by owner",
+    "raw_native_archive_in_repository": false,
+    "private_archive_sha256": "f43d68604a06d6319c68767a6ff76c9eb08a65c28fdcde5d4bb0f9fa7becd4cc",
+    "public_flows_source_original_sha256": "eeee8e5ec0c1afb00a35d769f8a554cf35ac8ce64b0adcd708b282b40764d3cb",
+    "public_flows_derived_sha256": "2a565b3b8f6de49101c46c5458d9295692541106fc4030388471f888358453f9",
+    "redactions": [
+      "absolute program/VM paths in automatic-flow-results launch_command fields"
+    ],
+    "source_integrity": "Preserved original SHA-256 for independent comparison; altered projection never claimed as raw evidence"
+  }
+}

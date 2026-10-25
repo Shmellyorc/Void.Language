@@ -1,5 +1,11 @@
 # Stage 10 final native acceptance handoff — 24 October 2026
 
+## Later native Windows 10 VM results — 25 October 2026
+
+[Reviewed VM evidence](../windows-console-final/windows10-vm-2026-10-25/WRENCH_REVIEW.md): native Debug/Release builds succeeded, focused console CTests passed **4/4**, ten direct classic Console Host flows with **scripted input** passed **10/10**, and four independent **Boss-confirmed physical Up** checks returned two key rows and native child exit zero. Source and binary receipts remained stable. CI #4 and both native stack gates remain separately accepted and were **not rerun** for this VM work.
+
+Those observations supersede the earlier host-unavailable checkpoint **only for classic Console Host coverage**. ConPTY, detailed physical key metadata, exact child-side modes/restoration, UTF-16 API traces and Windows borrowed-handle cancellation/lifetime remain **UNVERIFIED**. Earlier failures are preserved in the owner-held private evidence archive, including default-437 test-fixture output, malformed manual input and unconfirmed attempts. Public summaries and the unchanged raw-archive SHA-256 remain in the VM evidence manifest. Stage 10 is **INCOMPLETE** pending Boss disposition; no release or next stage is authorized.
+
 ## Subsequent native results and Windows console boundary
 
 Windows stack CI #1 passed Debug/Release at

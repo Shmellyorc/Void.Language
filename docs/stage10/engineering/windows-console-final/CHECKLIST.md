@@ -1,5 +1,11 @@
 # Stage 10 Windows console host checklist — 24 October 2026
 
+## Executed Windows 10 VM checkpoint — 25 October 2026
+
+The [Golden Wrench VM review](windows10-vm-2026-10-25/WRENCH_REVIEW.md) now records genuine attached **classic Console Host** results: native Debug/Release builds, focused CTests **4/4**, ten scripted native console flows **10/10** (explicit output CP 65001), and four Boss-attested physical Up-arrow tests **4/4** (Debug/Release × closed/unclosed). Original native reports, machine receipts, successes and prior failures are preserved **privately by Boss**, not published with machine-identifying paths. The raw-archive digest and public derived results are [recorded here](windows10-vm-2026-10-25/evidence-manifest.json). The corrected read-only observer's one-line native-exit-status fix is prepared in `observe.ps1`, based on the successful evidence-only Windows copy.
+
+**Remaining:** Windows Terminal/ConPTY, actual modifier/down/repeat values, in-process restoration/error snapshots, UTF-16 API/partial-progress traces, borrowed sync/overlapped cancellation/lifetime and complete rendered presentation remain **UNVERIFIED**. The following 24 October "NOT EXECUTED" host-access statement is retained as a historical checkpoint, **not** a claim about the later VM work. Stage 10 remains INCOMPLETE and no additional CI or release lock is implied.
+
 **NOT EXECUTED. No interactive Windows host is available in this Linux session.**
 No console/ConPTY acceptance or Stage 10 lock is issued. Golden Wrench/Boss must
 review this bounded handoff before host execution. No VM investigation occurred.

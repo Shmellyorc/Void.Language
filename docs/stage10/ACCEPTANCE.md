@@ -1,5 +1,11 @@
 # Stage 10 final engineering acceptance — 24 October 2026
 
+## 25 October 2026 — native Windows 10 Console Host observations
+
+[Independent VM evidence review](engineering/windows-console-final/windows10-vm-2026-10-25/WRENCH_REVIEW.md) records successful Debug/Release builds, focused console CTests **4/4**, genuine attached classic Console Host flows with **scripted input 10/10**, and **four Boss-attested physical Up-arrow runs**, each with two observed key rows and native child exit 0. This is a separate Windows 10 VM at commit `046fcf152a786ce6fe27d58ea4bfb709028f4a21`, not a new hosted CI matrix. Complete original native evidence, including earlier failed attempts, is preserved **privately by Boss**. Public path-free summaries and the unchanged raw-archive SHA-256 are available in [the VM evidence manifest](engineering/windows-console-final/windows10-vm-2026-10-25/evidence-manifest.json). A narrow one-line docs-only PowerShell observer exit-status correction is provided; the successful probes used the corrected evidence copy.
+
+**Evidence boundaries remain explicit:** Windows Terminal/ConPTY, complete modifier and key-down/repeat metadata, actual in-process nested-mode restoration, Win32 UTF-16 partial/error traces and borrowed synchronous/overlapped cancellation/lifetime are **UNVERIFIED**. The VM used explicit output CP 65001; unresolved default-437 and manual-input observations remain historical. The previous 24 October "no interactive Windows host" paragraphs below are **historical**; they are superseded only for the classic Console Host observations named here. **Stage 10 remains INCOMPLETE, no release lock or next stage authorized.**
+
 **Step 43 complete. Step 44 prepared for independent Golden Wrench review and
 Boss release decisions. Stage 10 remains INCOMPLETE and is not release locked.**
 The four authorized systems are implemented. This reconciliation found no new

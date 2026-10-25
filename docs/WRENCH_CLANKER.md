@@ -1,5 +1,13 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Latest native verification — 25 October 2026
+
+[Windows 10 VM evidence](stage10/engineering/windows-console-final/windows10-vm-2026-10-25/WRENCH_REVIEW.md) independently preserves native Debug/Release console CTests **4/4**, genuine attached classic Console Host **10/10 scripted input** cases and four separately **Boss-attested physical Up** cases. Prior full CI #4 remained **7/7, 1,383/1,383**; Windows and macOS targeted native **1 MiB stack gates have both passed**. Neither full CI nor stack tests were rerun for the VM evidence. A one-line `docs/` observer status-scope correction is reviewed separately; no compiler/Runtime/test/workflow change follows.
+
+The detailed unmodified Windows VM evidence archive is held privately to avoid exposing host-specific paths; public summaries and its SHA-256 are retained under `docs/stage10/engineering/windows-console-final/windows10-vm-2026-10-25/`.
+
+The 24 October "unverified 1 MiB stack" text below is **historical and superseded**. The remaining **Windows Terminal/ConPTY, complete physical metadata, in-process restoration, native UTF-16 edge observations and borrowed-handle cancellation/lifetime** are still explicitly **UNVERIFIED**. **Stage 10 remains INCOMPLETE** pending Boss release-gate disposition; no further stage is authorized.
+
 ## Current Stage 10 handoff — 24 October 2026
 
 ThinLTO experiment [#4](https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209)

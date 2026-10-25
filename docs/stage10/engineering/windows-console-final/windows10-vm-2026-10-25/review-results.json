@@ -1,0 +1,95 @@
+{
+  "observed_utc": "2026-10-25T08:42:30.723860+00:00",
+  "stage10": "INCOMPLETE",
+  "release_acceptance_issued": false,
+  "review_required": "Independent Golden Wrench and Boss",
+  "focused_ctest_executions": [
+    {
+      "configuration": "Debug",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Existing injected regression tests; not physical console evidence"
+    },
+    {
+      "configuration": "Release",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Existing injected regression tests; not physical console evidence"
+    }
+  ],
+  "automatic_native_flows": {
+    "passed": 10,
+    "total": 10,
+    "receipt": "automatic-flow-results.json",
+    "output_cp": 65001,
+    "input_cp": 437,
+    "synthetic_input_is_physical_evidence": false
+  },
+  "final_boss_attested_physical_checks": [
+    {
+      "attempt": "Debug-ClassicConsole-key-closed-final-physical-1",
+      "child_exit": 0,
+      "parent_state_equal": true,
+      "printed_key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ],
+      "boss_attestation_file": "Boss-Debug-ClassicConsole-key-closed-final-physical-1.json",
+      "physical_input_confirmed": true,
+      "synthetic_input": false
+    },
+    {
+      "attempt": "Debug-ClassicConsole-key-unclosed-final-physical-2",
+      "child_exit": 0,
+      "parent_state_equal": true,
+      "printed_key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ],
+      "boss_attestation_file": "Boss-Debug-ClassicConsole-key-unclosed-final-physical-2.json",
+      "physical_input_confirmed": true,
+      "synthetic_input": false
+    },
+    {
+      "attempt": "Release-ClassicConsole-key-closed-final-physical-1",
+      "child_exit": 0,
+      "parent_state_equal": true,
+      "printed_key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ],
+      "boss_attestation_file": "Boss-Release-ClassicConsole-key-closed-final-physical-1.json",
+      "physical_input_confirmed": true,
+      "synthetic_input": false
+    },
+    {
+      "attempt": "Release-ClassicConsole-key-unclosed-final-physical-1",
+      "child_exit": 0,
+      "parent_state_equal": true,
+      "printed_key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ],
+      "boss_attestation_file": "Boss-Release-ClassicConsole-key-unclosed-final-physical-1.json",
+      "physical_input_confirmed": true,
+      "synthetic_input": false
+    }
+  ],
+  "physical_checks_started_after_ten_automatic_passes": true,
+  "excluded_unconfirmed_physical_attempt": "Debug-ClassicConsole-key-unclosed-final-physical-1",
+  "failed_and_incomplete_history": "native-results.json and REPORT.md",
+  "remaining_unverified": [
+    "Windows Terminal/ConPTY",
+    "Actual modifier/down masks and repeat >1",
+    "Exact in-process nested mode/code-page restoration",
+    "Native UTF-16 API unit/partial/error traces",
+    "Borrowed sync/overlapped cancellation isolation and lifetime",
+    "Complete rendered presentation inspection"
+  ],
+  "source_identity": "Actual CRLF bytes reconciled; no byte-identical LF working-tree claim",
+  "production_changes": false,
+  "git_operations": false,
+  "hosted_ci": false
+}

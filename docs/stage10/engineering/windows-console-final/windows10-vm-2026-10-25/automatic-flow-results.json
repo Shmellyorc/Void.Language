@@ -1,0 +1,202 @@
+{
+  "observed_utc": "2026-10-25T08:33:05.673136+00:00",
+  "scope": "SCRIPTED input through genuine attached Windows consoles; never physical-key evidence",
+  "host_profile": "Explicit output CP 65001; initial CP 437 retained in each host-profile receipt. Prior default-437 results are preserved separately.",
+  "stage10": "INCOMPLETE",
+  "publication": {
+    "type": "derived path-free public result projection; NOT an original raw receipt",
+    "source_sha256": "eeee8e5ec0c1afb00a35d769f8a554cf35ac8ce64b0adcd708b282b40764d3cb",
+    "omitted_fields": [
+      "results[*].launch_command"
+    ],
+    "original_full_archive": "Privately retained; SHA-256 in evidence-manifest.json"
+  },
+  "results": [
+    {
+      "configuration": "Debug",
+      "scenario": "key-closed",
+      "attempt": "Debug-ClassicConsole-key-closed-auto-utf8-1",
+      "passed": true,
+      "reused_existing_receipt": true,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 2,
+        "Written": 2,
+        "Error": 0,
+        "Marker": "READY",
+        "MatchedUtc": "2026-10-25T08:30:25.5668317Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ]
+    },
+    {
+      "configuration": "Debug",
+      "scenario": "key-unclosed",
+      "attempt": "Debug-ClassicConsole-key-unclosed-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 2,
+        "Written": 2,
+        "Error": 0,
+        "Marker": "READY",
+        "MatchedUtc": "2026-10-25T08:32:02.6451125Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ]
+    },
+    {
+      "configuration": "Debug",
+      "scenario": "shared",
+      "attempt": "Debug-ClassicConsole-shared-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 8,
+        "Written": 8,
+        "Error": 0,
+        "Marker": "READY",
+        "MatchedUtc": "2026-10-25T08:32:09.3695478Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "stdout_unicode_records": 32,
+      "stderr_unicode_records": 32,
+      "done": "DONE:é"
+    },
+    {
+      "configuration": "Debug",
+      "scenario": "prompt",
+      "attempt": "Debug-ClassicConsole-prompt-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 8,
+        "Written": 8,
+        "Error": 0,
+        "Marker": "Name ",
+        "MatchedUtc": "2026-10-25T08:32:21.6770276Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "greeting": "Hello, é🎮"
+    },
+    {
+      "configuration": "Debug",
+      "scenario": "presentation",
+      "attempt": "Debug-ClassicConsole-presentation-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "presentation_report": [
+        "13 2034 2034 ",
+        "0 120 50",
+        "0 0 0 0 0 0 0 ",
+        "1"
+      ]
+    },
+    {
+      "configuration": "Release",
+      "scenario": "key-closed",
+      "attempt": "Release-ClassicConsole-key-closed-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 2,
+        "Written": 2,
+        "Error": 0,
+        "Marker": "READY",
+        "MatchedUtc": "2026-10-25T08:32:35.8309471Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ]
+    },
+    {
+      "configuration": "Release",
+      "scenario": "key-unclosed",
+      "attempt": "Release-ClassicConsole-key-unclosed-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 2,
+        "Written": 2,
+        "Error": 0,
+        "Marker": "READY",
+        "MatchedUtc": "2026-10-25T08:32:42.7001567Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "key_rows": [
+        "5 1 1 1",
+        "5 1 1 1"
+      ]
+    },
+    {
+      "configuration": "Release",
+      "scenario": "shared",
+      "attempt": "Release-ClassicConsole-shared-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 8,
+        "Written": 8,
+        "Error": 0,
+        "Marker": "READY",
+        "MatchedUtc": "2026-10-25T08:32:49.8342937Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "stdout_unicode_records": 32,
+      "stderr_unicode_records": 32,
+      "done": "DONE:é"
+    },
+    {
+      "configuration": "Release",
+      "scenario": "prompt",
+      "attempt": "Release-ClassicConsole-prompt-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "input_receipt": {
+        "Success": true,
+        "ReadyMarkerSeen": true,
+        "Requested": 8,
+        "Written": 8,
+        "Error": 0,
+        "Marker": "Name ",
+        "MatchedUtc": "2026-10-25T08:32:58.5355676Z",
+        "Scope": "SCRIPTED native queue records, never physical-key acceptance"
+      },
+      "greeting": "Hello, é🎮"
+    },
+    {
+      "configuration": "Release",
+      "scenario": "presentation",
+      "attempt": "Release-ClassicConsole-presentation-auto-utf8-1",
+      "passed": true,
+      "launch_exit": 0,
+      "presentation_report": [
+        "13 2034 2034 ",
+        "0 120 50",
+        "0 0 0 0 0 0 0 ",
+        "1"
+      ]
+    }
+  ]
+}

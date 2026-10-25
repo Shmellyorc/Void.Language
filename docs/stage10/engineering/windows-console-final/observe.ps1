@@ -67,7 +67,7 @@ $record = [ordered]@{
 function Save-Observation { $record | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $destination -Encoding UTF8 }
 Save-Observation
 try {
-    $LASTEXITCODE = $null
+    $global:LASTEXITCODE = $null
     if (@($before.ConsoleHandles | Where-Object { -not $_ }).Count -ne 0 -or
         $before.InputCodePage -eq 0 -or $before.OutputCodePage -eq 0) {
         throw 'All three standard handles must be console handles; no redirected interactive pass'
