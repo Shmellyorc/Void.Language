@@ -1,0 +1,184 @@
+[
+  {
+    "label": "debug-native-build[]",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "build",
+      "examples/stage10_console_time/main.void",
+      "-o",
+      "/tmp/void-stage10-ci4/debug-O2"
+    ],
+    "exit": 0,
+    "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d737461676531302d6369342f64656275672d4f320a",
+    "stderr_hex": "",
+    "seconds": 4.7545864740386605
+  },
+  {
+    "label": "debug-native-execute[]",
+    "argv": [
+      "/tmp/void-stage10-ci4/debug-O2"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 0.0033876379020512104
+  },
+  {
+    "label": "debug-native-build['--no-opt']",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "build",
+      "examples/stage10_console_time/main.void",
+      "-o",
+      "/tmp/void-stage10-ci4/debug-normal",
+      "--no-opt"
+    ],
+    "exit": 0,
+    "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d737461676531302d6369342f64656275672d6e6f726d616c0a",
+    "stderr_hex": "",
+    "seconds": 2.5196639439091086
+  },
+  {
+    "label": "debug-native-execute['--no-opt']",
+    "argv": [
+      "/tmp/void-stage10-ci4/debug-normal"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 0.002937390934675932
+  },
+  {
+    "label": "release-native-build[]",
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "build",
+      "examples/stage10_console_time/main.void",
+      "-o",
+      "/tmp/void-stage10-ci4/release-O2"
+    ],
+    "exit": 0,
+    "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d737461676531302d6369342f72656c656173652d4f320a",
+    "stderr_hex": "",
+    "seconds": 2.0387010539416224
+  },
+  {
+    "label": "release-native-execute[]",
+    "argv": [
+      "/tmp/void-stage10-ci4/release-O2"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 0.002401055069640279
+  },
+  {
+    "label": "release-native-build['--no-opt']",
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "build",
+      "examples/stage10_console_time/main.void",
+      "-o",
+      "/tmp/void-stage10-ci4/release-normal",
+      "--no-opt"
+    ],
+    "exit": 0,
+    "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d737461676531302d6369342f72656c656173652d6e6f726d616c0a",
+    "stderr_hex": "",
+    "seconds": 1.2471468690782785
+  },
+  {
+    "label": "release-native-execute['--no-opt']",
+    "argv": [
+      "/tmp/void-stage10-ci4/release-normal"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 0.002230475889518857
+  },
+  {
+    "label": "nullable-Ok-pattern",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "/tmp/void-stage10-ci4/nullable.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "",
+    "stderr_hex": "",
+    "seconds": 0.0373301450163126
+  },
+  {
+    "label": "main-no-return-check",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "check",
+      "/tmp/void-stage10-ci4/main-no-return.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "536f7572636520636865636b6564207375636365737366756c6c790a",
+    "stderr_hex": "",
+    "seconds": 0.008412436814978719
+  },
+  {
+    "label": "main-no-return-application",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "/tmp/void-stage10-ci4/main-no-return.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "",
+    "stderr_hex": "",
+    "seconds": 0.01721470197662711
+  },
+  {
+    "label": "main-return-check",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "check",
+      "/tmp/void-stage10-ci4/main-return.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "536f7572636520636865636b6564207375636365737366756c6c790a",
+    "stderr_hex": "",
+    "seconds": 0.008636136073619127
+  },
+  {
+    "label": "main-return-application",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "/tmp/void-stage10-ci4/main-return.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "",
+    "stderr_hex": "",
+    "seconds": 0.017528479918837547
+  },
+  {
+    "label": "main-array-parameter-check",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "check",
+      "/tmp/void-stage10-ci4/main-array-parameter.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "536f7572636520636865636b6564207375636365737366756c6c790a",
+    "stderr_hex": "",
+    "seconds": 0.008049278985708952
+  },
+  {
+    "label": "main-array-parameter-application",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "/tmp/void-stage10-ci4/main-array-parameter.void"
+    ],
+    "exit": 1,
+    "stdout_hex": "",
+    "stderr_hex": "2f746d702f766f69642d737461676531302d6369342f6d61696e2d61727261792d706172616d657465722e766f69643a313a313a206572726f723a204e6f20656e7472792066756e6374696f6e20666f756e642e0a20202020636f64653a20564f4944343030310a0a2031207c2066756e63206d61696e287261773a205b737472696e675d293a0a2020207c205e0a202020204d6f64756c653a202f6d61696e2d61727261792d706172616d657465722e766f69640a2020202048696e743a20446566696e652066756e6320656e7472792876616c75653a2069333229202d3e2069333220746f2072756e206f7220656d697420746869732066696c653b20636865636b2061636365707473206c696272617269657320776974686f757420616e20656e7472792e0a0a",
+    "seconds": 0.008700486039742827
+  }
+]

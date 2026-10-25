@@ -1,0 +1,163 @@
+{
+  "run_id": 40118666209,
+  "tested_commit": "90c0cf64b9aba60d7c642096d2aaac45aae70d56",
+  "mode": "thinlto-cache",
+  "jobs_passed": 7,
+  "ctest_passed": 1383,
+  "ctest_failed": 0,
+  "ctest_skipped": 0,
+  "wall_interval_seconds": 4124,
+  "wall_interval_basis": "created_at to updated_at, 18:00:03Z to 19:08:47Z; not sum of job durations",
+  "jobs": [
+    {
+      "id": 120945262292,
+      "name": "thinlto-cache / macOS ARM64 / Debug",
+      "conclusion": "success",
+      "ctest_passed": 199,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T18:51:35.4295160Z 100% tests passed out of 199"
+      ],
+      "raw_log_gzip": "job-120945262292.log.gz",
+      "raw_log_sha256": "1c053e444bfb18c862994b16d53de89a7e079e07e0125d249992fd6a67a931d4",
+      "gzip_sha256": "92585bf4118fb0582285a20ec8ea4dc482de120b4ef60986fcfa30d9357494c0",
+      "notable_lines": [
+        "2026-10-24T18:01:04.3343960Z clang version 19.1.7 (/Users/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+        "2026-10-24T18:24:32.4774290Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.49 sec",
+        "2026-10-24T18:24:34.2375080Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    1.53 sec",
+        "2026-10-24T18:46:03.7601160Z 177/199 Test #177: stage10_console_aot .......................   Passed  598.94 sec",
+        "2026-10-24T18:52:12.3648530Z PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair",
+        "2026-10-24T18:52:20.6348130Z PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup",
+        "2026-10-24T18:52:24.7796450Z PASS real editor restricted trust: no native child spawned",
+        "2026-10-24T18:52:28.2246140Z PASS real editor multi-root: explanatory error, no native child spawned"
+      ]
+    },
+    {
+      "id": 120945262512,
+      "name": "thinlto-cache / Windows 2022 / Debug",
+      "conclusion": "success",
+      "ctest_passed": 194,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T18:43:52.5610524Z 100% tests passed, 0 tests failed out of 194"
+      ],
+      "raw_log_gzip": "job-120945262512.log.gz",
+      "raw_log_sha256": "452f8afea479e7c1038f7fb7e8e76195c2bd51c2c3ee77c303cf0cb80ecb2494",
+      "gzip_sha256": "6501a0b77dd22d0e760ae9733f61a05b2df00d264dafa6e061da57c65d0aa089",
+      "notable_lines": [
+        "2026-10-24T18:00:46.3952471Z clang version 19.1.7",
+        "2026-10-24T18:37:50.2374230Z 172/194 Test #172: stage10_console_aot .......................   Passed  648.06 sec",
+        "2026-10-24T18:44:51.1809019Z PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair",
+        "2026-10-24T18:45:00.6442178Z PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup",
+        "2026-10-24T18:45:04.9075554Z PASS real editor restricted trust: no native child spawned",
+        "2026-10-24T18:45:09.6169271Z PASS real editor multi-root: explanatory error, no native child spawned"
+      ]
+    },
+    {
+      "id": 120945262621,
+      "name": "thinlto-cache / Ubuntu 24.04 / Sanitizers",
+      "conclusion": "success",
+      "ctest_passed": 199,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T19:08:37.9057664Z 100% tests passed, 0 tests failed out of 199"
+      ],
+      "raw_log_gzip": "job-120945262621.log.gz",
+      "raw_log_sha256": "28f7f0912286ee32109e0aa233104b7216048f0a5bccd6b086b916a1e4630bd8",
+      "gzip_sha256": "af172cb1eb97eb068e9b9492249815e47e596f7f505fe5c275e4c354a714c14c",
+      "notable_lines": [
+        "2026-10-24T18:01:06.8084242Z clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+        "2026-10-24T18:33:37.4799497Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.67 sec",
+        "2026-10-24T18:33:38.5248858Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    0.77 sec",
+        "2026-10-24T19:01:21.9394032Z 177/199 Test #177: stage10_console_aot .......................   Passed  927.11 sec"
+      ]
+    },
+    {
+      "id": 120945262642,
+      "name": "thinlto-cache / Windows 2022 / Release",
+      "conclusion": "success",
+      "ctest_passed": 194,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T18:24:51.1446803Z 100% tests passed, 0 tests failed out of 194"
+      ],
+      "raw_log_gzip": "job-120945262642.log.gz",
+      "raw_log_sha256": "8ba71ab847e8eb3f0f4cea70b93c17cffe421d1b0a92daa68a98a1e45ef1e687",
+      "gzip_sha256": "328dfe86427f17c7d56fa52cfd8b5d4adaeca73fd71293350fed9e1b85f99fec",
+      "notable_lines": [
+        "2026-10-24T18:00:41.9006386Z clang version 19.1.7",
+        "2026-10-24T18:21:26.0912316Z 172/194 Test #172: stage10_console_aot .......................   Passed  410.03 sec"
+      ]
+    },
+    {
+      "id": 120945262661,
+      "name": "thinlto-cache / Ubuntu 24.04 / Release",
+      "conclusion": "success",
+      "ctest_passed": 199,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T18:28:00.6383443Z 100% tests passed, 0 tests failed out of 199",
+        "2026-10-24T18:28:03.3893799Z 100% tests passed, 0 tests failed out of 1"
+      ],
+      "raw_log_gzip": "job-120945262661.log.gz",
+      "raw_log_sha256": "f2f0b27b207ad698a0f2456eeb8e238dad3c3e743012e3d947cbca9519defbd3",
+      "gzip_sha256": "19adef3d8743ec1481046f7fb025659d98c9b0b5b8fdf8daced9100589130e1c",
+      "notable_lines": [
+        "2026-10-24T18:01:27.0438934Z clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+        "2026-10-24T18:17:42.5117942Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.13 sec",
+        "2026-10-24T18:17:43.3558480Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    0.70 sec",
+        "2026-10-24T18:26:12.7811857Z 177/199 Test #177: stage10_console_aot .......................   Passed  310.39 sec"
+      ]
+    },
+    {
+      "id": 120945262672,
+      "name": "thinlto-cache / Ubuntu 24.04 / Debug",
+      "conclusion": "success",
+      "ctest_passed": 199,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T18:38:11.6641953Z 100% tests passed, 0 tests failed out of 199",
+        "2026-10-24T18:38:16.5298145Z 100% tests passed, 0 tests failed out of 1"
+      ],
+      "raw_log_gzip": "job-120945262672.log.gz",
+      "raw_log_sha256": "93e0d8231a580d10bf7333e882dee43c50c5dc560771571ead51f575a00e266f",
+      "gzip_sha256": "43fe766993201ce5ea48e10959350419fbf732bfe8bf17cbc26d6ff125919d1f",
+      "notable_lines": [
+        "2026-10-24T18:01:20.3213049Z clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+        "2026-10-24T18:17:40.1754572Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.19 sec",
+        "2026-10-24T18:17:41.0055314Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    0.70 sec",
+        "2026-10-24T18:34:43.0193541Z 177/199 Test #177: stage10_console_aot .......................   Passed  517.44 sec",
+        "2026-10-24T18:38:41.8663565Z PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair",
+        "2026-10-24T18:38:50.5454909Z PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup",
+        "2026-10-24T18:38:53.1879864Z PASS real editor restricted trust: no native child spawned",
+        "2026-10-24T18:38:55.9672297Z PASS real editor multi-root: explanatory error, no native child spawned"
+      ]
+    },
+    {
+      "id": 120945262688,
+      "name": "thinlto-cache / macOS ARM64 / Release",
+      "conclusion": "success",
+      "ctest_passed": 199,
+      "ctest_failed": 0,
+      "ctest_skipped": 0,
+      "ctest_summaries": [
+        "2026-10-24T18:38:53.9233400Z 100% tests passed out of 199"
+      ],
+      "raw_log_gzip": "job-120945262688.log.gz",
+      "raw_log_sha256": "a513061fc1f26fa0fdb2bb53db95df67f135124ecce9dfc19b4460345b4fba75",
+      "gzip_sha256": "54906e5a3511c1bc9250e5b462032e6a867f520aabcc0984e69ba38c91e51283",
+      "notable_lines": [
+        "2026-10-24T18:01:14.0543230Z clang version 19.1.7 (/Users/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+        "2026-10-24T18:26:57.3369650Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.35 sec",
+        "2026-10-24T18:26:58.7488500Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    1.17 sec",
+        "2026-10-24T18:36:21.7960070Z 177/199 Test #177: stage10_console_aot .......................   Passed  311.20 sec"
+      ]
+    }
+  ]
+}

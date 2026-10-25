@@ -1,0 +1,65 @@
+{
+  "scope": "Only this evidence-correction follow-up; previous uncommitted implementation/closeout work is pre-existing.",
+  "modified_existing_files": [
+    {
+      "path": "docs/stage10/engineering/step42-results.json",
+      "before_sha256": "e0e42522a8dbe6af0979e7c5359133760df7411e199f894b6602602130c60485",
+      "after_sha256": "e08241e6f2c00ffc35546b8884873190f0419ff767c93af501f6008aada5a5c0"
+    },
+    {
+      "path": "docs/stage10/EVIDENCE.md",
+      "before_sha256": "6e989601674736f0e69bb6b2717c057c07d0236850ab33c1f655587301c65713",
+      "after_sha256": "3df9aadd7ec37c35b8d1e7420b42ffc8f133da104ede9a0e68a9b3b1452d03fd"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/changed-files.json",
+      "before_sha256": "0b28d9c431fd077714fb49af8e7ea0dfd4061e7143308ab0f6851c261cfba34e",
+      "after_sha256": "29a02e1e11f9495f8bcb0fa7d8346d1f0a80a9a367c371f25149a5763aefd39f"
+    },
+    {
+      "path": "docs/stage10/engineering/native-final/HANDOFF.md",
+      "before_sha256": "ffd19850327680a0fcbffa138a2809f7ca9ae9cea1ae526b968aeaf4a5d76a88",
+      "after_sha256": "b7109bff1f668a2099e897613df67136b37143a2eaa6086bdf021d777dd7b1e3"
+    },
+    {
+      "path": "docs/stage10/engineering/native-final/changed-files.json",
+      "before_sha256": "1b7358c3ff7935b9d02eb69e691d9c647ae9bdda3d23b35dbca3a65ab435d1e8",
+      "after_sha256": "f2048a7ecb540373b29f725899e85643c14ec57568ef3b33eeedb8d58675ac84"
+    }
+  ],
+  "added_file_count": 7,
+  "added_files": [
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/CORRECTIONS.md",
+      "sha256": "d33479dc979698e86fb76fe66c99f84a8ce8c87bbb9ea38fe35216a43dd0f761"
+    },
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/changed-files.json",
+      "sha256": null
+    },
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/corrections.patch",
+      "sha256": "76b4da2d8e06297602b7fd2de9c00ad6af28773ecb9f005d4c5654bd267db756"
+    },
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/local-closeout-corrected.patch",
+      "sha256": "9df93e6b98b25f78e2313e2145417db88e0bf5bf3d550baf9d5cf0bf64a98480"
+    },
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/local-closeout-corrected.tar.gz",
+      "sha256": "3b1e4f26872733c8b8f5970574b765188f44c19f7be6a0227da5030789f88fdf"
+    },
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/payload.sha256",
+      "sha256": "95c99401c800bbf030c2eba76377f7ab82ca12ebb1363af6005605b585aadf4b"
+    },
+    {
+      "path": "docs/stage10/engineering/evidence-corrections/verification.json",
+      "sha256": "9ec37c1aad60881db7291ba8fc8e029b20b5910c8838e611910c768e89cbe949"
+    }
+  ],
+  "preexisting_review_preserved": {
+    "path": "docs/Stage10_Wrench_Review.md",
+    "sha256": "825f71ca29a97b4a331b40dfe7c6ccc24285236c294d6adbf5e157a481228850"
+  }
+}

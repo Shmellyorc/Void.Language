@@ -1,11 +1,11 @@
 {
   "increment": "Stage 10 Step 42 \u2014 native Windows/macOS acceptance preparation",
-  "updated_utc": "2026-10-24T17:39:35.859745+00:00",
-  "status": "CI98/ThinLTO3 macOS Release fixture synchronization repairs locally verified; Golden Wrench review and native Release verification pending; Step42 INCOMPLETE",
+  "updated_utc": "2026-10-24T21:53:13.472680+00:00",
+  "status": "Experiment #4 automated native matrix green; formal reconciliation complete; real Windows console/ConPTY and exact native 1MiB stack receipts open; independent review pending",
   "step42_complete": false,
   "stage_status": "INCOMPLETE",
-  "subsequent_steps": "43\u201344 remain separate",
-  "authority": "Boss authorizes bounded investigation/repair of the two macOS Release failures. Test-only changes; no Git mutation, CI dispatch, workflow edit or new architecture.",
+  "subsequent_steps": "Step43 documentation/examples reconciliation complete; Step44 final review package prepared, Golden Wrench/Boss decisions pending",
+  "authority": "Boss authorizes Stage10 acceptance closeout and future-design preservation; no Git mutation, hosted dispatch, workflow change, release lock or next-stage implementation.",
   "baseline": {
     "result": "step41-results.json",
     "result_sha256": "e7eb5375aea4eb705ac275aa6043fb9a0bd3c0336cd71ef39869c8750db9b688",
@@ -147,8 +147,27 @@
   },
   "platforms": {
     "windows": {
-      "status": "CI98/ThinLTO3 baseline Debug/Release green; no current native rerun or production change",
-      "native_attempts": [],
+      "status": "Experiment #4 native Debug/Release automated acceptance green; remaining explicit host/stack evidence is not inferred",
+      "native_attempts": [
+        {
+          "id": 120945262512,
+          "name": "thinlto-cache / Windows 2022 / Debug",
+          "conclusion": "success",
+          "ctest_passed": 194,
+          "ctest_failed": 0,
+          "ctest_skipped": 0,
+          "raw_log_gzip": "job-120945262512.log.gz"
+        },
+        {
+          "id": 120945262642,
+          "name": "thinlto-cache / Windows 2022 / Release",
+          "conclusion": "success",
+          "ctest_passed": 194,
+          "ctest_failed": 0,
+          "ctest_skipped": 0,
+          "raw_log_gzip": "job-120945262642.log.gz"
+        }
+      ],
       "planned_architecture": "x64",
       "planned_configurations": [
         "Debug",
@@ -160,17 +179,35 @@
       "planned_VOID_LINKER": "empty (Linux-only override not used)",
       "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
       "projected_suites_per_configuration": 194,
-      "actual_discovered": null,
-      "actual_executed": null,
-      "actual_passed": null,
-      "actual_failed": null,
-      "actual_skipped": null,
-      "actual_build_exit_codes": null,
-      "actual_compiler_configuration": null,
-      "native_source_receipts": null,
+      "actual_discovered": {
+        "Debug": 194,
+        "Release": 194
+      },
+      "actual_executed": {
+        "Debug": 194,
+        "Release": 194
+      },
+      "actual_passed": {
+        "Debug": 194,
+        "Release": 194
+      },
+      "actual_failed": {
+        "Debug": 0,
+        "Release": 0
+      },
+      "actual_skipped": {
+        "Debug": 0,
+        "Release": 0
+      },
+      "actual_build_exit_codes": {
+        "Debug": 0,
+        "Release": 0
+      },
+      "actual_compiler_configuration": "LLVM/Clang19.1.7; Ninja; Debug/Release; existing sanitizerOFF native settings; thinlto-cache experiment (Windows linker unchanged)",
+      "native_source_receipts": "Experiment4 checked out90c0cf64b9aba60d7c642096d2aaac45aae70d56; complete raw log identities retained",
       "native_binary_identities": null,
       "native_failure_logs": null,
-      "actual_os_sdk_compiler_versions": null,
+      "actual_os_sdk_compiler_versions": "Full native SDK/OS/compiler startup output in ci4/job-ID.log.gz",
       "ci97_baseline": {
         "run_id": 40069548583,
         "commit": "96bac2ea8e4be31d574a5916118feab0ef6b2e7f",
@@ -179,8 +216,27 @@
       }
     },
     "macos": {
-      "status": "CI98 and ThinLTO3 macOS Debug accepted; Release198/199 in each with different fixture synchronization failures. Current test-only repair native Release verification pending.",
-      "native_attempts": [],
+      "status": "Experiment #4 native Debug/Release automated acceptance green; remaining explicit host/stack evidence is not inferred",
+      "native_attempts": [
+        {
+          "id": 120945262292,
+          "name": "thinlto-cache / macOS ARM64 / Debug",
+          "conclusion": "success",
+          "ctest_passed": 199,
+          "ctest_failed": 0,
+          "ctest_skipped": 0,
+          "raw_log_gzip": "job-120945262292.log.gz"
+        },
+        {
+          "id": 120945262688,
+          "name": "thinlto-cache / macOS ARM64 / Release",
+          "conclusion": "success",
+          "ctest_passed": 199,
+          "ctest_failed": 0,
+          "ctest_skipped": 0,
+          "raw_log_gzip": "job-120945262688.log.gz"
+        }
+      ],
       "planned_architecture": "ARM64",
       "planned_configurations": [
         "Debug",
@@ -192,17 +248,35 @@
       "planned_VOID_LINKER": "empty (Linux-only override not used)",
       "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
       "projected_suites_per_configuration": 199,
-      "actual_discovered": null,
-      "actual_executed": null,
-      "actual_passed": null,
-      "actual_failed": null,
-      "actual_skipped": null,
-      "actual_build_exit_codes": null,
-      "actual_compiler_configuration": null,
-      "native_source_receipts": null,
+      "actual_discovered": {
+        "Debug": 199,
+        "Release": 199
+      },
+      "actual_executed": {
+        "Debug": 199,
+        "Release": 199
+      },
+      "actual_passed": {
+        "Debug": 199,
+        "Release": 199
+      },
+      "actual_failed": {
+        "Debug": 0,
+        "Release": 0
+      },
+      "actual_skipped": {
+        "Debug": 0,
+        "Release": 0
+      },
+      "actual_build_exit_codes": {
+        "Debug": 0,
+        "Release": 0
+      },
+      "actual_compiler_configuration": "LLVM/Clang19.1.7; Ninja; Debug/Release; existing sanitizerOFF native settings; thinlto-cache experiment (Windows linker unchanged)",
+      "native_source_receipts": "Experiment4 checked out90c0cf64b9aba60d7c642096d2aaac45aae70d56; complete raw log identities retained",
       "native_binary_identities": null,
       "native_failure_logs": null,
-      "actual_os_sdk_compiler_versions": null,
+      "actual_os_sdk_compiler_versions": "Full native SDK/OS/compiler startup output in ci4/job-ID.log.gz",
       "ci98_baseline": {
         "commit": "9a4985f89f40c56b8eaa984775faf18c52b69f19",
         "main_run": 40091828693,
@@ -317,27 +391,18 @@
     "source_limits_or_optimization_changed": false
   },
   "remaining_native_gates": [
-    "Actual macOS SDK standard/opt-in stop-token compile/link/run and native CMake detection",
-    "Native Windows chrono aliases and exact old/new component probe",
-    "Both native configurations: rerun four CI96 failures, then complete unfiltered suites and remaining host/editor/packaging gates",
-    "Boss-authorized exact source snapshot must include current uncommitted Stage10 work and match accepted766 inputs; HEAD alone is insufficient",
-    "Fresh native compiler/Runtime/voidc/voidls Debug and Release builds; actual CTest inventory, unfiltered complete JUnit and preserved full logs",
-    "Genuine1MiB fullfrontend and unchanged semantic_depth124/400/recovery checks: verify Windows PE StackReserve, macOS both RLIMIT values",
-    "Native normal/O2 JIT, independent AOT, production native build/install/relocation/embedded zones and stdlib source discovery",
-    "Native console/PTY/ConPTY and state snapshots, Unicode/UTF16/raw redirected data, partial errors, canonical editor state, restoration",
-    "Borrowed synchronous/overlapped Windows handles, queued/entered cancellation, buffers, GC/shutdown races and unrelated host I/O",
-    "Darwin SIGPIPE/signals, ncurses/terminfo modes/PTY restoration and canonical /var aliases",
-    "Windows extra-volume transfer if actual second volume available; otherwise retain UNVERIFIED",
-    "Real native editor hosts and optional installed Vim/Neovim adapters; POSIX menu harnesses do not establish Windows menus",
-    "Final native source/binary/SDK/artifact hashes and exact build/compiler/OS configurations"
+    "Actual Windows console/ConPTY ReadConsoleW/WriteConsoleW, key events, before/after modes/code pages, restoration and native errors in Debug/Release; portable injected adapter acceptance is not actual console evidence.",
+    "Real Windows borrowed synchronous/overlapped handles, cancellation/progress/retained buffers/GC/cleanup; current suite does not establish all host boundaries.",
+    "Exact native1MiB gate receipts: macOS both RLIMIT_STACK values and original probes; Windows PE StackReserve readback. Linux original protections and hosted frontend gates pass unchanged.",
+    "Optional native Vim/Neovim and actual second Windows volume remain unverified; do not infer from Linux or native VS Code.",
+    "Independent Golden Wrench completeness/evidence review and Boss acceptance/release decisions; no routine7-job rerun for documentation."
   ],
   "coverage_gaps": [
-    "Five POSIX-only CTest registrations are absent on Windows, not skipped successful tests",
-    "runtime_console_wide injected adapter checks do not establish real ReadConsoleW/WriteConsoleW behavior",
-    "No automated CreatePseudoConsole/ConPTY driver exists in current tests; additional genuine host evidence required even after green Windows CTest",
-    "Linux-only GC --wrap hooks are not available on these platforms; portable GC tests remain",
-    "Native configurations use existing sanitizerOFF platform settings; Linux strict acceptance is separate",
-    "Native actual tool versions, architectures, binary hashes, failure logs, test counts and performance/memory measurements are unavailable until execution"
+    "Five POSIX-only suites are absent on Windows, not skipped passes.",
+    "Real Windows console/ConPTY and handle-specific gaps remain as above.",
+    "Native configurations use existing sanitizerOFF; strict Linux is separate. Generated machine code is not equivalently sanitizer-instrumented.",
+    "Artifact metadata/digests retained; ZIP payload contents not downloaded or rehash-verified. No new native binary hash receipt inferred.",
+    "No same-commit control/cache performance comparison; cold builds and later warm relinks do not establish causal speedup here."
   ],
   "historical_observations_preserved": [
     "Step37 publication/default-root _year/year anomalies remain unexplained; later passing probes do not establish a fix",
@@ -354,9 +419,11 @@
     "Daybreak_application": false,
     "public_README_changed": false,
     "production_or_test_source_changes": true,
-    "accepted_Step41_reopened": false
+    "accepted_Step41_reopened": false,
+    "current_closeout_production_or_test_source_changes": false,
+    "production_or_test_source_changes_scope": "Historical Step42 CI96/97/98 repairs; current closeout changes docs/evidence and one example only."
   },
-  "next_concrete_action": "Boss reviews the job-budget correction, then controls Git and hosted native re-verification. Run actual SDK/chrono probes, repaired Windows/macOS Debug/Release checks and remaining Step42 gates. No additional local matrix for this workflow-only change.",
+  "next_concrete_action": "Golden Wrench reviews ACCEPTANCE.md, actual diff, all44 obligations and open native evidence. Boss decides concrete remaining native checks/disposition and release; no next stage or hosted dispatch is initiated.",
   "deliverable_hashes": {
     "ci96/REPAIR_HANDOFF.md": "97b559245b9b67469efaaf73933e2d9a3a38b50d9675dc6ed8a481fab5c948be",
     "ci96/artifacts.json": "350a3cb7905bbd209745ef541076632960f613e5433af533a0ed09af8d0468da",
@@ -430,10 +497,10 @@
     "ci96-timeout/workflow.diff": "cffc8299314596bf8095392812a989233511b330e26e42bbac55174444a1ac39"
   },
   "current_documentation_hashes": {
-    "docs/stage10/IMPLEMENTATION.md": "3f74addaf52f2297da2db4813fbe7c1e182c945fc39cdd089ef07662be32ad85",
-    "docs/stage10/TEST_PLAN.md": "bd8d7ec41d0a2a7497e5be38a8c49c4818bec76da9f94016c1297818acf407b3",
-    "docs/stage10/CONSOLE_IO.md": "bebaf5dceba69cd652b4a5fede6b751af66797771f68e66969f1ea272d50608e",
-    "docs/WORK_LOG.md": "b113efa04e6a175d1efe03a1787dfa1bccfbefd4fceea74a6370991a6ca2506f",
+    "docs/stage10/IMPLEMENTATION.md": "46332129b196dccd509a3aa585c6c10b7cf73f49f48dfd3f0071bbf006e7f2d2",
+    "docs/stage10/TEST_PLAN.md": "d1a03ecc5e928659ebfb9b069f5ab94c133a66c1aae07019154a319e74515a02",
+    "docs/stage10/CONSOLE_IO.md": "481fc064becdaa4b1cc4e24eb1e74959b94c6ae5212c331d70b868bb3c15bb89",
+    "docs/WORK_LOG.md": "0d351c4c6a31df5ee8a0833f0908ff02ab805ef7d03aa8e9ed1031d569110a49",
     "docs/stage10/engineering/step42-native-commands.md": "93b4307f6559f17c1895f01bf648dfe4572885c7d7b3db4f1df6fe3471504fff"
   },
   "historical_preparation_result": "ci96/before/docs/stage10/engineering/step42-results.json",
@@ -1033,5 +1100,134 @@
     },
     "hosted_numeric_prefix_count": "Not recorded in original failure log; zero count is inferred/model-reproduced, not claimed as a native macOS measurement.",
     "remaining_native_verification": "Golden Wrench review, then Boss-controlled macOS Release rebuild of transfer test and both original native fixture reruns/repetitions, raw terminal/progress reports and full Release acceptance. Other six green configurations retained as baseline. Stage10 INCOMPLETE; no Steps43/44 work."
+  },
+  "historical_pre_ci4_checkpoint": {
+    "updated_utc": "2026-10-24T17:39:35.859745+00:00",
+    "status": "CI98/ThinLTO3 macOS Release fixture synchronization repairs locally verified; Golden Wrench review and native Release verification pending; Step42 INCOMPLETE",
+    "step42_complete": false,
+    "stage_status": "INCOMPLETE",
+    "subsequent_steps": "43\u201344 remain separate",
+    "authority": "Boss authorizes bounded investigation/repair of the two macOS Release failures. Test-only changes; no Git mutation, CI dispatch, workflow edit or new architecture.",
+    "platforms": {
+      "windows": {
+        "status": "CI98/ThinLTO3 baseline Debug/Release green; no current native rerun or production change",
+        "native_attempts": [],
+        "planned_architecture": "x64",
+        "planned_configurations": [
+          "Debug",
+          "Release"
+        ],
+        "planned_generator": "Ninja",
+        "planned_compiler": "Windows clang-cl19.1.7",
+        "planned_VOID_CLANG": "Pinned SDK clang19.1.7 native AOT driver",
+        "planned_VOID_LINKER": "empty (Linux-only override not used)",
+        "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+        "projected_suites_per_configuration": 194,
+        "actual_discovered": null,
+        "actual_executed": null,
+        "actual_passed": null,
+        "actual_failed": null,
+        "actual_skipped": null,
+        "actual_build_exit_codes": null,
+        "actual_compiler_configuration": null,
+        "native_source_receipts": null,
+        "native_binary_identities": null,
+        "native_failure_logs": null,
+        "actual_os_sdk_compiler_versions": null,
+        "ci97_baseline": {
+          "run_id": 40069548583,
+          "commit": "96bac2ea8e4be31d574a5916118feab0ef6b2e7f",
+          "Debug": "194/194",
+          "Release": "194/194"
+        }
+      },
+      "macos": {
+        "status": "CI98 and ThinLTO3 macOS Debug accepted; Release198/199 in each with different fixture synchronization failures. Current test-only repair native Release verification pending.",
+        "native_attempts": [],
+        "planned_architecture": "ARM64",
+        "planned_configurations": [
+          "Debug",
+          "Release"
+        ],
+        "planned_generator": "Ninja",
+        "planned_compiler": "macOS ARM64 clang/clang++19.1.7",
+        "planned_VOID_CLANG": "Pinned SDK clang19.1.7 native AOT driver",
+        "planned_VOID_LINKER": "empty (Linux-only override not used)",
+        "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+        "projected_suites_per_configuration": 199,
+        "actual_discovered": null,
+        "actual_executed": null,
+        "actual_passed": null,
+        "actual_failed": null,
+        "actual_skipped": null,
+        "actual_build_exit_codes": null,
+        "actual_compiler_configuration": null,
+        "native_source_receipts": null,
+        "native_binary_identities": null,
+        "native_failure_logs": null,
+        "actual_os_sdk_compiler_versions": null,
+        "ci98_baseline": {
+          "commit": "9a4985f89f40c56b8eaa984775faf18c52b69f19",
+          "main_run": 40091828693,
+          "experiment_run": 40091853317,
+          "Debug": "Both jobs green",
+          "Release": "Each198/199; independent native terminal/transfer failures"
+        }
+      }
+    },
+    "remaining_native_gates": [
+      "Actual macOS SDK standard/opt-in stop-token compile/link/run and native CMake detection",
+      "Native Windows chrono aliases and exact old/new component probe",
+      "Both native configurations: rerun four CI96 failures, then complete unfiltered suites and remaining host/editor/packaging gates",
+      "Boss-authorized exact source snapshot must include current uncommitted Stage10 work and match accepted766 inputs; HEAD alone is insufficient",
+      "Fresh native compiler/Runtime/voidc/voidls Debug and Release builds; actual CTest inventory, unfiltered complete JUnit and preserved full logs",
+      "Genuine1MiB fullfrontend and unchanged semantic_depth124/400/recovery checks: verify Windows PE StackReserve, macOS both RLIMIT values",
+      "Native normal/O2 JIT, independent AOT, production native build/install/relocation/embedded zones and stdlib source discovery",
+      "Native console/PTY/ConPTY and state snapshots, Unicode/UTF16/raw redirected data, partial errors, canonical editor state, restoration",
+      "Borrowed synchronous/overlapped Windows handles, queued/entered cancellation, buffers, GC/shutdown races and unrelated host I/O",
+      "Darwin SIGPIPE/signals, ncurses/terminfo modes/PTY restoration and canonical /var aliases",
+      "Windows extra-volume transfer if actual second volume available; otherwise retain UNVERIFIED",
+      "Real native editor hosts and optional installed Vim/Neovim adapters; POSIX menu harnesses do not establish Windows menus",
+      "Final native source/binary/SDK/artifact hashes and exact build/compiler/OS configurations"
+    ],
+    "coverage_gaps": [
+      "Five POSIX-only CTest registrations are absent on Windows, not skipped successful tests",
+      "runtime_console_wide injected adapter checks do not establish real ReadConsoleW/WriteConsoleW behavior",
+      "No automated CreatePseudoConsole/ConPTY driver exists in current tests; additional genuine host evidence required even after green Windows CTest",
+      "Linux-only GC --wrap hooks are not available on these platforms; portable GC tests remain",
+      "Native configurations use existing sanitizerOFF platform settings; Linux strict acceptance is separate",
+      "Native actual tool versions, architectures, binary hashes, failure logs, test counts and performance/memory measurements are unavailable until execution"
+    ],
+    "next_concrete_action": "Boss reviews the job-budget correction, then controls Git and hosted native re-verification. Run actual SDK/chrono probes, repaired Windows/macOS Debug/Release checks and remaining Step42 gates. No additional local matrix for this workflow-only change.",
+    "current_documentation_hashes": {
+      "docs/stage10/IMPLEMENTATION.md": "3f74addaf52f2297da2db4813fbe7c1e182c945fc39cdd089ef07662be32ad85",
+      "docs/stage10/TEST_PLAN.md": "bd8d7ec41d0a2a7497e5be38a8c49c4818bec76da9f94016c1297818acf407b3",
+      "docs/stage10/CONSOLE_IO.md": "bebaf5dceba69cd652b4a5fede6b751af66797771f68e66969f1ea272d50608e",
+      "docs/WORK_LOG.md": "b113efa04e6a175d1efe03a1787dfa1bccfbefd4fceea74a6370991a6ca2506f",
+      "docs/stage10/engineering/step42-native-commands.md": "93b4307f6559f17c1895f01bf648dfe4572885c7d7b3db4f1df6fe3471504fff"
+    }
+  },
+  "thinlto_experiment_4": {
+    "run_id": 40118666209,
+    "tested_commit": "90c0cf64b9aba60d7c642096d2aaac45aae70d56",
+    "mode": "thinlto-cache",
+    "jobs_passed": 7,
+    "ctest_passed": 1383,
+    "ctest_failed": 0,
+    "ctest_skipped": 0,
+    "wall_interval_seconds": 4124,
+    "wall_interval_basis": "created_at to updated_at, 18:00:03Z to 19:08:47Z; not sum of job durations",
+    "run_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209",
+    "metadata": "ci4/run.json",
+    "jobs_metadata": "ci4/jobs.json",
+    "artifact_metadata": "ci4/artifacts.json",
+    "raw_logs": "ci4/job-ID.log.gz; SHA256 in ci4/summary.json",
+    "full_native_matrix_green": true,
+    "main_CI_changed": false,
+    "main_CI_success_claimed": false,
+    "stage_lock_implied": false,
+    "same_commit_control_comparison_available": false,
+    "ci98_experiment3_observations": "Preserved separately in ci98_final_macos_investigation; no cache causality claim",
+    "per_job_counts_logs_and_hashes": "ci4/summary.json"
   }
 }

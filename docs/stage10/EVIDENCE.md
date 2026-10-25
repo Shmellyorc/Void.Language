@@ -1,5 +1,14 @@
 # Stage 10 evidence and audit register
 
+## Current acceptance checkpoint — 24 October 2026
+
+Implementation, examples and executed coverage are reconciled in
+[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+native evidence remain open. Stage 10 is not locked. Earlier dated research and
+progress statements below retain their historical meaning.
+
+## Historical research baseline — 21 October 2026
+
 Research date: 21 October 2026. Inspected source HEAD:
 `e25816bdb80e3f32613edf77c9cf3258232af966`.
 **Research/documentation only; no compiler test run, production edit or hosted CI

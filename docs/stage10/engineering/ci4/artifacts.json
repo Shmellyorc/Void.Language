@@ -1,0 +1,327 @@
+{
+  "artifacts": [
+    {
+      "id": 12572570094,
+      "name": "tests-macOS-ARM64-Debug",
+      "size_in_bytes": 37733,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12572570094",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12572570094/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:52:47Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:52:47Z",
+      "digest": "sha256:464e348307d9ec1e2c9e17dc89efe02a329907aeeab2079b2738140463f117ec",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12572425393,
+      "name": "link-experiment-thinlto-cache-macOS-ARM64-Debug-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 390013,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12572425393",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12572425393/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:52:45Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:52:45Z",
+      "digest": "sha256:8c510bdfad63521f575ab8f44b32c21ca225c1d6445e1e158a81d4bfa5666d6b",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12572412633,
+      "name": "link-experiment-thinlto-cache-Linux-X64-Sanitizers-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 375863,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12572412633",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12572412633/zip",
+      "expired": false,
+      "created_at": "2026-10-24T19:08:41Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T19:08:41Z",
+      "digest": "sha256:5fdfe612316ee1364aa45a4e20642bf21dfab2be6905ab80b7e50ed9b425d993",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571962901,
+      "name": "tests-Linux-X64-Sanitizers",
+      "size_in_bytes": 23788,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571962901",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571962901/zip",
+      "expired": false,
+      "created_at": "2026-10-24T19:08:43Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T19:08:43Z",
+      "digest": "sha256:cb092c602c01e317a074d40025cef31f1200306ce4538c2ac4a6745fb9cba05e",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571930758,
+      "name": "void-editor-macOS-ARM64-Debug",
+      "size_in_bytes": 149789,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571930758",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571930758/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:52:38Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:52:38Z",
+      "digest": "sha256:726040ff5df661dad1748ee3d44e6ddf01705231d7acf05e016e315b732f4b9c",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571341878,
+      "name": "tests-Linux-X64-Release",
+      "size_in_bytes": 6091,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571341878",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571341878/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:28:08Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:28:08Z",
+      "digest": "sha256:8ad911637d82066bd8561d5881cf6793c80a7c98adfe1a8a567ddd0f400e23fe",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571328327,
+      "name": "link-experiment-thinlto-cache-Linux-X64-Debug-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 351771,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571328327",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571328327/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:39:06Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:39:06Z",
+      "digest": "sha256:dd6dd5cb5ccd79f1624b0e99176c4e9a6b6a1dac455e6f0d6caf871059b4e90b",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571291526,
+      "name": "tests-Windows-X64-Release",
+      "size_in_bytes": 22879,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571291526",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571291526/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:24:57Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:24:57Z",
+      "digest": "sha256:08b3dfca5b2c04fb727abe17b30dbe9198ee74d3bcca9b008e99cce98d7700d6",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571288382,
+      "name": "tests-Linux-X64-Debug",
+      "size_in_bytes": 6082,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571288382",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571288382/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:39:08Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:39:08Z",
+      "digest": "sha256:6c68f7487f55f77561113fe409e5087935b9c54983c396ba8f6dcc712f9da93f",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571233468,
+      "name": "void-editor-Linux-X64-Debug",
+      "size_in_bytes": 149790,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571233468",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571233468/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:39:03Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:39:03Z",
+      "digest": "sha256:89fe4968a75d086bc8e06ee38d168d18cfa7547068125b78bc7582087ed7c4e4",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571199462,
+      "name": "void-editor-Windows-X64-Debug",
+      "size_in_bytes": 149834,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571199462",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571199462/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:45:24Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:45:24Z",
+      "digest": "sha256:877f7b1291389f0926d60e3b8a0364a6c2d09c28402a53afbc33f1f046caa725",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571144386,
+      "name": "link-experiment-thinlto-cache-Windows-X64-Debug-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 347634,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571144386",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571144386/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:45:29Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:45:29Z",
+      "digest": "sha256:5ab6b0be34b52f55a9cf25ec1a5c2f74444917adf75c08a0e819c071a1cdecb8",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12571053478,
+      "name": "link-experiment-thinlto-cache-macOS-ARM64-Release-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 391132,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571053478",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12571053478/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:39:04Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:39:04Z",
+      "digest": "sha256:b9fa6fbe866616ccf5783c77020ec143cdd5a47b83f0e7e5262b5ed2380b58fd",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12570772293,
+      "name": "link-experiment-thinlto-cache-Linux-X64-Release-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 352049,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570772293",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570772293/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:28:06Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:28:06Z",
+      "digest": "sha256:4867f2c9458974a5ed7303e59455e12a0335ed079d1daa73eda7b63b96922e49",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12570764769,
+      "name": "tests-Windows-X64-Debug",
+      "size_in_bytes": 23031,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570764769",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570764769/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:45:31Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:45:31Z",
+      "digest": "sha256:26766bb5596ae1ab156539ddf6149a01affddee458cc716d50454acda8cf7b2f",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12570761923,
+      "name": "link-experiment-thinlto-cache-Windows-X64-Release-90c0cf64b9aba60d7c642096d2aaac45aae70d56-1",
+      "size_in_bytes": 342222,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570761923",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570761923/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:24:55Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:24:55Z",
+      "digest": "sha256:93a8b06072bb15ae1e5bb01d15dbef70baff74858f9cf87934b93f4f8eac7738",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    },
+    {
+      "id": 12570703917,
+      "name": "tests-macOS-ARM64-Release",
+      "size_in_bytes": 37634,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570703917",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12570703917/zip",
+      "expired": false,
+      "created_at": "2026-10-24T18:39:06Z",
+      "expires_at": "2027-01-22T18:00:04Z",
+      "updated_at": "2026-10-24T18:39:06Z",
+      "digest": "sha256:29d0c5d9b6574157a264a93b1bf15451b345302fb6c749a432e00e554b502d08",
+      "workflow_run": {
+        "id": 40118666209,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "90c0cf64b9aba60d7c642096d2aaac45aae70d56"
+      }
+    }
+  ]
+}

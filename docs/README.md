@@ -1,5 +1,28 @@
 # VOID documentation
 
+## Current Stage 10 handoff — 24 October 2026
+
+ThinLTO experiment [#4](https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209)
+at `90c0cf64b9aba60d7c642096d2aaac45aae70d56` passed **7/7 jobs and
+1,383/1,383 main CTest executions**, including both former macOS Release console
+failures, Linux strict sanitizers and applicable Debug editor integration.
+Overall interval: **1 h 8 m 44 s**, 18:00:03–19:08:47 UTC on 24 October.
+Main CI is unchanged; CI #98 and experiment #3 failures remain historical evidence.
+
+Step 43 contracts/examples/evidence reconciliation is complete. Step 44 is
+prepared for independent Golden Wrench review and Boss release decisions.
+**Stage 10 remains active and INCOMPLETE:** real Windows console/ConPTY and exact
+native 1 MiB stack receipts remain unverified. The experimental green result
+does not issue a release lock. See [final acceptance](stage10/ACCEPTANCE.md),
+[current implementation](stage10/IMPLEMENTATION.md) and
+[exact Step 42 evidence](stage10/engineering/step42-results.json).
+Earlier dated statuses below remain history. No next stage is authorized.
+
+[Runnable Stage 10 examples](stage10/EXAMPLES.md),
+[future stdlib/global design](VOID_STDLIB_AND_GLOBAL_VARS_WRENCH_HANDOFF_2026-10-24.md),
+[independent CI #4/design review](VOID_WRENCH_REVIEW_CI4_STDLIB_GLOBALS_2026-10-24.md)
+and [permanent stage workflow](WRENCH_CLANKER.md#permanent-workflow-for-every-new-development-stage).
+
 ## Stage 10 research design — 21 October 2026
 
 [Complete design and ordered roadmap](STAGE10_DESIGN.md) for console I/O, shared

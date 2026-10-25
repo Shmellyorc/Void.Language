@@ -1,5 +1,12 @@
 # Stage 10 console and terminal contract
 
+## Current acceptance checkpoint — 24 October 2026
+
+Implementation, examples and executed coverage are reconciled in
+[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+native evidence remain open. Stage 10 is not locked. Earlier dated research and
+progress statements below retain their historical meaning.
+
 ## Boss authorization — 21 October 2026
 
 Boss approved implementation of the entire 44-step Stage 10 mission, B1–B4,

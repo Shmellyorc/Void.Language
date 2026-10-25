@@ -1,0 +1,40 @@
+{
+  "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+  "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+  "records": [
+    {
+      "argv": [
+        "build/step42-ci96-san/voidc",
+        "check",
+        "examples/stage10_console_time/main.void"
+      ],
+      "exit": 0,
+      "stdout_hex": "536f7572636520636865636b6564207375636365737366756c6c790a",
+      "stderr_hex": "",
+      "seconds": 0.3727915291674435
+    },
+    {
+      "argv": [
+        "build/step42-ci96-san/voidc",
+        "run",
+        "examples/stage10_console_time/main.void",
+        "--no-opt"
+      ],
+      "exit": 0,
+      "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+      "stderr_hex": "",
+      "seconds": 3.475771919824183
+    },
+    {
+      "argv": [
+        "build/step42-ci96-san/voidc",
+        "run",
+        "examples/stage10_console_time/main.void"
+      ],
+      "exit": 0,
+      "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+      "stderr_hex": "",
+      "seconds": 4.220736951101571
+    }
+  ]
+}

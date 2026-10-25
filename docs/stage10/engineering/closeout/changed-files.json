@@ -1,0 +1,209 @@
+{
+  "starting_HEAD": "92136acaf114a492452a7d84b31f174f5b305def",
+  "tested_commit": "90c0cf64b9aba60d7c642096d2aaac45aae70d56",
+  "modified": 15,
+  "added_by_this_mission": 24,
+  "total": 39,
+  "preexisting_untracked_untouched": [
+    "docs/VOID_WRENCH_REVIEW_CI4_STDLIB_GLOBALS_2026-10-24.md"
+  ],
+  "inventory_self_hash": null,
+  "self_hash_note": "The inventory cannot hash itself. Validation JSON hash also omitted because the final validator updates it; all other payload hashes are frozen.",
+  "files": [
+    {
+      "path": "docs/DEVELOPMENT_STRATEGY.md",
+      "change": "modified",
+      "sha256": "795df002c6a9c7aa682d9a8b0151ed51ee07e67f67b330feced292a4a1e2a537"
+    },
+    {
+      "path": "docs/README.md",
+      "change": "modified",
+      "sha256": "43fd0480d7ff589d1c07fc1626d0f8f8cef1042773319e2bf76f8dd77566969b"
+    },
+    {
+      "path": "docs/RESEARCH_CLANKER.md",
+      "change": "modified",
+      "sha256": "50c5b08ced273334acc9efa4a326a71c190e8dd5458bcd53b99d896bd3265680"
+    },
+    {
+      "path": "docs/STAGE10_DESIGN.md",
+      "change": "modified",
+      "sha256": "6ad9584e7e7d9bc7616f0a0159caa5e3aeba6942645393f4faf3aa3cf3cf6454"
+    },
+    {
+      "path": "docs/VOID_STDLIB_AND_GLOBAL_VARS_WRENCH_HANDOFF_2026-10-24.md",
+      "change": "modified",
+      "sha256": "7a03175225f8af7ce57ab074316bb4f1cf149070007ad85d3fa3d08498cd8710"
+    },
+    {
+      "path": "docs/WORK_LOG.md",
+      "change": "modified",
+      "sha256": "0d351c4c6a31df5ee8a0833f0908ff02ab805ef7d03aa8e9ed1031d569110a49"
+    },
+    {
+      "path": "docs/WRENCH_CLANKER.md",
+      "change": "modified",
+      "sha256": "97a4e5fd8327b3073db5d4479cd071605c5dba9c91f9b9e2a3fd2bde2854ca74"
+    },
+    {
+      "path": "docs/stage10/CONSOLE_IO.md",
+      "change": "modified",
+      "sha256": "481fc064becdaa4b1cc4e24eb1e74959b94c6ae5212c331d70b868bb3c15bb89"
+    },
+    {
+      "path": "docs/stage10/DISPLAY_FORMATTING.md",
+      "change": "modified",
+      "sha256": "84508eee85ca53b9ec86b7c594de67e5a18c2e99a80e3933bd3737ffea6bf9eb"
+    },
+    {
+      "path": "docs/stage10/EVIDENCE.md",
+      "change": "modified",
+      "sha256": "3df9aadd7ec37c35b8d1e7420b42ffc8f133da104ede9a0e68a9b3b1452d03fd"
+    },
+    {
+      "path": "docs/stage10/FIELD_ACCESS.md",
+      "change": "modified",
+      "sha256": "eb78fd2518fa665a3d3fa7f6a6eaaab7b3c8dd1e5ea361a5e1060958e85e1bc4"
+    },
+    {
+      "path": "docs/stage10/IMPLEMENTATION.md",
+      "change": "modified",
+      "sha256": "46332129b196dccd509a3aa585c6c10b7cf73f49f48dfd3f0071bbf006e7f2d2"
+    },
+    {
+      "path": "docs/stage10/OPERATORS.md",
+      "change": "modified",
+      "sha256": "16cd97519380b98d4fe1e94d0ce65a96ee6dfaaf397043c6112356b7a8183275"
+    },
+    {
+      "path": "docs/stage10/TEST_PLAN.md",
+      "change": "modified",
+      "sha256": "d1a03ecc5e928659ebfb9b069f5ab94c133a66c1aae07019154a319e74515a02"
+    },
+    {
+      "path": "docs/stage10/engineering/step42-results.json",
+      "change": "modified",
+      "sha256": "e08241e6f2c00ffc35546b8884873190f0419ff767c93af501f6008aada5a5c0"
+    },
+    {
+      "path": "docs/stage10/ACCEPTANCE.md",
+      "change": "added",
+      "sha256": "b68c4fbbac859a70705c4d1bd17411db54c732224dddda5c7980d2560e680711"
+    },
+    {
+      "path": "docs/stage10/EXAMPLES.md",
+      "change": "added",
+      "sha256": "9bb95aa8bc782ef62b0a6cbf61296b2d45739706d77fb5bf3ddd32584d9803d2"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/artifacts.json",
+      "change": "added",
+      "sha256": "977eb185d9bb006d2f7183f68fcce9ca5ca8f4724fa1acf0fab4878e226369dd"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262292.log.gz",
+      "change": "added",
+      "sha256": "92585bf4118fb0582285a20ec8ea4dc482de120b4ef60986fcfa30d9357494c0"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262512.log.gz",
+      "change": "added",
+      "sha256": "6501a0b77dd22d0e760ae9733f61a05b2df00d264dafa6e061da57c65d0aa089"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262621.log.gz",
+      "change": "added",
+      "sha256": "af172cb1eb97eb068e9b9492249815e47e596f7f505fe5c275e4c354a714c14c"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262642.log.gz",
+      "change": "added",
+      "sha256": "328dfe86427f17c7d56fa52cfd8b5d4adaeca73fd71293350fed9e1b85f99fec"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262661.log.gz",
+      "change": "added",
+      "sha256": "19adef3d8743ec1481046f7fb025659d98c9b0b5b8fdf8daced9100589130e1c"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262672.log.gz",
+      "change": "added",
+      "sha256": "43fe766993201ce5ea48e10959350419fbf732bfe8bf17cbc26d6ff125919d1f"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/job-120945262688.log.gz",
+      "change": "added",
+      "sha256": "54906e5a3511c1bc9250e5b462032e6a867f520aabcc0984e69ba38c91e51283"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/jobs.json",
+      "change": "added",
+      "sha256": "6c8b4094bbae76c304867ac5166cb4717b30a4e41b14a9079fd8129b87301934"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/run.json",
+      "change": "added",
+      "sha256": "889e15efeefd7652314ee80735145649bdee71f2d62d76fc07934caf504cd72a"
+    },
+    {
+      "path": "docs/stage10/engineering/ci4/summary.json",
+      "change": "added",
+      "sha256": "c97f0a732e1fb01a5df557b9f05987eb839b4fca8734aa30ce627ccf39b581e1"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/changed-files.json",
+      "change": "added",
+      "sha256": null
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/design-probe-sources.json",
+      "change": "added",
+      "sha256": "74fce66b7ed0dcc9b9b625e7838ba93f78f9b5b24bc21c4eaad16e59764c242e"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/example-attempts.json",
+      "change": "added",
+      "sha256": "991312017545d80411e287b2cbba50ec7513f9a63569cc79555f57c6781bd72c"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/example-identities.json",
+      "change": "added",
+      "sha256": "f614a9facf06a87bda7b897af04517827d5c3b4161f717677d0650fb616f6239"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/example-native-and-design-probes.json",
+      "change": "added",
+      "sha256": "14b51f9f115f7a9736c862f9ded9790a60516a4e563aa9a52da105917566adba"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/example-strict.json",
+      "change": "added",
+      "sha256": "8d486f3c4c6088ff2daca4fc6bd2d882c2b7ac67a71909e4b5fdc594a74fd506"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/example.diff",
+      "change": "added",
+      "sha256": "5f248477a7d3f83411a6aeb00c33d2e3cfc5f5897068d99a5037e03d3e613df6"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/existing-example.json",
+      "change": "added",
+      "sha256": "8e97bb16ab3dbed1a10ff59e0f1d10840cd55b932aa2aa4d518abdfa7268cef3"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/results.json",
+      "change": "added",
+      "sha256": "4092967b3af3269aa334c1fa760be2c1e38a3fc902257dd3290f3189ca617d76"
+    },
+    {
+      "path": "docs/stage10/engineering/closeout/validation.json",
+      "change": "added",
+      "sha256": null
+    },
+    {
+      "path": "examples/stage10_console_time/main.void",
+      "change": "added",
+      "sha256": "2227e1c2094d71c73896e90d82a2dbabc899f63ddbec666da20db9bd9419027e"
+    }
+  ]
+}

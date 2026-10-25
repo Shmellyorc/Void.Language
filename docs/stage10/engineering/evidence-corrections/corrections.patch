@@ -1,0 +1,298 @@
+--- a/docs/stage10/engineering/step42-results.json
++++ b/docs/stage10/engineering/step42-results.json
+@@ -1110,49 +1110,8 @@
+     "authority": "Boss authorizes bounded investigation/repair of the two macOS Release failures. Test-only changes; no Git mutation, CI dispatch, workflow edit or new architecture.",
+     "platforms": {
+       "windows": {
+-        "status": "Experiment #4 native Debug/Release automated acceptance green; remaining explicit host/stack evidence is not inferred",
+-        "native_attempts": [
+-          {
+-            "id": 120945262512,
+-            "name": "thinlto-cache / Windows 2022 / Debug",
+-            "conclusion": "success",
+-            "ctest_passed": 194,
+-            "ctest_failed": 0,
+-            "ctest_skipped": 0,
+-            "ctest_summaries": [
+-              "2026-10-24T18:43:52.5610524Z 100% tests passed, 0 tests failed out of 194"
+-            ],
+-            "raw_log_gzip": "job-120945262512.log.gz",
+-            "raw_log_sha256": "452f8afea479e7c1038f7fb7e8e76195c2bd51c2c3ee77c303cf0cb80ecb2494",
+-            "gzip_sha256": "6501a0b77dd22d0e760ae9733f61a05b2df00d264dafa6e061da57c65d0aa089",
+-            "notable_lines": [
+-              "2026-10-24T18:00:46.3952471Z clang version 19.1.7",
+-              "2026-10-24T18:37:50.2374230Z 172/194 Test #172: stage10_console_aot .......................   Passed  648.06 sec",
+-              "2026-10-24T18:44:51.1809019Z PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair",
+-              "2026-10-24T18:45:00.6442178Z PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup",
+-              "2026-10-24T18:45:04.9075554Z PASS real editor restricted trust: no native child spawned",
+-              "2026-10-24T18:45:09.6169271Z PASS real editor multi-root: explanatory error, no native child spawned"
+-            ]
+-          },
+-          {
+-            "id": 120945262642,
+-            "name": "thinlto-cache / Windows 2022 / Release",
+-            "conclusion": "success",
+-            "ctest_passed": 194,
+-            "ctest_failed": 0,
+-            "ctest_skipped": 0,
+-            "ctest_summaries": [
+-              "2026-10-24T18:24:51.1446803Z 100% tests passed, 0 tests failed out of 194"
+-            ],
+-            "raw_log_gzip": "job-120945262642.log.gz",
+-            "raw_log_sha256": "8ba71ab847e8eb3f0f4cea70b93c17cffe421d1b0a92daa68a98a1e45ef1e687",
+-            "gzip_sha256": "328dfe86427f17c7d56fa52cfd8b5d4adaeca73fd71293350fed9e1b85f99fec",
+-            "notable_lines": [
+-              "2026-10-24T18:00:41.9006386Z clang version 19.1.7",
+-              "2026-10-24T18:21:26.0912316Z 172/194 Test #172: stage10_console_aot .......................   Passed  410.03 sec"
+-            ]
+-          }
+-        ],
++        "status": "CI98/ThinLTO3 baseline Debug/Release green; no current native rerun or production change",
++        "native_attempts": [],
+         "planned_architecture": "x64",
+         "planned_configurations": [
+           "Debug",
+@@ -1164,35 +1123,17 @@
+         "planned_VOID_LINKER": "empty (Linux-only override not used)",
+         "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+         "projected_suites_per_configuration": 194,
+-        "actual_discovered": {
+-          "Debug": 194,
+-          "Release": 194
+-        },
+-        "actual_executed": {
+-          "Debug": 194,
+-          "Release": 194
+-        },
+-        "actual_passed": {
+-          "Debug": 194,
+-          "Release": 194
+-        },
+-        "actual_failed": {
+-          "Debug": 0,
+-          "Release": 0
+-        },
+-        "actual_skipped": {
+-          "Debug": 0,
+-          "Release": 0
+-        },
+-        "actual_build_exit_codes": {
+-          "Debug": 0,
+-          "Release": 0
+-        },
+-        "actual_compiler_configuration": "LLVM/Clang19.1.7; Ninja; Debug/Release; existing sanitizerOFF native settings; thinlto-cache experiment (Windows linker unchanged)",
+-        "native_source_receipts": "Experiment4 checked out90c0cf64b9aba60d7c642096d2aaac45aae70d56; complete raw log identities retained",
++        "actual_discovered": null,
++        "actual_executed": null,
++        "actual_passed": null,
++        "actual_failed": null,
++        "actual_skipped": null,
++        "actual_build_exit_codes": null,
++        "actual_compiler_configuration": null,
++        "native_source_receipts": null,
+         "native_binary_identities": null,
+         "native_failure_logs": null,
+-        "actual_os_sdk_compiler_versions": "Full native SDK/OS/compiler startup output in ci4/job-ID.log.gz",
++        "actual_os_sdk_compiler_versions": null,
+         "ci97_baseline": {
+           "run_id": 40069548583,
+           "commit": "96bac2ea8e4be31d574a5916118feab0ef6b2e7f",
+@@ -1201,53 +1142,8 @@
+         }
+       },
+       "macos": {
+-        "status": "Experiment #4 native Debug/Release automated acceptance green; remaining explicit host/stack evidence is not inferred",
+-        "native_attempts": [
+-          {
+-            "id": 120945262292,
+-            "name": "thinlto-cache / macOS ARM64 / Debug",
+-            "conclusion": "success",
+-            "ctest_passed": 199,
+-            "ctest_failed": 0,
+-            "ctest_skipped": 0,
+-            "ctest_summaries": [
+-              "2026-10-24T18:51:35.4295160Z 100% tests passed out of 199"
+-            ],
+-            "raw_log_gzip": "job-120945262292.log.gz",
+-            "raw_log_sha256": "1c053e444bfb18c862994b16d53de89a7e079e07e0125d249992fd6a67a931d4",
+-            "gzip_sha256": "92585bf4118fb0582285a20ec8ea4dc482de120b4ef60986fcfa30d9357494c0",
+-            "notable_lines": [
+-              "2026-10-24T18:01:04.3343960Z clang version 19.1.7 (/Users/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+-              "2026-10-24T18:24:32.4774290Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.49 sec",
+-              "2026-10-24T18:24:34.2375080Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    1.53 sec",
+-              "2026-10-24T18:46:03.7601160Z 177/199 Test #177: stage10_console_aot .......................   Passed  598.94 sec",
+-              "2026-10-24T18:52:12.3648530Z PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair",
+-              "2026-10-24T18:52:20.6348130Z PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup",
+-              "2026-10-24T18:52:24.7796450Z PASS real editor restricted trust: no native child spawned",
+-              "2026-10-24T18:52:28.2246140Z PASS real editor multi-root: explanatory error, no native child spawned"
+-            ]
+-          },
+-          {
+-            "id": 120945262688,
+-            "name": "thinlto-cache / macOS ARM64 / Release",
+-            "conclusion": "success",
+-            "ctest_passed": 199,
+-            "ctest_failed": 0,
+-            "ctest_skipped": 0,
+-            "ctest_summaries": [
+-              "2026-10-24T18:38:53.9233400Z 100% tests passed out of 199"
+-            ],
+-            "raw_log_gzip": "job-120945262688.log.gz",
+-            "raw_log_sha256": "a513061fc1f26fa0fdb2bb53db95df67f135124ecce9dfc19b4460345b4fba75",
+-            "gzip_sha256": "54906e5a3511c1bc9250e5b462032e6a867f520aabcc0984e69ba38c91e51283",
+-            "notable_lines": [
+-              "2026-10-24T18:01:14.0543230Z clang version 19.1.7 (/Users/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)",
+-              "2026-10-24T18:26:57.3369650Z  25/199 Test  #25: runtime_console_native_transfers ..........   Passed    0.35 sec",
+-              "2026-10-24T18:26:58.7488500Z  29/199 Test  #29: runtime_console_native_terminal ...........   Passed    1.17 sec",
+-              "2026-10-24T18:36:21.7960070Z 177/199 Test #177: stage10_console_aot .......................   Passed  311.20 sec"
+-            ]
+-          }
+-        ],
++        "status": "CI98 and ThinLTO3 macOS Debug accepted; Release198/199 in each with different fixture synchronization failures. Current test-only repair native Release verification pending.",
++        "native_attempts": [],
+         "planned_architecture": "ARM64",
+         "planned_configurations": [
+           "Debug",
+@@ -1259,35 +1155,17 @@
+         "planned_VOID_LINKER": "empty (Linux-only override not used)",
+         "planned_sanitizers": "OFF, existing Windows/macOS CI settings",
+         "projected_suites_per_configuration": 199,
+-        "actual_discovered": {
+-          "Debug": 199,
+-          "Release": 199
+-        },
+-        "actual_executed": {
+-          "Debug": 199,
+-          "Release": 199
+-        },
+-        "actual_passed": {
+-          "Debug": 199,
+-          "Release": 199
+-        },
+-        "actual_failed": {
+-          "Debug": 0,
+-          "Release": 0
+-        },
+-        "actual_skipped": {
+-          "Debug": 0,
+-          "Release": 0
+-        },
+-        "actual_build_exit_codes": {
+-          "Debug": 0,
+-          "Release": 0
+-        },
+-        "actual_compiler_configuration": "LLVM/Clang19.1.7; Ninja; Debug/Release; existing sanitizerOFF native settings; thinlto-cache experiment (Windows linker unchanged)",
+-        "native_source_receipts": "Experiment4 checked out90c0cf64b9aba60d7c642096d2aaac45aae70d56; complete raw log identities retained",
++        "actual_discovered": null,
++        "actual_executed": null,
++        "actual_passed": null,
++        "actual_failed": null,
++        "actual_skipped": null,
++        "actual_build_exit_codes": null,
++        "actual_compiler_configuration": null,
++        "native_source_receipts": null,
+         "native_binary_identities": null,
+         "native_failure_logs": null,
+-        "actual_os_sdk_compiler_versions": "Full native SDK/OS/compiler startup output in ci4/job-ID.log.gz",
++        "actual_os_sdk_compiler_versions": null,
+         "ci98_baseline": {
+           "commit": "9a4985f89f40c56b8eaa984775faf18c52b69f19",
+           "main_run": 40091828693,
+--- a/docs/stage10/EVIDENCE.md
++++ b/docs/stage10/EVIDENCE.md
+@@ -6,6 +6,13 @@
+ [final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+ native evidence remain open. Stage 10 is not locked. Earlier dated research and
+ progress statements below retain their historical meaning.
++
++## Historical research baseline — 21 October 2026
++
++Research date: 21 October 2026. Inspected source HEAD:
++`e25816bdb80e3f32613edf77c9cf3258232af966`.
++**Research/documentation only; no compiler test run, production edit or hosted CI
++execution was performed for this design.** [Main roadmap](../STAGE10_DESIGN.md).
+ 
+ ## Evidence authority and historical corrections
+ 
+--- a/docs/stage10/engineering/closeout/changed-files.json
++++ b/docs/stage10/engineering/closeout/changed-files.json
+@@ -58,7 +58,7 @@
+     {
+       "path": "docs/stage10/EVIDENCE.md",
+       "change": "modified",
+-      "sha256": "6e989601674736f0e69bb6b2717c057c07d0236850ab33c1f655587301c65713"
++      "sha256": "3df9aadd7ec37c35b8d1e7420b42ffc8f133da104ede9a0e68a9b3b1452d03fd"
+     },
+     {
+       "path": "docs/stage10/FIELD_ACCESS.md",
+@@ -83,7 +83,7 @@
+     {
+       "path": "docs/stage10/engineering/step42-results.json",
+       "change": "modified",
+-      "sha256": "e0e42522a8dbe6af0979e7c5359133760df7411e199f894b6602602130c60485"
++      "sha256": "e08241e6f2c00ffc35546b8884873190f0419ff767c93af501f6008aada5a5c0"
+     },
+     {
+       "path": "docs/stage10/ACCEPTANCE.md",
+--- a/docs/stage10/engineering/native-final/HANDOFF.md
++++ b/docs/stage10/engineering/native-final/HANDOFF.md
+@@ -1,4 +1,14 @@
+ # Stage 10 final native acceptance handoff — 24 October 2026
++
++## Evidence corrections — 24 October 2026
++
++Golden Wrench's [independent package review](../../../Stage10_Wrench_Review.md)
++accepted the original package integrity and identified two provenance corrections.
++The [correction record and separately named corrected package](../evidence-corrections/CORRECTIONS.md)
++restore the authentic pre-CI #4 checkpoint and October 21 research baseline.
++The original archive, patch and their hashes below remain immutable historical
++review evidence. Their dated validation describes the pre-correction files;
++use the corrected package and current hash receipts for the final documentation.
+ 
+ **STOPPED: no usable native Windows/macOS host is available in this session.
+ No native probe was executed. Stage 10 remains INCOMPLETE; release lock HELD.**
+@@ -10,7 +20,7 @@
+ 
+ | File | Contents / verification |
+ |---|---|
+-| [local-closeout.patch](local-closeout.patch) | Complete binary-capable diff against `92136acaf114a492452a7d84b31f174f5b305def`: all 15 modified and 24 added paths, including compressed CI logs. Read-only `git apply --reverse --check` passes against the current checkout. |
++| [local-closeout.patch](local-closeout.patch) | Original reviewed binary-capable diff against `92136acaf114a492452a7d84b31f174f5b305def`: all 15 modified and 24 added paths, including compressed CI logs. Read-only reverse-check passed against the pre-correction checkout. |
+ | [local-closeout.tar.gz](local-closeout.tar.gz) | All 39 complete changed files, with repository-relative paths; includes the example, EXAMPLES, acceptance, closeout results/validation, seven full compressed logs and CI metadata. All archive members were compared byte-for-byte with the source files. |
+ | [payload.sha256](payload.sha256) | Exact SHA-256 for every one of the 39 payloads, including the original inventory and rolling validation whose self-referential fields were null. |
+ | [package.json](package.json) | Baseline, patch/archive/manifest digests, membership and original evidence-record checks. This is Keyboard packaging verification, not Wrench reproduction. |
+@@ -27,7 +37,8 @@
+ `sha256sum -c /absolute/path/to/payload.sha256` from that directory. Inspect the
+ patch against the stated baseline; do not apply it to the live checkout. The
+ archive is an exact Step 43/44 snapshot, not a package of this later native-access
+-handoff. The original 39-file inventory remains valid and unchanged. The newly
++handoff. Its embedded inventory remains valid for that original archive; the live
++39-file inventory now carries the corrected payload hashes. The newly
+ saved Step 44 review and earlier CI #4/design review are separate preserved inputs.
+ No independent reviewer approval is claimed for this newly supplied diff.
+ 
+--- a/docs/stage10/engineering/native-final/changed-files.json
++++ b/docs/stage10/engineering/native-final/changed-files.json
+@@ -1,5 +1,5 @@
+ {
+-  "scope": "Only this final-native-access follow-up; the previous39-file closeout remains byte-identical and separately frozen.",
++  "scope": "Historical native-access follow-up; original39-file archive remains frozen. Subsequent provenance corrections and updated live handoff hashes are recorded separately.",
+   "previous_closeout_manifest": "../closeout/changed-files.json",
+   "review_inputs_preexisting_untouched": [
+     "docs/GOLDEN_WRENCH_STAGE10_STEP44_REVIEW_2026-10-24.md",
+@@ -10,7 +10,7 @@
+   "files": [
+     {
+       "path": "docs/stage10/engineering/native-final/HANDOFF.md",
+-      "sha256": "ffd19850327680a0fcbffa138a2809f7ca9ae9cea1ae526b968aeaf4a5d76a88"
++      "sha256": "b7109bff1f668a2099e897613df67136b37143a2eaa6086bdf021d777dd7b1e3"
+     },
+     {
+       "path": "docs/stage10/engineering/native-final/changed-files.json",
+@@ -48,5 +48,6 @@
+       "path": "docs/stage10/engineering/native-final/validation.json",
+       "sha256": "3bf88475b84964c3ad7fca2a500d8b570faacab99873f7c9e437c4cf1bb7191d"
+     }
+-  ]
++  ],
++  "subsequent_evidence_corrections": "../evidence-corrections/CORRECTIONS.md"
+ }

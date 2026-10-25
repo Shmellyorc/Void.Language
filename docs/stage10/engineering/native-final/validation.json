@@ -1,0 +1,24 @@
+{
+  "initial_validation_attempt": {
+    "exit": 1,
+    "reason": "The new HANDOFF link to validation.json was checked before this validator created that receipt. Order corrected; no source or payload change."
+  },
+  "validated_utc": "2026-10-24T22:12:58.652469+00:00",
+  "preserved_files_checked": 2843,
+  "mismatches": [],
+  "original_closeout_payloads_verified": 39,
+  "archive_file_hashes_verified": 39,
+  "original_rolling_validation_preserved": true,
+  "original_recorded_28_outcomes_preserved_not_rerun": true,
+  "patch_reverse_check_exit": 0,
+  "diff_check_exit": 0,
+  "handoff_links_checked": 10,
+  "broken_handoff_links": [],
+  "HEAD": "92136acaf114a492452a7d84b31f174f5b305def",
+  "HEAD_unchanged": true,
+  "new_changes_restricted_to_native_final_docs_evidence": true,
+  "compiler_Runtime_tests_workflows_root_README_unchanged": true,
+  "CI4_CI98_Step41_original_evidence_unchanged": true,
+  "native_tests_executed": 0,
+  "native_acceptance": "UNVERIFIED; stopped for native access and Wrench/Boss decisions"
+}

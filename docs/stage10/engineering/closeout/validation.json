@@ -1,0 +1,64 @@
+{
+  "checked_utc": "2026-10-24T21:56:23.936367+00:00",
+  "protected_tracked_inputs_checked": 2611,
+  "protected_mismatches": [],
+  "historical_checkpoint_objects_preserved": [
+    "baseline",
+    "historical_ci96_local_verification",
+    "historical_ci97_local_verification",
+    "ci97_console_repairs",
+    "ci98_final_macos_investigation",
+    "historical_preparation_result",
+    "original_CI96",
+    "historical_observations_preserved"
+  ],
+  "all_44_roadmap_rows_present": true,
+  "local_markdown_links_checked": 432,
+  "introduced_broken_links": [],
+  "preexisting_broken_links": [],
+  "ci4_jobs_verified": [
+    {
+      "id": 120945262292,
+      "passed": 199,
+      "log_hashes_match": true
+    },
+    {
+      "id": 120945262512,
+      "passed": 194,
+      "log_hashes_match": true
+    },
+    {
+      "id": 120945262621,
+      "passed": 199,
+      "log_hashes_match": true
+    },
+    {
+      "id": 120945262642,
+      "passed": 194,
+      "log_hashes_match": true
+    },
+    {
+      "id": 120945262661,
+      "passed": 199,
+      "log_hashes_match": true
+    },
+    {
+      "id": 120945262672,
+      "passed": 199,
+      "log_hashes_match": true
+    },
+    {
+      "id": 120945262688,
+      "passed": 199,
+      "log_hashes_match": true
+    }
+  ],
+  "ci4_main_ctest_total": 1383,
+  "JSON_parsing": "pass",
+  "git_diff_check": "pass",
+  "production_tests_dependencies_editors_workflows_rootREADME_unchanged": true,
+  "HEAD_unchanged": true,
+  "tested_commit_to_starting_HEAD_docs_only": true,
+  "preexisting_untracked_review_sha256": "a4bf4186a161a3c7b5542fc9af551cc65606b88fb5e706762be3bdabc59be42d",
+  "validation_scope": "Read-only Git/source/log/doc checks; no builds, dispatches, commits or native host execution."
+}

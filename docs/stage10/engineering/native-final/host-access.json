@@ -1,0 +1,78 @@
+{
+  "checked_utc": "2026-10-24T22:10:14.017811+00:00",
+  "system": "Linux",
+  "release": "7.2.6-pikaos",
+  "machine": "x86_64",
+  "tools": {
+    "ssh": "/usr/bin/ssh",
+    "pwsh": null,
+    "powershell": null,
+    "xcrun": null,
+    "xcodebuild": null,
+    "sw_vers": null,
+    "wine": "/opt/wine-staging/bin/wine",
+    "VBoxManage": "/usr/bin/VBoxManage",
+    "virsh": null,
+    "vmrun": null,
+    "limactl": null,
+    "llvm-readobj-19": "/usr/bin/llvm-readobj-19"
+  },
+  "app_project_inventory": {
+    "available_execution_host_ids": [
+      "local"
+    ],
+    "native_Windows_or_macOS_execution_host_exposed": false,
+    "source": "Read-only Codex list_projects result; two local project entries point to this Linux checkout. ChatGPT project entries expose no native execution host."
+  },
+  "native_remote_endpoint_supplied": false,
+  "native_compiler_PE_search": {
+    "patterns": [
+      "build/*/voidc.exe",
+      "build/*/void_tests.exe"
+    ],
+    "matches": []
+  },
+  "virtualbox_queries": [
+    {
+      "argv": [
+        "VBoxManage",
+        "list",
+        "vms"
+      ],
+      "timeout_seconds": 15,
+      "outcome": "Timed out; registered-guest inventory unknown"
+    },
+    {
+      "argv": [
+        "VBoxManage",
+        "list",
+        "runningvms"
+      ],
+      "timeout_seconds": 15,
+      "outcome": "Timed out; running-guest inventory unknown"
+    }
+  ],
+  "virtualbox_guest_start_or_changes": false,
+  "SSH_connections_attempted": false,
+  "CI4_exact_native_stack_readback_present": false,
+  "CI4_stack_related_lines": {
+    "thinlto-cache / macOS ARM64 / Debug": [],
+    "thinlto-cache / Windows 2022 / Debug": [],
+    "thinlto-cache / Ubuntu 24.04 / Sanitizers": [],
+    "thinlto-cache / Windows 2022 / Release": [],
+    "thinlto-cache / Ubuntu 24.04 / Release": [
+      "2026-10-24T18:28:00.7511086Z ##[group]Run ulimit -s 1024",
+      "2026-10-24T18:28:00.7512300Z \u001b[36;1mulimit -s 1024\u001b[0m"
+    ],
+    "thinlto-cache / Ubuntu 24.04 / Debug": [
+      "2026-10-24T18:38:11.7103854Z ##[group]Run ulimit -s 1024",
+      "2026-10-24T18:38:11.7104038Z \u001b[36;1mulimit -s 1024\u001b[0m"
+    ],
+    "thinlto-cache / macOS ARM64 / Release": []
+  },
+  "Windows_PE_1MiB": "UNVERIFIED; no matching native binaries available for readback",
+  "macOS_Debug_Release_1MiB": "UNVERIFIED; no accessible native macOS host",
+  "real_Windows_console_ConPTY": "UNVERIFIED; no accessible native Windows interactive host",
+  "Wine_used_as_native_evidence": false,
+  "native_probe_execution_count": 0
+}

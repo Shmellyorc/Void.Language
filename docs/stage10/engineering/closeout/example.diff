@@ -1,0 +1,32 @@
+diff --git a/examples/stage10_console_time/main.void b/examples/stage10_console_time/main.void
+new file mode 100644
+index 0000000..474889d
+--- /dev/null
++++ b/examples/stage10_console_time/main.void
+@@ -0,0 +1,26 @@
++use console
++use time
++
++# One value uses private readonly storage, an exact operator and ordinary display.
++value struct score:
++    private const points: i32
++
++    operator +(const left: score, const right: i32) -> score:
++        return score(points = left.points + right)
++
++func (self score) init(points: i32):
++    self.points = points
++
++func (self score) string() -> string:
++    return "score:{self.points:000}"
++
++func main() -> i32:
++    var current = score(points = 7)
++    current += 5
++    if time.make_date(2024, 2, 29) is Ok(var day):
++        print("VOID", current, "{day:yyyy-MM-dd}", sep = " | ", flush = true)
++        if console.stdout.write("UTF-8: é🎮\n") is Err(var failure):
++            print(failure.message, file = console.stderr)
++            return 2
++        return 0
++    return 1

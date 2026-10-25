@@ -1,0 +1,14 @@
+{
+  "compiler_source_checks": {
+    "main_entry": "src/frontend/compiler.cpp:606-611 (zero parameters required)",
+    "nullable": "docs/stage10/EXAMPLES records runtime verification; examples/patterns/nullable.void retains nullable Ok matching",
+    "official_modules": "src/frontend/compiler.cpp import source path construction; docs/LOCAL_LIBRARIES.md separates first-level libs repeated-name entries",
+    "existing_pop_UTF8": "src/frontend/compiler.cpp:1600-1614"
+  },
+  "sources": {
+    "main-array-parameter.void": "func main(raw: [string]):\n    var count = raw.count\n",
+    "main-return.void": "func main() -> i32:\n    return 0\n",
+    "main-no-return.void": "func main():\n    var value = 1\n",
+    "nullable.void": "struct item:\n    value: i32\nfunc main() -> i32:\n    var maybe: item? = item(value = 7)\n    if maybe is Ok(var found):\n        if found.value == 7:\n            return 0\n    return 1\n"
+  }
+}

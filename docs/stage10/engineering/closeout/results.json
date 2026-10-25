@@ -1,0 +1,32 @@
+{
+  "stage": "10",
+  "stage_status": "INCOMPLETE",
+  "Step42": "Automated native acceptance green; real Windows console/ConPTY/handle and exact native1MiB receipts open",
+  "Step43": "Documentation/examples/evidence reconciliation complete",
+  "Step44": "Prepared for independent Golden Wrench review and Boss release decisions",
+  "tested_commit": "90c0cf64b9aba60d7c642096d2aaac45aae70d56",
+  "starting_HEAD": "92136acaf114a492452a7d84b31f174f5b305def",
+  "hosted_evidence": "../ci4/summary.json",
+  "current_production_tests_workflows_changes": [],
+  "new_example": "examples/stage10_console_time/main.void",
+  "example_added_after_hosted_run": true,
+  "local_validation": {
+    "command_records": 28,
+    "unexpected_failures": 0,
+    "new_example_Debug_Release_check": 2,
+    "new_example_Debug_Release_normal_O2_JIT_executions": 4,
+    "new_example_Debug_Release_native_builds": 4,
+    "new_example_Debug_Release_native_executions": 4,
+    "strict_check_normal_O2_JIT": 3,
+    "existing_example_Debug_Release_normal_O2": 4,
+    "design_probes": 7,
+    "expected_negative_application_entry": 1,
+    "note": "Existing accepted local compiler binaries, not a fresh compiler build or full CTest rerun; exact identities/commands/output/environment retained."
+  },
+  "independent_review": "Pending; CI4 design review is a separate prior observation, not approval of this new diff",
+  "Boss_release": "Pending; no Git mutation, hosted dispatch or release lock",
+  "future_work": "stdlib purpose folders/compiler-owned LSP and file-global lexical/GC/ownership/initialization/visibility/reload questions preserved as proposals; no next stage started",
+  "source_diff": "example.diff",
+  "validation": "validation.json",
+  "changed_inventory": "changed-files.json"
+}

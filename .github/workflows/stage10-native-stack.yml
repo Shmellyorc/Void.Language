@@ -1,0 +1,81 @@
+# Stack evidence only. Boss controls dispatch; this does not verify console/ConPTY.
+name: Stage 10 targeted native stack acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stack:
+    name: Native stack / ${{ matrix.platform }} / ${{ matrix.configuration }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-2022, platform: Windows x64, configuration: Debug}
+          - {os: windows-2022, platform: Windows x64, configuration: Release}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Release}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 360
+    env:
+      NATIVE_STACK_CONFIGURATION: ${{ matrix.configuration }}
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Record exact source and native architecture
+        run: python tools/ci/stage10_native_stack.py identity
+      - name: Windows native SDK environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Cache complete official LLVM SDK
+        uses: actions/cache@v5
+        with:
+          path: .toolchains/llvm-19.1.7
+          key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install and verify LLVM 19.1.7 development SDK
+        run: python tools/ci/stage10_native_stack.py sdk
+      - name: Configure ${{ matrix.configuration }} with proven native linking
+        run: python tools/ci/stage10_native_stack.py configure
+      - name: Build compiler and original frontend harness
+        id: build
+        run: python tools/ci/stage10_native_stack.py build
+      - name: Verify actual Windows PE reserves
+        id: pe
+        if: runner.os == 'Windows'
+        run: python tools/ci/stage10_native_stack.py pe
+      - name: Original frontend under verified stack boundary
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && (runner.os != 'Windows' || steps.pe.outcome == 'success') }}
+        run: python tools/ci/stage10_native_stack.py frontend
+      - name: Original semantic-depth and recovery probes under verified stack boundary
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && (runner.os != 'Windows' || steps.pe.outcome == 'success') }}
+        run: python tools/ci/stage10_native_stack.py depth
+      - name: Preserve final identities and evidence summary
+        if: always()
+        run: python tools/ci/stage10_native_stack.py finish
+      - name: Preserve native stack evidence and binaries even on failure
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: stage10-native-stack-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}-${{ github.sha }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
+          path: |
+            build/native-stack-evidence/
+            build/native-stack-${{ matrix.configuration }}/CMakeCache.txt
+            build/native-stack-${{ matrix.configuration }}/CMakeFiles/CMakeConfigureLog.yaml
+            build/native-stack-${{ matrix.configuration }}/build.ninja
+            build/native-stack-${{ matrix.configuration }}/.ninja_log
+            build/native-stack-${{ matrix.configuration }}/compile_commands.json
+            build/native-stack-${{ matrix.configuration }}/CTestTestfile.cmake
+            build/native-stack-${{ matrix.configuration }}/Testing/Temporary/
+            build/native-stack-${{ matrix.configuration }}/voidc
+            build/native-stack-${{ matrix.configuration }}/voidc.exe
+            build/native-stack-${{ matrix.configuration }}/void_tests
+            build/native-stack-${{ matrix.configuration }}/void_tests.exe

@@ -1,5 +1,15 @@
 # Stage 10: complete console, formatting, field policy and operators
 
+## Current acceptance pointer — 24 October 2026
+
+This document preserves the original research baseline and approved 44-step scope.
+Its baseline “missing” findings below describe 21 October, not current source.
+The four systems are now implemented; see the reconciled
+[44-step ledger](stage10/IMPLEMENTATION.md#all-44-roadmap-obligations),
+[examples](stage10/EXAMPLES.md) and [final acceptance](stage10/ACCEPTANCE.md).
+Experiment #4 passed 7/7 and 1,383/1,383. Required native evidence and independent
+review/release remain open; Stage 10 is not locked. No next stage is initiated.
+
 ## Boss authorization — 21 October 2026
 
 Boss approved implementation of the entire 44-step Stage 10 mission, B1–B4,

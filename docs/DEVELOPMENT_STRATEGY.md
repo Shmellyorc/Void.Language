@@ -1,5 +1,17 @@
 # VOID 2.0: Development Strategy and Compiler Architecture Roadmap
 
+## Current Stage 10 handoff — 24 October 2026
+
+Experiment #4 passed 7/7 jobs and 1,383/1,383 CTest executions at
+`90c0cf64b9aba60d7c642096d2aaac45aae70d56`. Step 43 is complete; Step 44 is
+prepared for review. Required native evidence and Boss release decisions remain
+open; Stage 10 is INCOMPLETE. [Exact acceptance](stage10/ACCEPTANCE.md).
+Follow the [permanent Research → Wrench → Boss → Keyboard stage workflow](WRENCH_CLANKER.md#permanent-workflow-for-every-new-development-stage):
+focused Linux engineering, then actual implementation review; Boss alone controls
+Git and final hosted CI. No routine seven-job run per edit; development native
+checks need a concrete reason and Boss authorization. Future stdlib/global work
+remains design only. Earlier dated milestones below are historical.
+
 ## Stage 9 authorization — 21 October 2026
 
 Boss authorized the complete three-milestone application workflow: automatic

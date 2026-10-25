@@ -1,5 +1,12 @@
 # Stage 10 shared display, formatting and interpolation
 
+## Current acceptance checkpoint — 24 October 2026
+
+Implementation, examples and executed coverage are reconciled in
+[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+native evidence remain open. Stage 10 is not locked. Earlier dated research and
+progress statements below retain their historical meaning.
+
 ## Boss authorization — 21 October 2026
 
 Boss approved implementation of the entire 44-step Stage 10 mission, B1–B4,
@@ -23,8 +30,8 @@ statements below; it does not claim implementation or acceptance.
   mutation, hosted CI dispatch, publication or root README edit is authorized.
 
 
-**Approved for implementation; Stage 10 acceptance remains open.** Public behavior below is the recommendation,
-not current compiler behavior. [Main roadmap](../STAGE10_DESIGN.md).
+**Approved for implementation; Stage 10 acceptance remains open.** The public behavior below is the implemented contract;
+executed coverage and exclusions are recorded in final acceptance. [Main roadmap](../STAGE10_DESIGN.md).
 
 ## One implementation and three uses
 

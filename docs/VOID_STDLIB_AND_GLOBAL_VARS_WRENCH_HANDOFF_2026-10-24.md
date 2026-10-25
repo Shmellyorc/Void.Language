@@ -1,5 +1,56 @@
 # 🔧 VOID 2.0: Standard Library and File-Level `var` Design Handoff
 
+## Current direction and source corrections — 24 October 2026
+
+**Future design only. Stage 10 stays active; no next stage, stdlib expansion or
+file-level runtime-global implementation is authorized.**
+
+Official `stdlib/` is separate from project-local `libs/`. Keep existing exact-file
+standard imports and nested purpose-based folders; do not copy the first-level
+`libs/name/name.void` entry convention into official modules or add another resolver.
+
+| Proposed import | Proposed future path |
+|---|---|
+| `use random` | `stdlib/random.void` |
+| `use sync` | `stdlib/sync.void` |
+| `use sync/mutex` | `stdlib/sync/mutex.void` |
+| `use net/http` | `stdlib/net/http.void` |
+| `use encoding/binary` | `stdlib/encoding/binary.void` |
+
+These paths are proposals, not implemented APIs. Compiler-owned import completion,
+discovery, diagnostics and navigation remain the authority for VS Code, Neovim
+and Vim. Preserve nested folders; do not flatten the library or hardcode editor
+module lists. Current `console`/`time`, display/format/print, numeric `.abs`/`.clamp`,
+UTF-8 `to_utf8`/`from_utf8`, collection `get` and list `pop` already exist and must
+be reused rather than duplicated.
+
+Focused current-source checks clarify two review assumptions: nullable
+`is Ok(var value)` is valid and executed successfully (the assets pseudocode's
+pattern needs no result-wrapper repair). Zero-argument `main()` accepts no result
+or `i32`; `[string]` parameters are legal ordinary function syntax but not selected
+as application entry (`VOID4001`). These are source/execution facts, not new
+language decisions. [Raw probes](stage10/engineering/closeout/example-native-and-design-probes.json)
+and [examples](stage10/EXAMPLES.md) record the exact scope; existing local compiler
+builds were reused. The independent review remains a separate, unmodified record.
+
+File-level mutable runtime `var` remains proposed for **any `.void` module**.
+Outermost declarations would share Runtime-owned storage; function/loop/condition
+locals and struct fields retain lexical/field semantics, with no global/nonlocal
+keyword and no changed `const` meaning. Preserve all section 25 questions: canonical
+module identity and once-only initialization, entry-script interleaving/migration,
+initializer effects/order/cycles/failure cleanup, qualified visibility and optional
+root implicit visibility, safe defaults, precise GC roots and native resource
+ownership, worker restrictions, compatibility/cache invalidation and body-reload
+state retention. No global cell, rooting, resolver or initialization mechanism is
+implemented by this handoff.
+
+Boss must still approve initialization effects/eager policy and ordering, selected
+entry-script migration, root/global visibility and typed pub/sub topic semantics.
+An instantiated channel router is not inherently global or a worker queue.
+The [permanent stage workflow](WRENCH_CLANKER.md#permanent-workflow-for-every-new-development-stage)
+requires Research investigation, Wrench review and Boss scope/semantic approval
+before Keyboard starts a new stage. Later module sketches remain illustrative.
+
 **To:** Golden Sacred Wrench / Wrench Clanker  
 **From:** Boss and the standard-library design discussion  
 **Date:** 24 October 2026  
@@ -15,11 +66,12 @@ Our wider Stage 10 language-completeness mission precedes substantial standard-l
 
 ## 1. Module organization and design principles
 
-We can use the VFS `use` system and the existing same-named folder entry convention, rather than inventing new import grammar:
+Use the existing VFS `use` system and exact official module file paths. The repeated-name entry convention belongs only to project-local first-level `libs/` imports:
 
 ```text
 stdlib/
-  sync/sync.void       # use sync
+  random.void          # use random
+  sync.void            # use sync
   sync/guard.void      # use sync/guard
   sync/mutex.void      # use sync/mutex
   net/http.void        # use net/http
@@ -384,7 +436,7 @@ Provide common match/search/replacement/capture functions with clear Unicode/err
 
 ## 20. `sync`: scoped synchronization with folder submodules
 
-Boss likes a `sync/` folder containing `sync.void` and distinct files (`guard.void`, `mutex.void`, `atomic.void`, potentially `semaphore.void`). Expose easy locking using existing `with` cleanup:
+Boss wants purpose-based nested modules: `stdlib/sync.void` supplies `use sync`; the sibling `stdlib/sync/` folder holds `guard.void`, `mutex.void`, `atomic.void` and potentially `semaphore.void`. Expose easy locking using existing `with` cleanup:
 
 ```void
 use sync

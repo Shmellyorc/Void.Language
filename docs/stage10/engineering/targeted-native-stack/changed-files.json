@@ -1,0 +1,35 @@
+{
+  "scope": "Only this targeted manual native-stack preparation; all earlier uncommitted work is pre-existing and preserved.",
+  "modified_existing_files": [],
+  "added_file_count": 7,
+  "files": [
+    {
+      "path": ".github/workflows/stage10-native-stack.yml",
+      "sha256": "5692dd8cee0d2d8beb0856922cb0895568137506b302e01f01cf0135d8348af7"
+    },
+    {
+      "path": "docs/stage10/engineering/targeted-native-stack/HANDOFF.md",
+      "sha256": "430d201444774e8a7c697693e33ba4a524e41cac79dbe47b63f94658b40cd621"
+    },
+    {
+      "path": "docs/stage10/engineering/targeted-native-stack/changed-files.json",
+      "sha256": null
+    },
+    {
+      "path": "docs/stage10/engineering/targeted-native-stack/local-validation.log.gz",
+      "sha256": "e2cdc28275324a6fc6560517382ff0efea07ae71ccbe51d0d934c7aac14927c1"
+    },
+    {
+      "path": "docs/stage10/engineering/targeted-native-stack/validation.json",
+      "sha256": "6a2ef81b97aa538c0e02ca422bc542c5627103568e6e9430023683475648f67e"
+    },
+    {
+      "path": "docs/stage10/engineering/targeted-native-stack/workflow-helper.diff",
+      "sha256": "c6bc142bd8c13b678afd8bb87e70245da556e9bbd5324856b69ad6dc2efb99d1"
+    },
+    {
+      "path": "tools/ci/stage10_native_stack.py",
+      "sha256": "4579fbfefbd6c0e0512fc7b3ea05ea7c607ba1e0106de6f10c9f8e8dcb2cc5f1"
+    }
+  ]
+}

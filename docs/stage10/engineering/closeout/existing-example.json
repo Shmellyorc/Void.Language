@@ -1,0 +1,52 @@
+[
+  {
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "examples/stage10_fields_display/main.void",
+      "7"
+    ],
+    "exit": 0,
+    "stdout_hex": "32330a",
+    "stderr_hex": "",
+    "seconds": 0.09387363609857857
+  },
+  {
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "examples/stage10_fields_display/main.void",
+      "7",
+      "--no-opt"
+    ],
+    "exit": 0,
+    "stdout_hex": "32330a",
+    "stderr_hex": "",
+    "seconds": 0.059661118080839515
+  },
+  {
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "run",
+      "examples/stage10_fields_display/main.void",
+      "7"
+    ],
+    "exit": 0,
+    "stdout_hex": "32330a",
+    "stderr_hex": "",
+    "seconds": 0.06274339999072254
+  },
+  {
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "run",
+      "examples/stage10_fields_display/main.void",
+      "7",
+      "--no-opt"
+    ],
+    "exit": 0,
+    "stdout_hex": "32330a",
+    "stderr_hex": "",
+    "seconds": 0.03884484805166721
+  }
+]

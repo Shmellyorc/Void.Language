@@ -1,0 +1,38 @@
+{
+  "created_utc": "2026-10-24T22:10:14.015240+00:00",
+  "base_HEAD": "92136acaf114a492452a7d84b31f174f5b305def",
+  "tested_commit": "90c0cf64b9aba60d7c642096d2aaac45aae70d56",
+  "closeout_paths": 39,
+  "modified": 15,
+  "added": 24,
+  "payload_hashes": "payload.sha256",
+  "all_original_nonnull_manifest_hashes_match": true,
+  "original_rolling_validation_and_inventory_now_have_external_hashes": true,
+  "patch_reverse_check": {
+    "argv": [
+      "git",
+      "apply",
+      "--reverse",
+      "--check",
+      "docs/stage10/engineering/native-final/local-closeout.patch"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "archive_all_39_members_match": true,
+  "local_command_records_verified": 28,
+  "unexpected_recorded_failures": 0,
+  "local_tests_rerun": false,
+  "independent_Wrench_execution_claimed": false,
+  "current_tracked_non_doc_inputs_match_CI4": true,
+  "native_source_inputs": 1193,
+  "hosted_native_tests_run_this_turn": 0,
+  "file_sha256": {
+    "payload.sha256": "7d1f8d50614987e32eac39bd8bb611467dbcc820b928c91a53b362d060cedddf",
+    "local-closeout.patch": "61607afa1d74cb7f1d10ab0cf59119399103938764fc3997f2ec4e844e8da921",
+    "local-closeout.tar.gz": "50c492f20740dd802f85d7e5a9a466f6c892f9fac91f7f121fd6d77ba41ae39f",
+    "native-source-inputs.json": "a5f5b531cea1396bce07ef40c15e31c3053268a70cdf1b6fd03fd6dd2079cee3",
+    "preserved-inputs.json": "3bb9c070c440b772368907105dc01d48ed471d1350233052241a4ff0f16bb3f7"
+  }
+}

@@ -1,0 +1,76 @@
+[
+  {
+    "label": "debug-check",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "check",
+      "examples/stage10_console_time/main.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "536f7572636520636865636b6564207375636365737366756c6c790a",
+    "stderr_hex": "",
+    "seconds": 0.3081393791362643
+  },
+  {
+    "label": "debug-O2",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "examples/stage10_console_time/main.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 4.062625911086798
+  },
+  {
+    "label": "debug-normal",
+    "argv": [
+      "build/step42-ci96-debug/voidc",
+      "run",
+      "examples/stage10_console_time/main.void",
+      "--no-opt"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 3.079824439017102
+  },
+  {
+    "label": "release-check",
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "check",
+      "examples/stage10_console_time/main.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "536f7572636520636865636b6564207375636365737366756c6c790a",
+    "stderr_hex": "",
+    "seconds": 0.35902968887239695
+  },
+  {
+    "label": "release-O2",
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "run",
+      "examples/stage10_console_time/main.void"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 2.2169096060097218
+  },
+  {
+    "label": "release-normal",
+    "argv": [
+      "build/ci-official-release-step41/voidc",
+      "run",
+      "examples/stage10_console_time/main.void",
+      "--no-opt"
+    ],
+    "exit": 0,
+    "stdout_hex": "564f4944207c2073636f72653a303132207c20323032342d30322d32390a5554462d383a20c3a9f09f8eae0a",
+    "stderr_hex": "",
+    "seconds": 1.3262106538750231
+  }
+]

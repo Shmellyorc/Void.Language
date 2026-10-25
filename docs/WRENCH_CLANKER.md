@@ -1,5 +1,51 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Current Stage 10 handoff — 24 October 2026
+
+ThinLTO experiment [#4](https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209)
+at `90c0cf64b9aba60d7c642096d2aaac45aae70d56` passed **7/7 jobs and
+1,383/1,383 main CTest executions**, including both former macOS Release console
+failures, Linux strict sanitizers and applicable Debug editor integration.
+Overall interval: **1 h 8 m 44 s**, 18:00:03–19:08:47 UTC on 24 October.
+Main CI is unchanged; CI #98 and experiment #3 failures remain historical evidence.
+
+Step 43 contracts/examples/evidence reconciliation is complete. Step 44 is
+prepared for independent Golden Wrench review and Boss release decisions.
+**Stage 10 remains active and INCOMPLETE:** real Windows console/ConPTY and exact
+native 1 MiB stack receipts remain unverified. The experimental green result
+does not issue a release lock. See [final acceptance](stage10/ACCEPTANCE.md),
+[current implementation](stage10/IMPLEMENTATION.md) and
+[exact Step 42 evidence](stage10/engineering/step42-results.json).
+Earlier dated statuses below remain history. No next stage is authorized.
+
+## Permanent workflow for every new development stage
+
+1. Research Clanker investigates current repository source, Language Bible,
+   existing infrastructure, dependencies and platform risks, then prepares a
+   practical roadmap.
+2. Wrench Clanker independently reviews architecture, removes unnecessary
+   complexity and identifies genuine owner decisions.
+3. Boss approves the stage and unresolved language semantics before implementation.
+4. Keyboard Clanker delivers the authorized scope in substantial engineering
+   sprints, using KISS/DRY and the existing compiler/Runtime infrastructure.
+5. During development Keyboard uses focused local Linux tests, Debug/Release,
+   relevant sanitizers and normal/O2 JIT/linked AOT checks.
+6. When ready, Wrench reviews actual implementation and evidence. Boss alone
+   commits, pushes, authorizes final hosted cross-platform CI and decides release.
+
+No routine seven-job CI after small edits or individual features. Development
+native-platform checks need a concrete reason and Boss authorization. Boss alone
+controls Git operations, hosted CI and release; root README stays protected.
+Preserve the single frontend/typed IR, LLVM 19.1.7, Runtime precise GC, generation
+leases and compiler-owned editor contracts. No speculative framework or weakened
+test may replace an incomplete feature.
+
+Official `stdlib/` and project-local `libs/` stay separate. Future purpose-based
+modules retain nested paths and existing compiler-owned completion/navigation in
+VS Code, Neovim and Vim. File-level mutable runtime `var` remains a language
+proposal; no stdlib/global implementation starts before Boss approval. See the
+[design handoff and current corrections](VOID_STDLIB_AND_GLOBAL_VARS_WRENCH_HANDOFF_2026-10-24.md#current-direction-and-source-corrections--24-october-2026).
+
 ## Current Windows milestone: RESOLVED — 21 October 2026
 
 At `e25816bdb80e3f32613edf77c9cf3258232af966`, Boss-run
@@ -454,7 +500,7 @@ Measure useful compiler/server/editor workloads and improve demonstrated
 bottlenecks. No native package manager, arbitrary public FFI, new syntax or
 automatic native hot reload is implied.
 
-The [canonical Stage 7 plan](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026)
+The [canonical Stage 7 plan](DEVELOPMENT_STRATEGY.md#historical-owner-workflow-and-stage-7-planning--19-october-2026)
 records the editor goals and unresolved choices, including Vim client/version
 support, server distribution, project handling and safe rename/formatting scope.
 They are planning goals, not completed functionality or a mandate for every LSP

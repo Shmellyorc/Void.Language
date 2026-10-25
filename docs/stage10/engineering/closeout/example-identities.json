@@ -1,0 +1,12 @@
+{
+  "sha256": {
+    "examples/stage10_console_time/main.void": "2227e1c2094d71c73896e90d82a2dbabc899f63ddbec666da20db9bd9419027e",
+    "build/step42-ci96-debug/voidc": "068b8f1578060dc3dfda1957d83a51b0d1fbf6f7afa1f1b22f4166922179046e",
+    "build/step42-ci96-debug/libvoid_runtime.a": "0dbae1aedd091037ab1711d4db239baa1aadb91d73641d624a9ec52d76f9c2df",
+    "build/ci-official-release-step41/voidc": "3b49ba9af3c8978a33acca75668275c3bf2a676211827948ce6bc187cf4f2e57",
+    "build/ci-official-release-step41/libvoid_runtime.a": "beb7500400fadfdc6043ebb77a8b4b3c55c9907ce15568b145376d39a02aa41b",
+    "build/step42-ci96-san/voidc": "6ca5aeaf281cce6fd6b2f3bef0423e0ce41fa706b70574e1dab254a253e7d891",
+    "build/step42-ci96-san/libvoid_runtime.a": "4c51ac09a6129c72667bde73cf803835702660f167c958474a7b3716ddcc4971"
+  },
+  "scope": "Existing accepted local compiler builds; no fresh compiler/Runtime rebuild. Debug CI96 compiler, Release Step41 compiler. Later CI97 keyboard adapter is not exercised by this redirected-output example. CI4 alone supplies current full-source hosted evidence."
+}

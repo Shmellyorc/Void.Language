@@ -1,24 +1,25 @@
 # Stage 10 engineering progress and permanent handoff
 
-Updated 24 October 2026 (America/Los_Angeles). **INCOMPLETE.**
-Current Step42 checkpoint: final macOS Release fixture synchronization repairs
-implemented; Golden Wrench review and repaired native Release verification pending.
-MainCI98 and ThinLTO experiment#3 at9a4985f8 each passed6/7 jobs. All configurations
-except macOS Release are green. Main Release198/199 failed the redirected-input
-terminal fixture; experiment Release198/199 failed the missing-stdin cancelled
-write prefix fixture. These are separate observations, not a ThinLTO cause claim.
+Updated 24 October 2026 (America/Los_Angeles). **Stage 10 INCOMPLETE; final
+engineering package prepared for Golden Wrench/Boss review.**
 
-The two demonstrated fixture ordering holes are repaired without changing Runtime:
-redirected input is queued before its zero-timeout probe starts, and cancellation
-waits for an actual native writable→not-writable pipe transition. All original
-assertions remain. Focused Linux Debug11/11 and strict11/11 pass, with each changed
-native fixture20/20 per configuration. This is test-driver verification, not native
-macOS Release or full CMake/JIT/AOT acceptance. Both workflows, all production
-sources, original CI97 builds, Step41 evidence and1MiB protections are unchanged.
-Steps42–44 remain open; Stage10 INCOMPLETE. See engineering/step42-results.json and
-[final Release diagnosis, raw records and remaining gates](engineering/ci98/DIAGNOSIS.md).
-Boss controls commits and native/hosted verification. Earlier records below retain
-their historical status and evidence.
+ThinLTO experiment [#4](https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209)
+at `90c0cf64b9aba60d7c642096d2aaac45aae70d56` passed **7/7 jobs,
+1,383/1,383 main CTest executions**. Both previously failing macOS Release suites
+passed, alongside strict Linux and applicable Debug editor integrations. Created
+18:00:03 UTC, updated 19:08:47 UTC on 24 October: **1 h 8 m 44 s** overall.
+Step 42 automated native evidence is green; additional real Windows console/ConPTY
+and exact native 1 MiB stack receipts remain open. Step 43 contracts/examples and
+evidence reconciliation are complete. Step 44 is prepared for independent review,
+not self-approved. [Final acceptance, exact scope and remaining gates](ACCEPTANCE.md).
+
+Main CI is unchanged. Main #98 and experiment #3 each remain historical 6/7 runs
+with different macOS Release fixture ordering failures. Their raw investigations
+and test-only repairs are preserved below and in engineering/ci98. No ThinLTO
+causality or same-commit control/cache speedup is claimed. This closeout changes
+docs/evidence and one example, not production or tests. Boss retains Git, hosted
+CI and release control; no next stage is started. Earlier dated entries retain
+their original status and evidence.
 
 Original mission baseline HEAD: `e25816bdb80e3f32613edf77c9cf3258232af966`.
 Step 32 builds on the owner checkpoint `ecf0bec6e04ef66e1e50cac4afc1598a945066c0`;
@@ -236,7 +237,9 @@ header with per-file digests and portable byte escapes.
 Step41 unfiltered consolidated Linux acceptance passes Debug 199/199, fresh
 Release 199/199 and strict 199/199, plus unchanged 1 MiB frontend/depth and actual Linux
 editor gates. Exact final-source evidence: engineering/step41-results.json.
-Native Windows/macOS and Steps42–44 remain open; Stage10 INCOMPLETE.
+Experiment #4 now supplies green automated native evidence (1,383/1,383); see
+[final acceptance](ACCEPTANCE.md) for Step 42 exclusions and Step 43/44 disposition.
+Stage 10 remains INCOMPLETE pending required native evidence and review.
 
 ### Preserved Step40 focused verification
 
@@ -539,92 +542,95 @@ a genuine architecture blocker or justified any feature omission.
 
 ## All 44 roadmap obligations
 
-“Implemented / focused” is not final system acceptance. No row below closes the
-entire Stage 10 mission.
+Current reconciliation at experiment #4. “Pass” names existing executed suites;
+it does not claim exhaustive combinations or close the native/review gates in
+[final acceptance](ACCEPTANCE.md). Earlier dated checkpoints below are history.
 
-| Step | Current state |
+| Step | Current state / evidence |
 |---|---|
-| 1 | Approved decisions recorded in contracts and DECISIONS. |
-| 2 | Focused baseline and toolchain captured. |
-| 3 | Field AST/nominal metadata and lexical closure owner implemented; focused tests pass. |
-| 4 | Shared field selection checks declaring owner, including promotion; acceptance remains partial. |
-| 5 | Deep const projection implemented and focused copy/alias tests pass; full matrix open. |
-| 6 | Direct own-init assignment implemented; ordinary helper/alias/derived writes reject. |
-| 7 | Independent IR checks added; full malformed-IR matrix remains open. |
-| 8 | Focused closures/generics/inheritance/composition/properties/interfaces/pattern cases implemented; complete cross-product open. |
-| 9 | Field compatibility/metadata/LSP and focused Linux VS Code/Neovim/Vim checks pass; full field cross-product/final acceptance remains open. |
-| 10 | Checked builder and shared numeric/layout/temporal parsing support collection and enum/result consumers; final integrated acceptance remains open. |
-| 11 | Pinned Ryu and all integer native/source rendering integrated, including collection leaves and ordinary custom hooks; final acceptance open. |
-| 12 | Native/source primitive numeric patterns, result errors and literal interpolation diagnostics implemented; full acceptance open. |
-| 13 | Primitive, nominal/custom, temporal, collection and enum/result runtime defaults implemented; focused Linux accepted, remaining cross-system/final acceptance open. |
-| 14 | Ordinary readonly custom hooks, effects, roots and recursion guards implemented; 77 focused checks; full cross-product acceptance open. |
-| 15 | Constant primitive conversion, formatting and interpolation share Runtime numeric kernel; full display types open. |
-| 16 | Typed interpolation supports primitive, nominal/custom, temporal, collection and enum/result values/alignment; focused compiler-owned console/composite tooling passes; final cross-system/stage acceptance remains open. |
-| 17 | Triple strings, multiline holes/comments, escapes and source spans implemented; focused Linux compiler/LSP/editor acceptance passes, final-stage/platform acceptance open. |
-| 18 | All current display families, including enum/results, use ordinary typed calls, roots and checked builders/failure cleanup; later cross-system/final acceptance open. |
-| 19 | Validated source date/time/local/instant/offset/duration/zone/zoned values and factories implemented; focused acceptance only. |
-| 20 | Checked wide seconds/fraction arithmetic, UTC/native resolution and per-Runtime monotonic context implemented; native Windows/macOS unverified. |
-| 21 | Embedded IANA 2026e, canonical zones, explicit overlap choice and gap rejection integrated with source APIs; full historical/platform matrix open. |
-| 22 | Shared temporal token grammar, defaults, alignment and literal diagnostics implemented; focused acceptance only. |
-| 23 | Native Runtime sessions, shared borrowed process endpoints, isolated adapter/clock, NativeSafe admission/gates, cancellation and drain implemented. Source bindings supplied in Step 27. |
-| 24 | Native checked transfers/progress/EOF/errors, single monotonic deadline, queued/readiness cancellation and retained entered-syscall lifetime implemented under Boss-approved best-effort contract; Linux Debug/strict 9/9 each. Native Windows/macOS unverified; engineering/step24-results.json. |
-| 25 | Shared native queue/UTF-8 reads and immediate CR/CRLF ownership implemented and focused-tested. Step 27 binds source read methods to this queue; native Windows/macOS acceptance remains open. |
-| 26 | Confirmed-console ReadConsoleW/WriteConsoleW and strict transcoding through the existing queue/worker implemented; focused Linux helper/adapter acceptance passed. Native Windows compilation/execution UNVERIFIED. |
-| 27 | Public heterogeneous print, source borrowed endpoints and recoverable reads/writes/flush/classification implemented. Focused Linux Debug/strict JIT/O2/linked-AOT and native error evidence recorded in step27-results.json; collection and enum/result display added; final/platform acceptance open. |
-| 28 | Explicit prompt visibility, unbuffered drain, normal/nonzero exit, reached cleanup, primary/secondary failures and source/Runtime shutdown integration implemented and Linux focused-tested; engineering/step28-results.json. Native-platform/final-stage acceptance remains open. |
-| 29 | Source capability snapshots and size/cursor/color/visibility/reset/clear/title/bell implemented through existing native/IR/ABI paths. Linux Debug/strict source/native/PTY acceptance passes; native Windows/macOS and final-stage acceptance remain open. |
-| 30 | Implemented; focused Linux Debug/strict/native PTY/JIT/O2/linked-AOT accepted. Native Windows/macOS and final-stage acceptance open. |
-| 31 | Shared console/mode/input/output/GC/shutdown/code-generation integration verified in focused Linux Debug and strict sanitizers; actual PTYs, normal/O2 JIT, linked AOT and native production builds pass. Native-platform/final-stage acceptance open. |
-| 32 | Owner-contained declaration metadata/parser and frontend/independent IR validation implemented; 278 focused declaration checks pass; Debug 8/8 and strict sanitizer 3/3. Step 33 now supplies source selection. |
-| 33 | Shared exact direct-owner selection, access/ambiguity diagnostics, generic/nullable handling, selected references and required ordinary-call plumbing implemented; focused acceptance recorded below. |
-| 34 | Ordinary-call integration and derived != implemented; focused GC/snapshots/RHS-await, worker effects, checked/owned failures, reached cleanup and source-frame tests pass in normal/O2 JIT and linked AOT. Final-stage/native-platform acceptance remains separate. |
-| 35 | Captured-place custom +=, -=, *=, /= and %= implemented across locals, fields, properties, fixed/growable arrays and dictionary values, with generic/mixed operands, ordinary result conversions, effects/roots and guarded commits. Focused acceptance in engineering/step35-results.json; native-platform/full-stage acceptance remains separate. |
-| 36 | Recursive direct-owner/custom-equality key exclusion implemented across source, independent IR and data-only Runtime metadata/schema admission; 131 focused checks, Debug 13/13 and strict 13/13 pass. Fixed arrays remain outside the existing eligible key domain. Final-stage/native-platform acceptance remains separate. |
-| 37 | Exact operator sets/owners/bindings/effects and format specifications/pinned policy identities integrated in existing contracts, invalidation, reload and cache. Final verified-source Linux Debug/strict 14/14 each; earlier unexplained observations retained. Independent/platform/final-stage acceptance separate. |
-| 38 | Compiler-owned operator/field/hook/interpolation/format/temporal plus console/collection/enum/result intelligence has focused Linux Debug/strict acceptance and actual VS Code/Neovim/Vim verification. Console/composite metadata106 and additional LSP237 checks pass; final Stage10/platform acceptance remains separate. |
-| 39 | Existing-parser syntax gate and physical/expanded token preservation implement conservative formatting; compiler/LSP/native-editor diagnostics, literals, UTF-16 and dirty-revision regressions added. Focused Step 39 and subsequent console/composite tooling evidence below; final-stage acceptance remains open. |
-| 40 | Earlier partial evidence preserved. Completed-system field/operator/display/temporal/console/composite scenarios now pass focused Linux Debug/strict25/25, normal/O2 JIT, independent AOT, production native build, real PTYs/partial progress, GC/failure/reload/cache and workloads. Independent Wrench review pending; this is not Step41 or full-stage acceptance. |
-| 41 | Complete unfiltered Linux Debug199/199, fresh Release199/199 and strict199/199; unchanged1MiB frontend/depth gates and actual Linux editor hosts pass. Evidence below; Wrench review pending. |
-| 42 | CI96 native Windows190/194 each and macOS build failures preserved; eight source/test/build changes focused-tested: Linux Debug18/18, strict18/18 and both1MiB probes. Repaired native source UNVERIFIED; Wrench review and Boss-controlled native reruns required. |
-| 43 | Engineering progress and evidence recorded; final feature documentation/examples open. |
-| 44 | Incomplete. Not a completed Stage 10 handoff and not independently Wrench-reviewed. |
+| 1 | Boss-approved B1–B4 and amendments recorded in the four feature contracts and DECISIONS. |
+| 2 | Baseline commands, host/tools and dependency receipts preserved in engineering/results.json and Step 41. |
+| 3 | Implemented field metadata and lexical owner context; stage10_fields, stage10_fields_aot and generic/closure neighbors pass. |
+| 4 | Implemented shared declaring-owner selection and promotion; source/IR/field/AOT regressions pass. |
+| 5 | Implemented deep const projections and copy/alias authority; field/compound/independent-IR regressions pass. |
+| 6 | Implemented direct own-initializer grants; helper/alias/closure/derived-phase rejection tests pass. |
+| 7 | Independent IR field policy, provenance, stores and construction proofs implemented; malformed-IR regressions pass. |
+| 8 | Constructors/properties/closures/interfaces/generics integrated; field and Step 40 cross-system regressions pass. |
+| 9 | Field compatibility, owned metadata and compiler-owned access-aware LSP implemented; reload and editor regressions pass. |
+| 10 | One checked native byte builder and format plans implemented; format_numeric, conversion, interpolation and composite regressions pass. |
+| 11 | Pinned Ryu/integer bit rendering implemented; numeric vectors and normal/O2/AOT consumers pass. |
+| 12 | Numeric grammar, exact scaling/ties-to-even and dynamic errors implemented; format_numeric and conversion regressions pass. |
+| 13 | Default display for all approved storable families implemented; collection/enum/result and all four consumers covered in conversion/console/Step 40. |
+| 14 | Ordinary readonly hooks and recursion/failure guards implemented; stage10_hooks, display_reload and GC/failure consumers pass. |
+| 15 | Pure constant numeric/bool/string formatting shares the same kernel; constant-expression tests pass. Runtime-only managed hooks remain Runtime operations by contract. |
+| 16 | Typed expression/spec interpolation implemented; source, IR, UTF-16 LSP and normal/O2/AOT regressions pass. |
+| 17 | Triple/multiline strings, escapes and original spans implemented; interpolation/formatting and actual Linux editor regressions pass. |
+| 18 | Rooted builder lowering and checked cleanup implemented; conversion/console/AOT and allocation-failure regressions pass. |
+| 19 | Validated date/time/local/instant/offset/duration/zone/zoned source values implemented; temporal source/IR/AOT tests pass on all hosted platforms. |
+| 20 | Checked temporal arithmetic and UTC/monotonic operations implemented; format_temporal, temporal_ir and AOT tests pass. |
+| 21 | Embedded versioned IANA rules, historical seconds, overlap choices and gap errors implemented; format_zones, temporal and relocation tests pass. |
+| 22 | Shared temporal patterns/defaults and diagnostics implemented; temporal formatting/source/AOT/tooling regressions pass. |
+| 23 | Runtime-borrowed endpoints, adapter, NativeSafe admission and drain implemented; Runtime/coordination/console tests pass. |
+| 24 | Checked progress/EOF/error/deadline/cancellation implemented under the approved best-effort entered-syscall contract; native POSIX and portable injected tests pass. Real Windows handle gates remain in ACCEPTANCE. |
+| 25 | Shared byte/UTF-8 queue and immediate CR/CRLF ownership implemented; mixed input tests pass. Real Windows console feed remains unverified. |
+| 26 | Windows wide console and redirected UTF-8 paths implemented and compiled/executed in Debug/Release; injected adapters pass. Actual ReadConsoleW/WriteConsoleW host acceptance is open. |
+| 27 | Heterogeneous print and recoverable standard endpoint APIs implemented; stage10_console_source/aot and redirected native tests pass. |
+| 28 | Explicit prompts/flush/exit/reached cleanup and primary/secondary failure paths implemented; console and production application regressions pass. |
+| 29 | Capabilities/presentation/cursor ownership implemented; actual Linux/macOS PTY and unsupported-redirection tests pass. Real Windows console host gate open. |
+| 30 | Keys/modes/nested restoration implemented; Linux/macOS native key suites and portable adapter tests pass. Real Windows event/host gate open. |
+| 31 | Console/GC/concurrency/shutdown/generation lifetime integration implemented; focused Step 31/40 plus complete Linux/native automated suites pass; Windows host-specific boundary remains open. |
+| 32 | Approved operator declarations and source/IR validation implemented; stage10_operator_declarations passes. |
+| 33 | Exact direct-owner expression selection and ambiguity/access diagnostics implemented; stage10_operator_resolution passes. |
+| 34 | Ordinary calls/effects/roots/derived inequality integrated; operator_integration and normal/O2/AOT GC/failure regressions pass. |
+| 35 | Captured-place arithmetic compounds implemented; operator_compounds and AOT cover once-only capture and failure noncommit. |
+| 36 | Recursive custom-equality key exclusion implemented in source/IR/Runtime; operator_keys and ordinary dictionary/pattern regressions pass. |
+| 37 | Exact operator/format policy dependencies integrated with reload/cache/leases; operator_reload and display_reload pass. Historical unexplained observations retained. |
+| 38 | Compiler-owned intelligence implemented; stage10_tooling, LSP and actual Linux VS Code/Neovim/Vim pass; experiment #4 native Debug VS Code integrations pass. |
+| 39 | Conservative parser/token-preserving formatting implemented; source_formatting and LSP/native-editor regression evidence retained. |
+| 40 | Complete four-system integration and measured workloads pass Debug/strict 25/25 each, normal/O2 JIT, independent AOT, native production and PTY/fault/GC/reload paths; original partial checkpoint preserved. |
+| 41 | Consolidated Linux Debug/Release/strict 199/199 each with original 1 MiB/depth and actual editor evidence preserved unchanged. |
+| 42 | Experiment #4 automated native matrix green: 7/7 and 1,383/1,383. Required real Windows console/ConPTY and exact native stack receipts remain unverified; see ACCEPTANCE. No production failure inferred. |
+| 43 | Complete documentation/examples/evidence reconciliation; EXAMPLES and closeout raw records cover exact output and provenance. No approved missing feature moved to future stdlib scope. |
+| 44 | Final acceptance package prepared in ACCEPTANCE.md. Independent Golden Wrench review and Boss release decisions pending; Stage 10 is not locked. |
 
 ## Every feature-completeness matrix row
 
+Current implementation and executed evidence, reconciled against the approved
+roadmap and test plan. Native evidence exclusions remain in ACCEPTANCE.md.
+
 | Capability | Current state |
 |---|---|
-| Strict UTF-8, NUL, scalar indexing, owned byte conversion | Existing source remains; Step 25 native shared input reuses UTF-8 validation and preserves NUL/BOM/raw bytes. Source bindings now use the same queue (Step 27); final integration remains open. |
-| Named/default binding and written-order evaluation | Print pack and named-only controls implemented; all supplied values/controls capture once before display. Written-order side effects and value/reference snapshots verified. |
-| Heterogeneous print | Implemented for primitive, nominal/custom, opaque resource, temporal and fixed-array/list/dictionary display. Enum/result defaults are now included; focused console/composite tooling acceptance passes; focused Step40 four-system integration passes; final-stage/platform acceptance remains separate. |
-| No-newline output and prompts | Explicit print(end="", flush=true) followed by existing reads implemented and verified in Step 28, including redirection/EOF/errors. No convenience helper added. |
-| Standard endpoints and byte/text access | Compiler-owned borrowed stdin/stdout/stderr, protected endpoint construction/payload, source recoverable write/write_bytes and all four read APIs implemented through Steps 23–26. |
-| Character/text/line EOF/errors | Native/shared-queue and source read APIs implemented; focused source tests verify mixed CRLF/Unicode, EOF, invalid prefixes, partial bytes and invalid counts. Windows-wide feed implemented; native Windows verification open. |
-| Redirection and Windows Unicode | Raw redirected bytes and source binary/NUL output verified on Linux; Step 26 wide paths implemented with source io_error retaining partial UTF-16 units. Native Windows/macOS acceptance open; Stage 9 corrections preserved. |
-| Terminal input and presentation | Steps29–30 presentation, keys, availability and scoped modes implemented with focused Linux acceptance through one queue. Native Windows/macOS and final-stage acceptance remain open. |
-| Concurrent output / normal exit | Steps28–31 normal/nonzero exit, reached cleanup, record serialization, shared Runtime/mode/queue ownership, GC, entered-call cancellation, code leases and restoration pass focused Linux verification. Native-platform and final-stage acceptance remain open. |
-| Complete interpolation | Primitive, nominal/custom, temporal and collection typed holes/alignment plus multiline/triple parsing implemented; enum/result defaults now included; focused console/composite tooling acceptance passes; focused Step40 four-system integration passes; final-stage/platform acceptance remains separate. |
-| Numeric/bool conversion | Primitive source/default/constant conversion and formatting implemented with focused tests. |
-| Numeric formatting | Native/source APIs, constant evaluation and interpolation share implementation; focused four-system integration passes, consolidated/final acceptance open. |
-| Deterministic rounding / special floats | Native tests pass; full shared-consumer acceptance open. |
-| Temporal values and formatting | Native kernel/source APIs/hooks/clocks implemented with focused JIT/O2/AOT tests; native Windows/macOS and full-stage acceptance open. |
-| Custom display / format hooks | Nominal ordinary-call implementation and 77 focused checks; reload and LSP tests pass; complete cross-product acceptance open. |
-| Private fields | Core implementation and focused source/IR/tooling tests; full acceptance open. |
-| Readonly fields | Core implementation and focused source/IR/tooling tests; full acceptance open. |
-| Copies, readonly views, initialization | Focused old/new tests; full Stage 10 cross-product open. |
-| Inheritance/composition/interfaces/generics | Focused field and Step40 inherited/const-promoted/generic composite cases pass; full final-stage matrix remains open. |
-| Owner arithmetic/equality/order | Steps 32–34 declaration/selection/ordinary calls, including %, GC/worker/failure paths and derived != pass focused normal/O2 JIT and linked AOT. Steps 35–36 compounds and key exclusion and Step 38 tooling are implemented; final acceptance remains open. |
-| Derived compounds | Custom arithmetic and %= use captured old-value/RHS calls before guarded commit; builtin behavior retained. Focused Linux tests cover counts, rebindings, readonly authority, GC/await, failures and collection invalidation. |
-| Dictionary equality/hash coherence | Recursive direct-owner custom-equality key exclusion implemented in shared source/IR eligibility and data-only Runtime metadata; values and pattern comparisons preserved. Focused Linux acceptance passes; final-stage/platform acceptance open. |
-| Compiler-owned LSP / editor integrations | Compiler-owned operator/field/format/hook/temporal/console/composite intelligence passes focused metadata/LSP and actual Linux VS Code/Neovim/Vim checks. Installed source/readonly and dirty/stale boundaries preserved. Final-stage/native-platform acceptance remains open. |
-| Reload/cache/JIT/AOT | Step 37 operator/format declaration, exact binding/specification/policy dependencies implemented; body-compatible leases and Debug cache paths pass focused Linux/JIT/O2/AOT verification. Earlier unproven observations retained; native/final-stage acceptance open. |
-| Git package manager | Separate, unmodified, outside Stage 10. |
+| Strict UTF-8, NUL, scalar indexing, owned byte conversion | Implemented; text/array/source suites, shared native input and exact console/AOT bytes pass. |
+| Named/default binding and written-order evaluation | Implemented; print controls snapshot once before display; console/compound/integration side-effect assertions pass. |
+| Heterogeneous print | Implemented across primitive/custom/opaque/temporal/array/dict/enum/result families; console_source/aot and Step 40 pass. |
+| No-newline output and prompts | Implemented explicit end/flush; prompt-before-read, redirection, EOF and cleanup assertions pass. |
+| Standard endpoints and byte/text access | Implemented borrowed endpoints and recoverable read/write APIs; Runtime/native/source suites pass. |
+| Character/text/line EOF/errors | Implemented shared queue/decoding/carry ownership; portable and POSIX native tests pass; real Windows console feed open. |
+| Redirection and Windows Unicode | Implemented and hosted Windows Debug/Release redirected/injected paths pass; real wide-console host gate open. |
+| Terminal input and presentation | Implemented; Linux/macOS real PTY restoration/key/presentation tests pass. Actual Windows console/ConPTY evidence open. |
+| Concurrent output / normal exit | Implemented; GC, shutdown, progress, reached cleanup and leases tested. Real Windows handle/host scope remains explicit. |
+| Complete interpolation | Implemented all approved expression/display families, alignment, multiline/triples and spans; source/IR/LSP/normal/O2/AOT pass. |
+| Numeric/bool conversion | Implemented default/constant/Runtime shared kernel; numeric/conversion/AOT regressions pass. |
+| Numeric formatting | Implemented grammar, all integer widths, floating patterns and errors; native/source/JIT/O2/AOT pass. |
+| Deterministic rounding / special floats | Implemented exact scaling/one ties-to-even step, signed zero/nan/inf; bit vectors and shared-consumer tests pass. |
+| Temporal values and formatting | Implemented factories/arithmetic/clocks/embedded rules and patterns; all hosted temporal/install/AOT suites pass. |
+| Custom display / format hooks | Implemented ordinary readonly typed calls, recursion/GC/failures/leases; hooks/reload/console/conversion pass. |
+| Private fields | Implemented declaring-owner policy in source/shared selection/independent IR/tooling; field/integration/AOT suites pass. |
+| Readonly fields | Implemented deep paths/direct owner-init grants with no alias thaw; source/IR/copy/compound tests pass. |
+| Copies, readonly views, initialization | Implemented existing value/reference semantics and staged readiness; focused matrices and complete frontend/field/GC suites pass. |
+| Inheritance/composition/interfaces/generics | Integrated lexical owners/const promotion/exact identities; field/operator/four-system and neighboring suites pass. |
+| Owner arithmetic/equality/order | Implemented complete approved exact set including binary %, derived != and independent ordering; declaration/resolution/integration/AOT pass. |
+| Derived compounds | Implemented captured-place arithmetic compounds (`+=`, `-=`, `*=`, `/=`, `%=`); operator_compounds and async/fault/GC/AOT checks pass. |
+| Dictionary equality/hash coherence | Implemented recursive custom-equality exclusion, existing data-only hashing/pattern semantics retained; key/schema/dict regressions pass. |
+| Compiler-owned LSP / editor integrations | Implemented one semantic authority. All hosted LSP and Debug VS Code checks pass; actual Linux Neovim/Vim evidence retained; optional native clients unverified. |
+| Reload/cache/JIT/AOT | Implemented exact policies/bindings/specs/dependency versions and body-compatible leases; complete existing regressions pass; historical anomalies not claimed fixed. |
+| Git package manager / future stdlib / file-level runtime var | Outside Stage 10. Future design only; no implementation or new resolver authorized here. |
 
 ## Continuing the already-authorized mission
 
-Current bounded Step41 consolidated Linux acceptance is complete and stops for
-Golden Wrench review. Exact evidence: engineering/step41-results.json. Step42
-handles actual native Windows/macOS acceptance and unavailable platform gates;
-Steps43–44 and the Boss release decision remain open. Stage10 INCOMPLETE.
+Step 43 is complete and Step 44 is prepared for independent review. Stop for
+Golden Wrench/Boss; required native evidence and release decisions remain in
+[ACCEPTANCE](ACCEPTANCE.md). No next stage, Git or hosted run is started.
 
 ## Deferred editor quality observations — Boss report, Step 31
 

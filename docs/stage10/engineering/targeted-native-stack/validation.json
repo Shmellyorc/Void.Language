@@ -1,0 +1,343 @@
+{
+  "local_validation_only": true,
+  "native_Windows_macOS_workflow_executions": 0,
+  "hosted_dispatches": 0,
+  "workflow_dispatch_only": true,
+  "matrix": [
+    {
+      "os": "windows-2022",
+      "platform": "Windows x64",
+      "configuration": "Debug"
+    },
+    {
+      "os": "windows-2022",
+      "platform": "Windows x64",
+      "configuration": "Release"
+    },
+    {
+      "os": "macos-latest",
+      "platform": "macOS ARM64",
+      "configuration": "Debug"
+    },
+    {
+      "os": "macos-latest",
+      "platform": "macOS ARM64",
+      "configuration": "Release"
+    }
+  ],
+  "actionlint": "pass (1.7.7)",
+  "YAML_and_Python_syntax": "pass",
+  "CMake_arguments": [
+    {
+      "system": "Windows",
+      "configuration": "Debug",
+      "argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build/native-stack-Debug",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DVOID_RETENTION_BASELINE=OFF",
+        "-DLLVM_DIR=/sdk with spaces/lib/cmake/llvm",
+        "-DVOID_CLANG=/sdk with spaces/bin/clang",
+        "-DVOID_LINKER="
+      ]
+    },
+    {
+      "system": "Windows",
+      "configuration": "Release",
+      "argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build/native-stack-Release",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DVOID_RETENTION_BASELINE=OFF",
+        "-DLLVM_DIR=/sdk with spaces/lib/cmake/llvm",
+        "-DVOID_CLANG=/sdk with spaces/bin/clang",
+        "-DVOID_LINKER="
+      ]
+    },
+    {
+      "system": "Darwin",
+      "configuration": "Debug",
+      "argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build/native-stack-Debug",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DVOID_RETENTION_BASELINE=OFF",
+        "-DLLVM_DIR=/sdk with spaces/lib/cmake/llvm",
+        "-DVOID_CLANG=/sdk with spaces/bin/clang",
+        "-DVOID_LINKER=",
+        "-DCMAKE_EXE_LINKER_FLAGS:STRING=-Wl,-cache_path_lto,\"/tmp/void-targeted-native-stack/cache with spaces\""
+      ]
+    },
+    {
+      "system": "Darwin",
+      "configuration": "Release",
+      "argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build/native-stack-Release",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DVOID_RETENTION_BASELINE=OFF",
+        "-DLLVM_DIR=/sdk with spaces/lib/cmake/llvm",
+        "-DVOID_CLANG=/sdk with spaces/bin/clang",
+        "-DVOID_LINKER=",
+        "-DCMAKE_EXE_LINKER_FLAGS:STRING=-Wl,-cache_path_lto,\"/tmp/void-targeted-native-stack/cache with spaces\""
+      ]
+    }
+  ],
+  "nonempty_ThinLTO_cache_rejected": true,
+  "build_parallelism_and_targets": [
+    [
+      "cmake",
+      "--build",
+      "build/native-stack-Debug",
+      "--parallel",
+      "3",
+      "--target",
+      "voidc",
+      "void_tests"
+    ]
+  ],
+  "PE_fixture_readback": {
+    "scope": "Linux-generated minimal PE files and real local LLVM19 readback; parser/negative-gate validation only, not native SDK compiler binaries or Windows execution",
+    "results": [
+      {
+        "expected_bytes": 1048576,
+        "binaries": {
+          "voidc": {
+            "sha256": "7a80fd0fdbf4490d2ce166a911623b7e481451b27576509374bb314762c70218",
+            "bytes": 1024,
+            "stack_reserves": [
+              1048576
+            ]
+          },
+          "void_tests": {
+            "sha256": "7a80fd0fdbf4490d2ce166a911623b7e481451b27576509374bb314762c70218",
+            "bytes": 1024,
+            "stack_reserves": [
+              1048576
+            ]
+          }
+        },
+        "passed": true
+      },
+      {
+        "expected_bytes": 1048576,
+        "binaries": {
+          "voidc": {
+            "sha256": "7a80fd0fdbf4490d2ce166a911623b7e481451b27576509374bb314762c70218",
+            "bytes": 1024,
+            "stack_reserves": [
+              1048576
+            ]
+          },
+          "void_tests": {
+            "sha256": "8742e4364c0bf37476be6098be6c228d86e01094b9906788767ce2b6fc8c86a3",
+            "bytes": 1024,
+            "stack_reserves": [
+              2097152
+            ]
+          }
+        },
+        "passed": false
+      }
+    ]
+  },
+  "simulated_macOS_limit_guard_cases": [
+    {
+      "case": "correct",
+      "child_scheduled": true,
+      "record": {
+        "before": [
+          8388608,
+          8388608
+        ],
+        "expected_bytes": 1048576,
+        "observed": [
+          1048576,
+          1048576
+        ]
+      }
+    },
+    {
+      "case": "wrong-readback",
+      "child_scheduled": false,
+      "record": {
+        "before": [
+          8388608,
+          8388608
+        ],
+        "expected_bytes": 1048576,
+        "observed": [
+          1048576,
+          8388608
+        ]
+      }
+    },
+    {
+      "case": "set-failed",
+      "child_scheduled": false,
+      "record": {
+        "before": [
+          8388608,
+          8388608
+        ],
+        "expected_bytes": 1048576,
+        "observed": [
+          8388608,
+          8388608
+        ]
+      }
+    }
+  ],
+  "command_exit_17_and_diagnostic_retained": true,
+  "raw_output_bytes_retained": true,
+  "macOS_x64_rejected": true,
+  "incomplete_summary_rejected": true,
+  "preexisting_inputs_checked": 2861,
+  "preexisting_mismatches": [],
+  "workflow_sha256": "5692dd8cee0d2d8beb0856922cb0895568137506b302e01f01cf0135d8348af7",
+  "helper_sha256": "4579fbfefbd6c0e0512fc7b3ea05ea7c607ba1e0106de6f10c9f8e8dcb2cc5f1",
+  "commands": [
+    {
+      "label": "actionlint",
+      "argv": [
+        "/tmp/void-actionlint-1.7.7/actionlint",
+        "-color",
+        "/home/shmellyorc/Documents/Void.Language/.github/workflows/stage10-native-stack.yml"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "assemble-local-PE-fixture",
+      "argv": [
+        "/usr/lib/llvm-19/bin/llvm-mc",
+        "-triple=x86_64-pc-windows-msvc",
+        "-filetype=obj",
+        "/tmp/void-targeted-native-stack/entry.s",
+        "-o",
+        "/tmp/void-targeted-native-stack/entry.obj"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "link-local-PE-fixture-1048576",
+      "argv": [
+        "/usr/lib/llvm-19/bin/lld-link",
+        "/entry:main",
+        "/subsystem:console",
+        "/nodefaultlib",
+        "/machine:x64",
+        "/stack:1048576",
+        "/out:/tmp/void-targeted-native-stack/1048576.exe",
+        "/tmp/void-targeted-native-stack/entry.obj"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "link-local-PE-fixture-2097152",
+      "argv": [
+        "/usr/lib/llvm-19/bin/lld-link",
+        "/entry:main",
+        "/subsystem:console",
+        "/nodefaultlib",
+        "/machine:x64",
+        "/stack:2097152",
+        "/out:/tmp/void-targeted-native-stack/2097152.exe",
+        "/tmp/void-targeted-native-stack/entry.obj"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "actionlint-version",
+      "argv": [
+        "/tmp/void-actionlint-1.7.7/actionlint",
+        "-version"
+      ],
+      "exit_code": 0,
+      "stdout": "1.7.7\ninstalled by downloading from release page\nbuilt with go1.23.4 compiler for linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "label": "local-LLVM19-version",
+      "argv": [
+        "/usr/bin/llvm-readobj-19",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "Debian LLVM version 19.1.7\n  Optimized build.\n",
+      "stderr": ""
+    }
+  ],
+  "validated_utc": "2026-10-25T00:19:22.904809+00:00",
+  "local_PE_fixture_assembly": ".text\n.globl main\nmain:\n  xorl %eax, %eax\n  retq\n",
+  "scope": "Workflow/helper validation only; no native Windows/macOS execution, CI dispatch, production/test change or VirtualBox investigation.",
+  "local_validation_log_sha256": "51df81e02a0009cdfd947e1c1f6a664eac3282764280151f996940976207c921",
+  "local_validation_log_gzip_sha256": "e2cdc28275324a6fc6560517382ff0efea07ae71ccbe51d0d934c7aac14927c1",
+  "documentation_links_checked": 8,
+  "broken_documentation_links": [],
+  "final_checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--reverse",
+        "--check",
+        "docs/stage10/engineering/targeted-native-stack/workflow-helper.diff"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "HEAD": "92136acaf114a492452a7d84b31f174f5b305def",
+  "workflow_helper_sha256_match": true
+}
