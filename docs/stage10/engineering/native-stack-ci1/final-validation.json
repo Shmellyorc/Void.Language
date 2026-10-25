@@ -1,0 +1,25 @@
+{
+  "baseline_commit": "b490579f84a702ec5d11da51a82934a498f88afa",
+  "all_tracked_paths_before": 2868,
+  "preexisting_paths_unchanged": 2865,
+  "preexisting_paths_changed": [
+    ".github/workflows/stage10-native-stack.yml",
+    "docs/stage10/engineering/targeted-native-stack/HANDOFF.md",
+    "tools/ci/stage10_native_stack.py"
+  ],
+  "protected_hashes": {
+    ".github/workflows/ci.yml": "6e8190d2eae73d3c4040564c1800b900ba753e038a47f9c4375f0c9ebcce3334",
+    ".github/workflows/ci-link-experiment.yml": "a0926040b2d2cbe0e77c797107925a58d7c1fe264f5280a066ab67e282ee15b1",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "tests/integration/semantic_depth.py": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d"
+  },
+  "all_other_preexisting_evidence_preserved": true,
+  "ci1_logs_and_receipts_verified": 4,
+  "json_and_new_local_markdown_links_valid": true,
+  "git_diff_check_exit": 0,
+  "harness_diff_sha256": "3e4ad80e0b6a5bc021bf83aacd4c43fd5685c633b3b73f28545b88c9bbaa7f69",
+  "preliminary_packaging_check": "A link check ran before final-validation.json was generated; rerun with generated receipts passes. No harness change required.",
+  "native_macos_acceptance": "PENDING; not executed locally",
+  "hosted_dispatch": false,
+  "git_mutations": false
+}

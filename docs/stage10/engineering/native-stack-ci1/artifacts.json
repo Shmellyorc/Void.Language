@@ -1,0 +1,80 @@
+{
+  "artifacts": [
+    {
+      "id": 12581193291,
+      "name": "stage10-native-stack-Windows-X64-Release-b490579f84a702ec5d11da51a82934a498f88afa-1",
+      "size_in_bytes": 36225809,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12581193291",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12581193291/zip",
+      "expired": false,
+      "created_at": "2026-10-25T00:35:43Z",
+      "expires_at": "2027-01-23T00:32:46Z",
+      "updated_at": "2026-10-25T00:35:43Z",
+      "digest": "sha256:6337942b8e16423cedf6bbbe185dc03d27c0627f41e9b2e204edf0b688443d07",
+      "workflow_run": {
+        "id": 40147114803,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "b490579f84a702ec5d11da51a82934a498f88afa"
+      }
+    },
+    {
+      "id": 12580508756,
+      "name": "stage10-native-stack-macOS-ARM64-Release-b490579f84a702ec5d11da51a82934a498f88afa-1",
+      "size_in_bytes": 40265114,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12580508756",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12580508756/zip",
+      "expired": false,
+      "created_at": "2026-10-25T00:37:37Z",
+      "expires_at": "2027-01-23T00:32:46Z",
+      "updated_at": "2026-10-25T00:37:37Z",
+      "digest": "sha256:bb640ea70c4f337a4e9c6b0f2fabe1dffb4351484ccee6d704821defa7393e7e",
+      "workflow_run": {
+        "id": 40147114803,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "b490579f84a702ec5d11da51a82934a498f88afa"
+      }
+    },
+    {
+      "id": 12580458533,
+      "name": "stage10-native-stack-Windows-X64-Debug-b490579f84a702ec5d11da51a82934a498f88afa-1",
+      "size_in_bytes": 44449035,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12580458533",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12580458533/zip",
+      "expired": false,
+      "created_at": "2026-10-25T00:34:51Z",
+      "expires_at": "2027-01-23T00:32:46Z",
+      "updated_at": "2026-10-25T00:34:51Z",
+      "digest": "sha256:c31527afdc4c05256251c75dc9efb26be269c6cb59a82082db41157bcf01c9a9",
+      "workflow_run": {
+        "id": 40147114803,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "b490579f84a702ec5d11da51a82934a498f88afa"
+      }
+    },
+    {
+      "id": 12580374463,
+      "name": "stage10-native-stack-macOS-ARM64-Debug-b490579f84a702ec5d11da51a82934a498f88afa-1",
+      "size_in_bytes": 43147988,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12580374463",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/12580374463/zip",
+      "expired": false,
+      "created_at": "2026-10-25T00:44:28Z",
+      "expires_at": "2027-01-23T00:32:46Z",
+      "updated_at": "2026-10-25T00:44:28Z",
+      "digest": "sha256:c061c299a5092e472ba3ceacf6d54be7a4ee376d58b3e107442d50577408cd3c",
+      "workflow_run": {
+        "id": 40147114803,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "b490579f84a702ec5d11da51a82934a498f88afa"
+      }
+    }
+  ]
+}

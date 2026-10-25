@@ -1,0 +1,139 @@
+{
+  "baseline_commit": "b490579f84a702ec5d11da51a82934a498f88afa",
+  "entries": [
+    {
+      "path": ".github/workflows/stage10-native-stack.yml",
+      "status": "modified",
+      "bytes": 4084,
+      "before_sha256": "5692dd8cee0d2d8beb0856922cb0895568137506b302e01f01cf0135d8348af7",
+      "sha256": "3de7486b6c03c9fe63617d0d954af6900589ef0fc70e35592988b9c0052a7016"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/REPAIR.md",
+      "status": "added",
+      "bytes": 8083,
+      "before_sha256": null,
+      "sha256": "557ba7e77f7f57f55d8a8113929209534955a6b450077ec0f91c6ea4880099d2"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/artifacts.json",
+      "status": "added",
+      "bytes": 3508,
+      "before_sha256": null,
+      "sha256": "c13c42d8d46f74d4919b466fbe6d8ca98dc8dedcaf04961833df5be4a2deb974"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/changed-files.json",
+      "status": "added",
+      "bytes": null,
+      "before_sha256": null,
+      "sha256": null
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/final-validation.json",
+      "status": "added",
+      "bytes": 1317,
+      "before_sha256": null,
+      "sha256": "eb05d3e81e7907c8ba55f3cca455c0a649912c9ebbb27a30266b1cea4d383914"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/harness.diff",
+      "status": "added",
+      "bytes": 6834,
+      "before_sha256": null,
+      "sha256": "3e4ad80e0b6a5bc021bf83aacd4c43fd5685c633b3b73f28545b88c9bbaa7f69"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/job-121030709535.log.gz",
+      "status": "added",
+      "bytes": 11194,
+      "before_sha256": null,
+      "sha256": "8f82f58b73a2db053056605371b4d5c2478c16c85f1d7ba49901d1e92e1c303b"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/job-121030709743.log.gz",
+      "status": "added",
+      "bytes": 20388,
+      "before_sha256": null,
+      "sha256": "7ef40a199e50d2d763afee8a6b5e2f46cffa2453ea9d637bf796810110bc6c4a"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/job-121030709746.log.gz",
+      "status": "added",
+      "bytes": 10738,
+      "before_sha256": null,
+      "sha256": "755dec681db4288fd753326a3fbd944df652957d8444359a3bea5b1cf9d2c6ef"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/job-121030709886.log.gz",
+      "status": "added",
+      "bytes": 20377,
+      "before_sha256": null,
+      "sha256": "d67e2254f99e0137dc4577f9c74683b14928a5f43eb72216f25b533ce3372953"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/jobs.json",
+      "status": "added",
+      "bytes": 12247,
+      "before_sha256": null,
+      "sha256": "a6f354f721c9ff7a184c3d66bdda78b5eea7fc721f19e91c4eed59c8b7c0ceff"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/local-validation.log.gz",
+      "status": "added",
+      "bytes": 1304,
+      "before_sha256": null,
+      "sha256": "1d9e4b6534e073811cbac4e4768f21f5f7513a5d5cdea7dab8eb2cc4f181a719"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/logs.json",
+      "status": "added",
+      "bytes": 1715,
+      "before_sha256": null,
+      "sha256": "1d4e9749cc13d2922040488f704f3c3a58936d6f4b9bf17ac4d48ade19446e92"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/run.json",
+      "status": "added",
+      "bytes": 13901,
+      "before_sha256": null,
+      "sha256": "1be8e54a3200c57821e01b5d3a0d36deae87c2fddd6923599cf8148b3e1e7e60"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/validate.py",
+      "status": "added",
+      "bytes": 8339,
+      "before_sha256": null,
+      "sha256": "812f568f07f955136494b3b109d29144204b6f28f89928461b9bfbcd583e4eed"
+    },
+    {
+      "path": "docs/stage10/engineering/native-stack-ci1/validation.json",
+      "status": "added",
+      "bytes": 1351,
+      "before_sha256": null,
+      "sha256": "5cb64147a2e438cb2d3b313a7451b35b6a852d977ecb01cfd6b2cbfea8b12be2"
+    },
+    {
+      "path": "docs/stage10/engineering/targeted-native-stack/HANDOFF.md",
+      "status": "modified",
+      "bytes": 7681,
+      "before_sha256": "430d201444774e8a7c697693e33ba4a524e41cac79dbe47b63f94658b40cd621",
+      "sha256": "b6a0ab4bac71011bb1c57d08732d51c2aca8d2220c8e33647b07fc0b4dfbd675"
+    },
+    {
+      "path": "tools/ci/stage10_macos_stack.sh",
+      "status": "added",
+      "bytes": 388,
+      "before_sha256": null,
+      "sha256": "1828ac8a7989f110a46edb541715bb8ef9cb7cf45a0bf67c701e4107eba7be23"
+    },
+    {
+      "path": "tools/ci/stage10_native_stack.py",
+      "status": "modified",
+      "bytes": 12363,
+      "before_sha256": "4579fbfefbd6c0e0512fc7b3ea05ea7c607ba1e0106de6f10c9f8e8dcb2cc5f1",
+      "sha256": "48604485ed75c88a6d68058c36ecf0712542fb6058a388a38f969211b7b4abb0"
+    }
+  ],
+  "self_hash": "Inventory digest and size omitted to avoid self-reference; all other changed payloads hashed"
+}

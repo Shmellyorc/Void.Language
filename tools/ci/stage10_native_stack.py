@@ -85,20 +85,40 @@ def verify_pe():
         raise RuntimeError('Both actual PE StackReserve values must equal 1048576')
 
 
+def verify_macho():
+    run('macho-python', ['/usr/bin/otool', '-l', sys.executable])
+    values = {}
+    for target in ('voidc', 'void_tests'):
+        binary = BUILD / target
+        run('macho-' + target, ['/usr/bin/otool', '-l', str(binary)])
+        text = (EVIDENCE / ('macho-' + target + '.log')).read_text(encoding='utf-8')
+        blocks = re.split(r'(?m)^Load command ', text)
+        main_blocks = [block for block in blocks if re.search(r'(?m)^\s*cmd LC_MAIN\s*$', block)]
+        stacks = [int(value) for block in main_blocks
+                  for value in re.findall(r'(?m)^\s*stacksize (\d+)\s*$', block)]
+        values[target] = {'sha256': digest(binary), 'LC_MAIN_commands': len(main_blocks),
+                          'LC_MAIN_stack_sizes': stacks}
+    passed = all(value['LC_MAIN_commands'] == 1 and value['LC_MAIN_stack_sizes'] == [0]
+                 for value in values.values())
+    save('macho-stack.json', {'binaries': values, 'passed': passed})
+    if not passed:
+        raise RuntimeError('Native test binaries must use the inherited default stack, without a Mach-O override')
+
+
 def stack_boundary(label):
     if SYSTEM == 'Windows':
         if not json.loads((EVIDENCE / 'pe-stack.json').read_text())['passed']:
             raise RuntimeError('Windows PE stack gate must pass before execution')
         return
     import resource
-    record = {'before': resource.getrlimit(resource.RLIMIT_STACK), 'expected_bytes': MIB}
-    try:
-        resource.setrlimit(resource.RLIMIT_STACK, (MIB, MIB))
-    finally:
-        record['observed'] = resource.getrlimit(resource.RLIMIT_STACK)
-        save(label + '-stack.json', record)
+    record = {'observed': resource.getrlimit(resource.RLIMIT_STACK), 'expected_bytes': MIB,
+              'method': 'inherited from native bash before Python startup',
+              'python_executable': sys.executable}
+    save(label + '-stack.json', record)
     if record['observed'] != (MIB, MIB):
         raise RuntimeError('Both inherited macOS stack limits must equal 1048576')
+    if not json.loads((EVIDENCE / 'macho-stack.json').read_text())['passed']:
+        raise RuntimeError('Native Mach-O default-stack gate must pass before execution')
 
 
 def finish():
@@ -117,7 +137,9 @@ def finish():
         path = EVIDENCE / 'pe-stack.json'
         boundary = path.exists() and json.loads(path.read_text())['passed']
     else:
-        boundary = all((EVIDENCE / (label + '-stack.json')).exists() and
+        path = EVIDENCE / 'macho-stack.json'
+        boundary = path.exists() and json.loads(path.read_text())['passed'] and all(
+                       (EVIDENCE / (label + '-stack.json')).exists() and
                        json.loads((EVIDENCE / (label + '-stack.json')).read_text())['observed'] == [MIB, MIB]
                        for label in ('frontend', 'semantic-depth'))
     complete = unchanged and boundary and all(value == 0 for value in outcomes.values())
@@ -181,16 +203,23 @@ def main(phase):
         run('configure', configure_command())
     elif phase == 'build':
         run('build', ['cmake', '--build', str(BUILD), '--parallel', '3', '--target', 'voidc', 'void_tests'])
+        if SYSTEM == 'Darwin':
+            verify_macho()
     elif phase == 'pe':
         if SYSTEM != 'Windows':
             raise RuntimeError('PE readback requires the actual Windows build')
         verify_pe()
-    elif phase in ('frontend', 'depth'):
-        label = 'frontend' if phase == 'frontend' else 'semantic-depth'
+    elif phase in ('frontend', 'depth', 'frontend-inherited', 'depth-inherited'):
+        original_phase = phase.removesuffix('-inherited')
+        label = 'frontend' if original_phase == 'frontend' else 'semantic-depth'
+        if SYSTEM == 'Darwin' and phase == original_phase:
+            run(label + '-launcher', ['/bin/bash', 'tools/ci/stage10_macos_stack.sh',
+                                      sys.executable, str(Path(__file__).resolve()), phase + '-inherited'])
+            return
         stack_boundary(label)
         command = (['ctest', '--test-dir', str(BUILD), '-R', '^frontend$', '--no-tests=error',
                     '--output-on-failure', '--output-junit', str((EVIDENCE / 'frontend-junit.xml').resolve())]
-                   if phase == 'frontend' else
+                   if original_phase == 'frontend' else
                    [sys.executable, 'tests/integration/semantic_depth.py', str(BUILD / ('voidc' + SUFFIX))])
         run(label, command)
     elif phase == 'finish':

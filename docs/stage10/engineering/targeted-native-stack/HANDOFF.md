@@ -1,5 +1,24 @@
 # Stage 10 targeted native stack workflow — 24 October 2026
 
+## CI #1 result and bounded macOS repair — 24 October 2026
+
+[CI #1 evidence and repair handoff](../native-stack-ci1/REPAIR.md) supersede the
+pre-dispatch status below. Run `40147114803` at
+`b490579f84a702ec5d11da51a82934a498f88afa` passed Windows Debug/Release (both
+actual PE reserves and unchanged frontend/depth probes). Both macOS builds
+succeeded, but Python's stack-limit setter failed before either test executed.
+The reviewed preparation and validation below remain historical evidence.
+
+The bounded harness repair sets/verifies both limits in native Bash before
+starting Python, checks inherited byte values and native Mach-O default stacks,
+and preserves original test commands. Manual dispatch now defaults to
+`platforms=macos-only` (Debug/Release); `all` retains the four configurations.
+Local checks do not establish macOS acceptance. No follow-up was dispatched;
+stop for Golden Wrench/Boss review. Windows console/ConPTY remains UNVERIFIED,
+and Stage 10 remains INCOMPLETE.
+
+## Original preparation (before CI #1)
+
 **Prepared and locally validated; NOT DISPATCHED.** Stop for Golden Wrench review
 and Boss-controlled commit/push and hosted authorization. Stage 10 remains
 INCOMPLETE. Native results below describe the required future artifacts, not

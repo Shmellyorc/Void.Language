@@ -1,0 +1,41 @@
+{
+  "origin": "GitHub connector decoded logs; CRLF normalized to LF and trailing newline retained",
+  "jobs": [
+    {
+      "job_id": 121030709535,
+      "name": "Native stack / macOS ARM64 / Debug",
+      "conclusion": "failure",
+      "log": "job-121030709535.log.gz",
+      "decoded_normalized_bytes": 62026,
+      "decoded_normalized_sha256": "8197ec56a413b135d32683f5d70a8fd6a217d36f4655afe3e7513cbe17f9734b",
+      "gzip_sha256": "8f82f58b73a2db053056605371b4d5c2478c16c85f1d7ba49901d1e92e1c303b"
+    },
+    {
+      "job_id": 121030709743,
+      "name": "Native stack / Windows x64 / Release",
+      "conclusion": "success",
+      "log": "job-121030709743.log.gz",
+      "decoded_normalized_bytes": 190710,
+      "decoded_normalized_sha256": "199a7fce82ec1bf832cb0b41a126a148d05eafcb939d4c15cd505e4c772d9d00",
+      "gzip_sha256": "7ef40a199e50d2d763afee8a6b5e2f46cffa2453ea9d637bf796810110bc6c4a"
+    },
+    {
+      "job_id": 121030709746,
+      "name": "Native stack / macOS ARM64 / Release",
+      "conclusion": "failure",
+      "log": "job-121030709746.log.gz",
+      "decoded_normalized_bytes": 60951,
+      "decoded_normalized_sha256": "8fa1c728dae74dcb8e67d29b734ebca0608186f661334c941554d2dbafcf4a92",
+      "gzip_sha256": "755dec681db4288fd753326a3fbd944df652957d8444359a3bea5b1cf9d2c6ef"
+    },
+    {
+      "job_id": 121030709886,
+      "name": "Native stack / Windows x64 / Debug",
+      "conclusion": "success",
+      "log": "job-121030709886.log.gz",
+      "decoded_normalized_bytes": 190523,
+      "decoded_normalized_sha256": "65d493c95be645c4a5533c3091e51d9111cad72d5280357e2c5ddc698024726d",
+      "gzip_sha256": "d67e2254f99e0137dc4577f9c74683b14928a5f43eb72216f25b533ce3372953"
+    }
+  ]
+}

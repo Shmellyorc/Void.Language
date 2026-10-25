@@ -2,19 +2,22 @@
 name: Stage 10 targeted native stack acceptance
 on:
   workflow_dispatch:
+    inputs:
+      platforms:
+        description: Native platforms (CI 1 Windows gates already passed)
+        type: choice
+        default: macos-only
+        options: [macos-only, all]
 permissions:
   contents: read
 jobs:
   stack:
-    name: Native stack / ${{ matrix.platform }} / ${{ matrix.configuration }}
+    name: Native stack / ${{ matrix.os == 'windows-2022' && 'Windows x64' || 'macOS ARM64' }} / ${{ matrix.configuration }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - {os: windows-2022, platform: Windows x64, configuration: Debug}
-          - {os: windows-2022, platform: Windows x64, configuration: Release}
-          - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
-          - {os: macos-latest, platform: macOS ARM64, configuration: Release}
+        os: ${{ fromJSON(inputs.platforms == 'macos-only' && '["macos-latest"]' || '["windows-2022","macos-latest"]') }}
+        configuration: [Debug, Release]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 360
     env:
