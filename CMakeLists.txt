@@ -409,6 +409,18 @@ if(BUILD_TESTING)
   target_link_libraries(void_runtime_console_input PRIVATE void_runtime)
   add_test(NAME runtime_console_input COMMAND void_runtime_console_input)
   set_tests_properties(runtime_console_input PROPERTIES TIMEOUT 90)
+  if(WIN32)
+    # Observe genuine Win32 calls in the identical console implementation only
+    # for native fixtures. The archive's console object is not extracted; normal
+    # compiler/JIT/AOT binaries continue linking the uninstrumented Runtime.
+    add_library(void_console_windows_observed OBJECT src/runtime/console.cpp)
+    target_link_libraries(void_console_windows_observed PRIVATE void_options Threads::Threads)
+    target_compile_definitions(void_console_windows_observed PRIVATE VD_CONSOLE_OBSERVE_CALLS=1)
+    target_compile_options(void_console_windows_observed PRIVATE "/FI${PROJECT_SOURCE_DIR}/tests/runtime/console_windows_trace.hpp")
+    foreach(fixture keyboard transfers wide)
+      target_sources(void_runtime_console_${fixture} PRIVATE $<TARGET_OBJECTS:void_console_windows_observed> tests/runtime/console_windows_trace.cpp tests/runtime/console_windows_native.cpp)
+    endforeach()
+  endif()
   if(UNIX)
     add_test(NAME runtime_console_native_input COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/runtime/console_input.py" "$<TARGET_FILE:void_runtime_console_input>")
     set_tests_properties(runtime_console_native_input PROPERTIES TIMEOUT 90)

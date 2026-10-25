@@ -1,5 +1,6 @@
 #include "void/detail/console_wide.hpp"
 #include "void/runtime.hpp"
+#include "console_windows_native.hpp"
 #include <atomic>
 #include <codecvt>
 #include <cstdlib>
@@ -214,4 +215,10 @@ void lifetime(){
     Harness carry;carry.a->add(u"🎮");check(carry.c->read_bytes(1).bytes==Bytes{0xf0},"carry initial byte");carry.runtime.close();vd::Runtime later(0,carry.streams);auto tail=later.console_context()->read_bytes(3);check(tail.bytes==Bytes({0x9f,0x8e,0xae}),"carry not shared after Runtime close");
 }
 }
-int main(){try{mixed();unicode();errors();output();allocation();contracts();lifetime();std::cout<<"console wide checks: "<<checks<<'\n';return 0;}catch(const std::exception& e){fail_one_allocation=false;std::cerr<<e.what()<<'\n';return 1;}}
+int main(int argc,char** argv){try{
+#ifdef _WIN32
+if(argc==3 && vd_windows_console_native(argv[1],argv[2]))return 0;
+#else
+(void)argc;(void)argv;
+#endif
+mixed();unicode();errors();output();allocation();contracts();lifetime();std::cout<<"console wide checks: "<<checks<<'\n';return 0;}catch(const std::exception& e){fail_one_allocation=false;std::cerr<<e.what()<<'\n';return 1;}}

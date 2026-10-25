@@ -1,6 +1,7 @@
 #include "void/console.hpp"
 #include "void/runtime.hpp"
 #include "console_posix.hpp"
+#include "console_windows_native.hpp"
 #include <atomic>
 #include <barrier>
 #include <deque>
@@ -313,6 +314,9 @@ void simple(const char* mode,const char* path){
 #endif
 }
 int main(int argc,char** argv){try{
+#ifdef _WIN32
+    if(argc==3 && vd_windows_console_native(argv[1],argv[2]))return 0;
+#endif
 #ifndef _WIN32
     if(argc>=3){std::string mode=argv[1];
         if(mode=="--host-flags"){

@@ -11,6 +11,8 @@
 #include <functional>
 #include <iostream>
 #include <stdexcept>
+#include "console_windows_observation.hpp"
+#include "console_windows_native.hpp"
 using namespace vd::console;
 namespace {
 std::atomic<unsigned> checks=0;void check(bool value,const char* message){++checks;if(!value)throw std::runtime_error(message);}
@@ -27,11 +29,19 @@ struct Fake:Adapter {
     Transfer write(Stream,std::span<const std::uint8_t> bytes,const Request&)override{output.append(bytes.begin(),bytes.end());return {bytes.size()};}
 };
 void probe(unsigned count,bool unclosed){
-    vd::Runtime runtime;auto c=runtime.console_context();auto outer=c->begin_mode({false,false,true});check(!outer.error,"native mode failed");
-    auto inner=c->begin_mode({false,true,false});check(!inner.error,"native nested mode failed");check(c->end_mode(outer.token).kind==ErrorKind::would_block,"native non-LIFO accepted");check(!c->end_mode(inner.token),"native inner restore failed");
+    ConsoleWindowsObservation observation;
+    {vd::Runtime runtime;auto c=runtime.console_context();observation.state("after_runtime");
+    auto outer=c->begin_mode({false,false,true});observation.result("begin_outer",outer.error,outer.token);observation.state("after_outer_apply");check(!outer.error,"native mode failed");
+    auto inner=c->begin_mode({false,true,false});observation.result("begin_inner",inner.error,inner.token);observation.state("after_inner_apply");check(!inner.error,"native nested mode failed");
+    auto non_lifo=c->end_mode(outer.token);observation.result("reject_non_lifo",non_lifo,outer.token);observation.state("after_non_lifo");check(non_lifo.kind==ErrorKind::would_block,"native non-LIFO accepted");
+    auto restored=c->end_mode(inner.token);observation.result("end_inner",restored,inner.token);observation.state("after_inner_restore");check(!restored,"native inner restore failed");
     auto available=c->key_available();check(!available.transfer.error && !available.first,"native initial availability failed");std::cout<<"READY\n"<<std::flush;
-    for(unsigned n=0;n<count;++n){auto key=c->read_key(false,2000);check(!key.transfer.error,"native key failed");std::cout<<static_cast<unsigned>(key.key)<<' '<<key.modifiers_known<<' '<<key.key_down_known<<' '<<key.repeat<<' ';for(auto byte:key.bytes)std::cout<<"0123456789abcdef"[byte>>4]<<"0123456789abcdef"[byte&15];std::cout<<'\n';}
-    if(!unclosed)check(!c->end_mode(outer.token),"native outer restore failed");runtime.close();
+    bool captured=!observation.capturing();
+    for(unsigned n=0;n<count;++n){auto key=c->read_key(false,2000);observation.key(n,key);observation.state("after_key");check(!key.transfer.error,"native key failed");std::cout<<static_cast<unsigned>(key.key)<<' '<<key.modifiers_known<<' '<<key.key_down_known<<' '<<key.repeat<<' ';for(auto byte:key.bytes)std::cout<<"0123456789abcdef"[byte>>4]<<"0123456789abcdef"[byte&15];std::cout<<'\n';if(observation.captured(key)){captured=true;break;}}
+    if(observation.capturing())check(captured,"native opt-in capture did not reach requested event");
+    if(!unclosed){auto error=c->end_mode(outer.token);observation.result("end_outer",error,outer.token);observation.state("after_outer_restore");check(!error,"native outer restore failed");}
+    observation.state("before_runtime_close");auto closed=runtime.close();observation.result("runtime_close",closed);observation.state("after_runtime_close");}
+    observation.state("after_runtime_destructor");
 }
 void default_probe(){vd::Runtime runtime;auto c=runtime.console_context();std::cout<<"READY\n"<<std::flush;auto key=c->read_key(true,2000);check(!key.transfer.error,"default read failed");std::cout<<static_cast<unsigned>(key.key)<<'\n';runtime.close();}
 
@@ -102,6 +112,9 @@ void run(){
 }
 }
 int main(int argc,char** argv){try{
+#ifdef _WIN32
+if(argc==3 && vd_windows_console_native(argv[1],argv[2]))return 0;
+#endif
 #ifndef _WIN32
 if(argc==2 && std::string(argv[1])=="canonical-availability"){vd::Runtime runtime;auto context=runtime.console_context();auto available=context->key_available();std::cout<<"AVAILABLE "<<available.first<<"\n"<<std::flush;auto line=context->read_line(2000);if(line.transfer.error)throw std::runtime_error("canonical read failed");std::cout<<line.text<<"\n";runtime.close();return 0;}
 if(argc==2 && std::string(argv[1])=="closed-input"){vd::Runtime runtime;auto context=runtime.console_context();::close(0);auto result=context->begin_mode();std::cout<<static_cast<unsigned>(result.error.kind)<<' '<<result.error.os_code<<'\n';runtime.close();return 0;}
