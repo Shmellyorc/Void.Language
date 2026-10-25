@@ -6,6 +6,25 @@ The four authorized systems are implemented. This reconciliation found no new
 demonstrated production defect. Required native evidence gaps below remain open;
 documentation and a green experimental workflow cannot close them.
 
+## Native stack gates and final Windows console handoff — 24 October 2026
+
+Targeted Windows stack CI #1 (`40147114803`, source
+`b490579f84a702ec5d11da51a82934a498f88afa`) passed Debug/Release, both actual
+1,048,576-byte PE reserves and original frontend/depth tests. Targeted macOS
+stack CI #2 (`40152738145`, source `383d2ce0a404a4bbf3df01d43097de100f5829a1`)
+passed both ARM64 configurations, Mach-O checks, exact inherited 1 MiB limits
+and original frontend/depth tests. These close the specific stack evidence gaps
+listed in the earlier acceptance snapshot below; CI #1's macOS setter failures
+remain historical. Full CI #4 and all previous failure evidence are preserved.
+
+The [final Windows console checklist and exact evidence](engineering/windows-console-final/CHECKLIST.md)
+map existing native probes to what they can actually observe. No interactive
+Windows host is available here. Genuine physical metadata, in-process mode/code-page
+restoration and borrowed-handle cancellation/lifetime remain UNVERIFIED. A small
+parent-state observer is prepared, unexecuted, and explicitly cannot certify
+those in-process boundaries. Stage 10 remains INCOMPLETE for Wrench/Boss review;
+no new stage, hosted dispatch or release lock is authorized.
+
 ## Exact source and experiment #4
 
 [Compiler link experiment #4](https://github.com/Shmellyorc/Void.Language/actions/runs/40118666209)

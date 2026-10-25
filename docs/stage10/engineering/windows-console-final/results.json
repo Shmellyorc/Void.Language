@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-24 America/Los_Angeles",
+  "host": "Linux-7.2.6-pikaos-x86_64-with-glibc2.44",
+  "native_windows_shells": {
+    "pwsh": null,
+    "powershell": null,
+    "cmd.exe": null
+  },
+  "interactive_windows_available_in_session": false,
+  "virtualization_investigation": false,
+  "native_console_tests_executed": false,
+  "powershell_syntax_and_Win32_execution": "NOT RUN; native PowerShell unavailable",
+  "static_observer_review": "Read-only Get* P/Invokes; direct native invocation; no native input reader/injector, console setter or redirection; this is not PowerShell parser validation",
+  "inspected_source_hashes_verified": 47,
+  "historical_source_hashes_verified": 1193,
+  "previous_files_preserved": 2469,
+  "existing_files_changed": [
+    "docs/stage10/ACCEPTANCE.md",
+    "docs/stage10/engineering/native-final/HANDOFF.md"
+  ],
+  "ci2_run_id": 40152738145,
+  "ci2_source_commit": "383d2ce0a404a4bbf3df01d43097de100f5829a1",
+  "ci2_jobs_and_log_receipts_verified": 2,
+  "local_markdown_links_verified": 48,
+  "all_new_JSON_parsed": true,
+  "git_activity": "Initial read-only status only; no mutations or subsequent Git commands. Source/diff validation uses filesystem hashes and difflib.",
+  "hosted_activity": "Read-only existing run/job/log/artifact metadata; no dispatch or rerun",
+  "unavailable_list_queries": "Two general workflow URL lookups rejected by connector; exact Boss-supplied CI2 run URL succeeded",
+  "console_gates": {
+    "actual_console_ConPTY_IO": "UNVERIFIED",
+    "physical_modifier_down_repeat": "UNVERIFIED",
+    "exact_in_process_mode_CP_restore": "UNVERIFIED",
+    "borrowed_sync_overlapped_cancellation_lifetime": "UNVERIFIED"
+  },
+  "Stage10": "INCOMPLETE; independent Wrench and Boss release decisions required"
+}

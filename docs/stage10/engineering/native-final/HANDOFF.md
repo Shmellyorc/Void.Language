@@ -1,5 +1,21 @@
 # Stage 10 final native acceptance handoff — 24 October 2026
 
+## Subsequent native results and Windows console boundary
+
+Windows stack CI #1 passed Debug/Release at
+`b490579f84a702ec5d11da51a82934a498f88afa`. macOS stack CI #2 passed both ARM64
+configurations at `383d2ce0a404a4bbf3df01d43097de100f5829a1` (run `40152738145`),
+including exact inherited 1 MiB limits, Mach-O checks and original frontend/depth
+tests. Those specific stack gaps are now evidenced; earlier unavailable statuses
+below describe this handoff's original session and remain historical.
+
+[Final Windows console checklist](../windows-console-final/CHECKLIST.md) preserves
+the separate CI results, inventories existing probes, supplies direct-handle native
+commands and an unexecuted read-only parent-state observer, and specifies the
+remaining in-process observations. This Linux session has no interactive Windows
+host; no native console/ConPTY result is invented. No virtualization investigation
+was repeated. Stage 10 remains INCOMPLETE; stop for Golden Wrench/Boss review.
+
 ## Evidence corrections — 24 October 2026
 
 Golden Wrench's [independent package review](../../../Stage10_Wrench_Review.md)

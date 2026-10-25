@@ -1,0 +1,89 @@
+{
+  "entries": [
+    {
+      "path": "docs/stage10/ACCEPTANCE.md",
+      "status": "modified",
+      "sha256_before": "b68c4fbbac859a70705c4d1bd17411db54c732224dddda5c7980d2560e680711",
+      "sha256": "df9bce51a8da6fae2afa73eabaab5857aae97050e10c890c82277e06c5794b32"
+    },
+    {
+      "path": "docs/stage10/engineering/native-final/HANDOFF.md",
+      "status": "modified",
+      "sha256_before": "b7109bff1f668a2099e897613df67136b37143a2eaa6086bdf021d777dd7b1e3",
+      "sha256": "403ed22515c2c09487bc3d2474d169b1a927ecffa95f4c19ffd9d62a95eb0598"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/CHECKLIST.md",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "7bf5719d2972a320521d04d8a1d6a635ce701b55be7acc0694ca143cef7def8e"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/changed-files.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": null
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/ci2/artifacts.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "91245c7b608aa4d18e8bee7d5cea648337cd64a93cc4756d79b4e880446a6d01"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/ci2/job-121047503258.log.gz",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "e5a1636a23ed78b1b782b8b6118d6a11f121b282d42ee8caf97068a0fdf67782"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/ci2/job-121047503305.log.gz",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "ce8038c46aa763ad4e6fc82d5d31c2cecb7e811ce5970403c689f0c9dada2802"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/ci2/jobs.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "e290b806619132fc0bbd09be7c8c14f9cbd3722024500ca7b05af767c317f80f"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/ci2/run.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "a0ee9a1d080480aa848c7ae9e4531262345789a7c20d96f9d2fd7b8389bdaeb1"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/ci2/summary.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "568e0c0311c9b42e4aac95b6a100a12b72bc090e6783be63dd091e2c1baca062"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/handoff.diff",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "9f4d7886dc521b3a4e8fd503f71ac76a1a0d0d9d8f678b7cd722c45f497cde50"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/observe.ps1",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "ba07114f91c40e89525776f81b92dc07f4532baf3abe325be262562d1d01eb6c"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/results.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "752432dc85194308667591b43f1e053fc9d2de5967a2715cbe6636c8e6074ff5"
+    },
+    {
+      "path": "docs/stage10/engineering/windows-console-final/source-inputs.json",
+      "status": "added",
+      "sha256_before": null,
+      "sha256": "2f8a85a665591697519676261d77cd0272fb626035361c38d0951403b9e3fe98"
+    }
+  ],
+  "self_hash": "Omitted to avoid self-reference; all other payloads hashed"
+}

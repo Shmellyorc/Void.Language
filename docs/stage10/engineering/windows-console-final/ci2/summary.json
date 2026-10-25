@@ -1,0 +1,29 @@
+{
+  "run_id": 40152738145,
+  "commit": "383d2ce0a404a4bbf3df01d43097de100f5829a1",
+  "native_jobs": "2/2 successful",
+  "log_normalization": "Connector-decoded text: CRLF normalized to LF; trailing newline retained",
+  "jobs": [
+    {
+      "job_id": 121047503258,
+      "log": "job-121047503258.log.gz",
+      "decoded_normalized_sha256": "c133803c4afd632d0bb1e82fb571145c2b55b6588c713cff9431940d7b267893",
+      "gzip_sha256": "e5a1636a23ed78b1b782b8b6118d6a11f121b282d42ee8caf97068a0fdf67782",
+      "inherited_limit_log_markers": 2,
+      "frontend_success_marker": true,
+      "semantic_depth_marker": true
+    },
+    {
+      "job_id": 121047503305,
+      "log": "job-121047503305.log.gz",
+      "decoded_normalized_sha256": "737f755177bbd5e14497492f53129a9161210c09a360ffd870283e78700574e0",
+      "gzip_sha256": "ce8038c46aa763ad4e6fc82d5d31c2cecb7e811ce5970403c689f0c9dada2802",
+      "inherited_limit_log_markers": 2,
+      "frontend_success_marker": true,
+      "semantic_depth_marker": true
+    }
+  ],
+  "Golden_Wrench_review": "Boss reports independent log review; not self-issued here",
+  "artifact_ZIPs_downloaded": false,
+  "console_acceptance": false
+}
