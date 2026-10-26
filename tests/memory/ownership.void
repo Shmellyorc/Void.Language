@@ -1,0 +1,167 @@
+use io/memory
+use encoding/binary
+
+
+private struct marker:
+    value: i32
+
+
+private var active = memory.stream()
+private var alias = active
+private var saved: [u8] = []
+private var saved_position: i64 = 0
+private var scenario: i32 = 0
+
+
+private func equal(const left: [u8], const right: [u8]) -> bool:
+    if left.count != right.count:
+        return false
+
+    for value, index in left:
+        if value != right[index]:
+            return false
+
+    return true
+
+
+private func reset(selected: i32):
+    scenario = selected
+    var initial: [u8] = [1, 2, 3, 4]
+
+    if selected == 3:
+        initial = [65, 195, 169, 0]
+
+    if selected == 4:
+        initial = [0, 0, 0, 3, 195, 169, 0]
+
+    active = memory.stream(initial, binary.byte_order.big)
+    alias = active
+
+    if selected == 0 or selected == 1 or selected == 6 or selected == 8:
+        var checked = active.seek(1)
+
+    saved = active.to_bytes()
+    saved_position = active.position
+
+
+private func intact() -> bool:
+    if active.position != saved_position or alias.position != saved_position:
+        return false
+
+    return equal(active.to_bytes(), saved) and equal(alias.to_bytes(), saved)
+
+
+private func committed() -> bool:
+    if scenario == 11:
+        if active.position != 0 or not equal(active.to_bytes(), [9, 8, 7]):
+            return false
+
+        return alias.position == saved_position and equal(alias.to_bytes(), saved)
+
+    if alias.position != active.position or not equal(alias.to_bytes(), active.to_bytes()):
+        return false
+
+    if scenario == 0:
+        return active.position == 7 and equal(active.to_bytes(), [1, 9, 8, 7, 6, 5, 4])
+
+    if scenario == 1:
+        return active.position == 8 and equal(active.to_bytes(), [1, 0, 0, 0, 3, 195, 169, 0])
+
+    if scenario == 2:
+        return active.position == 3 and equal(active.to_bytes(), saved)
+
+    if scenario == 3:
+        return active.position == 4 and equal(active.to_bytes(), saved)
+
+    if scenario == 4:
+        return active.position == 7 and equal(active.to_bytes(), saved)
+
+    if scenario == 5:
+        return active.position == 4 and equal(active.to_bytes(), saved)
+
+    if scenario == 6:
+        return active.position == 4 and equal(active.to_bytes(), [1, 195, 169, 0])
+
+    if scenario == 7 or scenario == 9:
+        return active.position == 4 and equal(active.to_bytes(), saved)
+
+    if scenario == 8:
+        var expected: [u8] = [1, 1, 2, 3, 4, 5, 6, 7, 8]
+        return active.position == 9 and equal(active.to_bytes(), expected)
+
+    return active.position == saved_position and equal(active.to_bytes(), saved)
+
+
+## Dispatch memory stream operations for precise-GC and allocation-budget probes.
+## @param mode Setup 100..111, inspect -1/-2, force GC -3, or execute the selected operation with zero.
+## @return One on successful operation or invariant check; zero identifies an invariant failure.
+func entry(mode: i32) -> i32:
+    if mode >= 100:
+        reset(mode - 100)
+        return 1
+
+    if mode == -1:
+        if intact():
+            return 1
+
+        return 0
+
+    if mode == -2:
+        if committed():
+            return 1
+
+        return 0
+
+    if mode == -3:
+        var collected = marker(value = active.position as i32)
+        return collected.value
+
+    if scenario == 0:
+        if active.write_bytes([9, 8, 7, 6, 5, 4]) is Ok(var count):
+            return 1
+
+    if scenario == 1:
+        if active.write_pascal_string("é\0") is Ok(var count):
+            return 1
+
+    if scenario == 2:
+        if active.read_exact(3) is Ok(var bytes):
+            return 1
+
+    if scenario == 3:
+        if active.read_string(4) is Ok(var value):
+            return 1
+
+    if scenario == 4:
+        if active.read_pascal_string() is Ok(var value):
+            return 1
+
+    if scenario == 5:
+        if active.read<i32>() is Ok(var value):
+            return 1
+
+    if scenario == 6:
+        if active.write_string("é\0") is Ok(var count):
+            return 1
+
+    if scenario == 7:
+        if active.seek(4) is Ok(var position):
+            return 1
+
+    if scenario == 8:
+        if active.write<u64>(72623859790382856) is Ok(var count):
+            return 1
+
+    if scenario == 9:
+        if active.read_bytes(i64.max_value) is Ok(var bytes):
+            return 1
+
+    if scenario == 10:
+        var snapshot = active.to_bytes()
+        return 1
+
+    if scenario == 11:
+        active = memory.stream([9, 8, 7])
+        return 1
+
+    return 0

@@ -2255,9 +2255,39 @@ class Semantics {
             for(const auto& [id,u]:units) {
                 for(const auto& structure:u->structures) for(const auto& f:structure.definition->fields) names.insert(f.name);
                 for(const auto& f:u->functions) if(f.receiver && !f.initializer && f.accessor!=2 && f.token.text!="deinit") names.insert(f.token.text);
+                for (const auto& function : u->generic_functions) {
+                    if (function.receiver && !function.generics.empty()) {
+                        names.insert(function.token.text);
+                    }
+                }
             }
             for(const auto& name:names) try {
-                auto token=e.token;token.text=name;auto selected=member(t,token);
+                auto token = e.token;
+                token.text = name;
+                auto [owner, generic] = generic_method_declaration(t, token);
+
+                if (generic) {
+                    // Inspect the original header without instantiating a body
+                    // or granting mutation through an unchecked readonly view.
+                    if (t.readonly || !ir::readonly_paths(t).empty()) {
+                        continue;
+                    }
+
+                    auto result = generic->result;
+
+                    if (ir::collection_type(result)) {
+                        result.kind = Type::unresolved;
+                    }
+
+                    if (auto* candidate = add(name, result, 2)) {
+                        candidate->documentation = source_documentation(
+                            owner->source, generic->token.offset).text(generic->result != Type::none);
+                    }
+
+                    continue;
+                }
+
+                auto selected = member(t, token);
                 if(selected.function) {
                     if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
                     if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2))

@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-26",
+  "platform": "local Linux x86_64",
+  "sdk": "LLVM/Clang/LLD 19.1.7",
+  "selected_ctests": {
+    "Debug": {
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Release": {
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0
+    },
+    "RelWithDebInfo_ASan_UBSan_leaks": {
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "distinct_configuration_suite_combinations": 61,
+  "additional_native_checks": {
+    "frontend_1MiB_scripts": 2,
+    "expanded_read_result_ownership_processes_per_configuration": 7
+  },
+  "memory_module_1MiB_processes_per_native_configuration": 7,
+  "per_configuration": {
+    "numeric_IEEE_vectors": 268,
+    "cursor_model_transitions": 64,
+    "negative_compilation_cases": 14,
+    "execution_driver_processes": 35,
+    "ownership_assertions": 13922,
+    "failing_allocation_budgets_per_normal_O2_mode": 749,
+    "fault_scenarios": 12,
+    "LSP_checks": 156,
+    "module_documentation_warnings": 0
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "sanitizer_execution": "Approved local execution outside tracing sandbox; LSan requires thread inspection. No option disabled. Existing Linux stage11_globals_stack is included in the 19 selected suites.",
+  "sanitizer_abi_limit": "RTTI-off SDK: vptr checking unavailable; supported address/undefined checks and leaks enabled.",
+  "public_surface": {
+    "types": [
+      "stream",
+      "error"
+    ],
+    "error_cases": [
+      "invalid_range",
+      "unexpected_eof",
+      "invalid_utf8",
+      "limit_exceeded"
+    ],
+    "constructors": 1,
+    "readonly_properties": 5,
+    "methods": 11
+  },
+  "implementation": "Source-only stream. Existing generic method declaration lookup shared with compiler-owned completion; no language grammar/IR/Runtime ABI/allocator/codec additions.",
+  "limitations": [
+    "Writes stage a complete buffer copy; repeated small writes can be quadratic.",
+    "Reads/seeks allocate state; numeric reads encode zero to obtain width.",
+    "Native Windows/macOS and big-endian hosts not executed.",
+    "Physical multi-GiB/i64 growth and u32 write-prefix overflow not dynamically allocated; guards source-audited.",
+    "Independent Golden Wrench review and Boss-controlled cross-platform acceptance pending."
+  ],
+  "protected_paths_unchanged": [
+    "stdlib/console.void",
+    "README.md",
+    "stdlib/encoding/binary.void",
+    "tests/binary",
+    "docs/binary",
+    "src/frontend/binary_codec.inc"
+  ],
+  "hosted_CI_or_git_mutation": false
+}

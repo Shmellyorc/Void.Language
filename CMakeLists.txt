@@ -670,6 +670,21 @@ if(BUILD_TESTING)
     set_tests_properties(binary_stack PROPERTIES TIMEOUT 300)
   endif()
 
+  add_test(NAME memory_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/memory/execution.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(memory_execution PROPERTIES TIMEOUT 1200)
+  add_test(NAME lsp_memory COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/memory/lsp.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_memory PROPERTIES TIMEOUT 180)
+
+  add_executable(void_memory_ownership tests/memory/ownership.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_memory_ownership PRIVATE void_llvm)
+  add_test(NAME memory_ownership COMMAND void_memory_ownership "${PROJECT_SOURCE_DIR}/tests/memory/ownership.void")
+  set_tests_properties(memory_ownership PROPERTIES TIMEOUT 300)
+
+  if(UNIX AND NOT VOID_SANITIZERS)
+    add_test(NAME memory_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/memory/stack.py" "$<TARGET_FILE:voidc>")
+    set_tests_properties(memory_stack PROPERTIES TIMEOUT 300)
+  endif()
+
   add_test(NAME lsp_stage7 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/lsp/stage7.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_stage7 PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_demo COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/lsp_demo.py" "$<TARGET_FILE:voidls>")

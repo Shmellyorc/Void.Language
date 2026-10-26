@@ -1,5 +1,13 @@
 # Standard library
 
+`use io/memory` provides an owned `memory.stream(bytes = [], order = ...)` with a
+shared cursor, independent `to_bytes()` snapshots, bounded seeking, up-to/exact
+byte reads, numeric `read<t>()`/`write(value)` through the binary codec, strict raw
+UTF-8 and u32-length-prefixed Pascal strings. Failed operations preserve the old
+state. Writes stage a full copy; see [the contract](../docs/memory/CONTRACT.md) and
+[local implementation evidence](../docs/memory/IMPLEMENTATION.md) for exact costs,
+tests and review limits.
+
 `use encoding/binary` provides `encode(value, order)` and `decode<t>(bytes, order)`
 for all ten fixed-width numeric primitives. Little endian is the default; explicit
 big endian is supported. Encoding returns fresh owned bytes, decoding requires an

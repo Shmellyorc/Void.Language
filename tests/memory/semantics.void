@@ -1,0 +1,342 @@
+use io/memory
+use encoding/binary
+
+
+private func equal(const left: [u8], const right: [u8]) -> bool:
+    if left.count != right.count:
+        return false
+
+    for value, index in left:
+        if value != right[index]:
+            return false
+
+    return true
+
+
+private func ok<t>(outcome: result<t, memory.error>, expected: t) -> bool:
+    if outcome is Ok(var value):
+        return value == expected
+
+    return false
+
+
+private func chunk(outcome: result<[u8], memory.error>, const expected: [u8]) -> bool:
+    if outcome is Ok(var value):
+        return equal(value, expected)
+
+    return false
+
+
+private func failure<t>(outcome: result<t, memory.error>, expected: i32) -> bool:
+    if outcome is Err(var reason):
+        match reason:
+            memory.error.invalid_range:
+                return expected == 1
+            memory.error.unexpected_eof:
+                return expected == 2
+            memory.error.invalid_utf8:
+                return expected == 3
+            memory.error.limit_exceeded:
+                return expected == 4
+
+    return false
+
+
+private func observed(const value: memory.stream) -> [u8]:
+    var snapshot = value.to_bytes()
+    snapshot.push(99)
+    return snapshot
+
+
+private func ownership() -> i32:
+    var empty = memory.stream()
+    var independent = memory.stream()
+
+    if not empty.eof or empty.length != 0 or empty.position != 0 or empty.remaining != 0:
+        return 101
+
+    if not ok(empty.write_bytes([1]), 1) or not independent.eof:
+        return 102
+
+    var input: [u8] = [1, 2, 3, 4]
+    var buffer = memory.stream(input)
+    var alias = buffer
+    input[0] = 99
+    var first = buffer.to_bytes()
+    var second = buffer.to_bytes()
+    first[0] = 88
+
+    if not equal(second, [1, 2, 3, 4]) or not equal(alias.to_bytes(), second):
+        return 103
+
+    if not ok(alias.seek(2), 2) or buffer.position != 2 or buffer.remaining != 2:
+        return 104
+
+    if not ok(buffer.write_bytes([9]), 1) or alias.position != 3:
+        return 105
+
+    if not equal(alias.to_bytes(), [1, 2, 9, 4]) or not equal(second, [1, 2, 3, 4]):
+        return 106
+
+    if not equal(observed(buffer), [1, 2, 9, 4, 99]) or buffer.length != 4:
+        return 107
+
+    const readonly_input: [u8] = [7, 8]
+    var copied = memory.stream(readonly_input)
+
+    if not ok(copied.write_bytes(readonly_input), 2) or not equal(readonly_input, [7, 8]):
+        return 108
+
+    var readback = memory.stream([1, 2, 3])
+
+    if readback.read_bytes(2) is Ok(var bytes):
+        bytes[0] = 99
+    else:
+        return 109
+
+    if readback.read_exact(1) is Ok(var bytes):
+        bytes[0] = 88
+    else:
+        return 110
+
+    if not equal(readback.to_bytes(), [1, 2, 3]) or not readback.eof:
+        return 111
+
+    return 0
+
+
+private func seeking_and_bytes() -> i32:
+    var buffer = memory.stream([10, 20, 30])
+
+    if not chunk(buffer.read_bytes(0), []) or buffer.position != 0 or buffer.eof:
+        return 201
+
+    if not failure(buffer.seek(-1), 1) or not failure(buffer.seek(i64.min_value), 1):
+        return 202
+
+    if not failure(buffer.seek(4), 1) or not failure(buffer.seek(i64.max_value), 1):
+        return 203
+
+    if not failure(buffer.read_exact(-1), 1) or not failure(buffer.read_bytes(i64.min_value), 1):
+        return 204
+
+    if not failure(buffer.read_exact(4), 2) or buffer.position != 0:
+        return 205
+
+    if not chunk(buffer.read_exact(2), [10, 20]) or buffer.remaining != 1:
+        return 206
+
+    if not failure(buffer.read_exact(2), 2) or buffer.position != 2:
+        return 207
+
+    if not chunk(buffer.read_bytes(i64.max_value), [30]) or not buffer.eof:
+        return 208
+
+    if not chunk(buffer.read_bytes(1), []) or not chunk(buffer.read_exact(0), []):
+        return 209
+
+    if not failure(buffer.read_exact(1), 2) or not failure(buffer.read_exact(i64.max_value), 2):
+        return 210
+
+    if not ok(buffer.write_bytes([]), 0) or buffer.position != 3 or buffer.length != 3:
+        return 211
+
+    if not ok(buffer.seek(1), 1) or not ok(buffer.write_bytes([40, 50, 60]), 3):
+        return 212
+
+    if not equal(buffer.to_bytes(), [10, 40, 50, 60]) or buffer.position != 4:
+        return 213
+
+    if not ok(buffer.seek(0), 0) or not ok(buffer.write_bytes([70]), 1):
+        return 214
+
+    if not equal(buffer.to_bytes(), [70, 40, 50, 60]):
+        return 215
+
+    if not ok(buffer.seek(buffer.length), 4) or not buffer.eof:
+        return 216
+
+    var snapshot = buffer.to_bytes()
+
+    if not ok(buffer.write_bytes(snapshot), 4):
+        return 217
+
+    if not equal(buffer.to_bytes(), [70, 40, 50, 60, 70, 40, 50, 60]):
+        return 218
+
+    var empty = memory.stream()
+
+    if not ok(empty.seek(0), 0) or not failure(empty.seek(1), 1):
+        return 219
+
+    if not chunk(empty.read_bytes(i64.max_value), []) or not empty.eof:
+        return 220
+
+    return 0
+
+
+private func bad_utf8(const bytes: [u8]) -> bool:
+    var buffer = memory.stream(bytes)
+
+    if not failure(buffer.read_string(bytes.count), 3):
+        return false
+
+    if buffer.position != 0 or not equal(buffer.to_bytes(), bytes):
+        return false
+
+    return chunk(buffer.read_exact(bytes.count), bytes)
+
+
+private func strings() -> i32:
+    var buffer = memory.stream()
+    var value = "Aé🎮\0é"
+    var expected = value.to_utf8()
+
+    if not ok(buffer.write_string(value), expected.count) or not equal(buffer.to_bytes(), expected):
+        return 301
+
+    if not ok(buffer.seek(0), 0) or not ok(buffer.read_string(expected.count), value):
+        return 302
+
+    if not buffer.eof or not ok(buffer.read_string(0), ""):
+        return 303
+
+    if not failure(buffer.read_string(1), 2) or not failure(buffer.read_string(-1), 1):
+        return 304
+
+    if not ok(buffer.write_string(""), 0) or buffer.length != expected.count:
+        return 305
+
+    var scalar = memory.stream([195, 169])
+
+    if not failure(scalar.read_string(1), 3) or scalar.position != 0:
+        return 306
+
+    if not failure(scalar.read_string(3), 2) or not ok(scalar.read_string(2), "é"):
+        return 307
+
+    if not bad_utf8([128]) or not bad_utf8([192, 175]) or not bad_utf8([226, 130]):
+        return 308
+
+    if not bad_utf8([237, 160, 128]) or not bad_utf8([244, 144, 128, 128]):
+        return 309
+
+    if not bad_utf8([245, 128, 128, 128]) or not bad_utf8([65, 255, 66]):
+        return 310
+
+    var bom = memory.stream([239, 187, 191])
+
+    if bom.read_string(3) is Ok(var text):
+        if not equal(text.to_utf8(), [239, 187, 191]):
+            return 311
+    else:
+        return 312
+
+    var highest = memory.stream([244, 143, 191, 191])
+
+    if highest.read_string(4) is Ok(var text):
+        if not equal(text.to_utf8(), [244, 143, 191, 191]):
+            return 313
+    else:
+        return 314
+
+    return 0
+
+
+private func pascal(order: binary.byte_order) -> i32:
+    var buffer = memory.stream(order = order)
+    var value = "Aé🎮\0"
+    var expected = binary.encode<u32>(8, order)
+
+    for byte in value.to_utf8():
+        expected.push(byte)
+
+    if not ok(buffer.write_pascal_string(value), 12) or not equal(buffer.to_bytes(), expected):
+        return 401
+
+    if not ok(buffer.write_pascal_string(""), 4) or buffer.length != 16:
+        return 402
+
+    if not ok(buffer.seek(0), 0) or not failure(buffer.read_pascal_string(-1), 1):
+        return 403
+
+    if not failure(buffer.read_pascal_string(7), 4) or buffer.position != 0:
+        return 404
+
+    if not ok(buffer.read_pascal_string(8), value) or buffer.position != 12:
+        return 405
+
+    if not ok(buffer.read_pascal_string(0), "") or not buffer.eof:
+        return 406
+
+    if not failure(buffer.read_pascal_string(), 2) or buffer.position != 16:
+        return 407
+
+    for count in 0..<4:
+        var partial = memory.stream(expected[0..<(count as i64)], order)
+
+        if not failure(partial.read_pascal_string(), 2) or partial.position != 0:
+            return 408
+
+    var incomplete = memory.stream(expected[0..<11], order)
+
+    if not failure(incomplete.read_pascal_string(), 2) or incomplete.position != 0:
+        return 409
+
+    var huge = memory.stream(binary.encode<u32>(u32.max_value, order), order)
+
+    if not failure(huge.read_pascal_string(16), 4) or not failure(huge.read_pascal_string(), 2):
+        return 410
+
+    if huge.position != 0 or huge.length != 4:
+        return 411
+
+    var invalid = binary.encode<u32>(2, order)
+    invalid.push(192)
+    invalid.push(175)
+    var malformed = memory.stream(invalid, order)
+
+    if not failure(malformed.read_pascal_string(), 3) or malformed.position != 0:
+        return 412
+
+    if not chunk(malformed.read_exact(6), invalid):
+        return 413
+
+    var manual = memory.stream(order = order)
+
+    if not ok(manual.write<u32>(8), 4) or not ok(manual.write_string(value), 8):
+        return 414
+
+    if not ok(manual.seek(0), 0) or not ok(manual.read_pascal_string(), value):
+        return 415
+
+    if not equal(manual.to_bytes(), expected):
+        return 416
+
+    return 0
+
+
+private func propagated(value: memory.stream) -> result<i32, memory.error>:
+    var number = value.read<i32>()?
+    return Ok(number)
+
+
+## Exercise byte ownership, shared cursor, errors, UTF-8 and Pascal interoperability.
+## @return Zero when every semantic assertion passes, otherwise a failing case code.
+func main() -> i32:
+    var first = ownership()
+    var second = seeking_and_bytes()
+    var third = strings()
+    var little = pascal(binary.byte_order.little)
+    var big = pascal(binary.byte_order.big)
+    var empty = memory.stream()
+
+    if first != 0 or second != 0 or third != 0 or little != 0 or big != 0:
+        print(first, second, third, little, big)
+        return 1
+
+    if not failure(propagated(empty), 2) or empty.position != 0:
+        return 2
+
+    print("memory semantics passed")
+    return 0

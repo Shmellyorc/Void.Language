@@ -1,5 +1,14 @@
 # VOID documentation
 
+## Standard-library Sprint 2 — io/memory, 26 October 2026
+
+Boss authorized the complete memory-stream slice after independent Wrench source
+review of binary commit `64c485c5beb5df519e998fdb838a640fd9758376`. The
+[memory contract and audit](memory/CONTRACT.md) and
+[implementation and local evidence](memory/IMPLEMENTATION.md) define this scope.
+Console, root README and binary source remain protected. No hosted CI or later
+module is authorized; stop after local completeness review for Golden Wrench.
+
 ## Standard-library Sprint 1 — encoding/binary, 26 October 2026
 
 Boss authorized this bounded module after the locks below. Its

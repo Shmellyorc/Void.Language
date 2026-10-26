@@ -1,0 +1,50 @@
+use io/memory
+use encoding/binary
+
+
+## Exercise nested source methods, ownership and framing on a native small stack.
+## @return Zero if raw bytes, numeric representations, cursor aliases and Pascal text survive.
+func main() -> i32:
+    var buffer = memory.stream(order = binary.byte_order.big)
+    var alias = buffer
+
+    if buffer.write<i64>(i64.min_value) is Err(var reason):
+        return 1
+
+    if alias.write<f64>(-0.0d) is Err(var reason):
+        return 2
+
+    if buffer.write_pascal_string("é🎮\0") is Err(var reason):
+        return 3
+
+    var snapshot = buffer.to_bytes()
+    snapshot[0] = 0
+
+    if alias.seek(0) is Err(var reason):
+        return 4
+
+    if buffer.read<i64>() is Ok(var number):
+        if number != i64.min_value:
+            return 5
+    else:
+        return 6
+
+    if alias.read<f64>() is Ok(var number):
+        var encoded = binary.encode(number, binary.byte_order.big)
+
+        if encoded[0] != 128:
+            return 7
+    else:
+        return 8
+
+    if buffer.read_pascal_string() is Ok(var text):
+        if text != "é🎮\0":
+            return 9
+    else:
+        return 10
+
+    if not buffer.eof or not alias.eof or buffer.position != 27:
+        return 11
+
+    print("memory small stack passed")
+    return 0

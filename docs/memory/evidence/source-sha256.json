@@ -1,0 +1,13 @@
+{
+  "CMakeLists.txt": "6233e66da1e04b9ebcd57cca4f3236fb2bee13147f01907d2979c0c9c17e10c1",
+  "src/frontend/compiler.cpp": "ae591dd4973083ed739e3a08ee548e3e484dd378aa5b1792429db03af45fc7ab",
+  "src/frontend/generic_inference.inc": "40f5bcf20b8f49e775a325991fd3a99c10f553ad0244cf0f18375a1f2e4ee5cc",
+  "stdlib/io/memory.void": "ee990760dc5353864f68b3b76cb5d1864b55f59920b491880e5ae2e419bba728",
+  "tests/memory/execution.py": "3fa40f79e660c7290970e79067e52db54998743a3e6181853ed8352ee4a11165",
+  "tests/memory/lsp.py": "922dc8578a766f748c60386bc81a4c6501542fa8454fcecf8e2f76a01f321d34",
+  "tests/memory/ownership.cpp": "475c9ffc9db5261c0ec5bc3f7217615fa335bc8195d87774fe3c165f2e1f4a9f",
+  "tests/memory/ownership.void": "5a3c926bea4ce453427c610ccfaabb934853c28b38d950f7cfcba4c1fb162e10",
+  "tests/memory/semantics.void": "3cc586e398161265ee760e89bc01e2f9d3187ba063ce2a61f44340575504ed3a",
+  "tests/memory/stack.py": "c493f73926ddb4b9d186f7f5227696a353bb2649bc5531336fc0af11703d79c5",
+  "tests/memory/stack.void": "99b37370db2afc64eccd550540e499b7403b0ddbacb3b4b29f5632ba19aff17a"
+}

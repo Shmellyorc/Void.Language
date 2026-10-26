@@ -1,0 +1,41 @@
+Working directory: /home/shmellyorc/Documents/Void.Language
+Pinned SDK: LLVM/Clang/LLD 19.1.7, Linux x86_64
+
+For CONFIG in debug, release, sanitizers, each configuration was configured before
+its builds; independent build directories ran concurrently:
+cmake -S . -B build/ci-official-CONFIG
+cmake --build build/ci-official-CONFIG --target voidc voidls void_memory_ownership void_binary_ownership void_generics_tests void_tests -j 2 -- --jobserver-style=pipe
+
+Debug and Release each executed 21 selected suites:
+ctest --test-dir build/ci-official-debug --output-on-failure -j 2 -R '^(memory_.*|lsp_memory|binary_.*|lsp_binary|documentation_execution|lsp_documentation|generics_source|frontend|numeric|tooling|analysis|modules|numeric_sprint2|lsp_stage8|lsp_stage11_globals|stage11_globals_aot|stage11_globals_stack)$'
+ctest --test-dir build/ci-official-release --output-on-failure -j 2 -R '^(memory_.*|lsp_memory|binary_.*|lsp_binary|documentation_execution|lsp_documentation|generics_source|frontend|numeric|tooling|analysis|modules|numeric_sprint2|lsp_stage8|lsp_stage11_globals|stage11_globals_aot|stage11_globals_stack)$'
+
+Additional final actual 1 MiB frontend guard/recovery scripts:
+python3 tests/integration/semantic_depth.py build/ci-official-debug/voidc
+python3 tests/integration/semantic_depth.py build/ci-official-release/voidc
+
+The memory_stack and binary_stack CTests independently set a 1 MiB process stack
+for check, normal/O2 JIT, linked build and native execution. Stage 11's stack suite
+also passed as part of the 21 selections. Sanitizer builds omit memory_stack and
+binary_stack; the unchanged Linux Stage 11 global-stack gate remains registered
+and passed in the sanitizer selection as well. Other sanitizer tests use the
+normal process stack.
+
+After the 21-suite native runs, the semantics fixture was expanded to mutate the
+arrays returned by both up-to and exact reads. The implementation did not change.
+The expanded fixture passed seven processes in each native configuration:
+voidc check tests/memory/semantics.void
+voidc run tests/memory/semantics.void --no-opt
+voidc build tests/memory/semantics.void -o TEMP/program --no-opt
+TEMP/program
+voidc run tests/memory/semantics.void
+voidc build tests/memory/semantics.void -o TEMP/program
+TEMP/program
+Exact compiler/executable paths are in debug-read-ownership.log and
+release-read-ownership.log. The full sanitizer run uses the expanded fixture.
+
+Strict sanitizers: the approved local test invocation runs outside the execution
+tool's tracing sandbox because LeakSanitizer cannot inspect threads under ptrace.
+No option is weakened. The LLVM SDK's RTTI-off ABI makes vptr checking unavailable;
+address, supported undefined checks, and leak detection are enabled:
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-sanitizers --output-on-failure -j 2 -R '^(memory_.*|lsp_memory|binary_.*|lsp_binary|documentation_execution|lsp_documentation|generics_source|frontend|numeric|tooling|analysis|modules|numeric_sprint2|lsp_stage8|lsp_stage11_globals|stage11_globals_aot|stage11_globals_stack)$'

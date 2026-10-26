@@ -109,22 +109,79 @@ Structure& concrete_structure(Expr& e,Unit& owner,Structure& declaration,unsigne
     return unit.specialize_structure(unit,owner,declaration,arguments,e.token);
 }
 
-const Function* concrete_method(Expr& e,Type receiver,bool reference=false) {
-    if(!receiver.definition)return nullptr;
-    for(const auto& [id,u]:units)for(auto& generic:u->generic_functions) {
-        if(!generic.receiver || generic.generics.empty() || generic.token.text!=e.token.text)continue;
-        const Structure* actual=nullptr;for(const auto& s:u->structures)if(s.definition==receiver.definition)actual=&s;
-        if(!actual)continue;
-        const auto owner=actual->generic_origin?actual->generic_origin->definition:actual->definition;
-        if(generic.symbol!=owner->identity+"::method::"+e.token.text)continue;
-        if((u.get()!=&unit && generic.file_private) || (u.get()!=&unit && u.get()!=&root && !std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i){return i.target==id;})))
-            error(source,e.token,Code::visibility,"Generic method is not accessible from this module.");
-        validate_generic_receiver(receiver,e.token);
-        std::vector<std::pair<Type,Expr*>> supplied;
-        if(!reference) {auto mapping=argument_mapping(e,generic,1,false);for(unsigned n=0;n<mapping.size();++n)supplied.emplace_back(generic.parameters[mapping[n]].type,e.parts[n+1].get());}
-        auto arguments=infer_arguments(*u,generic.generics,e.type_arguments,supplied,e.token);
-        return &unit.specialize_function(unit,*u,generic,arguments,e.token,current?current->specialization_depth+1:0,receiver);
+std::pair<Unit*, Function*> generic_method_declaration(Type receiver, const Token& token) {
+    if (!receiver.definition) {
+        return {};
     }
-    if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Method '"+e.token.text+"' does not introduce generic type parameters.");
+
+    for (const auto& [id, owner] : units) {
+        for (auto& generic : owner->generic_functions) {
+            if (!generic.receiver || generic.generics.empty() || generic.token.text != token.text) {
+                continue;
+            }
+
+            const Structure* actual = nullptr;
+
+            for (const auto& structure : owner->structures) {
+                if (structure.definition == receiver.definition) {
+                    actual = &structure;
+                }
+            }
+
+            if (!actual) {
+                continue;
+            }
+
+            const auto declaration = actual->generic_origin ? actual->generic_origin->definition : actual->definition;
+
+            if (generic.symbol != declaration->identity + "::method::" + token.text) {
+                continue;
+            }
+
+            const bool imported = owner.get() == &unit || owner.get() == &root ||
+                std::any_of(unit.imports.begin(), unit.imports.end(), [&](const auto& import) {
+                    return import.target == id;
+                });
+
+            if ((owner.get() != &unit && generic.file_private) || !imported) {
+                error(source, token, Code::visibility, "Generic method is not accessible from this module.");
+            }
+
+            validate_generic_receiver(receiver, token);
+            return {owner.get(), &generic};
+        }
+    }
+
+    return {};
+}
+
+const Function* concrete_method(Expr& e, Type receiver, bool reference = false) {
+    if (!receiver.definition) {
+        return nullptr;
+    }
+
+    auto [owner, generic] = generic_method_declaration(receiver, e.token);
+
+    if (generic) {
+        std::vector<std::pair<Type, Expr*>> supplied;
+
+        if (!reference) {
+            const auto mapping = argument_mapping(e, *generic, 1, false);
+
+            for (unsigned index = 0; index < mapping.size(); ++index) {
+                supplied.emplace_back(generic->parameters[mapping[index]].type, e.parts[index + 1].get());
+            }
+        }
+
+        const auto arguments = infer_arguments(*owner, generic->generics, e.type_arguments, supplied, e.token);
+        const auto depth = current ? current->specialization_depth + 1 : 0;
+        return &unit.specialize_function(unit, *owner, *generic, arguments, e.token, depth, receiver);
+    }
+
+    if (!e.type_arguments.empty()) {
+        error(source, e.token, Code::unsupported_type,
+              "Method '" + e.token.text + "' does not introduce generic type parameters.");
+    }
+
     return nullptr;
 }
