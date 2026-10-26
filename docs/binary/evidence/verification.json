@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-26",
+  "platform": "local Linux x86_64",
+  "sdk": "LLVM/Clang/LLD 19.1.7",
+  "configuration_suite_coverage": {
+    "Debug": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Release": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    "RelWithDebInfo_ASan_UBSan": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "final_readability_recheck": {
+    "Debug": "6/6 binary/documentation suites",
+    "Release": "6/6 binary/documentation suites"
+  },
+  "counting": "54 distinct configuration/suite combinations; development repetitions are not added to this coverage count.",
+  "binary_generated_cases": {
+    "numeric_and_IEEE_vector_cases": 346,
+    "typed_width_sweeps": 10,
+    "width_counts": "0..16 inclusive, both byte orders",
+    "driver_processes_per_configuration": 19
+  },
+  "ownership_per_configuration": {
+    "assertions": 2251,
+    "normal_failing_allocation_budgets": 183,
+    "optimized_failing_allocation_budgets": 183,
+    "retry_after_every_budget": true
+  },
+  "lsp_assertions_per_configuration": 81,
+  "documentation_warnings": 0,
+  "stack": {
+    "bytes": 1048576,
+    "processes_per_configuration": 7,
+    "configurations": [
+      "Debug",
+      "Release"
+    ],
+    "modes": [
+      "check",
+      "JIT",
+      "optimized JIT",
+      "linked AOT",
+      "optimized linked AOT"
+    ]
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "sanitizer_execution": "Approved execution outside tracing sandbox; original 0/9 ptrace/LSan startup failures are retained in sanitizer-sandbox-failure.log. Final 10/10 run retains strict leak detection.",
+  "sanitizer_limit": "Official SDK has RTTI off; vptr checking is unavailable in this ABI. Address, supported undefined behavior checks and leaks remain enabled.",
+  "runtime_abi_changes": false,
+  "new_ir_operations": false,
+  "protected_root_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "console": {
+    "edited_by_this_sprint": false,
+    "concurrent_formatting_diff_preserved": true,
+    "original_observed_sha256": "4bf8ead48a350c9ecd7147bed4b8ef282a3a873169b5fa24ab4b36f2e04c791a"
+  },
+  "pending_external_acceptance": [
+    "Independent Golden Wrench review",
+    "Boss-controlled native Windows/macOS acceptance",
+    "Big-endian host execution not performed"
+  ],
+  "git_mutation_or_hosted_ci": false
+}

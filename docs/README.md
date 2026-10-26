@@ -1,5 +1,13 @@
 # VOID documentation
 
+## Standard-library Sprint 1 — encoding/binary, 26 October 2026
+
+Boss authorized this bounded module after the locks below. Its
+[public contract and capability audit](binary/CONTRACT.md) and
+[implementation/review evidence](binary/IMPLEMENTATION.md) cover the actual source
+API, compiler support, tests and remaining acceptance limits. Historical lock
+records remain unchanged. No `io/memory` or other module is authorized by this sprint.
+
 ## Documentation/hover repair: OFFICIALLY ACCEPTED AND LOCKED, 26 October 2026
 
 **Boss confirms Golden Wrench source review and final hosted acceptance** at tested

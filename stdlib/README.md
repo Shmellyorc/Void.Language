@@ -1,5 +1,12 @@
 # Standard library
 
+`use encoding/binary` provides `encode(value, order)` and `decode<t>(bytes, order)`
+for all ten fixed-width numeric primitives. Little endian is the default; explicit
+big endian is supported. Encoding returns fresh owned bytes, decoding requires an
+exact width and returns recoverable `error.wrong_width`, and IEEE bits are preserved.
+See [the binary contract](../docs/binary/CONTRACT.md) and
+[implementation evidence](../docs/binary/IMPLEMENTATION.md).
+
 `use time` provides validated Gregorian dates, times, local/offset/zoned values,
 full-range seconds-based instants and durations, checked arithmetic, bundled IANA
 rules and UTC/monotonic clocks. Components are private const fields with public

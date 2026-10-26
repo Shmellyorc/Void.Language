@@ -1,0 +1,23 @@
+use encoding/binary
+
+struct marker:
+    value: i32
+
+
+func entry(input: i32) -> i32:
+    var prior = binary.encode<i64>(-1)
+    var bytes = binary.encode(input, binary.byte_order.big)
+    var independent = binary.encode(input, binary.byte_order.big)
+    independent[0] = 255
+
+    var collected = marker(value = input)
+
+    if bytes[0] != 0 or prior[0] != 255 or collected.value != input:
+        return -1
+
+    if binary.decode<i32>(bytes, binary.byte_order.big) is Ok(var value):
+        if binary.decode<i64>(prior) is Ok(var minimum):
+            if minimum == -1:
+                return value
+
+    return -2

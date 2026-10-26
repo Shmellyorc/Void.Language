@@ -1,0 +1,11 @@
+{
+  "CMakeLists.txt": "9e562b4c45fe6fc8b2672f691c03dfcd5ba512759c3ff5f5208850b118edd2aa",
+  "src/frontend/compiler.cpp": "9710175f5e00ee008672959f2722a05b89eef6bd1501e5fb8c1e4fb7b9781233",
+  "src/frontend/binary_codec.inc": "16fe0bcde0c7aacf6c2536f17a118498dbcef3f880f33efe42b299fb95b094ca",
+  "stdlib/encoding/binary.void": "2ac4f23823d0f16de74339b659cb126bb8f41e0647d4124d966fa6eaa39c2d78",
+  "tests/binary/execution.py": "4d8fd60b1b21c9f9b48841b3edf55e170fbdaf69973dd8e651a935ac82d0ee82",
+  "tests/binary/ownership.cpp": "e7695fe386dfa91aed70babd864f551ff9c59667174d88ede8bf1b464053eaa9",
+  "tests/binary/ownership.void": "fa095522f9e2ef491394227c9fea70114bb089e16e9d0b912bd6a93909b77904",
+  "tests/binary/lsp.py": "d15f31918289e943f1ba88d7423e326e188cb167af40cf0b564d65ad9327ed55",
+  "tests/binary/stack.py": "3ec3bb564ceabff64e6b000b4da1a5ed8f99dbe47c05d57a59f1f1a20b741528"
+}

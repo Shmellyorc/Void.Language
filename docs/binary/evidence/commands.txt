@@ -1,0 +1,37 @@
+Repository root: /home/shmellyorc/Documents/Void.Language
+Compiler SDK: bundled LLVM/Clang/LLD 19.1.7
+
+cmake -S . -B build/ci-official-debug
+cmake --build build/ci-official-debug --target voidc voidls void_binary_ownership void_tests void_arrays_source void_generics_tests void_growable_arrays_tests void_patterns_tests void_globals -j 2
+ctest --test-dir build/ci-official-debug --output-on-failure -j 2 -R '^(binary_|lsp_binary|documentation_execution|lsp_documentation)'
+ctest --test-dir build/ci-official-debug --output-on-failure -j 2 -R '^(numeric|numeric_cli|numeric_sprint2|frontend|modules|analysis|tooling|growable_arrays_source|arrays_source|generics_source|patterns_source|stage11_globals|stage11_globals_aot|stage11_globals_stack|lsp_stage11_globals|lsp_stage8)$'
+
+cmake -S . -B build/ci-official-release
+cmake --build build/ci-official-release --target voidc voidls void_binary_ownership void_tests void_arrays_source void_generics_tests void_growable_arrays_tests void_patterns_tests void_globals -j 2
+
+cmake -S . -B build/ci-official-sanitizers
+cmake --build build/ci-official-sanitizers --target voidc voidls void_binary_ownership -j 2
+ctest --test-dir build/ci-official-release --output-on-failure -j 2 -R '^(binary_|lsp_binary|documentation_execution|lsp_documentation|numeric|numeric_cli|numeric_sprint2|frontend|modules|analysis|tooling|growable_arrays_source|arrays_source|generics_source|patterns_source|stage11_globals|stage11_globals_aot|stage11_globals_stack|lsp_stage11_globals|lsp_stage8)$'
+ctest --test-dir build/ci-official-release --output-on-failure -j 2 -R '^binary_'
+
+The first Release selection matched 19 tests: its anchored binary_ alternative
+matched no suffix. The second selection executed the three binary_* suites.
+Combined Release coverage is the same 22 suites as Debug, with no skipped suite.
+
+After expanding the private helper's chained assignments into separate readable
+statements (no behavior change), all three binary targets were rebuilt in each
+configuration. Debug and Release repeated the six binary/documentation suites:
+cmake --build build/ci-official-debug --target voidc voidls void_binary_ownership -j 2
+ctest --test-dir build/ci-official-debug --output-on-failure -j 2 -R '^(binary_|lsp_binary|documentation_execution|lsp_documentation)'
+cmake --build build/ci-official-release --target voidc voidls void_binary_ownership -j 2
+ctest --test-dir build/ci-official-release --output-on-failure -j 2 -R '^(binary_|lsp_binary|documentation_execution|lsp_documentation)'
+
+Sanitizer final build (fresh make rules; pipe jobserver avoids shared-/tmp FIFO names):
+cmake --build build/ci-official-sanitizers --target voidc voidls void_binary_ownership -j 2 -- --jobserver-style=pipe
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-sanitizers --output-on-failure -j 2 -R '^(binary_execution|lsp_binary|documentation_execution|lsp_documentation|numeric_cli|numeric_sprint2|stage11_globals_aot|lsp_stage11_globals|lsp_stage8)$'
+
+The nine-suite sandbox attempt failed at LeakSanitizer startup because the tool's
+tracing sandbox prevents thread inspection (LSan reports ptrace unsupported).
+No sanitizer option was weakened. The final ten-suite run used approved execution
+outside the tracing sandbox, with the same environment and the ownership target:
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-sanitizers --output-on-failure -j 2 -R '^(binary_.*|lsp_binary|documentation_execution|lsp_documentation|numeric_cli|numeric_sprint2|stage11_globals_aot|lsp_stage11_globals|lsp_stage8)$'

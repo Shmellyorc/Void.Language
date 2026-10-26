@@ -2282,7 +2282,30 @@ class Semantics {
                 if(!valid_editor_identifier(name) || candidates.contains(name)) continue;
                 Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
                 try { auto [owner, value] = global(test); if (value) { if (value->type == Type::none) owner->resolve_global(*value); if (auto* candidate = add(name, value->type, 6)) candidate->documentation = source_documentation(owner->source, value->token.offset).text(); continue; } } catch (const CompilationError&) {} catch (const Poison&) {}
-                try {auto& f=resolve(test);if(auto* candidate=add(name,f.result,3))for(const auto& [id,u]:units)if(u->declarations.contains(f.token.text) && u->declarations.at(f.token.text)==&f)candidate->documentation=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
+                try {
+                    const auto& function = resolve(test);
+                    auto result = function.result;
+
+                    // Generic collection headers still hold source patterns;
+                    // their element layouts are resolved only on specialization.
+                    if (!function.generics.empty() && ir::collection_type(result)) {
+                        result.kind = Type::unresolved;
+                    }
+
+                    if (auto* candidate = add(name, result, 3)) {
+                        for (const auto& [id, owner] : units) {
+                            if (owner->declarations.contains(function.token.text) &&
+                                owner->declarations.at(function.token.text) == &function) {
+                                candidate->documentation = source_documentation(
+                                    owner->source, function.token.offset).text(function.result != Type::none);
+                            }
+                        }
+                    }
+
+                    continue;
+                } catch (const CompilationError&) {
+                } catch (const Poison&) {
+                }
                 try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);if(auto* candidate=add(name,c->type,21))candidate->documentation=source_documentation(owner->source,c->declaration.token.offset).text();continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
                 try {auto [owner,structure]=structure_lookup(unit,root,units,e.qualifier.empty()?name:e.qualifier+"."+name,e.token);
                     if(structure && structure->layout_state!=3)candidates.emplace(name,EditorCandidate{name,structure->generics.empty()?"type":"generic type",7,{},source_documentation(owner->source,structure->token.offset).text()});
@@ -2819,7 +2842,15 @@ class Semantics {
         builtin_record(target,"Validated temporal Runtime kernel operation.");e.source_target=target.symbol;e.target=target.symbol;
         return e.type=call_arguments(e,target,0);
     }
+#include "binary_codec.inc"
+
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (unit.identity == "/@stdlib/encoding/binary.void" && e.qualifier.empty() &&
+            (e.token.text == "_binary_width" || e.token.text == "_binary_bits" ||
+             e.token.text == "_binary_value")) {
+            return binary_codec_call(e);
+        }
+
         if (!(e.qualifier.empty() && (lookup(e.token.text) || (current && current->substitutions.contains(e.token.text))))) if (auto [owner, value] = global(e); value) {
             auto target = std::make_unique<Expr>(Expr::Kind::name, e.token);
             target->qualifier = e.qualifier; target->qualifier_token = e.qualifier_token;
@@ -3968,6 +3999,51 @@ class Lowering {
                 std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
                 ir::Instruction operation{ir::Op::console_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(9));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
             }
+            if (e.target.starts_with("$binary.")) {
+                if (e.target == "$binary.width") {
+                    return constant(Type::i64, {e.value, {}}, e.token);
+                }
+
+                const bool encoding = e.target == "$binary.bits";
+                const auto numeric_type = encoding ? e.parts[0]->type : e.type;
+                Type storage_type;
+
+                switch (numeric::width(numeric_type)) {
+                case 8:
+                    storage_type = Type::u8;
+                    break;
+                case 16:
+                    storage_type = Type::u16;
+                    break;
+                case 32:
+                    storage_type = Type::u32;
+                    break;
+                default:
+                    storage_type = Type::u64;
+                    break;
+                }
+
+                auto value = expression(*e.parts[0]);
+
+                if (encoding) {
+                    ir::Instruction bits{ir::Op::bitcast, value};
+                    bits.type = storage_type;
+                    value = emit(bits, e.token);
+
+                    ir::Instruction widen{ir::Op::convert, value};
+                    widen.type = Type::u64;
+                    return emit(widen, e.token);
+                }
+
+                ir::Instruction narrow{ir::Op::convert, value};
+                narrow.type = storage_type;
+                value = emit(narrow, e.token);
+
+                ir::Instruction number{ir::Op::bitcast, value};
+                number.type = numeric_type;
+                return emit(number, e.token);
+            }
+
             if(e.target.starts_with("$time.")) {
                 std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.parts[n]->token);
                 ir::Instruction operation{ir::Op::temporal_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(6));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
