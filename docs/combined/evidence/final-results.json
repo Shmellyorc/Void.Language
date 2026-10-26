@@ -1,0 +1,646 @@
+{
+  "debug": {
+    "final_cases_passed": 50,
+    "cases": {
+      "combined_execution": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "combined_stack": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "memory_execution": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage10_console_source": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "binary_execution": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage10_temporal_aot": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "combined_ownership": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage10_temporal_install": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "memory_ownership": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage11_globals_aot": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_combined": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "memory_stack": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_stage10_display": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "generics_source": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "numeric_sprint2": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_memory": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage11_globals": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage11_globals_stack": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage10_temporal_ir": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "binary_stack": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "documentation_execution": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "binary_ownership": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_stage10_source_formatting": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "numeric": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_documentation": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "frontend": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "modules": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_native_terminal": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_binary": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_stage10_intelligence": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "format_temporal": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_native_transfers": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_stage11_globals": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_native_keyboard": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "analysis": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "combined_async_normal": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "combined_async_optimized": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "tooling": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_wide": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_native_input": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_endpoints": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_stage10_fields": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_input": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_transfers": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_terminal": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "runtime_console_keyboard": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_const_recovery": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "lsp_const_recovery_stack": {
+        "passed": true,
+        "evidence": "debug-integrated-details.log"
+      },
+      "stage10_console_aot": {
+        "passed": true,
+        "evidence": "debug-console-final.log",
+        "correction": "Frozen production source snapshot"
+      }
+    },
+    "additional_operator_harnesses": {
+      "integration": {
+        "checks_passed": 1169,
+        "evidence": "operators-integration-debug.log"
+      },
+      "reload": {
+        "checks_passed": 248,
+        "evidence": "operators-reload-debug.log"
+      },
+      "aot": {
+        "checks_passed": 344,
+        "evidence": "operators-aot-debug.log"
+      }
+    }
+  },
+  "release": {
+    "final_cases_passed": 50,
+    "cases": {
+      "combined_stack": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "combined_execution": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage10_temporal_install": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_stage10_display": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage10_console_source": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "memory_execution": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage10_temporal_aot": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "binary_execution": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "combined_ownership": {
+        "passed": true,
+        "evidence": "release-corrections-details.log",
+        "correction": "Final ownership assertion and frozen source snapshot"
+      },
+      "stage11_globals_aot": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "memory_ownership": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "memory_stack": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "generics_source": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "numeric": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage10_temporal_ir": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "numeric_sprint2": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage11_globals": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "frontend": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_combined": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "binary_stack": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_native_terminal": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "documentation_execution": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "analysis": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage11_globals_stack": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_memory": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "binary_ownership": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "modules": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_stage10_source_formatting": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_native_transfers": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_stage10_intelligence": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_documentation": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_native_keyboard": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_native_input": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_binary": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_stage11_globals": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "tooling": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_endpoints": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_stage10_fields": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_wide": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "format_temporal": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_transfers": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_input": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_keyboard": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "runtime_console_terminal": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_const_recovery": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "lsp_const_recovery_stack": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "combined_async_normal": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "combined_async_optimized": {
+        "passed": true,
+        "evidence": "release-integrated-details.log"
+      },
+      "stage10_console_aot": {
+        "passed": true,
+        "evidence": "release-corrections-details.log",
+        "correction": "Final ownership assertion and frozen source snapshot"
+      }
+    },
+    "additional_operator_harnesses": {
+      "integration": {
+        "checks_passed": 1169,
+        "evidence": "operators-integration-release.log"
+      },
+      "reload": {
+        "checks_passed": 248,
+        "evidence": "operators-reload-release.log"
+      },
+      "aot": {
+        "checks_passed": 344,
+        "evidence": "operators-aot-release.log"
+      }
+    }
+  },
+  "sanitizers": {
+    "final_cases_passed": 46,
+    "cases": {
+      "binary_execution": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage11_globals_aot": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "frontend": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "numeric": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "memory_ownership": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "generics_source": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "numeric_sprint2": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "documentation_execution": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_memory": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage11_globals_stack": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "analysis": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "modules": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "binary_ownership": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_documentation": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "tooling": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_binary": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_stage11_globals": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage10_temporal_ir": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "format_temporal": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_endpoints": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_transfers": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_native_transfers": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_keyboard": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_terminal": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_native_keyboard": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_native_terminal": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_wide": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_input": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "runtime_console_native_input": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_const_recovery": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "combined_ownership": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "combined_async_normal": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "combined_async_optimized": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "memory_execution": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_combined": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage11_globals": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "combined_execution": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage10_temporal_install": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage10_temporal_aot": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage10_console_source": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_stage10_fields": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_stage10_display": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_stage10_intelligence": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "lsp_stage10_source_formatting": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      },
+      "stage10_console_aot": {
+        "passed": true,
+        "evidence": "sanitizers-details.log"
+      }
+    },
+    "additional_operator_harnesses": {
+      "integration": {
+        "checks_passed": 1169,
+        "evidence": "operators-integration-sanitizers.log"
+      },
+      "reload": {
+        "checks_passed": 248,
+        "evidence": "operators-reload-sanitizers.log"
+      },
+      "aot": {
+        "checks_passed": 344,
+        "evidence": "operators-aot-sanitizers.log"
+      }
+    }
+  }
+}

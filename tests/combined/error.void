@@ -1,0 +1,21 @@
+use error as core
+
+struct child extends core.error:
+    detail: i64
+
+func failure() -> result<i32, child>:
+    return Err(child(message = "failed", path = "asset", code = 7, detail = 42))
+
+func forward() -> result<i32, child>:
+    return Ok(failure()?)
+
+func main() -> i32:
+    var empty = core.error()
+    if empty.message != "" or empty.path != "" or empty.code != 0:
+        return 1
+    if forward() is Err(var reason):
+        var base: core.error = reason
+        if base.message != "failed" or base.path != "asset" or base.code != 7 or reason.detail != 42:
+            return 2
+        return 0
+    return 3

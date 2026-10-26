@@ -284,7 +284,9 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                     captured, sent, started = b"", False, time.monotonic()
                     try:
                         while child.poll() is None:
-                            assert time.monotonic()-started < 60, (label, captured)
+                            # JIT compilation precedes READY; use the same process
+                            # deadline as run(), retaining the key-read timeout.
+                            assert time.monotonic()-started < 120, (key_source, label, optimized, captured)
                             if select.select([child.stdout], [], [], .02)[0]:
                                 captured += os.read(child.stdout.fileno(), 65536)
                             if b"READY\n" in captured and not sent:

@@ -30,6 +30,8 @@ void vd_collection_leave(void*,vd::RuntimeFailure*) noexcept;
 void vd_collection_append(void*,vd::RuntimeFailure*) noexcept;
 void vd_collection_finish(void**,vd::RuntimeFailure*) noexcept;
 void vd_display_leave() noexcept;
+unsigned vd_convert_parse(std::uint64_t*, void*, unsigned, const char* const*,
+                          std::size_t, vd::RuntimeFailure*) noexcept;
 void vd_display_error(void*,vd::RuntimeFailure*) noexcept;
 void vd_string_encode(void**,void*,vd::RuntimeFailure*) noexcept;
 // ScalarEncoding values 0..10, or 11 for immutable string. Formatting returns
@@ -64,6 +66,7 @@ std::uint64_t vd_list_count(void**,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_version(void**,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_read(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_list_write(void**,unsigned,std::uint64_t,std::uint64_t,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_list_write_bytes(void**, void**, std::uint64_t, vd::RuntimeFailure*) noexcept;
 void vd_list_push(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_remove(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_gc_frame_enter(void*, const vd::Runtime::Slot*, std::size_t) noexcept;

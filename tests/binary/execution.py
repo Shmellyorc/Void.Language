@@ -92,7 +92,7 @@ func invalid<t>() -> bool:
                     return false
 
                 if result is Err(var reason):
-                    if not (reason is binary.error.wrong_width):
+                    if not (reason.kind is binary.error_kind.wrong_width):
                         return false
 
     return true
@@ -118,7 +118,7 @@ func ownership() -> bool:
         return false
 
     if propagated([]) is Err(var reason):
-        return reason is binary.error.wrong_width
+        return reason.kind is binary.error_kind.wrong_width
 
     return false
 

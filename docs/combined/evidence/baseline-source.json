@@ -1,0 +1,9 @@
+{
+  "head": "37e98791fcbc3dcc434ab8437c7af1ddf2d8d054",
+  "sha256": {
+    "stdlib/io/memory.void": "ee990760dc5353864f68b3b76cb5d1864b55f59920b491880e5ae2e419bba728",
+    "stdlib/encoding/binary.void": "2ac4f23823d0f16de74339b659cb126bb8f41e0647d4124d966fa6eaa39c2d78",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+  },
+  "benchmark": "Linked Release O2; count=20000,40000,80000; three process wall-clock samples each; compilation excluded; overwrite includes seed construction."
+}

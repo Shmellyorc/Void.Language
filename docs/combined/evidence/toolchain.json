@@ -1,0 +1,35 @@
+{
+  "debug": {
+    "CMAKE_BUILD_TYPE": "Debug",
+    "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "VOID_SANITIZERS": "OFF",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+    "CMAKE_EXE_LINKER_FLAGS": "-Wl,--thinlto-cache-dir=/home/shmellyorc/Documents/Void.Language/build/phase6-verification/lto-cache",
+    "core_flags": "-g -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic",
+    "ctest_python": "/home/shmellyorc/.local/bin/python3.11"
+  },
+  "release": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "VOID_SANITIZERS": "OFF",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+    "CMAKE_EXE_LINKER_FLAGS": "-Wl,--thinlto-cache-dir=/home/shmellyorc/Documents/Void.Language/build/phase6-verification/lto-cache",
+    "core_flags": "-O3 -DNDEBUG -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic",
+    "ctest_python": "/home/shmellyorc/.local/bin/python3.11"
+  },
+  "sanitizers": {
+    "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+    "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+    "VOID_SANITIZERS": "ON",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+    "CMAKE_EXE_LINKER_FLAGS": "-Wl,--thinlto-cache-dir=/home/shmellyorc/Documents/Void.Language/build/phase6-verification/sanitizer-lto-cache",
+    "core_flags": "-O2 -g -DNDEBUG -std=c++20 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ctest_python": "/home/shmellyorc/.local/bin/python3.11"
+  }
+}

@@ -1,3 +1,10 @@
+> **26 October 2026 combined-sprint update:** Public failures now use managed
+> errors derived from `error.error`; inspect `reason.kind` using `error_kind`.
+> [The current combined contract](../combined/CONTRACT.md) and
+> [implementation/evidence](../combined/IMPLEMENTATION.md) supersede the earlier
+> source-protection and implementation-cost statements below. The original
+> sprint receipt and source hashes remain historical evidence.
+
 # io/memory — Sprint 2 contract and capability audit
 
 Boss authorized this module on 26 October 2026 after independent Wrench source

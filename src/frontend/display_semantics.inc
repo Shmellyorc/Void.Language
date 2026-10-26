@@ -51,7 +51,11 @@ Function& nominal_display_adapter(Type type,bool formatted,const Token& site) {
     if(formatted){
         variable("$pattern",propagated(call("$display_pattern",name("$spec"))));
         variable("$alignment",propagated(call("$display_alignment",name("$spec"))));
-        auto custom=hook("format");if(!custom)custom=call("Err",text("format at byte 0: Type has no custom format hook"));
+        auto custom = hook("format");
+        if (custom && nonnullable.definition->module_identity == "/@stdlib/time.void") {
+            custom = call("$temporal_result", std::move(custom));
+        }
+        if(!custom)custom=call("Err",text("format at byte 0: Type has no custom format hook"));
         body=choice(equal(name("$pattern"),text("")),call("Ok",default_value()),std::move(custom));
     }
     else body=default_value();

@@ -1,0 +1,73 @@
+use error as core
+use console
+use encoding/binary
+use io/memory
+use time
+use convert
+
+struct child extends core.error:
+    detail: string
+
+func entry(scenario: i32) -> i32:
+    if scenario == 0:
+        var reason = child(message = "failure", path = "asset", code = 7, detail = "detail")
+        var base: core.error = reason
+        var alias = reason
+        var retained: result<child, string> = Ok(reason)
+        var pressure: [string] = []
+        for index in 0..<8:
+            pressure.push("pressure {index}")
+        alias.message = "updated"
+        if base.message != "updated" or base.path != "asset" or base.code != 7 or alias.detail != "detail":
+            return -1
+        if convert.unwrap(retained).message != "updated":
+            return -2
+        return 1
+    if scenario == 1:
+        if binary.decode<i64>([]) is Err(var reason):
+            var base: core.error = reason
+            if base.message != "" and base.path == "" and base.code == 1:
+                if reason.kind is binary.error_kind.wrong_width:
+                    return 1
+    if scenario == 2:
+        var buffer = memory.stream()
+        if buffer.read_exact(1) is Err(var reason):
+            var base: core.error = reason
+            if base.message != "" and base.path == "" and base.code == 2:
+                if reason.kind is memory.error_kind.unexpected_eof:
+                    return 1
+    if scenario == 3:
+        if console.stdin.read_text(-1) is Err(var reason):
+            var base: core.error = reason
+            if base.message != "" and base.path == "" and base.code == 1:
+                if reason.operation == "read_text" and reason.stream == "stdin" and reason.partial.count == 0:
+                    return 1
+    if scenario == 4:
+        if time.make_date(2023, 2, 29) is Err(var reason):
+            var base: core.error = reason
+            if base.message == "" or base.path != "" or base.code != 0 or reason.operation != "time":
+                return -4
+            var day = convert.unwrap(time.make_date(2024, 2, 29))
+            if string(day) != "2024-02-29":
+                return -5
+            if convert.unwrap(day.format("yyyy-MM-dd")) != "2024-02-29":
+                return -6
+            var maximum = convert.unwrap(time.make_instant(i64.max_value, 0))
+            if maximum.format("yyyy") is Err(var formatted):
+                if format(maximum, "yyyy") is Err(var bridged):
+                    if formatted.message != "" and formatted.message == bridged:
+                        return 1
+    if scenario == 5:
+        if convert.parse<i32>("invalid") is Err(var reason):
+            var base: core.error = reason
+            if base.message != "" and base.path == "" and base.code == 1 and reason.input == "invalid":
+                if reason.kind is convert.error_kind.invalid_text:
+                    return 1
+    if scenario == 6:
+        var bytes: [u8] = [1, 2, 3]
+        var retained: result<[u8], core.error> = Ok(bytes)
+        var alias = convert.unwrap(retained)
+        alias[0] = 42
+        if bytes[0] == 42:
+            return 1
+    return -3

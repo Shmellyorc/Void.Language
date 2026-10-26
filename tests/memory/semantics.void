@@ -29,14 +29,14 @@ private func chunk(outcome: result<[u8], memory.error>, const expected: [u8]) ->
 
 private func failure<t>(outcome: result<t, memory.error>, expected: i32) -> bool:
     if outcome is Err(var reason):
-        match reason:
-            memory.error.invalid_range:
+        match reason.kind:
+            memory.error_kind.invalid_range:
                 return expected == 1
-            memory.error.unexpected_eof:
+            memory.error_kind.unexpected_eof:
                 return expected == 2
-            memory.error.invalid_utf8:
+            memory.error_kind.invalid_utf8:
                 return expected == 3
-            memory.error.limit_exceeded:
+            memory.error_kind.limit_exceeded:
                 return expected == 4
 
     return false

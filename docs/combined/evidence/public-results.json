@@ -1,0 +1,275 @@
+[
+  {
+    "module": "stdlib/console.void",
+    "public_result_functions": [
+      {
+        "line": 131,
+        "declaration": "func (self output) write(text: string) -> result<i64, io_error>:"
+      },
+      {
+        "line": 140,
+        "declaration": "func (self output) write_bytes(const bytes: [u8]) -> result<i64, io_error>:"
+      },
+      {
+        "line": 148,
+        "declaration": "func (self output) flush() -> result<bool, io_error>:"
+      },
+      {
+        "line": 176,
+        "declaration": "func (self input) read_char(timeout_ms: i64 = -1) -> result<text_read, io_error>:"
+      },
+      {
+        "line": 183,
+        "declaration": "func (self input) read_text(max_scalars: i64, timeout_ms: i64 = -1) -> result<text_read, io_error>:"
+      },
+      {
+        "line": 189,
+        "declaration": "func (self input) read_line(timeout_ms: i64 = -1) -> result<text_read, io_error>:"
+      },
+      {
+        "line": 196,
+        "declaration": "func (self input) read_bytes(max_bytes: i64, timeout_ms: i64 = -1) -> result<bytes_read, io_error>:"
+      },
+      {
+        "line": 351,
+        "declaration": "func (self output) size() -> result<terminal_size, io_error>:"
+      },
+      {
+        "line": 359,
+        "declaration": "func (self output) cursor_position() -> result<terminal_position, io_error>:"
+      },
+      {
+        "line": 369,
+        "declaration": "func (self output) set_cursor(column: i64, row: i64) -> result<bool, io_error>:"
+      },
+      {
+        "line": 375,
+        "declaration": "func (self output) set_cursor_visible(visible: bool) -> result<bool, io_error>:"
+      },
+      {
+        "line": 385,
+        "declaration": "func (self output) set_color(foreground: color, background: color) -> result<bool, io_error>:"
+      },
+      {
+        "line": 390,
+        "declaration": "func (self output) reset_color() -> result<bool, io_error>:"
+      },
+      {
+        "line": 395,
+        "declaration": "func (self output) clear() -> result<bool, io_error>:"
+      },
+      {
+        "line": 401,
+        "declaration": "func (self output) set_title(text: string) -> result<bool, io_error>:"
+      },
+      {
+        "line": 406,
+        "declaration": "func (self output) bell() -> result<bool, io_error>:"
+      },
+      {
+        "line": 416,
+        "declaration": "func (self terminal_session) close() -> result<bool, io_error>:"
+      },
+      {
+        "line": 428,
+        "declaration": "func (self input) begin_mode(echo: bool = true, line_input: bool = true, control_c_as_input: bool = false) -> result<terminal_session, io_error>:"
+      },
+      {
+        "line": 588,
+        "declaration": "func (self input) read_key(echo: bool = false, timeout_ms: i64 = -1) -> result<key_event, io_error>:"
+      },
+      {
+        "line": 612,
+        "declaration": "func (self input) key_available() -> result<bool, io_error>:"
+      }
+    ]
+  },
+  {
+    "module": "stdlib/convert.void",
+    "public_result_functions": [
+      {
+        "line": 22,
+        "declaration": "func parse<t>(text: string) -> result<t, error>:"
+      }
+    ]
+  },
+  {
+    "module": "stdlib/encoding/binary.void",
+    "public_result_functions": [
+      {
+        "line": 53,
+        "declaration": "func decode<t>(const bytes: [u8], order: byte_order = byte_order.little) -> result<t, error>:"
+      }
+    ]
+  },
+  {
+    "module": "stdlib/error.void",
+    "public_result_functions": []
+  },
+  {
+    "module": "stdlib/io/memory.void",
+    "public_result_functions": [
+      {
+        "line": 99,
+        "declaration": "func (self stream) seek(position: i64) -> result<i64, error>:"
+      },
+      {
+        "line": 131,
+        "declaration": "func (self stream) read_bytes(max_count: i64) -> result<[u8], error>:"
+      },
+      {
+        "line": 151,
+        "declaration": "func (self stream) read_exact(count: i64) -> result<[u8], error>:"
+      },
+      {
+        "line": 165,
+        "declaration": "func (self stream) write_bytes(const bytes: [u8]) -> result<i64, error>:"
+      },
+      {
+        "line": 183,
+        "declaration": "func (self stream) read<t>() -> result<t, error>:"
+      },
+      {
+        "line": 198,
+        "declaration": "func (self stream) write<t>(value: t) -> result<i64, error>:"
+      },
+      {
+        "line": 214,
+        "declaration": "func (self stream) read_string(count: i64) -> result<string, error>:"
+      },
+      {
+        "line": 226,
+        "declaration": "func (self stream) write_string(value: string) -> result<i64, error>:"
+      },
+      {
+        "line": 237,
+        "declaration": "func (self stream) read_pascal_string(max_bytes: i64 = i64.max_value) -> result<string, error>:"
+      },
+      {
+        "line": 260,
+        "declaration": "func (self stream) write_pascal_string(value: string) -> result<i64, error>:"
+      }
+    ]
+  },
+  {
+    "module": "stdlib/time.void",
+    "public_result_functions": [
+      {
+        "line": 368,
+        "declaration": "func make_date(year: i64, month: i64, day: i64) -> result<date, error>:"
+      },
+      {
+        "line": 378,
+        "declaration": "func make_time(hour: i64, minute: i64, second: i64, nanosecond: i64 = 0) -> result<time_of_day, error>:"
+      },
+      {
+        "line": 386,
+        "declaration": "func make_local_datetime(day: date, clock: time_of_day) -> result<local_datetime, error>:"
+      },
+      {
+        "line": 393,
+        "declaration": "func make_instant(seconds: i64, nanosecond: i64 = 0) -> result<instant, error>:"
+      },
+      {
+        "line": 401,
+        "declaration": "func make_duration(seconds: i64, nanosecond: i64 = 0) -> result<duration, error>:"
+      },
+      {
+        "line": 408,
+        "declaration": "func find_zone(name: string) -> result<zone, error>:"
+      },
+      {
+        "line": 416,
+        "declaration": "func at_offset(value: instant, offset_seconds: i64) -> result<offset_datetime, error>:"
+      },
+      {
+        "line": 434,
+        "declaration": "func in_zone(value: instant, selected: zone) -> result<zoned_datetime, error>:"
+      },
+      {
+        "line": 444,
+        "declaration": "func resolve_local(value: local_datetime, selected: zone, choice: local_choice = local_choice.reject ) -> result<zoned_datetime, error>:"
+      },
+      {
+        "line": 456,
+        "declaration": "func now_utc() -> result<instant, error>:"
+      },
+      {
+        "line": 462,
+        "declaration": "func monotonic_now() -> result<monotonic_tick, error>:"
+      },
+      {
+        "line": 468,
+        "declaration": "func utc_precision_ns() -> result<i64, error>:"
+      },
+      {
+        "line": 473,
+        "declaration": "func monotonic_precision_ns() -> result<i64, error>:"
+      },
+      {
+        "line": 496,
+        "declaration": "func (self instant) add(delta: duration) -> result<instant, error>:"
+      },
+      {
+        "line": 503,
+        "declaration": "func (self instant) subtract(delta: duration) -> result<instant, error>:"
+      },
+      {
+        "line": 510,
+        "declaration": "func (self instant) difference(other: instant) -> result<duration, error>:"
+      },
+      {
+        "line": 517,
+        "declaration": "func (self duration) add(other: duration) -> result<duration, error>:"
+      },
+      {
+        "line": 524,
+        "declaration": "func (self duration) subtract(other: duration) -> result<duration, error>:"
+      },
+      {
+        "line": 532,
+        "declaration": "func elapsed(start: monotonic_tick, end: monotonic_tick) -> result<duration, error>:"
+      },
+      {
+        "line": 540,
+        "declaration": "func (self zoned_datetime) components() -> result<offset_datetime, error>:"
+      },
+      {
+        "line": 548,
+        "declaration": "func (self date) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 559,
+        "declaration": "func (self time_of_day) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 570,
+        "declaration": "func (self local_datetime) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 591,
+        "declaration": "func (self instant) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 602,
+        "declaration": "func (self duration) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 613,
+        "declaration": "func (self offset_datetime) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 635,
+        "declaration": "func (self zoned_datetime) format(spec: string) -> result<string, error>:"
+      },
+      {
+        "line": 663,
+        "declaration": "func (self offset_datetime) to_instant() -> result<instant, error>:"
+      },
+      {
+        "line": 683,
+        "declaration": "func (self monotonic_tick) compare(other: monotonic_tick) -> result<i32, error>:"
+      }
+    ]
+  }
+]

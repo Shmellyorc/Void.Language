@@ -1,0 +1,294 @@
+[
+  {
+    "path": "CMakeLists.txt",
+    "status": "modified"
+  },
+  {
+    "path": "docs/README.md",
+    "status": "modified"
+  },
+  {
+    "path": "docs/binary/CONTRACT.md",
+    "status": "modified"
+  },
+  {
+    "path": "docs/binary/IMPLEMENTATION.md",
+    "status": "modified"
+  },
+  {
+    "path": "docs/combined/CONTRACT.md",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/IMPLEMENTATION.md",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/PERFORMANCE.md",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/RECEIPT.md",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/baseline-source.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/changed-files.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/completeness.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/console-summary-debug.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/console-summary-release.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/console-summary-sanitizers.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/final-results.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/memory-after.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/memory-before-large.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/memory-before.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/operators-workloads-debug.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/operators-workloads-release.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/operators-workloads-sanitizers.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/public-results.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/source-sha256.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/test-selection.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/combined/evidence/toolchain.json",
+    "status": "new"
+  },
+  {
+    "path": "docs/memory/CONTRACT.md",
+    "status": "modified"
+  },
+  {
+    "path": "docs/memory/IMPLEMENTATION.md",
+    "status": "modified"
+  },
+  {
+    "path": "docs/stage10/CONSOLE_IO.md",
+    "status": "modified"
+  },
+  {
+    "path": "include/void/ir.hpp",
+    "status": "modified"
+  },
+  {
+    "path": "include/void/runtime.hpp",
+    "status": "modified"
+  },
+  {
+    "path": "include/void/runtime_abi.hpp",
+    "status": "modified"
+  },
+  {
+    "path": "src/backend/llvm/backend.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "src/frontend/capabilities.inc",
+    "status": "modified"
+  },
+  {
+    "path": "src/frontend/compiler.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "src/frontend/display_semantics.inc",
+    "status": "modified"
+  },
+  {
+    "path": "src/frontend/stdlib_conversion.inc",
+    "status": "new"
+  },
+  {
+    "path": "src/ir/module.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "src/ir/reference_capabilities.inc",
+    "status": "modified"
+  },
+  {
+    "path": "src/runtime/array.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "src/runtime/conversion.cpp",
+    "status": "new"
+  },
+  {
+    "path": "src/runtime/fixed_abi.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "stdlib/README.md",
+    "status": "modified"
+  },
+  {
+    "path": "stdlib/console.void",
+    "status": "modified"
+  },
+  {
+    "path": "stdlib/convert.void",
+    "status": "new"
+  },
+  {
+    "path": "stdlib/encoding/binary.void",
+    "status": "modified"
+  },
+  {
+    "path": "stdlib/error.void",
+    "status": "new"
+  },
+  {
+    "path": "stdlib/io/memory.void",
+    "status": "modified"
+  },
+  {
+    "path": "stdlib/time.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/binary/execution.py",
+    "status": "modified"
+  },
+  {
+    "path": "tests/combined/async.void",
+    "status": "new"
+  },
+  {
+    "path": "tests/combined/conversion.void",
+    "status": "new"
+  },
+  {
+    "path": "tests/combined/error.void",
+    "status": "new"
+  },
+  {
+    "path": "tests/combined/execution.py",
+    "status": "new"
+  },
+  {
+    "path": "tests/combined/lsp.py",
+    "status": "new"
+  },
+  {
+    "path": "tests/combined/ownership.cpp",
+    "status": "new"
+  },
+  {
+    "path": "tests/combined/ownership.void",
+    "status": "new"
+  },
+  {
+    "path": "tests/memory/benchmark.py",
+    "status": "new"
+  },
+  {
+    "path": "tests/memory/execution.py",
+    "status": "modified"
+  },
+  {
+    "path": "tests/memory/ownership.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "tests/memory/ownership.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/memory/semantics.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/console.cpp",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/console.py",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/lsp_display.py",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/operator_console_model.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/operator_format_cache.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/operator_systems.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/operator_systems_async.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/operator_systems_workload.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage10/time.void",
+    "status": "modified"
+  },
+  {
+    "path": "tests/stage11/const_global_minimal.void",
+    "status": "new"
+  },
+  {
+    "path": "tests/stage11/guessing_game.void",
+    "status": "new"
+  },
+  {
+    "path": "tests/stage11/lsp_const_recovery.py",
+    "status": "new"
+  }
+]

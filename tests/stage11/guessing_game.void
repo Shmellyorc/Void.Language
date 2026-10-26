@@ -1,0 +1,45 @@
+use console
+use convert
+
+struct game_data:
+    score: i32
+    value: i32
+    health:i32
+
+const choices = [1,3,5,9]
+const max_tries = 3 # added "const" here and got an vscode void language popup about "VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log. See Output → VOID."
+
+var index : i32
+
+
+func main():
+    var game = game_data(score = 0, value = choices[index], health = max_tries)
+    var won = false
+
+    print("Try to guess the correct number from 1 to 10.")
+    print("You got three tries!")
+
+    for game.health > 0:
+        if won:
+            break
+
+        var text = readline("Number from 1 to 10? ")
+        var number = convert.parse<i32>(text)
+
+        if number is Ok(var num):
+            if num == game.value:
+                print("Correct, you won!")
+                won = true
+            else:
+                if num > game.value:
+                    print("{num} is too high!")
+                else if num < game.value:
+                    print("{num} is too low!")
+
+                game.health--
+                print("Retries: {game.health}/")
+        else:
+            print("number must be an number!")
+
+    if game.health <= 0:
+        print("You have lost!, try again!")

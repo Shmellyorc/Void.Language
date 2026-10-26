@@ -131,6 +131,9 @@ public:
     std::uint64_t list_read(RegisteredRootWord,ScalarEncoding,std::uint64_t index) const;
     void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
     void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
+    // Transactional byte overwrite/append using the existing list backing allocator.
+    void list_write_bytes(RegisteredRootWord destination, RegisteredRootWord input,
+                          std::uint64_t position);
     std::uint64_t list_remove(RegisteredRootWord,ScalarEncoding,std::uint64_t index);
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;

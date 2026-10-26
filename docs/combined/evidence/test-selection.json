@@ -1,0 +1,1183 @@
+{
+  "selection": "^(combined_.*|lsp_combined|memory_.*|lsp_memory|binary_.*|lsp_binary|.*console.*|.*temporal.*|lsp_stage10.*|documentation_execution|lsp_documentation|generics_source|frontend|numeric|tooling|analysis|modules|numeric_sprint2|lsp_stage11_globals|stage11_globals.*|lsp_const_recovery.*)$",
+  "profiles": {
+    "debug": [
+      {
+        "name": "stage10_temporal_ir",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_temporal_ir",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+        ]
+      },
+      {
+        "name": "format_temporal",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_temporal"
+        ]
+      },
+      {
+        "name": "runtime_console",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console"
+        ]
+      },
+      {
+        "name": "runtime_console_endpoints",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_endpoints.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console"
+        ]
+      },
+      {
+        "name": "runtime_console_transfers",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_transfers"
+        ]
+      },
+      {
+        "name": "runtime_console_native_transfers",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_transfers"
+        ]
+      },
+      {
+        "name": "runtime_console_keyboard",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_keyboard"
+        ]
+      },
+      {
+        "name": "runtime_console_terminal",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_terminal"
+        ]
+      },
+      {
+        "name": "runtime_console_native_keyboard",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_keyboard"
+        ]
+      },
+      {
+        "name": "runtime_console_native_terminal",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_terminal.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_terminal"
+        ]
+      },
+      {
+        "name": "runtime_console_wide",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_wide"
+        ]
+      },
+      {
+        "name": "runtime_console_input",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_input"
+        ]
+      },
+      {
+        "name": "runtime_console_native_input",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_input.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_console_input"
+        ]
+      },
+      {
+        "name": "generics_source",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_generics_tests",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "lsp_stage11_globals",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_globals.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "documentation_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "lsp_documentation",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "binary_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "lsp_binary",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "binary_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_binary_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+        ]
+      },
+      {
+        "name": "binary_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "lsp_const_recovery",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "lsp_const_recovery_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+          "--small-stack"
+        ]
+      },
+      {
+        "name": "combined_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_combined_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+        ]
+      },
+      {
+        "name": "combined_async_normal",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_combined_async_normal",
+          "7"
+        ]
+      },
+      {
+        "name": "combined_async_optimized",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_combined_async_optimized",
+          "7"
+        ]
+      },
+      {
+        "name": "combined_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "lsp_combined",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "combined_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+          "--small-stack"
+        ]
+      },
+      {
+        "name": "memory_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "lsp_memory",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "memory_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_memory_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+        ]
+      },
+      {
+        "name": "memory_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "stage11_globals",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_globals",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/stage11 native fixtures"
+        ]
+      },
+      {
+        "name": "stage10_console_source",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_console_source"
+        ]
+      },
+      {
+        "name": "tooling",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+          "tooling",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/tooling fixtures"
+        ]
+      },
+      {
+        "name": "analysis",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+          "analysis",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/analysis fixtures"
+        ]
+      },
+      {
+        "name": "numeric",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+          "numeric",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "frontend",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+          "frontend",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "modules",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_tests",
+          "modules",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/module fixtures with spaces"
+        ]
+      },
+      {
+        "name": "numeric_sprint2",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/numeric/sprint2.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld"
+        ]
+      },
+      {
+        "name": "stage10_temporal_install",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/install_temporal.py",
+          "/usr/bin/cmake",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+          "Debug"
+        ]
+      },
+      {
+        "name": "stage10_temporal_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/temporal.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a",
+          "OFF"
+        ]
+      },
+      {
+        "name": "stage11_globals_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+        ]
+      },
+      {
+        "name": "stage11_globals_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/globals.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a",
+          "OFF"
+        ]
+      },
+      {
+        "name": "stage10_console_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a",
+          "OFF"
+        ]
+      },
+      {
+        "name": "lsp_stage10_fields",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_display",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_intelligence",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_source_formatting",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_source_formatting.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+        ]
+      }
+    ],
+    "release": [
+      {
+        "name": "stage10_temporal_ir",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_temporal_ir",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+        ]
+      },
+      {
+        "name": "format_temporal",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_temporal"
+        ]
+      },
+      {
+        "name": "runtime_console",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console"
+        ]
+      },
+      {
+        "name": "runtime_console_endpoints",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_endpoints.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console"
+        ]
+      },
+      {
+        "name": "runtime_console_transfers",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_transfers"
+        ]
+      },
+      {
+        "name": "runtime_console_native_transfers",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_transfers"
+        ]
+      },
+      {
+        "name": "runtime_console_keyboard",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_keyboard"
+        ]
+      },
+      {
+        "name": "runtime_console_terminal",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_terminal"
+        ]
+      },
+      {
+        "name": "runtime_console_native_keyboard",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_keyboard"
+        ]
+      },
+      {
+        "name": "runtime_console_native_terminal",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_terminal.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_terminal"
+        ]
+      },
+      {
+        "name": "runtime_console_wide",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_wide"
+        ]
+      },
+      {
+        "name": "runtime_console_input",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_input"
+        ]
+      },
+      {
+        "name": "runtime_console_native_input",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_input.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_console_input"
+        ]
+      },
+      {
+        "name": "generics_source",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_generics_tests",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "lsp_stage11_globals",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_globals.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "documentation_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "lsp_documentation",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "binary_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "lsp_binary",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "binary_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_binary_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+        ]
+      },
+      {
+        "name": "binary_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "lsp_const_recovery",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "lsp_const_recovery_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls",
+          "--small-stack"
+        ]
+      },
+      {
+        "name": "combined_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_combined_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+        ]
+      },
+      {
+        "name": "combined_async_normal",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_combined_async_normal",
+          "7"
+        ]
+      },
+      {
+        "name": "combined_async_optimized",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_combined_async_optimized",
+          "7"
+        ]
+      },
+      {
+        "name": "combined_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "lsp_combined",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "combined_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+          "--small-stack"
+        ]
+      },
+      {
+        "name": "memory_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "lsp_memory",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "memory_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_memory_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+        ]
+      },
+      {
+        "name": "memory_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "stage11_globals",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_globals",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/stage11 native fixtures"
+        ]
+      },
+      {
+        "name": "stage10_console_source",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_console_source"
+        ]
+      },
+      {
+        "name": "tooling",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+          "tooling",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/tooling fixtures"
+        ]
+      },
+      {
+        "name": "analysis",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+          "analysis",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/analysis fixtures"
+        ]
+      },
+      {
+        "name": "numeric",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+          "numeric",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "frontend",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+          "frontend",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "modules",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+          "modules",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/module fixtures with spaces"
+        ]
+      },
+      {
+        "name": "numeric_sprint2",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/numeric/sprint2.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld"
+        ]
+      },
+      {
+        "name": "stage10_temporal_install",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/install_temporal.py",
+          "/usr/bin/cmake",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+          "Release"
+        ]
+      },
+      {
+        "name": "stage10_temporal_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/temporal.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_native_fixture.a",
+          "OFF"
+        ]
+      },
+      {
+        "name": "stage11_globals_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+        ]
+      },
+      {
+        "name": "stage11_globals_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/globals.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_native_fixture.a",
+          "OFF"
+        ]
+      },
+      {
+        "name": "stage10_console_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_native_fixture.a",
+          "OFF"
+        ]
+      },
+      {
+        "name": "lsp_stage10_fields",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_display",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_intelligence",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_source_formatting",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_source_formatting.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+        ]
+      }
+    ],
+    "sanitizers": [
+      {
+        "name": "stage10_temporal_ir",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_temporal_ir",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/time.void"
+        ]
+      },
+      {
+        "name": "format_temporal",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_temporal"
+        ]
+      },
+      {
+        "name": "runtime_console",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console"
+        ]
+      },
+      {
+        "name": "runtime_console_endpoints",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_endpoints.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console"
+        ]
+      },
+      {
+        "name": "runtime_console_transfers",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_transfers"
+        ]
+      },
+      {
+        "name": "runtime_console_native_transfers",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_transfers.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_transfers"
+        ]
+      },
+      {
+        "name": "runtime_console_keyboard",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_keyboard"
+        ]
+      },
+      {
+        "name": "runtime_console_terminal",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_terminal"
+        ]
+      },
+      {
+        "name": "runtime_console_native_keyboard",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_keyboard.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_keyboard"
+        ]
+      },
+      {
+        "name": "runtime_console_native_terminal",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_terminal.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_terminal"
+        ]
+      },
+      {
+        "name": "runtime_console_wide",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_wide"
+        ]
+      },
+      {
+        "name": "runtime_console_input",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_input"
+        ]
+      },
+      {
+        "name": "runtime_console_native_input",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/runtime/console_input.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_console_input"
+        ]
+      },
+      {
+        "name": "generics_source",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_generics_tests",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "lsp_stage11_globals",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_globals.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "documentation_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+        ]
+      },
+      {
+        "name": "lsp_documentation",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "binary_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+        ]
+      },
+      {
+        "name": "lsp_binary",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "binary_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_binary_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+        ]
+      },
+      {
+        "name": "lsp_const_recovery",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "combined_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+        ]
+      },
+      {
+        "name": "combined_async_normal",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_async_normal",
+          "7"
+        ]
+      },
+      {
+        "name": "combined_async_optimized",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_async_optimized",
+          "7"
+        ]
+      },
+      {
+        "name": "combined_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+        ]
+      },
+      {
+        "name": "lsp_combined",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "memory_execution",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+        ]
+      },
+      {
+        "name": "lsp_memory",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "memory_ownership",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_memory_ownership",
+          "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+        ]
+      },
+      {
+        "name": "stage11_globals",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_globals",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/stage11 native fixtures"
+        ]
+      },
+      {
+        "name": "stage10_console_source",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_console_source"
+        ]
+      },
+      {
+        "name": "tooling",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_tests",
+          "tooling",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/tooling fixtures"
+        ]
+      },
+      {
+        "name": "analysis",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_tests",
+          "analysis",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/analysis fixtures"
+        ]
+      },
+      {
+        "name": "numeric",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_tests",
+          "numeric",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "frontend",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_tests",
+          "frontend",
+          "/home/shmellyorc/Documents/Void.Language"
+        ]
+      },
+      {
+        "name": "modules",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_tests",
+          "modules",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/module fixtures with spaces"
+        ]
+      },
+      {
+        "name": "numeric_sprint2",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/numeric/sprint2.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld"
+        ]
+      },
+      {
+        "name": "stage10_temporal_install",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/install_temporal.py",
+          "/usr/bin/cmake",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+          "RelWithDebInfo"
+        ]
+      },
+      {
+        "name": "stage10_temporal_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/temporal.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_native_fixture.a",
+          "ON"
+        ]
+      },
+      {
+        "name": "stage11_globals_stack",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/stack.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+        ]
+      },
+      {
+        "name": "stage11_globals_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage11/globals.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_native_fixture.a",
+          "ON"
+        ]
+      },
+      {
+        "name": "stage10_console_aot",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_runtime.a",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_native_fixture.a",
+          "ON"
+        ]
+      },
+      {
+        "name": "lsp_stage10_fields",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_fields.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_display",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_intelligence",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      },
+      {
+        "name": "lsp_stage10_source_formatting",
+        "command": [
+          "/home/shmellyorc/.local/bin/python3.11",
+          "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_source_formatting.py",
+          "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+        ]
+      }
+    ]
+  }
+}

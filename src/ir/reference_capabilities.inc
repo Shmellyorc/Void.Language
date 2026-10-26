@@ -135,6 +135,9 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         for (auto& [path,fact]:stored) fact.readonly=capacity.contains(path);
                         local_changed|=join_facts(locals[i.a],stored); value={}; break;
                     }
+                    case Op::result_unwrap:
+                        value = field_facts(types[function][block][i.a], values[i.a], 1);
+                        break;
                     case Op::await: case Op::sum_get: case Op::extract: case Op::gc_read:
                         value=field_facts(types[function][block][i.a],values[i.a],i.op==Op::await?1:static_cast<unsigned>(i.immediate)); break;
                     case Op::insert:
@@ -175,6 +178,16 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     case Op::gc_construct:
                         for(unsigned field=0;field<i.arguments.size();++field)retain(values[i.arguments[field]],field_type(i.type,field));
                         break;
+                    case Op::memory_write: {
+                        const auto& destination = values[i.arguments[0]];
+                        if (auto found = destination.find({}); found != destination.end()) {
+                            effect(summary.mutations, found->second);
+                            if (found->second.readonly) {
+                                fail("mutation through readonly memory byte buffer");
+                            }
+                        }
+                        break;
+                    }
                     case Op::list_push: case Op::list_remove: case Op::list_commit: case Op::list_insert: case Op::list_clear: {
                         auto owner=types[function][block][i.a];
                         if(auto found=values[i.a].find({});found!=values[i.a].end()) {effect(summary.mutations,found->second);if(found->second.readonly)fail("mutation through readonly list");}

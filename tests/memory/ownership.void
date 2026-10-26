@@ -37,6 +37,12 @@ private func reset(selected: i32):
     active = memory.stream(initial, binary.byte_order.big)
     alias = active
 
+    if selected == 12 or selected == 13:
+        var prepared = active.write_bytes([1, 2, 3, 4, 5])
+        var checked = active.seek(5)
+        if selected == 13:
+            checked = active.seek(1)
+
     if selected == 0 or selected == 1 or selected == 6 or selected == 8:
         var checked = active.seek(1)
 
@@ -52,6 +58,12 @@ private func intact() -> bool:
 
 
 private func committed() -> bool:
+    if scenario == 12:
+        return active.position == 6 and equal(active.to_bytes(), [1, 2, 3, 4, 5, 6])
+
+    if scenario == 13:
+        return active.position == 3 and equal(active.to_bytes(), [1, 9, 8, 4, 5])
+
     if scenario == 11:
         if active.position != 0 or not equal(active.to_bytes(), [9, 8, 7]):
             return false
@@ -93,7 +105,7 @@ private func committed() -> bool:
 
 
 ## Dispatch memory stream operations for precise-GC and allocation-budget probes.
-## @param mode Setup 100..111, inspect -1/-2, force GC -3, or execute the selected operation with zero.
+## @param mode Setup 100..113, inspect -1/-2, force GC -3, or execute the selected operation with zero.
 ## @return One on successful operation or invariant check; zero identifies an invariant failure.
 func entry(mode: i32) -> i32:
     if mode >= 100:
@@ -115,6 +127,14 @@ func entry(mode: i32) -> i32:
     if mode == -3:
         var collected = marker(value = active.position as i32)
         return collected.value
+
+    if scenario == 12:
+        if active.write_bytes([6]) is Ok(var count):
+            return 1
+
+    if scenario == 13:
+        if active.write_bytes([9, 8]) is Ok(var count):
+            return 1
 
     if scenario == 0:
         if active.write_bytes([9, 8, 7, 6, 5, 4]) is Ok(var count):

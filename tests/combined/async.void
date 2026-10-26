@@ -1,0 +1,22 @@
+use error as core
+use convert
+use time
+
+async func failure() -> result<i32, time.error>:
+    var value = time.make_date(2023, 2, 29)?
+    return Ok(value.year as i32)
+
+async func propagate() -> result<i32, time.error>:
+    var job = failure()
+    return Ok((await job)?)
+
+async func entry(input: i32) -> i32:
+    var reason = core.error(message = "retained", path = "scene", code = 42)
+    var job = propagate()
+    var first = await job
+    var second = await job
+    if first is Err(var original):
+        if second is Err(var repeated):
+            if original.message == repeated.message and original.message != "" and reason.path == "scene":
+                return input
+    return -1

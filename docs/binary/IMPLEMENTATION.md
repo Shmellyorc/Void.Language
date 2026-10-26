@@ -1,3 +1,10 @@
+> **26 October 2026 combined-sprint update:** Public failures now use managed
+> errors derived from `error.error`; inspect `reason.kind` using `error_kind`.
+> [The current combined contract](../combined/CONTRACT.md) and
+> [implementation/evidence](../combined/IMPLEMENTATION.md) supersede the earlier
+> source-protection and implementation-cost statements below. The original
+> sprint receipt and source hashes remain historical evidence.
+
 # encoding/binary implementation and Wrench handoff
 
 26 October 2026. Implementation of Boss-authorized Sprint 1 only. Independent

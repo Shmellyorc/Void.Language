@@ -1,5 +1,6 @@
 #include "void/runtime.hpp"
 #include "void/utf8.hpp"
+#include <algorithm>
 #include <cstring>
 #include <limits>
 namespace vd {
@@ -163,6 +164,92 @@ void Runtime::array_insert(RegisteredRootWord source,const ElementSchemaRef& sch
     if(h.version!=version || h.backing!=old || h.count!=count)throw ListModified("List structurally modified during resize");
     h.backing=next;h.capacity=grown;h.count=count+1;h.version=version+1;
 }
+void Runtime::list_write_bytes(RegisteredRootWord destination, RegisteredRootWord input,
+                               std::uint64_t position) {
+    require_managed();
+    auto schema = fixed_scalar_schema(ScalarEncoding::u8);
+    poll();
+
+    void* old = nullptr;
+    void* incoming = nullptr;
+    void* next = nullptr;
+    constexpr std::size_t zero = 0;
+    Slot slots[] = {
+        {&old, sizeof(old), &zero, 1},
+        {&incoming, sizeof(incoming), &zero, 1},
+        {&next, sizeof(next), &zero, 1}
+    };
+    Frame roots(*this, slots, 3);
+    std::uint64_t count, capacity, version, added, end;
+    BufferLayoutRef old_layout, input_layout;
+
+    {
+        std::lock_guard lock(mutex_);
+        auto& target = list_header(destination, schema);
+        const auto& source = list_header(input, schema);
+        if (position > target.count || source.count > maximum - position) {
+            throw std::out_of_range("Memory write outside representable extent");
+        }
+        added = source.count;
+        if (!added) {
+            return;
+        }
+        structural_room(target.version);
+        end = position + added;
+        count = target.count;
+        capacity = target.capacity;
+        version = target.version;
+        old = target.backing;
+        incoming = source.backing;
+        input_layout = heap_.buffer_state(incoming).layout;
+        if (old) {
+            old_layout = heap_.buffer_state(old).layout;
+            if (heap_.buffer_state(old).readers) {
+                throw BufferBusy("Leased memory stream backing");
+            }
+        }
+        if (end <= capacity) {
+            // Every check and allocation precedes this nonthrowing commit.
+            auto& state = heap_.buffer_state(old);
+            std::memmove(static_cast<char*>(old) + position, incoming,
+                         static_cast<std::size_t>(added));
+            target.count = std::max(count, end);
+            state.valid_prefix = target.count;
+            state.catalog = types_;
+            ++target.version;
+            return;
+        }
+    }
+
+    const auto doubled = capacity > maximum / 2 ? maximum : capacity * 2;
+    const auto grown = std::max(end, std::max<std::uint64_t>(4, doubled));
+    auto layout = buffer_layout(schema, grown);
+    std::optional<BufferReadLease> previous;
+    if (old) {
+        previous.emplace(*this, root_word(&old), old_layout);
+    }
+    BufferReadLease source(*this, root_word(&incoming), input_layout);
+    BufferBuilder builder(*this, layout, std::max(count, end), quota);
+    if (previous) {
+        builder.copy_elements(*previous, 0, position);
+    }
+    builder.copy_elements(source, 0, added);
+    if (end < count) {
+        builder.copy_elements(*previous, end, count - end);
+    }
+    builder.finish_into(&next);
+
+    std::lock_guard lock(mutex_);
+    auto& target = list_header(destination, schema);
+    if (target.version != version || target.backing != old || target.count != count) {
+        throw ListModified("Memory stream changed during growth");
+    }
+    target.backing = next;
+    target.capacity = grown;
+    target.count = std::max(count, end);
+    target.version = version + 1;
+}
+
 void Runtime::array_remove(void* out,RegisteredRootWord source,const ElementSchemaRef& schema,std::uint64_t index) {
     require_managed();if(!schema || !schema->mutable_data())throw std::invalid_argument("array profile does not permit mutation");if(!out)throw std::invalid_argument("missing removed result");poll();std::lock_guard lock(mutex_);heap_.validate_output_address(reinterpret_cast<void**>(out));auto& h=list_header(source,schema);structural_room(h.version);
     if(index>=h.count)throw std::out_of_range("list index outside extent");const auto& state=heap_.buffer_state(h.backing);if(state.readers)throw BufferBusy("leased list backing");

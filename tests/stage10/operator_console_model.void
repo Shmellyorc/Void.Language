@@ -143,8 +143,8 @@ func run(mode: i32) -> i32:
                             print("NO OUTER PREFIX", [failed])
                         var character: result<string, string> = Ok(pressed.character)
                         print([character])
-            Err(var error):
-                print("mode", error.kind)
+            Err(var reason):
+                print("mode", reason.kind)
     return mode
 func work(count: i32) -> i32:
     if make_date(2024, 2, 29) is Ok(var day):
@@ -157,7 +157,7 @@ func work(count: i32) -> i32:
             print("{[payload]}|{day:yyyy-MM-dd}|{value:000}")
             i++
     return 0
-func zone_text() -> result<string, string>:
+func zone_text() -> result<string, time.error>:
     var chosen_zone = find_zone("America/New_York")?
     var local = make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?)?
     var zoned = resolve_local(local, chosen_zone, local_choice.later)?

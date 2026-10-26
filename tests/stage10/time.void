@@ -1,55 +1,55 @@
 use time
-func work(input: i32) -> result<i32, string>:
+func work(input: i32) -> result<i32, time.error>:
     var day = make_date(2024, 2, 29)?
     if string(day) != "2024-02-29":
-        return Err("date")
+        return Err(time.error(message = "date"))
     if "{day:dddd, MMMM dd, yyyy}" != "Thursday, February 29, 2024":
-        return Err("date format")
+        return Err(time.error(message = "date format"))
     var clock = make_time(1, 30, 0)?
     var local = make_local_datetime(make_date(2026, 11, 1)?, clock)?
     var ny = find_zone("America/New_York")?
     var early = resolve_local(local, ny, local_choice.earlier)?
     var late = resolve_local(local, ny, local_choice.later)?
     if "{early:yyyy-MM-dd HH:mm:ss zzz VV}" != "2026-11-01 01:30:00 -04:00 America/New_York":
-        return Err("zone")
+        return Err(time.error(message = "zone"))
     if string(late) != "2026-11-01T01:30:00-05:00[America/New_York]":
-        return Err("late")
+        return Err(time.error(message = "late"))
     var first = make_instant(early.seconds, early.nanosecond as i64)?
     var last = make_instant(late.seconds, late.nanosecond as i64)?
     var difference = last.difference(first)?
     if difference.seconds != 3600:
-        return Err("difference")
+        return Err(time.error(message = "difference"))
     var civil = late.components()?
     var recovered = civil.to_instant()?
     if recovered.seconds != late.seconds or civil.local.date.year != 2026:
-        return Err("associated conversion")
+        return Err(time.error(message = "associated conversion"))
     if late.zone.rules_version != "2026e":
-        return Err("rules version")
+        return Err(time.error(message = "rules version"))
     var negative = make_duration(-1, 500000000)?
     if string(negative) != "-0:00:00:00.5":
-        return Err("duration")
+        return Err(time.error(message = "duration"))
     if make_date(2023, 2, 29) is Ok(var invalid):
-        return Err("invalid date accepted")
+        return Err(time.error(message = "invalid date accepted"))
     if resolve_local(local, ny) is Ok(var invalid):
-        return Err("overlap accepted")
+        return Err(time.error(message = "overlap accepted"))
     var current = now_utc()?
     var utc_resolution = utc_precision_ns()?
     var monotonic_resolution = monotonic_precision_ns()?
     if utc_resolution <= 0 or monotonic_resolution <= 0:
-        return Err("clock resolution")
+        return Err(time.error(message = "clock resolution"))
     if current.nanosecond >= (1000000000 as u32):
-        return Err("clock fraction")
+        return Err(time.error(message = "clock fraction"))
     var maximum = make_instant(9223372036854775807, 0)?
     if format(maximum, "yyyy") is Ok(var invalid):
-        return Err("out of calendar instant")
+        return Err(time.error(message = "out of calendar instant"))
     var start = monotonic_now()?
     var end = monotonic_now()?
     var comparison = start.compare(end)?
     if comparison > 0:
-        return Err("monotonic comparison")
+        return Err(time.error(message = "monotonic comparison"))
     var measured = elapsed(start, end)?
     if measured.seconds < 0:
-        return Err("clock")
+        return Err(time.error(message = "clock"))
     return Ok(input)
 func entry(input: i32) -> i32:
     if work(input) is Ok(var value):

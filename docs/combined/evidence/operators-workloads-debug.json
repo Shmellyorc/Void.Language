@@ -1,0 +1,91 @@
+{
+  "configuration": "Debug",
+  "clock": "Python perf_counter process wall; C++ steady_clock LLVM compilation/invocation",
+  "memory": "JIT getrusage process peak RSS includes analysis/compiler/Runtime; not incremental workload memory",
+  "measurements": [
+    {
+      "result": 270000,
+      "compile_ms": 5836.63,
+      "invoke_ms": 877.714,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 124012,
+      "engine": "JIT",
+      "optimization": "normal",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "wall_seconds": 7.020193969990942
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "normal",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "result": 270000,
+      "wall_seconds": 0.8515414249995956,
+      "memory": "not sampled by this process runner"
+    },
+    {
+      "result": 1000003,
+      "compile_ms": 6258.01,
+      "invoke_ms": 26226.4,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 125080,
+      "engine": "JIT",
+      "optimization": "normal",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "wall_seconds": 32.796922063003876
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "normal",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "result": 1000003,
+      "wall_seconds": 24.858910490002017,
+      "memory": "not sampled by this process runner"
+    },
+    {
+      "result": 270000,
+      "compile_ms": 9747.55,
+      "invoke_ms": 810.027,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 135760,
+      "engine": "JIT",
+      "optimization": "optimized",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "wall_seconds": 10.844043297009193
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "optimized",
+      "workload": "10000 numeric/custom/temporal interpolated records, 27 scalars each",
+      "argument": 10000,
+      "result": 270000,
+      "wall_seconds": 0.8314529789931839,
+      "memory": "not sampled by this process runner"
+    },
+    {
+      "result": 1000003,
+      "compile_ms": 9686.54,
+      "invoke_ms": 25453.2,
+      "objects_after_collection": 0,
+      "process_peak_rss_kib": 134352,
+      "engine": "JIT",
+      "optimization": "optimized",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "wall_seconds": 35.43404089000251
+    },
+    {
+      "engine": "linked_AOT",
+      "optimization": "optimized",
+      "workload": "1000000 decimal places, all 1000003 UTF-8 bytes checked",
+      "argument": -1000000,
+      "result": 1000003,
+      "wall_seconds": 25.690417222998803,
+      "memory": "not sampled by this process runner"
+    }
+  ]
+}

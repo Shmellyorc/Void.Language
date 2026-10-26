@@ -395,6 +395,58 @@ void four_systems(){
     }
 }
 
+void convenience() {
+    auto program = analyze(R"VOID(use console
+func entry(n: i32) -> i32:
+    var value = readline("Prompt: ")
+    return value.length as i32
+)VOID");
+    for (bool optimize : {false, true}) {
+        for (int failure = 0; failure < 3; ++failure) {
+            auto fake = std::make_shared<Fake>();
+            fake->input = "é🎮\r\nTAIL";
+            auto runtime = std::make_shared<vd::Runtime>(1, Streams::isolated(fake));
+            bool read = false;
+            fake->on_read = [&](const Request&) {
+                check(fake->output == "Prompt: ", "readline consumed input before its complete prompt");
+                read = true;
+            };
+            if (failure == 1) {
+                fake->fault = {ErrorKind::io_failure, 87};
+                fake->partial = 2;
+                fake->once = true;
+            }
+            if (failure == 2) {
+                fake->on_write = [&] { runtime->console_context()->begin_close(); };
+            }
+            vd::Jit jit;
+            auto code = jit.compile(program->lower(), program->entry_symbol(), optimize, {}, runtime);
+            check(code->invoke(0) == (failure ? 0 : 2), "readline convenience result differs");
+            check(read == (failure == 0), "failed prompt write/flush consumed input");
+            if (failure) {
+                check(fake->at == 0, "failed prompt changed native input position");
+            }
+            if (failure == 1) {
+                fake->output.clear();
+                check(code->invoke(0) == 2 && read, "recoverable prompt failure prevented retry");
+            }
+            empty(*runtime);
+        }
+    }
+    auto shadow = analyze(R"VOID(use console as port
+func read(count: i64 = 1) -> string:
+    return "local"
+func readline(prompt: string = "") -> string:
+    return prompt
+func entry(n: i32) -> i32:
+    if read() == "local" and readline("shadow") == "shadow":
+        return n
+    return -1
+)VOID");
+    vd::Jit jit;
+    check(jit.compile(*shadow)->invoke(7) == 7, "ordinary convenience name binding changed shadowing");
+}
+
 void blocked(){
     auto program=analyze("func entry(n: i32) -> i32:\n    var text = \"é🎮\"\n    print(text, n)\n    if text.byte_length != 6:\n        return -1\n    return n\n");auto fake=std::make_shared<Fake>();auto runtime=std::make_shared<vd::Runtime>(1,Streams::isolated(fake));vd::Jit jit;auto code=jit.compile(program->lower(),program->entry_symbol(),false,{},runtime);
     std::binary_semaphore entered(0),release(0);fake->on_write=[&]{entered.release();release.acquire();};auto call=std::async(std::launch::async,[&]{return code->invoke(9);});entered.acquire();
@@ -402,4 +454,4 @@ void blocked(){
     release.release();check(call.get()==9 && fake->output=="é🎮 9\n","source console native bytes/lifetime corrupted");empty(*runtime);
 }
 }
-int main(int argc,char** argv){try{project=std::filesystem::temp_directory_path()/("VOID-console27-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()))/"main.void";std::filesystem::create_directories(project.parent_path());std::ofstream(project)<<"func entry(n: i32) -> i32:\n    return n\n";if(argc==2 && std::string(argv[1])=="--four-system"){four_systems();std::filesystem::remove_all(project.parent_path());std::cout<<checks<<" four-system console checks passed\n";return 0;}negatives();execution();failures();error_kinds();null_order();blocked();lifecycle();cleanup_allocations();terminal();keyboard();generation_lifetime();collection_display();four_systems();std::filesystem::remove_all(project.parent_path());std::cout<<"source console checks: "<<checks<<'\n';return 0;}catch(const std::exception& e){if(!project.empty())std::filesystem::remove_all(project.parent_path());std::cerr<<e.what()<<'\n';return 1;}}
+int main(int argc,char** argv){try{project=std::filesystem::temp_directory_path()/("VOID-console27-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()))/"main.void";std::filesystem::create_directories(project.parent_path());std::ofstream(project)<<"func entry(n: i32) -> i32:\n    return n\n";if(argc==2 && std::string(argv[1])=="--four-system"){four_systems();std::filesystem::remove_all(project.parent_path());std::cout<<checks<<" four-system console checks passed\n";return 0;}negatives();execution();failures();error_kinds();null_order();convenience();blocked();lifecycle();cleanup_allocations();terminal();keyboard();generation_lifetime();collection_display();four_systems();std::filesystem::remove_all(project.parent_path());std::cout<<"source console checks: "<<checks<<'\n';return 0;}catch(const std::exception& e){if(!project.empty())std::filesystem::remove_all(project.parent_path());std::cerr<<e.what()<<'\n';return 1;}}

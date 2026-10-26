@@ -1,8 +1,9 @@
 use encoding/binary
+use error as core
 
 
 ## Recoverable memory stream errors; every error preserves contents and position.
-enum error:
+enum error_kind:
     ## A count or absolute position is negative, outside the data, or cannot fit its wire width.
     invalid_range
 
@@ -16,14 +17,31 @@ enum error:
     limit_exceeded
 
 
+## Recoverable memory-stream failure with common diagnostic fields.
+struct error extends core.error:
+    ## Exact range, EOF, encoding or caller-limit failure category.
+    kind: error_kind
+
+private func _error(kind: error_kind) -> error:
+    match kind:
+        error_kind.invalid_range:
+            return error(message = "Memory stream range is invalid", code = 1, kind = kind)
+        error_kind.unexpected_eof:
+            return error(message = "Memory stream ended before the exact read completed", code = 2, kind = kind)
+        error_kind.invalid_utf8:
+            return error(message = "Memory stream contains invalid UTF-8", code = 3, kind = kind)
+        error_kind.limit_exceeded:
+            return error(message = "Pascal string exceeds the caller's byte limit", code = 4, kind = kind)
+    return error(message = "Unknown memory stream error", kind = kind)
+
 private struct _state:
-    const bytes: [u8]
+    bytes: [u8]
     const position: i64
     const order: binary.byte_order
 
 
 ## An owned memory buffer with one shared cursor; aliases observe the same stream state.
-## Writes stage a complete replacement buffer before publication and cost O(buffer length).
+## Writes retain spare capacity and grow geometrically, with atomic contents and cursor publication.
 struct stream:
     private _state: _state
 
@@ -80,7 +98,7 @@ private func (self stream) _advance(count: i64):
 ## @return Ok with the new position, or Err(invalid_range) without changing the stream.
 func (self stream) seek(position: i64) -> result<i64, error>:
     if position < 0 or position > self.length:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     self._state = _state(bytes = self._state.bytes, position = position, order = self.order)
     return Ok(position)
@@ -94,13 +112,13 @@ func (self stream) to_bytes() -> [u8]:
 
 private func (self stream) _peek(count: i64, offset: i64 = 0) -> result<[u8], error>:
     if count < 0 or offset < 0:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     if offset > self.remaining:
-        return Err(error.unexpected_eof)
+        return Err(_error(error_kind.unexpected_eof))
 
     if count > self.remaining - offset:
-        return Err(error.unexpected_eof)
+        return Err(_error(error_kind.unexpected_eof))
 
     var first = self.position + offset
     return Ok(self._state.bytes[first..<first + count])
@@ -112,7 +130,7 @@ private func (self stream) _peek(count: i64, offset: i64 = 0) -> result<[u8], er
 ## @return Ok with independent bytes and matching cursor progress, or Err(invalid_range).
 func (self stream) read_bytes(max_count: i64) -> result<[u8], error>:
     if max_count < 0:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     var count = max_count
 
@@ -140,30 +158,22 @@ func (self stream) read_exact(count: i64) -> result<[u8], error>:
 
 
 ## Overwrite bytes at the cursor and extend the buffer when needed, preserving any existing tail.
-## Stages a complete copy before publishing; allocation failures preserve the old stream state.
+## Growth stages new storage; writes within capacity copy only input bytes.
+## Allocation failures preserve the old contents and cursor.
 ## @param bytes Readonly or mutable input bytes, copied without retaining caller storage.
 ## @return Ok with bytes written, or Err(invalid_range) if the resulting position cannot fit i64.
 func (self stream) write_bytes(const bytes: [u8]) -> result<i64, error>:
     var count = bytes.count
 
     if count > i64.max_value - self.position:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     if count == 0:
         return Ok(0)
 
-    var staged = self.to_bytes()
-    var position = self.position
-
-    for byte in bytes:
-        if position < staged.count:
-            staged[position] = byte
-        else:
-            staged.push(byte)
-
-        position += 1
-
-    self._state = _state(bytes = staged, position = position, order = self.order)
+    var next = _state(bytes = self._state.bytes, position = self.position + count, order = self.order)
+    _memory_write(self._state.bytes, bytes, self.position)
+    self._state = next
     return Ok(count)
 
 
@@ -178,7 +188,7 @@ func (self stream) read<t>() -> result<t, error>:
         self._advance(width)
         return Ok(value)
 
-    return Err(error.unexpected_eof)
+    return Err(_error(error_kind.unexpected_eof))
 
 
 ## Write one fixed-width number through encoding/binary in this stream's byte order.
@@ -195,7 +205,7 @@ private func (self stream) _text(count: i64, offset: i64 = 0) -> result<string, 
     if string.from_utf8(bytes) is Ok(var value):
         return Ok(value)
 
-    return Err(error.invalid_utf8)
+    return Err(_error(error_kind.invalid_utf8))
 
 
 ## Read an exact byte count as strict UTF-8; invalid or incomplete input does not move the cursor.
@@ -215,7 +225,7 @@ func (self stream) read_string(count: i64) -> result<string, error>:
 ## @return Ok with UTF-8 bytes written, or Err(invalid_range) for position overflow.
 func (self stream) write_string(value: string) -> result<i64, error>:
     if value.byte_length > i64.max_value - self.position:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     return self.write_bytes(value.to_utf8())
 
@@ -226,7 +236,7 @@ func (self stream) write_string(value: string) -> result<i64, error>:
 ## @return Ok with text, or Err(invalid_range/limit_exceeded/unexpected_eof/invalid_utf8) without progress.
 func (self stream) read_pascal_string(max_bytes: i64 = i64.max_value) -> result<string, error>:
     if max_bytes < 0:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     var prefix = self._peek(4)?
 
@@ -234,13 +244,13 @@ func (self stream) read_pascal_string(max_bytes: i64 = i64.max_value) -> result<
         var count = length as i64
 
         if count > max_bytes:
-            return Err(error.limit_exceeded)
+            return Err(_error(error_kind.limit_exceeded))
 
         var value = self._text(count, 4)?
         self._advance(4 + count)
         return Ok(value)
 
-    return Err(error.unexpected_eof)
+    return Err(_error(error_kind.unexpected_eof))
 
 
 ## Write a u32 UTF-8 byte-length prefix followed by raw payload in this stream's byte order.
@@ -249,12 +259,12 @@ func (self stream) read_pascal_string(max_bytes: i64 = i64.max_value) -> result<
 ## @return Ok with total bytes including the four-byte prefix, or Err(invalid_range) on width/position overflow.
 func (self stream) write_pascal_string(value: string) -> result<i64, error>:
     if value.byte_length > (u32.max_value as i64):
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     var wire_count = value.byte_length + 4
 
     if wire_count > i64.max_value - self.position:
-        return Err(error.invalid_range)
+        return Err(_error(error_kind.invalid_range))
 
     var payload = value.to_utf8()
     var framed = binary.encode(value.byte_length as u32, self.order)

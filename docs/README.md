@@ -1,5 +1,15 @@
 # VOID documentation
 
+## Combined standard-library sprint — 26 October 2026
+
+Boss authorized the error hierarchy, console completeness, convert module and
+measured memory-write optimization as one scope, including the reported VOIDLS
+constant-completion crash repair. The [current contract](combined/CONTRACT.md),
+[implementation handoff](combined/IMPLEMENTATION.md) and [concise local receipt](combined/evidence/RECEIPT.md)
+supersede earlier binary/memory source protection and copy-cost statements for
+this sprint. Prior lock evidence remains historical. No hosted CI or Git mutation
+is authorized; Golden Wrench review remains the next gate.
+
 ## Standard-library Sprint 2 — io/memory, 26 October 2026
 
 Boss authorized the complete memory-stream slice after independent Wrench source

@@ -1257,6 +1257,88 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     for(unsigned k=6;k<8;++k)b.CreateStore(b.CreateLoad(b.getInt64Ty(),b.CreateInBoundsGEP(words_type,words,{b.getInt32(0),b.getInt32(k)})),b.CreateStructGEP(type(instruction.type),storage,k+2));
                     v=b.CreateLoad(type(instruction.type),storage);break;
                 }
+                case Op::result_unwrap: {
+                    auto input = values[instruction.a];
+                    fail_if(b.CreateICmpNE(b.CreateExtractValue(input, 0), b.getInt32(0)),
+                            "convert.unwrap received Err; inspect the result or use unwrap_or");
+                    v = b.CreateExtractValue(input, 1);
+                    break;
+                }
+                case Op::scalar_parse: {
+                    auto value_type = ir::field_type(instruction.type, 1);
+                    const bool enumeration = value_type.kind == ir::Type::aggregate;
+                    const auto count = enumeration ? value_type.definition->cases.size() : 0;
+                    auto* cases_type = llvm::ArrayType::get(b.getPtrTy(), count);
+                    std::vector<llvm::Constant*> cases;
+                    if (enumeration) {
+                        for (const auto& variant : value_type.definition->cases) {
+                            cases.push_back(b.CreateGlobalStringPtr(value_type.definition->identity + "." + variant.name));
+                        }
+                    }
+                    auto* names = new llvm::GlobalVariable(*module, cases_type, true,
+                        llvm::GlobalValue::PrivateLinkage, llvm::ConstantArray::get(cases_type, cases),
+                        "convert.enum_cases");
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                    auto* word = home(allocations.CreateAlloca(b.getInt64Ty()),
+                                      StorageRole::known_abi, llvm_backend::HomeKind::value);
+                    b.CreateStore(b.getInt64(0), word);
+                    auto* rejected = b.CreateCall(module->getOrInsertFunction("vd_convert_parse",
+                        b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), b.getInt32Ty(),
+                        b.getPtrTy(), size_type, b.getPtrTy()),
+                        {word, values[instruction.a], b.getInt32(enumeration ? 11 : scalar_encoding(value_type)),
+                         names, llvm::ConstantInt::get(size_type, count), failure});
+                    array_failure();
+                    auto* raw = b.CreateLoad(b.getInt64Ty(), word);
+                    llvm::Value* parsed;
+                    if (enumeration) {
+                        parsed = b.CreateInsertValue(llvm::Constant::getNullValue(type(value_type)),
+                                                     b.CreateTrunc(raw, b.getInt32Ty()), 0);
+                    } else if (numeric::floating(value_type)) {
+                        parsed = b.CreateBitCast(b.CreateZExtOrTrunc(raw,
+                            b.getIntNTy(numeric::width(value_type))), type(value_type));
+                    } else {
+                        parsed = b.CreateZExtOrTrunc(raw, type(value_type));
+                    }
+                    auto* valid = b.CreateICmpEQ(rejected, b.getInt32(0));
+                    v = llvm::Constant::getNullValue(type(instruction.type));
+                    v = b.CreateInsertValue(v, b.CreateSelect(valid, b.getInt32(0), b.getInt32(1)), 0);
+                    v = b.CreateInsertValue(v, b.CreateSelect(valid, parsed,
+                        llvm::Constant::getNullValue(type(value_type))), 1);
+                    v = b.CreateInsertValue(v, rejected, 2);
+                    break;
+                }
+                case Op::memory_write: {
+                    b.CreateCall(module->getOrInsertFunction("vd_list_write_bytes", b.getVoidTy(),
+                        b.getPtrTy(), b.getPtrTy(), b.getInt64Ty(), b.getPtrTy()),
+                        {value_roots[n].at(instruction.arguments[0]),
+                         value_roots[n].at(instruction.arguments[1]),
+                         values[instruction.arguments[2]], failure});
+                    array_failure();
+                    v = llvm::UndefValue::get(b.getInt8Ty());
+                    break;
+                }
+                case Op::temporal_result: {
+                    auto input = values[instruction.a];
+                    auto* storage = value_roots[n].at(values.size());
+                    b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)), storage);
+                    auto* rejected = llvm::BasicBlock::Create(context, "temporal.error_text", fn);
+                    auto* ready = llvm::BasicBlock::Create(context, "temporal.display_ready", fn);
+                    auto* tag = b.CreateExtractValue(input, 0);
+                    b.CreateStore(tag, b.CreateStructGEP(type(instruction.type), storage, 0));
+                    b.CreateStore(b.CreateExtractValue(input, 1),
+                                  b.CreateStructGEP(type(instruction.type), storage, 1));
+                    b.CreateCondBr(b.CreateICmpEQ(tag, b.getInt32(0)), ready, rejected);
+                    b.SetInsertPoint(rejected);
+                    auto* reason = b.CreateExtractValue(input, 2);
+                    fail_if(b.CreateIsNull(reason), "Invalid temporal error payload");
+                    auto error_type = ir::field_type(operand_type(instruction.a), 2);
+                    auto* message = b.CreateLoad(b.getPtrTy(), field_address(error_type, reason, 0));
+                    b.CreateStore(message, b.CreateStructGEP(type(instruction.type), storage, 2));
+                    b.CreateBr(ready);
+                    b.SetInsertPoint(ready);
+                    v = b.CreateLoad(type(instruction.type), storage);
+                    break;
+                }
                 case Op::temporal_native: {
                     const auto& contract=temporal::operations.at(instruction.immediate);
                     auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
@@ -1663,6 +1745,8 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_value_array_insert",vd_value_array_insert);bind("vd_value_array_clear",vd_value_array_clear);bind("vd_value_array_slice",vd_value_array_slice);
     bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
+    bind("vd_convert_parse", vd_convert_parse);
+    bind("vd_list_write_bytes", vd_list_write_bytes);
     bind("vd_list_read",vd_list_read);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
     bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_construct_typed",vd_gc_construct_typed);

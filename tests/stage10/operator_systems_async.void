@@ -4,8 +4,12 @@ func work(input: i32) -> result<string, string>:
     var total = library.quantity<i32>(value = input)
     total += 7
     total %= 5
-    var day = make_date(2024, 2, 29)?
-    return Ok("{total:000}/{day:yyyy-MM-dd}")
+    var requested = make_date(2024, 2, 29)
+    if requested is Err(var reason):
+        return Err(reason.message)
+    if requested is Ok(var day):
+        return Ok("{total:000}/{day:yyyy-MM-dd}")
+    return Err("Invalid temporal result")
 async func rhs(value: i32) -> i32:
     if make_date(2024, 2, 29) is Ok(var day):
         var text = "{day:yyyy-MM-dd}:{value:000}"

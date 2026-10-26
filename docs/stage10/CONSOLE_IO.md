@@ -1,3 +1,9 @@
+> **26 October 2026 combined standard-library update:** `io_error` is now a
+> managed subtype of `error.error`, retaining every module-specific/native field.
+> Ordinary source `readline`/`read` convenience uses the same queue and checked
+> endpoints. [Current additions and preserved surface](../combined/CONTRACT.md#console).
+> Original Stage 10 evidence below remains historical.
+
 # Stage 10 console and terminal contract
 
 ## Current acceptance checkpoint — 24 October 2026

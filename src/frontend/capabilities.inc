@@ -198,7 +198,16 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.kind==K::awaited || e.kind==K::task_cancel || e.kind==K::function_call || e.asynchronous_call || e.interface_call || !e.virtual_slot.empty())edges.unsafe=true;
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
             if(e.target.starts_with("$time.") && temporal::operations.at(std::stoul(e.target.substr(6))).clock)edges.unsafe=true;
-            if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$collection.") && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.") && !e.target.starts_with("$time.") && !e.target.starts_with("$layout.") && !e.target.starts_with("$display.") && e.target!="$interpolation" && e.target!="$hole")edges.unsafe=true;
+            const bool intrinsic = e.target.starts_with("$collection.") ||
+                e.target.starts_with("$array.") || e.target.starts_with("$dict.") ||
+                e.target.starts_with("$convert.") || e.target == "$temporal.result" ||
+                e.target.starts_with("$time.") || e.target.starts_with("$layout.") ||
+                e.target.starts_with("$display.") || e.target == "$interpolation" ||
+                e.target == "$hole";
+            if ((e.kind == K::call || e.kind == K::method_call) &&
+                !functions.contains(e.target) && !intrinsic) {
+                edges.unsafe = true;
+            }
             auto view=ir::reference_facts(e.type);
             if(e.kind==K::spawned)frontend_case([&] {auto result=expression(*e.parts[0]);view=ir::replaced_facts(view,1,result);
             }); else if(e.kind==K::awaited)frontend_case([&] {
@@ -264,6 +273,17 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             else if (e.kind==K::call || e.kind==K::method_call) frontend_case([&] {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
+                if (e.target == "$convert.unwrap") {
+                    view = ir::field_facts(e.parts[0]->type, arguments[0], 1);
+                }
+                if (e.target == "$memory.write") {
+                    if (auto leaf = arguments[0].find({}); leaf != arguments[0].end()) {
+                        effect(f.reference_effects.mutations, leaf->second);
+                        if (report && leaf->second.readonly) {
+                            issue(e.token, "Cannot write through readonly memory buffer authority.");
+                        }
+                    }
+                }
                 if(e.target.starts_with("$safe.")){
                     auto child=ir::field_facts(e.parts[0]->type,arguments[0],ir::array_element_path);
                     if(e.parts[0]->type.kind==Type::dictionary)child=ir::field_facts(ir::array_element(e.parts[0]->type),child,1);
@@ -525,7 +545,15 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             catch(const CompilationError& failure){diagnostics.add(failure);}
         }
         if(f.receiver && !f.interface_requirement && (f.token.text=="string" || f.token.text=="format")) {
-            bool signature=f.token.text=="string" ? f.parameters.empty() && f.result==Type::string : f.parameters.size()==1 && f.parameters[0].type==Type::string && f.result.definition && f.result.definition->result_type && ir::field_type(f.result,1)==Type::string && ir::field_type(f.result,2)==Type::string;
+            const bool temporal_error = u->identity == "/@stdlib/time.void" &&
+                f.result.definition && f.result.definition->result_type &&
+                Type::key(ir::field_type(f.result, 2)) == "/@stdlib/time.void::error";
+            const bool signature = f.token.text == "string" ?
+                f.parameters.empty() && f.result == Type::string :
+                f.parameters.size() == 1 && f.parameters[0].type == Type::string &&
+                f.result.definition && f.result.definition->result_type &&
+                ir::field_type(f.result, 1) == Type::string &&
+                (ir::field_type(f.result, 2) == Type::string || temporal_error);
             bool mutating=f.receiver_mutates;
             for(const auto* effects:{&f.reference_effects.mutations,&f.reference_effects.required_mutable})for(const auto& origin:*effects)mutating|=origin.parameter==0;
             if(!signature || f.asynchronous || mutating)try{error(u->source,f.token,Code::readonly,"A display hook must have an exact synchronous string/format signature and a nonmutating readonly receiver.");}catch(const CompilationError& failure){diagnostics.add(failure);}

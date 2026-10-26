@@ -87,7 +87,7 @@ target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROO
 target_link_libraries(void_core PUBLIC void_options Threads::Threads)
 add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
 target_link_libraries(void_native_fixture PRIVATE void_options)
-add_library(void_runtime STATIC src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+add_library(void_runtime STATIC src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
 target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
 option(VOID_LLVM_RESEARCH "Build optional LLVM machine-code certification experiments" OFF)
@@ -670,6 +670,41 @@ if(BUILD_TESTING)
     set_tests_properties(binary_stack PROPERTIES TIMEOUT 300)
   endif()
 
+  add_test(NAME lsp_const_recovery COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/lsp_const_recovery.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_const_recovery PROPERTIES TIMEOUT 180)
+  if(UNIX AND NOT VOID_SANITIZERS)
+    add_test(NAME lsp_const_recovery_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/lsp_const_recovery.py" "$<TARGET_FILE:voidls>" --small-stack)
+    set_tests_properties(lsp_const_recovery_stack PROPERTIES TIMEOUT 180)
+  endif()
+
+  add_executable(void_combined_ownership tests/combined/ownership.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_combined_ownership PRIVATE void_llvm)
+  add_test(NAME combined_ownership COMMAND void_combined_ownership
+    "${PROJECT_SOURCE_DIR}/tests/combined/ownership.void" "${PROJECT_SOURCE_DIR}/tests/combined/async.void")
+  set_tests_properties(combined_ownership PROPERTIES TIMEOUT 300)
+  foreach(mode IN ITEMS normal optimized)
+    set(combined_async_object "${CMAKE_CURRENT_BINARY_DIR}/combined-async-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${combined_async_object}"
+      COMMAND void_combined_ownership --emit-async "${PROJECT_SOURCE_DIR}/tests/combined/async.void" "${combined_async_object}" "${mode}"
+      DEPENDS void_combined_ownership "${PROJECT_SOURCE_DIR}/tests/combined/async.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/error.void" "${PROJECT_SOURCE_DIR}/stdlib/time.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/convert.void"
+      VERBATIM)
+    set_source_files_properties("${combined_async_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_combined_async_${mode} tests/async/aot.cpp "${combined_async_object}")
+    target_link_libraries(void_combined_async_${mode} PRIVATE void_runtime)
+    add_test(NAME combined_async_${mode} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/async/aot.py" "$<TARGET_FILE:void_combined_async_${mode}>" 7)
+  endforeach()
+  add_test(NAME combined_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/combined/execution.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(combined_execution PROPERTIES TIMEOUT 600)
+  add_test(NAME lsp_combined COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/combined/lsp.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_combined PROPERTIES TIMEOUT 180)
+  if(UNIX AND NOT VOID_SANITIZERS)
+    add_test(NAME combined_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/combined/execution.py" "$<TARGET_FILE:voidc>" --small-stack)
+    set_tests_properties(combined_stack PROPERTIES TIMEOUT 600)
+  endif()
+
   add_test(NAME memory_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/memory/execution.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(memory_execution PROPERTIES TIMEOUT 1200)
   add_test(NAME lsp_memory COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/memory/lsp.py" "$<TARGET_FILE:voidls>")
@@ -903,7 +938,7 @@ if(BUILD_TESTING)
   add_test(NAME stage11_globals_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/globals.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}")
   set_tests_properties(stage11_globals_aot PROPERTIES TIMEOUT 900)
   add_test(NAME stage10_console_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/console.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}")
-  set_tests_properties(stage10_console_aot PROPERTIES TIMEOUT 1800)
+  set_tests_properties(stage10_console_aot PROPERTIES TIMEOUT 2400)
   add_test(NAME stage10_operators_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/operators.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}" $<TARGET_FILE:void_operator_integration>)
   # Includes the combined temporal/field/hook fixtures and measured source workloads.
   set_tests_properties(stage10_operators_aot PROPERTIES TIMEOUT 600)

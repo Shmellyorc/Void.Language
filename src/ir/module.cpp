@@ -1049,6 +1049,69 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     for(unsigned n=0;n<10;++n){auto t=field_type(i.type,n);if(n==7){if(t.kind!=Type::growable_array || array_element(t)!=Type::u8 || t.readonly || !readonly_paths(t).empty())fail("invalid console reply bytes");}else if(t!=(n<5 || n>=8?Type(Type::i64):n==5?Type(Type::boolean):Type(Type::string)))fail("invalid console reply field");}
                     result=i.type;break;
                 }
+                case Op::result_unwrap: {
+                    auto input = operand(i.a);
+                    if (!m.coordinated || f.module_identity != "/@stdlib/convert.void" ||
+                        !input.definition || !input.definition->result_type ||
+                        i.type != field_type(input, 1) || i.b || i.immediate || i.receiver ||
+                        !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) {
+                        fail("invalid checked result extraction");
+                    }
+                    result = i.type;
+                    break;
+                }
+                case Op::scalar_parse: {
+                    valid_type(i.type);
+                    if (!m.coordinated || f.module_identity != "/@stdlib/convert.void" ||
+                        operand(i.a) != Type::string || !i.type.definition ||
+                        !i.type.definition->result_type || field_type(i.type, 2) != Type::i32 ||
+                        i.b || i.immediate || i.receiver || !i.arguments.empty() ||
+                        !i.callee.empty() || i.initialization || i.array_repeat) {
+                        fail("invalid scalar parse");
+                    }
+                    auto value = field_type(i.type, 1);
+                    const bool enumeration = value.kind == Type::aggregate && value.definition &&
+                        !value.nullable && !value.definition->cases.empty() &&
+                        !value.definition->result_type &&
+                        std::all_of(value.definition->cases.begin(), value.definition->cases.end(),
+                                    [](const auto& variant) { return variant.count == 0; });
+                    if (!numeric::number(value) && value != Type::boolean && !enumeration) {
+                        fail("unsupported scalar parse type");
+                    }
+                    result = i.type;
+                    break;
+                }
+                case Op::memory_write: {
+                    if (!m.coordinated || f.module_identity != "/@stdlib/io/memory.void" ||
+                        i.a || i.b || i.immediate || i.receiver || !i.callee.empty() ||
+                        i.initialization || i.array_repeat || i.arguments.size() != 3 || i.type != Type::none) {
+                        fail("invalid private memory write");
+                    }
+                    for (unsigned n = 0; n < 2; ++n) {
+                        auto bytes = operand(i.arguments[n]);
+                        if (bytes.kind != Type::growable_array || array_element(bytes) != Type::u8 ||
+                            (n == 0 && (bytes.readonly || !readonly_paths(bytes).empty()))) {
+                            fail("invalid memory byte buffer");
+                        }
+                    }
+                    expect(i.arguments[2], Type::i64);
+                    result = Type::none;
+                    break;
+                }
+                case Op::temporal_result: {
+                    auto input = operand(i.a);
+                    valid_type(i.type);
+                    if (!m.coordinated || !input.definition || !input.definition->result_type ||
+                        field_type(input, 1) != Type::string ||
+                        Type::key(field_type(input, 2)) != "/@stdlib/time.void::error" ||
+                        !i.type.definition || !i.type.definition->result_type ||
+                        field_type(i.type, 1) != Type::string || field_type(i.type, 2) != Type::string ||
+                        i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty()) {
+                        fail("invalid temporal display bridge");
+                    }
+                    result = i.type;
+                    break;
+                }
                 case Op::temporal_native: {
                     if(!m.coordinated || i.a || i.b || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=temporal::operations.size() || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid temporal operation");
                     const auto& contract=temporal::operations.at(i.immediate);
@@ -1271,7 +1334,15 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     auto* inferred=verified_effects?verified_effects:&worker_effects;
     validate_reference_capabilities(m,qualified_types,inferred);
     for(const auto& hook:m.functions)if(hook.receiver && (hook.method_name=="string" || hook.method_name=="format")) {
-        bool signature=hook.method_name=="string"?hook.parameters.size()==1 && hook.result==Type::string:hook.parameters.size()==2 && hook.parameters[1]==Type::string && hook.result.definition && hook.result.definition->result_type && field_type(hook.result,1)==Type::string && field_type(hook.result,2)==Type::string;
+        const bool temporal_error = hook.module_identity == "/@stdlib/time.void" &&
+            hook.result.definition && hook.result.definition->result_type &&
+            Type::key(field_type(hook.result, 2)) == "/@stdlib/time.void::error";
+        const bool signature = hook.method_name == "string" ?
+            hook.parameters.size() == 1 && hook.result == Type::string :
+            hook.parameters.size() == 2 && hook.parameters[1] == Type::string &&
+            hook.result.definition && hook.result.definition->result_type &&
+            field_type(hook.result, 1) == Type::string &&
+            (field_type(hook.result, 2) == Type::string || temporal_error);
         if(!m.coordinated || !signature || hook.asynchronous || hook.receiver_mutates || hook.parameters[0].construction)fail("invalid display hook contract");
         const auto& effects=inferred->at(hook.name);
         for(const auto* set:{&effects.mutations,&effects.required_mutable})for(const auto& origin:*set)if(origin.parameter==0)fail("display hook requires mutable receiver authority");

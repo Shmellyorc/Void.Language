@@ -94,6 +94,13 @@ void vd_array_write(void** source,std::uint64_t index,std::uint64_t bits,unsigne
 }
 
 extern "C" {
+void vd_list_write_bytes(void** destination, void** input, std::uint64_t position,
+                         vd::RuntimeFailure* failure) noexcept {
+    checked(failure, [&] {
+        auto& runtime = vd::Runtime::current();
+        runtime.list_write_bytes(runtime.root_word(destination), runtime.root_word(input), position);
+    });
+}
 void vd_list_new(void** out,unsigned encoding,std::uint64_t count,vd::RuntimeFailure* failure) noexcept {
     checked(failure,[&]{vd::Runtime::current().list_into(out,static_cast<vd::ScalarEncoding>(encoding),count);});
 }

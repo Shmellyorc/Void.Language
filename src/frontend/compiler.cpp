@@ -2093,7 +2093,18 @@ class Semantics {
         if (e.kind == K::conversion) return e.type;
         if (e.kind == K::global) return e.type;
         if (e.kind == K::name) {
-            if (auto [owner, value] = global(e); value) { if (value->type == Type::none) owner->resolve_global(*value); return value->type; }
+            if (auto [owner, value] = global(e); value) {
+                // Pure expressions cannot read runtime globals. In particular,
+                // a type hint must not start runtime initializer analysis while
+                // declaration layouts and constant defaults are being prepared.
+                if (value->type == Type::none) {
+                    if (!current) {
+                        return {};
+                    }
+                    owner->resolve_global(*value);
+                }
+                return value->type;
+            }
             if (auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr) return v->type;
             auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
             return {};
@@ -2134,6 +2145,9 @@ class Semantics {
             return concrete_function(e,resolve(e)).result;
         }
         if (e.kind == K::field) {
+            if (auto [owner, declaration] = enum_declaration(e); declaration) {
+                return Type(declaration->definition);
+            }
             if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
             const auto& operand = *e.parts[0];
             if (operand.kind == K::name && !lookup(operand.token.text) && unit.qualifiers.contains(operand.token.text)) {
@@ -2311,7 +2325,26 @@ class Semantics {
             for(const auto& name:names) {
                 if(!valid_editor_identifier(name) || candidates.contains(name)) continue;
                 Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
-                try { auto [owner, value] = global(test); if (value) { if (value->type == Type::none) owner->resolve_global(*value); if (auto* candidate = add(name, value->type, 6)) candidate->documentation = source_documentation(owner->source, value->token.offset).text(); continue; } } catch (const CompilationError&) {} catch (const Poison&) {}
+                try {
+                    auto [owner, value] = global(test);
+                    if (value) {
+                        // Completion follows the same pure/runtime boundary as
+                        // name_expression, without inferring illegal candidates.
+                        if (!current) {
+                            continue;
+                        }
+                        if (value->type == Type::none) {
+                            owner->resolve_global(*value);
+                        }
+                        if (auto* candidate = add(name, value->type, 6)) {
+                            candidate->documentation = source_documentation(
+                                owner->source, value->token.offset).text();
+                        }
+                        continue;
+                    }
+                } catch (const CompilationError&) {
+                } catch (const Poison&) {
+                }
                 try {
                     const auto& function = resolve(test);
                     auto result = function.result;
@@ -2410,7 +2443,11 @@ class Semantics {
         auto type=expression(*e.parts[0]);
         if(current && current->deferred)error(source,e.token,Code::invalid_value,"? cannot propagate out of deferred code.");
         if(!current || !type.definition || !type.definition->result_type || !current->result.definition || !current->result.definition->result_type)error(source,e.token,Code::type_mismatch,"? requires a result value in a result-returning function.");
-        expect(ir::field_type(type,2),ir::field_type(current->result,2),e.token);return e.type=ir::field_type(type,1);
+        if (ir::field_type(type, 2) != ir::field_type(current->result, 2)) {
+            error(source, e.token, Code::type_mismatch,
+                  "Result propagation requires exactly matching error types.");
+        }
+        return e.type = ir::field_type(type, 1);
     }
 #include "pattern_semantics.inc"
     VOID_SEMANTIC_HANDLER Type lambda_expression(Expr& e) {
@@ -2518,13 +2555,31 @@ class Semantics {
         e.source_target=target.symbol;
         return sum_expression(e,*expected,e.token.text=="Ok"?0:1,0);
     }
+    std::pair<Unit*, Structure*> enum_declaration(Expr& e) {
+        auto& base = *e.parts[0];
+        std::string spelling;
+        if (base.kind == Expr::Kind::name && !lookup(base.token.text)) {
+            spelling = base.token.text;
+        } else if (base.kind == Expr::Kind::field &&
+                   base.parts[0]->kind == Expr::Kind::name &&
+                   unit.qualifiers.contains(base.parts[0]->token.text)) {
+            spelling = base.parts[0]->token.text + "." + base.token.text;
+        }
+        if (spelling.empty()) {
+            return {};
+        }
+        auto selected = structure_lookup(unit, root, units, spelling, base.token);
+        if (!selected.second || selected.second->definition->cases.empty()) {
+            return {};
+        }
+        return selected;
+    }
+
     std::optional<Type> enum_expression(Expr& e,bool call) {
-        auto& base=*e.parts[0];std::string spelling;
-        if(base.kind==Expr::Kind::name && !lookup(base.token.text))spelling=base.token.text;
-        else if(base.kind==Expr::Kind::field && base.parts[0]->kind==Expr::Kind::name && unit.qualifiers.contains(base.parts[0]->token.text))spelling=base.parts[0]->token.text+"."+base.token.text;
-        if(spelling.empty())return {};
-        auto [owner,structure]=structure_lookup(unit,root,units,spelling,base.token);
-        if(!structure || structure->definition->cases.empty())return {};
+        auto [owner, structure] = enum_declaration(e);
+        if (!structure) {
+            return {};
+        }
         const auto& variants=structure->definition->cases;
         if(editor_cursor(e)) {
             auto& out=diagnostics.editor->result;
@@ -2873,8 +2928,47 @@ class Semantics {
         return e.type=call_arguments(e,target,0);
     }
 #include "binary_codec.inc"
+#include "stdlib_conversion.inc"
 
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (unit.identity == "/@stdlib/convert.void" && e.qualifier.empty() &&
+            (e.token.text == "_convert_parse" || e.token.text == "_convert_unwrap")) {
+            return conversion_call(e);
+        }
+
+        if (e.target == "$memory.write" || e.target == "$temporal.result") {
+            return e.type;
+        }
+
+        if (unit.identity == "/@stdlib/io/memory.void" && e.qualifier.empty() &&
+            e.token.text == "_memory_write") {
+            Function target;
+            target.token = e.token;
+            target.symbol = "$memory.write";
+            target.result = Type::none;
+            auto bytes = byte_list();
+            target.parameters.push_back({Token{TokenKind::name, "buffer", e.token.offset}, bytes});
+            target.parameters.push_back({Token{TokenKind::name, "bytes", e.token.offset}, ir::readonly_view(bytes)});
+            target.parameters.push_back({Token{TokenKind::name, "position", e.token.offset}, Type::i64});
+            e.target = target.symbol;
+            return e.type = call_arguments(e, target, 0);
+        }
+
+        if ((unit.identity == "/@stdlib/time.void" || (current && current->display_adapter)) &&
+            (e.token.text == "$temporal_result" || e.token.text == "_temporal_result")) {
+            if (e.parts.size() != 1) {
+                error(source, e.token, Code::argument_count, "Temporal display needs one result.");
+            }
+            auto value = expression(*e.parts[0]);
+            if (!value.definition || !value.definition->result_type ||
+                ir::field_type(value, 1) != Type::string ||
+                Type::key(ir::field_type(value, 2)) != "/@stdlib/time.void::error") {
+                error(source, e.token, Code::type_mismatch, "Invalid temporal display result.");
+            }
+            e.target = "$temporal.result";
+            return e.type = unit.make_result(Type::string, Type::string);
+        }
+
         if (unit.identity == "/@stdlib/encoding/binary.void" && e.qualifier.empty() &&
             (e.token.text == "_binary_width" || e.token.text == "_binary_bits" ||
              e.token.text == "_binary_value")) {
@@ -3626,10 +3720,70 @@ class Lowering {
         if(i.receiver && cells.contains(i.receiver->slot)) {
             i.receiver->slot=cells.at(i.receiver->slot);i.receiver->fields.insert(i.receiver->fields.begin(),0);
         }
-        if(i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::dict_new || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format)module.coordinated=true;
+        const bool coordinated_operation =
+            i.op == ir::Op::collection_enter ||
+            i.op == ir::Op::collection_leave ||
+            i.op == ir::Op::collection_append ||
+            i.op == ir::Op::collection_finish ||
+            i.op == ir::Op::console_native ||
+            i.op == ir::Op::console_print ||
+            i.op == ir::Op::dict_new ||
+            i.op == ir::Op::string_join ||
+            i.op == ir::Op::format_unwrap ||
+            i.op == ir::Op::format_layout ||
+            i.op == ir::Op::memory_write ||
+            i.op == ir::Op::temporal_result ||
+            i.op == ir::Op::scalar_parse ||
+            i.op == ir::Op::result_unwrap ||
+            i.op == ir::Op::temporal_native ||
+            i.op == ir::Op::scalar_display ||
+            i.op == ir::Op::scalar_format;
+        if (coordinated_operation) {
+            module.coordinated = true;
+        }
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::global_cell || i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave || i.op==ir::Op::collection_append || i.op==ir::Op::collection_finish || i.op==ir::Op::console_native || i.op==ir::Op::console_print || i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (coordinated_operation ||
+            i.op == ir::Op::global_cell ||
+            i.op == ir::Op::function_call ||
+            i.op == ir::Op::panic ||
+            i.op == ir::Op::pattern_equal ||
+            i.op == ir::Op::type_cast ||
+            i.op == ir::Op::sum_get ||
+            i.op == ir::Op::dict_get ||
+            i.op == ir::Op::dict_set ||
+            i.op == ir::Op::dict_contains ||
+            i.op == ir::Op::dict_remove ||
+            i.op == ir::Op::dict_clear ||
+            i.op == ir::Op::dict_entry ||
+            i.op == ir::Op::dict_check ||
+            i.op == ir::Op::array_slice ||
+            i.op == ir::Op::list_insert ||
+            i.op == ir::Op::list_clear ||
+            i.op == ir::Op::list_push ||
+            i.op == ir::Op::list_remove ||
+            i.op == ir::Op::list_index ||
+            i.op == ir::Op::list_commit ||
+            i.op == ir::Op::array_get ||
+            i.op == ir::Op::array_set ||
+            i.op == ir::Op::string_count ||
+            i.op == ir::Op::string_index ||
+            i.op == ir::Op::string_encode ||
+            i.op == ir::Op::string_decode ||
+            i.op == ir::Op::string_literal ||
+            i.op == ir::Op::string_concat ||
+            i.op == ir::Op::string_equal ||
+            i.op == ir::Op::call ||
+            i.op == ir::Op::interface_pack ||
+            i.op == ir::Op::interface_prepare ||
+            i.op == ir::Op::interface_call ||
+            i.op == ir::Op::divide ||
+            i.op == ir::Op::remainder ||
+            i.op == ir::Op::convert ||
+            i.op == ir::Op::gc_construct ||
+            i.op == ir::Op::gc_read ||
+            i.op == ir::Op::gc_write) {
             i.source_excerpt = source.excerpt(token.offset);
+        }
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
     }
@@ -4072,6 +4226,28 @@ class Lowering {
                 ir::Instruction number{ir::Op::bitcast, value};
                 number.type = numeric_type;
                 return emit(number, e.token);
+            }
+
+            if (e.target == "$convert.parse" || e.target == "$convert.unwrap") {
+                ir::Instruction operation{e.target == "$convert.parse" ?
+                    ir::Op::scalar_parse : ir::Op::result_unwrap, expression(*e.parts[0])};
+                operation.type = e.type;
+                return emit(operation, e.token);
+            }
+
+            if (e.target == "$memory.write") {
+                ir::Instruction operation{ir::Op::memory_write};
+                operation.type = Type::none;
+                for (auto& part : e.parts) {
+                    operation.arguments.push_back(expression(*part));
+                }
+                return emit(operation, e.token);
+            }
+
+            if (e.target == "$temporal.result") {
+                ir::Instruction operation{ir::Op::temporal_result, expression(*e.parts[0])};
+                operation.type = e.type;
+                return emit(operation, e.token);
             }
 
             if(e.target.starts_with("$time.")) {
@@ -5212,6 +5388,40 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             preparing_relationships=false;
         }catch(...){preparing_relationships=false;throw;}
     };
+    // Install every unit's lazy resolver before any semantic declaration pass
+    // can discover a global. Actual initializer evaluation keeps its later phase,
+    // after layouts, headers, constants and defaults have been prepared.
+    for (auto& [id, owner] : units) {
+        owner->resolve_global = [&, u = owner.get()](Global& value) {
+            if (value.state == 2) {
+                return;
+            }
+            if (value.state == 1) {
+                if (value.type != Type::none) {
+                    return;
+                }
+                error(u->source, value.token, Code::initializer,
+                      "Global type inference cycle requires an explicit type annotation.");
+            }
+            if (value.state == 3) {
+                throw Poison{};
+            }
+            Depth guard(diagnostics.semantic_depth(), u->source, value.token, 128);
+            value.state = 1;
+            try {
+                if (value.initializer->body.front().annotation) {
+                    value.type = resolve_type(*value.initializer->body.front().annotation,
+                                              *u, root, units, value.token);
+                }
+                Semantics(*u, units, root, evaluate, diagnostics, defaults).analyze_global(value);
+                value.cell = u->make_capture_record(value.identity + "::$global_cell", value.type, true);
+                value.state = 2;
+            } catch (...) {
+                value.state = 3;
+                throw;
+            }
+        };
+    }
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         try { layout(*unit,structure); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -5253,22 +5463,6 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const CompilationError& failure) { diagnostics.add(failure); value.state = 3; }
         catch (const Poison&) { value.state = 3; }
     }
-    for (auto& [id, owner] : units) owner->resolve_global = [&, u = owner.get()](Global& value) {
-        if (value.state == 2) return;
-        if (value.state == 1) {
-            if (value.type != Type::none) return;
-            error(u->source, value.token, Code::initializer, "Global type inference cycle requires an explicit type annotation.");
-        }
-        if (value.state == 3) throw Poison{};
-        Depth guard(diagnostics.semantic_depth(), u->source, value.token, 128);
-        value.state = 1;
-        try {
-            if (value.initializer->body.front().annotation) value.type = resolve_type(*value.initializer->body.front().annotation, *u, root, units, value.token);
-            Semantics(*u, units, root, evaluate, diagnostics, defaults).analyze_global(value);
-            value.cell = u->make_capture_record(value.identity + "::$global_cell", value.type, true);
-            value.state = 2;
-        } catch (...) { value.state = 3; throw; }
-    };
     for (auto& [id, owner] : units) for (auto& value : owner->globals) {
         try { owner->resolve_global(value); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }

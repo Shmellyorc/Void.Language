@@ -2,18 +2,22 @@ use "operator_systems.void" as library
 use time
 func repeated(count: i32) -> result<i32, string>:
     var item = library.quantity<i32>(value = 42)
-    var day = make_date(2024, 2, 29)?
-    var total = 0
-    var last = ""
-    for index in 0..<count:
-        var text = "{item}|{item:0000}|{day:yyyy-MM-dd}|{index:00000}"
-        if text.length != 27:
-            return Err("record length")
-        total += text.length as i32
-        last = text
-    if count > 0 and last != "q:042|0042|2024-02-29|{count - 1:00000}":
-        return Err("last record")
-    return Ok(total)
+    var requested = make_date(2024, 2, 29)
+    if requested is Err(var reason):
+        return Err(reason.message)
+    if requested is Ok(var day):
+        var total = 0
+        var last = ""
+        for index in 0..<count:
+            var text = "{item}|{item:0000}|{day:yyyy-MM-dd}|{index:00000}"
+            if text.length != 27:
+                return Err("record length")
+            total += text.length as i32
+            last = text
+        if count > 0 and last != "q:042|0042|2024-02-29|{count - 1:00000}":
+            return Err("last record")
+        return Ok(total)
+    return Err("Invalid temporal result")
 func padded(precision: i32) -> result<i32, string>:
     var spec = "F{precision}"
     var text = format(42 as u64, spec)?

@@ -80,7 +80,7 @@ private func pattern<t>(const expected: [u8], order: binary.byte_order) -> bool:
         var short = memory.stream(expected[0..<expected.count - 1], order)
 
         if short.read<t>() is Err(var reason):
-            return (reason is memory.error.unexpected_eof) and short.position == 0
+            return (reason.kind is memory.error_kind.unexpected_eof) and short.position == 0
 
     return false
 
@@ -189,9 +189,9 @@ private func bytes(outcome: result<[u8], memory.error>, const expected: [u8]) ->
 private func failed<t>(outcome: result<t, memory.error>, eof: bool = false) -> bool:
     if outcome is Err(var reason):
         if eof:
-            return reason is memory.error.unexpected_eof
+            return reason.kind is memory.error_kind.unexpected_eof
 
-        return reason is memory.error.invalid_range
+        return reason.kind is memory.error_kind.invalid_range
 
     return false
 

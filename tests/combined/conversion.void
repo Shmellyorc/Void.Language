@@ -1,0 +1,98 @@
+use convert
+use encoding/binary
+
+struct box:
+    value: i32
+
+enum direction:
+    left
+    right
+
+var evaluations: i32 = 0
+
+func fallback() -> i32:
+    evaluations += 1
+    return 99
+
+func main() -> i32:
+    var integer = convert.parse<i64>("-9223372036854775808")
+    if convert.unwrap(integer) != i64.min_value:
+        return 1
+    var largest = convert.parse<u64>("18446744073709551615")
+    if convert.unwrap(largest) != u64.max_value:
+        return 2
+    if convert.unwrap(convert.parse<f64>("-0.0")) != -0.0d:
+        return 3
+    if not convert.unwrap(convert.parse<bool>("true")):
+        return 4
+    if convert.unwrap(convert.parse<bool>("false")):
+        return 5
+    if not (convert.unwrap(convert.parse<direction>("left")) is direction.left):
+        return 6
+    var label = convert.to_string(direction.right)
+    if not (convert.unwrap(convert.parse<direction>(label)) is direction.right):
+        return 7
+    var success: result<i32, string> = Ok(7)
+    if convert.unwrap_or(success, fallback()) != 7 or evaluations != 1:
+        return 8
+    var failure: result<i32, string> = Err("failure")
+    if convert.unwrap_or(failure, fallback()) != 99 or evaluations != 2:
+        return 9
+    var object = box(value = 42)
+    var wrapped: result<box, string> = Ok(object)
+    var extracted = convert.unwrap(wrapped)
+    extracted.value = 43
+    if object.value != 43:
+        return 10
+    if convert.parse<u8>("256") is Err(var reason):
+        if not (reason.kind is convert.error_kind.out_of_range):
+            return 11
+        if reason.code != 2 or reason.message == "" or reason.path != "" or reason.input != "256":
+            return 12
+    else:
+        return 13
+    if convert.to_string(42) != "42":
+        return 14
+    var text: result<string, i32> = Ok("é🎮\0")
+    if convert.unwrap(text) != "é🎮\0":
+        return 15
+    var fixed: [i32, 2] = [1, 2]
+    var fixed_result: result<[i32, 2], string> = Ok(fixed)
+    var copied = convert.unwrap(fixed_result)
+    copied[0] = 9
+    if fixed[0] != 1 or copied[1] != 2:
+        return 16
+    var table: {string: i32} = {"key": 7}
+    var dictionary: result<{string: i32}, string> = Ok(table)
+    var shared = convert.unwrap(dictionary)
+    shared["key"] = 8
+    if table["key"] != 8:
+        return 17
+    var selected: result<direction, string> = Ok(direction.left)
+    if not (convert.unwrap(selected) is direction.left):
+        return 18
+    var nullable: result<box?, string> = Ok(null)
+    if convert.unwrap(nullable) != null:
+        return 19
+    var nested: result<result<i32, string>, i32> = Ok(Err("inner"))
+    if convert.unwrap_or(convert.unwrap(nested), 77) != 77:
+        return 20
+    var callback = func(value: i32) -> i32:
+        return value + 1
+    var callable: result<func(i32) -> i32, string> = Ok(callback)
+    var extracted_callback = convert.unwrap(callable)
+    if extracted_callback(4) != 5:
+        return 21
+    var enum_error: result<i32, direction> = Err(direction.right)
+    if convert.unwrap_or(enum_error, 88) != 88:
+        return 22
+    if convert.to_string(true) != "true" or convert.to_string(false) != "false":
+        return 23
+    if convert.to_string(1.5f) != "1.5" or convert.to_string(-2.75d) != "-2.75":
+        return 24
+    if convert.to_string("é🎮\0") != "é🎮\0":
+        return 25
+    if convert.to_string([1, 2]) != "[1, 2]":
+        return 26
+    print("conversion passed")
+    return 0

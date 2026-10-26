@@ -167,7 +167,7 @@ func entry(score: i32) -> i32:
     """
     print(fixed, items, table, chosen, outcome, absent, record(), end = "", flush = true)
     var written = console.stdout.write("é😀\\0")
-    var read = console.stdin.read_line(timeout_ms = 0)
+    var received = console.stdin.read_line(timeout_ms = 0)
     if outcome is Ok(var selected):
         if selected is p.message . data(var boxed, var note):
             return boxed.value.count as i32

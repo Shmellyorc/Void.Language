@@ -71,7 +71,7 @@ void execute(const vd::ValidatedAnalysis& program, bool optimize) {
     auto runtime = code->runtime_owner();
     unsigned total_failures = 0;
 
-    for (int scenario = 0; scenario < 12; ++scenario) {
+    for (int scenario = 0; scenario < 14; ++scenario) {
         check(code->invoke(100 + scenario) == 1, "memory setup failed");
 
         managed_test::Probe collection;
@@ -151,7 +151,7 @@ void execute(const vd::ValidatedAnalysis& program, bool optimize) {
     check(runtime->memory_snapshot().handles == 0,
           "memory stream roots survived Runtime shutdown");
     std::cout << (optimize ? "O2" : "normal") << ": " << total_failures
-              << " failure budgets across 12 operations; atomic state and retry passed\n";
+              << " failure budgets across 14 operations; atomic state and retry passed\n";
 }
 
 } // namespace

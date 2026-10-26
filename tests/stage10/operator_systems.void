@@ -46,7 +46,7 @@ func (self component) string() -> string:
     return string(self.item)
 struct wrapper:
     const using component
-func verify(input: i32) -> result<i32, string>:
+func verify(input: i32) -> result<i32, time.error>:
     var day = make_date(2024, 2, 29)?
     var values = [quantity<i32>(value = 10)]
     var first = account(value = 10, history = values)
@@ -60,31 +60,36 @@ func verify(input: i32) -> result<i32, string>:
     current.amount += rhs()
     values[0] %= 3
     if calls != 1 or first.amount.read() != 13 or current.amount.read() != 90 or first.history[0].read() != 1:
-        return Err("captured owner/property/const alias")
+        return Err(time.error(message = "captured owner/property/const alias"))
     var copy = first.amount
     copy %= 5
     if copy != quantity<i32>(value = 3) or first.amount.read() != 13:
-        return Err("value copy/derived inequality")
-    if format(copy, spec)? != "003":
-        return Err("constant format policy")
+        return Err(time.error(message = "value copy/derived inequality"))
+    var formatted = ""
+    if format(copy, spec) is Ok(var text):
+        formatted = text
+    else:
+        return Err(time.error(message = "constant format policy failed"))
+    if formatted != "003":
+        return Err(time.error(message = "constant format policy"))
     var entries = {"item": copy}
     entries["item"] += 4
     var fixed: [quantity<i32>, 2] = [copy, entries["item"]]
     fixed[0] += 1
     if fixed[0].read() != 4 or fixed[1].read() != 7 or copy.read() != 3:
-        return Err("collection values")
+        return Err(time.error(message = "collection values"))
     var parent: base = first
     var promoted = wrapper(component = component(item = entries["item"]))
     if string(parent) != "account:010/013" or string(promoted) != "q:007":
-        return Err("inherited/promoted hooks")
+        return Err(time.error(message = "inherited/promoted hooks"))
     var text = "é😀 {{amount}} {entries["item"]:>6|000} {day:yyyy-MM-dd} {copy}"
     if text != "é😀 {{amount}}    007 2024-02-29 q:003":
-        return Err("interpolation/layout/hook")
+        return Err(time.error(message = "interpolation/layout/hook"))
     if format(copy, "reject") is Err(var message):
         if message != "quantity-3":
-            return Err("recoverable hook reason")
+            return Err(time.error(message = "recoverable hook reason"))
     else:
-        return Err("failed hook unexpectedly succeeded")
+        return Err(time.error(message = "failed hook unexpectedly succeeded"))
     var local = make_local_datetime(make_date(2026, 11, 1)?, make_time(1, 30, 0)?)?
     var selected = find_zone("America/New_York")?
     var early = resolve_local(local, selected, local_choice.earlier)?
@@ -93,7 +98,7 @@ func verify(input: i32) -> result<i32, string>:
     var minutes = quantity<i64>(value = difference.seconds / 60)
     minutes %= 7 as i64
     if "{minutes:000}|{late:yyyy-MM-dd HH:mm:ss zzz VV}" != "004|2026-11-01 01:30:00 -05:00 America/New_York":
-        return Err("temporal/generic operator")
+        return Err(time.error(message = "temporal/generic operator"))
     return Ok(input)
 func entry(input: i32) -> i32:
     if verify(input) is Ok(var value):
