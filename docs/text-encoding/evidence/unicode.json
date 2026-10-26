@@ -1,0 +1,16 @@
+{
+  "unicode": "16.0.0",
+  "counts": {
+    "lower": 1460,
+    "upper": 1552,
+    "Cased": 159,
+    "CI": 452
+  },
+  "inputs": {
+    "version": "63f771c327e92574fbd77919586079c38f669058a5e6b67ccec385ef8fcde882",
+    "SpecialCasing.txt": "8d5de354eef79f2395a54c9c7dcebbaf3d30fc962d0f85611ea97aa973a0c451",
+    "lib/Cased/Y.pl": "3ab422d3bf8acab2bd4d66d5a8dd824b43a2dc88d119585df84857bec87bf560",
+    "lib/CI/Y.pl": "9fa60a6ba78f693e15625f6074f9ddb3edc18c217c0624d24b1312dcbfd9ac59"
+  },
+  "output_sha256": "fae60f77cc2101e9266bdbf60ea136945b30c9a5f1288b4cb8d4d7be543141fe"
+}

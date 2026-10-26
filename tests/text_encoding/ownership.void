@@ -1,0 +1,120 @@
+use text
+use encoding/hex
+use encoding/base64
+use encoding/ascii
+
+
+var original = "  ΟΣ İß\0雪  "
+var bytes: [u8] = [0, 128, 255]
+var scenario: i32 = 0
+
+
+private func intact() -> bool:
+    return original == "  ΟΣ İß\0雪  " and bytes.count == 3 and bytes[0] == 0 and bytes[1] == 128 and bytes[2] == 255
+
+
+## Dispatch immutable text/codec operations for precise-GC and allocation-budget tests.
+## @param mode Setup 100..118, inspect -1, or execute the selected operation with zero.
+## @return One when the selected operation and immutable-input checks succeed, otherwise zero.
+func entry(mode: i32) -> i32:
+    if mode >= 100:
+        scenario = mode - 100
+        return 1
+
+    if mode == -1:
+        if intact():
+            return 1
+
+        return 0
+
+    if scenario == 0:
+        if text.trim(original) == "ΟΣ İß\0雪":
+            return 1
+
+    if scenario == 1:
+        if text.to_lower(original) == "  ος i\u{307}ß\0雪  ":
+            return 1
+
+    if scenario == 2:
+        if text.to_upper(original) == "  ΟΣ İSS\0雪  ":
+            return 1
+
+    if scenario == 3:
+        if text.substring(original, 2, 2) is Ok(var value):
+            if value == "ΟΣ":
+                return 1
+
+    if scenario == 4:
+        if text.split("雪|\0||😀", "|") is Ok(var value):
+            if value.count == 4 and value[1] == "\0":
+                return 1
+
+    if scenario == 5:
+        if text.split_lines("雪\r\n\0\r😀\n") is Ok(var value):
+            if value.count == 4 and value[1] == "\0":
+                return 1
+
+    if scenario == 6:
+        if text.join(["雪", "\0", "😀"], "|") is Ok(var value):
+            if value == "雪|\0|😀":
+                return 1
+
+    if scenario == 7:
+        if text.replace("ab雪ab", "ab", "😀") is Ok(var value):
+            if value == "😀雪😀":
+                return 1
+
+    if scenario == 8:
+        if text.repeat("雪", 3) is Ok(var value):
+            if value == "雪雪雪":
+                return 1
+
+    if scenario == 9:
+        if text.pad_left("雪", 3, "😀") is Ok(var value):
+            if value == "😀😀雪":
+                return 1
+
+    if scenario == 10:
+        if hex.try_encode(bytes) is Ok(var value):
+            if value == "0080ff":
+                return 1
+
+    if scenario == 11:
+        if hex.decode("0080FF") is Ok(var value):
+            if value.count == 3 and value[1] == 128:
+                return 1
+
+    if scenario == 12:
+        if base64.try_encode(bytes) is Ok(var value):
+            if value == "AID/":
+                return 1
+
+    if scenario == 13:
+        if base64.decode("AID/") is Ok(var value):
+            if value.count == 3 and value[2] == 255:
+                return 1
+
+    if scenario == 14:
+        if ascii.encode("a\0z") is Ok(var value):
+            if value.count == 3 and value[1] == 0:
+                return 1
+
+    if scenario == 15:
+        if ascii.decode([65, 0, 90]) is Ok(var value):
+            if value == "A\0Z":
+                return 1
+
+    if scenario == 16:
+        if base64.decode("AB==") is Err(var reason):
+            if reason.kind is base64.error_kind.noncanonical_bits:
+                return 1
+
+    if scenario == 17:
+        if hex.encode(bytes) == "0080ff":
+            return 1
+
+    if scenario == 18:
+        if base64.encode(bytes) == "AID/":
+            return 1
+
+    return 0

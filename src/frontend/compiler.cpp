@@ -2077,6 +2077,33 @@ class Semantics {
             if(known){auto selected=ir::select_operator(*root.member_catalog,e.op,operands,unit.identity,lexical_owner());if(selected.status==ir::MemberSelection::found)for(const auto& f:root.member_catalog->functions)if(f.name==selected.method)return f.result;}
         return {};
     }
+    // Keep name/global resolution temporaries out of recursive hint frames so
+    // the unchanged semantic-depth guard fits the supported 1 MiB stack.
+    VOID_SEMANTIC_HANDLER std::optional<Type> name_anchor(Expr& e) {
+        if (auto [owner, value] = global(e); value) {
+            // Pure expressions cannot read runtime globals. In particular,
+            // a type hint must not start runtime initializer analysis while
+            // declaration layouts and constant defaults are being prepared.
+            if (value->type == Type::none) {
+                if (!current) {
+                    return {};
+                }
+                owner->resolve_global(*value);
+            }
+            return value->type;
+        }
+        if (auto* local = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
+            return local->type;
+        }
+
+        auto [owner, constant_value] = constant(e);
+        if (constant_value) {
+            evaluate(*owner, *constant_value);
+            return constant_value->type;
+        }
+        return {};
+    }
+
     // Hints resolve typed anchors without prematurely defaulting untyped literals.
     std::optional<Type> anchor(Expr& e) {
         try {
@@ -2094,21 +2121,7 @@ class Semantics {
         if (e.kind == K::conversion) return e.type;
         if (e.kind == K::global) return e.type;
         if (e.kind == K::name) {
-            if (auto [owner, value] = global(e); value) {
-                // Pure expressions cannot read runtime globals. In particular,
-                // a type hint must not start runtime initializer analysis while
-                // declaration layouts and constant defaults are being prepared.
-                if (value->type == Type::none) {
-                    if (!current) {
-                        return {};
-                    }
-                    owner->resolve_global(*value);
-                }
-                return value->type;
-            }
-            if (auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr) return v->type;
-            auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
-            return {};
+            return name_anchor(e);
         }
         if(e.kind==K::array_index || e.kind==K::array_slice) {
             auto owner=anchor(*e.parts[0]);
@@ -2932,6 +2945,17 @@ class Semantics {
 #include "binary_codec.inc"
 #include "stdlib_conversion.inc"
 
+    VOID_SEMANTIC_HANDLER Type text_case_call(Expr& e) {
+        Function target;
+        target.token = e.token;
+        target.symbol = "$text.case";
+        target.result = Type::string;
+        target.parameters.push_back({Token{TokenKind::name, "value", e.token.offset}, Type::string});
+        target.parameters.push_back({Token{TokenKind::name, "upper", e.token.offset}, Type::boolean});
+        e.target = target.symbol;
+        return e.type = call_arguments(e, target, 0);
+    }
+
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
         if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
             for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
@@ -2946,6 +2970,15 @@ class Semantics {
         if (unit.identity == "/@stdlib/convert.void" && e.qualifier.empty() &&
             (e.token.text == "_convert_parse" || e.token.text == "_convert_unwrap")) {
             return conversion_call(e);
+        }
+
+        if (e.target == "$text.case") {
+            return e.type;
+        }
+
+        if (unit.identity == "/@stdlib/text.void" && e.qualifier.empty() &&
+            e.token.text == "_text_case") {
+            return text_case_call(e);
         }
 
         if (e.target == "$memory.write" || e.target == "$temporal.result") {
@@ -3746,6 +3779,7 @@ class Lowering {
             i.op == ir::Op::string_join ||
             i.op == ir::Op::format_unwrap ||
             i.op == ir::Op::format_layout ||
+            i.op == ir::Op::text_case ||
             i.op == ir::Op::memory_write ||
             i.op == ir::Op::temporal_result ||
             i.op == ir::Op::scalar_parse ||
@@ -4261,6 +4295,13 @@ class Lowering {
                 ir::Instruction operation{e.target == "$convert.parse" ?
                     ir::Op::scalar_parse : ir::Op::result_unwrap, expression(*e.parts[0])};
                 operation.type = e.type;
+                return emit(operation, e.token);
+            }
+
+            if (e.target == "$text.case") {
+                ir::Instruction operation{ir::Op::text_case,
+                    expression(*e.parts[0]), expression(*e.parts[1])};
+                operation.type = Type::string;
                 return emit(operation, e.token);
             }
 
@@ -5716,7 +5757,7 @@ struct AnalysisAccess {
             result->editor_declarations_.push_back(std::move(record));
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
-        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:display-v1:console-v2:terminal-v2:application-v1:"+result->entry_symbol_;
+        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-v1:"+result->entry_symbol_;
         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
 
         result->contract_+=std::string(formatting::abi_version)+"|"+std::string(temporal::abi_version);

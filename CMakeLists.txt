@@ -87,7 +87,7 @@ target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROO
 target_link_libraries(void_core PUBLIC void_options Threads::Threads)
 add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
 target_link_libraries(void_native_fixture PRIVATE void_options)
-add_library(void_runtime STATIC src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+add_library(void_runtime STATIC src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
 target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
 option(VOID_LLVM_RESEARCH "Build optional LLVM machine-code certification experiments" OFF)
@@ -185,6 +185,8 @@ target_compile_options(voidls PRIVATE ${VOID_LLVM_DEFINITIONS})
 target_link_libraries(voidls PRIVATE void_lsp ${VOID_NUMERIC_LIBS})
 install(TARGETS voidls RUNTIME DESTINATION bin COMPONENT tooling)
 foreach(component IN ITEMS compiler tooling)
+  install(FILES tools/unicode/LICENSE.txt DESTINATION share/void/licenses
+    RENAME UNICODE-LICENSE.txt COMPONENT ${component})
   install(DIRECTORY stdlib/ DESTINATION share/void/stdlib COMPONENT ${component} FILES_MATCHING PATTERN "*.void")
   install(FILES third_party/ryu/LICENSE-Boost third_party/date/LICENSE.txt third_party/date/NOTICE
     third_party/tzdata/LICENSE third_party/stage10-versions.json
@@ -710,6 +712,52 @@ if(BUILD_TESTING)
   add_test(NAME lsp_memory COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/memory/lsp.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_memory PROPERTIES TIMEOUT 180)
 
+  foreach(fixture IN ITEMS text hex base64 ascii oracles interop large errors)
+    add_test(NAME text_encoding_${fixture} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/text_encoding/execution.py" "$<TARGET_FILE:voidc>" "${fixture}")
+    set_tests_properties(text_encoding_${fixture} PROPERTIES TIMEOUT 1800)
+  endforeach()
+  add_test(NAME text_encoding_crash_preservation COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/crash_test.py")
+  add_test(NAME lsp_text_encoding COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/lsp.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_text_encoding PROPERTIES TIMEOUT 180)
+  add_test(NAME text_encoding_install COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/install.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
+  set_tests_properties(text_encoding_install PROPERTIES TIMEOUT 900 RUN_SERIAL TRUE)
+  if(NOT VOID_SANITIZERS AND NOT WIN32)
+    add_test(NAME text_encoding_stack COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/text_encoding/execution.py" "$<TARGET_FILE:voidc>" text --small-stack)
+    add_test(NAME lsp_text_encoding_stack COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/text_encoding/lsp.py" "$<TARGET_FILE:voidls>" --small-stack)
+    set_tests_properties(text_encoding_stack lsp_text_encoding_stack PROPERTIES TIMEOUT 600)
+  endif()
+  if(NOT WIN32)
+    add_test(NAME text_encoding_depth COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/text_encoding/depth.py" "$<TARGET_FILE:voidc>")
+    set_tests_properties(text_encoding_depth PROPERTIES TIMEOUT 180)
+  endif()
+  add_test(NAME text_encoding_semantic_depth COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/integration/semantic_depth.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(text_encoding_semantic_depth PROPERTIES TIMEOUT 180
+    ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/tests/text_encoding;VOID_CRASH_EVIDENCE=${PROJECT_SOURCE_DIR}/docs/text-encoding/evidence/crashes")
+  add_executable(void_text_performance tests/text_encoding/performance.cpp)
+  target_link_libraries(void_text_performance PRIVATE void_llvm)
+  add_executable(void_text_audit tests/text_encoding/audit.cpp)
+  target_link_libraries(void_text_audit PRIVATE void_llvm)
+  add_test(NAME text_encoding_ir COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/process.py" "$<TARGET_FILE:void_text_audit>"
+    --ir "${PROJECT_SOURCE_DIR}/tests/text_encoding/ownership.void")
+  add_test(NAME text_encoding_inventory COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/process.py" "$<TARGET_FILE:void_text_audit>"
+    --inventory "${PROJECT_SOURCE_DIR}/tests/text_encoding/ownership.void")
+  add_executable(void_text_ownership tests/text_encoding/ownership.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_text_ownership PRIVATE void_llvm)
+  add_test(NAME text_encoding_ownership COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/process.py" "$<TARGET_FILE:void_text_ownership>"
+    "${PROJECT_SOURCE_DIR}/tests/text_encoding/ownership.void")
+  set_tests_properties(text_encoding_ownership PROPERTIES TIMEOUT 600)
   add_executable(void_memory_ownership tests/memory/ownership.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_memory_ownership PRIVATE void_llvm)
   add_test(NAME memory_ownership COMMAND void_memory_ownership "${PROJECT_SOURCE_DIR}/tests/memory/ownership.void")

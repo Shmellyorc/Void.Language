@@ -1,0 +1,524 @@
+[
+  {
+    "name": "binary_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 64.41002574999584,
+    "log": "sanitizers-binary_execution.log"
+  },
+  {
+    "name": "binary_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_binary_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 1.937640611999086,
+    "log": "sanitizers-binary_ownership.log"
+  },
+  {
+    "name": "collections_source",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_collections_tests",
+      "/home/shmellyorc/Documents/Void.Language"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 71.08103585700155,
+    "log": "sanitizers-collections_source.log"
+  },
+  {
+    "name": "combined_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 234.8134646249964,
+    "log": "sanitizers-combined_execution.log"
+  },
+  {
+    "name": "combined_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 24.85246872001153,
+    "log": "sanitizers-combined_ownership.log"
+  },
+  {
+    "name": "documentation_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 1.881331714001135,
+    "log": "sanitizers-documentation_execution.log"
+  },
+  {
+    "name": "gc_buffers",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_gc_buffers"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 3.570535714010475,
+    "log": "sanitizers-gc_buffers.log"
+  },
+  {
+    "name": "gc_schemas",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_gc_schemas"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.22906229499494657,
+    "log": "sanitizers-gc_schemas.log"
+  },
+  {
+    "name": "io_async_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_io_runner",
+      "--async"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 108.83302917701076,
+    "log": "sanitizers-io_async_execution.log"
+  },
+  {
+    "name": "io_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 146.32925959298154,
+    "log": "sanitizers-io_execution.log"
+  },
+  {
+    "name": "io_ir",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_io_ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 2.6740719210065436,
+    "log": "sanitizers-io_ir.log"
+  },
+  {
+    "name": "io_kernel",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_io_kernel",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/io kernel fixtures"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.08701391599606723,
+    "log": "sanitizers-io_kernel.log"
+  },
+  {
+    "name": "io_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_io_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/ownership_async.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 66.09387162898201,
+    "log": "sanitizers-io_ownership.log"
+  },
+  {
+    "name": "lsp_binary",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.35142550901218783,
+    "log": "sanitizers-lsp_binary.log"
+  },
+  {
+    "name": "lsp_combined",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 6.177817112999037,
+    "log": "sanitizers-lsp_combined.log"
+  },
+  {
+    "name": "lsp_const_recovery",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 5.704748492004001,
+    "log": "sanitizers-lsp_const_recovery.log"
+  },
+  {
+    "name": "lsp_documentation",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.4214577050006483,
+    "log": "sanitizers-lsp_documentation.log"
+  },
+  {
+    "name": "lsp_io",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 4.094569419976324,
+    "log": "sanitizers-lsp_io.log"
+  },
+  {
+    "name": "lsp_memory",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 1.9086774939933093,
+    "log": "sanitizers-lsp_memory.log"
+  },
+  {
+    "name": "lsp_text_encoding",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 2.8650503479875624,
+    "log": "sanitizers-lsp_text_encoding.log"
+  },
+  {
+    "name": "memory_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 175.9104656779964,
+    "log": "sanitizers-memory_execution.log"
+  },
+  {
+    "name": "memory_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_memory_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 10.060571115987841,
+    "log": "sanitizers-memory_ownership.log"
+  },
+  {
+    "name": "runtime_coordination",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_tests"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 2.067633656988619,
+    "log": "sanitizers-runtime_coordination.log"
+  },
+  {
+    "name": "runtime_failures",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_failures"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.016883275005966425,
+    "log": "sanitizers-runtime_failures.log"
+  },
+  {
+    "name": "runtime_generated",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_generated"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 1.5333443049894413,
+    "log": "sanitizers-runtime_generated.log"
+  },
+  {
+    "name": "runtime_invariants",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/runtime/invariants.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_invariants"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.0841393870068714,
+    "log": "sanitizers-runtime_invariants.log"
+  },
+  {
+    "name": "strings_aot_normal",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_strings_aot_normal"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.10668327099119779,
+    "log": "sanitizers-strings_aot_normal.log"
+  },
+  {
+    "name": "strings_aot_optimized",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_strings_aot_optimized"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.0698371379985474,
+    "log": "sanitizers-strings_aot_optimized.log"
+  },
+  {
+    "name": "strings_cli",
+    "command": [
+      "/usr/bin/cmake",
+      "-DCOMPILER=/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "-DROOT=/home/shmellyorc/Documents/Void.Language",
+      "-DBIN=/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+      "-DEXE_SUFFIX=",
+      "-P",
+      "/home/shmellyorc/Documents/Void.Language/tests/integration/strings.cmake"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 5.967927003002842,
+    "log": "sanitizers-strings_cli.log"
+  },
+  {
+    "name": "strings_source",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_strings_tests",
+      "/home/shmellyorc/Documents/Void.Language"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 7.447624968001037,
+    "log": "sanitizers-strings_source.log"
+  },
+  {
+    "name": "text_collections_sprint3",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint3.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_runtime.a",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/libvoid_native_fixture.a",
+      "ON"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 60.220985769003164,
+    "log": "sanitizers-text_collections_sprint3.log"
+  },
+  {
+    "name": "text_encoding_ascii",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "ascii"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 3.9980662269954337,
+    "log": "sanitizers-text_encoding_ascii.log"
+  },
+  {
+    "name": "text_encoding_base64",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "base64"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 12.647636189009063,
+    "log": "sanitizers-text_encoding_base64.log"
+  },
+  {
+    "name": "text_encoding_crash_preservation",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.23170921302516945,
+    "log": "sanitizers-text_encoding_crash_preservation.log"
+  },
+  {
+    "name": "text_encoding_hex",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "hex"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 4.899770994001301,
+    "log": "sanitizers-text_encoding_hex.log"
+  },
+  {
+    "name": "text_encoding_install",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+      "RelWithDebInfo"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 50.337036777986214,
+    "log": "sanitizers-text_encoding_install.log"
+  },
+  {
+    "name": "text_encoding_interop",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "interop"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 73.12854750800761,
+    "log": "sanitizers-text_encoding_interop.log"
+  },
+  {
+    "name": "text_encoding_inventory",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_text_audit",
+      "--inventory",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 0.4239954890217632,
+    "log": "sanitizers-text_encoding_inventory.log"
+  },
+  {
+    "name": "text_encoding_ir",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_text_audit",
+      "--ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 1.4921608709846623,
+    "log": "sanitizers-text_encoding_ir.log"
+  },
+  {
+    "name": "text_encoding_large",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "large"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 489.6568446119927,
+    "log": "sanitizers-text_encoding_large.log"
+  },
+  {
+    "name": "text_encoding_oracles",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "oracles"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 365.3162275470095,
+    "log": "sanitizers-text_encoding_oracles.log"
+  },
+  {
+    "name": "text_encoding_ownership",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_text_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 24.185884461010573,
+    "log": "sanitizers-text_encoding_ownership.log"
+  },
+  {
+    "name": "text_encoding_text",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+      "text"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "status": 0,
+    "seconds": 21.377563563000876,
+    "log": "sanitizers-text_encoding_text.log"
+  }
+]

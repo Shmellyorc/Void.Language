@@ -1,0 +1,156 @@
+[  0%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_managed_test_abi
+[100%] Building CXX object CMakeFiles/void_binary_ownership.dir/tests/binary/ownership.cpp.o
+[100%] Building CXX object CMakeFiles/void_binary_ownership.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_binary_ownership
+[100%] Built target void_binary_ownership
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_collections_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_collections_tests.dir/tests/collections/tests.cpp.o
+[100%] Linking CXX executable void_collections_tests
+[100%] Built target void_collections_tests
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_combined_ownership.dir/tests/combined/ownership.cpp.o
+[100%] Building CXX object CMakeFiles/void_combined_ownership.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_combined_ownership
+[100%] Built target void_combined_ownership
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/buffers.cpp.o
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/fixed_call.cpp.o
+[100%] Linking CXX executable void_gc_buffers
+[100%] Built target void_gc_buffers
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_schemas.dir/tests/runtime/schemas.cpp.o
+[100%] Linking CXX executable void_gc_schemas
+[100%] Built target void_gc_schemas
+[ 50%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_io_ir.dir/tests/io/ir.cpp.o
+[100%] Linking CXX executable void_io_ir
+[100%] Built target void_io_ir
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_io_kernel
+[100%] Built target void_io_kernel
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_io_ownership.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_io_ownership.dir/tests/io/ownership.cpp.o
+[100%] Linking CXX executable void_io_ownership
+[100%] Built target void_io_ownership
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_io_runner.dir/tests/io/runner.cpp.o
+[100%] Linking CXX executable void_io_runner
+[100%] Built target void_io_runner
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_memory_ownership.dir/tests/memory/ownership.cpp.o
+[100%] Building CXX object CMakeFiles/void_memory_ownership.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_memory_ownership
+[100%] Built target void_memory_ownership
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_runtime_failures
+[100%] Built target void_runtime_failures
+[  0%] Building CXX object CMakeFiles/void_runtime_generated_abi.dir/src/runtime/abi.cpp.o
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_native_fixture
+[ 50%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_runtime_generated_abi
+[100%] Building CXX object CMakeFiles/void_runtime_generated.dir/tests/runtime/generated.cpp.o
+[100%] Linking CXX executable void_runtime_generated
+[100%] Built target void_runtime_generated
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_runtime_invariants
+[100%] Built target void_runtime_invariants
+[  0%] Built target void_native_fixture
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_runtime_tests
+[100%] Built target void_runtime_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Building CXX object CMakeFiles/void_string_test_abi.dir/src/runtime/abi.cpp.o
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target void_string_test_abi
+[100%] Building CXX object CMakeFiles/void_strings_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_strings_tests.dir/tests/strings/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_strings_tests.dir/tests/strings/tests.cpp.o
+[100%] Linking CXX executable void_strings_tests
+[100%] Built target void_strings_tests
+[100%] Generating strings-library-normal.o
+[100%] Generating strings-reloaded-normal.o
+==1240==LeakSanitizer has encountered a fatal error.
+==1240==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==1240==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+==1241==LeakSanitizer has encountered a fatal error.
+==1241==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==1241==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+gmake[3]: *** [CMakeFiles/void_strings_aot_normal.dir/build.make:83: strings-reloaded-normal.o] Error 1
+gmake[3]: *** Deleting file 'strings-reloaded-normal.o'
+gmake[3]: *** Waiting for unfinished jobs....
+gmake[3]: *** [CMakeFiles/void_strings_aot_normal.dir/build.make:78: strings-library-normal.o] Error 1
+gmake[3]: *** Deleting file 'strings-library-normal.o'
+gmake[2]: *** [CMakeFiles/Makefile2:15735: CMakeFiles/void_strings_aot_normal.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:15743: CMakeFiles/void_strings_aot_normal.dir/rule] Error 2
+gmake: *** [Makefile:5601: void_strings_aot_normal] Error 2

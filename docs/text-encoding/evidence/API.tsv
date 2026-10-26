@@ -1,0 +1,74 @@
+Identity	Source	Signature	Parameters	Return	Tests
+/@stdlib/encoding/ascii.void::error_kind::variant::non_ascii	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:8	    non_ascii	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error_kind::variant::limit_exceeded	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:11	    limit_exceeded	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error_kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:6	enum error_kind:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error::field::kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:17	    kind: error_kind	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error::field::offset	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:20	    offset: i64	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:15	struct error extends core.error:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::encode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:40	func encode(value: string) -> result<[u8], error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::decode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:56	func decode(const bytes: [u8]) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_alpha	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:70	func is_alpha(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_digit	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:77	func is_digit(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_alphanumeric	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:84	func is_alphanumeric(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_upper	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:91	func is_upper(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_lower	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:98	func is_lower(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_whitespace	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:105	func is_whitespace(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_printable	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:112	func is_printable(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::is_control	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:119	func is_control(byte: u8) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::to_lower	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:126	func to_lower(byte: u8) -> u8:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::to_upper	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:136	func to_upper(byte: u8) -> u8:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::alphabet::variant::standard	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:8	    standard	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::alphabet::variant::url_safe	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:11	    url_safe	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::alphabet	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:6	enum alphabet:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::padding::variant::required	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:17	    required	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::padding::variant::omitted	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:20	    omitted	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::padding	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:15	enum padding:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error_kind::variant::invalid_length	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:26	    invalid_length	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error_kind::variant::invalid_character	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:29	    invalid_character	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error_kind::variant::invalid_padding	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:32	    invalid_padding	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error_kind::variant::noncanonical_bits	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:35	    noncanonical_bits	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error_kind::variant::limit_exceeded	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:38	    limit_exceeded	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error_kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:24	enum error_kind:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error::field::kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:44	    kind: error_kind	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error::field::offset	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:47	    offset: i64	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::error	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:42	struct error extends core.error:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::encode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:114	func encode(const bytes: [u8], selected: alphabet = alphabet.standard, pad: padding = padding.required) -> string:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::try_encode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:123	func try_encode(const bytes: [u8], selected: alphabet = alphabet.standard, pad: padding = padding.required) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/base64.void::decode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void:176	func decode(value: string, selected: alphabet = alphabet.standard, pad: padding = padding.required) -> result<[u8], error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error_kind::variant::invalid_length	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:8	    invalid_length	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error_kind::variant::invalid_digit	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:11	    invalid_digit	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error_kind::variant::limit_exceeded	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:14	    limit_exceeded	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error_kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:6	enum error_kind:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error::field::kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:20	    kind: error_kind	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error::field::offset	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:23	    offset: i64	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::error	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:18	struct error extends core.error:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::encode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:60	func encode(const bytes: [u8], uppercase: bool = false) -> string:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::try_encode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:68	func try_encode(const bytes: [u8], uppercase: bool = false) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/encoding/hex.void::decode	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void:91	func decode(value: string) -> result<[u8], error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::error_kind::variant::invalid_range	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:8	    invalid_range	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/text.void::error_kind::variant::invalid_argument	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:11	    invalid_argument	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/text.void::error_kind::variant::limit_exceeded	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:14	    limit_exceeded	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/text.void::error_kind	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:6	enum error_kind:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/text.void::error::field::kind	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:20	    kind: error_kind	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/text.void::error	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:18	struct error extends core.error:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/text.void::trim	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:110	func trim(value: string) -> string:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::trim_start	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:117	func trim_start(value: string) -> string:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::trim_end	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:124	func trim_end(value: string) -> string:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::is_empty	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:131	func is_empty(value: string) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::is_blank	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:138	func is_blank(value: string) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::index_of	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:217	func index_of(value: string, search: string) -> i64:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::last_index_of	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:225	func last_index_of(value: string, search: string) -> i64:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::contains	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:233	func contains(value: string, search: string) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::starts_with	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:260	func starts_with(value: string, search: string) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::ends_with	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:268	func ends_with(value: string, search: string) -> bool:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::substring	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:277	func substring(value: string, start: i64, count: i64 = -1) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::split	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:328	func split(value: string, delimiter: string, max_parts: i64 = 1048576) -> result<[string], error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::split_lines	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:358	func split_lines(value: string, max_parts: i64 = 1048576) -> result<[string], error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::join	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:406	func join(const values: [string], separator: string = "") -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::replace	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:468	func replace(value: string, search: string, replacement: string) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::replace_first	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:477	func replace_first(value: string, search: string, replacement: string) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::repeat	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:485	func repeat(value: string, count: i64) -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::pad_left	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:535	func pad_left(value: string, width: i64, padding: string = " ") -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::pad_right	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:544	func pad_right(value: string, width: i64, padding: string = " ") -> result<string, error>:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::to_lower	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:551	func to_lower(value: string) -> string:	yes	yes	oracles, focused, ownership, lsp
+/@stdlib/text.void::to_upper	/home/shmellyorc/Documents/Void.Language/stdlib/text.void:558	func to_upper(value: string) -> string:	yes	yes	oracles, focused, ownership, lsp

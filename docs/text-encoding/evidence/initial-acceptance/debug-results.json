@@ -1,0 +1,551 @@
+[
+  {
+    "name": "binary_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 40.69157603800704,
+    "log": "debug-binary_execution.log"
+  },
+  {
+    "name": "binary_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_binary_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 1.0048864470008994,
+    "log": "debug-binary_ownership.log"
+  },
+  {
+    "name": "collections_source",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_collections_tests",
+      "/home/shmellyorc/Documents/Void.Language"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 69.44737705599982,
+    "log": "debug-collections_source.log"
+  },
+  {
+    "name": "combined_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 199.5523372500029,
+    "log": "debug-combined_execution.log"
+  },
+  {
+    "name": "combined_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_combined_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 18.0646368250018,
+    "log": "debug-combined_ownership.log"
+  },
+  {
+    "name": "documentation_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.8712460060050944,
+    "log": "debug-documentation_execution.log"
+  },
+  {
+    "name": "gc_buffers",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_gc_buffers"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 10.257245829998283,
+    "log": "debug-gc_buffers.log"
+  },
+  {
+    "name": "gc_schemas",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_gc_schemas"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.883911682991311,
+    "log": "debug-gc_schemas.log"
+  },
+  {
+    "name": "io_async_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_runner",
+      "--async"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 113.96112576898304,
+    "log": "debug-io_async_execution.log"
+  },
+  {
+    "name": "io_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 148.59287927497644,
+    "log": "debug-io_execution.log"
+  },
+  {
+    "name": "io_ir",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 3.597843443014426,
+    "log": "debug-io_ir.log"
+  },
+  {
+    "name": "io_kernel",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_kernel",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/io kernel fixtures"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.21228757200879045,
+    "log": "debug-io_kernel.log"
+  },
+  {
+    "name": "io_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/ownership_async.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 51.099849491001805,
+    "log": "debug-io_ownership.log"
+  },
+  {
+    "name": "lsp_binary",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.2603989169874694,
+    "log": "debug-lsp_binary.log"
+  },
+  {
+    "name": "lsp_combined",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 7.565067574993009,
+    "log": "debug-lsp_combined.log"
+  },
+  {
+    "name": "lsp_const_recovery",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 4.536114578004344,
+    "log": "debug-lsp_const_recovery.log"
+  },
+  {
+    "name": "lsp_documentation",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.3569338850065833,
+    "log": "debug-lsp_documentation.log"
+  },
+  {
+    "name": "lsp_io",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 8.936332300014328,
+    "log": "debug-lsp_io.log"
+  },
+  {
+    "name": "lsp_memory",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 2.1922422539937543,
+    "log": "debug-lsp_memory.log"
+  },
+  {
+    "name": "lsp_text_encoding",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 3.833473877995857,
+    "log": "debug-lsp_text_encoding.log"
+  },
+  {
+    "name": "lsp_text_encoding_stack",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+      "--small-stack"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 3.7386935700051254,
+    "log": "debug-lsp_text_encoding_stack.log"
+  },
+  {
+    "name": "memory_execution",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 170.24202419100038,
+    "log": "debug-memory_execution.log"
+  },
+  {
+    "name": "memory_ownership",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_memory_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 8.037918195012026,
+    "log": "debug-memory_ownership.log"
+  },
+  {
+    "name": "runtime_coordination",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_tests"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 2.0456131170067238,
+    "log": "debug-runtime_coordination.log"
+  },
+  {
+    "name": "runtime_failures",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_failures"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.0038959080120548606,
+    "log": "debug-runtime_failures.log"
+  },
+  {
+    "name": "runtime_generated",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_generated"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 1.1091369790083263,
+    "log": "debug-runtime_generated.log"
+  },
+  {
+    "name": "runtime_invariants",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/runtime/invariants.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_runtime_invariants"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.075987272997736,
+    "log": "debug-runtime_invariants.log"
+  },
+  {
+    "name": "strings_aot_normal",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_strings_aot_normal"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.09596557100303471,
+    "log": "debug-strings_aot_normal.log"
+  },
+  {
+    "name": "strings_aot_optimized",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_strings_aot_optimized"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.08972433599410579,
+    "log": "debug-strings_aot_optimized.log"
+  },
+  {
+    "name": "strings_cli",
+    "command": [
+      "/usr/bin/cmake",
+      "-DCOMPILER=/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "-DROOT=/home/shmellyorc/Documents/Void.Language",
+      "-DBIN=/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "-DEXE_SUFFIX=",
+      "-P",
+      "/home/shmellyorc/Documents/Void.Language/tests/integration/strings.cmake"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 3.7680701529898215,
+    "log": "debug-strings_cli.log"
+  },
+  {
+    "name": "strings_source",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_strings_tests",
+      "/home/shmellyorc/Documents/Void.Language"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 14.72774716001004,
+    "log": "debug-strings_source.log"
+  },
+  {
+    "name": "text_collections_sprint3",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint3.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a",
+      "OFF"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 61.94264497701079,
+    "log": "debug-text_collections_sprint3.log"
+  },
+  {
+    "name": "text_encoding_ascii",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "ascii"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 2.6742451829923084,
+    "log": "debug-text_encoding_ascii.log"
+  },
+  {
+    "name": "text_encoding_base64",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "base64"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 10.028644167003222,
+    "log": "debug-text_encoding_base64.log"
+  },
+  {
+    "name": "text_encoding_crash_preservation",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.24709822601289488,
+    "log": "debug-text_encoding_crash_preservation.log"
+  },
+  {
+    "name": "text_encoding_hex",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "hex"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 3.96297364399652,
+    "log": "debug-text_encoding_hex.log"
+  },
+  {
+    "name": "text_encoding_install",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "Debug"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 50.05702356400434,
+    "log": "debug-text_encoding_install.log"
+  },
+  {
+    "name": "text_encoding_interop",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "interop"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 65.8666493310011,
+    "log": "debug-text_encoding_interop.log"
+  },
+  {
+    "name": "text_encoding_inventory",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_text_audit",
+      "--inventory",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.3013896920019761,
+    "log": "debug-text_encoding_inventory.log"
+  },
+  {
+    "name": "text_encoding_ir",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_text_audit",
+      "--ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 1.528042092002579,
+    "log": "debug-text_encoding_ir.log"
+  },
+  {
+    "name": "text_encoding_large",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "large"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 581.6265118710144,
+    "log": "debug-text_encoding_large.log"
+  },
+  {
+    "name": "text_encoding_oracles",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "oracles"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 367.36970821199066,
+    "log": "debug-text_encoding_oracles.log"
+  },
+  {
+    "name": "text_encoding_ownership",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_text_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 21.942044451003312,
+    "log": "debug-text_encoding_ownership.log"
+  },
+  {
+    "name": "text_encoding_stack",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "text",
+      "--small-stack"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 13.303073691000463,
+    "log": "debug-text_encoding_stack.log"
+  },
+  {
+    "name": "text_encoding_text",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "text"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 18.022469262999948,
+    "log": "debug-text_encoding_text.log"
+  }
+]

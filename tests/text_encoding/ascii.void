@@ -1,0 +1,74 @@
+use encoding/ascii
+
+
+func main() -> i32:
+    var bytes: [u8] = []
+
+    for index in 0..<128:
+        bytes.push(index as u8)
+
+    if ascii.decode(bytes) is Ok(var decoded):
+        if decoded.byte_length != 128 or decoded.length != 128:
+            return 1
+
+        if ascii.encode(decoded) is Ok(var encoded):
+            for index in 0..<128:
+                if encoded[index] != (index as u8):
+                    return 2
+
+            bytes[0] = 65
+
+            if encoded[0] != 0 or decoded[0] != "\0":
+                return 3
+        else:
+            return 4
+    else:
+        return 5
+
+    for index in 0..<256:
+        var byte = index as u8
+        var upper = index >= 65 and index <= 90
+        var lower = index >= 97 and index <= 122
+        var digit = index >= 48 and index <= 57
+
+        if ascii.is_alpha(byte) != (upper or lower) or ascii.is_digit(byte) != digit:
+            return 6
+
+        if ascii.is_alphanumeric(byte) != (upper or lower or digit):
+            return 7
+
+        if ascii.is_upper(byte) != upper or ascii.is_lower(byte) != lower:
+            return 8
+
+        if ascii.is_whitespace(byte) != ((index >= 9 and index <= 13) or index == 32):
+            return 9
+
+        if ascii.is_printable(byte) != (index >= 32 and index <= 126):
+            return 10
+
+        if ascii.is_control(byte) != (index <= 31 or index == 127):
+            return 11
+
+        var expected_lower = index
+        var expected_upper = index
+
+        if upper:
+            expected_lower += 32
+
+        if lower:
+            expected_upper -= 32
+
+        if ascii.to_lower(byte) != (expected_lower as u8) or ascii.to_upper(byte) != (expected_upper as u8):
+            return 12
+
+        if index >= 128:
+            if ascii.decode([byte]) is Ok(var invalid):
+                return 13
+
+    if ascii.encode("x雪") is Err(var reason):
+        if reason.offset != 1 or not (reason.kind is ascii.error_kind.non_ascii):
+            return 14
+    else:
+        return 15
+
+    return 0

@@ -1,0 +1,28 @@
+{
+  "description": "Exact original-byte replay using preserved pre-repair executable; no reduction or original evidence edit.",
+  "command": [
+    "gdb",
+    "-batch",
+    "-ex",
+    "set pagination off",
+    "-ex",
+    "set disable-randomization off",
+    "-ex",
+    "set exec-wrapper /usr/bin/prlimit --stack=1048576:1048576 --core=0:0 --",
+    "-ex",
+    "run",
+    "-ex",
+    "bt 45",
+    "-ex",
+    "info registers rsp rip",
+    "-ex",
+    "info proc mappings",
+    "--args",
+    "/home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair",
+    "check",
+    "/home/shmellyorc/Documents/Void.Language/build/text-encoding-stack-replay/deep-methods.void"
+  ],
+  "source_sha256": "73871bef34c030e336699c8e7ff706917428d0450dfa5e7c7b923c9419245b00",
+  "transcript": "stack-crash-gdb-before.txt",
+  "core_requested": false
+}

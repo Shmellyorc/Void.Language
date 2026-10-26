@@ -1,0 +1,1074 @@
+{
+  "profile": "release",
+  "regex": "^(text_encoding_.*|lsp_text_encoding.*|strings_(source|cli|aot_normal|aot_optimized)|text_collections_sprint3|collections_source|gc_(buffers|schemas)|runtime_(generated|coordination|invariants|failures)|binary_(execution|ownership)|memory_(execution|ownership)|combined_(execution|ownership)|lsp_(binary|memory|combined|io|const_recovery)|io_(ownership|execution|async_execution|kernel|ir)|documentation_execution|lsp_documentation|frontend|analysis|modules|generics_source|stage11_globals|lsp_stage11_globals|stage11_globals_stack|lsp_const_recovery_stack)$",
+  "tests": [
+    {
+      "backtrace": 37,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_gc_buffers"
+      ],
+      "name": "gc_buffers",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 39,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_gc_schemas"
+      ],
+      "name": "gc_schemas",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 90.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 65,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_tests"
+      ],
+      "name": "runtime_coordination",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 90.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 67,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_generated"
+      ],
+      "name": "runtime_generated",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 75,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_generics_tests",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name": "generics_source",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 77,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_collections_tests",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name": "collections_source",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 182,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_strings_tests",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name": "strings_source",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 185,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_strings_aot_normal"
+      ],
+      "name": "strings_aot_normal",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 188,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_strings_aot_optimized"
+      ],
+      "name": "strings_aot_optimized",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 191,
+      "command": [
+        "/usr/bin/cmake",
+        "-DCOMPILER=/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "-DROOT=/home/shmellyorc/Documents/Void.Language",
+        "-DBIN=/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+        "-DEXE_SUFFIX=",
+        "-P",
+        "/home/shmellyorc/Documents/Void.Language/tests/integration/strings.cmake"
+      ],
+      "name": "strings_cli",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 195,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_failures"
+      ],
+      "name": "runtime_failures",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 90.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 201,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/invariants.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_invariants"
+      ],
+      "name": "runtime_invariants",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 60.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 207,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_globals.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_stage11_globals",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 211,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "documentation_execution",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 213,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_documentation",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 215,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "binary_execution",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 900.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 217,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_binary",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 219,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_binary_ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+      ],
+      "name": "binary_ownership",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 223,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_const_recovery",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 225,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls",
+        "--small-stack"
+      ],
+      "name": "lsp_const_recovery_stack",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 227,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_combined_ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void",
+        "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+      ],
+      "name": "combined_ownership",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 233,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "combined_execution",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 235,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_combined",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 239,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "memory_execution",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 241,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_memory",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 243,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "text"
+      ],
+      "name": "text_encoding_text",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 245,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "hex"
+      ],
+      "name": "text_encoding_hex",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 247,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "base64"
+      ],
+      "name": "text_encoding_base64",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 249,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "ascii"
+      ],
+      "name": "text_encoding_ascii",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 251,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "oracles"
+      ],
+      "name": "text_encoding_oracles",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 253,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "interop"
+      ],
+      "name": "text_encoding_interop",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 255,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "large"
+      ],
+      "name": "text_encoding_large",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 257,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "errors"
+      ],
+      "name": "text_encoding_errors",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 259,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py"
+      ],
+      "name": "text_encoding_crash_preservation",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 261,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_text_encoding",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 263,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+        "Release"
+      ],
+      "name": "text_encoding_install",
+      "properties": [
+        {
+          "name": "RUN_SERIAL",
+          "value": true
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 900.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 265,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "text",
+        "--small-stack"
+      ],
+      "name": "text_encoding_stack",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 267,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls",
+        "--small-stack"
+      ],
+      "name": "lsp_text_encoding_stack",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 269,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "text_encoding_depth",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 271,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/integration/semantic_depth.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "text_encoding_semantic_depth",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "PYTHONPATH=/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 273,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_audit",
+        "--ir",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+      ],
+      "name": "text_encoding_ir",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 275,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_audit",
+        "--inventory",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+      ],
+      "name": "text_encoding_inventory",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 277,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+      ],
+      "name": "text_encoding_ownership",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 279,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_memory_ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+      ],
+      "name": "memory_ownership",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 289,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_globals",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/stage11 native fixtures"
+      ],
+      "name": "stage11_globals",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 333,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void",
+        "/home/shmellyorc/Documents/Void.Language/tests/io/ownership_async.void"
+      ],
+      "name": "io_ownership",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 335,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "io_execution",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 337,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner",
+        "--async"
+      ],
+      "name": "io_async_execution",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 343,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+      ],
+      "name": "lsp_io",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 385,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_kernel",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/io kernel fixtures"
+      ],
+      "name": "io_kernel",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 60.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 387,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_ir",
+        "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void"
+      ],
+      "name": "io_ir",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 60.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 485,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+        "analysis",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/analysis fixtures"
+      ],
+      "name": "analysis",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 489,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+        "frontend",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name": "frontend",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 90.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 491,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_tests",
+        "modules",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/module fixtures with spaces"
+      ],
+      "name": "modules",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 90.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 515,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/stack.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+      ],
+      "name": "stage11_globals_stack",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 543,
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint3.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_native_fixture.a",
+        "OFF"
+      ],
+      "name": "text_collections_sprint3",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,11 @@
 use error as core
 
+
 ## Recoverable calendar, clock, zone, arithmetic or temporal-format failure.
 struct error extends core.error:
     ## Operation family producing the failure; the message carries precise details.
     operation: string
+
 
 private func _checked<t>(outcome: result<t, string>) -> result<t, error>:
     if outcome is Ok(var value):
@@ -12,7 +14,9 @@ private func _checked<t>(outcome: result<t, string>) -> result<t, error>:
         return Err(error(message = message, operation = "time"))
     return Err(error(message = "Invalid temporal result", operation = "time"))
 
+
 # Validated temporal values over the compiler-owned, versioned Runtime kernel.
+
 
 ## A validated proleptic Gregorian calendar date.
 value struct date:
@@ -20,10 +24,12 @@ value struct date:
     private const _month: i64
     private const _day: i64
 
+
 private func (self date) init(year: i64, month: i64, day: i64):
     self._year = year
     self._month = month
     self._day = day
+
 
 ## Read the validated year component.
 ## @return The stored validated component without changing this value.
@@ -31,17 +37,20 @@ property (self date) year: i64:
     get:
         return self._year
 
+
 ## Read the validated month component.
 ## @return The stored validated component without changing this value.
 property (self date) month: i64:
     get:
         return self._month
 
+
 ## Read the validated day component.
 ## @return The stored validated component without changing this value.
 property (self date) day: i64:
     get:
         return self._day
+
 
 ## A validated wall clock time with nanosecond precision.
 value struct time_of_day:
@@ -50,11 +59,13 @@ value struct time_of_day:
     private const _second: i64
     private const _nanosecond: u32
 
+
 private func (self time_of_day) init(hour: i64, minute: i64, second: i64, nanosecond: u32):
     self._hour = hour
     self._minute = minute
     self._second = second
     self._nanosecond = nanosecond
+
 
 ## Read the validated hour component.
 ## @return The stored validated component without changing this value.
@@ -62,11 +73,13 @@ property (self time_of_day) hour: i64:
     get:
         return self._hour
 
+
 ## Read the validated minute component.
 ## @return The stored validated component without changing this value.
 property (self time_of_day) minute: i64:
     get:
         return self._minute
+
 
 ## Read the validated second component.
 ## @return The stored validated component without changing this value.
@@ -74,11 +87,13 @@ property (self time_of_day) second: i64:
     get:
         return self._second
 
+
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
 property (self time_of_day) nanosecond: u32:
     get:
         return self._nanosecond
+
 
 ## A validated civil date and time without a zone.
 value struct local_datetime:
@@ -90,6 +105,7 @@ value struct local_datetime:
     private const _second: i64
     private const _nanosecond: u32
 
+
 private func (self local_datetime) init(year: i64, month: i64, day: i64, hour: i64, minute: i64, second: i64, nanosecond: u32):
     self._year = year
     self._month = month
@@ -99,11 +115,13 @@ private func (self local_datetime) init(year: i64, month: i64, day: i64, hour: i
     self._second = second
     self._nanosecond = nanosecond
 
+
 ## Read the validated year component.
 ## @return The stored validated component without changing this value.
 property (self local_datetime) year: i64:
     get:
         return self._year
+
 
 ## Read the validated month component.
 ## @return The stored validated component without changing this value.
@@ -111,11 +129,13 @@ property (self local_datetime) month: i64:
     get:
         return self._month
 
+
 ## Read the validated day component.
 ## @return The stored validated component without changing this value.
 property (self local_datetime) day: i64:
     get:
         return self._day
+
 
 ## Read the validated hour component.
 ## @return The stored validated component without changing this value.
@@ -123,11 +143,13 @@ property (self local_datetime) hour: i64:
     get:
         return self._hour
 
+
 ## Read the validated minute component.
 ## @return The stored validated component without changing this value.
 property (self local_datetime) minute: i64:
     get:
         return self._minute
+
 
 ## Read the validated second component.
 ## @return The stored validated component without changing this value.
@@ -135,16 +157,19 @@ property (self local_datetime) second: i64:
     get:
         return self._second
 
+
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
 property (self local_datetime) nanosecond: u32:
     get:
         return self._nanosecond
 
+
 ## A Unix epoch instant with normalized nanoseconds.
 value struct instant:
     private const _seconds: i64
     private const _nanosecond: u32
+
 
 private func (self instant) init(seconds: i64, nanosecond: u32):
     self._seconds = seconds
@@ -156,20 +181,24 @@ property (self instant) seconds: i64:
     get:
         return self._seconds
 
+
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
 property (self instant) nanosecond: u32:
     get:
         return self._nanosecond
 
+
 ## A signed duration stored as seconds and normalized nanoseconds.
 value struct duration:
     private const _seconds: i64
     private const _nanosecond: u32
 
+
 private func (self duration) init(seconds: i64, nanosecond: u32):
     self._seconds = seconds
     self._nanosecond = nanosecond
+
 
 ## Read the validated seconds component.
 ## @return The stored validated component without changing this value.
@@ -177,11 +206,13 @@ property (self duration) seconds: i64:
     get:
         return self._seconds
 
+
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
 property (self duration) nanosecond: u32:
     get:
         return self._nanosecond
+
 
 ## A validated civil date and time with a fixed UTC offset.
 value struct offset_datetime:
@@ -194,6 +225,7 @@ value struct offset_datetime:
     private const _nanosecond: u32
     private const _offset_seconds: i64
 
+
 private func (self offset_datetime) init(year: i64, month: i64, day: i64, hour: i64, minute: i64, second: i64, nanosecond: u32, offset_seconds: i64):
     self._year = year
     self._month = month
@@ -204,11 +236,13 @@ private func (self offset_datetime) init(year: i64, month: i64, day: i64, hour: 
     self._nanosecond = nanosecond
     self._offset_seconds = offset_seconds
 
+
 ## Read the validated year component.
 ## @return The stored validated component without changing this value.
 property (self offset_datetime) year: i64:
     get:
         return self._year
+
 
 ## Read the validated month component.
 ## @return The stored validated component without changing this value.
@@ -216,11 +250,13 @@ property (self offset_datetime) month: i64:
     get:
         return self._month
 
+
 ## Read the validated day component.
 ## @return The stored validated component without changing this value.
 property (self offset_datetime) day: i64:
     get:
         return self._day
+
 
 ## Read the validated hour component.
 ## @return The stored validated component without changing this value.
@@ -228,11 +264,13 @@ property (self offset_datetime) hour: i64:
     get:
         return self._hour
 
+
 ## Read the validated minute component.
 ## @return The stored validated component without changing this value.
 property (self offset_datetime) minute: i64:
     get:
         return self._minute
+
 
 ## Read the validated second component.
 ## @return The stored validated component without changing this value.
@@ -240,11 +278,13 @@ property (self offset_datetime) second: i64:
     get:
         return self._second
 
+
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
 property (self offset_datetime) nanosecond: u32:
     get:
         return self._nanosecond
+
 
 ## Read the validated offset seconds component.
 ## @return The stored validated component without changing this value.
@@ -252,18 +292,22 @@ property (self offset_datetime) offset_seconds: i64:
     get:
         return self._offset_seconds
 
+
 ## A canonical zone from the bundled timezone database.
 value struct zone:
     private const _name: string
 
+
 private func (self zone) init(name: string):
     self._name = name
+
 
 ## Read the validated name component.
 ## @return The stored validated component without changing this value.
 property (self zone) name: string:
     get:
         return self._name
+
 
 ## An instant associated with a canonical timezone.
 value struct zoned_datetime:
@@ -276,11 +320,13 @@ private func (self zoned_datetime) init(seconds: i64, nanosecond: u32, zone_name
     self._nanosecond = nanosecond
     self._zone_name = zone_name
 
+
 ## Read the validated seconds component.
 ## @return The stored validated component without changing this value.
 property (self zoned_datetime) seconds: i64:
     get:
         return self._seconds
+
 
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
@@ -288,11 +334,13 @@ property (self zoned_datetime) nanosecond: u32:
     get:
         return self._nanosecond
 
+
 ## Read the validated zone name component.
 ## @return The stored validated component without changing this value.
 property (self zoned_datetime) zone_name: string:
     get:
         return self._zone_name
+
 
 ## An opaque monotonic sample tied to its owning Runtime clock.
 value struct monotonic_tick:
@@ -300,32 +348,39 @@ value struct monotonic_tick:
     private const _nanosecond: i64
     private const _context: i64
 
+
 private func (self monotonic_tick) init(seconds: i64, nanosecond: i64, context: i64):
     self._seconds = seconds
     self._nanosecond = nanosecond
     self._context = context
 
+
 private property (self monotonic_tick) seconds: i64:
     get:
         return self._seconds
+
 
 private property (self monotonic_tick) nanosecond: i64:
     get:
         return self._nanosecond
 
+
 private property (self monotonic_tick) context: i64:
     get:
         return self._context
+
 
 private value struct _clock_sample:
     private const _seconds: i64
     private const _nanosecond: i64
     private const _context: i64
 
+
 private func (self _clock_sample) init(seconds: i64, nanosecond: i64, context: i64):
     self._seconds = seconds
     self._nanosecond = nanosecond
     self._context = context
+
 
 ## Read the validated seconds component.
 ## @return The stored validated component without changing this value.
@@ -333,11 +388,13 @@ property (self _clock_sample) seconds: i64:
     get:
         return self._seconds
 
+
 ## Read the validated nanosecond component.
 ## @return The stored validated component without changing this value.
 property (self _clock_sample) nanosecond: i64:
     get:
         return self._nanosecond
+
 
 ## Read the validated context component.
 ## @return The stored validated component without changing this value.
@@ -345,11 +402,13 @@ property (self _clock_sample) context: i64:
     get:
         return self._context
 
+
 ## Read the validated rules version component.
 ## @return The stored validated component without changing this value.
 property (self zone) rules_version: string:
     get:
         return "2026e"
+
 
 ## Policy for resolving ambiguous local times in a timezone.
 enum local_choice:
@@ -360,6 +419,7 @@ enum local_choice:
     ## Choose the later matching instant.
     later
 
+
 ## Validate and construct a Gregorian calendar date.
 ## @param year The calendar year.
 ## @param month The month from 1 through 12.
@@ -368,6 +428,7 @@ enum local_choice:
 func make_date(year: i64, month: i64, day: i64) -> result<date, error>:
     var checked = _checked<i64>(_date_check(year, month, day))?
     return Ok(date(year, month, day))
+
 
 ## Validate and construct a wall clock time.
 ## @param hour Hour from 0 through 23.
@@ -379,12 +440,14 @@ func make_time(hour: i64, minute: i64, second: i64, nanosecond: i64 = 0) -> resu
     var checked = _checked<i64>(_time_check(hour, minute, second, nanosecond))?
     return Ok(time_of_day(hour, minute, second, nanosecond as u32))
 
+
 ## Combine a validated date and wall clock time.
 ## @param day Validated date, or day of month for date construction.
 ## @param clock Validated wall clock time to combine with the date.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func make_local_datetime(day: date, clock: time_of_day) -> result<local_datetime, error>:
     return Ok(local_datetime(day.year, day.month, day.day, clock.hour, clock.minute, clock.second, clock.nanosecond))
+
 
 ## Construct an instant with checked nanosecond normalization.
 ## @param seconds Signed whole seconds relative to the operation’s epoch.
@@ -394,6 +457,7 @@ func make_instant(seconds: i64, nanosecond: i64 = 0) -> result<instant, error>:
     var checked = _checked<i64>(_time_check(0, 0, 0, nanosecond))?
     return Ok(instant(seconds, nanosecond as u32))
 
+
 ## Construct a duration with checked nanosecond normalization.
 ## @param seconds Signed whole seconds relative to the operation’s epoch.
 ## @param nanosecond Normalized fractional second from 0 through 999999999.
@@ -402,12 +466,14 @@ func make_duration(seconds: i64, nanosecond: i64 = 0) -> result<duration, error>
     var checked = _checked<i64>(_time_check(0, 0, 0, nanosecond))?
     return Ok(duration(seconds, nanosecond as u32))
 
+
 ## Resolve a canonical timezone using the bundled database.
 ## @param name Timezone name to resolve using the bundled rules.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func find_zone(name: string) -> result<zone, error>:
     var canonical = _checked<string>(_zone(name))?
     return Ok(zone(canonical))
+
 
 ## Project an instant into a checked fixed UTC offset.
 ## @param value Validated temporal value to project or resolve.
@@ -427,6 +493,7 @@ func at_offset(value: instant, offset_seconds: i64) -> result<offset_datetime, e
     var year = packed / 100
     return Ok(offset_datetime(year, month, day, hour, minute, second, value.nanosecond, offset_seconds))
 
+
 ## Associate an instant with a canonical timezone.
 ## @param value Validated temporal value to project or resolve.
 ## @param selected Canonical timezone whose rules should be applied.
@@ -435,6 +502,7 @@ func in_zone(value: instant, selected: zone) -> result<zoned_datetime, error>:
     var offset = _checked<i64>(_zone_offset(value.seconds, selected.name))?
     var checked = _checked<i64>(_project(value.seconds, offset))?
     return Ok(zoned_datetime(value.seconds, value.nanosecond, selected.name))
+
 
 ## Resolve civil time using the selected timezone ambiguity policy.
 ## @param value Validated temporal value to project or resolve.
@@ -451,11 +519,13 @@ func resolve_local(value: local_datetime, selected: zone, choice: local_choice =
     var resolved = _checked<i64>(_resolve(seconds, selected.name, selection))?
     return Ok(zoned_datetime(resolved, value.nanosecond, selected.name))
 
+
 ## Sample the system UTC clock.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func now_utc() -> result<instant, error>:
     var sample = _checked<_clock_sample>(_now())?
     return make_instant(sample.seconds, sample.nanosecond)
+
 
 ## Sample the owning Runtime monotonic clock.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
@@ -463,15 +533,18 @@ func monotonic_now() -> result<monotonic_tick, error>:
     var sample = _checked<_clock_sample>(_monotonic())?
     return Ok(monotonic_tick(sample.seconds, sample.nanosecond, sample.context))
 
+
 ## Query nominal UTC clock resolution in nanoseconds.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func utc_precision_ns() -> result<i64, error>:
     return _checked<i64>(_utc_precision())
 
+
 ## Query nominal monotonic clock resolution in nanoseconds.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func monotonic_precision_ns() -> result<i64, error>:
     return _checked<i64>(_monotonic_precision())
+
 
 private func _combine(a: i64, an: i64, b: i64, bn: i64, subtract: bool) -> result<_clock_sample, error>:
     var ns: i64 = an + bn
@@ -490,12 +563,14 @@ private func _combine(a: i64, an: i64, b: i64, bn: i64, subtract: bool) -> resul
     var seconds = _checked<i64>(_seconds(a, b, operation, carry))?
     return Ok(_clock_sample(seconds, ns, 0))
 
+
 ## Add a duration with checked seconds arithmetic.
 ## @param delta Duration to add or subtract with checked seconds arithmetic.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func (self instant) add(delta: duration) -> result<instant, error>:
     var value = _combine(self.seconds, self.nanosecond as i64, delta.seconds, delta.nanosecond as i64, false)?
     return make_instant(value.seconds, value.nanosecond)
+
 
 ## Subtract a duration with checked seconds arithmetic.
 ## @param delta Duration to add or subtract with checked seconds arithmetic.
@@ -504,12 +579,14 @@ func (self instant) subtract(delta: duration) -> result<instant, error>:
     var value = _combine(self.seconds, self.nanosecond as i64, delta.seconds, delta.nanosecond as i64, true)?
     return make_instant(value.seconds, value.nanosecond)
 
+
 ## Compute the checked duration between two instants.
 ## @param other Other temporal value used by this checked operation.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func (self instant) difference(other: instant) -> result<duration, error>:
     var value = _combine(self.seconds, self.nanosecond as i64, other.seconds, other.nanosecond as i64, true)?
     return make_duration(value.seconds, value.nanosecond)
+
 
 ## Add a duration with checked seconds arithmetic.
 ## @param other Other temporal value used by this checked operation.
@@ -518,12 +595,14 @@ func (self duration) add(other: duration) -> result<duration, error>:
     var value = _combine(self.seconds, self.nanosecond as i64, other.seconds, other.nanosecond as i64, false)?
     return make_duration(value.seconds, value.nanosecond)
 
+
 ## Subtract a duration with checked seconds arithmetic.
 ## @param other Other temporal value used by this checked operation.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func (self duration) subtract(other: duration) -> result<duration, error>:
     var value = _combine(self.seconds, self.nanosecond as i64, other.seconds, other.nanosecond as i64, true)?
     return make_duration(value.seconds, value.nanosecond)
+
 
 ## Compute elapsed time between samples from the same Runtime clock.
 ## @param start Earlier sample from the same Runtime monotonic clock.
@@ -535,6 +614,7 @@ func elapsed(start: monotonic_tick, end: monotonic_tick) -> result<duration, err
     var value = _combine(end.seconds, end.nanosecond, start.seconds, start.nanosecond, true)?
     return make_duration(value.seconds, value.nanosecond)
 
+
 ## Project this zoned instant into its civil components and UTC offset.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func (self zoned_datetime) components() -> result<offset_datetime, error>:
@@ -542,16 +622,19 @@ func (self zoned_datetime) components() -> result<offset_datetime, error>:
     var offset = _checked<i64>(_zone_offset(self.seconds, self.zone_name))?
     return at_offset(point, offset)
 
+
 ## Format this temporal value with an invariant pattern.
 ## @param spec Invariant temporal format pattern; empty selects the default display.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func (self date) format(spec: string) -> result<string, error>:
     return _checked<string>(_date_format(self.year, self.month, self.day, spec))
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self date) string() -> string:
     return _temporal_unwrap(_temporal_result(self.format("")))
+
 
 ## Format this temporal value with an invariant pattern.
 ## @param spec Invariant temporal format pattern; empty selects the default display.
@@ -559,10 +642,12 @@ func (self date) string() -> string:
 func (self time_of_day) format(spec: string) -> result<string, error>:
     return _checked<string>(_time_format(self.hour, self.minute, self.second, self.nanosecond as i64, spec))
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self time_of_day) string() -> string:
     return _temporal_unwrap(_temporal_result(self.format("")))
+
 
 ## Format this temporal value with an invariant pattern.
 ## @param spec Invariant temporal format pattern; empty selects the default display.
@@ -580,6 +665,7 @@ func (self local_datetime) format(spec: string) -> result<string, error>:
     )
     return _checked<string>(outcome)
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self local_datetime) string() -> string:
@@ -591,10 +677,12 @@ func (self local_datetime) string() -> string:
 func (self instant) format(spec: string) -> result<string, error>:
     return _checked<string>(_instant_format(self.seconds, self.nanosecond as i64, spec))
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self instant) string() -> string:
     return _temporal_unwrap(_temporal_result(self.format("")))
+
 
 ## Format this temporal value with an invariant pattern.
 ## @param spec Invariant temporal format pattern; empty selects the default display.
@@ -602,10 +690,12 @@ func (self instant) string() -> string:
 func (self duration) format(spec: string) -> result<string, error>:
     return _checked<string>(_duration_format(self.seconds, self.nanosecond as i64, spec))
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self duration) string() -> string:
     return _temporal_unwrap(_temporal_result(self.format("")))
+
 
 ## Format this temporal value with an invariant pattern.
 ## @param spec Invariant temporal format pattern; empty selects the default display.
@@ -624,10 +714,12 @@ func (self offset_datetime) format(spec: string) -> result<string, error>:
     )
     return _checked<string>(outcome)
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self offset_datetime) string() -> string:
     return _temporal_unwrap(_temporal_result(self.format("")))
+
 
 ## Format this temporal value with an invariant pattern.
 ## @param spec Invariant temporal format pattern; empty selects the default display.
@@ -635,10 +727,12 @@ func (self offset_datetime) string() -> string:
 func (self zoned_datetime) format(spec: string) -> result<string, error>:
     return _checked<string>(_zoned_format(self.seconds, self.nanosecond as i64, self.zone_name, spec))
 
+
 ## Render the default invariant temporal display.
 ## @return Owned invariant display text; checked Runtime failure if default formatting fails.
 func (self zoned_datetime) string() -> string:
     return _temporal_unwrap(_temporal_result(self.format("")))
+
 
 ## Read the validated date component.
 ## @return The stored validated component without changing this value.
@@ -646,17 +740,20 @@ property (self local_datetime) date: date:
     get:
         return date(self.year, self.month, self.day)
 
+
 ## Read the validated time component.
 ## @return The stored validated component without changing this value.
 property (self local_datetime) time: time_of_day:
     get:
         return time_of_day(self.hour, self.minute, self.second, self.nanosecond)
 
+
 ## Read the validated local component.
 ## @return The stored validated component without changing this value.
 property (self offset_datetime) local: local_datetime:
     get:
         return local_datetime(self.year, self.month, self.day, self.hour, self.minute, self.second, self.nanosecond)
+
 
 ## Convert fixed-offset civil time into a checked Unix instant.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
@@ -665,17 +762,20 @@ func (self offset_datetime) to_instant() -> result<instant, error>:
     var shifted = _checked<i64>(_seconds(seconds, self.offset_seconds, 1, 0))?
     return make_instant(shifted, self.nanosecond as i64)
 
+
 ## Read the validated instant component.
 ## @return The stored validated component without changing this value.
 property (self zoned_datetime) instant: instant:
     get:
         return instant(self.seconds, self.nanosecond)
 
+
 ## Read the validated zone component.
 ## @return The stored validated component without changing this value.
 property (self zoned_datetime) zone: zone:
     get:
         return zone(self.zone_name)
+
 
 ## Compare monotonic samples from the same owning Runtime clock.
 ## @param other Other temporal value used by this checked operation.

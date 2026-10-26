@@ -1,0 +1,118 @@
+[
+  {
+    "name": "text_encoding_text",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "text"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 11.499067063006805,
+    "log": "final-release-text_encoding_text.log"
+  },
+  {
+    "name": "text_encoding_errors",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "errors"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 12.374942194990581,
+    "log": "final-release-text_encoding_errors.log"
+  },
+  {
+    "name": "text_encoding_crash_preservation",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 0.2842834769980982,
+    "log": "final-release-text_encoding_crash_preservation.log"
+  },
+  {
+    "name": "lsp_text_encoding",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 0.6782737419998739,
+    "log": "final-release-lsp_text_encoding.log"
+  },
+  {
+    "name": "text_encoding_install",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+      "Release"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 31.860829967976315,
+    "log": "final-release-text_encoding_install.log"
+  },
+  {
+    "name": "text_encoding_depth",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 0.13238638499751687,
+    "log": "final-release-text_encoding_depth.log"
+  },
+  {
+    "name": "text_encoding_ir",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_audit",
+      "--ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 0.310830090980744,
+    "log": "final-release-text_encoding_ir.log"
+  },
+  {
+    "name": "text_encoding_inventory",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_audit",
+      "--inventory",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 0.08917686800123192,
+    "log": "final-release-text_encoding_inventory.log"
+  },
+  {
+    "name": "text_encoding_ownership",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "status": 0,
+    "seconds": 13.4622149229981,
+    "log": "final-release-text_encoding_ownership.log"
+  }
+]

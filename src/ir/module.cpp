@@ -1083,6 +1083,17 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result = i.type;
                     break;
                 }
+                case Op::text_case: {
+                    if (!m.coordinated || f.module_identity != "/@stdlib/text.void" ||
+                        i.type != Type::string || i.immediate || i.receiver ||
+                        !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) {
+                        fail("invalid private Unicode casing operation");
+                    }
+                    expect(i.a, Type::string);
+                    expect(i.b, Type::boolean);
+                    result = Type::string;
+                    break;
+                }
                 case Op::memory_write: {
                     if (!m.coordinated || f.module_identity != "/@stdlib/io/memory.void" ||
                         i.a || i.b || i.immediate || i.receiver || !i.callee.empty() ||

@@ -1,0 +1,77 @@
+{"event": "attempt_begin", "elapsed_seconds": 0.000227, "attempt": 2, "mode": null, "phase": "startup", "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-02"}
+{"event": "main_enter", "elapsed_seconds": 0.096328, "attempt": 2, "mode": null, "phase": "startup", "main_address": "0x55b085c6adf0", "pid": 670540}
+{"event": "boundary", "elapsed_seconds": 0.242258, "attempt": 2, "mode": "normal", "phase": "compile_begin", "pc": "0x55b085c6b5b2", "thread": 1, "optimized_argument_ecx": 0}
+{"event": "boundary", "elapsed_seconds": 21.686037, "attempt": 2, "mode": "normal", "phase": "compile_end", "pc": "0x55b085c6b5b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 21.686613, "attempt": 2, "mode": "normal", "phase": "invoke_begin", "pc": "0x55b085c6b432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 21.759809, "attempt": 2, "mode": "normal", "phase": "invoke_end", "pc": "0x55b085c6b437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 21.760411, "attempt": 2, "mode": "normal", "phase": "code_teardown_begin", "pc": "0x55b085c6b489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 21.761173, "attempt": 2, "mode": "normal", "phase": "code_teardown_end", "pc": "0x55b085c6b22c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 21.761479, "attempt": 2, "mode": "normal", "phase": "jit_teardown_begin", "pc": "0x55b085c6b22f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 21.764687, "attempt": 2, "mode": "normal", "phase": "jit_teardown_end", "pc": "0x55b085c6b234", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 21.766306, "attempt": 2, "mode": "O2", "phase": "compile_begin", "pc": "0x55b085c6b5b2", "thread": 1, "optimized_argument_ecx": 1}
+{"event": "boundary", "elapsed_seconds": 59.775859, "attempt": 2, "mode": "O2", "phase": "compile_end", "pc": "0x55b085c6b5b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 59.77629, "attempt": 2, "mode": "O2", "phase": "invoke_begin", "pc": "0x55b085c6b432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 59.849453, "attempt": 2, "mode": "O2", "phase": "invoke_end", "pc": "0x55b085c6b437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 59.849935, "attempt": 2, "mode": "O2", "phase": "code_teardown_begin", "pc": "0x55b085c6b489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 59.850764, "attempt": 2, "mode": "O2", "phase": "code_teardown_end", "pc": "0x55b085c6b22c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 59.851028, "attempt": 2, "mode": "O2", "phase": "jit_teardown_begin", "pc": "0x55b085c6b22f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 59.874777, "attempt": 2, "mode": "O2", "phase": "jit_teardown_end", "pc": "0x55b085c6b234", "thread": 1}
+{"event": "inferior_exited", "elapsed_seconds": 59.895042, "attempt": 2, "mode": "O2", "phase": "jit_teardown_end", "exit_code": 0}
+{"event": "attempt_begin", "elapsed_seconds": 59.895732, "attempt": 3, "mode": null, "phase": "startup", "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-03"}
+{"event": "main_enter", "elapsed_seconds": 59.927821, "attempt": 3, "mode": null, "phase": "startup", "main_address": "0x564d093f7df0", "pid": 670617}
+{"event": "boundary", "elapsed_seconds": 60.065097, "attempt": 3, "mode": "normal", "phase": "compile_begin", "pc": "0x564d093f85b2", "thread": 1, "optimized_argument_ecx": 0}
+{"event": "boundary", "elapsed_seconds": 83.03971, "attempt": 3, "mode": "normal", "phase": "compile_end", "pc": "0x564d093f85b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 83.040087, "attempt": 3, "mode": "normal", "phase": "invoke_begin", "pc": "0x564d093f8432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 83.128025, "attempt": 3, "mode": "normal", "phase": "invoke_end", "pc": "0x564d093f8437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 83.128529, "attempt": 3, "mode": "normal", "phase": "code_teardown_begin", "pc": "0x564d093f8489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 83.129441, "attempt": 3, "mode": "normal", "phase": "code_teardown_end", "pc": "0x564d093f822c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 83.129922, "attempt": 3, "mode": "normal", "phase": "jit_teardown_begin", "pc": "0x564d093f822f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 83.132146, "attempt": 3, "mode": "normal", "phase": "jit_teardown_end", "pc": "0x564d093f8234", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 83.133485, "attempt": 3, "mode": "O2", "phase": "compile_begin", "pc": "0x564d093f85b2", "thread": 1, "optimized_argument_ecx": 1}
+{"event": "boundary", "elapsed_seconds": 120.245035, "attempt": 3, "mode": "O2", "phase": "compile_end", "pc": "0x564d093f85b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 120.245508, "attempt": 3, "mode": "O2", "phase": "invoke_begin", "pc": "0x564d093f8432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 120.322245, "attempt": 3, "mode": "O2", "phase": "invoke_end", "pc": "0x564d093f8437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 120.322721, "attempt": 3, "mode": "O2", "phase": "code_teardown_begin", "pc": "0x564d093f8489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 120.323423, "attempt": 3, "mode": "O2", "phase": "code_teardown_end", "pc": "0x564d093f822c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 120.323704, "attempt": 3, "mode": "O2", "phase": "jit_teardown_begin", "pc": "0x564d093f822f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 120.325721, "attempt": 3, "mode": "O2", "phase": "jit_teardown_end", "pc": "0x564d093f8234", "thread": 1}
+{"event": "inferior_exited", "elapsed_seconds": 120.368121, "attempt": 3, "mode": "O2", "phase": "jit_teardown_end", "exit_code": 0}
+{"event": "attempt_begin", "elapsed_seconds": 120.368813, "attempt": 4, "mode": null, "phase": "startup", "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-04"}
+{"event": "main_enter", "elapsed_seconds": 120.403624, "attempt": 4, "mode": null, "phase": "startup", "main_address": "0x562e06a75df0", "pid": 670816}
+{"event": "boundary", "elapsed_seconds": 120.547192, "attempt": 4, "mode": "normal", "phase": "compile_begin", "pc": "0x562e06a765b2", "thread": 1, "optimized_argument_ecx": 0}
+{"event": "boundary", "elapsed_seconds": 143.514889, "attempt": 4, "mode": "normal", "phase": "compile_end", "pc": "0x562e06a765b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 143.515348, "attempt": 4, "mode": "normal", "phase": "invoke_begin", "pc": "0x562e06a76432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 143.58735, "attempt": 4, "mode": "normal", "phase": "invoke_end", "pc": "0x562e06a76437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 143.58774, "attempt": 4, "mode": "normal", "phase": "code_teardown_begin", "pc": "0x562e06a76489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 143.58823, "attempt": 4, "mode": "normal", "phase": "code_teardown_end", "pc": "0x562e06a7622c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 143.588372, "attempt": 4, "mode": "normal", "phase": "jit_teardown_begin", "pc": "0x562e06a7622f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 143.589966, "attempt": 4, "mode": "normal", "phase": "jit_teardown_end", "pc": "0x562e06a76234", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 143.590903, "attempt": 4, "mode": "O2", "phase": "compile_begin", "pc": "0x562e06a765b2", "thread": 1, "optimized_argument_ecx": 1}
+{"event": "boundary", "elapsed_seconds": 178.957006, "attempt": 4, "mode": "O2", "phase": "compile_end", "pc": "0x562e06a765b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 178.957506, "attempt": 4, "mode": "O2", "phase": "invoke_begin", "pc": "0x562e06a76432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 179.031351, "attempt": 4, "mode": "O2", "phase": "invoke_end", "pc": "0x562e06a76437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 179.031645, "attempt": 4, "mode": "O2", "phase": "code_teardown_begin", "pc": "0x562e06a76489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 179.032241, "attempt": 4, "mode": "O2", "phase": "code_teardown_end", "pc": "0x562e06a7622c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 179.0324, "attempt": 4, "mode": "O2", "phase": "jit_teardown_begin", "pc": "0x562e06a7622f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 179.033838, "attempt": 4, "mode": "O2", "phase": "jit_teardown_end", "pc": "0x562e06a76234", "thread": 1}
+{"event": "inferior_exited", "elapsed_seconds": 179.076934, "attempt": 4, "mode": "O2", "phase": "jit_teardown_end", "exit_code": 0}
+{"event": "attempt_begin", "elapsed_seconds": 179.077526, "attempt": 5, "mode": null, "phase": "startup", "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-05"}
+{"event": "main_enter", "elapsed_seconds": 179.109506, "attempt": 5, "mode": null, "phase": "startup", "main_address": "0x560ecf389df0", "pid": 670932}
+{"event": "boundary", "elapsed_seconds": 179.247692, "attempt": 5, "mode": "normal", "phase": "compile_begin", "pc": "0x560ecf38a5b2", "thread": 1, "optimized_argument_ecx": 0}
+{"event": "boundary", "elapsed_seconds": 199.98863, "attempt": 5, "mode": "normal", "phase": "compile_end", "pc": "0x560ecf38a5b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 199.989108, "attempt": 5, "mode": "normal", "phase": "invoke_begin", "pc": "0x560ecf38a432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 200.06009, "attempt": 5, "mode": "normal", "phase": "invoke_end", "pc": "0x560ecf38a437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 200.060602, "attempt": 5, "mode": "normal", "phase": "code_teardown_begin", "pc": "0x560ecf38a489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 200.061292, "attempt": 5, "mode": "normal", "phase": "code_teardown_end", "pc": "0x560ecf38a22c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 200.061591, "attempt": 5, "mode": "normal", "phase": "jit_teardown_begin", "pc": "0x560ecf38a22f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 200.063329, "attempt": 5, "mode": "normal", "phase": "jit_teardown_end", "pc": "0x560ecf38a234", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 200.06439, "attempt": 5, "mode": "O2", "phase": "compile_begin", "pc": "0x560ecf38a5b2", "thread": 1, "optimized_argument_ecx": 1}
+{"event": "boundary", "elapsed_seconds": 234.479349, "attempt": 5, "mode": "O2", "phase": "compile_end", "pc": "0x560ecf38a5b7", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 234.4798, "attempt": 5, "mode": "O2", "phase": "invoke_begin", "pc": "0x560ecf38a432", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 234.562528, "attempt": 5, "mode": "O2", "phase": "invoke_end", "pc": "0x560ecf38a437", "thread": 1, "answer_eax": 7}
+{"event": "boundary", "elapsed_seconds": 234.562812, "attempt": 5, "mode": "O2", "phase": "code_teardown_begin", "pc": "0x560ecf38a489", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 234.563302, "attempt": 5, "mode": "O2", "phase": "code_teardown_end", "pc": "0x560ecf38a22c", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 234.563444, "attempt": 5, "mode": "O2", "phase": "jit_teardown_begin", "pc": "0x560ecf38a22f", "thread": 1}
+{"event": "boundary", "elapsed_seconds": 234.564854, "attempt": 5, "mode": "O2", "phase": "jit_teardown_end", "pc": "0x560ecf38a234", "thread": 1}
+{"event": "inferior_exited", "elapsed_seconds": 234.60978, "attempt": 5, "mode": "O2", "phase": "jit_teardown_end", "exit_code": 0}
+{"event": "bounded_batch_finished_without_sigsegv", "elapsed_seconds": 234.610227, "attempt": 5, "mode": "O2", "phase": "jit_teardown_end", "attempts": 4}

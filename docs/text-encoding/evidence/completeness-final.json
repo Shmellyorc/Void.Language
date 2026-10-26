@@ -1,0 +1,70 @@
+{
+  "completed_utc": "2026-10-26T20:12:41.703032+00:00",
+  "head": "e24d3a95db03fd282c87a5d9b885471057e38798",
+  "profiles": {
+    "debug": {
+      "profile": "debug",
+      "passed": 56,
+      "total": 56,
+      "seconds": 1164.0930442209938,
+      "allocation_failures_per_mode": {
+        "normal": "2668",
+        "O2": "2668"
+      },
+      "ownership_checks": 41778,
+      "results_sha256": "985cb1d81cb575a8c826116cf6625d8f0ce96584db2bd0c1f80eda80dcbcfc10",
+      "selection_sha256": "5478e1a0db9468994aa842805dc9c0655a649c63c455e3afb05731105cce5684"
+    },
+    "release": {
+      "profile": "release",
+      "passed": 56,
+      "total": 56,
+      "seconds": 637.2310804680164,
+      "allocation_failures_per_mode": {
+        "normal": "2668",
+        "O2": "2668"
+      },
+      "ownership_checks": 41778,
+      "results_sha256": "4a89679108bc2fa61b6b7c2e741e40ee64b3a2f5f8b98e4885aee07f40925931",
+      "selection_sha256": "20e48db9b0560768004fb21ad92e6d9771b531727e17833b10a71f1d4d51a6a6"
+    },
+    "sanitizers": {
+      "profile": "sanitizers",
+      "passed": 53,
+      "total": 53,
+      "seconds": 1198.112263766001,
+      "allocation_failures_per_mode": {
+        "normal": "2668",
+        "O2": "2668"
+      },
+      "ownership_checks": 41778,
+      "results_sha256": "cb6a07c85faef79e17466927a6579f94cbf95ecd0d45ff9aa21ff6b6d850b486",
+      "selection_sha256": "f96bc7b22cd4c42cc827afc6ce05fdf14281d48ce6dc2a4ccfbd48778b82c40d"
+    }
+  },
+  "frozen_source_hashes_match": 40,
+  "protected_hashes_match": 20,
+  "confirmed_external_changes": [
+    {
+      "path": "stdlib/time.void",
+      "original_sha256": "e912ee71333545e3c6d938b66d58f2dff34932ac8b16e01dc20dfdf5d9967f77",
+      "actual_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "owner": "Boss confirmed their own blank-line formatting change in chat; preserved untouched."
+    }
+  ],
+  "public_declarations": 73,
+  "oracle_cases": 929,
+  "ownership_scenarios": 19,
+  "real_crash_incidents": [
+    "incident-splghldg"
+  ],
+  "crash_source_hashes_match_and_readonly": 13,
+  "crash_provenance_and_private_binary_hashes_match": true,
+  "root_readme_changed": false,
+  "console_changed": false,
+  "semantic_limits_changed": false,
+  "historical_filesystem_sigsegv_fixed": false,
+  "hosted_ci_run": false,
+  "git_refs_mutated": false,
+  "pending_review": "Independent Golden Wrench source review; native Windows/macOS acceptance remains for later owner-controlled matrix."
+}

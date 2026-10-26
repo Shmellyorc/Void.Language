@@ -1,0 +1,109 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000055d9cd2ed2ab in vd::(anonymous namespace)::Semantics::anchor (this=0x55d9d6c8b5b0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2081
+2081	    std::optional<Type> anchor(Expr& e) {
+#0  0x000055d9cd2ed2ab in vd::(anonymous namespace)::Semantics::anchor (this=0x55d9d6c8b5b0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2081
+#1  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#2  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#3  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#4  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#5  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#6  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#7  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#8  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#9  0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#10 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#11 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#12 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#13 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#14 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#15 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#16 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#17 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#18 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#19 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#20 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#21 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#22 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#23 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#24 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#25 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#26 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#27 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#28 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#29 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#30 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#31 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#32 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#33 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#34 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#35 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#36 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#37 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#38 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#39 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#40 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#41 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#42 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#43 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+#44 0x000055d9cd2eddc9 in vd::(anonymous namespace)::Semantics::anchor (this=0x7ffff49529e0, e=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2128
+rsp            0x7ffff485bc30      0x7ffff485bc30
+rip            0x55d9cd2ed2ab      0x55d9cd2ed2ab <vd::(anonymous namespace)::Semantics::anchor(vd::(anonymous namespace)::Expr&)+11>
+process 716035
+Mapped address spaces:
+
+Start Addr         End Addr           Size               Offset             Perms File 
+0x000055d9cc688000 0x000055d9cd123000 0xa9b000           0x0                r--p  /home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair 
+0x000055d9cd123000 0x000055d9cf3b8000 0x2295000          0xa9a000           r-xp  /home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair 
+0x000055d9cf3b8000 0x000055d9cf443000 0x8b000            0x2d2e000          r--p  /home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair 
+0x000055d9cf443000 0x000055d9cf445000 0x2000             0x2db8000          rw-p  /home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair 
+0x000055d9cf445000 0x000055d9cf4a9000 0x64000            0x0                rw-p   
+0x000055d9d6c0e000 0x000055d9d6ce1000 0xd3000            0x0                rw-p  [heap] 
+0x00007f0c8dc00000 0x00007f0c8dc28000 0x28000            0x0                r--p  /usr/lib/x86_64-linux-gnu/libc.so.6 
+0x00007f0c8dc28000 0x00007f0c8dd99000 0x171000           0x28000            r-xp  /usr/lib/x86_64-linux-gnu/libc.so.6 
+0x00007f0c8dd99000 0x00007f0c8dded000 0x54000            0x199000           r--p  /usr/lib/x86_64-linux-gnu/libc.so.6 
+0x00007f0c8dded000 0x00007f0c8ddf1000 0x4000             0x1ec000           r--p  /usr/lib/x86_64-linux-gnu/libc.so.6 
+0x00007f0c8ddf1000 0x00007f0c8ddf3000 0x2000             0x1f0000           rw-p  /usr/lib/x86_64-linux-gnu/libc.so.6 
+0x00007f0c8ddf3000 0x00007f0c8de00000 0xd000             0x0                rw-p   
+0x00007f0c8de00000 0x00007f0c8dea6000 0xa6000            0x0                r--p  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.36 
+0x00007f0c8dea6000 0x00007f0c8e005000 0x15f000           0xa6000            r-xp  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.36 
+0x00007f0c8e005000 0x00007f0c8e09a000 0x95000            0x205000           r--p  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.36 
+0x00007f0c8e09a000 0x00007f0c8e0a9000 0xf000             0x299000           r--p  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.36 
+0x00007f0c8e0a9000 0x00007f0c8e0ac000 0x3000             0x2a8000           rw-p  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.36 
+0x00007f0c8e0ac000 0x00007f0c8e0b0000 0x4000             0x0                rw-p   
+0x00007f0c8e23e000 0x00007f0c8e244000 0x6000             0x0                rw-p   
+0x00007f0c8e244000 0x00007f0c8e248000 0x4000             0x0                r--p  /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 
+0x00007f0c8e248000 0x00007f0c8e26c000 0x24000            0x4000             r-xp  /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 
+0x00007f0c8e26c000 0x00007f0c8e270000 0x4000             0x28000            r--p  /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 
+0x00007f0c8e270000 0x00007f0c8e271000 0x1000             0x2b000            r--p  /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 
+0x00007f0c8e271000 0x00007f0c8e272000 0x1000             0x2c000            rw-p  /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 
+0x00007f0c8e272000 0x00007f0c8e277000 0x5000             0x0                r--p  /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7 
+0x00007f0c8e277000 0x00007f0c8e326000 0xaf000            0x5000             r-xp  /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7 
+0x00007f0c8e326000 0x00007f0c8e33a000 0x14000            0xb4000            r--p  /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7 
+0x00007f0c8e33a000 0x00007f0c8e33b000 0x1000             0xc7000            r--p  /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7 
+0x00007f0c8e33b000 0x00007f0c8e33c000 0x1000             0xc8000            rw-p  /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7 
+0x00007f0c8e33c000 0x00007f0c8e33f000 0x3000             0x0                r--p  /usr/lib/x86_64-linux-gnu/libz.so.1.3.2 
+0x00007f0c8e33f000 0x00007f0c8e353000 0x14000            0x3000             r-xp  /usr/lib/x86_64-linux-gnu/libz.so.1.3.2 
+0x00007f0c8e353000 0x00007f0c8e359000 0x6000             0x17000            r--p  /usr/lib/x86_64-linux-gnu/libz.so.1.3.2 
+0x00007f0c8e359000 0x00007f0c8e35a000 0x1000             0x1c000            r--p  /usr/lib/x86_64-linux-gnu/libz.so.1.3.2 
+0x00007f0c8e35a000 0x00007f0c8e35b000 0x1000             0x1d000            rw-p  /usr/lib/x86_64-linux-gnu/libz.so.1.3.2 
+0x00007f0c8e35b000 0x00007f0c8e36d000 0x12000            0x0                r--p  /usr/lib/x86_64-linux-gnu/libm.so.6 
+0x00007f0c8e36d000 0x00007f0c8e400000 0x93000            0x12000            r-xp  /usr/lib/x86_64-linux-gnu/libm.so.6 
+0x00007f0c8e400000 0x00007f0c8e474000 0x74000            0xa5000            r--p  /usr/lib/x86_64-linux-gnu/libm.so.6 
+0x00007f0c8e474000 0x00007f0c8e475000 0x1000             0x118000           r--p  /usr/lib/x86_64-linux-gnu/libm.so.6 
+0x00007f0c8e475000 0x00007f0c8e476000 0x1000             0x119000           rw-p  /usr/lib/x86_64-linux-gnu/libm.so.6 
+0x00007f0c8e476000 0x00007f0c8e478000 0x2000             0x0                rw-p   
+0x00007f0c8e478000 0x00007f0c8e49f000 0x27000            0x0                r--p  /etc/ld.so.cache 
+0x00007f0c8e49f000 0x00007f0c8e4a3000 0x4000             0x0                r--p  [vvar] 
+0x00007f0c8e4a3000 0x00007f0c8e4a5000 0x2000             0x0                r--p  [vvar_vclock] 
+0x00007f0c8e4a5000 0x00007f0c8e4a7000 0x2000             0x0                r-xp  [vdso] 
+0x00007f0c8e4a7000 0x00007f0c8e4a8000 0x1000             0x0                r--p  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 
+0x00007f0c8e4a8000 0x00007f0c8e4d3000 0x2b000            0x1000             r-xp  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 
+0x00007f0c8e4d3000 0x00007f0c8e4df000 0xc000             0x2c000            r--p  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 
+0x00007f0c8e4df000 0x00007f0c8e4e1000 0x2000             0x38000            r--p  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 
+0x00007f0c8e4e1000 0x00007f0c8e4e2000 0x1000             0x3a000            rw-p  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 
+0x00007f0c8e4e2000 0x00007f0c8e4e3000 0x1000             0x0                rw-p   
+0x00007ffff485c000 0x00007ffff495c000 0x100000           0x0                rw-p  [stack] 
+0xffffffffff600000 0xffffffffff601000 0x1000             0x0                --xp  [vsyscall] 

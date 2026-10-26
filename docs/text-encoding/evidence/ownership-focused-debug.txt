@@ -1,0 +1,37 @@
+normal scenario 0: 213 failed budgets recovered
+normal scenario 1: 14 failed budgets recovered
+normal scenario 2: 14 failed budgets recovered
+normal scenario 3: 81 failed budgets recovered
+normal scenario 4: 343 failed budgets recovered
+normal scenario 5: 324 failed budgets recovered
+normal scenario 6: 240 failed budgets recovered
+normal scenario 7: 296 failed budgets recovered
+normal scenario 8: 116 failed budgets recovered
+normal scenario 9: 299 failed budgets recovered
+normal scenario 10: 99 failed budgets recovered
+normal scenario 11: 76 failed budgets recovered
+normal scenario 12: 87 failed budgets recovered
+normal scenario 13: 72 failed budgets recovered
+normal scenario 14: 40 failed budgets recovered
+normal scenario 15: 41 failed budgets recovered
+normal scenario 16: 64 failed budgets recovered
+normal: 2419 allocation failures recovered
+O2 scenario 0: 213 failed budgets recovered
+O2 scenario 1: 14 failed budgets recovered
+O2 scenario 2: 14 failed budgets recovered
+O2 scenario 3: 81 failed budgets recovered
+O2 scenario 4: 343 failed budgets recovered
+O2 scenario 5: 324 failed budgets recovered
+O2 scenario 6: 240 failed budgets recovered
+O2 scenario 7: 296 failed budgets recovered
+O2 scenario 8: 116 failed budgets recovered
+O2 scenario 9: 299 failed budgets recovered
+O2 scenario 10: 99 failed budgets recovered
+O2 scenario 11: 76 failed budgets recovered
+O2 scenario 12: 87 failed budgets recovered
+O2 scenario 13: 72 failed budgets recovered
+O2 scenario 14: 40 failed budgets recovered
+O2 scenario 15: 41 failed budgets recovered
+O2 scenario 16: 64 failed budgets recovered
+O2: 2419 allocation failures recovered
+37886 ownership/root checks passed

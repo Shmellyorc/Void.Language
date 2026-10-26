@@ -33,6 +33,7 @@ void vd_display_leave() noexcept;
 unsigned vd_convert_parse(std::uint64_t*, void*, unsigned, const char* const*,
                           std::size_t, vd::RuntimeFailure*) noexcept;
 void vd_display_error(void*,vd::RuntimeFailure*) noexcept;
+void vd_text_case(void**, void*, bool, vd::RuntimeFailure*) noexcept;
 void vd_string_encode(void**,void*,vd::RuntimeFailure*) noexcept;
 // ScalarEncoding values 0..10, or 11 for immutable string. Formatting returns
 // success/error text through the same rooted output; allocation stays checked.

@@ -1,0 +1,118 @@
+[
+  {
+    "name": "text_encoding_text",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "text"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 17.297354631999042,
+    "log": "final-debug-text_encoding_text.log"
+  },
+  {
+    "name": "text_encoding_errors",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "errors"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 19.889342075010063,
+    "log": "final-debug-text_encoding_errors.log"
+  },
+  {
+    "name": "text_encoding_crash_preservation",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.26207009601057507,
+    "log": "final-debug-text_encoding_crash_preservation.log"
+  },
+  {
+    "name": "lsp_text_encoding",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 4.290455122973071,
+    "log": "final-debug-lsp_text_encoding.log"
+  },
+  {
+    "name": "text_encoding_install",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "Debug"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 58.643971621000674,
+    "log": "final-debug-text_encoding_install.log"
+  },
+  {
+    "name": "text_encoding_depth",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.3579030309920199,
+    "log": "final-debug-text_encoding_depth.log"
+  },
+  {
+    "name": "text_encoding_ir",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_text_audit",
+      "--ir",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 1.632718376989942,
+    "log": "final-debug-text_encoding_ir.log"
+  },
+  {
+    "name": "text_encoding_inventory",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_text_audit",
+      "--inventory",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 0.30230392201337963,
+    "log": "final-debug-text_encoding_inventory.log"
+  },
+  {
+    "name": "text_encoding_ownership",
+    "command": [
+      "/home/shmellyorc/.local/bin/python3.11",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_text_ownership",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "status": 0,
+    "seconds": 26.774031976994593,
+    "log": "final-debug-text_encoding_ownership.log"
+  }
+]

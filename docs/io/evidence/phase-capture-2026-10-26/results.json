@@ -1,0 +1,45 @@
+{
+  "attempts": [
+    {
+      "attempt": 2,
+      "exit_code": 0,
+      "signal": null,
+      "last_phase": "jit_teardown_end",
+      "mode": "O2",
+      "compile_count": 2,
+      "pid_at_stop": 0,
+      "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-02"
+    },
+    {
+      "attempt": 3,
+      "exit_code": 0,
+      "signal": null,
+      "last_phase": "jit_teardown_end",
+      "mode": "O2",
+      "compile_count": 2,
+      "pid_at_stop": 0,
+      "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-03"
+    },
+    {
+      "attempt": 4,
+      "exit_code": 0,
+      "signal": null,
+      "last_phase": "jit_teardown_end",
+      "mode": "O2",
+      "compile_count": 2,
+      "pid_at_stop": 0,
+      "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-04"
+    },
+    {
+      "attempt": 5,
+      "exit_code": 0,
+      "signal": null,
+      "last_phase": "jit_teardown_end",
+      "mode": "O2",
+      "compile_count": 2,
+      "pid_at_stop": 0,
+      "cwd": "/tmp/void-io-phase-capture-20261026-6vfao69v/attempt-05"
+    }
+  ],
+  "stopped_on_first_abnormal": false
+}

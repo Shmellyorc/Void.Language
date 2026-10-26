@@ -1,0 +1,91 @@
+{
+  "collected_utc": "2026-10-26T19:54:17.412846+00:00",
+  "system": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "machine": "x86_64",
+  "profiles": {
+    "debug": {
+      "build": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "cache_sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "flags": {
+        "CMAKE_BUILD_TYPE:STRING": "Debug",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING": "",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING": "-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING": "-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING": "-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL": "OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL": "1",
+        "CMAKE_GENERATOR:INTERNAL": "Unix Makefiles"
+      },
+      "executables": {
+        "voidc": "aa31a189a1d2b6155bad7e89151408f9cd61023f232396f2f297884c63a4dbf9",
+        "voidls": "0026e1d9808dcaa19ec26a4d9cb1f3fc69558d065c2cd9a3244c7fd53ffd888d",
+        "void_text_ownership": "f34dd54a26b34bc6841ff0d875f2d52b1c98949069a7453101f4143b86a08ade",
+        "void_text_audit": "5e8a0feb506f54e4dc3cf1e7b240601cd02f55ad6a2e45ba0ec669f169dc25f1",
+        "void_text_performance": "a0168ea9e87495cbeaa097e8176f57514aa7c6c1f5c393a17fe16887c28e43d4"
+      }
+    },
+    "release": {
+      "build": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+      "cache_sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "flags": {
+        "CMAKE_BUILD_TYPE:STRING": "Release",
+        "CMAKE_CXX_COMPILER:STRING": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING": "",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING": "-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING": "-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING": "-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL": "OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL": "1",
+        "CMAKE_GENERATOR:INTERNAL": "Unix Makefiles"
+      },
+      "executables": {
+        "voidc": "49037597669211d753bc667e8ced1a329dddf37b7e62adac94db747e205d69c5",
+        "voidls": "1906aca61ca416fa6325af7349f1b02e7c0ff4cfc1c9fa19d34f80814a870a37",
+        "void_text_ownership": "4a4a51ece7b028ad8fdcc993df4e76c1d3f11b60a2af601cff003f7063e46945",
+        "void_text_audit": "ea427baee306fb639f75d67c27d61c853986138d9bca94ca5c51c3c504b6ba61",
+        "void_text_performance": "612b9eae125384e625f027adcf0c66015130b5b85eede457a872904a2594baaa"
+      }
+    },
+    "sanitizers": {
+      "build": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+      "cache_sha256": "05bad7ad190fbdbea3afdc7a700542adc7e7e147c8df85fd1aeace72158fdedb",
+      "flags": {
+        "CMAKE_BUILD_TYPE:STRING": "RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:STRING": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING": "",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING": "-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING": "-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING": "-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING": "-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL": "ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL": "1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL": "1",
+        "CMAKE_GENERATOR:INTERNAL": "Unix Makefiles"
+      },
+      "executables": {
+        "voidc": "fa39df37fb91424f36cf10ac026049cd56aefb1a83fe78ff5a66828b2761a7bb",
+        "voidls": "8868bd2f96a1ac064802df6998891c2e29c07f2e8f48ed0907bc833cf9964598",
+        "void_text_ownership": "eaf169f6f2a0f68980cb5c8a1c92f42792164c0e87125fe14161a9fdac6ab0df",
+        "void_text_audit": "bd3f0b0b74c9025147fbf65d3636151c2c7e126cae2c4a35f1fdd924056fc232",
+        "void_text_performance": "a28261e920c9d10b1a2bc1d89a545c7185118c061afb33024d6dc412b324e168"
+      }
+    }
+  }
+}

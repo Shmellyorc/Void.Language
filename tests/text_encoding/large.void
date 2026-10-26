@@ -1,0 +1,39 @@
+use text
+use encoding/hex
+use encoding/base64
+use convert
+
+
+func main() -> i32:
+    if text.repeat("x", 67108865) is Ok(var excessive):
+        return 1
+
+    if text.pad_left("x", 67108865) is Ok(var excessive):
+        return 2
+
+    var payload = convert.unwrap(text.repeat("a雪", 65536))
+    var parts = convert.unwrap(text.split(payload, "absent"))
+    var joined = convert.unwrap(text.join(parts, "|"))
+    var replaced = convert.unwrap(text.replace(payload, "a", "b"))
+    var encoded_hex = hex.encode(payload.to_utf8())
+    var encoded_base64 = base64.encode(payload.to_utf8())
+    var decoded_hex = convert.unwrap(hex.decode(encoded_hex))
+    var decoded_base64 = convert.unwrap(base64.decode(encoded_base64))
+
+    if payload.byte_length != 262144 or payload.length != 131072 or parts.count != 1 or joined != payload:
+        return 3
+
+    if replaced.byte_length != 262144 or replaced[0] != "b" or replaced[-1] != "雪":
+        return 4
+
+    if decoded_hex.count != 262144 or decoded_base64.count != 262144:
+        return 5
+
+    if encoded_hex.byte_length != 524288 or encoded_base64.byte_length != 349528:
+        return 6
+
+    for index in 0..<decoded_hex.count:
+        if decoded_hex[index] != decoded_base64[index]:
+            return 7
+
+    return 0

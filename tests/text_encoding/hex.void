@@ -1,0 +1,62 @@
+use encoding/hex
+
+
+func main() -> i32:
+    var bytes: [u8] = []
+
+    for index in 0..<256:
+        bytes.push(index as u8)
+
+    if hex.try_encode(bytes) is Ok(var encoded):
+        if encoded.byte_length != 512:
+            return 1
+
+        if hex.decode(encoded) is Ok(var decoded):
+            for index in 0..<256:
+                if decoded[index] != (index as u8):
+                    return 2
+
+            decoded[0] = 99
+
+            if bytes[0] != 0:
+                return 3
+        else:
+            return 4
+    else:
+        return 5
+
+    if hex.try_encode([0, 128, 255], true) is Ok(var upper):
+        if upper != "0080FF":
+            return 6
+    else:
+        return 7
+
+    for bad in ["0", "0x", " 0", "0\0", "雪a"]:
+        if hex.decode(bad) is Ok(var invalid):
+            return 8
+
+    if hex.decode("aB") is Ok(var mixed):
+        if mixed[0] != 171:
+            return 9
+    else:
+        return 10
+
+    if hex.decode("") is Ok(var empty):
+        if empty.count != 0:
+            return 11
+    else:
+        return 12
+
+    if hex.decode("00gg") is Err(var reason):
+        if reason.offset != 2 or not (reason.kind is hex.error_kind.invalid_digit):
+            return 13
+    else:
+        return 14
+
+    if hex.encode([0, 128, 255]) != "0080ff":
+        return 15
+
+    if hex.encode([0, 128, 255], uppercase = true) != "0080FF":
+        return 16
+
+    return 0

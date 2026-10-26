@@ -1,0 +1,115 @@
+{
+  "baseline": "e24d3a95db03fd282c87a5d9b885471057e38798",
+  "runner": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner",
+  "runner_sha256": "b42d5bcd782470be46a5a6009a56b8003fef5e8439e2b93caa04f0b027f3a3b6",
+  "fixture": "/tmp/VOID io async wire 1icf1laa/main.void",
+  "fixture_sha256": "64b6a7abbf71eb627d80a0244acb9a0db061e5f6c6f5d582e38732d510befaab",
+  "core_pattern": "core",
+  "attempts": [
+    {
+      "attempt": 1,
+      "returncode": 0,
+      "elapsed_seconds": 63.375,
+      "stdout": "Debug source execution passed\nO2 source execution passed\n",
+      "stderr": "",
+      "core_files": []
+    },
+    {
+      "attempt": 2,
+      "returncode": 0,
+      "elapsed_seconds": 61.401,
+      "stdout": "Debug source execution passed\nO2 source execution passed\n",
+      "stderr": "",
+      "core_files": []
+    }
+  ],
+  "gdb_phase": {
+    "exit_status": 0,
+    "normal_exit": true,
+    "aslr": "set disable-randomization off",
+    "transcript": "[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".\nPHASE compile_async 1 elapsed=0.241\nPHASE invoke 1 elapsed=22.292\nPHASE async_root 1 elapsed=22.292\nPHASE compile_async 2 elapsed=22.376\nPHASE invoke 2 elapsed=58.672\nPHASE async_root 2 elapsed=58.672\nDebug source execution passed\nO2 source execution passed\n[Inferior 1 (process 666020) exited normally]\nPHASE_DIAGNOSTIC normal_exit; no crashing stack captured\n",
+    "sandbox_attempt": "GDB startup blocked by ptrace; no inferior source execution; rerun with approved unsandboxed debugger access"
+  },
+  "original_failure_reproduced": false,
+  "source_freeze": {
+    "source_sha256_verified": 53,
+    "protected_sha256_verified": 7
+  },
+  "release_binary_has_dwarf": false,
+  "scope": "Two unchanged direct runner attempts plus one unchanged phase-traced GDB run, all using a reconstructed candidate fixture; not verified original crash bytes, a full test suite or repair acceptance.",
+  "independent_wire_oracles": {
+    "vectors": 42,
+    "results": [
+      {
+        "directory": "attempt-01",
+        "byte_order": "little",
+        "bytes": 201,
+        "match": true
+      },
+      {
+        "directory": "attempt-01",
+        "byte_order": "big",
+        "bytes": 201,
+        "match": true
+      },
+      {
+        "directory": "attempt-02",
+        "byte_order": "little",
+        "bytes": 201,
+        "match": true
+      },
+      {
+        "directory": "attempt-02",
+        "byte_order": "big",
+        "bytes": 201,
+        "match": true
+      },
+      {
+        "directory": "gdb-phase",
+        "byte_order": "little",
+        "bytes": 201,
+        "match": true
+      },
+      {
+        "directory": "gdb-phase",
+        "byte_order": "big",
+        "bytes": 201,
+        "match": true
+      }
+    ]
+  },
+  "fixture_provenance": {
+    "classification": "reconstructed reproduction candidate",
+    "original_temporary_source_preserved": false,
+    "original_crashing_bytes_verified": false,
+    "historical_command": "void_io_runner --async \"/tmp/VOID io async wire 1icf1laa/main.void\"",
+    "reconstruction_basis": "async_fixture() in tests/io/execution.py at baseline e24d3a95db03fd282c87a5d9b885471057e38798",
+    "generator_sha256": "f6e566294e84fb652db0cda91546873864c92e6a106e1fb2aa2610b48f18f743",
+    "candidate_matches_baseline_generator": true,
+    "warning": "All recorded research invocations used reconstructed candidate bytes. Original generator/source may have differed during repairs; these hashes do not establish original crash-input identity."
+  },
+  "additional_user_evidence": {
+    "archive_path": "/home/shmellyorc/Downloads/VOID_async_SIGSEGV_reproducer.zip",
+    "archive_sha256": "c08dfb63167eb1babfab68a8c4292e375cf1f764a14f7ab1503d748e1d6c4827",
+    "entries": {
+      "VOID_async_SIGSEGV_reproducer/main.void": {
+        "bytes": 17032,
+        "sha256": "64b6a7abbf71eb627d80a0244acb9a0db061e5f6c6f5d582e38732d510befaab"
+      },
+      "VOID_async_SIGSEGV_reproducer/README_REPRO.md": {
+        "bytes": 3146,
+        "sha256": "16fb5e900b2efbb1b43a8976cb5f14a7a24450530e250913bcacd3e156fab2cf"
+      },
+      "VOID_async_SIGSEGV_reproducer/RELEASE_FAILURE_EXCERPT.txt": {
+        "bytes": 990,
+        "sha256": "f0fe58b4dd188c046a58076bf24a5a6c8c4525ee8c0d4223e3f5d41b73b7387e"
+      }
+    },
+    "standalone_source": "/home/shmellyorc/Downloads/main.void",
+    "standalone_source_matches_candidate": true,
+    "archive_source_matches_candidate": true,
+    "failure_assertion_matches_original_log": true,
+    "failure_assertion_matches_original_summary": true,
+    "archive_executed": false
+  }
+}

@@ -83,3 +83,19 @@ public values use ordinary VOID source. Installed CLI/LSP tools discover matchin
 sources under `share/void/stdlib`, with `VOID_STDLIB_ROOT` as an explicit override.
 Time-zone rules are embedded in linked Runtime bytes. Stage 10 and Stage 11 locks
 remain separate from this standard-library sprint.
+
+`use text` provides scalar-indexed literal search and extraction, Unicode whitespace
+trimming, splitting/line splitting/joining, replacement, repetition and scalar-width
+padding. `to_lower`/`to_upper` apply pinned Unicode 16.0 full default casing, including
+expansions and final sigma, without locale tailoring or normalization. Fallible
+construction APIs return managed errors and bound output to 64 MiB.
+
+`use encoding/hex` and `use encoding/base64` provide plain-text `encode`, recoverable
+`try_encode` for output limits, and strict result-returning `decode` into independent
+owned bytes. Hex is strict ASCII pairs, with explicit uppercase output. Base64
+selects standard/URL-safe alphabet and required/omitted padding explicitly; decoding
+rejects whitespace, mixed alphabets, malformed padding and nonzero unused bits.
+`use encoding/ascii` provides strict lossless 7-bit conversion, byte predicates and
+ASCII byte casing. NUL is data in every module. Allocation exhaustion follows the
+existing checked Runtime failure channel. See the [text/encoding contract](../docs/text-encoding/CONTRACT.md),
+[API inventory](../docs/text-encoding/API.md) and [engineering record](../docs/text-encoding/IMPLEMENTATION.md).

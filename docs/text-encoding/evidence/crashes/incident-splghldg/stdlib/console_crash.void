@@ -1,0 +1,640 @@
+use error as core
+
+# Borrowed compiler-owned standard endpoints. There are no source native handles.
+
+## Borrowed standard input endpoint; all reads share one Runtime queue.
+value struct input:
+    internal const _id: i64
+
+## Borrowed standard output endpoint; complete records are serialized.
+value struct output:
+    internal const _id: i64
+
+## Standard input; redirection preserves raw UTF-8 bytes.
+const stdin = input(_id = 0)
+
+## Standard output; use explicit flush for prompts.
+const stdout = output(_id = 1)
+
+## Standard error; capabilities are detected independently from stdout.
+const stderr = output(_id = 2)
+
+## Portable categories of recoverable console failures.
+enum io_error_kind:
+    ## Invalid count, timeout or operation argument.
+    invalid_argument
+    ## Input or output violates the strict Unicode boundary.
+    invalid_encoding
+    ## This endpoint does not support the requested operation.
+    unsupported
+    ## The operation cannot currently make progress.
+    would_block
+    ## The monotonic wait deadline elapsed.
+    timed_out
+    ## The endpoint or scoped mode is closed.
+    closed
+    ## The output peer closed its pipe.
+    broken_pipe
+    ## The operating system interrupted the operation.
+    interrupted
+    ## Other native I/O failure.
+    io_failure
+
+## Managed console failure retaining native progress and cleanup details.
+struct io_error extends core.error:
+    ## Name of the console operation that failed.
+    const operation: string
+    ## Standard endpoint name associated with the failure.
+    const stream: string
+    ## Portable recoverable I/O failure category.
+    const kind: io_error_kind
+    ## Native platform error number, retained without narrowing.
+    const os_code: i64
+    ## Number of bytes transferred before the failure.
+    const bytes_transferred: i64
+    ## Owned bytes consumed or transferred before failure.
+    const partial: [u8]
+    ## Native restoration failure code, or zero when cleanup succeeded.
+    const cleanup_code: i64
+    ## Native UTF-16 units transferred before a Windows conversion boundary.
+    const partial_utf16_units: i64
+
+## A text chunk (including an empty line), or distinct end of input.
+enum text_read:
+    ## A text chunk, including an empty logical line.
+    ## @param value Unicode text read from the shared input queue.
+    ## @return A text result preserving empty lines.
+    text(value: string)
+    ## End of input, distinct from empty data.
+    eof
+
+## A byte chunk, or distinct end of input.
+enum bytes_read:
+    ## An owned byte chunk.
+    ## @param value Owned bytes read from the shared input queue.
+    ## @return A data result preserving empty byte chunks.
+    data(value: [u8])
+    ## End of input, distinct from empty data.
+    eof
+
+private value struct _reply:
+    kind: i64
+    os_code: i64
+    progress: i64
+    cleanup_code: i64
+    partial_utf16_units: i64
+    eof: bool
+    text: string
+    bytes: [u8]
+    first: i64
+    second: i64
+
+private func _error(reply: _reply, operation: string, stream: string) -> io_error:
+    var kind = io_error_kind.io_failure
+    if reply.kind == 1:
+        kind = io_error_kind.invalid_argument
+    if reply.kind == 2:
+        kind = io_error_kind.invalid_encoding
+    if reply.kind == 3:
+        kind = io_error_kind.unsupported
+    if reply.kind == 4:
+        kind = io_error_kind.would_block
+    if reply.kind == 5:
+        kind = io_error_kind.timed_out
+    if reply.kind == 6:
+        kind = io_error_kind.closed
+    if reply.kind == 7:
+        kind = io_error_kind.broken_pipe
+    if reply.kind == 8:
+        kind = io_error_kind.interrupted
+    return io_error(
+        operation = operation,
+        stream = stream,
+        kind = kind,
+        os_code = reply.os_code,
+        message = reply.text,
+        code = reply.kind as i32,
+        bytes_transferred = reply.progress,
+        partial = reply.bytes,
+        cleanup_code = reply.cleanup_code,
+        partial_utf16_units = reply.partial_utf16_units
+    )
+
+private func _stream(self: output) -> string:
+    if self._id == 1:
+        return "stdout"
+    return "stderr"
+
+## Write UTF-8 text completely or return checked progress and an I/O error.
+## @param text Exact Unicode text, including embedded NUL.
+## @return Bytes written on success; structured progress and failure otherwise.
+func (self output) write(text: string) -> result<i64, io_error>:
+    var reply = _console_write(self, text)
+    if reply.kind != 0:
+        return Err(_error(reply, "write", _stream(self)))
+    return Ok(reply.progress)
+
+## Write exact bytes; redirected output is binary. Failures retain partial progress.
+## @param bytes Exact bytes to write, or owned bytes retained by the value.
+## @return Bytes written on success; structured progress and failure otherwise.
+func (self output) write_bytes(const bytes: [u8]) -> result<i64, io_error>:
+    var reply = _console_write_bytes(self, bytes)
+    if reply.kind != 0:
+        return Err(_error(reply, "write_bytes", _stream(self)))
+    return Ok(reply.progress)
+
+## Drain VOID-owned output. This is not a durable-storage guarantee.
+## @return True after VOID-owned output is drained, or a structured failure.
+func (self output) flush() -> result<bool, io_error>:
+    var reply = _console_flush(self)
+    if reply.kind != 0:
+        return Err(_error(reply, "flush", _stream(self)))
+    return Ok(true)
+
+## Report whether the endpoint is redirected.
+## @return True when this standard endpoint is redirected away from a terminal.
+property (self output) is_redirected: bool:
+    get:
+        return _console_redirected(self).progress != (0 as i64)
+
+## Report whether the endpoint is redirected.
+## @return True when this standard endpoint is redirected away from a terminal.
+property (self input) is_redirected: bool:
+    get:
+        return _console_redirected(self).progress != (0 as i64)
+
+private func _text(reply: _reply, operation: string) -> result<text_read, io_error>:
+    if reply.kind != 0:
+        return Err(_error(reply, operation, "stdin"))
+    if reply.eof:
+        return Ok(text_read.eof)
+    return Ok(text_read.text(reply.text))
+
+## Read one Unicode scalar through the shared input queue.
+## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
+## @return One scalar or explicit EOF; a structured error on failure.
+func (self input) read_char(timeout_ms: i64 = -1) -> result<text_read, io_error>:
+    return _text(_console_read_char(self, timeout_ms), "read_char")
+
+## Read up to max_scalars Unicode scalars through the shared input queue.
+## @param max_scalars Maximum number of Unicode scalars to read.
+## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
+## @return Up to the requested scalars or explicit EOF; a structured error on failure.
+func (self input) read_text(max_scalars: i64, timeout_ms: i64 = -1) -> result<text_read, io_error>:
+    return _text(_console_read_text(self, max_scalars, timeout_ms), "read_text")
+
+## Read a line without its LF, CRLF or CR terminator. Standalone CR completes immediately.
+## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
+## @return A line without its terminator, explicit EOF, or a structured error.
+func (self input) read_line(timeout_ms: i64 = -1) -> result<text_read, io_error>:
+    return _text(_console_read_line(self, timeout_ms), "read_line")
+
+## Read raw bytes with precise queue ownership; EOF is distinct from empty data.
+## @param max_bytes Maximum raw byte count to read.
+## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
+## @return Owned bytes or explicit EOF; structured failure includes partial progress.
+func (self input) read_bytes(max_bytes: i64, timeout_ms: i64 = -1) -> result<bytes_read, io_error>:
+    var reply = _console_read_bytes(self, max_bytes, timeout_ms)
+    if reply.kind != 0:
+        return Err(_error(reply, "read_bytes", "stdin"))
+    if reply.eof:
+        return Ok(bytes_read.eof)
+    return Ok(bytes_read.data(reply.bytes))
+
+# Live per-endpoint capability snapshots.
+## Live capabilities of one standard endpoint.
+value struct terminal_capabilities:
+    ## Whether Unicode text input is supported.
+    const text_input: bool
+    ## Whether Unicode text output is supported.
+    const text_output: bool
+    ## Whether structured keyboard input is supported.
+    const key_input: bool
+    ## Whether scoped input mode changes are supported.
+    const input_modes: bool
+    ## Whether terminal dimensions can be queried.
+    const size: bool
+    ## Whether terminal cursor position can be queried or changed.
+    const cursor_position: bool
+    ## Whether cursor visibility can be changed.
+    const cursor_visibility: bool
+    ## Whether the approved color palette is supported.
+    const color: bool
+    ## Whether display clearing is supported.
+    const clear: bool
+    ## Whether terminal titles are supported.
+    const title: bool
+    ## Whether an audible or visible bell is supported.
+    const bell: bool
+
+## Terminal dimensions in character cells.
+value struct terminal_size:
+    ## Terminal width in character cells.
+    const columns: i64
+    ## Terminal height in character cells.
+    const rows: i64
+
+## Zero-based terminal cursor coordinates.
+value struct terminal_position:
+    ## Zero-based cursor column.
+    const column: i64
+    ## Zero-based cursor row.
+    const row: i64
+
+## Approved 16-color terminal palette.
+enum color:
+    ## The black terminal color.
+    black
+    ## The red terminal color.
+    red
+    ## The green terminal color.
+    green
+    ## The yellow terminal color.
+    yellow
+    ## The blue terminal color.
+    blue
+    ## The magenta terminal color.
+    magenta
+    ## The cyan terminal color.
+    cyan
+    ## The white terminal color.
+    white
+    ## The bright black terminal color.
+    bright_black
+    ## The bright red terminal color.
+    bright_red
+    ## The bright green terminal color.
+    bright_green
+    ## The bright yellow terminal color.
+    bright_yellow
+    ## The bright blue terminal color.
+    bright_blue
+    ## The bright magenta terminal color.
+    bright_magenta
+    ## The bright cyan terminal color.
+    bright_cyan
+    ## The bright white terminal color.
+    bright_white
+
+private func _color_code(value: color) -> i64:
+    match value:
+        color.black:
+            return 0
+        color.red:
+            return 1
+        color.green:
+            return 2
+        color.yellow:
+            return 3
+        color.blue:
+            return 4
+        color.magenta:
+            return 5
+        color.cyan:
+            return 6
+        color.white:
+            return 7
+        color.bright_black:
+            return 8
+        color.bright_red:
+            return 9
+        color.bright_green:
+            return 10
+        color.bright_yellow:
+            return 11
+        color.bright_blue:
+            return 12
+        color.bright_magenta:
+            return 13
+        color.bright_cyan:
+            return 14
+        color.bright_white:
+            return 15
+    return -1
+
+private func _flag(mask: i64, bit: i64) -> bool:
+    return mask / bit % 2 != 0
+
+private func _capabilities(reply: _reply) -> terminal_capabilities:
+    var mask = reply.progress
+    return terminal_capabilities(
+        text_input = _flag(mask, 1),
+        text_output = _flag(mask, 2),
+        key_input = _flag(mask, 4),
+        input_modes = _flag(mask, 8),
+        size = _flag(mask, 16),
+        cursor_position = _flag(mask, 32),
+        cursor_visibility = _flag(mask, 64),
+        color = _flag(mask, 128),
+        clear = _flag(mask, 256),
+        title = _flag(mask, 512),
+        bell = _flag(mask, 1024)
+    )
+
+## Snapshot actual standard-input capabilities without opening a terminal.
+## @return A current snapshot of this endpoint’s supported operations.
+func (self input) capabilities() -> terminal_capabilities:
+    return _capabilities(_console_capabilities(self))
+
+## Snapshot this endpoint's supported capabilities; individual operations can still fail.
+## @return A current snapshot of this endpoint’s supported operations.
+func (self output) capabilities() -> terminal_capabilities:
+    return _capabilities(_console_capabilities(self))
+
+private func _ack(reply: _reply, operation: string, stream: string) -> result<bool, io_error>:
+    if reply.kind != 0:
+        return Err(_error(reply, operation, stream))
+    return Ok(true)
+
+## Query current terminal columns and rows; redirected/unsupported endpoints return Err.
+## @return Current columns and rows, or an unsupported/native error.
+func (self output) size() -> result<terminal_size, io_error>:
+    var reply = _console_size(self)
+    if reply.kind != 0:
+        return Err(_error(reply, "size", _stream(self)))
+    return Ok(terminal_size(columns = reply.first, rows = reply.second))
+
+## Query the live cursor using the owned accessible input channel and a bounded wait. No hidden terminal.
+## @return Current zero-based cursor coordinates, or a structured failure.
+func (self output) cursor_position() -> result<terminal_position, io_error>:
+    var reply = _console_position(self)
+    if reply.kind != 0:
+        return Err(_error(reply, "cursor_position", _stream(self)))
+    return Ok(terminal_position(column = reply.first, row = reply.second))
+
+## Move to zero-based column and row; unsupported endpoints emit no controls.
+## @param column Zero-based column.
+## @param row Zero-based row.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) set_cursor(column: i64, row: i64) -> result<bool, io_error>:
+    return _ack(_console_cursor(self, column, row), "set_cursor", _stream(self))
+
+## Set cursor visibility when supported by this endpoint.
+## @param visible Whether the cursor should be visible.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) set_cursor_visible(visible: bool) -> result<bool, io_error>:
+    var flag: i64 = 0
+    if visible:
+        flag = 1
+    return _ack(_console_visible(self, flag), "set_cursor_visible", _stream(self))
+
+## Select foreground and background from the approved 16-color palette.
+## @param foreground Foreground palette color.
+## @param background Background palette color.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) set_color(foreground: color, background: color) -> result<bool, io_error>:
+    return _ack(_console_color(self, _color_code(foreground), _color_code(background)), "set_color", _stream(self))
+
+## Restore terminal default colors when supported.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) reset_color() -> result<bool, io_error>:
+    return _ack(_console_reset(self), "reset_color", _stream(self))
+
+## Clear the visible display and home the cursor when supported.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) clear() -> result<bool, io_error>:
+    return _ack(_console_clear(self), "clear", _stream(self))
+
+## Set a safe terminal title; control characters and escape injection are rejected.
+## @param text Exact Unicode text to write or assign.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) set_title(text: string) -> result<bool, io_error>:
+    return _ack(_console_title(self, text), "set_title", _stream(self))
+
+## Request a terminal bell when supported.
+## @return True when the operation completes, or a structured I/O failure.
+func (self output) bell() -> result<bool, io_error>:
+    return _ack(_console_bell(self), "bell", _stream(self))
+
+# Native-owned saved terminal state; managed aliases share one close identity.
+## Shared restoration identity for a scoped terminal input mode.
+struct terminal_session:
+    internal _token: i64
+
+## Restore this scoped input mode; failures remain recoverable and restoration can be retried.
+## @return True after restoration, or a retryable structured restoration failure.
+func (self terminal_session) close() -> result<bool, io_error>:
+    return _ack(_console_end_mode(self), "close_mode", "stdin")
+
+## Restore terminal input state during scoped cleanup.
+func (self terminal_session) deinit():
+    _console_restore(self)
+
+## Begin a scoped input mode on owned terminal input; close restores the saved state.
+## @param echo Whether terminal input should be echoed.
+## @param line_input Whether the terminal should collect complete lines.
+## @param control_c_as_input Whether Control-C is delivered as input rather than a signal.
+## @return Shared scoped restoration identity, or a structured failure.
+func (self input) begin_mode(echo: bool = true, line_input: bool = true, control_c_as_input: bool = false) -> result<terminal_session, io_error>:
+    var flags: i64 = 0
+    if echo:
+        flags += 1
+    if line_input:
+        flags += 2
+    if control_c_as_input:
+        flags += 4
+    var session = terminal_session(_token = 0)
+    var reply = _console_mode(self, flags)
+    if reply.kind != 0:
+        return Err(_error(reply, "begin_mode", "stdin"))
+    session._token = reply.first
+    return Ok(session)
+
+## Portable keyboard key identity.
+enum key:
+    ## A Unicode character, available in key_event.character.
+    character
+    ## The enter key.
+    enter
+    ## The tab key.
+    tab
+    ## The backspace key.
+    backspace
+    ## The escape key.
+    escape
+    ## The up key.
+    up
+    ## The down key.
+    down
+    ## The left key.
+    left
+    ## The right key.
+    right
+    ## The home key.
+    home
+    ## The end key.
+    end
+    ## The insert key.
+    insert
+    ## The Delete key.
+    delete_key
+    ## The page up key.
+    page_up
+    ## The page down key.
+    page_down
+    ## The f1 key.
+    f1
+    ## The f2 key.
+    f2
+    ## The f3 key.
+    f3
+    ## The f4 key.
+    f4
+    ## The f5 key.
+    f5
+    ## The f6 key.
+    f6
+    ## The f7 key.
+    f7
+    ## The f8 key.
+    f8
+    ## The f9 key.
+    f9
+    ## The f10 key.
+    f10
+    ## The f11 key.
+    f11
+    ## The f12 key.
+    f12
+    ## An unrecognized key sequence, preserved in key_event.bytes.
+    unknown
+
+## One keyboard event with explicit metadata availability.
+value struct key_event:
+    ## Unicode text associated with this key event; empty for nontext keys.
+    const character: string
+    ## Portable key identity.
+    const key: key
+    ## Whether Shift was reported pressed.
+    const shift: bool
+    ## Whether Alt was reported pressed.
+    const alt: bool
+    ## Whether Control was reported pressed.
+    const control: bool
+    ## Whether modifier metadata is authoritative.
+    const modifiers_known: bool
+    ## Whether key direction metadata is authoritative.
+    const key_down_known: bool
+    ## Whether this event reports key press rather than release.
+    const key_down: bool
+    ## Native repeat count; at least one for a reported event.
+    const repeat_count: i64
+    ## Owned input bytes represented by the key event.
+    const bytes: [u8]
+
+private func _key(code: i64) -> key:
+    if code == 0:
+        return key.character
+    if code == 1:
+        return key.enter
+    if code == 2:
+        return key.tab
+    if code == 3:
+        return key.backspace
+    if code == 4:
+        return key.escape
+    if code == 5:
+        return key.up
+    if code == 6:
+        return key.down
+    if code == 7:
+        return key.left
+    if code == 8:
+        return key.right
+    if code == 9:
+        return key.home
+    if code == 10:
+        return key.end
+    if code == 11:
+        return key.insert
+    if code == 12:
+        return key.delete_key
+    if code == 13:
+        return key.page_up
+    if code == 14:
+        return key.page_down
+    if code == 15:
+        return key.f1
+    if code == 16:
+        return key.f2
+    if code == 17:
+        return key.f3
+    if code == 18:
+        return key.f4
+    if code == 19:
+        return key.f5
+    if code == 20:
+        return key.f6
+    if code == 21:
+        return key.f7
+    if code == 22:
+        return key.f8
+    if code == 23:
+        return key.f9
+    if code == 24:
+        return key.f10
+    if code == 25:
+        return key.f11
+    if code == 26:
+        return key.f12
+    if code == 27:
+        return key.unknown
+    return key.unknown
+
+## Read one key event through shared input ownership; unsupported redirected input returns Err.
+## @param echo Whether terminal input should be echoed.
+## @param timeout_ms Monotonic wait deadline in milliseconds; -1 waits indefinitely.
+## @return One keyboard event with explicit metadata availability, or a structured failure.
+func (self input) read_key(echo: bool = false, timeout_ms: i64 = -1) -> result<key_event, io_error>:
+    var flag: i64 = 0
+    if echo:
+        flag = 1
+    var reply = _console_key(self, flag, timeout_ms)
+    if reply.kind != 0:
+        return Err(_error(reply, "read_key", "stdin"))
+    return Ok(
+        key_event(
+            character = reply.text,
+            key = _key(reply.first),
+            shift = _flag(reply.second, 1),
+            alt = _flag(reply.second, 2),
+            control = _flag(reply.second, 4),
+            modifiers_known = _flag(reply.second, 8),
+            key_down_known = _flag(reply.second, 16),
+            key_down = _flag(reply.second, 32),
+            repeat_count = reply.second / 256,
+            bytes = reply.bytes
+        )
+    )
+
+## Check for a complete available key without consuming unrelated input.
+## @return True if a complete key event is available without consuming unrelated input.
+func (self input) key_available() -> result<bool, io_error>:
+    var reply = _console_available(self)
+    if reply.kind != 0:
+        return Err(_error(reply, "key_available", "stdin"))
+    return Ok(reply.first != (0 as i64))
+
+## Read a complete logical line, optionally writing and flushing a prompt first.
+## EOF, an empty line or a recoverable I/O failure returns an empty string.
+## @param prompt Exact text to complete and flush before consuming any input.
+## @return Line text without LF, CRLF or CR; empty on EOF or recoverable failure.
+func readline(prompt: string = "") -> string:
+    if prompt != "":
+        if stdout.write(prompt) is Err(var reason):
+            return ""
+        if stdout.flush() is Err(var reason):
+            return ""
+    if stdin.read_line() is Ok(var outcome):
+        if outcome is text_read.text(var value):
+            return value
+    return ""
+
+## Read up to the requested number of Unicode scalars from the shared input queue.
+## @param max_scalars Maximum scalar count; one by default, zero yields empty text.
+## @return Read text; empty on EOF, invalid count or recoverable I/O failure.
+func read(max_scalars: i64 = 1) -> string:
+    if stdin.read_text(max_scalars) is Ok(var outcome):
+        if outcome is text_read.text(var value):
+            return value
+    return ""

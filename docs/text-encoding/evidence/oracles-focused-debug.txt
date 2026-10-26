@@ -1,0 +1,3 @@
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void --no-opt
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void

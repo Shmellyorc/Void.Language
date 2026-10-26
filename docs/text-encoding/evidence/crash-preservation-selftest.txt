@@ -1,0 +1,3 @@
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest z1_a4yuq/synthetic-only-evidence/incident-7340cum7
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest z1_a4yuq/synthetic-only-evidence/incident-9__m5hrt
+Two synthetic signal incidents preserved exact bytes independently; no real source crash claimed

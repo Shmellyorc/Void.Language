@@ -1,0 +1,23 @@
+{
+  "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+  "stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+  "stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+  "stdlib/time.void": "e912ee71333545e3c6d938b66d58f2dff34932ac8b16e01dc20dfdf5d9967f77",
+  "stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+  "stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+  "stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+  "stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+  "docs/io/SIGSEGV_RESEARCH.md": "6a282f6cb512953a03ee8be3b59566feb4adab761a60d5e10301afe19f071bf4",
+  "docs/io/PHASE_CAPTURE_2026-10-26.md": "47df03ca60c8ac415329a832f3ac21332bf6cc3ad2666343048c708c929e1170",
+  "docs/io/evidence/phase-capture-2026-10-26/manifest.json": "9e29280f57e1867a6a8a4ece55a70b1c1341ea25acb1570e5eae8ebe4ee0a6f2",
+  "docs/io/evidence/phase-capture-2026-10-26/results.json": "209bf64976176767235ee54c77efa200f78d47ebfe429613df05ac4d181ba0dc",
+  "docs/io/evidence/phase-capture-2026-10-26/events.jsonl": "0914ac74b2253f805641cdca50de295d4fd3b4f1ed9c8f937cdced71fb3f16b2",
+  "docs/io/evidence/phase-capture-2026-10-26/session.log": "68d49b7dfadc3d34d69b26683379083e669e098c439d4e8bbbeee3143192c7cf",
+  "docs/io/evidence/phase-capture-2026-10-26/capture.gdb": "6a05f3d49ae3176d1fe4094e2e90dda2f476b0e56816b227aca56375fdffa7e3",
+  "docs/io/evidence/phase-capture-2026-10-26/run-capture.sh": "d0ce4e4e2650f13f79446631e5e8f19cebac056724fda5ffec1bbb3ce1727798",
+  "docs/io/evidence/phase-capture-2026-10-26/main-disassembly.txt": "55d2e80376b6b7e3d70f369a82a8490c404443b75051612450c39e28cc250b52",
+  "docs/io/evidence/phase-capture-2026-10-26/summary.json": "8816e87ee700ea4cdfc00002fae6f33e40ba9789209bc8e9ea73b02104ee4c61",
+  "docs/io/evidence/phase-capture-2026-10-26/sha256.json": "7348bd1b12d4f3caa953a711bb4efb9e69889b3c1847535a16650d20d8ba6590",
+  "docs/io/evidence/sigsegv-research-2026-10-26.json": "7867ce0f5dd881e54e3705a01eb028af1fa859e0af34b01a6f9ada55f6425a0f"
+}

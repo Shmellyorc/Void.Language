@@ -1,0 +1,22 @@
+{
+  "before": {
+    "anchor": {
+      "stack_subtraction_bytes": 3840,
+      "prologue": "00000000000d7e80 <vd::(anonymous namespace)::Semantics::anchor(vd::(anonymous namespace)::Expr&)>:\n   d7e80: 55                           \tpushq\t%rbp\n   d7e81: 48 89 e5                     \tmovq\t%rsp, %rbp\n   d7e84: 48 81 ec 00 0f 00 00         \tsubq\t$0xf00, %rsp            # imm = 0xF00\n   d7e8b: 48 89 bd 50 f2 ff ff         \tmovq\t%rdi, -0xdb0(%rbp)\n"
+    },
+    "call_expression": {
+      "stack_subtraction_bytes": 19904,
+      "prologue": "0000000000097c80 <vd::(anonymous namespace)::Semantics::call_expression(vd::(anonymous namespace)::Expr&)>:\n   97c80: 55                           \tpushq\t%rbp\n   97c81: 48 89 e5                     \tmovq\t%rsp, %rbp\n   97c84: 48 81 ec c0 4d 00 00         \tsubq\t$0x4dc0, %rsp           # imm = 0x4DC0\n   97c8b: 48 89 bd 20 b6 ff ff         \tmovq\t%rdi, -0x49e0(%rbp)\n"
+    }
+  },
+  "after": {
+    "anchor": {
+      "stack_subtraction_bytes": 3584,
+      "prologue": "00000000000d7a50 <vd::(anonymous namespace)::Semantics::anchor(vd::(anonymous namespace)::Expr&)>:\n   d7a50: 55                           \tpushq\t%rbp\n   d7a51: 48 89 e5                     \tmovq\t%rsp, %rbp\n   d7a54: 48 81 ec 00 0e 00 00         \tsubq\t$0xe00, %rsp            # imm = 0xE00\n   d7a5b: 48 89 bd 08 f3 ff ff         \tmovq\t%rdi, -0xcf8(%rbp)\n"
+    },
+    "call_expression": {
+      "stack_subtraction_bytes": 16224,
+      "prologue": "0000000000097c80 <vd::(anonymous namespace)::Semantics::call_expression(vd::(anonymous namespace)::Expr&)>:\n   97c80: 55                           \tpushq\t%rbp\n   97c81: 48 89 e5                     \tmovq\t%rsp, %rbp\n   97c84: 48 81 ec 60 3f 00 00         \tsubq\t$0x3f60, %rsp           # imm = 0x3F60\n   97c8b: 48 89 bd 50 c4 ff ff         \tmovq\t%rdi, -0x3bb0(%rbp)\n"
+    }
+  }
+}

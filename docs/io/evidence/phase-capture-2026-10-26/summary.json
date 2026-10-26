@@ -1,0 +1,170 @@
+{
+  "baseline": "e24d3a95db03fd282c87a5d9b885471057e38798",
+  "maximum_authorized_attempts": 5,
+  "user_reported_passes": 1,
+  "independently_phase_captured_passes": 4,
+  "sigsegv_count": 0,
+  "core_files": [],
+  "phase_boundary_checks": [
+    {
+      "attempt": 2,
+      "mode": "normal",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 21.443779,
+      "invoke_seconds": 0.073196,
+      "code_teardown_seconds": 0.000762,
+      "jit_teardown_seconds": 0.003208
+    },
+    {
+      "attempt": 2,
+      "mode": "O2",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 38.009553,
+      "invoke_seconds": 0.073163,
+      "code_teardown_seconds": 0.000829,
+      "jit_teardown_seconds": 0.023749
+    },
+    {
+      "attempt": 3,
+      "mode": "normal",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 22.974613,
+      "invoke_seconds": 0.087938,
+      "code_teardown_seconds": 0.000912,
+      "jit_teardown_seconds": 0.002224
+    },
+    {
+      "attempt": 3,
+      "mode": "O2",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 37.11155,
+      "invoke_seconds": 0.076737,
+      "code_teardown_seconds": 0.000702,
+      "jit_teardown_seconds": 0.002017
+    },
+    {
+      "attempt": 4,
+      "mode": "normal",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 22.967697,
+      "invoke_seconds": 0.072002,
+      "code_teardown_seconds": 0.00049,
+      "jit_teardown_seconds": 0.001594
+    },
+    {
+      "attempt": 4,
+      "mode": "O2",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 35.366103,
+      "invoke_seconds": 0.073845,
+      "code_teardown_seconds": 0.000596,
+      "jit_teardown_seconds": 0.001438
+    },
+    {
+      "attempt": 5,
+      "mode": "normal",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 20.740938,
+      "invoke_seconds": 0.070982,
+      "code_teardown_seconds": 0.00069,
+      "jit_teardown_seconds": 0.001738
+    },
+    {
+      "attempt": 5,
+      "mode": "O2",
+      "all_eight_boundaries_in_order": true,
+      "answer": 7,
+      "compile_seconds": 34.414959,
+      "invoke_seconds": 0.082728,
+      "code_teardown_seconds": 0.00049,
+      "jit_teardown_seconds": 0.00141
+    }
+  ],
+  "aslr_main_addresses": [
+    "0x55b085c6adf0",
+    "0x564d093f7df0",
+    "0x562e06a75df0",
+    "0x560ecf389df0"
+  ],
+  "per_attempt_seconds": [
+    {
+      "attempt": 2,
+      "seconds": 59.894815
+    },
+    {
+      "attempt": 3,
+      "seconds": 60.472389
+    },
+    {
+      "attempt": 4,
+      "seconds": 58.708121
+    },
+    {
+      "attempt": 5,
+      "seconds": 55.532254
+    }
+  ],
+  "wire_oracles": [
+    {
+      "attempt": 2,
+      "byte_order": "little",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 2,
+      "byte_order": "big",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 3,
+      "byte_order": "little",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 3,
+      "byte_order": "big",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 4,
+      "byte_order": "little",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 4,
+      "byte_order": "big",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 5,
+      "byte_order": "little",
+      "bytes": 201,
+      "matches": true
+    },
+    {
+      "attempt": 5,
+      "byte_order": "big",
+      "bytes": 201,
+      "matches": true
+    }
+  ],
+  "source_freeze_hashes_verified": {
+    "source_sha256": 53,
+    "protected_sha256": 7
+  },
+  "capture_scope": "normal-path caller boundaries; no per-job/GC instrumentation or behavior isolation; no DWARF decoded Task/Work state",
+  "evidence_root": "/tmp/void-io-phase-capture-20261026-6vfao69v"
+}

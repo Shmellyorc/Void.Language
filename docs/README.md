@@ -1,5 +1,15 @@
 # VOID documentation
 
+## Standard-library Sprint 3 — text and encodings, 26 October 2026
+
+Boss authorized complete text, hex, Base64 and ASCII source modules from `e24d3a9`.
+The [contract](text-encoding/CONTRACT.md), [API inventory](text-encoding/API.md) and
+[engineering record](text-encoding/IMPLEMENTATION.md) describe scalar semantics,
+pinned Unicode casing, strict codec policies and crash preservation. Local
+verification is in progress; no acceptance lock or hosted CI is claimed. Existing
+filesystem SIGSEGV research remains unchanged and the historical fault remains open.
+
+
 ## File I/O and filesystem sprint — 26 October 2026
 
 Boss authorized complete `io` and `path` modules from `084fe1eb`, including real

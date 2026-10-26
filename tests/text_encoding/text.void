@@ -1,0 +1,83 @@
+use text
+
+
+func main() -> i32:
+    if text.trim("\u{2003}\t雪\0 \r") != "雪\0":
+        return 1
+
+    if text.trim_start("  x  ") != "x  " or text.trim_end("  x  ") != "  x":
+        return 2
+
+    if not text.is_empty("") or not text.is_blank("\u{85}\u{3000}") or text.is_blank("\0"):
+        return 3
+
+    if text.index_of("雪😀e\u{301}雪", "雪") != 0 or text.last_index_of("雪😀e\u{301}雪", "雪") != 4:
+        return 4
+
+    if text.last_index_of("aaaa", "aa") != 2 or text.index_of("雪", "") != 0:
+        return 5
+
+    if text.last_index_of("雪😀", "") != 2 or not text.contains("a\0雪", "\0雪"):
+        return 6
+
+    if not text.starts_with("雪a", "雪") or not text.ends_with("a😀", "😀"):
+        return 7
+
+    if text.substring("a雪😀b", -3, 2) is Ok(var extracted):
+        if extracted != "雪😀":
+            return 8
+    else:
+        return 9
+
+    if text.substring("x", -9223372036854775808) is Ok(var invalid):
+        return 10
+
+    if text.split("|雪||", "|") is Ok(var pieces):
+        if pieces.count != 4 or pieces[0] != "" or pieces[1] != "雪" or pieces[3] != "":
+            return 11
+    else:
+        return 12
+
+    if text.split_lines("a\r\nb\rc\n") is Ok(var lines):
+        if lines.count != 4 or lines[1] != "b" or lines[2] != "c" or lines[3] != "":
+            return 13
+    else:
+        return 14
+
+    if text.join(["雪", "", "😀"], "\0") is Ok(var joined):
+        if joined != "雪\0\0😀":
+            return 15
+    else:
+        return 16
+
+    if text.replace("aaaaa", "aa", "雪") is Ok(var replaced):
+        if replaced != "雪雪a":
+            return 17
+    else:
+        return 18
+
+    if text.replace_first("abab", "ab", "x") is Ok(var first):
+        if first != "xab":
+            return 19
+    else:
+        return 20
+
+    if text.repeat("雪\0", 3) is Ok(var repeated):
+        if repeated != "雪\0雪\0雪\0":
+            return 21
+    else:
+        return 22
+
+    if text.pad_left("雪", 3, "😀") is Ok(var padded):
+        if padded != "😀😀雪":
+            return 23
+    else:
+        return 24
+
+    if text.to_lower("ΟΣ ΟΣΑ Σ AΣ\u{301} AΣ\u{345}Α İ\0𐐀") != "ος οσα σ aς\u{301} aσ\u{345}α i\u{307}\0𐐨":
+        return 25
+
+    if text.to_upper("Straße ﬃ ᾀ \0é𐐨") != "STRASSE FFI ἈΙ \0É𐐀":
+        return 26
+
+    return 0

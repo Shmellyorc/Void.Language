@@ -1,0 +1,14 @@
+{
+  "protected_hashes_match": 21,
+  "source_hashes_match": 40,
+  "public_declarations": 71,
+  "real_crash_incidents": [
+    "incident-splghldg"
+  ],
+  "semantic_limits_changed": false,
+  "root_readme_changed": false,
+  "console_changed": false,
+  "hosted_ci_run": false,
+  "git_refs_mutated": false,
+  "pending": "Post-repair consolidated acceptance"
+}

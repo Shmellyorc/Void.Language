@@ -1,0 +1,27 @@
+use text
+use encoding/hex
+use encoding/base64
+use convert
+
+
+## Exercise accumulation and codec work at a caller-selected scalar count.
+## @param count Positive repetition count; each input unit is four UTF-8 bytes.
+## @return One only when split/join/replace and independent size invariants hold.
+func entry(count: i32) -> i32:
+    var payload = convert.unwrap(text.repeat("a雪", count as i64))
+    var parts = convert.unwrap(text.split(payload, "雪"))
+    var joined = convert.unwrap(text.join(parts, "雪"))
+    var replaced = convert.unwrap(text.replace(payload, "a雪", "😀"))
+    var encoded_hex = hex.encode(payload.to_utf8())
+    var encoded_base64 = base64.encode(payload.to_utf8())
+
+    if payload != joined or parts.count != (count as i64) + 1:
+        return 2
+
+    if replaced.byte_length != (count as i64) * 4 or encoded_hex.byte_length != (count as i64) * 8:
+        return 3
+
+    if encoded_base64.byte_length != (((count as i64) * 4 + 2) / 3) * 4:
+        return 4
+
+    return 1

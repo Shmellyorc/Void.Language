@@ -1,0 +1,91 @@
+use text
+use encoding/hex
+use encoding/base64
+use encoding/ascii
+use error as core
+
+
+private func common(reason: core.error) -> bool:
+    return reason.code > 0 and reason.message.byte_length > 0
+
+
+func main() -> i32:
+    if text.substring("x", -2) is Err(var reason):
+        if not (reason.kind is text.error_kind.invalid_range) or not common(reason):
+            return 1
+    else:
+        return 2
+
+    if text.split("x", "") is Err(var reason):
+        if not (reason.kind is text.error_kind.invalid_argument) or not common(reason):
+            return 3
+    else:
+        return 4
+
+    if text.repeat("x", 67108865) is Err(var reason):
+        if not (reason.kind is text.error_kind.limit_exceeded) or not common(reason):
+            return 5
+    else:
+        return 6
+
+    if hex.decode("0") is Err(var reason):
+        if not (reason.kind is hex.error_kind.invalid_length) or reason.offset != -1 or not common(reason):
+            return 7
+    else:
+        return 8
+
+    if hex.decode("0g") is Err(var reason):
+        if not (reason.kind is hex.error_kind.invalid_digit) or reason.offset != 1:
+            return 9
+    else:
+        return 10
+
+    if base64.decode("A", pad = base64.padding.omitted) is Err(var reason):
+        if not (reason.kind is base64.error_kind.invalid_length) or not common(reason):
+            return 11
+    else:
+        return 12
+
+    if base64.decode("AA=A") is Err(var reason):
+        if not (reason.kind is base64.error_kind.invalid_padding) or reason.offset != 2:
+            return 13
+    else:
+        return 14
+
+    if base64.decode("AA A") is Err(var reason):
+        if not (reason.kind is base64.error_kind.invalid_character) or reason.offset != 2:
+            return 15
+    else:
+        return 16
+
+    if base64.decode("AB==") is Err(var reason):
+        if not (reason.kind is base64.error_kind.noncanonical_bits) or reason.offset != 1:
+            return 17
+    else:
+        return 18
+
+    if ascii.decode([65, 128]) is Err(var reason):
+        if not (reason.kind is ascii.error_kind.non_ascii) or reason.offset != 1 or not common(reason):
+            return 19
+    else:
+        return 20
+
+    const bytes: [u8] = [0, 65, 127]
+    const words: [string] = ["a", "雪"]
+
+    if hex.try_encode(bytes) is Err(var reason):
+        return 21
+
+    if base64.try_encode(bytes) is Err(var reason):
+        return 22
+
+    if ascii.decode(bytes) is Err(var reason):
+        return 23
+
+    if text.join(words, "\0") is Ok(var joined):
+        if joined != "a\0雪":
+            return 24
+    else:
+        return 25
+
+    return 0

@@ -1,0 +1,40 @@
+use text
+use encoding/hex
+use encoding/base64
+use encoding/ascii
+use encoding/binary
+use io/memory
+use io
+use convert
+
+
+func main() -> i32:
+    var buffer_stream = memory.stream(order = binary.byte_order.big)
+    var written_number = convert.unwrap(buffer_stream.write<u32>(16909060))
+    var written_text = convert.unwrap(buffer_stream.write_pascal_string("雪\0😀"))
+    var bytes = buffer_stream.to_bytes()
+    var hex_text = hex.encode(bytes)
+    var base64_text = base64.encode(bytes, base64.alphabet.url_safe, base64.padding.omitted)
+    var ascii_bytes = convert.unwrap(ascii.encode(hex_text))
+    var ascii_text = convert.unwrap(ascii.decode(ascii_bytes))
+    var written_file = convert.unwrap(io.write_text("wire.hex", ascii_text))
+    var restored_file = convert.unwrap(io.read_text("wire.hex"))
+    var restored_bytes = convert.unwrap(hex.decode(text.trim("  {restored_file}\r\n")))
+    var decoded = memory.stream(restored_bytes, binary.byte_order.big)
+    var number = convert.unwrap(decoded.read<u32>())
+    var value = convert.unwrap(decoded.read_pascal_string())
+
+    if number != 16909060 or value != "雪\0😀":
+        return 1
+
+    var url_bytes = convert.unwrap(base64.decode(base64_text, base64.alphabet.url_safe, base64.padding.omitted))
+
+    if url_bytes.count != bytes.count:
+        return 2
+
+    for index in 0..<bytes.count:
+        if url_bytes[index] != bytes[index]:
+            return 3
+
+    var removed = convert.unwrap(io.remove_file("wire.hex"))
+    return 0
