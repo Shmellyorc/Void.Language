@@ -53,7 +53,65 @@ local function main()
   vim.lsp.util.apply_text_edits({items[1].textEdit},buf,'utf-16')
   check(vim.api.nvim_buf_get_lines(buf,2,3,false)[1]=='    return worker.calculate','completion selection')
   vim.api.nvim_buf_set_lines(buf,2,3,false,{'    return worker.calculate('})
-  local sig=request('textDocument/signatureHelp',point(2,28));check(sig.activeParameter==0 and sig.signatures[1].label:find('x: i32',1,true),'signature')
+  local sig=request('textDocument/signatureHelp',point(2,28));check(sig==nil or sig==vim.NIL,'undocumented signature must be null')
+  -- Exercise real owned windows, not only protocol results.
+  local documentation={'## Save plain_name <value> é😀.','## @param name Name payload. plain_name <value> é😀','## @param last Last payload.','func save(name: string, middle: i32 = 1, last: i32 = 2):','    pass','func main():','    save('}
+  local function floats()
+    local out={}
+    for _,win in ipairs(vim.api.nvim_list_wins())do
+      if vim.api.nvim_win_get_config(win).relative~='' then
+        out[#out+1]={win=win,text=table.concat(vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(win),0,-1,false),'\n')}
+      end
+    end
+    return out
+  end
+  vim.opt.virtualedit='onemore'
+  local function call(prefix)
+    documentation[7]='    '..prefix
+    vim.api.nvim_buf_set_lines(buf,0,-1,false,documentation)
+    vim.api.nvim_win_set_cursor(0,{7,#documentation[7]})
+    vim.cmd('doautocmd CursorMoved')
+    request('workspace/symbol',{query='save'})
+  end
+  call('save(');adapter.signature_help()
+  wait(function()return #floats()==1 end)
+  check(floats()[1].text:find('Name payload.',1,true) and floats()[1].text:find('plain_name <value> é😀',1,true) and not floats()[1].text:find('Last payload.',1,true),'active-only visible docs')
+  call('save("hero", ')
+  wait(function()return #floats()==0 end)
+  adapter.signature_help();request('workspace/symbol',{query='save'})
+  check(#floats()==0,'manual undocumented popup remained')
+  call('save(');adapter.signature_help();wait(function()return #floats()==1 end)
+  -- Same cursor, source-only edit reproduces the builtin null/old-float defect.
+  vim.api.nvim_buf_set_lines(buf,1,2,false,{'## plain description without a parameter tag'})
+  adapter.signature_help();request('workspace/symbol',{query='save'})
+  wait(function()return #floats()==0 end)
+  call('save(');adapter.signature_help();wait(function()return #floats()==1 end)
+  call('save("hero", last = ');adapter.signature_help();wait(function()return #floats()==1 end)
+  check(floats()[1].text:find('Last payload.',1,true) and not floats()[1].text:find('Name payload.',1,true),'named last visible docs')
+  -- Hold a real server response, issue a newer null request, then release it.
+  call('save(')
+  local send=c.request;local delayed
+  c.request=function(self,method,params,handler,...)
+    if method=='textDocument/signatureHelp' then
+      return send(self,method,params,function(...)
+        local args={...};delayed=function()handler(unpack(args))end
+      end,...)
+    end
+    return send(self,method,params,handler,...)
+  end
+  adapter.signature_help();wait(function()return delayed~=nil end);c.request=send
+  call('save("hero", ');adapter.signature_help();request('workspace/symbol',{query='save'})
+  delayed();check(#floats()==0,'stale documented reply reopened a window')
+  -- Changed source alone also rejects a delayed reply without a second request.
+  call('save(');delayed=nil
+  c.request=function(self,method,params,handler,...)
+    if method=='textDocument/signatureHelp' then return send(self,method,params,function(...)local args={...};delayed=function()handler(unpack(args))end end,...)end
+    return send(self,method,params,handler,...)
+  end
+  adapter.signature_help();wait(function()return delayed~=nil end);c.request=send
+  vim.api.nvim_buf_set_lines(buf,1,2,false,{'## source changed'})
+  delayed();check(#floats()==0,'stale source reply reopened a window')
+  vim.api.nvim_buf_set_lines(buf,0,-1,false,original)
   vim.api.nvim_buf_set_lines(buf,2,3,false,{'    return worker.calculate(x)'})
   wait(function()return #vim.diagnostic.get(buf)==0 end)
   local worker=vim.fn.bufadd(root..'/worker.void');vim.fn.bufload(worker)
@@ -86,7 +144,7 @@ local function main()
   wait(function()return c:is_stopped()end)
   local replacement=vim.lsp.get_clients({bufnr=worker,name='voidls'})[1]
   replacement:stop();wait(function()return replacement:is_stopped()end)
-  vim.fn.writefile({vim.json.encode({editor=vim.version(),passed={'shipped adapter','console source docs/navigation','enum pattern navigation/completion','public print hover/signature','shared entry preflight','nested import edits','standard docs/navigation','completion selection','incomplete call signature','hover','symbols','navigation','dirty repair','cross-file guarded rename','stale edit rejection','stale formatting rejection','formatting','refresh','restart','stop'}})},output)
+  vim.fn.writefile({vim.json.encode({editor=vim.version(),passed={'documentation window transitions/manual/source edits/stale replies','shipped adapter','console source docs/navigation','enum pattern navigation/completion','public print hover/signature','shared entry preflight','nested import edits','standard docs/navigation','completion selection','incomplete call signature','hover','symbols','navigation','dirty repair','cross-file guarded rename','stale edit rejection','stale formatting rejection','formatting','refresh','restart','stop'}})},output)
 end
 local ok,err=pcall(main)
 if not ok then vim.fn.writefile({tostring(err)},output..'.error');vim.cmd('cquit 1')else vim.cmd('qa!')end

@@ -111,12 +111,14 @@ public:
             items.push_back(std::move(d));
         }
     }
-    void warn(const SourceFile& source,const Token& token,Code code,const std::string& message) {
+    void warn(SourceSpan location,Code code,const std::string& message,std::vector<RelatedLocation> related={}) {
         if(items.size()-seen.size()>=100)return;
-        auto location=span(source,token);if(auto found=snapshots.find(source.path());found!=snapshots.end()){location.module_identity=found->second.first;location.source=found->second.second;}
-        for(const auto& item:items)if(item.severity==Severity::warning && item.primary.source->path()==source.path() && item.primary.begin==location.begin && item.code==code)return;
-        Diagnostic d{code};d.severity=Severity::warning;d.primary=std::move(location);d.description=message;d.related=context;items.push_back(std::move(d));
+        auto own=[&](SourceSpan& site){if(auto found=snapshots.find(site.source->path());found!=snapshots.end()){site.module_identity=found->second.first;site.source=found->second.second;}};
+        own(location);for(auto& item:related)own(item.span);
+        for(const auto& item:items)if(item.severity==Severity::warning && item.primary.source->path()==location.source->path() && item.primary.begin==location.begin && item.code==code)return;
+        Diagnostic d{code};d.severity=Severity::warning;d.primary=std::move(location);d.description=message;d.related=context;d.related.insert(d.related.end(),related.begin(),related.end());items.push_back(std::move(d));
     }
+    void warn(const SourceFile& source,const Token& token,Code code,const std::string& message) {warn(span(source,token),code,message);}
     std::vector<Diagnostic> warnings() const {std::vector<Diagnostic> result;for(const auto& d:items)if(d.severity==Severity::warning)result.push_back(d);return result;}
     bool failed() const { return std::any_of(items.begin(), items.end(), [](const auto& d) { return d.severity == Severity::error; }); }
     unsigned& semantic_depth() { return expression_depth; }
@@ -124,7 +126,7 @@ public:
     bool full() { if (seen.size() < 100) return false; suppressed = true; return true; }
     bool within(const SourceFile& source, std::size_t begin, std::size_t end) const {
         return std::any_of(items.begin(), items.end(), [&](const auto& d) {
-            return d.primary.source->path() == source.path() && d.primary.begin >= begin && (d.primary.begin < end || (end == source.text().size() && d.primary.begin == end));
+            return d.severity == Severity::error && d.primary.source->path() == source.path() && d.primary.begin >= begin && (d.primary.begin < end || (end == source.text().size() && d.primary.begin == end));
         });
     }
     std::size_t size() const { return seen.size(); }
@@ -539,24 +541,56 @@ static_assert(std::is_move_constructible_v<Function> && std::is_move_assignable_
 static_assert(!std::is_copy_constructible_v<Statement> && !std::is_copy_assignable_v<Statement>);
 static_assert(!std::is_copy_constructible_v<Structure> && !std::is_copy_assignable_v<Structure>);
 static_assert(std::is_move_constructible_v<Structure> && std::is_move_assignable_v<Structure>);
-std::string source_documentation(const SourceFile& source,std::size_t offset) {
+Documentation source_documentation(const SourceFile& source,std::size_t offset) {
     const auto& text=source.text();auto line=offset?text.find_last_of("\r\n",offset-1):std::string::npos;
     if(line==std::string::npos)return {};
-    auto end=line;std::string result;
+    auto end=line;std::vector<std::pair<std::size_t,std::size_t>> lines;
     while(true) {
         if(end && text[end]=='\n' && text[end-1]=='\r')--end;
         auto begin=end?text.find_last_of("\r\n",end-1):std::string::npos;begin=begin==std::string::npos?0:begin+1;
-        auto content=text.substr(begin,end-begin);auto first=content.find_first_not_of(' ');
-        if(first==std::string::npos || content.compare(first,2,"##"))break;
-        content=content.substr(first+2);if(content.starts_with(' '))content.erase(0,1);
-        result=content+(result.empty()?"":"\n"+result);
+        auto first=text.find_first_not_of(' ',begin);
+        if(first>=end || text.compare(first,2,"##"))break;
+        first+=2;if(first<end && text[first]==' ')++first;
+        lines.emplace_back(first,end);
         if(!begin)break;end=begin-1;
+    }
+    Documentation result;bool prose=false;auto snapshot=std::make_shared<const SourceFile>(source);
+    for(auto it=lines.rbegin();it!=lines.rend();++it) {
+        const auto [begin,end]=*it;auto first=text.find_first_not_of(" \t",begin);
+        auto content=std::string_view(text).substr(begin,end-begin);
+        auto tag=first<end?std::string_view(text).substr(first,end-first):std::string_view{};
+        auto recognized=[&](std::string_view name){return tag==name || (tag.starts_with(name) && tag.size()>name.size() && (tag[name.size()]==' ' || tag[name.size()]=='\t'));};
+        auto description=[&](std::size_t from){auto a=tag.find_first_not_of(" \t",from);if(a==std::string_view::npos)return std::string{};auto b=tag.find_last_not_of(" \t");return std::string(tag.substr(a,b-a+1));};
+        if(recognized("@param")) {
+            auto a=tag.find_first_not_of(" \t",6);if(a==std::string_view::npos)a=tag.size();
+            auto b=tag.find_first_of(" \t",a);if(b==std::string_view::npos)b=tag.size();
+            result.parameters.push_back({std::string(tag.substr(a,b-a)),description(b),{snapshot,{},first,first+b}});
+        } else if(recognized("@return")) {
+            auto value=description(7);if(!value.empty() && !result.returns)result.returns=DocumentationText{std::move(value),{snapshot,{},first,first+7}};
+        } else {
+            if(prose)result.description+='\n';result.description+=content;prose=true;
+        }
     }
     return result;
 }
-std::string parameter_documentation(const std::string& docs,const std::string& name) {
-    auto key="@param "+name+" ";auto start=docs.find(key);if(start==std::string::npos)return {};
-    start+=key.size();return docs.substr(start,docs.find('\n',start)-start);
+Documentation numeric_documentation(const numeric::Member& api) {
+    Documentation docs;docs.description=std::string(api.documentation);
+    for(unsigned n=0;n<api.parameter_documentation.size();++n)docs.parameters.push_back({std::string(api.parameters[n]),std::string(api.parameter_documentation[n]),{}});
+    return docs;
+}
+void validate_documentation(const SourceFile& source,const Function& f,Diagnostics& diagnostics) {
+    auto docs=source_documentation(source,f.token.offset);
+    std::map<std::string,SourceSpan> first;
+    bool documented=false;
+    for(const auto& p:docs.parameters) {
+        auto formal=std::find_if(f.parameters.begin(),f.parameters.end(),[&](const auto& formal){return formal.token.text==p.name;});
+        if(formal==f.parameters.end())diagnostics.warn(p.source,Code::documentation_unknown_parameter,"Unknown documented parameter '"+p.name+"'.");
+        else documented|=!p.description.empty();
+        auto [original,inserted]=first.emplace(p.name,p.source);
+        if(!inserted)diagnostics.warn(p.source,Code::documentation_duplicate_parameter,"Duplicate documentation for parameter '"+p.name+"'.",{{original->second,"First documentation tag"}});
+    }
+    if(documented)for(const auto& p:f.parameters)if(docs.parameter(p.token.text).empty())
+        diagnostics.warn(source,p.token,Code::documentation_missing_parameter,"Missing documentation for parameter '"+p.token.text+"'.");
 }
 bool standard_module(std::string_view id) { return id.starts_with("/@stdlib/"); }
 bool same_library(std::string_view a, std::string_view b) { return standard_module(a)==standard_module(b); }
@@ -752,8 +786,8 @@ class Parser {
         function_types.push_back({token,std::move(parameters),result,definition});Type value(definition);value.nullable=accept("?");return value;
     }
     VOID_SEMANTIC_HANDLER Type result_type() {
-        auto token=take();need("<");auto success=type();need(",");auto failure=type();need(">");
-        auto d=std::make_shared<ir::ValueType>();d->name=d->identity="result";d->result_type=true;
+        auto token=take();need("<");auto success=type();need(",");auto failure=type();auto close=need(">");
+        auto d=std::make_shared<ir::ValueType>();d->name=d->identity="result";d->display_name=source.text().substr(token.offset,close.offset+1-token.offset);d->result_type=true;
         results.push_back({token,success,failure,d});return Type(d);
     }
     VOID_SEMANTIC_HANDLER Type dictionary_type() {
@@ -1246,6 +1280,11 @@ public:
             Statement end(Statement::Kind::returned,application.token);end.expression=std::make_unique<Expr>(Expr::Kind::literal,Token{TokenKind::number,"0",0});end.expression->literal_text="0";application.body.push_back(std::move(end));
             application.source_end=source.text().size();unit.functions.push_back(std::move(application));
         }
+        if(!instantiating) {
+            for(const auto& f:unit.functions)if(!f.anonymous && f.token.text!="$application")validate_documentation(source,f,diagnostics);
+            for(const auto& f:unit.generic_functions)validate_documentation(source,f,diagnostics);
+            for(const auto& structure:unit.generic_structures)for(const auto& f:structure.operators)validate_documentation(source,f,diagnostics);
+        }
         unit.parse_failed |= diagnostics.size() != before;
         unit.type_uses = std::move(type_uses);
         unit.function_types=std::move(function_types);unit.results=std::move(results);
@@ -1633,7 +1672,7 @@ class Semantics {
     void builtin_record(const Function& function,const std::string& documentation) {
         auto text=std::make_shared<const SourceFile>("<core prelude>",function.token.text);SourceSpan site{text,"$core",0,function.token.text.size()};
         AnalyzedDeclaration record{AnalyzedDeclaration::Kind::function,function.symbol,"$core","public",site,{},function.result,{}};
-        record.builtin=true;record.documentation=documentation;
+        record.builtin=true;record.documentation.description=documentation;
         for(const auto& p:function.parameters){record.parameters.push_back(p.type);record.written_parameters.push_back({p.token.text,p.type,site});}
         unit.builtins.insert_or_assign(function.symbol,std::move(record));
     }
@@ -1672,7 +1711,7 @@ class Semantics {
         }
         target.symbol=e.target+"::"+ir::capability_key(receiver)+(argument?"::"+ir::capability_key(*argument):"");
         if(argument)target.parameters.push_back({Token{TokenKind::name,name,e.token.offset},*argument});
-        builtin_record(target,documentation);e.source_target=target.symbol;
+        builtin_record(target,documentation);if(argument)unit.builtins.at(target.symbol).documentation.parameters.push_back({name,type_level?"The UTF-8 bytes to validate and copy.":receiver.kind==Type::dictionary?"The key to look up.":"The index to look up; negative indexes count from the end.",{}});e.source_target=target.symbol;
         if(type_level)e.parts.erase(e.parts.begin());
         const auto result=call_arguments(e,target,type_level?0:1);
         return e.type=result;
@@ -1814,7 +1853,7 @@ class Semantics {
         }
         return e.type = call_arguments(e,target,1);
     }
-    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,bool /*constructor*/) {
+    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,bool /*constructor*/,const Documentation* selected_docs=nullptr) {
         std::optional<std::size_t> active;
         for(std::size_t n=first;n<e.parts.size() && !active;++n) {
             std::vector<const Expr*> work{e.parts[n].get()};
@@ -1826,11 +1865,17 @@ class Semantics {
         }
         if(!active)return;
         auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=target.token.text+"(";
-        for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target)out.documentation=source_documentation(u->source,target.token.offset);
-        if(auto builtin=unit.builtins.find(target.symbol);builtin!=unit.builtins.end())out.documentation=builtin->second.documentation;
+        Documentation docs;
+        if(selected_docs)docs=*selected_docs;
+        else {
+            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target)docs=source_documentation(u->source,target.token.offset);
+            if(auto builtin=unit.builtins.find(target.symbol);builtin!=unit.builtins.end())docs=builtin->second.documentation;
+        }
+        if(target.symbol.starts_with("$numeric::"))docs=numeric_documentation(*numeric::member(target.token.text));
+        out.documentation=docs.text(target.result!=Type::none);
         out.parameter_documentation.clear();
         for(const auto& p:target.parameters) {
-            out.parameter_documentation.push_back(parameter_documentation(out.documentation,p.token.text));
+            out.parameter_documentation.push_back(docs.parameter(p.token.text));
             auto label=p.token.text+": "+ir::type_name(p.type);if(p.default_expression)label+=" = …";
             if(!out.parameters.empty())out.signature+=", ";out.signature+=label;out.parameters.push_back(label);
         }
@@ -2216,7 +2261,7 @@ class Semantics {
                 if(selected.function) {
                     if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
                     if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2))
-                        for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset);
+                        for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);
                 } else {
                     if(t.definition->native_resource)continue; // Source methods remain visible; native payloads do not.
                     auto type=t;bool readonly=false;std::string declaring;
@@ -2236,11 +2281,11 @@ class Semantics {
             for(const auto& name:names) {
                 if(!valid_editor_identifier(name) || candidates.contains(name)) continue;
                 Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
-                try { auto [owner, value] = global(test); if (value) { if (value->type == Type::none) owner->resolve_global(*value); if (auto* candidate = add(name, value->type, 6)) candidate->documentation = source_documentation(owner->source, value->token.offset); continue; } } catch (const CompilationError&) {} catch (const Poison&) {}
-                try {auto& f=resolve(test);if(auto* candidate=add(name,f.result,3))for(const auto& [id,u]:units)if(u->declarations.contains(f.token.text) && u->declarations.at(f.token.text)==&f)candidate->documentation=source_documentation(u->source,f.token.offset);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
-                try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);if(auto* candidate=add(name,c->type,21))candidate->documentation=source_documentation(owner->source,c->declaration.token.offset);continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
+                try { auto [owner, value] = global(test); if (value) { if (value->type == Type::none) owner->resolve_global(*value); if (auto* candidate = add(name, value->type, 6)) candidate->documentation = source_documentation(owner->source, value->token.offset).text(); continue; } } catch (const CompilationError&) {} catch (const Poison&) {}
+                try {auto& f=resolve(test);if(auto* candidate=add(name,f.result,3))for(const auto& [id,u]:units)if(u->declarations.contains(f.token.text) && u->declarations.at(f.token.text)==&f)candidate->documentation=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
+                try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);if(auto* candidate=add(name,c->type,21))candidate->documentation=source_documentation(owner->source,c->declaration.token.offset).text();continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
                 try {auto [owner,structure]=structure_lookup(unit,root,units,e.qualifier.empty()?name:e.qualifier+"."+name,e.token);
-                    if(structure && structure->layout_state!=3)candidates.emplace(name,EditorCandidate{name,structure->generics.empty()?"type":"generic type",7,{},source_documentation(owner->source,structure->token.offset)});
+                    if(structure && structure->layout_state!=3)candidates.emplace(name,EditorCandidate{name,structure->generics.empty()?"type":"generic type",7,{},source_documentation(owner->source,structure->token.offset).text()});
                 } catch(const CompilationError&){}catch(const Poison&){}
             }
             if(e.qualifier.empty()) {
@@ -2257,7 +2302,11 @@ class Semantics {
     // copy storage in recursive Debug frames that must fit the 1 MiB stack.
     VOID_SEMANTIC_HANDLER void editor_name_candidates(Expr& e,const std::optional<Type>& expected) {
         if(e.qualifier.empty() && expected && expected->definition && expected->definition->result_type)
-            for(unsigned tag=0;tag<2;++tag){const auto name=tag?"Err":"Ok";diagnostics.editor->result.candidates.push_back({name,std::string(name)+"("+(tag?"error: ":"value: ")+ir::type_name(ir::field_type(*expected,tag?2:1))+") -> "+ir::type_name(*expected),3,{},"Construct the contextual result variant."});}
+            for(unsigned tag=0;tag<2;++tag) {
+                const auto name=tag?"Err":"Ok";auto token=e.token;token.text=name;
+                auto target=result_editor_target(*expected,tag,token);
+                diagnostics.editor->result.candidates.push_back({name,std::string(name)+"("+(tag?"error: ":"value: ")+ir::type_name(target.parameters[0].type)+") -> "+ir::type_name(*expected),3,{},unit.builtins.at(target.symbol).documentation.text(true)});
+            }
         editor_candidates(e);
     }
     VOID_SEMANTIC_HANDLER void editor_field_candidates(Expr& e,const Type& receiver) {
@@ -2400,9 +2449,11 @@ class Semantics {
         e.kind=Expr::Kind::sum;e.slot=tag;return e.type=type;
     }
     Function result_editor_target(Type type,unsigned tag,Token token) {
-        Function target;target.token=token;target.symbol="$result::"+Type::key(type)+"|"+ir::capability_key(type)+"::"+(tag?"Err":"Ok");target.result=type;
-        target.parameters.push_back({Token{TokenKind::name,tag?"error":"value",token.offset},ir::field_type(type,tag?2:1)});
-        builtin_record(target,"Construct the selected result variant; only its active payload is stored. Ok(null) is successful.");
+        Function target;target.token=token;target.symbol=std::string(type.nullable?"$nullable::":"$result::")+Type::key(type)+"|"+ir::capability_key(type)+"::"+(tag?"Err":"Ok");target.result=type;
+        auto payload=type;if(type.nullable)payload.nullable=false;else payload=ir::field_type(type,tag?2:1);
+        target.parameters.push_back({Token{TokenKind::name,tag?"error":"value",token.offset},payload});
+        builtin_record(target,type.nullable?"Matches a present nullable value and exposes its non-null payload.":tag?"The error variant of result; contains the failure payload.":"The success variant of result; contains the successful value. Ok(null) is successful.");
+        unit.builtins.at(target.symbol).documentation.parameters.push_back({tag?"error":"value",type.nullable?"The present non-null value.":tag?"The error carried by Err.":"The successful value carried by Ok.",{}});
         return target;
     }
     // Keep the result signature's Function temporary out of the recursive
@@ -2430,14 +2481,14 @@ class Semantics {
                 std::string signature=target.token.text;
                 if(!target.parameters.empty()){signature+="(";for(const auto& p:target.parameters){if(signature.back()!='(')signature+=", ";signature+=p.token.text+": "+ir::type_name(p.type);}signature+=")";}
                 signature+=" -> "+ir::type_name(target.result);
-                out.candidates.push_back({target.token.text,signature,20,{},source_documentation(owner->source,target.token.offset)});
+                out.candidates.push_back({target.token.text,signature,20,{},source_documentation(owner->source,target.token.offset).text(true)});
             }
             throw EditorProbeFound{};
         }
         auto found=std::find_if(variants.begin(),variants.end(),[&](const auto& variant){return variant.name==e.token.text;});
         if(found==variants.end())error(source,e.token,Code::unknown_identifier,"Unknown enum variant '"+e.token.text+"'.");
         if(!call && found->count)error(source,e.token,Code::argument_count,"Variant requires its payload arguments.");
-        if(diagnostics.editor && call){Function target;target.token=e.token;target.result=Type(structure->definition);for(unsigned i=0;i<found->count;++i){const auto& field=structure->fields[found->begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,found->begin+i)});}editor_call(e,target,1,false);diagnostics.editor->result.documentation=source_documentation(owner->source,structure->case_tokens[found-variants.begin()].offset);}
+        if(diagnostics.editor && call){Function target;target.token=e.token;target.result=Type(structure->definition);for(unsigned i=0;i<found->count;++i){const auto& field=structure->fields[found->begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,found->begin+i)});}auto docs=source_documentation(owner->source,structure->case_tokens[found-variants.begin()].offset);editor_call(e,target,1,false,&docs);}
         auto result=sum_expression(e,Type(structure->definition),static_cast<unsigned>(found-variants.begin()),1);e.target=structure->definition->identity+"::variant::"+found->name;return result;
     }
     VOID_SEMANTIC_HANDLER Type dictionary_expression(Expr& e,std::optional<Type> expected) {
@@ -2703,6 +2754,9 @@ class Semantics {
         target.parameters[0].type=ir::readonly_view(t);
         target.symbol=std::string("$display.")+(formatted?"format":"string")+"::"+std::to_string(t.kind)+":"+std::to_string(Type::key(t).size())+":"+Type::key(t)+(t.nullable?"?":"")+"|"+ir::capability_key(t);
         builtin_record(target,formatted?"Format a value using invariant patterns; invalid specifications return Err with a byte offset.":"Display a value using invariant type-aware text.");
+        auto& docs=unit.builtins.at(target.symbol).documentation;
+        docs.parameters.push_back({"value","The value to display.",{}});
+        if(formatted)docs.parameters.push_back({"spec","The invariant format specification.",{}});
         e.source_target=target.symbol;e.target=adapter?adapter->symbol:formatted?"$display.format":"$display.string";
         e.type=call_arguments(e,target,0);
         if(formatted)for(unsigned n=0;n<e.parts.size();++n)if(e.argument_indexes[n]==1){e.format_specification=format_specification_syntax(*e.parts[n]);if((ir::collection_type(t) || (t.definition && !t.definition->cases.empty())) && e.parts[n]->kind==Expr::Kind::literal && e.parts[n]->type==Type::string)try{formatting::parse_text(e.parts[n]->aggregate_value.text);}catch(const formatting::Error& failure){auto site=e.parts[n]->token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}}
@@ -2723,7 +2777,7 @@ class Semantics {
             auto& out=diagnostics.editor->result;
             if(!out.signature.empty() && out.signature.starts_with("print(")) {
                 out.signature=public_signature;out.parameters={"*values","sep: string = space","end: string = newline","file: console.output = console.stdout","flush: bool = false"};
-                out.parameter_documentation.resize(5);out.documentation="Capture arguments once, display left to right and write one complete record. Checked I/O failure; prohibited on workers.";
+                out.parameter_documentation={"Values to display from left to right.","Text written between values.","Text written after the record.","The console output receiving the record.","Whether to flush after writing the record."};out.documentation="Capture arguments once, display left to right and write one complete record. Checked I/O failure; prohibited on workers.";
                 out.active_parameter=out.active_parameter<count?0:out.active_parameter-count+1;
             }
         }
@@ -2896,7 +2950,7 @@ class Semantics {
             if(!invalid_function && !unit.failed_import)for(const auto& name:{"+","-","*","/","%","==","!=","<",">","<=",">="}) {
                 auto match=ir::select_operator(*root.member_catalog,name==std::string("!=")?"==":name,operands,unit.identity,lexical_owner());
                 if(match.status!=ir::MemberSelection::found)continue;
-                for(const auto& [id,u]:units)for(const auto& f:u->functions)if(f.symbol==match.method){auto spelling=std::string(name);if(e.token.text.size()==2 && e.token.text[1]=='=' && e.token.text!="==" && e.token.text!="!=" && e.token.text!="<=" && e.token.text!=">="){if(spelling.size()!=1 || spelling=="<" || spelling==">")continue;spelling+="=";}out.candidates.push_back({spelling,editor_signature(f),24,{},source_documentation(u->source,f.token.offset)});diagnostics.editor->candidate_targets[spelling].insert(f.symbol);++diagnostics.editor->candidate_occurrences[spelling];}
+                for(const auto& [id,u]:units)for(const auto& f:u->functions)if(f.symbol==match.method){auto spelling=std::string(name);if(e.token.text.size()==2 && e.token.text[1]=='=' && e.token.text!="==" && e.token.text!="!=" && e.token.text!="<=" && e.token.text!=">="){if(spelling.size()!=1 || spelling=="<" || spelling==">")continue;spelling+="=";}out.candidates.push_back({spelling,editor_signature(f),24,{},source_documentation(u->source,f.token.offset).text(f.result!=Type::none)});diagnostics.editor->candidate_targets[spelling].insert(f.symbol);++diagnostics.editor->candidate_occurrences[spelling];}
             }
             // Continue the ordinary checker so effects and capability contracts
             // are finalized before presenting these candidates.
@@ -5321,7 +5375,7 @@ struct AnalysisAccess {
             const std::string name(api.name);auto text=std::make_shared<const SourceFile>("<numeric prelude>",name);
             SourceSpan site{text,"$numeric",0,name.size()};
             AnalyzedDeclaration record{api.callable?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,numeric::symbol(type,api.name),"$numeric","public",site,{},type,{}};
-            record.builtin=true;record.documentation=std::string(api.documentation);
+            record.builtin=true;record.documentation=numeric_documentation(api);
             for(auto parameter:api.parameters){record.parameters.push_back(type);record.written_parameters.push_back({std::string(parameter),type,site});}
             if(!api.callable)record.value=numeric::limit(type,api.name=="max_value");
             result->editor_declarations_.push_back(std::move(record));
@@ -5363,6 +5417,8 @@ struct AnalysisAccess {
         std::set<std::string> exact_references;
         auto declaration = [&](AnalyzedDeclaration d,bool native_contract=true,bool visible=true) {
             if(d.source.source)d.documentation=source_documentation(*d.source.source,d.source.begin);
+            for(auto& p:d.documentation.parameters)p.source.module_identity=d.module;
+            if(d.documentation.returns)d.documentation.returns->source.module_identity=d.module;
             if (d.owner.empty()) d.owner = d.module;
             if(native_contract) {
             field(result->contract_, "declaration"); field(result->contract_, d.identity); field(result->contract_, d.visibility);
@@ -5453,6 +5509,23 @@ struct AnalysisAccess {
                 result->editor_declarations_.push_back({AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id});
 #include "generic_tooling.inc"
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
+            auto visit_patterns = [&](const Pattern& pattern,const std::string& owner,const std::map<unsigned,std::string>& locals,bool implicit) {
+                std::vector<const Pattern*> patterns{&pattern};
+                while(!patterns.empty()) {
+                    auto* p=patterns.back();patterns.pop_back();
+                    if(p->kind==Pattern::Kind::constructor && !p->variant_token.text.empty())frontend_case([&] {
+                        std::string target;
+                        if(p->nullable)target="$nullable::"+Type::key(p->type)+"|"+ir::capability_key(p->type)+"::Ok";
+                        else if(p->type.definition && !p->type.definition->cases.empty()) {
+                            const auto& variant=p->type.definition->cases.at(p->tag);
+                            if(p->variant_token.text==variant.name)target=p->type.definition->result_type?"$result::"+Type::key(p->type)+"|"+ir::capability_key(p->type)+"::"+variant.name:p->type.definition->identity+"::variant::"+variant.name;
+                        }
+                        if(!target.empty()){Expr use(Expr::Kind::name,p->variant_token);reference(owner,target,use,*unit,implicit,false);}
+                    });
+                    for(const auto& value:p->values)visit_expression(*value,owner,locals,implicit);
+                    for(const auto& child:p->children)patterns.push_back(&child);
+                }
+            };
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,owner.find("::$display$")!=std::string::npos); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
                 if(auto spec=format_specification(e)) {
@@ -5498,19 +5571,7 @@ struct AnalysisAccess {
                 if ((e.kind == Expr::Kind::construction || e.kind==Expr::Kind::base_initialization) && e.initializer.empty()) for (unsigned n = 0; n < e.names.size(); ++n) {
                     Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->fields.at(e.field_indexes[n]).owner + "::field::" + e.names[n].text,use,*unit);
                 }
-                std::vector<const Pattern*> patterns;for(const auto& p:e.patterns)patterns.push_back(&p);
-                while(!patterns.empty()){
-                    auto* p=patterns.back();patterns.pop_back();
-                    if(p->kind==Pattern::Kind::constructor && !p->nullable && p->type.definition && !p->type.definition->cases.empty() && !p->variant_token.text.empty()) {
-                        // Keep cold metadata temporaries out of every recursive
-                        // expression-visitor frame (including ordinary receiver chains).
-                        frontend_case([&] {
-                            const auto& variant=p->type.definition->cases.at(p->tag);
-                            if(p->variant_token.text==variant.name){Expr use(Expr::Kind::name,p->variant_token);reference(owner,p->type.definition->result_type?"$result::"+Type::key(p->type)+"|"+ir::capability_key(p->type)+"::"+variant.name:p->type.definition->identity+"::variant::"+variant.name,use,*unit,implicit,false);}
-                        });
-                    }
-                    for(const auto& value:p->values)visit_expression(*value,owner,locals,implicit);for(const auto& child:p->children)patterns.push_back(&child);
-                }
+                for(const auto& p:e.patterns)visit_patterns(p,owner,locals,implicit);
                 for (const auto& part : e.parts) visit_expression(*part,owner,locals,implicit);
                 for (const auto& part : e.omitted) visit_expression(*part,owner,locals,true);
             };
@@ -5533,6 +5594,17 @@ struct AnalysisAccess {
                     for (const auto& member : structure.fields) consider(member.token,structure.definition->identity + "::field::" + member.name);
                 }
                 Expr use(Expr::Kind::name,token); reference(owner,t.definition->identity,use,*unit);
+            }
+            for(const auto& syntax:unit->results) {
+                auto type=syntax.resolved==Type::none?Type(syntax.definition):syntax.resolved;
+                const auto key="$result::type::"+(syntax.resolved==Type::none?id+":"+std::to_string(syntax.token.offset):Type::key(type));
+                if(visible_declarations.insert(key).second) {
+                    auto text=std::make_shared<const SourceFile>("<core prelude>","result");
+                    AnalyzedDeclaration record{AnalyzedDeclaration::Kind::value_structure,key,"$core","public",{text,"$core",0,6},{},type,{}};
+                    record.builtin=true;record.documentation.description="A result carries either a successful Ok value or an Err error; only the active payload is stored.";
+                    record.signature=ir::type_name(type);result->editor_declarations_.push_back(std::move(record));
+                }
+                Expr use(Expr::Kind::name,syntax.token);reference(id,key,use,*unit,false,false);
             }
             for (const auto& structure : unit->structures) {
                 auto key = structure.definition->identity;
@@ -5648,7 +5720,7 @@ struct AnalysisAccess {
                         if (s.range_end) expression(*s.range_end,owner,locals);
                         if (s.index) expression(*s.index,owner,locals);
                         if (s.expression) expression(*s.expression,owner,locals);
-                        if(s.pattern){std::vector<const Pattern*> patterns{&*s.pattern};while(!patterns.empty()){auto* p=patterns.back();patterns.pop_back();for(const auto& value:p->values)expression(*value,owner,locals);for(const auto& child:p->children)patterns.push_back(&child);}}
+                        if(s.pattern)visit_patterns(*s.pattern,owner,locals,false);
                         if (s.readonly) locals.emplace(s.slot,owner);
                         body(s.body); body(s.otherwise);
                     }
@@ -5759,7 +5831,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
             if(editor->candidate_occurrences.at(name)!=editor->operator_occurrences)continue;
             std::set<std::string> details,docs;
             for(const auto& [id,u]:graph.units)for(const auto& f:u->functions)if(editor->candidate_targets.at(name).contains(f.symbol)) {
-                details.insert(editor_signature(f));auto doc=source_documentation(u->source,f.token.offset);if(!doc.empty())docs.insert(std::move(doc));
+                details.insert(editor_signature(f));auto doc=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);if(!doc.empty())docs.insert(std::move(doc));
             }
             candidate.detail=details.size()>1?"Selected specializations:":"";
             for(const auto& detail:details){if(!candidate.detail.empty())candidate.detail+="\n\n";candidate.detail+=detail;}

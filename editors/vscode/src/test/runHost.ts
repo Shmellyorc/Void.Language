@@ -52,7 +52,7 @@ async function main(): Promise<void> {
                 'telemetry.telemetryLevel': 'off', 'update.mode': 'none', 'extensions.autoCheckUpdates': false}));
             const env = {VOID_TEST_PROFILE: profile, VOID_TEST_ROOT: root, VOID_TEST_MODE: mode, VOIDLS_PATH: server};
             const launchArgs = [mode === 'multi-root' ? multi : root, '--user-data-dir=' + profile, '--extensions-dir=' + path.join(temp, 'extensions'),
-                '--skip-welcome', '--skip-release-notes', ...(installed ? [] : ['--disable-extensions']), '--disable-updates', '--disable-gpu'];
+                '--skip-welcome', '--skip-release-notes', ...(process.env.VOID_TEST_CDP_PORT ? ['--remote-debugging-port='+process.env.VOID_TEST_CDP_PORT] : []), ...(installed ? [] : ['--disable-extensions']), '--disable-updates', '--disable-gpu'];
             try {
             if (mode === 'untrusted') {
                 // test-electron.runTests unconditionally disables Workspace Trust.

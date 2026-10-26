@@ -184,7 +184,7 @@ class Server {
     bool dirty=false;
     std::int64_t process_id=0;
     std::set<std::string> cancellations;
-    bool related_information=false, diagnostic_versions=false, rename_edits=false;
+    bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
     std::string identity(const std::string& uri) const {
         auto path=vd::lsp::uri_path(uri);
         if(auto current=session.current_analysis();current && current->result().program)
@@ -393,9 +393,16 @@ class Server {
             if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
             auto assistance=vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
-                if(assistance.signature.empty())return nullptr;
-                j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n)parameters.push_back(j::Object{{"label",assistance.parameters[n]},{"documentation",n<assistance.parameter_documentation.size()?assistance.parameter_documentation[n]:""}});
-                return j::Object{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"documentation",assistance.documentation},{"parameters",std::move(parameters)}}}},{"activeSignature",0},{"activeParameter",assistance.active_parameter}};
+                if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty())return nullptr;
+                j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
+                    j::Object parameter{{"label",assistance.parameters[n]}};
+                    if(n==assistance.active_parameter) {
+                        if(signature_plaintext)parameter["documentation"]=j::Object{{"kind","plaintext"},{"value",assistance.parameter_documentation[n]}};
+                        else parameter["documentation"]=assistance.parameter_documentation[n];
+                    }
+                    parameters.push_back(std::move(parameter));
+                }
+                return j::Object{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"parameters",std::move(parameters)}}}},{"activeSignature",0},{"activeParameter",assistance.active_parameter}};
             }
             j::Array items;for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},{"documentation",c.documentation},
                 {"textEdit",j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end})},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});
@@ -411,7 +418,7 @@ class Server {
         for(const auto& ref:index->references())if(!ref.implicit && ref.to==definition->identity && ref.source.module_identity==module && ref.source.begin<=*offset && *offset<ref.source.end){selected_span=ref.source;break;}
         if(method=="textDocument/hover") {
             std::string text;
-            for(const auto& d:definitions){if(!text.empty())text+="\n\n";text+=describe(d)+(d.documentation.empty()?"":"\n\n"+d.documentation);}
+            for(const auto& d:definitions){if(!text.empty())text+="\n\n";auto docs=d.documentation.text(d.type!=vd::ir::Type::none && (d.kind==vd::AnalyzedDeclaration::Kind::function || d.kind==vd::AnalyzedDeclaration::Kind::receiver_method || d.kind==vd::AnalyzedDeclaration::Kind::interface_requirement || d.kind==vd::AnalyzedDeclaration::Kind::operator_function));text+=describe(d)+(docs.empty()?"":"\n\n"+docs);}
             return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",std::move(text)}}},{"range",range(selected_span)}};
         }
         if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
@@ -556,6 +563,8 @@ public:
                 const auto& caps=object(params.get("capabilities"));
                 if(auto pid=params.get("processId");pid && !pid->getAsNull())process_id=integer(pid,1);
                 if(auto td=caps.getObject("textDocument")) {
+                    if(auto help=td->getObject("signatureHelp"))if(auto info=help->getObject("signatureInformation"))if(auto formats=info->getArray("documentationFormat"))
+                        for(const auto& format:*formats)if(format.getAsString()=="plaintext")signature_plaintext=true;
                     if(auto symbols=td->getObject("documentSymbol"))hierarchical_symbols=symbols->getBoolean("hierarchicalDocumentSymbolSupport").value_or(false);
                 }
                 if(auto td=caps.getObject("textDocument")) if(auto pd=td->getObject("publishDiagnostics")) {

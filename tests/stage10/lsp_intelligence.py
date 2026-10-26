@@ -159,7 +159,8 @@ func entry(input: i32) -> i32:
         check(replace(hooks.replace('item.string()', 'item.string(')),'malformed call diagnostic')
         check(query('textDocument/hover','string(item)',2) is None,'stale hook result')
         check(not replace(hooks),'hook repair')
-        numeric = '''func identity(value: i32) -> i32:
+        numeric = '''## @param value The input number.
+func identity(value: i32) -> i32:
     return value
 func entry(input: i32) -> i32:
     var text = """é😀 {{escaped}}:
@@ -174,7 +175,7 @@ func entry(input: i32) -> i32:
         items = completion('format(input, "")',len('format(input, "'))
         check('N2' in items and 'E3' in items and 'B' in items, items)
         check('identity' in hover('identity(input)',2), 'hole function hover')
-        check(query('textDocument/definition','identity(input)',2)['range']['start']['line']==0, 'hole definition')
+        check(query('textDocument/definition','identity(input)',2)['range']['start']['line']==1, 'hole definition')
         refs = query('textDocument/references','value: i32',1,context={'includeDeclaration':True})
         check(len(refs)==2, refs)
         # Signature help in an existing interpolation call, followed by dirty completion.

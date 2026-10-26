@@ -1,5 +1,15 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Documentation/hover repair: authorized separate sprint, 25 October 2026
+
+Boss approved full implementation after Golden Wrench's architecture review,
+including uniform automatic/manual suppression for undocumented parameters.
+[Approved contract](DOCUMENTATION_HOVER.md), [local implementation and verification](DOCUMENTATION_HOVER_IMPLEMENTATION.md).
+This repair is separate from the locked Stage 11 runtime-globals acceptance below;
+its historical evidence is preserved. Golden Wrench review and Boss-controlled
+acceptance remain required. Git, hosted CI and root README are unchanged.
+
+
 ## STAGE 11: OFFICIALLY LOCKED, October 25, 2026
 
 **Golden Wrench reviewed and accepted the runtime globals implementation. Boss

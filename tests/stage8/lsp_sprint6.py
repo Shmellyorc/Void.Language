@@ -7,6 +7,8 @@ source='''value struct component:
     number: i32
 struct node:
     using component
+## @param text Text to display.
+## @param suffix Text appended to the display.
 func echo(text: string, suffix: string = "!") -> string:
     return "{text}{suffix}"
 func entry(input: i32) -> i32:
@@ -34,22 +36,22 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 editor ') as directory:
         def q(method,line=0,col=0,**extra):
             return c.request(method,{'textDocument':{'uri':uri},'position':{'line':line,'character':col},**extra})[0]
         assert not replace(source)
-        for line,col,name in [(7,16,'node'),(7,25,'component'),(9,13,'echo'),(13,9,'text')]:
+        for line,col,name in [(9,16,'node'),(9,25,'component'),(11,13,'echo'),(15,9,'text')]:
             response=q('textDocument/hover',line,col);assert response.get('result'),response
             response=q('textDocument/definition',line,col);assert response.get('result'),(name,response)
         # UTF-16 position after the supplementary scalar points to the embedded call.
-        line=source.splitlines()[9];column=len(line[:line.index('echo')+1].encode('utf-16-le'))//2
-        assert q('textDocument/definition',9,column)['result']['range']['start']['line']==4
-        response=q('textDocument/rename',4,7,newName='display');assert 'result' in response,response
+        line=source.splitlines()[11];column=len(line[:line.index('echo')+1].encode('utf-16-le'))//2
+        assert q('textDocument/definition',11,column)['result']['range']['start']['line']==6
+        response=q('textDocument/rename',6,7,newName='display');assert 'result' in response,response
         renamed=response['result'];assert renamed,renamed
         # Completion and signature assistance on a multiline argument line.
         partial=source.replace('        suffix = "?",','        suffix = echo(')
-        replace(partial);signature=q('textDocument/signatureHelp',10,len('        suffix = echo('))['result'];assert signature,signature
+        replace(partial);signature=q('textDocument/signatureHelp',12,len('        suffix = echo('))['result'];assert signature,signature
         partial=source.replace('        suffix = "?",','        suffix = inp')
-        replace(partial);items=q('textDocument/completion',10,len('        suffix = inp'))['result'];assert 'input' in {i['label'] for i in items},items
+        replace(partial);items=q('textDocument/completion',12,len('        suffix = inp'))['result'];assert 'input' in {i['label'] for i in items},items
         # Inner substitution tokens remain available to compiler-owned completion.
         replace(source.replace('{text}{suffix}', '{te}{suffix}'))
-        items=q('textDocument/completion',5,len('    return "{te'))['result'];assert 'text' in {i['label'] for i in items},items
+        items=q('textDocument/completion',7,len('    return "{te'))['result'];assert 'text' in {i['label'] for i in items},items
         messy=source.replace('var text = echo(', 'var text=echo(')
         assert not replace(messy)
         formatted=q('textDocument/formatting',options={'tabSize':4,'insertSpaces':True})['result']
@@ -81,15 +83,15 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 editor ') as directory:
                     assert all('$' not in item['label'] for item in items),response
             assert c.process.pid==pid and c.process.poll() is None,fragment
             assert not replace(source),fragment
-            definition=q('textDocument/definition',7,16)['result'];assert definition and definition['uri']==uri,(fragment,definition)
+            definition=q('textDocument/definition',9,16)['result'];assert definition and definition['uri']==uri,(fragment,definition)
         # Incomplete function-local expressions and temporary statements share
         # the same recovery machinery, including anonymous/generated functions.
         for fragment in ['u','input +','echo(','var callback = func(', 'var text = "{inp']:
             edited=source[:source.index('    var yes')]+'    '+fragment+'\n'
             replace(edited)
-            response=q('textDocument/completion',7,len('    '+fragment));assert 'error' not in response,(fragment,response)
+            response=q('textDocument/completion',9,len('    '+fragment));assert 'error' not in response,(fragment,response)
             assert not replace(source)
-            assert q('textDocument/definition',7,16)['result']
+            assert q('textDocument/definition',9,16)['result']
         # Walk complete editing sequences character by character, including
         # synthetic applications/closures and poisoned declaration signatures.
         sequences=['var callback = func(value: i32) -> i32:\n    return value\n',
@@ -103,7 +105,7 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 editor ') as directory:
                 response=q('textDocument/completion',line,column);assert 'error' not in response,(fragment,response)
                 assert c.process.poll() is None,fragment
             assert not replace(source)
-            assert q('textDocument/definition',7,16)['result']
+            assert q('textDocument/definition',9,16)['result']
         assert c.process.poll() is None and c.process.pid==pid
         c.shutdown()
 print('Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed')

@@ -3,6 +3,43 @@ local M = {}
 local function client()
   return vim.lsp.get_clients({bufnr=0,name='voidls'})[1]
 end
+-- The builtin signature command leaves an old float open on a null reply.
+-- Own only this adapter's window; documentation and suppression belong to voidls.
+local signature_window,signature_generation=nil,0
+local function close_signature()
+  if signature_window and vim.api.nvim_win_is_valid(signature_window) then
+    vim.api.nvim_win_close(signature_window,true)
+  end
+  signature_window=nil
+end
+function M.signature_help()
+  signature_generation=signature_generation+1
+  local generation=signature_generation
+  close_signature()
+  local c=client();if not c then return end
+  local buf=vim.api.nvim_get_current_buf()
+  local win=vim.api.nvim_get_current_win()
+  local cursor=vim.api.nvim_win_get_cursor(win)
+  local tick=vim.api.nvim_buf_get_changedtick(buf)
+  c:request('textDocument/signatureHelp',vim.lsp.util.make_position_params(win,c.offset_encoding),function(err,result)
+    if generation~=signature_generation or not vim.api.nvim_buf_is_valid(buf) or
+      vim.api.nvim_get_current_buf()~=buf or vim.api.nvim_get_current_win()~=win or
+      vim.api.nvim_buf_get_changedtick(buf)~=tick or
+      not vim.deep_equal(vim.api.nvim_win_get_cursor(win),cursor) then return end
+    if err or not result or not result.signatures or #result.signatures==0 then return end
+    local lines,highlight=vim.lsp.util.convert_signature_help_to_markdown_lines(result,vim.bo[buf].filetype,c.server_capabilities.signatureHelpProvider.triggerCharacters)
+    if not lines or #lines==0 then return end
+    local preview
+    preview,signature_window=vim.lsp.util.open_floating_preview(lines,'markdown',{
+      focus_id='void.signature_help',
+      close_events={'CursorMoved','CursorMovedI','InsertCharPre','TextChanged','TextChangedI','BufLeave'},
+    })
+    if highlight then
+      vim.hl.range(preview,vim.api.nvim_create_namespace('void.signature_help'),'LspSignatureActiveParameter',
+        {highlight[1],highlight[2]},{highlight[3],highlight[4]})
+    end
+  end,buf)
+end
 function M.versioned_edit(edit)
   if not edit or edit.changes or not edit.documentChanges then return false end
   for _, change in ipairs(edit.documentChanges) do
@@ -75,7 +112,7 @@ function M.setup(opts)
           if vim.lsp.completion then vim.lsp.completion.enable(true,c.id,buf,{autotrigger=true}) end
           local keys={gd=vim.lsp.buf.definition,gr=vim.lsp.buf.references,K=vim.lsp.buf.hover,
             ['<leader>rn']=vim.lsp.buf.rename,['<leader>vf']=M.format,['<leader>vr']=M.refresh,
-            ['<C-k>']=vim.lsp.buf.signature_help,['<leader>vd']=vim.diagnostic.open_float}
+            ['<C-k>']=M.signature_help,['<leader>vd']=vim.diagnostic.open_float}
           for key,fn in pairs(keys)do vim.keymap.set('n',key,fn,{buffer=buf,silent=true})end
         end,
       })

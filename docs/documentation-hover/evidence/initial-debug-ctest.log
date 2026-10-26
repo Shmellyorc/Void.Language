@@ -1,0 +1,71 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/step42-ci96-debug
+      Start   6: stage10_tooling
+ 1/19 Test   #6: stage10_tooling ..................   Passed    0.58 sec
+      Start  88: lsp_positions
+ 2/19 Test  #88: lsp_positions ....................   Passed    0.00 sec
+      Start  89: lsp_protocol
+ 3/19 Test  #89: lsp_protocol .....................   Passed    0.54 sec
+      Start  90: lsp_stage11_globals
+ 4/19 Test  #90: lsp_stage11_globals ..............   Passed    0.14 sec
+      Start  91: lsp_stage8
+ 5/19 Test  #91: lsp_stage8 .......................   Passed    0.45 sec
+      Start  92: documentation_execution
+ 6/19 Test  #92: documentation_execution ..........   Passed    0.80 sec
+      Start  93: lsp_documentation
+ 7/19 Test  #93: lsp_documentation ................   Passed    0.27 sec
+      Start  94: lsp_stage7
+ 8/19 Test  #94: lsp_stage7 .......................***Failed    0.17 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage7.py", line 74, in <module>
+    assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':at(worker.read_text(encoding='utf-8'),'calculate',2),'newName':'compute'})[0]['error']['code']==-32602
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'error'
+
+      Start  95: lsp_demo
+ 9/19 Test  #95: lsp_demo .........................   Passed    0.09 sec
+      Start 165: tooling
+10/19 Test #165: tooling ..........................   Passed    0.51 sec
+      Start 168: frontend
+11/19 Test #168: frontend .........................   Passed   10.06 sec
+      Start 186: lsp_sprint6
+12/19 Test #186: lsp_sprint6 ......................   Passed    0.89 sec
+      Start 187: lsp_stage10_fields
+13/19 Test #187: lsp_stage10_fields ...............   Passed    0.11 sec
+      Start 188: lsp_stage10_display
+14/19 Test #188: lsp_stage10_display ..............***Failed    1.76 sec
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 222, in <module>
+    check(not diagnostics, ("composite source", diagnostics))
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 127, in check
+    assert value, why
+           ^^^^^
+AssertionError: ('composite source', [{'code': 'VOID2024', 'message': "Duplicate documentation for parameter 'timeout_ms'.", 'range': {'end': {'character': 20, 'line': 135}, 'start': {'character': 3, 'line': 135}}, 'severity': 2, 'source': 'VOID'}, {'code': 'VOID2024', 'message': "Duplicate documentation for parameter 'column'.", 'range': {'end': {'character': 16, 'line': 261}, 'start': {'character': 3, 'line': 261}}, 'severity': 2, 'source': 'VOID'}, {'code': 'VOID2024', 'message': "Duplicate documentation for parameter 'row'.", 'range': {'end': {'character': 13, 'line': 262}, 'start': {'character': 3, 'line': 262}}, 'severity': 2, 'source': 'VOID'}])
+
+      Start 189: lsp_stage10_intelligence
+15/19 Test #189: lsp_stage10_intelligence .........   Passed    0.61 sec
+      Start 190: lsp_stage10_source_formatting
+16/19 Test #190: lsp_stage10_source_formatting ....   Passed    1.06 sec
+      Start 192: lsp_sprint4
+17/19 Test #192: lsp_sprint4 ......................   Passed    0.10 sec
+      Start 196: lsp_sprint3
+18/19 Test #196: lsp_sprint3 ......................   Passed    0.18 sec
+      Start 197: lsp_sprint2
+19/19 Test #197: lsp_sprint2 ......................***Failed    0.12 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/sprint2.py", line 35, in <module>
+    assert 'extra: i32' in q('textDocument/hover',7,16)['result']['contents']['value']
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+
+84% tests passed, 3 tests failed out of 19
+
+Total Test time (real) =  18.46 sec
+
+The following tests FAILED:
+	 94 - lsp_stage7 (Failed)
+	188 - lsp_stage10_display (Failed)
+	197 - lsp_sprint2 (Failed)
+Errors while running CTest

@@ -1,5 +1,24 @@
 # Minimal VOID language server (Phase 10)
 
+## Compiler documentation and result metadata repair
+
+[Contract](DOCUMENTATION_HOVER.md) and [local evidence](DOCUMENTATION_HOVER_IMPLEMENTATION.md)
+cover the separate Boss-authorized repair after Stage 11. Callable hover/completion
+filters recognized parameter/return tags into description and applicable return
+text. Signature help retains labels/binding metadata but returns null unless the
+active parameter has nonempty documentation, for both automatic and manual requests.
+Only the active parameter carries documentation; signature-level documentation is
+omitted. The server negotiates plaintext MarkupContent and otherwise uses a plain
+string. Clients never parse documentation tags.
+
+The compiler exports typed builtin result annotation/Ok/Err references and shared
+statement/expression/nested pattern references, including ordinary enum variants.
+Nullable-presence Ok has distinct metadata. Captures retain their local types;
+builtins have no filesystem definition or rename target. Documentation is excluded
+from native compatibility contracts. Existing snapshots, UTF-16 conversion, version
+checks, cancellation and diagnostic publication remain authoritative.
+
+
 ## Stage 11 compiler-owned global symbols
 
 Global declarations/references use the shared compiler's mutable-variable records

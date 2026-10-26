@@ -63,9 +63,11 @@ modes. The LSP protocol regression verifies malformed disk source retains its
 UTF-16 range through an unsaved repair and close back to the rejected disk bytes.
 WORK_LOG.md records actual local verification and hosted limitations.
 
-No warnings are currently generated. Severity supports warning/information; the
-lowering gate tests error severity, so warnings alone do not invalidate a program.
-There is no successful-compilation warnings/result API in this slice.
+Warnings accompany successful analysis through `AnalysisResult::diagnostics` and
+`ValidatedAnalysis::warnings()`. The lowering gate and parser poison checks test
+error severity; warnings alone do not invalidate a program or a specialization.
+The CLI prints warnings before check, run, emit and build. LSP publishes them with
+warning severity through the same owned source snapshots.
 
 ## Assigned codes
 
@@ -105,6 +107,10 @@ are implemented.
 | VOID2015 | Invalid checked numeric conversion |
 | VOID2016 | Illegal numeric operator |
 | VOID2017 | Floating literal range or exact-representability failure |
+| VOID2021 | Incomplete match (warning) |
+| VOID2022 | Missing explicit parameter description in a partially documented callable (warning) |
+| VOID2023 | Unknown documented parameter name (warning) |
+| VOID2024 | Duplicate parameter documentation tag (warning; relates to first tag) |
 | VOID3001 | Invalid/unsupported/nonportable VFS import path or identity |
 | VOID3002 | Source/import file discovery, reading or directory access failure |
 | VOID3003 | Private/inaccessible export or unresolved qualifier |
@@ -348,3 +354,21 @@ statuses. Checked AOT failure messages/traces now use stderr and preserve the
 existing source diagnostic contents and 32-caller bound; scalar objects retain
 their CRT-only diagnostic dependency. Real executable/JIT parity includes exact
 stdout/stderr, source locations and cleanup regressions.
+
+
+## Plain documentation warnings
+
+[The documentation contract](DOCUMENTATION_HOVER.md) assigns VOID2022–VOID2024.
+No warning is emitted just because documentation is absent. Missing-parameter
+warnings require at least one known, nonempty parameter description, and use each
+missing formal's source token. Empty/unknown-only tags do not start a missing-tag
+cascade. Unknown and duplicate tags use the original `@param NAME` span; duplicates
+relate to the first authored tag. The first nonempty parameter description wins.
+Repeated return tags also use their first nonempty text without another warning
+category. Tags are recognized at the beginning of documentation lines only.
+
+Original callable headers are validated once during original parsing, including
+unused generic functions, generic receiver methods and interface requirements.
+Specializations do not revalidate documentation. Warnings retain declaring-module
+ownership across imports and overlays, and cannot poison a reparsed generic header.
+[Local evidence and limitations](DOCUMENTATION_HOVER_IMPLEMENTATION.md).

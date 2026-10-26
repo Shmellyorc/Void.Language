@@ -1,0 +1,54 @@
+Debug
+Testing: documentation_execution
+92/205 Test: documentation_execution
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py" "/home/shmellyorc/Documents/Void.Language/build/step42-ci96-debug/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/step42-ci96-debug
+"documentation_execution" start time: Oct 25 21:13 PDT
+Output:
+----------------------------------------------------------
+Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+<end of output>
+Test time =   0.78 sec
+----------------------------------------------------------
+Test Passed.
+"documentation_execution" end time: Oct 25 21:13 PDT
+"documentation_execution" time elapsed: 00:00:00
+----------------------------------------------------------
+
+93/205 
+Release
+Testing: documentation_execution
+92/205 Test: documentation_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41
+"documentation_execution" start time: Oct 25 21:14 PDT
+Output:
+----------------------------------------------------------
+Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+<end of output>
+Test time =   0.67 sec
+----------------------------------------------------------
+Test Passed.
+"documentation_execution" end time: Oct 25 21:14 PDT
+"documentation_execution" time elapsed: 00:00:00
+----------------------------------------------------------
+
+93/205 
+Strict
+Testing: documentation_execution
+92/205 Test: documentation_execution
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py" "/home/shmellyorc/Documents/Void.Language/build/step42-ci96-san/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/step42-ci96-san
+"documentation_execution" start time: Oct 25 21:17 PDT
+Output:
+----------------------------------------------------------
+Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+<end of output>
+Test time =   1.39 sec
+----------------------------------------------------------
+Test Passed.
+"documentation_execution" end time: Oct 25 21:17 PDT
+"documentation_execution" time elapsed: 00:00:01
+----------------------------------------------------------
+
+93/205 

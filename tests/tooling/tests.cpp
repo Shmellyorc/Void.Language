@@ -219,7 +219,7 @@ void discovery(const fs::path& root) {
     auto program=analyze(project);vd::ToolingIndex index(program);
     check(program->modules().size()==7,"nested domains/keyword path/diamond identity");
     auto definition=index.definition_at("/main.void",main.find("files.read")+7);
-    check(definition && definition->module=="/@stdlib/io/files.void" && definition->documentation.find("Read a fixture.")!=std::string::npos,"standard definition/docs");
+    check(definition && definition->module=="/@stdlib/io/files.void" && definition->documentation.description.find("Read a fixture.")!=std::string::npos,"standard definition/docs");
     vd::Jit jit;check(jit.compile(*program,false)->invoke(4)==113,"nested modules JIT");
     auto probe=[&](std::string text,std::size_t cursor=std::string::npos,const vd::SourceOverrides& extra=vd::SourceOverrides{}) {
         auto overlays=extra;overlays.insert_or_assign("/main.void",vd::SourceFile((project/"main.void").string(),text));
@@ -302,5 +302,48 @@ void discovery(const fs::path& root) {
     if(!ec)check(!hasname(probe("use \""),"alias/"),"symlink discovery");
 }
 
+// Bounded documentation cases share the existing frontend/tooling harness.
+void documentation_tests(const fs::path& root) {
+    const std::string header="## Saves a name.\n## Mention @param ghost inside prose.\n## @param name The player's name.\n## @return Saved length.\n";
+    write(root/"main.void",header+"func save(name: string, level: i32 = 1) -> i32:\n    return level\nfunc main():\n    var n = save(\"Hero\")\n");
+    auto a=analyze(root);vd::ToolingIndex index(a);
+    auto d=index.declaration("/main.void::save");
+    check(d && d->documentation.description.find("Saves a name.")!=std::string::npos,"description lost");
+    check(d->documentation.description.find("@param ghost")!=std::string::npos,"inline tag consumed");
+    check(d->documentation.description.find("@param name")==std::string::npos,"raw tag leaked");
+    check(d->documentation.returns && d->documentation.returns->description=="Saved length.","return extraction");
+    check(a->warnings().size()==1 && a->warnings()[0].code==vd::DiagnosticCode::documentation_missing_parameter,"partial docs warning");
+    check(a->warnings()[0].primary.source->text().substr(a->warnings()[0].primary.begin,5)=="level","formal warning location");
+    for(const auto& call:{std::string("save("),std::string("save(\"Hero\", ")}) {
+        auto text=header+"func save(name: string, level: i32 = 1) -> i32:\n    return level\nfunc main():\n    var n = "+call;
+        auto help=vd::editor_assistance(root/"main.void",{{"/main.void",vd::SourceFile("overlay",text)}},"/main.void",text.size());
+        check(!help.signature.empty(),"signature metadata lost");
+        check(help.active_parameter==(call.back()=='('?0u:1u),"active formal changed");
+        check(help.parameter_documentation[0]=="The player's name." && help.parameter_documentation[1].empty(),"parameter extraction");
+    }
+    write(root/"main.void","## @param first First value.\n## @param first Later value.\n## @param bogus Unknown.\nfunc unused<t>(first: t, second: t) -> t:\n    return first\n");
+    auto generic=analyze(root);check(generic->warnings().size()==3,"unused generic warnings");
+    auto duplicate=std::find_if(generic->warnings().begin(),generic->warnings().end(),[](const auto& w){return w.code==vd::DiagnosticCode::documentation_duplicate_parameter;});
+    check(duplicate!=generic->warnings().end() && duplicate->related.size()==1 && duplicate->related[0].span.begin<duplicate->primary.begin,"duplicate original location");
+    // Authored warnings must not poison reparsed specialization headers.
+    write(root/"main.void","## @param first First value.\nfunc choose<t>(first: t, second: t) -> t:\n    return first\nfunc main():\n    var one = choose(1, 2)\n    var two = choose(1d, 2d)\n");
+    auto instances=analyze(root);check(instances->warnings().size()==1,"specializations multiplied warnings or poisoned header");
+    auto changed=vd::analyze_project(root/"main.void",{{"/main.void",vd::SourceFile("docs-only", "## Changed description.\n## @param first Updated first value.\nfunc choose<t>(first: t, second: t) -> t:\n    return first\nfunc main():\n    var one = choose(1, 2)\n    var two = choose(1d, 2d)\n")}});
+    check(changed.program && changed.program->compatibility_contract()==instances->compatibility_contract(),"documentation changed native compatibility");
+    auto plan=vd::plan_invalidation(*instances,{},changed.program.get());
+    check(plan.changed_declarations.empty() && plan.changed_bindings.empty() && plan.source_compatibility==vd::SourceCompatibility::exact_match,"documentation requires a restart");
+    for(const auto& [tags,count]:std::vector<std::pair<std::string,unsigned>>{
+        {"",0},{"## @param first First.\n## @param second Second.\n",0},
+        {"## @param wrong Unknown.\n",1},{"## @param first\n",0},
+        {"## @param wrong Unknown.\n## @param first First.\n",2},
+        {"## @param first\n## @param first Chosen.\n## @param first Ignored.\n",3}}) {
+        auto source=vd::analyze_source({"warning-matrix",tags+"func value(first: i32, second: i32) -> i32:\n    return first\n"});
+        check(source.program && source.diagnostics.size()==count,"zero/subset/complete/unknown/empty/duplicate warning matrix");
+    }
+    write(root/"main.void","interface reader:\n    ## @param first First value.\n    func read(first: i32, second: i32) -> i32\nvalue struct box<t>:\n    value: t\n## @param first First value.\nfunc (self box<t>) unused(first: t, second: t) -> t:\n    return first\n");
+    check(analyze(root)->warnings().size()==2,"unused interface/generic receiver header validation");
+
 }
-void tooling_tests(const fs::path& output) { discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }
+
+}
+void tooling_tests(const fs::path& output) { documentation_tests(output/"documentation"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }

@@ -9,6 +9,26 @@ async function until<T>(read: () => T | PromiseLike<T>, valid: (value:T) => bool
     while (Date.now() < end) { const value = await read(); if(valid(value)) return value; await new Promise(r => setTimeout(r, 50)); }
     throw new Error('Timed out: ' + label);
 }
+// Test-only CDP access observes the real workbench widget, beyond provider data.
+async function signatureWidget() {
+    const port=process.env.VOID_TEST_CDP_PORT;
+    if(!port)return undefined;
+    const targets=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json() as {url:string;webSocketDebuggerUrl:string}[];
+    const target=targets.find(t=>t.url.includes('workbench.html'));assert(target,'workbench CDP target');
+    const socket=new WebSocket(target.webSocketDebuggerUrl);
+    await new Promise<void>((resolve,reject)=>{socket.addEventListener('open',()=>resolve(),{once:true});socket.addEventListener('error',reject,{once:true});});
+    let sequence=0;
+    const waiting=new Map<number,(value:{result?:{value?:string[]}})=>void>();
+    socket.addEventListener('message',event=>{const message=JSON.parse(String(event.data));waiting.get(message.id)?.(message.result);waiting.delete(message.id);});
+    return {
+        read:(expression=`[...document.querySelectorAll('.parameter-hints-widget')].filter(e=>e.getBoundingClientRect().width>0&&getComputedStyle(e).visibility!=='hidden'&&getComputedStyle(e).display!=='none').map(e=>e.innerText)`)=>new Promise<string[]>(resolve=>{
+            const id=++sequence;
+            waiting.set(id,value=>resolve(value.result?.value??[]));
+            socket.send(JSON.stringify({id,method:'Runtime.evaluate',params:{returnByValue:true,expression}}));
+        }),
+        close:()=>socket.close(),
+    };
+}
 function code(d: vscode.Diagnostic): unknown { return typeof d.code === 'object' ? d.code.value : d.code; }
 export async function run(): Promise<void> {
     const root = process.env.VOID_TEST_ROOT!;
@@ -161,14 +181,17 @@ export async function run(): Promise<void> {
         await replace(main,mainText);assert.equal((await definitions())?.length,1);
         assert.equal(children.length,typingCount);assert(!gone(typingChild));
         record('PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair');
-        for (const [prefix,expected] of [['use ','use console'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
+        const suggestionWidget=await signatureWidget();
+        try {for (const [prefix,expected] of [['use ','use console'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);
             await vscode.commands.executeCommand('type',{text:prefix});
-            await new Promise(resolve=>setTimeout(resolve,750));
+            if(suggestionWidget)await until(()=>suggestionWidget.read(`[...document.querySelectorAll('.suggest-widget.visible .monaco-list-row.focused')].map(e=>e.innerText)`),
+                rows=>rows.some(row=>row.includes(expected.slice(prefix.length).replace(/"$/, ''))),'visible import suggestion '+prefix);
+            else await new Promise(resolve=>setTimeout(resolve,750));
             await vscode.commands.executeCommand('acceptSelectedSuggestion');
             assert.equal(main.getText(),expected,'automatic import suggestions '+prefix);
-        }
+        }} finally {suggestionWidget?.close();}
         for (const [prefix,label] of [['use ','io/'],['use io/','files'],['use "','app/'],['use "app/','systems/'],['use "app/systems/','player.void']]) {
             await replace(main,prefix);
             const menu=await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',mainUri,new vscode.Position(0,prefix.length),prefix.slice(-1));
@@ -216,7 +239,59 @@ export async function run(): Promise<void> {
         assert(await vscode.workspace.applyEdit(selected)); assert(main.getText().includes('worker.calculate'));
         await replace(main, mainText.replace('worker.calculate(x)', 'worker.calculate('));
         const signature = await vscode.commands.executeCommand<vscode.SignatureHelp>('vscode.executeSignatureHelpProvider', mainUri, new vscode.Position(3, 28), '(');
-        assert(signature?.signatures[0].label.includes('x: i32'));
+        assert.equal(signature,undefined,'undocumented callable suppression');
+        // Preserve metadata coverage with documented fixtures; ordinary undocumented
+        // callables now intentionally provide no manual or automatic popup.
+        const docs='## Save plain_name <value> é😀.\n## @param name Name payload. plain_name <value> é😀\n## @param last Last payload.\nfunc save(name: string, middle: i32 = 1, last: i32 = 2):\n    pass\nfunc main():\n    save(';
+        const widget=await signatureWidget();
+        const setCall=async (call:string)=>{
+            await replace(main,docs.slice(0,docs.lastIndexOf('    save('))+'    '+call);
+            const editor=await vscode.window.showTextDocument(main);
+            editor.selection=new vscode.Selection(new vscode.Position(6,4+call.length),new vscode.Position(6,4+call.length));
+        };
+        const help=()=>vscode.commands.executeCommand<vscode.SignatureHelp>('vscode.executeSignatureHelpProvider',mainUri,vscode.window.activeTextEditor!.selection.active);
+        try {
+            await setCall('save(');
+            let info=await help();assert.equal(info?.activeParameter,0);assert.equal(info.signatures[0].parameters[0].documentation,'Name payload. plain_name <value> é😀');
+            assert.equal(info.signatures[0].documentation,undefined);
+            await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+            if(widget)await until(widget.read,lines=>lines.some(line=>line.includes('Name payload. plain_name <value> é😀')),'visible documented parameter');
+            // Typing the delimiter uses the installed editor's real automatic trigger.
+            await vscode.commands.executeCommand('type',{text:'"hero", '});
+            assert.equal(await help(),undefined);
+            if(widget)await until(widget.read,lines=>lines.length===0,'automatic undocumented dismissal');
+            await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+            if(widget)assert.equal((await widget.read()).length,0,'manual undocumented popup');
+            await setCall('save(');await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+            if(widget)await until(widget.read,lines=>lines.some(line=>line.includes('Name payload.')),'documented popup restored');
+            // A source-only change at the same argument must dismiss the widget too.
+            const edit=new vscode.WorkspaceEdit();edit.replace(mainUri,new vscode.Range(1,0,1,main.lineAt(1).text.length),'## no parameter documentation');
+            assert(await vscode.workspace.applyEdit(edit));
+            await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+            if(widget)await until(widget.read,lines=>lines.length===0,'source-edit undocumented dismissal');
+            await setCall('save("hero", last = ');await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+            if(widget)await until(widget.read,lines=>lines.some(line=>line.includes('Last payload.')&&!line.includes('Name payload.')),'named active parameter popup');
+            // Hold a real native response until after the cursor/source changed.
+            // Replay the exact transport bytes; no replacement server or result.
+            await setCall('save(');
+            const transport=children[children.length-1].stdout;assert(transport);
+            transport.pause();let held=Buffer.alloc(0);
+            try {
+                await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+                await until(()=>{
+                    const chunk=transport.read() as Buffer|null;
+                    if(chunk)held=Buffer.concat([held,chunk]);
+                    return held.toString('utf8');
+                },bytes=>bytes.includes('Name payload.'),'held native documented response');
+                await setCall('save("hero", ');
+                await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+                await new Promise(resolve=>setTimeout(resolve,100));
+            } finally {if(held.length)transport.unshift(held);transport.resume();}
+            assert.equal(await help(),undefined);
+            if(widget){await new Promise(resolve=>setTimeout(resolve,250));assert.equal((await widget.read()).length,0,'delayed reply reopened widget');}
+            record(widget?'PASS visible documentation transitions, source edit, manual invocation and stale request':'PASS documentation provider transitions (UI observation requires VOID_TEST_CDP_PORT)');
+        } finally {widget?.close();}
+
         await replace(main, mainText);
         assert.equal((await definitions())?.length, 1);
         const rename = await vscode.commands.executeCommand<vscode.WorkspaceEdit>('vscode.executeDocumentRenameProvider', workerUri, new vscode.Position(0, 7), 'compute');

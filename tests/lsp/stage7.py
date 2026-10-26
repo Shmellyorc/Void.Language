@@ -15,7 +15,7 @@ def init(c, safe=False):
 with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
     root=pathlib.Path(directory);entry=root/'main.void';worker=root/'worker.void'
     # Byte writes preserve UTF-8 and LF offsets on every platform.
-    worker.write_bytes('func calculate(x: i32, y: i32) -> i32:\n    return x + y\n'.encode("utf-8"))
+    worker.write_bytes('## @param x First operand.\n## @param y Second operand.\nfunc calculate(x: i32, y: i32) -> i32:\n    return x + y\n'.encode("utf-8"))
     text='# é😀\nuse "/worker.void" as worker\nfunc entry(x: i32) -> i32:\n    var value = x\n    return worker.calculate(value, x)\n'
     entry.write_bytes(text.encode("utf-8"))
     with Client(server,entry) as c:
@@ -56,22 +56,22 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         local=q('textDocument/rename','value,',newName='amount')['result'];assert len(local['documentChanges'])==1 and len(local['documentChanges'][0]['edits'])==2
         parameter=q('textDocument/rename','x: i32',newName='input')['result'];assert len(parameter['documentChanges'][0]['edits'])==3
         assert q('textDocument/rename','x: i32',newName='value')['error']['code']==-32602
-        rename=c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'compute'})[0]
+        rename=c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':at(worker.read_text(encoding='utf-8'),'calculate',2),'newName':'compute'})[0]
         assert 'result' in rename,rename
         changes=rename['result']['documentChanges'];assert len(changes)==2
         actual_versions={d['textDocument']['uri']:d['textDocument']['version'] for d in changes}
         expected_versions={uri:version,worker.as_uri():None}
         assert actual_versions==expected_versions,json.dumps({'actual':actual_versions,'expected':expected_versions},ensure_ascii=True)
         expected_edits={uri:[{'range':{'start':at(text,'calculate'),'end':at(text,'calculate',len('calculate'))},'newText':'compute'}],
-                        worker.as_uri():[{'range':{'start':{'line':0,'character':5},'end':{'line':0,'character':14}},'newText':'compute'}]}
+                        worker.as_uri():[{'range':{'start':at(worker.read_text(encoding='utf-8'),'calculate'),'end':at(worker.read_text(encoding='utf-8'),'calculate',len('calculate'))},'newText':'compute'}]}
         assert {d['textDocument']['uri']:d['edits'] for d in changes}==expected_edits,changes
         assert q('textDocument/rename','entry',newName='changed')['error']['code']==-32602
-        assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'return'})[0]['error']['code']==-32602
+        assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':at(worker.read_text(encoding='utf-8'),'calculate',2),'newName':'return'})[0]['error']['code']==-32602
         # Legal source rebinding/conflicts are rejected; server writes no files.
-        assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'entry'})[0]['error']['code']==-32602
-        assert worker.read_text(encoding="utf-8").startswith('func calculate')
+        assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':at(worker.read_text(encoding='utf-8'),'calculate',2),'newName':'entry'})[0]['error']['code']==-32602
+        assert 'func calculate' in worker.read_text(encoding="utf-8")
         worker.write_bytes('func calculate(x: i32, y: i32) -> i32:\n    return x - y\n'.encode("utf-8"))
-        assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'compute'})[0]['error']['code']==-32602
+        assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':2,'character':7},'newName':'compute'})[0]['error']['code']==-32602
         c.request('void/refreshProject',{})
         # Disk refresh preserves a dirty overlay, including errors.
         bad=text.replace('return worker.calculate(value, x)','return missing');active[0]=bad;settext(bad)
@@ -108,7 +108,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         c.finish(expected=1)
     with Client(server,entry) as c:
         init(c,False);assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'other'})[0]['error']['code']==-32602;c.shutdown()
-    types='value struct point:\n    count: i32\nfunc (p point) init(first: i32 = 1, second: i32 = 2):\n    p.count = first + second\nfunc (p point) change(value: i32):\n    p.count = value\n'
+    types='value struct point:\n    count: i32\n## @param first First coordinate.\n## @param second Second coordinate.\nfunc (p point) init(first: i32 = 1, second: i32 = 2):\n    p.count = first + second\nfunc (p point) change(value: i32):\n    p.count = value\n'
     valid=types+'func entry(x: i32) -> i32:\n    const p = point(second=x, first=x)\n    return p.count\n'
     entry.write_bytes(valid.encode("utf-8"))
     with Client(server,entry) as c:

@@ -206,6 +206,9 @@ enum local_choice:
     reject
     earlier
     later
+## @param year The calendar year.
+## @param month The month from 1 through 12.
+## @param day The day of the month.
 func make_date(year: i64, month: i64, day: i64) -> result<date, string>:
     var checked = _date_check(year, month, day)?
     return Ok(date(year, month, day))

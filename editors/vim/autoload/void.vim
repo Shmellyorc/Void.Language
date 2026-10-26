@@ -10,6 +10,8 @@ function! void#setup(server, entry, ...) abort
   if v:shell_error | throw 'VOID project discovery failed: ' . result | endif
   let project = json_decode(result)
   let entry = project.entry
+  " The pinned client hides parameter prose unless its display option is enabled.
+  call LspOptionsSet({'showSignatureDocs': v:true})
   call LspAddServer([{'name':'voidls', 'filetype':['void'], 'path':executable, 'args':['--entry',entry]}])
   augroup void_lsp_keys
     autocmd!

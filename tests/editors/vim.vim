@@ -4,6 +4,7 @@ execute 'set runtimepath^=' .. fnameescape($VOID_VIM_CLIENT)
 execute 'set runtimepath^=' .. fnameescape($VOID_REPO .. '/editors/vim')
 execute 'source ' .. fnameescape($VOID_VIM_CLIENT .. '/plugin/lsp.vim')
 import autoload 'lsp/lsp.vim'
+import autoload 'lsp/signature.vim' as signature
 filetype plugin indent on
 call LspOptionsSet({autoComplete: false, autoHighlightDiags: true})
 call void#setup($VOIDLS_PATH, $VOID_STAGE8_EXPLICIT_ENTRY ==# '1' ? $VOID_STAGE7_FIXTURE .. '/main.void' : '', $VOID_STAGE7_FIXTURE)
@@ -76,7 +77,62 @@ try
   listener_flush()
   point.position.character = 28
   var sig = server.rpc('textDocument/signatureHelp', point)
-  assert_equal(0, sig.result.activeParameter)
+  assert_equal(v:null, sig.result)
+  # Inspect real Vim popup buffers, including the pinned client's null close path.
+  var docs = ['## Save plain_name <value> é😀.', '## @param name Name payload. plain_name <value> é😀', '## @param last Last payload.', 'func save(name: string, middle: i32 = 1, last: i32 = 2):', '    pass', 'func main():', '    save(']
+  deletebufline('%', 1, '$')
+  setline(1, docs)
+  set virtualedit=onemore
+  listener_flush()
+  cursor(7, strlen(getline(7)) + 1)
+  LspShowSignature
+  Wait(() => server.signaturePopup > 0 && !empty(popup_getpos(server.signaturePopup)))
+  var popupText = join(getbufline(winbufnr(server.signaturePopup), 1, '$'), "\n")
+  assert_match('Name payload.', popupText, 'visible default parameter docs: ' .. popupText)
+  assert_match('plain_name <value> é😀', popupText)
+  assert_notmatch('Last payload.', popupText)
+  setline(7, '    save("hero", ')
+  cursor(7, strlen(getline(7)) + 1)
+  listener_flush()
+  LspShowSignature
+  Wait(() => server.signaturePopup <= 0 || empty(popup_getpos(server.signaturePopup)))
+  LspShowSignature
+  server.rpc('workspace/symbol', {query: 'save'})
+  assert_true(server.signaturePopup <= 0 || empty(popup_getpos(server.signaturePopup)), 'manual undocumented popup')
+  setline(7, '    save(')
+  cursor(7, strlen(getline(7)) + 1)
+  listener_flush()
+  LspShowSignature
+  Wait(() => server.signaturePopup > 0 && !empty(popup_getpos(server.signaturePopup)))
+  setline(2, '## no parameter tag')
+  listener_flush()
+  LspShowSignature
+  Wait(() => server.signaturePopup <= 0 || empty(popup_getpos(server.signaturePopup)))
+  setline(1, docs)
+  cursor(7, strlen(getline(7)) + 1)
+  listener_flush()
+  LspShowSignature
+  Wait(() => server.signaturePopup > 0 && !empty(popup_getpos(server.signaturePopup)))
+  # Preserve an actual server result and the client's original request context.
+  var oldContext = signature.SignatureRequestContextGet()
+  var oldReply = server.rpc('textDocument/signatureHelp', {textDocument: point.textDocument, position: {line: 6, character: strlen(getline(7))}}).result
+  setline(7, '    save("hero", ')
+  cursor(7, strlen(getline(7)) + 1)
+  listener_flush()
+  LspShowSignature
+  Wait(() => server.signaturePopup <= 0 || empty(popup_getpos(server.signaturePopup)))
+  signature.SignatureHelp(server, oldReply, {}, oldContext)
+  assert_true(server.signaturePopup <= 0 || empty(popup_getpos(server.signaturePopup)), 'stale documented reply reopened popup')
+  setline(7, '    save("hero", last = ')
+  cursor(7, strlen(getline(7)) + 1)
+  listener_flush()
+  LspShowSignature
+  Wait(() => server.signaturePopup > 0 && !empty(popup_getpos(server.signaturePopup)))
+  popupText = join(getbufline(winbufnr(server.signaturePopup), 1, '$'), "\n")
+  assert_match('Last payload.', popupText)
+  assert_notmatch('Name payload.', popupText)
+  deletebufline('%', 1, '$')
+  setline(1, original)
   setline(3, '    return worker.calculate(x)')
   listener_flush()
   cursor(3, 19)
@@ -104,7 +160,7 @@ try
   LspServer stop
   Wait(() => !g:LspServerRunning('void'))
   if !empty(v:errors) | throw string(v:errors) | endif
-  writefile([json_encode({editor: execute('version')->split('\n')[0], passed: ['shipped adapter', 'console source docs/navigation', 'enum pattern navigation/completion', 'print hover/signature', 'hover', 'symbols', 'incomplete completion', 'signature', 'definition', 'rename disabled', 'dirty diagnostics', 'guarded formatting', 'refresh', 'restart', 'stop']})], $VOID_STAGE7_OUTPUT)
+  writefile([json_encode({editor: execute('version')->split('\n')[0], passed: ['documentation popup transitions/manual/source edits/stale replies', 'shipped adapter', 'console source docs/navigation', 'enum pattern navigation/completion', 'print hover/signature', 'hover', 'symbols', 'incomplete completion', 'signature', 'definition', 'rename disabled', 'dirty diagnostics', 'guarded formatting', 'refresh', 'restart', 'stop']})], $VOID_STAGE7_OUTPUT)
 catch
   writefile([v:exception, v:throwpoint, execute('messages')], $VOID_STAGE7_OUTPUT .. '.error')
   cquit 1

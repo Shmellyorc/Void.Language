@@ -1,0 +1,3 @@
+Failed to open LSP log file: /home/shmellyorc/.local/state/nvim/logs/lsp.log: Read-only file system
+log: "/home/shmellyorc/.local/state/nvim/logs/nvim.log" not accessible, logging to: "nvim.log"
+{"before":[{"lines":["```void","save(name: string) -> no result","```","Name payload."],"win":1002}],"version":{"minor":13,"build":"g510f61555b","api_level":15,"patch":0,"major":0,"api_prerelease":true,"api_compatible":0,"prerelease":"dev"},"after":[{"lines":["```void","save(name: string) -> no result","```","Name payload."],"win":1002}]}

@@ -1,0 +1,57 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/step42-ci96-debug
+      Start   6: stage10_tooling
+ 1/19 Test   #6: stage10_tooling ..................   Passed    0.58 sec
+      Start  88: lsp_positions
+ 2/19 Test  #88: lsp_positions ....................   Passed    0.00 sec
+      Start  89: lsp_protocol
+ 3/19 Test  #89: lsp_protocol .....................   Passed    0.57 sec
+      Start  90: lsp_stage11_globals
+ 4/19 Test  #90: lsp_stage11_globals ..............   Passed    0.14 sec
+      Start  91: lsp_stage8
+ 5/19 Test  #91: lsp_stage8 .......................   Passed    0.48 sec
+      Start  92: documentation_execution
+ 6/19 Test  #92: documentation_execution ..........   Passed    0.79 sec
+      Start  93: lsp_documentation
+ 7/19 Test  #93: lsp_documentation ................   Passed    0.26 sec
+      Start  94: lsp_stage7
+ 8/19 Test  #94: lsp_stage7 .......................   Passed    0.31 sec
+      Start  95: lsp_demo
+ 9/19 Test  #95: lsp_demo .........................   Passed    0.08 sec
+      Start 165: tooling
+10/19 Test #165: tooling ..........................   Passed    0.49 sec
+      Start 168: frontend
+11/19 Test #168: frontend .........................   Passed    9.37 sec
+      Start 186: lsp_sprint6
+12/19 Test #186: lsp_sprint6 ......................   Passed    0.71 sec
+      Start 187: lsp_stage10_fields
+13/19 Test #187: lsp_stage10_fields ...............   Passed    0.10 sec
+      Start 188: lsp_stage10_display
+14/19 Test #188: lsp_stage10_display ..............***Failed    1.68 sec
+Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 225, in <module>
+    check(definition and definition["uri"] == foreign.as_uri() and definition["range"]["start"]["line"] == line, definition)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 127, in check
+    assert value, why
+           ^^^^^
+AssertionError: {'range': {'end': {'character': 8, 'line': 10}, 'start': {'character': 4, 'line': 10}}, 'uri': 'file:///tmp/VOID%20composite%20tooling%20%C3%A9%F0%9F%98%80%20nmyeon39/payload.void'}
+
+      Start 189: lsp_stage10_intelligence
+15/19 Test #189: lsp_stage10_intelligence .........   Passed    0.56 sec
+      Start 190: lsp_stage10_source_formatting
+16/19 Test #190: lsp_stage10_source_formatting ....   Passed    0.99 sec
+      Start 192: lsp_sprint4
+17/19 Test #192: lsp_sprint4 ......................   Passed    0.09 sec
+      Start 196: lsp_sprint3
+18/19 Test #196: lsp_sprint3 ......................   Passed    0.15 sec
+      Start 197: lsp_sprint2
+19/19 Test #197: lsp_sprint2 ......................   Passed    0.11 sec
+
+95% tests passed, 1 tests failed out of 19
+
+Total Test time (real) =  17.47 sec
+
+The following tests FAILED:
+	188 - lsp_stage10_display (Failed)
+Errors while running CTest

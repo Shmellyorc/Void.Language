@@ -1,0 +1,64 @@
+{
+  "nvim": {
+    "editor": {
+      "api_prerelease": true,
+      "api_compatible": 0,
+      "prerelease": "dev",
+      "minor": 13,
+      "build": "g510f61555b",
+      "patch": 0,
+      "api_level": 15,
+      "major": 0
+    },
+    "passed": [
+      "documentation window transitions/manual/source edits/stale replies",
+      "shipped adapter",
+      "console source docs/navigation",
+      "enum pattern navigation/completion",
+      "public print hover/signature",
+      "shared entry preflight",
+      "nested import edits",
+      "standard docs/navigation",
+      "completion selection",
+      "incomplete call signature",
+      "hover",
+      "symbols",
+      "navigation",
+      "dirty repair",
+      "cross-file guarded rename",
+      "stale edit rejection",
+      "stale formatting rejection",
+      "formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "selection": "explicit override",
+    "executable": "/usr/bin/nvim"
+  },
+  "vim": {
+    "passed": [
+      "documentation popup transitions/manual/source edits/stale replies",
+      "shipped adapter",
+      "console source docs/navigation",
+      "enum pattern navigation/completion",
+      "print hover/signature",
+      "hover",
+      "symbols",
+      "incomplete completion",
+      "signature",
+      "definition",
+      "rename disabled",
+      "dirty diagnostics",
+      "guarded formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "editor": "VIM - Vi IMproved 9.2 (2026 Feb 14, compiled Jul 27 2026 10:11:18)",
+    "selection": "explicit override",
+    "executable": "/usr/bin/vim.basic"
+  }
+}

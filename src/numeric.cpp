@@ -154,8 +154,8 @@ const std::vector<Member>& members() {
     static const std::vector<Member> entries{
         {"min_value",false,{},"The most negative finite value (zero for unsigned integers)."},
         {"max_value",false,{},"The largest finite value of this exact numeric type."},
-        {"abs",true,{"value"},"Absolute value. Signed minimum fails; floating sign is cleared, including negative zero. Type and receiver forms share one implementation."},
-        {"clamp",true,{"value","lower","upper"},"Clamp to inclusive bounds. Validate bounds first: reversed or NaN bounds fail. NaN input propagates; infinite bounds are allowed; in-range signed zero is preserved."}
+        {"abs",true,{"value"},"Absolute value. Signed minimum fails; floating sign is cleared, including negative zero. Type and receiver forms share one implementation.",{"The value whose absolute value is returned."}},
+        {"clamp",true,{"value","lower","upper"},"Clamp to inclusive bounds. Validate bounds first: reversed or NaN bounds fail. NaN input propagates; infinite bounds are allowed; in-range signed zero is preserved.",{"The value to constrain.","The inclusive lower bound.","The inclusive upper bound."}}
     };return entries;
 }
 const Member* member(std::string_view name) {for(const auto& m:members())if(m.name==name)return &m;return nullptr;}

@@ -83,6 +83,30 @@ not proof of a self-contained bundle or clean-machine portability. Other targets
 must be built and audited on their own native hosts. No public redistribution is
 authorized while repository licensing remains UNLICENSED.
 
+### Plain documentation and popup policy
+
+[The compiler contract](DOCUMENTATION_HOVER.md) applies equally to automatic and
+manual signature requests. Only the active documented parameter supplies prose;
+an undocumented argument closes/suppresses help. Hover/completion shows callable
+description and applicable return text, with no parameter descriptions or raw tags.
+
+VS Code uses its existing null-result dismissal path. The Neovim Ctrl-K mapping
+owns a signature float because the builtin command leaves old floats open on null.
+The small wrapper consumes compiler responses and guards buffer, changedtick,
+cursor and request generation; it closes only its own window. Neovim's shipped
+adapter does not install automatic signature triggers. The pinned Vim client's
+existing null/stale-context handling is retained; `void#setup` enables its existing
+`showSignatureDocs` display option so parameter prose is visible. This is a client
+UI option, with no source parsing. Later explicit client configuration may override
+it. Third-party signature plugins and custom float lifecycle settings remain
+client-owned. Plaintext may still be styled by a client's preview utilities.
+
+The [implementation handoff](DOCUMENTATION_HOVER_IMPLEMENTATION.md) records exact
+executed editor versions, real popup/window checks and remaining platform limits.
+The VS Code host harness accepts `VOID_TEST_CDP_PORT` with an isolated test window
+to inspect the actual parameter-hint DOM; provider-only assertions do not certify
+a visible popup dismissal.
+
 ### Neovim
 
 Install/copy the shipped runtime directories, or point `runtimepath` at them.

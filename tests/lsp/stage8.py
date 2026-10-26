@@ -226,7 +226,7 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 # % ') as temp:
         assert edit['newText']=='player.void'
         replace('use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.read(')
         sig=q('textDocument/signatureHelp',2,22)['result']['signatures'][0]
-        assert 'Fixture documentation.' in sig['documentation'] and sig['parameters'][0]['documentation']=='incoming number',sig
+        assert 'documentation' not in sig and sig['parameters'][0]['documentation']=='incoming number',sig
         replace('use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.re')
         items=q('textDocument/completion',2,19)['result'];assert items[0]['label']=='read' and 'Fixture documentation.' in items[0]['documentation'],items
 print('Stage 8 compiler-backed LSP discovery/docs/readonly checks passed')

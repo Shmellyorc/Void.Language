@@ -34,7 +34,7 @@ func entry(score: i32) -> i32:
     auto pattern=index.definition_at("/main.void",source.find("parcel . data(")+9);
     check(data && pattern && data->identity==pattern->identity,"enum payload pattern/source identity");
     check(data->written_parameters.size()==2 && data->written_parameters[0].name=="item" && data->written_parameters[1].name=="note","enum payload names");
-    check(data->documentation.find("Active payload")!=std::string::npos,"enum payload docs");
+    check(data->documentation.description.find("Active payload")!=std::string::npos,"enum payload docs");
     check(index.references_to(data->identity).size()==2,"enum constructor/pattern references");
     auto success=index.definition_at("/main.void",source.find("Ok(chosen)"));
     auto tested=index.definition_at("/main.void",source.find("outcome is Ok(")+11);
@@ -84,7 +84,7 @@ func entry(input: i32) -> i32:
     check(first && second,"selected operator missing from index");
     check(first->identity==second->identity,"generic source navigation identity fragmented");
     check(first->signature.find("box<i32>")!=std::string::npos && second->signature.find("box<i64>")!=std::string::npos,"concrete operator signature erased");
-    check(first->documentation.find("Preserve source")!=std::string::npos && first->signature.find("Effects: synchronous")!=std::string::npos,"operator docs/effects missing");
+    check(first->documentation.description.find("Preserve source")!=std::string::npos && first->signature.find("Effects: synchronous")!=std::string::npos,"operator docs/effects missing");
     check(!first->rename_safe,"operator glyph rename allowed");
     check(index.references_to(first->identity).size()==2,"generic source references fragmented or duplicated");
     for(const auto& [spelling,glyph]:{std::pair{"b %= a","%"},std::pair{"b != a","=="}}){auto found=index.definition_at("/main.void",source.find(spelling)+2);check(found && found->operator_glyph==glyph && !found->rename_safe,"derived/compound definition");auto refs=index.references_to(found->identity);check(refs.size()==1 && refs[0].source.end-refs[0].source.begin==2,"derived/compound original glyph span");}

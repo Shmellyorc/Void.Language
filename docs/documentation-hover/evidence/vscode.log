@@ -1,0 +1,15 @@
+VS Code 1.143.0 (2d0b7506a36c1d6db9a466440131a8e01eab2289), Linux x64
+Actual workbench DOM observed over an isolated test-only CDP port.
+A documented native response was held and replayed after a newer undocumented request.
+
+Editor test begins: trusted
+PASS real typing: incomplete top-level keywords/expressions/imports recover in the same native process
+PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair
+PASS visible documentation transitions, source edit, manual invocation and stale request
+PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup
+Exit code:   0
+Editor test begins: untrusted
+PASS real editor restricted trust: no native child spawned
+Editor test begins: multi-root
+PASS real editor multi-root: explanatory error, no native child spawned
+Exit code:   0

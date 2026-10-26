@@ -68,6 +68,7 @@ with tempfile.TemporaryDirectory(prefix="VOID Stage10 display editor ") as direc
     private const value: i32 = 4
 func (self record) string() -> string:
     return "{self.value}"
+## @param spec The custom format specification.
 func (self record) format(spec: string) -> result<string, string>:
     return format(self.value, spec)
 func entry(input: i32) -> i32:
@@ -75,16 +76,16 @@ func entry(input: i32) -> i32:
     return item.string().length as i32
 '''
         assert not replace(hooks)
-        definition = query("textDocument/definition", 8, 18)["result"]
+        definition = query("textDocument/definition", 9, 18)["result"]
         assert definition["range"]["start"]["line"] == 2, definition
-        hover = query("textDocument/hover", 8, 18)["result"]["contents"]["value"]
+        hover = query("textDocument/hover", 9, 18)["result"]["contents"]["value"]
         assert "string" in hover, hover
         replace(hooks.replace("item.string().length as i32", "item."))
-        methods = completions(8, len("    return item."))
+        methods = completions(9, len("    return item."))
         assert "string" in methods and "format" in methods and "value" not in methods, methods
         assert not any("$display$" in name for name in methods), methods
         replace(hooks.replace("item.string().length as i32", "item.format("))
-        signature = query("textDocument/signatureHelp", 8, len("    return item.format("))["result"]
+        signature = query("textDocument/signatureHelp", 9, len("    return item.format("))["result"]
         assert signature and "spec" in signature["signatures"][0]["label"], signature
         assert not replace(hooks)
         temporal = '''use time
@@ -137,6 +138,8 @@ enum message:
     ## Empty message.
     empty
     ## Data message in declared payload order.
+    ## @param item The contained box.
+    ## @param note The accompanying note.
     data(item: box<[i32]>, note: string)
 ''')
     source = '''use console
@@ -217,7 +220,7 @@ func entry(score: i32) -> i32:
             return replace(source.replace("    return score", "    var pending = "+expr+"\n    return score"))
         diagnostics = replace(source)
         check(not diagnostics, ("composite source", diagnostics))
-        for needle, delta, line in [("p.message.data(p.box",10,8), ("message . data(var",10,8), ("boxed.value",7,2)]:
+        for needle, delta, line in [("p.message.data(p.box",10,10), ("message . data(var",10,10), ("boxed.value",7,2)]:
             definition = query("definition", needle, delta)
             check(definition and definition["uri"] == foreign.as_uri() and definition["range"]["start"]["line"] == line, definition)
         text = hover("p.message.data(p.box", 10)

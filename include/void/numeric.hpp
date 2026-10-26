@@ -9,7 +9,7 @@ bool floating(ir::Type);
 bool signed_integer(ir::Type);
 bool number(ir::Type);
 unsigned width(ir::Type);
-struct Member { std::string_view name; bool callable; std::vector<std::string_view> parameters; std::string_view documentation; };
+struct Member { std::string_view name; bool callable; std::vector<std::string_view> parameters; std::string_view documentation; std::vector<std::string_view> parameter_documentation = {}; };
 const std::vector<Member>& members();
 const Member* member(std::string_view);
 ir::Type primitive(std::string_view);

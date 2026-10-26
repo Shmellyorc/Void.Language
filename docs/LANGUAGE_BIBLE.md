@@ -2263,13 +2263,34 @@ value struct vector2:
 
 ## Moves a player to a new location.
 ##
-## position: Destination in world coordinates.
-## speed: Units per second; default is 1.0.
+## @param position Destination in world coordinates.
+## @param speed Units per second; default is 1.0.
 func (p player) move_to(position: vector2, speed: f32 = 1.0):
     p.position = position
 ```
 
-Docs should be attached to compiler symbols (structs, fields, properties, methods, functions, interfaces, variants, generic parameters, and accessible internal/private elements) so the editor and CLI use the same information. XML documentation is not required.
+The supported documentation is ordinary `##` description text, line-start
+`## @param NAME DESCRIPTION` and `## @return DESCRIPTION`. No rich documentation
+syntax is added. For example:
+
+```void
+## Loads a player's saved name.
+## @param path The location of the save file.
+## @return The player's name or an error.
+func load_name(path: string) -> result<string, error>:
+    ...
+```
+
+Callable hover shows its signature, description and applicable return information.
+Signature help shows only the active parameter's description. An undocumented or
+empty active parameter produces no popup for automatic **or manual** invocation.
+If some explicit parameters have nonempty documentation, missing descriptions warn;
+zero documented parameters do not warn. Unknown/duplicate parameter names warn
+without blocking compilation or execution. The first nonempty duplicate text wins.
+[Compiler contract](DOCUMENTATION_HOVER.md) and
+[implementation evidence](DOCUMENTATION_HOVER_IMPLEMENTATION.md) define the repair.
+
+Docs should be attached to compiler symbols (structs, fields, properties, methods, functions, interfaces, variants, generic parameters, and accessible internal/private elements) so the editor and CLI use the same information. XML, HTML, Markdown lists, code blocks, rich source documentation, a rendering framework and a documentation generator are outside this contract.
 
 ### 46.1 IntelliSense and editor behavior [AGREED]
 

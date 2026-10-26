@@ -13,6 +13,23 @@ struct AnalyzedParameter {
     std::string name; ir::Type type; SourceSpan source;
     std::optional<SourceSpan> default_source = {};
 };
+// Plain compiler-owned documentation; tag locations retain the authored snapshot.
+struct DocumentationText { std::string description; SourceSpan source; };
+struct ParameterDocumentation { std::string name, description; SourceSpan source; };
+struct Documentation {
+    std::string description;
+    std::optional<DocumentationText> returns;
+    std::vector<ParameterDocumentation> parameters;
+    std::string parameter(const std::string& name) const {
+        for(const auto& p:parameters)if(p.name==name && !p.description.empty())return p.description;
+        return {};
+    }
+    std::string text(bool value_result = false) const {
+        auto out=description;
+        if(value_result && returns){if(!out.empty())out+="\n\n";out+="Returns: "+returns->description;}
+        return out;
+    }
+};
 struct AnalyzedDeclaration {
     enum class Kind { function, global_variable, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias, operator_function } kind;
     std::string identity, module, visibility;
@@ -41,7 +58,7 @@ struct AnalyzedDeclaration {
     bool rename_safe = false;
     bool builtin = false; // Compiler metadata only; has no filesystem definition target.
     int editor_symbol_kind = 0;
-    std::string documentation = {};
+    Documentation documentation = {};
     bool readonly = false;
     std::string operator_glyph = {};
     std::string signature = {}; // Compiler-owned presentation; excluded from native contracts.

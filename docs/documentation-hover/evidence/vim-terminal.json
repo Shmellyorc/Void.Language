@@ -1,0 +1,247 @@
+{
+  "use ": {
+    "items": [
+      {
+        "word": "io/",
+        "menu": "folder",
+        "user_data": {
+          "label": "io/",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 0
+              },
+              "start": {
+                "character": 4,
+                "line": 0
+              }
+            },
+            "newText": "io/"
+          },
+          "documentation": "",
+          "kind": 19,
+          "detail": "folder"
+        },
+        "info": "",
+        "kind": "F",
+        "abbr": "io/"
+      }
+    ],
+    "accepted": "use io/"
+  },
+  "use io/": {
+    "items": [
+      {
+        "word": "files",
+        "menu": "standard module",
+        "user_data": {
+          "label": "files",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 7,
+                "line": 0
+              },
+              "start": {
+                "character": 7,
+                "line": 0
+              }
+            },
+            "newText": "files"
+          },
+          "documentation": "",
+          "kind": 17,
+          "detail": "standard module"
+        },
+        "info": "",
+        "kind": "f",
+        "abbr": "files"
+      }
+    ],
+    "accepted": "use io/files"
+  },
+  "use \"": {
+    "items": [
+      {
+        "word": "app/",
+        "menu": "folder",
+        "user_data": {
+          "label": "app/",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 5,
+                "line": 0
+              },
+              "start": {
+                "character": 5,
+                "line": 0
+              }
+            },
+            "newText": "app/"
+          },
+          "documentation": "",
+          "kind": 19,
+          "detail": "folder"
+        },
+        "info": "",
+        "kind": "F",
+        "abbr": "app/"
+      },
+      {
+        "word": "main.void\"",
+        "menu": "project source",
+        "user_data": {
+          "label": "main.void",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 5,
+                "line": 0
+              },
+              "start": {
+                "character": 5,
+                "line": 0
+              }
+            },
+            "newText": "main.void\""
+          },
+          "documentation": "",
+          "kind": 17,
+          "detail": "project source"
+        },
+        "info": "",
+        "kind": "f",
+        "abbr": "main.void"
+      },
+      {
+        "word": "standard/",
+        "menu": "folder",
+        "user_data": {
+          "label": "standard/",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 5,
+                "line": 0
+              },
+              "start": {
+                "character": 5,
+                "line": 0
+              }
+            },
+            "newText": "standard/"
+          },
+          "documentation": "",
+          "kind": 19,
+          "detail": "folder"
+        },
+        "info": "",
+        "kind": "F",
+        "abbr": "standard/"
+      }
+    ],
+    "accepted": "use \"app/"
+  },
+  "use \"app/": {
+    "items": [
+      {
+        "word": "systems/",
+        "menu": "folder",
+        "user_data": {
+          "label": "systems/",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 9,
+                "line": 0
+              },
+              "start": {
+                "character": 9,
+                "line": 0
+              }
+            },
+            "newText": "systems/"
+          },
+          "documentation": "",
+          "kind": 19,
+          "detail": "folder"
+        },
+        "info": "",
+        "kind": "F",
+        "abbr": "systems/"
+      }
+    ],
+    "accepted": "use \"app/systems/"
+  },
+  "use \"app/systems/": {
+    "items": [
+      {
+        "word": "player.void\"",
+        "menu": "project source",
+        "user_data": {
+          "label": "player.void",
+          "textEdit": {
+            "range": {
+              "end": {
+                "character": 17,
+                "line": 0
+              },
+              "start": {
+                "character": 17,
+                "line": 0
+              }
+            },
+            "newText": "player.void\""
+          },
+          "documentation": "",
+          "kind": 17,
+          "detail": "project source"
+        },
+        "info": "",
+        "kind": "f",
+        "abbr": "player.void"
+      }
+    ],
+    "accepted": "use \"app/systems/player.void\""
+  },
+  "signature transitions": {
+    "documented": {
+      "mode": "i",
+      "line": "    save(",
+      "ready": 1,
+      "popups": [
+        "save(name: string, middle: i32 = \u2026, last: i32 = \u2026) -> no result\n\nParameter:\nName payload. plain_name <value> \u00e9\ud83d\ude00"
+      ]
+    },
+    "undocumented": {
+      "mode": "i",
+      "line": "    save(\"hero\", ",
+      "ready": 1,
+      "popups": []
+    },
+    "manual undocumented": {
+      "mode": "i",
+      "line": "    save(\"hero\", ",
+      "ready": 1,
+      "popups": []
+    },
+    "restored": {
+      "mode": "i",
+      "line": "    save(",
+      "ready": 1,
+      "popups": [
+        "save(name: string, middle: i32 = \u2026, last: i32 = \u2026) -> no result\n\nParameter:\nName payload. plain_name <value> \u00e9\ud83d\ude00"
+      ]
+    },
+    "named last": {
+      "mode": "i",
+      "line": "    save(\"hero\", last = ",
+      "ready": 1,
+      "popups": [
+        "save(name: string, middle: i32 = \u2026, last: i32 = \u2026) -> no result\n\nParameter:\nLast payload."
+      ]
+    }
+  }
+}

@@ -83,7 +83,7 @@
 
             if((p.spelling=="Ok" || p.spelling=="Err") && type.nullable && (ir::reference_value(type) || (type.definition && type.definition->callable))) {
                 if(p.spelling=="Err" || p.children.size()!=1)error(source,p.token,Code::type_mismatch,"Nullable presence uses Ok(pattern); Err is a result variant.");
-                p.nullable=true;auto present=type;present.nullable=false;check_pattern(p.children[0],present);return;
+                p.nullable=true;(void)result_editor_target(type,0,p.variant_token);auto present=type;present.nullable=false;check_pattern(p.children[0],present);return;
             }
             if(type.definition && !type.definition->cases.empty() && p.spelling.substr(p.spelling.rfind('.')==std::string::npos?0:p.spelling.rfind('.')+1)==type.definition->name){
                 auto [owner,structure]=structure_lookup(unit,root,units,p.spelling,p.token);if(structure && structure->definition==type.definition){if(p.children.size()>1)error(source,p.token,Code::type_mismatch,"A whole enum type pattern accepts one pattern.");if(p.children.empty()){p.kind=K::wildcard;return;}auto inner=std::move(p.children[0]);p=std::move(inner);check_pattern(p,type);return;}
