@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1"
+	timestamp="2026-10-26T14:37:01"
+	>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.6928" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-3vafs9p8
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-bwxii2up
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-px_f9l07
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-ojfo0em2
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-xaw77fd9
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-looun7bb
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-betl_rfb
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest h6jv4pwz/evidence/incident-x7eg4v00
+{"intentional_incidents_verified": 8, "checked_crash_preserved": true, "sanitizer_exits_verified": [87, 86], "run_and_popen_verified": true, "signed_windows_receipt_simulation_verified": true, "windows_native_branch_executed": false, "colliding_filenames_verified": true, "editor_snapshot_verified": true...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.329689" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation zrmm2_o7/incidents/incident-_7yislru
+CRASH EVIDENCE: /tmp/VOID disposable io preservation zrmm2_o7/incidents/incident-x4llm9xt
+CRASH EVIDENCE: /tmp/VOID disposable io preservation zrmm2_o7/incidents/incident-efy5uvjl
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+</testsuite>

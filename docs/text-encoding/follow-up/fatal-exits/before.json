@@ -1,0 +1,9 @@
+{
+  "baseline": "cc8d47625795db861db459de58f707b8cbd238bb",
+  "classification": "controlled classifier/receipt simulation; no compiler or native crash",
+  "asan_87_recognized": false,
+  "ubsan_86_recognized": false,
+  "ordinary_1_recognized": false,
+  "negative_windows_receipt_failure": "1073741819 is not a valid Signals",
+  "temporary_outputs_removed": true
+}

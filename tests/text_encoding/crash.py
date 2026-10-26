@@ -19,7 +19,18 @@ def digest(path):
 
 
 def crashed(status):
-    return status < 0 or status >= 0x80000000
+    # Local strict profiles reserve 87 for fatal ASan and 86 for fatal UBSan.
+    return status < 0 or status in (86, 87) or status >= 0x80000000
+
+
+def _signal_name(status):
+    if os.name == 'nt' or status >= 0:
+        return None
+    try:
+        return signal.Signals(-status).name
+    except ValueError:
+        # Signed Windows exception statuses are not POSIX signal numbers.
+        return None
 
 
 def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
@@ -98,7 +109,7 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
                                        if line.startswith(('CMAKE_BUILD_TYPE:', 'CMAKE_CXX_COMPILER:',
                                                            'CMAKE_CXX_FLAGS', 'VOID_SANITIZERS:', 'LLVM_DIR:'))]})
     record = {'command': arguments, 'cwd': str(working), 'returncode': result.returncode,
-              'signal': signal.Signals(-result.returncode).name if result.returncode < 0 else None,
+              'signal': _signal_name(result.returncode),
               'executable': executable,
               'executable_sha256': digest(Path(executable)) if executable else None,
               'sources': records, 'build_inputs': build_inputs,

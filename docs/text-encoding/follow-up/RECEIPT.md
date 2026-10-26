@@ -99,3 +99,13 @@ sync/async/error-async text match in memory. The historical original temporary
 source was not recovered by that comparison. [Classification](verification/crash-classification.md)
 retains all unresolved distinctions and exact source references. No new genuine
 crash, unproved production fix, hosted CI or Git mutation occurred.
+
+## Final fatal-exit correction — baseline cc8d476
+
+The [final correction receipt](fatal-exits/RECEIPT.md) supersedes the helper/self-test
+source hashes above. Reserved ASan 87 and UBSan 86 exits now preserve evidence;
+ordinary diagnostic exit 1 remains excluded. Windows uses recognizable ExitProcess
+status, and signed Windows status cannot fail POSIX signal-name interpretation.
+Focused preservation CTests passed 2/2 in Debug, Release and strict profiles. All
+1,971 protected evidence files match; no full IO/compiler workload was rerun.
+Historical receipts and genuine crash artifacts remain unchanged.

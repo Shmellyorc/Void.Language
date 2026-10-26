@@ -113,3 +113,14 @@ LLD trace does not prove an abnormal exit. Native Windows/macOS execution remain
 for later owner-controlled acceptance. All execution here was focused local Linux
 verification. No speculative compiler/GC/LLVM/async redesign, hosted CI, staging,
 commits, branches or pushes occurred. Stop for independent Golden Wrench review.
+
+## Final correction after accepted push cc8d476
+
+[The final fatal-exit correction](fatal-exits/RECEIPT.md) is complete. Shared
+preservation now recognizes reserved ASan exit 87 and UBSan exit 86, while keeping
+ordinary positive diagnostics excluded. The Windows self-test uses ExitProcess,
+and signed Windows status simulation verifies receipt creation without Unix-only
+signal conversion failures. Focused preservation tests passed 2/2 in all three
+available profiles; original evidence is untouched. No production changes or full
+IO/compiler matrix were needed. Native Windows execution remains pending. Stop for
+Golden Wrench review.

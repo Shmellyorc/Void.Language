@@ -1,0 +1,111 @@
+{
+  "baseline": "cc8d47625795db861db459de58f707b8cbd238bb",
+  "completed_utc": "2026-10-26T21:38:50.761872+00:00",
+  "source_sha256": {
+    "tests/text_encoding/crash.py": "acd89c634204aa18026a4de4b8a686635d528205c92c1483b268dced030e888e",
+    "tests/text_encoding/crash_test.py": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625"
+  },
+  "profiles": {
+    "debug": {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/ci-official-debug",
+        "-V",
+        "-R",
+        "^(text_encoding_crash_preservation|io_crash_preservation)$",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/fatal-exits/debug-junit.xml"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "environment": {
+        "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+        "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+      },
+      "returncode": 0,
+      "passed": 2,
+      "total": 2,
+      "seconds": 1.15,
+      "tests": [
+        "text_encoding_crash_preservation",
+        "io_crash_preservation"
+      ],
+      "log": "debug.log",
+      "log_sha256": "2cc102ff39493f1968ce2cdee1b4de6335ddc27ee3652ef59ff32f64ff6cdf8d",
+      "junit": "debug-junit.xml",
+      "junit_sha256": "831ca04caafe0d22621742d865b1e87d180bccdfb9c05b1f9456b3a8780890a2"
+    },
+    "release": {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/ci-official-release",
+        "-V",
+        "-R",
+        "^(text_encoding_crash_preservation|io_crash_preservation)$",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/fatal-exits/release-junit.xml"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "environment": {
+        "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+        "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+      },
+      "returncode": 0,
+      "passed": 2,
+      "total": 2,
+      "seconds": 1.12,
+      "tests": [
+        "text_encoding_crash_preservation",
+        "io_crash_preservation"
+      ],
+      "log": "release.log",
+      "log_sha256": "5f7ef40c103e7e44ec55456836412d23448b1ce65d419463e12a29f43df6755d",
+      "junit": "release-junit.xml",
+      "junit_sha256": "3cc46b18042c3425bc6132d1be99762aed22d830d613dac9cf1785fede33ee0e"
+    },
+    "sanitizers": {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/ci-official-sanitizers",
+        "-V",
+        "-R",
+        "^(text_encoding_crash_preservation|io_crash_preservation)$",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/fatal-exits/sanitizers-junit.xml"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "environment": {
+        "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+        "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+      },
+      "returncode": 0,
+      "passed": 2,
+      "total": 2,
+      "seconds": 1.03,
+      "tests": [
+        "text_encoding_crash_preservation",
+        "io_crash_preservation"
+      ],
+      "log": "sanitizers.log",
+      "log_sha256": "7a459a6e19d0f8808058616104890be4ab5c412460685917e1ab5754031db40d",
+      "junit": "sanitizers-junit.xml",
+      "junit_sha256": "18b5dca783a5ead8421d3a1380f26f50d2ce2c3acba0b4f7be20c34d17bcb7cb"
+    }
+  },
+  "original_evidence_files_unchanged": 1971,
+  "production_and_stdlib_unchanged": true,
+  "synthetic_repository_subtree_absent": true,
+  "new_genuine_incidents": 0,
+  "windows_validation": "signed-status receipt simulation on Linux; native Windows branch not executed",
+  "full_io_or_compiler_matrix_run": false,
+  "hosted_ci": false,
+  "git_staging_or_ref_changes": false
+}

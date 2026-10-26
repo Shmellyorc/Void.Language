@@ -6,7 +6,8 @@ import os
 import subprocess
 import sys
 import tempfile
-from crash import ROOT, run, install
+from types import SimpleNamespace
+from crash import ROOT, crashed, preserve, run, install
 
 
 def snapshot(directory):
@@ -24,7 +25,7 @@ def exercise(root):
     os.environ['VOID_CRASH_EVIDENCE'] = str(kept)
     script = 'import os,signal; os.kill(os.getpid(), signal.SIGSEGV)'
     if os.name == 'nt':
-        script = 'import os; os.abort()'
+        script = 'import ctypes; ctypes.windll.kernel32.ExitProcess(0xC0000005)'
     else:
         script = 'import resource; resource.setrlimit(resource.RLIMIT_CORE,(0,0)); ' + script
     executable = Path(sys.executable).resolve()
@@ -50,12 +51,37 @@ def exercise(root):
                                str(original)], cwd=root, stdin=subprocess.PIPE,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     direct.communicate(framed)
+    fatal_stdout = b'synthetic fatal stdout\0\r\n'
+    fatal_stderr = b'synthetic fatal stderr\0\r\n'
+    for status in (87, 86):
+        fatal = ('import os; '
+                 f'os.write(1, {fatal_stdout!r}); '
+                 f'os.write(2, {fatal_stderr!r}); '
+                 f'os._exit({status})')
+        arguments = [sys.executable, '-c', fatal, original]
+        result = run(arguments, cwd=root, capture_output=True,
+                     provenance_inputs=(Path(__file__).resolve(),))
+        assert result.returncode == status
+        direct_fatal = subprocess.Popen(arguments, cwd=root, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+        assert direct_fatal.communicate() == (fatal_stdout, fatal_stderr)
+        assert direct_fatal.returncode == status
+    # Exercise signed Windows receipt creation on every host. This is a status
+    # simulation, not a claim that the Windows native branch ran on POSIX.
+    windows_status = -1073741819
+    assert crashed(windows_status) and crashed(0xC0000005)
+    preserve([sys.executable, '--simulated-signed-windows-status', original], root,
+             SimpleNamespace(returncode=windows_status, stdout=fatal_stdout, stderr=fatal_stderr),
+             provenance_inputs=(Path(__file__).resolve(),))
+    for status in (0, 1, 2, 3, 42, 85, 88):
+        assert not crashed(status), status
     rejected = run([sys.executable, '-c', 'raise SystemExit(1)', original],
                    cwd=root, capture_output=True)
     assert rejected.returncode == 1
     receipts = list(kept.glob('*/receipt.json'))
-    assert len(receipts) == 3
+    assert len(receipts) == 8
     collisions = 0
+    fatal_counts = {87: 0, 86: 0, windows_status: 0}
     for receipt in receipts:
         record = json.loads(receipt.read_text())
         entry = next(item for item in record['sources'] if item['original'] == str(original))
@@ -67,6 +93,11 @@ def exercise(root):
         assert copy.stat().st_mode & 0o222 == 0
         assert record['executable_sha256'] == hashlib.sha256(executable.read_bytes()).hexdigest()
         assert record['cwd'] == str(root)
+        if record['returncode'] in fatal_counts:
+            fatal_counts[record['returncode']] += 1
+            assert record['signal'] is None
+            assert (receipt.parent / 'stdout.bin').read_bytes() == fatal_stdout
+            assert (receipt.parent / 'stderr.bin').read_bytes() == fatal_stderr
         matching = [item for item in record['sources'] if item['original'] == str(companion)]
         if matching:
             collisions += 1
@@ -82,6 +113,7 @@ def exercise(root):
             assert Path(snapshot['copy']).read_bytes() == edited.encode()
             assert snapshot['sha256'] == hashlib.sha256(edited.encode()).hexdigest()
     assert collisions == 1
+    assert fatal_counts == {87: 2, 86: 2, windows_status: 1}
     assert sum(bool(json.loads(p.read_text()).get('editor_snapshots')) for p in receipts) == 1
 
 
@@ -100,7 +132,10 @@ finally:
         os.environ['VOID_CRASH_EVIDENCE'] = previous
 assert not disposable.exists()
 assert snapshot(legacy) == before
-print(json.dumps({'intentional_incidents_verified': 3, 'checked_crash_preserved': True,
+print(json.dumps({'intentional_incidents_verified': 8, 'checked_crash_preserved': True,
+                  'sanitizer_exits_verified': [87, 86], 'run_and_popen_verified': True,
+                  'signed_windows_receipt_simulation_verified': True,
+                  'windows_native_branch_executed': os.name == 'nt',
                   'colliding_filenames_verified': True, 'editor_snapshot_verified': True,
                   'ordinary_rejection_ignored': True, 'temporary_outputs_removed': True,
                   'repository_artifacts_added': 0}))
