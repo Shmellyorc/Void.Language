@@ -1,8 +1,55 @@
-# Stage 11 local verification record
+# Stage 11 final acceptance and local verification record
 
-25 October 2026. Local engineering evidence; Golden Wrench review and
-Boss-controlled acceptance remain pending. No commit, branch, push, native
-Windows/macOS run or hosted CI dispatch is part of this record.
+## STAGE 11: OFFICIALLY LOCKED, October 25, 2026
+
+**Boss officially authorizes the Stage 11 runtime globals lock. Golden Wrench
+has reviewed and accepted the implementation.** The exact tested commit is
+`e8633b246fe6139d39d830afd4cb249f7dab4d8e`.
+[Final CI run 40248573233](https://github.com/Shmellyorc/Void.Language/actions/runs/40248573233)
+used `ci-link-experiment.yml`, `mode=thinlto-cache`, and passed **7/7 jobs on
+attempt 1, with 1,407/1,407 CTests passed**.
+
+| Hosted platform | Configuration | CTests passed |
+| --- | --- | ---: |
+| Ubuntu 24.04 | Debug | 203/203 |
+| Ubuntu 24.04 | Release | 203/203 |
+| Ubuntu 24.04 | Sanitizers | 203/203 |
+| Windows 2022 | Debug | 197/197 |
+| Windows 2022 | Release | 197/197 |
+| macOS ARM64 | Debug | 202/202 |
+| macOS ARM64 | Release | 202/202 |
+| **Total** | **7 jobs** | **1,407/1,407** |
+
+Hosted Debug editor integration passed on Linux, Windows and macOS. These editor
+steps are separate from the CTest total. The run completed on 26 October UTC
+(25 October in America/Los_Angeles). Earlier local Linux acceptance passed
+**609/609**, recorded separately below; it is not included in the hosted total.
+
+The lock covers the implemented [runtime globals contract](../RUNTIME_GLOBALS.md):
+visibility, eager startup, Runtime ownership/GC/lifecycle, reload/cache, normal/O2
+JIT, linked AOT and compiler-owned global tooling. It does not certify native
+Windows/macOS Vim/Neovim host execution or physical second-volume Windows/editor
+paths. Stage 10's Boss-accepted release exclusions remain exclusions, not passes.
+The separate compiler-owned hover/documentation repair, standard-library expansion
+and package-manager work remain future work. No next engineering stage is authorized.
+
+The earlier LLVM 19.1.7 DSE crash remains **unexplained**: it was reproduced
+locally, subsequently passed without a demonstrated repair, and did not recur
+in hosted acceptance. This lock does not claim it was fixed. The separate local
+ThinLTO cache/link incident is distinguished in the engineering record below.
+
+This decision supersedes earlier pending-review/acceptance status only for the
+accepted scope above. Historical machine-readable evidence, hashes, source-freeze
+records, failures and the [optimizer observation](OPTIMIZER_FAILURE.md) remain
+unchanged. This documentation-only lock update performs no Git mutation, hosted
+dispatch, acceptance rerun or implementation work; Boss retains Git/release control.
+
+## Historical local verification — 25 October 2026
+
+The following records the pre-lock local engineering verification. Review and
+Boss-controlled acceptance were pending when it was recorded; the official lock
+above supersedes that status. No commit, branch, push, native Windows/macOS run
+or hosted CI dispatch was part of that local verification work.
 
 ## Source and environment
 
@@ -149,12 +196,20 @@ Installed-standard global hover and rename protection, UTF-16 positions,
 stale document versions and invalid-overlay repair are also exercised by the
 compiler-owned LSP protocol suite; no separate editor semantic parser was added.
 
-## Engineering failures and review boundary
+## Engineering failures and acceptance boundary
 
-An earlier Debug run crashed inside LLVM DSE; the identical standalone executable
-later passed 4,463 checks, and the final full Debug run also passed. The
-[original backtrace and verified IR](OPTIMIZER_FAILURE.md) remain an unresolved
-reliability finding for Golden Wrench review. The default O2 pipeline is unchanged.
+An earlier Debug run crashed inside LLVM 19.1.7 DSE, and a direct GDB run
+reproduced it. The same standalone executable later passed 4,463 checks without
+an intervening production-code change or rebuild; the final full Debug run also
+passed. The [original backtrace and captured IR](OPTIMIZER_FAILURE.md) remain an
+unresolved reliability observation. No causal repair was demonstrated. The crash
+did not recur in hosted acceptance; that result does not establish a fix. The
+default O2 pipeline is unchanged.
+
+Separately, an earlier parallel local Debug build failed in LLD while renaming a
+ThinLTO cache temporary object. A serial retry using the same cache succeeded.
+That build-time cache/link failure is distinct from the in-process JIT O2/DSE
+SIGSEGV; the successful link retry is not evidence of a DSE repair.
 
 
 Failed development runs are not counted as passes. Retained logs include the
@@ -166,7 +221,8 @@ A strengthened regression initially used a private JIT helper; it now exercises
 the public ReloadSlot replacement API. A callback-lifetime fixture was also
 corrected to respect the existing provider's one-shot registration rule.
 
-Native Windows/macOS, second-volume editor paths and final hosted CI remain
-Boss-controlled. This record does not replace Stage 10's accepted native editor
-exclusions with a passing claim. Result/Ok/Err and parameter/return hover-quality
-repairs, library expansion and package-manager work remain out of scope.
+Hosted Windows/macOS and final cross-platform acceptance are recorded in the
+official lock above. This record does not replace Stage 10's accepted native
+editor/second-volume exclusions with a passing claim. Result/Ok/Err and
+parameter/return hover-quality repairs, library expansion and package-manager
+work remain out of scope. Further engineering requires Boss authorization.

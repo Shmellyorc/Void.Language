@@ -1,14 +1,32 @@
 # 🔧🤖 THE WRENCH CLANKER
 
-## Stage 11 runtime globals — authorized 25 October 2026
+## STAGE 11: OFFICIALLY LOCKED, October 25, 2026
 
-Boss authorized complete file-level runtime globals, including direct project-root
-visibility, eager startup, precise Runtime ownership, reload/cache and compiler-owned
-tooling. [Current contract](RUNTIME_GLOBALS.md) and
-[engineering handoff](stage11/IMPLEMENTATION.md) track implementation and verification.
-Earlier Stage-11-unauthorized statements below are historical and superseded for
-this approved scope. Standard-library expansion remains outside this mission.
-Git operations, native Windows/macOS and final hosted CI remain Boss-controlled.
+**Golden Wrench reviewed and accepted the runtime globals implementation. Boss
+officially authorizes the Stage 11 lock** at tested commit
+`e8633b246fe6139d39d830afd4cb249f7dab4d8e`.
+[Final CI 40248573233](https://github.com/Shmellyorc/Void.Language/actions/runs/40248573233)
+used `ci-link-experiment.yml`, `mode=thinlto-cache`, with **7/7 jobs successful
+on attempt 1 and 1,407/1,407 CTests passed**: Ubuntu Debug/Release/Sanitizers
+203/203 each; Windows 2022 Debug/Release 197/197 each; macOS ARM64 Debug/Release
+202/202 each. Hosted Debug editor integration passed on Linux, Windows and macOS.
+Earlier local Linux verification passed 609/609 separately.
+[Official acceptance](stage11/ACCEPTANCE.md), [contract](RUNTIME_GLOBALS.md) and
+[implementation](stage11/IMPLEMENTATION.md) define the accepted scope.
+
+The LLVM 19.1.7 DSE crash was reproduced locally, subsequently passed without a
+demonstrated repair, and did not recur in hosted acceptance. It remains an
+**unexplained [reliability observation](stage11/OPTIMIZER_FAILURE.md); no fix is
+claimed**. The separate local ThinLTO cache temporary-object rename/link failure
+and serial build retry do not establish a DSE repair. Historical evidence,
+machine-readable results, hashes and source-freeze records remain unchanged.
+
+Stage 10's accepted native Windows/macOS Vim/Neovim host and physical second-volume
+Windows exclusions remain exclusions, not passes. This lock supersedes earlier
+pending/unauthorized statuses only for the accepted runtime globals scope.
+Compiler-owned hover/documentation repair, standard-library expansion and
+package-manager work remain future work. **Do not begin the next engineering
+stage.** Boss retains Git, CI and release control; root README remains protected.
 
 
 ## STAGE 10: OFFICIALLY LOCKED, October 25, 2026
@@ -82,8 +100,9 @@ test may replace an incomplete feature.
 
 Official `stdlib/` and project-local `libs/` stay separate. Future purpose-based
 modules retain nested paths and existing compiler-owned completion/navigation in
-VS Code, Neovim and Vim. File-level mutable runtime `var` remains a language
-proposal; no stdlib/global implementation starts before Boss approval. See the
+VS Code, Neovim and Vim. File-level mutable runtime `var` is implemented and
+locked under the [Stage 11 contract](RUNTIME_GLOBALS.md). Standard-library
+expansion remains future work requiring Boss approval. See the historical
 [design handoff and current corrections](VOID_STDLIB_AND_GLOBAL_VARS_WRENCH_HANDOFF_2026-10-24.md#current-direction-and-source-corrections--24-october-2026).
 
 ## Current Windows milestone: RESOLVED — 21 October 2026

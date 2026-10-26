@@ -1,6 +1,15 @@
 # Stage 11 runtime globals — engineering handoff
 
-25 October 2026. **Implementation complete; final Linux verification complete; review pending.**
+25 October 2026. **STAGE 11: OFFICIALLY LOCKED.** Golden Wrench reviewed and
+accepted the runtime globals implementation; Boss authorized the lock at tested
+commit `e8633b246fe6139d39d830afd4cb249f7dab4d8e`.
+[Final CI 40248573233](https://github.com/Shmellyorc/Void.Language/actions/runs/40248573233),
+`ci-link-experiment.yml`, `mode=thinlto-cache`, passed **7/7 jobs on attempt 1:
+1,407/1,407 CTests**. Ubuntu Debug/Release/Sanitizers passed 203/203 each,
+Windows 2022 Debug/Release 197/197 each, and macOS ARM64 Debug/Release 202/202
+each. Hosted Debug editor integration passed on all three platforms.
+[Official acceptance](ACCEPTANCE.md) defines the exact evidence and boundaries.
+
 Boss authorized runtime globals only. The Stage 11 research/roadmap's proposed
 file/packet/text libraries and package-manager work remain outside this mission.
 The approved root-global visibility and eager startup rules supersede conflicting
@@ -8,7 +17,9 @@ research recommendations. [Language/runtime contract](../RUNTIME_GLOBALS.md).
 
 Baseline: Stage 10 source `d507240`, lock record `909c0c3`. Pre-existing
 `stdlib/console.void` edits and the untracked research/roadmap were preserved.
-Root README and Git history are unchanged; no hosted action has been dispatched.
+The original local engineering work did not modify the root README or Git history
+or dispatch hosted CI. Boss subsequently committed the tested implementation and
+ran the accepted hosted workflow. This lock update changes documentation only.
 
 ## Implementation
 
@@ -57,9 +68,14 @@ compatibility break; both were repaired. One build read a source file during an
 in-place rewrite and Clang crashed; subsequent engineering edits use atomic file
 replacement, and that build is not acceptance evidence.
 
-Native Windows/macOS and final hosted CI remain Boss-controlled. Stage 10's
-accepted native editor/second-volume exclusions are not converted into passes.
-The earlier intermittent Debug LLVM DSE failure remains an explicit
-[reliability finding](OPTIMIZER_FAILURE.md), even when later runs pass.
-Golden Wrench must review the final implementation and exact local evidence before
-Boss-controlled acceptance.
+Stage 10's accepted native Windows/macOS Vim/Neovim host and physical second-volume
+Windows exclusions are not converted into passes by hosted editor integration.
+The earlier LLVM 19.1.7 Debug DSE crash was reproduced locally, then passed
+without a demonstrated repair. It did not recur in hosted acceptance and remains
+an **unexplained [reliability observation](OPTIMIZER_FAILURE.md), not a fixed bug**.
+The local ThinLTO temporary-cache-object rename/link failure and successful serial
+build retry are separate incidents; they do not explain or repair the DSE crash.
+Historical machine-readable evidence, hashes and source freezes remain unchanged.
+Compiler-owned hover/documentation repair, standard-library expansion and
+package-manager work remain future work. No next engineering stage is authorized;
+Boss retains Git, CI and release control.

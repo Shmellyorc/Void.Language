@@ -1,9 +1,24 @@
 # Runtime globals — Stage 11
 
+**STAGE 11: OFFICIALLY LOCKED, October 25, 2026.** Golden Wrench reviewed and
+accepted the implementation; Boss authorized the lock at tested commit
+`e8633b246fe6139d39d830afd4cb249f7dab4d8e`.
+[Final CI 40248573233](https://github.com/Shmellyorc/Void.Language/actions/runs/40248573233),
+`ci-link-experiment.yml`, `mode=thinlto-cache`, passed **7/7 jobs on attempt 1,
+1,407/1,407 CTests**, with hosted Debug editor integration on Linux, Windows and
+macOS. [Official acceptance](stage11/ACCEPTANCE.md) records all platform counts,
+the separate local Linux 609/609 result and acceptance exclusions.
+
 Boss authorized complete file-level runtime globals on 25 October 2026. This
 contract supersedes the visibility/startup recommendations in the Stage 11 research
-and roadmap. Engineering verification is recorded separately in
-[the Stage 11 handoff](stage11/IMPLEMENTATION.md); no hosted lock is implied.
+and roadmap. [The Stage 11 handoff](stage11/IMPLEMENTATION.md) describes the
+implementation. The earlier locally reproduced LLVM 19.1.7 DSE crash remains
+unexplained: subsequent runs passed without a demonstrated repair, and it did
+not recur in hosted acceptance. The separate local ThinLTO cache/link incident
+does not establish a DSE fix. [The original observation](stage11/OPTIMIZER_FAILURE.md)
+and historical evidence remain preserved. Compiler-owned hover/documentation
+repair and standard-library expansion remain future work; the lock authorizes no
+next engineering stage.
 
 ## Declarations and visibility
 
