@@ -1,0 +1,116 @@
+use io
+
+func failure<t>(outcome: result<t, io.error>, code: i32, progress: i64) -> bool:
+    if outcome is Err(var reason):
+        return reason.code == code and reason.bytes_transferred == progress
+
+    return false
+
+func exercise() -> result<i32, io.error>:
+    const original: [u8] = [192, 175, 0]
+    var written = io.write_bytes("errors.bin", original)?
+    var snapshot = io.read_bytes("errors.bin")?
+    snapshot[0] = 1
+    var independent = io.read_bytes("errors.bin")?
+
+    if independent[0] != 192:
+        return Ok(1)
+
+    with io.open("errors.bin", io.open_mode.read_write)? as handle:
+        var short = handle.read_exact(4)
+
+        if not failure(short, 9, 3):
+            return Ok(2)
+
+        if short is Err(var reason):
+            if reason.partial.count != 3 or reason.partial[0] != 192:
+                return Ok(3)
+
+        var cursor = handle.position()?
+
+        if cursor != 3 or not failure(handle.seek(-4, io.seek_origin.current), 6, 0):
+            return Ok(4)
+
+        var reset = handle.seek(0)?
+        var malformed = handle.read_string(3)
+
+        if not failure(malformed, 10, 3):
+            return Ok(5)
+
+        var beginning = handle.seek(0)?
+        var line = handle.read_line()
+
+        if not failure(line, 10, 3):
+            return Ok(6)
+
+        var negative = handle.read_exact(-1)
+
+        if not failure(negative, 6, 0):
+            return Ok(7)
+
+        var closed = handle.close()?
+        var closed_again = handle.close()?
+
+        if not failure(handle.read_bytes(1), 7, 0):
+            return Ok(8)
+
+    var prefix = io.write_bytes("errors.bin", [255, 255, 255, 255])?
+
+    with io.open("errors.bin")? as handle:
+        var limited = handle.read_pascal_string(8)
+
+        if not failure(limited, 12, 4):
+            return Ok(9)
+
+        var cursor = handle.position()?
+
+        if cursor != 4 or not failure(handle.write_string("x"), 5, 0):
+            return Ok(10)
+
+    var truncated = io.write_bytes("errors.bin", [5, 0, 0, 0, 65])?
+
+    with io.open("errors.bin")? as handle:
+        var partial = handle.read_pascal_string()
+
+        if not failure(partial, 9, 5):
+            return Ok(11)
+
+        if partial is Err(var reason):
+            if reason.partial.count != 5 or reason.partial[4] != 65:
+                return Ok(12)
+
+    var framed = io.write_text("lines.txt", "first\r\n\nlast\r")?
+
+    with io.open("lines.txt")? as handle:
+        var first = handle.read_line()?
+        var blank = handle.read_line()?
+        var last = handle.read_line()?
+        var exhausted = handle.read_line()?
+
+        if not (first is io.text_read.text(var first_text)):
+            return Ok(13)
+
+        if blank is io.text_read.text(var blank_text):
+            if blank_text != "":
+                return Ok(14)
+        else:
+            return Ok(15)
+
+        if last is io.text_read.text(var last_text):
+            if last_text != "last":
+                return Ok(16)
+        else:
+            return Ok(17)
+
+        if not (exhausted is io.text_read.eof):
+            return Ok(18)
+
+    var removed = io.remove_file("errors.bin")?
+    var removed_lines = io.remove_file("lines.txt")?
+    return Ok(7)
+
+func entry(input: i32) -> i32:
+    if exercise() is Ok(var answer):
+        return answer
+
+    return 99

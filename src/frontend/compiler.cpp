@@ -3,6 +3,7 @@
 #include "void/numeric.hpp"
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
+#include "void/filesystem_ops.hpp"
 #include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
 #include <algorithm>
@@ -2927,10 +2928,21 @@ class Semantics {
         builtin_record(target,"Validated temporal Runtime kernel operation.");e.source_target=target.symbol;e.target=target.symbol;
         return e.type=call_arguments(e,target,0);
     }
+#include "filesystem.inc"
 #include "binary_codec.inc"
 #include "stdlib_conversion.inc"
 
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
+            for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
+                auto name = filesystem::source_operations[n].name;
+                if (e.token.text == name) return filesystem_call(e, n, false);
+                if (n < filesystem::claim_operation && e.token.text == std::string(name) + "_async") {
+                    return filesystem_call(e, n, true);
+                }
+            }
+        }
+
         if (unit.identity == "/@stdlib/convert.void" && e.qualifier.empty() &&
             (e.token.text == "_convert_parse" || e.token.text == "_convert_unwrap")) {
             return conversion_call(e);
@@ -3725,6 +3737,9 @@ class Lowering {
             i.op == ir::Op::collection_leave ||
             i.op == ir::Op::collection_append ||
             i.op == ir::Op::collection_finish ||
+            i.op == ir::Op::filesystem_native ||
+            i.op == ir::Op::filesystem_async ||
+            i.op == ir::Op::filesystem_control ||
             i.op == ir::Op::console_native ||
             i.op == ir::Op::console_print ||
             i.op == ir::Op::dict_new ||
@@ -4179,6 +4194,20 @@ class Lowering {
                 for(unsigned n=0;n<rendered.size();++n){if(n)join.arguments.push_back(emit({ir::Op::load,*sep},e.token));join.arguments.push_back(emit({ir::Op::load,rendered[n]},e.token));}join.arguments.push_back(emit({ir::Op::load,*end},e.token));
                 ir::Instruction print{ir::Op::console_print,emit(join,e.token),flush?emit({ir::Op::load,*flush},e.token):constant(Type::boolean,{0,{}},e.token)};print.type=Type::none;if(file)print.arguments.push_back(emit({ir::Op::load,*file},e.token));return emit(print,e.token);
             });
+            if (e.target.starts_with("$io.")) {
+                bool asynchronous = e.target.starts_with("$io.async.");
+                std::vector<unsigned> slots(e.parts.size());
+                for (unsigned n = 0; n < e.parts.size(); ++n) {
+                    slots[e.argument_indexes.at(n)] = snapshot(expression(*e.parts[n]),
+                                                              expression_type(*e.parts[n]), e.parts[n]->token);
+                }
+                ir::Instruction operation{asynchronous ? ir::Op::filesystem_async : ir::Op::filesystem_native};
+                operation.type = e.type;
+                operation.immediate = std::stoul(e.target.substr(asynchronous ? 10 : 9));
+                if (operation.immediate >= filesystem::claim_operation) operation.op = ir::Op::filesystem_control;
+                for (auto slot : slots) operation.arguments.push_back(emit({ir::Op::load, slot}, e.token));
+                return emit(operation, e.token);
+            }
             if(e.target.starts_with("$console.")) {
                 std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
                 ir::Instruction operation{ir::Op::console_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(9));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
@@ -4438,11 +4467,17 @@ class Lowering {
         }
         case K::scoped:{
             if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
-            std::optional<unsigned> group;if(output.asynchronous)group=snapshot(emit({ir::Op::async_group_enter},s.token),Type::u64,s.token);
+            std::optional<unsigned> group;
             auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
             auto node=register_cleanup(expression(*s.selection),false,s.token);
             auto value=expression(*s.expression);emit({ir::Op::store,s.slot,value},s.token);
             ir::Instruction activate{ir::Op::gc_write,emit({ir::Op::load,node},s.token),constant(Type::boolean,{1,{}},s.token)};activate.immediate=2;emit(activate,s.token);
+            // Acquisition can propagate Err before the resource scope exists.
+            // Register and activate disposal first, then create the child group;
+            // a group-allocation failure still reaches the acquired cleanup.
+            if (output.asynchronous) {
+                group = snapshot(emit({ir::Op::async_group_enter}, s.token), Type::u64, s.token);
+            }
             with_scopes.push_back({node,false,group});sequence(s.body);if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
         }
         case K::deferred:register_cleanup(expression(*s.expression),true,s.token);break;

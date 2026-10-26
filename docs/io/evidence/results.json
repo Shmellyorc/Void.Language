@@ -1,0 +1,32 @@
+{
+  "debug": {
+    "name": "Linux-clang++",
+    "tests": "63",
+    "failures": "0",
+    "disabled": "0",
+    "skipped": "0",
+    "hostname": "gamedev",
+    "time": "1020",
+    "timestamp": "2026-10-26T09:27:16"
+  },
+  "release": {
+    "name": "Linux-clang++",
+    "tests": "63",
+    "failures": "0",
+    "disabled": "0",
+    "skipped": "0",
+    "hostname": "gamedev",
+    "time": "688",
+    "timestamp": "2026-10-26T09:25:59"
+  },
+  "sanitizers": {
+    "name": "Linux-clang++",
+    "tests": "56",
+    "failures": "0",
+    "disabled": "0",
+    "skipped": "0",
+    "hostname": "gamedev",
+    "time": "866",
+    "timestamp": "2026-10-26T09:29:57"
+  }
+}

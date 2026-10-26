@@ -1,0 +1,64 @@
+use io
+use path
+use io/memory
+use encoding/binary
+
+func exercise() -> result<i32, io.error>:
+    var created = io.create_directories("game data 雪")?
+    var config_name = path.join(["game data 雪", "settings.txt"])?
+    var config_written = io.write_text(config_name, "player=雪\ntries=3\n")?
+    var config_text = io.read_text(config_name, 4096)?
+
+    if config_text != "player=雪\ntries=3\n":
+        return Ok(1)
+
+    var save_name = path.change_extension(config_name, ".save")?
+
+    with io.open(save_name, io.open_mode.create, binary.byte_order.big)? as handle:
+        var score_written = handle.write<i32>(900)?
+        var player_written = handle.write_pascal_string("雪")?
+        var beginning = handle.seek(0)?
+        var score = handle.read<i32>()?
+        var player = handle.read_pascal_string(1024)?
+
+        if score != 900 or player != "雪":
+            return Ok(2)
+
+    var packet = memory.stream(order = binary.byte_order.big)
+    var packet_number = packet.write<u32>(16909060)
+    var packet_text = packet.write_pascal_string("asset\0雪")
+
+    if packet_number is Err(var reason):
+        return Ok(3)
+
+    if packet_text is Err(var reason):
+        return Ok(4)
+
+    var asset_name = path.join(["game data 雪", "asset.bin"])?
+    var asset_written = io.write_bytes(asset_name, packet.to_bytes())?
+
+    with io.open(asset_name, order = binary.byte_order.big)? as handle:
+        var identifier = handle.read<u32>()?
+        var label = handle.read_pascal_string(1024)?
+
+        if identifier != 16909060 or label != "asset\0雪":
+            return Ok(5)
+
+    var assets = io.get_files("game data 雪", "*.bin", true)?
+
+    if assets.count != 1:
+        return Ok(6)
+
+    var removed = io.remove_tree("game data 雪")?
+    return Ok(0)
+
+func main() -> i32:
+    var outcome = exercise()
+
+    if outcome is Ok(var status):
+        return status
+
+    if outcome is Err(var reason):
+        print("{reason.operation}: {reason.message}, native={reason.os_code}")
+
+    return 99

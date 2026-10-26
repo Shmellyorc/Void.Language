@@ -1,6 +1,9 @@
 #pragma once
 #include "void/execution.hpp"
+#include "void/runtime.hpp"
+#include <atomic>
 #include <cstddef>
+#include <memory>
 // Private same-build compiler/runtime ABI; all transitions run on the owning executor.
 extern "C" {
 using vd_async_start_entry = void* (*)(std::int32_t,vd::RuntimeFailure*);
@@ -24,4 +27,24 @@ bool vd_async_group_join(std::uint64_t,std::int32_t,void*,vd::RuntimeFailure*) n
 bool vd_async_drain(void*,vd::RuntimeFailure*) noexcept;
 }
 
-namespace vd { const void* async_execution_context() noexcept; }
+namespace vd {
+const void* async_execution_context() noexcept;
+bool async_context_descends_from(const void*) noexcept;
+
+// Private native jobs share the source-worker pool. execute/abandon run in
+// NativeSafe state and must use only owned native memory. publish runs on the
+// owning executor with the task rooted; it may report allocation failure.
+class NativeJob {
+public:
+    virtual ~NativeJob() = default;
+    virtual void execute(const std::atomic<bool>&, RuntimeFailure*) noexcept = 0;
+    virtual void publish(Runtime&, void*) = 0;
+    virtual void cancel_queued() noexcept {}
+    virtual bool acquired() const noexcept { return false; }
+    virtual void abandon(RuntimeFailure*) noexcept {}
+    virtual void commit() noexcept {}
+};
+
+void async_submit_native(void**, const TypeLayout&, const void*,
+                         std::shared_ptr<NativeJob>);
+}

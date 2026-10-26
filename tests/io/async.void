@@ -1,0 +1,64 @@
+use io
+use path
+use encoding/binary
+
+async func exercise() -> result<i32, io.error>:
+    var directory = "io async 雪"
+    var created = (await io.create_directories_async(directory))?
+    var name = path.join([directory, "wire.bin"])?
+    var handle = (await io.open_async(name, io.open_mode.create, binary.byte_order.big))?
+    var alias = handle
+    var written_number = (await handle.write_async<i32>(16909060))?
+    var written_text = (await handle.write_pascal_string_async("雪\0x"))?
+    var written_raw = (await handle.write_string_async("end"))?
+    var cursor = (await alias.position_async())?
+
+    if cursor != 16:
+        return Ok(1)
+
+    var beginning = (await alias.seek_async(0))?
+    var number = (await handle.read_async<i32>())?
+    var text = (await alias.read_pascal_string_async())?
+    var raw = (await handle.read_string_async(3))?
+
+    if number != 16909060 or text != "雪\0x" or raw != "end":
+        return Ok(2)
+
+    var eof_result = await handle.read_exact_async(1)
+
+    if eof_result is Err(var reason):
+        if not (reason.kind is io.error_kind.unexpected_eof) or reason.bytes_transferred != 0:
+            return Ok(3)
+    else:
+        return Ok(4)
+
+    var flushed = (await handle.flush_async())?
+    var resized = (await handle.set_length_async(20))?
+    var measured = (await handle.length_async())?
+    var restored_size = (await handle.set_length_async(16))?
+
+    if measured != 20:
+        return Ok(6)
+
+    var closed = (await alias.close_async())?
+    var closed_again = (await handle.close_async())?
+    var contents = (await io.read_bytes_async(name))?
+    var details = (await io.metadata_async(name))?
+    var files = (await io.get_files_async(directory, "*.bin", true))?
+
+    if contents.count != 16 or details.size != 16 or files.count != 1:
+        return Ok(5)
+
+    var removed = (await io.remove_tree_async(directory))?
+    return Ok(7)
+
+async func entry(input: i32) -> i32:
+    var outcome = await exercise()
+
+    if outcome is Ok(var answer):
+        return answer
+
+    if outcome is Err(var reason):
+        print("{reason.operation}: {reason.kind}, native={reason.os_code}")
+
+    return 99

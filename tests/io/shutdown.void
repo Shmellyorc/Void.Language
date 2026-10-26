@@ -1,0 +1,9 @@
+use io
+
+func entry(input: i32) -> i32:
+    var opened = io.open("shutdown failure.bin", io.open_mode.create)
+
+    if opened is Ok(var handle):
+        return 7
+
+    return 99

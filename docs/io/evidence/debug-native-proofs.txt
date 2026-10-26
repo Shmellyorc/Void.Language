@@ -1,0 +1,85 @@
+Start testing: Oct 26 08:23 PDT
+----------------------------------------------------------
+139/235 Testing: io_native_responsiveness
+139/235 Test: io_native_responsiveness
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/responsive.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/io responsive
+"io_native_responsiveness" start time: Oct 26 08:23 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =  20.64 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_responsiveness" end time: Oct 26 08:23 PDT
+"io_native_responsiveness" time elapsed: 00:00:20
+----------------------------------------------------------
+
+140/235 Testing: io_native_pending_close
+140/235 Test: io_native_pending_close
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/pending.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/io pending
+"io_native_pending_close" start time: Oct 26 08:23 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =  21.14 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_pending_close" end time: Oct 26 08:23 PDT
+"io_native_pending_close" time elapsed: 00:00:21
+----------------------------------------------------------
+
+141/235 Testing: io_probe_normal
+141/235 Test: io_probe_normal
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_probe_normal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/io probe normal
+"io_probe_normal" start time: Oct 26 08:23 PDT
+Output:
+----------------------------------------------------------
+linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"io_probe_normal" end time: Oct 26 08:23 PDT
+"io_probe_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+142/235 Testing: io_probe_optimized
+142/235 Test: io_probe_optimized
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_probe_optimized"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/io probe optimized
+"io_probe_optimized" start time: Oct 26 08:23 PDT
+Output:
+----------------------------------------------------------
+linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"io_probe_optimized" end time: Oct 26 08:23 PDT
+"io_probe_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+148/235 Testing: io_kernel
+148/235 Test: io_kernel
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_kernel" "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/io kernel fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"io_kernel" start time: Oct 26 08:23 PDT
+Output:
+----------------------------------------------------------
+native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"io_kernel" end time: Oct 26 08:23 PDT
+"io_kernel" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 26 08:23 PDT

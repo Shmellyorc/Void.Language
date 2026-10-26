@@ -1,0 +1,21 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7ffff76006c0 (LWP 612045)]
+[New Thread 0x7ffff6dff6c0 (LWP 612046)]
+[New Thread 0x7ffff65fe6c0 (LWP 612047)]
+[New Thread 0x7ffff5dfd6c0 (LWP 612048)]
+[Thread 0x7ffff5dfd6c0 (LWP 612048) exited]
+[Thread 0x7ffff65fe6c0 (LWP 612047) exited]
+[Thread 0x7ffff6dff6c0 (LWP 612046) exited]
+[Thread 0x7ffff76006c0 (LWP 612045) exited]
+[New Thread 0x7ffff5dfd6c0 (LWP 613138)]
+[New Thread 0x7ffff65fe6c0 (LWP 613139)]
+[New Thread 0x7ffff6dff6c0 (LWP 613140)]
+[New Thread 0x7ffff76006c0 (LWP 613141)]
+[Thread 0x7ffff76006c0 (LWP 613141) exited]
+[Thread 0x7ffff6dff6c0 (LWP 613140) exited]
+[Thread 0x7ffff65fe6c0 (LWP 613139) exited]
+[Thread 0x7ffff5dfd6c0 (LWP 613138) exited]
+Debug source execution passed
+O2 source execution passed
+[Inferior 1 (process 611736) exited normally]

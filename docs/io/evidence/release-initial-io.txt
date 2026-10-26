@@ -1,0 +1,454 @@
+Start testing: Oct 26 08:56 PDT
+----------------------------------------------------------
+135/248 Testing: io_ownership
+135/248 Test: io_ownership
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_ownership" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership_async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_ownership" start time: Oct 26 08:56 PDT
+Output:
+----------------------------------------------------------
+149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 622 checked allocation failures recovered
+async O2: 622 checked allocation failures recovered
+7213 I/O ownership/documentation checks passed
+<end of output>
+Test time =  29.83 sec
+----------------------------------------------------------
+Test Passed.
+"io_ownership" end time: Oct 26 08:56 PDT
+"io_ownership" time elapsed: 00:00:29
+----------------------------------------------------------
+
+137/248 Testing: io_async_execution
+137/248 Test: io_async_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_async_execution" start time: Oct 26 08:56 PDT
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 255, in <module>
+    main()
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 209, in main
+    run([runner, '--async', fixture], root, expected=None)
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 24, in run
+    assert result.returncode == expected_status, (arguments, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner'), '--async', PosixPath('/tmp/VOID io async wire 1icf1laa/main.void')], -11, b'', b'')
+<end of output>
+Test time =  55.73 sec
+----------------------------------------------------------
+Test Failed.
+"io_async_execution" end time: Oct 26 08:57 PDT
+"io_async_execution" time elapsed: 00:00:55
+----------------------------------------------------------
+
+138/248 Testing: io_wire_normal
+138/248 Test: io_wire_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_wire_normal" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io wire normal
+"io_wire_normal" start time: Oct 26 08:57 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"io_wire_normal" end time: Oct 26 08:57 PDT
+"io_wire_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+139/248 Testing: io_wire_optimized
+139/248 Test: io_wire_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_wire_optimized" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io wire optimized
+"io_wire_optimized" start time: Oct 26 08:57 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"io_wire_optimized" end time: Oct 26 08:57 PDT
+"io_wire_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+140/248 Testing: lsp_io
+140/248 Test: lsp_io
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"lsp_io" start time: Oct 26 08:57 PDT
+Output:
+----------------------------------------------------------
+41 io/path LSP documentation, completion and persistent recovery checks passed
+<end of output>
+Test time =   0.94 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_io" end time: Oct 26 08:57 PDT
+"lsp_io" time elapsed: 00:00:00
+----------------------------------------------------------
+
+136/248 Testing: io_execution
+136/248 Test: io_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_execution" start time: Oct 26 08:56 PDT
+Output:
+----------------------------------------------------------
+18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+<end of output>
+Test time = 133.16 sec
+----------------------------------------------------------
+Test Passed.
+"io_execution" end time: Oct 26 08:58 PDT
+"io_execution" time elapsed: 00:02:13
+----------------------------------------------------------
+
+141/248 Testing: io_stack
+141/248 Test: io_stack
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "--small-stack"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_stack" start time: Oct 26 08:57 PDT
+Output:
+----------------------------------------------------------
+18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=True
+<end of output>
+Test time = 148.34 sec
+----------------------------------------------------------
+Test Passed.
+"io_stack" end time: Oct 26 09:00 PDT
+"io_stack" time elapsed: 00:02:28
+----------------------------------------------------------
+
+143/248 Testing: lsp_io_stack
+143/248 Test: lsp_io_stack
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls" "--small-stack"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"lsp_io_stack" start time: Oct 26 09:00 PDT
+Output:
+----------------------------------------------------------
+41 io/path LSP documentation, completion and persistent recovery checks passed
+<end of output>
+Test time =   1.41 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_io_stack" end time: Oct 26 09:00 PDT
+"lsp_io_stack" time elapsed: 00:00:01
+----------------------------------------------------------
+
+144/248 Testing: io_native_responsiveness
+144/248 Test: io_native_responsiveness
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/responsive.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io responsive
+"io_native_responsiveness" start time: Oct 26 09:00 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =  17.76 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_responsiveness" end time: Oct 26 09:00 PDT
+"io_native_responsiveness" time elapsed: 00:00:17
+----------------------------------------------------------
+
+142/248 Testing: io_async_stack
+142/248 Test: io_async_stack
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "--small-stack"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_async_stack" start time: Oct 26 08:58 PDT
+Output:
+----------------------------------------------------------
+42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+<end of output>
+Test time = 132.06 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_stack" end time: Oct 26 09:00 PDT
+"io_async_stack" time elapsed: 00:02:12
+----------------------------------------------------------
+
+145/248 Testing: io_native_close_failure
+145/248 Test: io_native_close_failure
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "--close-failure" "/home/shmellyorc/Documents/Void.Language/tests/io/close_failure.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_close_failure" start time: Oct 26 09:00 PDT
+Output:
+----------------------------------------------------------
+JIT: recoverable close failure retained its diagnostic, retired once and released roots
+O2: recoverable close failure retained its diagnostic, retired once and released roots
+<end of output>
+Test time =  16.75 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_close_failure" end time: Oct 26 09:00 PDT
+"io_native_close_failure" time elapsed: 00:00:16
+----------------------------------------------------------
+
+146/248 Testing: io_native_shutdown
+146/248 Test: io_native_shutdown
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "--shutdown" "/home/shmellyorc/Documents/Void.Language/tests/io/shutdown.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_shutdown" start time: Oct 26 09:00 PDT
+Output:
+----------------------------------------------------------
+JIT: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+O2: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+<end of output>
+Test time =  14.74 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_shutdown" end time: Oct 26 09:00 PDT
+"io_native_shutdown" time elapsed: 00:00:14
+----------------------------------------------------------
+
+147/248 Testing: io_native_pending_close
+147/248 Test: io_native_pending_close
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/pending.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io pending
+"io_native_pending_close" start time: Oct 26 09:00 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =  14.69 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_pending_close" end time: Oct 26 09:01 PDT
+"io_native_pending_close" time elapsed: 00:00:14
+----------------------------------------------------------
+
+149/248 Testing: io_probe_normal
+149/248 Test: io_probe_normal
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_probe_normal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io probe normal
+"io_probe_normal" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"io_probe_normal" end time: Oct 26 09:01 PDT
+"io_probe_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+150/248 Testing: io_probe_optimized
+150/248 Test: io_probe_optimized
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_probe_optimized"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io probe optimized
+"io_probe_optimized" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"io_probe_optimized" end time: Oct 26 09:01 PDT
+"io_probe_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+148/248 Testing: io_native_cancelled
+148/248 Test: io_native_cancelled
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/cancelled.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io cancelled
+"io_native_cancelled" start time: Oct 26 09:00 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =  14.60 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_cancelled" end time: Oct 26 09:01 PDT
+"io_native_cancelled" time elapsed: 00:00:14
+----------------------------------------------------------
+
+151/248 Testing: io_async_source
+151/248 Test: io_async_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/tests/io/async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_async_source" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =  26.26 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_source" end time: Oct 26 09:01 PDT
+"io_async_source" time elapsed: 00:00:26
+----------------------------------------------------------
+
+152/248 Testing: io_errors_source
+152/248 Test: io_errors_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--sync" "/home/shmellyorc/Documents/Void.Language/tests/io/errors.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io errors
+"io_errors_source" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =  23.99 sec
+----------------------------------------------------------
+Test Passed.
+"io_errors_source" end time: Oct 26 09:01 PDT
+"io_errors_source" time elapsed: 00:00:23
+----------------------------------------------------------
+
+153/248 Testing: io_errors_async
+153/248 Test: io_errors_async
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/io-errors-async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io async errors
+"io_errors_async" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =  28.37 sec
+----------------------------------------------------------
+Test Passed.
+"io_errors_async" end time: Oct 26 09:01 PDT
+"io_errors_async" time elapsed: 00:00:28
+----------------------------------------------------------
+
+155/248 Testing: io_async_acquisition
+155/248 Test: io_async_acquisition
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/tests/io/acquisition.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_async_acquisition" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =   0.31 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_acquisition" end time: Oct 26 09:01 PDT
+"io_async_acquisition" time elapsed: 00:00:00
+----------------------------------------------------------
+
+156/248 Testing: io_async_normal
+156/248 Test: io_async_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_async_normal" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io async normal
+"io_async_normal" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_normal" end time: Oct 26 09:01 PDT
+"io_async_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+157/248 Testing: io_async_optimized
+157/248 Test: io_async_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_async_optimized" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io async optimized
+"io_async_optimized" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_optimized" end time: Oct 26 09:01 PDT
+"io_async_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+158/248 Testing: io_native_jobs
+158/248 Test: io_native_jobs
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native_jobs"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_jobs" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback and cleanup diagnostics passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_jobs" end time: Oct 26 09:01 PDT
+"io_native_jobs" time elapsed: 00:00:00
+----------------------------------------------------------
+
+159/248 Testing: io_kernel
+159/248 Test: io_kernel
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_kernel" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/io kernel fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_kernel" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"io_kernel" end time: Oct 26 09:01 PDT
+"io_kernel" time elapsed: 00:00:00
+----------------------------------------------------------
+
+160/248 Testing: io_ir
+160/248 Test: io_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_ir" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_ir" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+11 independent filesystem IR authority, arity, reply and opcode rejections passed
+<end of output>
+Test time =   0.63 sec
+----------------------------------------------------------
+Test Passed.
+"io_ir" end time: Oct 26 09:01 PDT
+"io_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+161/248 Testing: io_cross_volume
+161/248 Test: io_cross_volume
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/cross_volume.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_cross_volume" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+Cross-device file and directory renames preserved both source entries in actual JIT/O2
+<end of output>
+Test time =  17.17 sec
+----------------------------------------------------------
+Test Passed.
+"io_cross_volume" end time: Oct 26 09:02 PDT
+"io_cross_volume" time elapsed: 00:00:17
+----------------------------------------------------------
+
+154/248 Testing: io_examples_install
+154/248 Test: io_examples_install
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/io/examples.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release" "/home/shmellyorc/Documents/Void.Language/examples/io/filesystem.void" "Release"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_examples_install" start time: Oct 26 09:01 PDT
+Output:
+----------------------------------------------------------
+11 example/install checks passed: Unicode config, game save/load, binary asset, memory/file wire interoperability, JIT/O2/linked AOT and relocated stdlib
+<end of output>
+Test time =  65.91 sec
+----------------------------------------------------------
+Test Passed.
+"io_examples_install" end time: Oct 26 09:02 PDT
+"io_examples_install" time elapsed: 00:01:05
+----------------------------------------------------------
+
+End testing: Oct 26 09:02 PDT

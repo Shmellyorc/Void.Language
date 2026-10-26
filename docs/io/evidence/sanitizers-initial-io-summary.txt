@@ -1,0 +1,53 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+      Start 131: io_ownership
+      Start 132: io_execution
+ 1/24 Test #131: io_ownership .....................   Passed   77.54 sec
+      Start 133: io_async_execution
+ 2/24 Test #132: io_execution .....................   Passed  209.06 sec
+      Start 134: io_wire_normal
+ 3/24 Test #134: io_wire_normal ...................   Passed    0.50 sec
+      Start 135: io_wire_optimized
+ 4/24 Test #135: io_wire_optimized ................   Passed    0.61 sec
+      Start 136: lsp_io
+ 5/24 Test #136: lsp_io ...........................   Passed    7.03 sec
+      Start 137: io_native_responsiveness
+ 6/24 Test #137: io_native_responsiveness .........   Passed   38.44 sec
+      Start 138: io_native_close_failure
+ 7/24 Test #133: io_async_execution ...............   Passed  178.17 sec
+      Start 139: io_native_shutdown
+ 8/24 Test #138: io_native_close_failure ..........   Passed   27.34 sec
+      Start 140: io_native_pending_close
+ 9/24 Test #139: io_native_shutdown ...............   Passed   27.41 sec
+      Start 141: io_native_cancelled
+10/24 Test #140: io_native_pending_close ..........   Passed   29.34 sec
+      Start 142: io_probe_normal
+11/24 Test #142: io_probe_normal ..................   Passed    0.10 sec
+      Start 143: io_probe_optimized
+12/24 Test #143: io_probe_optimized ...............   Passed    0.10 sec
+      Start 144: io_async_source
+13/24 Test #141: io_native_cancelled ..............   Passed   30.47 sec
+      Start 145: io_errors_source
+14/24 Test #145: io_errors_source .................   Passed   41.70 sec
+      Start 146: io_errors_async
+15/24 Test #144: io_async_source ..................   Passed   48.11 sec
+      Start 147: io_examples_install
+16/24 Test #146: io_errors_async ..................   Passed   44.76 sec
+      Start 148: io_async_acquisition
+17/24 Test #148: io_async_acquisition .............   Passed    0.74 sec
+      Start 149: io_async_normal
+18/24 Test #149: io_async_normal ..................   Passed    0.10 sec
+      Start 150: io_async_optimized
+19/24 Test #150: io_async_optimized ...............   Passed    0.11 sec
+      Start 151: io_native_jobs
+20/24 Test #151: io_native_jobs ...................   Passed    0.05 sec
+      Start 152: io_kernel
+21/24 Test #152: io_kernel ........................   Passed    0.10 sec
+      Start 153: io_ir
+22/24 Test #153: io_ir ............................   Passed    3.56 sec
+      Start 154: io_cross_volume
+23/24 Test #154: io_cross_volume ..................   Passed   32.28 sec
+24/24 Test #147: io_examples_install ..............   Passed  116.84 sec
+
+100% tests passed, 0 tests failed out of 24
+
+Total Test time (real) = 477.48 sec

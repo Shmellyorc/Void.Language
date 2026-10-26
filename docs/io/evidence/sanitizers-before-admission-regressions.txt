@@ -1,0 +1,483 @@
+Start testing: Oct 26 09:11 PDT
+----------------------------------------------------------
+101/241 Testing: combined_execution
+101/241 Test: combined_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/combined/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"combined_execution" start time: Oct 26 09:11 PDT
+Output:
+----------------------------------------------------------
+Combined execution: 246 parsing assertions; 74 processes passed
+<end of output>
+Test time = 191.02 sec
+----------------------------------------------------------
+Test Passed.
+"combined_execution" end time: Oct 26 09:14 PDT
+"combined_execution" time elapsed: 00:03:11
+----------------------------------------------------------
+
+110/241 Testing: stage10_console_source
+110/241 Test: stage10_console_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_console_source"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"stage10_console_source" start time: Oct 26 09:11 PDT
+Output:
+----------------------------------------------------------
+source console checks: 4492
+<end of output>
+Test time = 243.43 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_source" end time: Oct 26 09:15 PDT
+"stage10_console_source" time elapsed: 00:04:03
+----------------------------------------------------------
+
+94/241 Testing: binary_execution
+94/241 Test: binary_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"binary_execution" start time: Oct 26 09:15 PDT
+Output:
+----------------------------------------------------------
+Binary execution: 356 independent vectors; 19 processes passed (check, JIT/O2, linked AOT/O2, rejection checks)
+<end of output>
+Test time =  44.66 sec
+----------------------------------------------------------
+Test Passed.
+"binary_execution" end time: Oct 26 09:15 PDT
+"binary_execution" time elapsed: 00:00:44
+----------------------------------------------------------
+
+98/241 Testing: combined_ownership
+98/241 Test: combined_ownership
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_ownership" "/home/shmellyorc/Documents/Void.Language/tests/combined/ownership.void" "/home/shmellyorc/Documents/Void.Language/tests/combined/async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"combined_ownership" start time: Oct 26 09:15 PDT
+Output:
+----------------------------------------------------------
+268 installed public declarations documented
+normal: 351 allocation failure budgets passed across all derived errors and unwrap
+O2: 351 allocation failure budgets passed across all derived errors and unwrap
+Combined ownership/documentation: 4867 checks passed
+<end of output>
+Test time =  21.71 sec
+----------------------------------------------------------
+Test Passed.
+"combined_ownership" end time: Oct 26 09:16 PDT
+"combined_ownership" time elapsed: 00:00:21
+----------------------------------------------------------
+
+105/241 Testing: memory_ownership
+105/241 Test: memory_ownership
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_memory_ownership" "/home/shmellyorc/Documents/Void.Language/tests/memory/ownership.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"memory_ownership" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+normal scenario 0: 30 allocation failure budgets passed
+normal scenario 1: 90 allocation failure budgets passed
+normal scenario 2: 26 allocation failure budgets passed
+normal scenario 3: 32 allocation failure budgets passed
+normal scenario 4: 75 allocation failure budgets passed
+normal scenario 5: 67 allocation failure budgets passed
+normal scenario 6: 24 allocation failure budgets passed
+normal scenario 7: 5 allocation failure budgets passed
+normal scenario 8: 61 allocation failure budgets passed
+normal scenario 9: 28 allocation failure budgets passed
+normal scenario 10: 21 allocation failure budgets passed
+normal scenario 11: 44 allocation failure budgets passed
+normal scenario 12: 19 allocation failure budgets passed
+normal scenario 13: 20 allocation failure budgets passed
+normal: 542 failure budgets across 14 operations; atomic state and retry passed
+O2 scenario 0: 30 allocation failure budgets passed
+O2 scenario 1: 90 allocation failure budgets passed
+O2 scenario 2: 26 allocation failure budgets passed
+O2 scenario 3: 32 allocation failure budgets passed
+O2 scenario 4: 75 allocation failure budgets passed
+O2 scenario 5: 67 allocation failure budgets passed
+O2 scenario 6: 24 allocation failure budgets passed
+O2 scenario 7: 5 allocation failure budgets passed
+O2 scenario 8: 61 allocation failure budgets passed
+O2 scenario 9: 28 allocation failure budgets passed
+O2 scenario 10: 21 allocation failure budgets passed
+O2 scenario 11: 44 allocation failure budgets passed
+O2 scenario 12: 19 allocation failure budgets passed
+O2 scenario 13: 20 allocation failure budgets passed
+O2: 542 failure budgets across 14 operations; atomic state and retry passed
+Memory ownership: 10262 checks passed
+<end of output>
+Test time =   8.81 sec
+----------------------------------------------------------
+Test Passed.
+"memory_ownership" end time: Oct 26 09:16 PDT
+"memory_ownership" time elapsed: 00:00:08
+----------------------------------------------------------
+
+102/241 Testing: lsp_combined
+102/241 Test: lsp_combined
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/combined/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"lsp_combined" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+Combined LSP: 97 documentation, completion, signature and navigation assertions passed
+<end of output>
+Test time =   5.59 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_combined" end time: Oct 26 09:16 PDT
+"lsp_combined" time elapsed: 00:00:05
+----------------------------------------------------------
+
+97/241 Testing: lsp_const_recovery
+97/241 Test: lsp_const_recovery
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"lsp_const_recovery" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+Const/global completion recovery: 472 assertions passed
+<end of output>
+Test time =   3.70 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_const_recovery" end time: Oct 26 09:16 PDT
+"lsp_const_recovery" time elapsed: 00:00:03
+----------------------------------------------------------
+
+109/241 Testing: stage11_globals
+109/241 Test: stage11_globals
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_globals" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/stage11 native fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"stage11_globals" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+101 global checks passed
+<end of output>
+Test time =   2.58 sec
+----------------------------------------------------------
+Test Passed.
+"stage11_globals" end time: Oct 26 09:16 PDT
+"stage11_globals" time elapsed: 00:00:02
+----------------------------------------------------------
+
+104/241 Testing: lsp_memory
+104/241 Test: lsp_memory
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/memory/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"lsp_memory" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+Memory LSP: 156 completion, navigation, hover, constructor/method signature and documentation checks passed
+<end of output>
+Test time =   1.73 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_memory" end time: Oct 26 09:16 PDT
+"lsp_memory" time elapsed: 00:00:01
+----------------------------------------------------------
+
+96/241 Testing: binary_ownership
+96/241 Test: binary_ownership
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_binary_ownership" "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"binary_ownership" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+normal: 183 allocation failure budgets, collection and retry passed
+O2: 183 allocation failure budgets, collection and retry passed
+Binary ownership: 2253 checks passed
+<end of output>
+Test time =   1.14 sec
+----------------------------------------------------------
+Test Passed.
+"binary_ownership" end time: Oct 26 09:16 PDT
+"binary_ownership" time elapsed: 00:00:01
+----------------------------------------------------------
+
+83/241 Testing: runtime_callbacks
+83/241 Test: runtime_callbacks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_callbacks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"runtime_callbacks" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+callback provider quiescence, shutdown, self-drain, generated native roots/reentry, exceptions and code leases passed
+<end of output>
+Test time =   0.93 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_callbacks" end time: Oct 26 09:16 PDT
+"runtime_callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/241 Testing: runtime_coordination
+33/241 Test: runtime_coordination
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"runtime_coordination" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+NativeSafe rendezvous baseline (1000, one frozen object): mean 1.61824 us, max 16.86 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+<end of output>
+Test time =   2.06 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_coordination" end time: Oct 26 09:16 PDT
+"runtime_coordination" time elapsed: 00:00:02
+----------------------------------------------------------
+
+95/241 Testing: lsp_binary
+95/241 Test: lsp_binary
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"lsp_binary" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+Binary LSP: 81 import, completion, navigation, hover and active-parameter checks passed
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_binary" end time: Oct 26 09:16 PDT
+"lsp_binary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+90/241 Testing: lsp_stage11_globals
+90/241 Test: lsp_stage11_globals
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_globals.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"lsp_stage11_globals" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+<end of output>
+Test time =   0.16 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage11_globals" end time: Oct 26 09:16 PDT
+"lsp_stage11_globals" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/241 Testing: format_temporal
+9/241 Test: format_temporal
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_temporal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"format_temporal" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+1311 temporal core checks passed
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"format_temporal" end time: Oct 26 09:16 PDT
+"format_temporal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+100/241 Testing: combined_async_optimized
+100/241 Test: combined_async_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_async_optimized" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"combined_async_optimized" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"combined_async_optimized" end time: Oct 26 09:16 PDT
+"combined_async_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+99/241 Testing: combined_async_normal
+99/241 Test: combined_async_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_combined_async_normal" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"combined_async_normal" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"combined_async_normal" end time: Oct 26 09:16 PDT
+"combined_async_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+87/241 Testing: runtime_invariants
+87/241 Test: runtime_invariants
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/invariants.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_invariants"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"runtime_invariants" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+corrupt roots and frame order cannot resume managed execution
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_invariants" end time: Oct 26 09:16 PDT
+"runtime_invariants" time elapsed: 00:00:00
+----------------------------------------------------------
+
+84/241 Testing: runtime_failures
+84/241 Test: runtime_failures
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_runtime_failures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"runtime_failures" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_failures" end time: Oct 26 09:16 PDT
+"runtime_failures" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/241 Testing: stage10_hooks
+10/241 Test: stage10_hooks
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_stage10_hooks"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"stage10_hooks" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+77 nominal/custom display checks passed
+<end of output>
+Test time =   6.46 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_hooks" end time: Oct 26 09:16 PDT
+"stage10_hooks" time elapsed: 00:00:06
+----------------------------------------------------------
+
+15/241 Testing: format_zones
+15/241 Test: format_zones
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_format_zones"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"format_zones" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+2026e: 344 zones, 253 links, 1720 projections; embedded gap/overlap/history passed
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"format_zones" end time: Oct 26 09:16 PDT
+"format_zones" time elapsed: 00:00:00
+----------------------------------------------------------
+
+103/241 Testing: memory_execution
+103/241 Test: memory_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/memory/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"memory_execution" start time: Oct 26 09:14 PDT
+Output:
+----------------------------------------------------------
+Memory execution: 268 numeric/IEEE vectors, 64 model transitions, semantic fixture, 14 rejection cases; 35 processes passed (check, JIT/O2, linked AOT/O2)
+<end of output>
+Test time = 155.81 sec
+----------------------------------------------------------
+Test Passed.
+"memory_execution" end time: Oct 26 09:16 PDT
+"memory_execution" time elapsed: 00:02:35
+----------------------------------------------------------
+
+112/241 Testing: native_source
+112/241 Test: native_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_native_tests" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/native fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"native_source" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+native source passed
+<end of output>
+Test time =   9.62 sec
+----------------------------------------------------------
+Test Passed.
+"native_source" end time: Oct 26 09:16 PDT
+"native_source" time elapsed: 00:00:09
+----------------------------------------------------------
+
+113/241 Testing: stage6_integrated
+113/241 Test: stage6_integrated
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_native_tests" "--integrated" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/stage6 integrated fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"stage6_integrated" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+<end of output>
+Test time =  11.40 sec
+----------------------------------------------------------
+Test Passed.
+"stage6_integrated" end time: Oct 26 09:17 PDT
+"stage6_integrated" time elapsed: 00:00:11
+----------------------------------------------------------
+
+156/241 Testing: async_ir
+156/241 Test: async_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_async_tests" "--ir"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"async_ir" start time: Oct 26 09:17 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"async_ir" end time: Oct 26 09:17 PDT
+"async_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+157/241 Testing: async_parallel
+157/241 Test: async_parallel
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_async_tests" "--parallel" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/async parallel fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"async_parallel" start time: Oct 26 09:17 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   4.00 sec
+----------------------------------------------------------
+Test Passed.
+"async_parallel" end time: Oct 26 09:17 PDT
+"async_parallel" time elapsed: 00:00:03
+----------------------------------------------------------
+
+158/241 Testing: async_lifecycle
+158/241 Test: async_lifecycle
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_async_tests" "--lifecycle" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/async lifecycle fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"async_lifecycle" start time: Oct 26 09:17 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   6.74 sec
+----------------------------------------------------------
+Test Passed.
+"async_lifecycle" end time: Oct 26 09:17 PDT
+"async_lifecycle" time elapsed: 00:00:06
+----------------------------------------------------------
+
+155/241 Testing: async_source
+155/241 Test: async_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_async_tests" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/async fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+"async_source" start time: Oct 26 09:16 PDT
+Output:
+----------------------------------------------------------
+async activations passed
+<end of output>
+Test time =  18.98 sec
+----------------------------------------------------------
+Test Passed.
+"async_source" end time: Oct 26 09:17 PDT
+"async_source" time elapsed: 00:00:18
+----------------------------------------------------------
+
+End testing: Oct 26 09:17 PDT

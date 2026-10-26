@@ -87,7 +87,7 @@ target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROO
 target_link_libraries(void_core PUBLIC void_options Threads::Threads)
 add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
 target_link_libraries(void_native_fixture PRIVATE void_options)
-add_library(void_runtime STATIC src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+add_library(void_runtime STATIC src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
 target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
 option(VOID_LLVM_RESEARCH "Build optional LLVM machine-code certification experiments" OFF)
@@ -776,6 +776,156 @@ if(BUILD_TESTING)
       add_test(NAME native_aot_${fixture}_${mode} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/async/aot.py" "$<TARGET_FILE:void_native_aot_${fixture}_${mode}>" "${native_answer}")
     endforeach()
   endforeach()
+
+  add_executable(void_io_ownership tests/io/ownership.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_io_ownership PRIVATE void_llvm void_cache_identity)
+  add_test(NAME io_ownership COMMAND void_io_ownership
+    "${PROJECT_SOURCE_DIR}/tests/io/ownership.void" "${PROJECT_SOURCE_DIR}/tests/io/ownership_async.void")
+  set_tests_properties(io_ownership PROPERTIES TIMEOUT 600)
+
+  add_test(NAME io_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(io_execution PROPERTIES TIMEOUT 600)
+  add_test(NAME io_async_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py"
+    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_io_runner>" --async)
+  set_tests_properties(io_async_execution PROPERTIES TIMEOUT 600)
+  set(io_wire_source "${CMAKE_CURRENT_BINARY_DIR}/io-wire.void")
+  add_custom_command(OUTPUT "${io_wire_source}"
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" --generate-async "${io_wire_source}"
+    DEPENDS "${PROJECT_SOURCE_DIR}/tests/io/execution.py" VERBATIM)
+  foreach(mode IN ITEMS normal optimized)
+    set(io_wire_object "${CMAKE_CURRENT_BINARY_DIR}/io-wire-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${io_wire_object}"
+      COMMAND void_io_runner --emit-async "${io_wire_source}" "${io_wire_object}" "${mode}"
+      DEPENDS void_io_runner "${io_wire_source}" "${PROJECT_SOURCE_DIR}/stdlib/io.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/path.void" "${PROJECT_SOURCE_DIR}/stdlib/encoding/binary.void"
+      VERBATIM)
+    set_source_files_properties("${io_wire_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_io_wire_${mode} tests/async/aot.cpp "${io_wire_object}")
+    target_link_libraries(void_io_wire_${mode} PRIVATE void_runtime)
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io wire ${mode}")
+    add_test(NAME io_wire_${mode} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/async/aot.py" "$<TARGET_FILE:void_io_wire_${mode}>" 7)
+    set_tests_properties(io_wire_${mode} PROPERTIES
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io wire ${mode}" TIMEOUT 180)
+  endforeach()
+
+  add_test(NAME lsp_io COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/lsp.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_io PROPERTIES TIMEOUT 180)
+  if(UNIX AND NOT VOID_SANITIZERS)
+    add_test(NAME io_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "$<TARGET_FILE:voidc>" --small-stack)
+    set_tests_properties(io_stack PROPERTIES TIMEOUT 600)
+    add_test(NAME io_async_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_io_runner>" --async --small-stack)
+    set_tests_properties(io_async_stack PROPERTIES TIMEOUT 600)
+    add_test(NAME lsp_io_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/lsp.py"
+      "$<TARGET_FILE:voidls>" --small-stack)
+    set_tests_properties(lsp_io_stack PROPERTIES TIMEOUT 180)
+  endif()
+
+  add_executable(void_io_native tests/io/native.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_io_native PRIVATE void_llvm void_cache_identity)
+  add_test(NAME io_native_responsiveness COMMAND void_io_native "${PROJECT_SOURCE_DIR}/tests/io/responsive.void")
+  set_tests_properties(io_native_responsiveness PROPERTIES TIMEOUT 180)
+  add_test(NAME io_native_close_failure COMMAND void_io_native --close-failure "${PROJECT_SOURCE_DIR}/tests/io/close_failure.void")
+  add_test(NAME io_native_shutdown COMMAND void_io_native --shutdown "${PROJECT_SOURCE_DIR}/tests/io/shutdown.void")
+  set_tests_properties(io_native_close_failure io_native_shutdown PROPERTIES TIMEOUT 180)
+  add_test(NAME io_native_opening_shutdown COMMAND void_io_native --opening-shutdown
+    "${PROJECT_SOURCE_DIR}/tests/io/opening.void")
+  set_tests_properties(io_native_opening_shutdown PROPERTIES TIMEOUT 180)
+  add_test(NAME io_native_whole_shutdown COMMAND void_io_native --opening-shutdown
+    "${PROJECT_SOURCE_DIR}/tests/io/opening_whole.void")
+  set_tests_properties(io_native_whole_shutdown PROPERTIES TIMEOUT 180)
+
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io responsive" "${CMAKE_CURRENT_BINARY_DIR}/io pending")
+  set_tests_properties(io_native_responsiveness PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io responsive")
+  add_test(NAME io_native_pending_close COMMAND void_io_native "${PROJECT_SOURCE_DIR}/tests/io/pending.void")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io cancelled")
+  add_test(NAME io_native_cancelled COMMAND void_io_native "${PROJECT_SOURCE_DIR}/tests/io/cancelled.void")
+  set_tests_properties(io_native_cancelled PROPERTIES TIMEOUT 180
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io cancelled")
+  set_tests_properties(io_native_pending_close PROPERTIES TIMEOUT 180
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io pending")
+
+  foreach(mode IN ITEMS normal optimized)
+    set(io_probe_object "${CMAKE_CURRENT_BINARY_DIR}/io-probe-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    set(io_probe_adapter "${io_probe_object}.cpp")
+    add_custom_command(OUTPUT "${io_probe_object}" "${io_probe_adapter}"
+      COMMAND void_io_runner --emit-probe "${PROJECT_SOURCE_DIR}/tests/io/responsive.void" "${io_probe_object}" "${mode}"
+      DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/tests/io/responsive.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/io.void" "${PROJECT_SOURCE_DIR}/stdlib/path.void"
+      VERBATIM)
+    set_source_files_properties("${io_probe_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_io_probe_${mode} tests/io/native.cpp tests/managed/probe.cpp
+      $<TARGET_OBJECTS:void_managed_test_abi> "${io_probe_object}" "${io_probe_adapter}")
+    target_compile_definitions(void_io_probe_${mode} PRIVATE IO_AOT_PROBE=1)
+    target_link_libraries(void_io_probe_${mode} PRIVATE void_runtime)
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io probe ${mode}")
+    add_test(NAME io_probe_${mode} COMMAND void_io_probe_${mode})
+    set_tests_properties(io_probe_${mode} PROPERTIES
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io probe ${mode}" TIMEOUT 60)
+  endforeach()
+
+
+  add_executable(void_io_runner tests/io/runner.cpp)
+  target_link_libraries(void_io_runner PRIVATE void_llvm void_cache_identity)
+  add_test(NAME io_async_source COMMAND void_io_runner --async "${PROJECT_SOURCE_DIR}/tests/io/async.void")
+  set_tests_properties(io_async_source PROPERTIES TIMEOUT 180)
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io errors")
+  add_test(NAME io_errors_source COMMAND void_io_runner --sync "${PROJECT_SOURCE_DIR}/tests/io/errors.void")
+  set_tests_properties(io_errors_source PROPERTIES TIMEOUT 180
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io errors")
+  set(io_errors_async "${CMAKE_CURRENT_BINARY_DIR}/io-errors-async.void")
+  add_custom_command(OUTPUT "${io_errors_async}"
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" --generate-errors-async "${io_errors_async}"
+    DEPENDS "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "${PROJECT_SOURCE_DIR}/tests/io/errors.void" VERBATIM)
+  add_custom_target(void_io_error_fixture DEPENDS "${io_errors_async}")
+  add_dependencies(void_io_runner void_io_error_fixture)
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async errors")
+  add_test(NAME io_errors_async COMMAND void_io_runner --async "${io_errors_async}")
+  set_tests_properties(io_errors_async PROPERTIES TIMEOUT 180
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async errors")
+  add_test(NAME io_examples_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/examples.py"
+    "$<TARGET_FILE:voidc>" "${CMAKE_CURRENT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/examples/io/filesystem.void" "$<CONFIG>")
+  set_tests_properties(io_examples_install PROPERTIES TIMEOUT 600)
+
+  add_test(NAME io_async_acquisition COMMAND void_io_runner --async "${PROJECT_SOURCE_DIR}/tests/io/acquisition.void")
+  set_tests_properties(io_async_acquisition PROPERTIES TIMEOUT 180)
+  foreach(mode IN ITEMS normal optimized)
+    set(io_async_object "${CMAKE_CURRENT_BINARY_DIR}/io-async-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${io_async_object}"
+      COMMAND void_io_runner --emit-async "${PROJECT_SOURCE_DIR}/tests/io/async.void" "${io_async_object}" "${mode}"
+      DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/tests/io/async.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/io.void" "${PROJECT_SOURCE_DIR}/stdlib/path.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/encoding/binary.void"
+      VERBATIM)
+    set_source_files_properties("${io_async_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_io_async_${mode} tests/async/aot.cpp "${io_async_object}")
+    target_link_libraries(void_io_async_${mode} PRIVATE void_runtime)
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async ${mode}")
+    add_test(NAME io_async_${mode} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/async/aot.py" "$<TARGET_FILE:void_io_async_${mode}>" 7)
+    set_tests_properties(io_async_${mode} PROPERTIES
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async ${mode}" TIMEOUT 180)
+  endforeach()
+
+
+  add_executable(void_io_native_jobs tests/io/native_jobs.cpp)
+  target_link_libraries(void_io_native_jobs PRIVATE void_runtime)
+  add_test(NAME io_native_jobs COMMAND void_io_native_jobs)
+  set_tests_properties(io_native_jobs PROPERTIES TIMEOUT 60)
+
+  add_executable(void_io_kernel tests/io/kernel.cpp)
+  target_link_libraries(void_io_kernel PRIVATE void_runtime)
+  add_test(NAME io_kernel COMMAND void_io_kernel "${CMAKE_CURRENT_BINARY_DIR}/io kernel fixtures")
+  set_tests_properties(io_kernel PROPERTIES TIMEOUT 60)
+
+  add_executable(void_io_ir tests/io/ir.cpp)
+  target_link_libraries(void_io_ir PRIVATE void_core)
+  add_test(NAME io_ir COMMAND void_io_ir "${PROJECT_SOURCE_DIR}/tests/io/ownership.void")
+  set_tests_properties(io_ir PROPERTIES TIMEOUT 60)
+  add_test(NAME io_cross_volume COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/cross_volume.py"
+    "$<TARGET_FILE:voidc>" "${CMAKE_CURRENT_BINARY_DIR}")
+  set_tests_properties(io_cross_volume PROPERTIES TIMEOUT 180 SKIP_RETURN_CODE 77)
 
   add_executable(void_async_tests tests/async/tests.cpp tests/async/parallel.cpp tests/async/ir.cpp tests/async/lifecycle.cpp tests/async/lifetime.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_async_tests PRIVATE void_llvm void_cache_identity)

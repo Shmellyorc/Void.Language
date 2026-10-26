@@ -276,6 +276,20 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (e.target == "$convert.unwrap") {
                     view = ir::field_facts(e.parts[0]->type, arguments[0], 1);
                 }
+                if (e.target.starts_with("$io.")) {
+                    bool asynchronous = e.target.starts_with("$io.async.");
+                    auto operation = std::stoul(e.target.substr(asynchronous ? 10 : 9));
+                    const auto& contract = filesystem::source_operations.at(operation);
+                    for (unsigned n = 0; n < arguments.size(); ++n) {
+                        if (contract.arguments[n] != 'F') continue;
+                        if (auto leaf = arguments[n].find({}); leaf != arguments[n].end()) {
+                            effect(f.reference_effects.mutations, leaf->second);
+                            if (report && leaf->second.readonly) {
+                                issue(e.token, "Cannot mutate a file through readonly authority.");
+                            }
+                        }
+                    }
+                }
                 if (e.target == "$memory.write") {
                     if (auto leaf = arguments[0].find({}); leaf != arguments[0].end()) {
                         effect(f.reference_effects.mutations, leaf->second);

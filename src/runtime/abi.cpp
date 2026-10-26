@@ -69,13 +69,14 @@ void Runtime::require_globals_ready() const {
     if (global_state_ != 2 || global_owner_ != std::this_thread::get_id())
         throw std::logic_error("Selected entry cannot run before global initialization completes on its owner thread");
 }
-void Runtime::cleanup_failed_globals() {
+std::error_code Runtime::cleanup_failed_globals() {
     if (current_runtime_ == this && is_managed()) throw std::logic_error("Global failure cleanup requires NativeSafe state");
-    { std::lock_guard lock(mutex_); if (global_state_ != 3) return; }
-    native_shutdown(*this);
+    { std::lock_guard lock(mutex_); if (global_state_ != 3) return {}; }
+    auto error = native_shutdown(*this);
     std::vector<std::unique_ptr<Handle>> roots;
     { std::lock_guard lock(mutex_); roots.swap(globals_); }
     roots.clear();
+    return error;
 }
 void Runtime::display_enter(std::string_view hook,void* identity) {
     auto& active=thread().display_hooks;

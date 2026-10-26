@@ -1,0 +1,29 @@
+use io
+use path
+use encoding/binary
+
+async func exercise() -> result<i32, io.error>:
+    with (await io.open_async("io ownership.bin", io.open_mode.create, binary.byte_order.big))? as handle:
+        var alias = handle
+        var count = (await handle.write_pascal_string_async("owned 雪"))?
+        var beginning = (await alias.seek_async(0))?
+        var text = (await handle.read_pascal_string_async())?
+
+        if text != "owned 雪" or count != 13:
+            return Ok(1)
+
+        var cursor = (await alias.position_async())?
+
+        if cursor != 13:
+            return Ok(2)
+
+        var closed = (await handle.close_async())?
+        return Ok(7)
+
+async func entry(input: i32) -> i32:
+    var outcome = await exercise()
+
+    if outcome is Ok(var answer):
+        return answer
+
+    return 99

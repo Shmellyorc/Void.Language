@@ -1,0 +1,73 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+      Start 135: io_ownership
+      Start 136: io_execution
+ 1/27 Test #135: io_ownership .....................   Passed   29.83 sec
+      Start 137: io_async_execution
+ 2/27 Test #137: io_async_execution ...............***Failed   55.73 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 255, in <module>
+    main()
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 209, in main
+    run([runner, '--async', fixture], root, expected=None)
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 24, in run
+    assert result.returncode == expected_status, (arguments, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner'), '--async', PosixPath('/tmp/VOID io async wire 1icf1laa/main.void')], -11, b'', b'')
+
+      Start 138: io_wire_normal
+ 3/27 Test #138: io_wire_normal ...................   Passed    0.12 sec
+      Start 139: io_wire_optimized
+ 4/27 Test #139: io_wire_optimized ................   Passed    0.11 sec
+      Start 140: lsp_io
+ 5/27 Test #140: lsp_io ...........................   Passed    0.94 sec
+      Start 141: io_stack
+ 6/27 Test #136: io_execution .....................   Passed  133.16 sec
+      Start 142: io_async_stack
+ 7/27 Test #141: io_stack .........................   Passed  148.34 sec
+      Start 143: lsp_io_stack
+ 8/27 Test #143: lsp_io_stack .....................   Passed    1.41 sec
+      Start 144: io_native_responsiveness
+ 9/27 Test #144: io_native_responsiveness .........   Passed   17.76 sec
+      Start 145: io_native_close_failure
+10/27 Test #142: io_async_stack ...................   Passed  132.06 sec
+      Start 146: io_native_shutdown
+11/27 Test #145: io_native_close_failure ..........   Passed   16.75 sec
+      Start 147: io_native_pending_close
+12/27 Test #146: io_native_shutdown ...............   Passed   14.74 sec
+      Start 148: io_native_cancelled
+13/27 Test #147: io_native_pending_close ..........   Passed   14.69 sec
+      Start 149: io_probe_normal
+14/27 Test #149: io_probe_normal ..................   Passed    0.03 sec
+      Start 150: io_probe_optimized
+15/27 Test #150: io_probe_optimized ...............   Passed    0.03 sec
+      Start 151: io_async_source
+16/27 Test #148: io_native_cancelled ..............   Passed   14.60 sec
+      Start 152: io_errors_source
+17/27 Test #151: io_async_source ..................   Passed   26.26 sec
+      Start 153: io_errors_async
+18/27 Test #152: io_errors_source .................   Passed   23.99 sec
+      Start 154: io_examples_install
+19/27 Test #153: io_errors_async ..................   Passed   28.37 sec
+      Start 155: io_async_acquisition
+20/27 Test #155: io_async_acquisition .............   Passed    0.31 sec
+      Start 156: io_async_normal
+21/27 Test #156: io_async_normal ..................   Passed    0.08 sec
+      Start 157: io_async_optimized
+22/27 Test #157: io_async_optimized ...............   Passed    0.06 sec
+      Start 158: io_native_jobs
+23/27 Test #158: io_native_jobs ...................   Passed    0.01 sec
+      Start 159: io_kernel
+24/27 Test #159: io_kernel ........................   Passed    0.05 sec
+      Start 160: io_ir
+25/27 Test #160: io_ir ............................   Passed    0.63 sec
+      Start 161: io_cross_volume
+26/27 Test #161: io_cross_volume ..................   Passed   17.17 sec
+27/27 Test #154: io_examples_install ..............   Passed   65.91 sec
+
+96% tests passed, 1 tests failed out of 27
+
+Total Test time (real) = 384.46 sec
+
+The following tests FAILED:
+	137 - io_async_execution (Failed)
+Errors while running CTest

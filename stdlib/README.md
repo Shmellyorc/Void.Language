@@ -1,5 +1,50 @@
 # Standard library
 
+`use io` provides owned file handles, bounded whole-file bytes/UTF-8 reads,
+write/append, metadata, file and directory copy/move/removal, symbolic links and
+filtered recursive directory lookup. `get_files(directory, "*.bin", true)` and
+`get_directories(directory, "save*", true)` return ordinary owned arrays.
+`entries` returns type, name, size and modification metadata, including links.
+Every blocking operation has a paired `_async` API backed by the existing bounded
+native worker queue. Await entered work before closing; conflicting aliases
+receive `busy`. Cancellation drains an entered syscall before cleanup.
+
+`use path` supplies host-aware joining, lexical normalization, filename/stem/
+extension/parent/root extraction, extension replacement and absolute/relative
+conversion. These operations do not resolve symlinks or establish existence.
+Both modules use recoverable `io.error`, derived from the common error base.
+Errors preserve native codes, actual transfer progress, owned partial bytes and
+cleanup failures. Writes and recursive mutations can leave partial changes.
+
+```void
+use io
+use path
+use encoding/binary
+
+func save(score: i32) -> result<i64, io.error>:
+    var name = path.join(["saves", "player.bin"])?
+    var made = io.create_directories("saves")?
+
+    with io.open(name, io.open_mode.create, binary.byte_order.big)? as handle:
+        var written = handle.write(score)?
+        return handle.write_pascal_string("雪")
+```
+
+File aliases share one logical cursor and closed state. File construction uses
+`open`/`open_async`; close is idempotent. Scope disposal is synchronous: explicitly
+await `close_async()` before leaving an async scope when disposal must stay off
+the owner. GC does not invoke source destructors; forgotten handles remain owned
+by their Runtime until shutdown. Append writes always select EOF, even after a
+seek. File seeks may pass EOF; memory seeks stay within existing data.
+
+File numeric/raw/Pascal methods match memory wire representations and reuse
+`encoding/binary`. Pascal prefixes count UTF-8 bytes as a u32 in the selected byte
+order. Raw strings have no implicit framing or newline. Text decoding is strict.
+Whole-file and line reads default to a configurable 64 MiB budget. Enumeration
+defaults to 100,000 inspected entries and never intentionally traverses links.
+See the [full contract](../docs/io/CONTRACT.md), [API audit](../docs/io/API.md) and
+[executable configuration/save/asset example](../examples/io/filesystem.void).
+
 `use error as core` exposes the three-field managed `core.error` base. Every
 installed module uses a derived public recoverable error; result error types
 remain exact. `use convert` provides checked numeric/Boolean/payload-free-enum

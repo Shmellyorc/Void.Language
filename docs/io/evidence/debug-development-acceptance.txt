@@ -1,0 +1,134 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start 135: io_ownership
+      Start 151: io_errors_async
+ 1/25 Test #151: io_errors_async ..................   Passed   37.66 sec
+      Start 149: io_async_source
+ 2/25 Test #135: io_ownership .....................***Failed   40.20 sec
+149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+I/O retained unreachable roots after completion/failure
+
+      Start 144: io_native_shutdown
+ 3/25 Test #144: io_native_shutdown ...............   Passed   24.44 sec
+      Start 146: io_native_cancelled
+ 4/25 Test #149: io_async_source ..................   Passed   37.58 sec
+      Start 143: io_native_close_failure
+ 5/25 Test #146: io_native_cancelled ..............   Passed   23.17 sec
+      Start 145: io_native_pending_close
+ 6/25 Test #143: io_native_close_failure ..........   Passed   21.41 sec
+      Start 142: io_native_responsiveness
+ 7/25 Test #145: io_native_pending_close ..........   Passed   21.73 sec
+      Start 157: io_kernel
+ 8/25 Test #157: io_kernel ........................   Passed    0.14 sec
+      Start 147: io_probe_normal
+ 9/25 Test #147: io_probe_normal ..................   Passed    0.05 sec
+      Start 148: io_probe_optimized
+10/25 Test #148: io_probe_optimized ...............   Passed    0.04 sec
+      Start 156: io_native_jobs
+11/25 Test #156: io_native_jobs ...................   Passed    0.03 sec
+      Start 136: io_execution
+12/25 Test #142: io_native_responsiveness .........   Passed   21.13 sec
+      Start 137: io_async_execution
+13/25 Test #137: io_async_execution ...............   Passed   92.15 sec
+      Start 138: io_wire_normal
+14/25 Test #138: io_wire_normal ...................   Passed    0.47 sec
+      Start 139: io_wire_optimized
+15/25 Test #136: io_execution .....................***Failed  100.73 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 254, in <module>
+    main()
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 232, in main
+    run(arguments, cwd, expected=None)
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 23, in run
+    assert (result.returncode == 0) == success, (arguments, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc'), 'build', PosixPath('/tmp/VOID io source 267u2ij7/main.void'), '-o', PosixPath('/tmp/VOID io source 267u2ij7/native-optimized/io')], 1, b'', b'/home/shmellyorc/Documents/Void.Language/stdlib/io.void:386:30: error: Type mismatch: expected i64, received i32.\n    code: VOID2001\n\n 386 |     if allow_closed and code == _code(error_kind.closed):\n     |                              ^^\n    Module: /@stdlib/io.void\n    Expected: i64\n    Received: i32\n\n')
+
+      Start 140: lsp_io
+16/25 Test #139: io_wire_optimized ................   Passed    0.45 sec
+      Start 141: io_stack
+17/25 Test #140: lsp_io ...........................***Failed    0.52 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py", line 70, in <module>
+    check(all(not note['diagnostics'] for note in notes), notes)
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/lsp.py", line 18, in check
+    assert value, message
+           ^^^^^
+AssertionError: [{'diagnostics': [{'code': 'VOID2001', 'message': 'Type mismatch: expected i64, received i32.', 'range': {'end': {'character': 31, 'line': 385}, 'start': {'character': 29, 'line': 385}}, 'severity': 1, 'source': 'VOID'}], 'uri': 'file:///home/shmellyorc/Documents/Void.Language/stdlib/io.void'}, {'diagnostics': [{'code': 'VOID2001', 'message': 'Type mismatch: expected i64, received i32.', 'range': {'end': {'character': 31, 'line': 385}, 'start': {'character': 29, 'line': 385}}, 'severity': 1, 'source': 'VOID'}], 'uri': 'file:///home/shmellyorc/Documents/Void.Language/stdlib/io.void'}, {'diagnostics': [], 'uri': 'file:///tmp/VOID%20io%20LSP%20as4zrw05/main.void'}]
+
+      Start 150: io_errors_source
+18/25 Test #141: io_stack .........................***Failed    0.28 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 254, in <module>
+    main()
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 219, in main
+    run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n')
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py", line 23, in run
+    assert (result.returncode == 0) == success, (arguments, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc'), 'check', PosixPath('/tmp/VOID io source ue74bg82/main.void')], 1, b'', b'/home/shmellyorc/Documents/Void.Language/stdlib/io.void:386:30: error: Type mismatch: expected i64, received i32.\n    code: VOID2001\n\n 386 |     if allow_closed and code == _code(error_kind.closed):\n     |                              ^^\n    Module: /@stdlib/io.void\n    Expected: i64\n    Received: i32\n\n')
+
+      Start 152: io_examples_install
+19/25 Test #150: io_errors_source .................***Failed    0.17 sec
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:386:30: error: Type mismatch: expected i64, received i32.
+    code: VOID2001
+
+ 386 |     if allow_closed and code == _code(error_kind.closed):
+     |                              ^^
+    Module: /@stdlib/io.void
+    Expected: i64
+    Received: i32
+
+
+      Start 153: io_async_acquisition
+20/25 Test #152: io_examples_install ..............***Failed    0.21 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/examples.py", line 34, in <module>
+    run(arguments, cwd)
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/examples.py", line 18, in run
+    assert result.returncode == 0, (arguments, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc'), 'run', PosixPath('/tmp/VOID io examples install f2fv6r5g/main.void'), '--no-opt'], b'', b'/home/shmellyorc/Documents/Void.Language/stdlib/io.void:386:30: error: Type mismatch: expected i64, received i32.\n    code: VOID2001\n\n 386 |     if allow_closed and code == _code(error_kind.closed):\n     |                              ^^\n    Module: /@stdlib/io.void\n    Expected: i64\n    Received: i32\n\n')
+
+      Start 154: io_async_normal
+21/25 Test #154: io_async_normal ..................   Passed    0.10 sec
+      Start 155: io_async_optimized
+22/25 Test #155: io_async_optimized ...............   Passed    0.10 sec
+      Start 158: io_ir
+23/25 Test #153: io_async_acquisition .............   Passed    0.41 sec
+      Start 159: io_cross_volume
+24/25 Test #158: io_ir ............................***Failed    0.21 sec
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:386:30: error: Type mismatch: expected i64, received i32.
+    code: VOID2001
+
+ 386 |     if allow_closed and code == _code(error_kind.closed):
+     |                              ^^
+    Module: /@stdlib/io.void
+    Expected: i64
+    Received: i32
+
+
+25/25 Test #159: io_cross_volume ..................***Failed    0.20 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/io/cross_volume.py", line 68, in <module>
+    assert result.returncode == 0, (result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (b'', b'/home/shmellyorc/Documents/Void.Language/stdlib/io.void:386:30: error: Type mismatch: expected i64, received i32.\n    code: VOID2001\n\n 386 |     if allow_closed and code == _code(error_kind.closed):\n     |                              ^^\n    Module: /@stdlib/io.void\n    Expected: i64\n    Received: i32\n\n')
+
+
+68% tests passed, 8 tests failed out of 25
+
+Total Test time (real) = 211.83 sec
+
+The following tests FAILED:
+	135 - io_ownership (Failed)
+	136 - io_execution (Failed)
+	140 - lsp_io (Failed)
+	141 - io_stack (Failed)
+	150 - io_errors_source (Failed)
+	152 - io_examples_install (Failed)
+	158 - io_ir (Failed)
+	159 - io_cross_volume (Failed)
+Errors while running CTest

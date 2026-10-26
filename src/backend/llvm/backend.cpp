@@ -12,6 +12,8 @@
 #include "void/numeric.hpp"
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
+#include "void/filesystem_ops.hpp"
+#include "void/filesystem_abi.hpp"
 #include "void/format.hpp"
 #include "void/temporal.hpp"
 #include "void/runtime_abi.hpp"
@@ -1237,6 +1239,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     b.CreateCall(module->getOrInsertFunction("vd_console_print",b.getVoidTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt1Ty(),b.getPtrTy()),{values[instruction.a],role,values[instruction.b],failure});
                     selected_failure();v=llvm::UndefValue::get(b.getInt8Ty());break;
                 }
+#include "filesystem.inc"
                 case Op::console_native: {
                     auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());auto* words_type=llvm::ArrayType::get(b.getInt64Ty(),8);
@@ -1733,6 +1736,8 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
         return std::move(object);
     });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_filesystem_call", vd_filesystem_call);
+    bind("vd_file_control", vd_file_control);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
     bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);

@@ -1,0 +1,37 @@
+struct counter:
+    disposed: i32 = 0
+
+struct resource:
+    state: counter
+
+func (self resource) deinit():
+    self.state.disposed += 1
+
+func acquire(state: counter, fail: bool) -> result<resource, i32>:
+    if fail:
+        return Err(3)
+
+    return Ok(resource(state = state))
+
+async func ready(value: i32) -> i32:
+    return value
+
+async func use_resource(state: counter, fail: bool) -> result<i32, i32>:
+    with acquire(state, fail)? as held:
+        var job = ready(7)
+        return Ok(await job)
+
+async func entry(input: i32) -> i32:
+    var state = counter()
+    var rejected = await use_resource(state, true)
+
+    if not (rejected is Err(var reason)) or state.disposed != 0:
+        return 1
+
+    var accepted = await use_resource(state, false)
+
+    if accepted is Ok(var value):
+        if value == 7 and state.disposed == 1:
+            return 7
+
+    return 2

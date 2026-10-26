@@ -1,5 +1,18 @@
 # VOID documentation
 
+## File I/O and filesystem sprint — 26 October 2026
+
+Boss authorized complete `io` and `path` modules from `084fe1eb`, including real
+native async jobs, recursive filtered directory lookup and practical host paths.
+The [contract](io/CONTRACT.md), [public API completeness audit](io/API.md) and
+[engineering record](io/IMPLEMENTATION.md) cover this scope. The
+[Golden Wrench handoff](io/HANDOFF.md) records **182/182** final selected local
+tests passing, the earlier unresolved Release SIGSEGV and native-platform limits.
+This is not an acceptance lock. `os` and application-data discovery
+remain future work. Root README and `stdlib/console.void` remain untouched.
+No hosted CI or Git mutation is authorized. Stop for Golden Wrench source review
+after the completed local completeness audit; implementation work has stopped.
+
 ## Combined standard-library sprint — 26 October 2026
 
 Boss authorized the error hierarchy, console completeness, convert module and

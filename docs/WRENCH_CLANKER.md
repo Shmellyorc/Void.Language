@@ -1,5 +1,19 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Current file I/O and path sprint — 26 October 2026
+
+Boss authorizes the complete `io`/`path` scope from `084fe1eb`. The
+[contract](io/CONTRACT.md), [API audit](io/API.md) and
+[implementation/evidence record](io/IMPLEMENTATION.md) define current work.
+The [handoff](io/HANDOFF.md) records the completed local audit and **182/182**
+selected final tests passing: Debug 63/63, Release 63/63, strict sanitizers 56/56.
+An earlier Release async wire SIGSEGV remains unexplained despite two passing
+debugger attempts; it is not claimed fixed. No acceptance lock is claimed.
+Native Windows/macOS execution remains unverified. No `os`, hosted CI, Git mutation, root README or console
+source change is authorized. The next gate is Golden Wrench source review after
+local completion; implementation work has stopped at that review gate. Earlier
+locks below remain historical and unchanged.
+
 ## Documentation/hover repair: OFFICIALLY ACCEPTED AND LOCKED, 26 October 2026
 
 **Boss confirms Golden Wrench source review and final hosted acceptance** at tested

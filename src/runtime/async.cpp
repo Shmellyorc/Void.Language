@@ -40,7 +40,7 @@ struct Diagnostic {
 struct Task;
 struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;};
 struct Task {
-    enum State { prepared,ready,running,waiting,joining,working,finished } state=prepared;
+    enum State { prepared,ready,running,waiting,joining,working,finishing,finished } state=prepared;
     enum Outcome { success,cancelled,failed } outcome=success;
     vd::Runtime::Handle task,frame;
     void* address=nullptr;
@@ -56,6 +56,8 @@ struct Task {
         bool cancelled=false,draining=false,completed=false;
         unsigned cleanup_depth=0;
         Diagnostic failure;
+        std::shared_ptr<vd::NativeJob> native;
+        bool abandoning = false;
     };
     std::unique_ptr<Work> work;
     Task* next_worker=nullptr;
@@ -101,8 +103,20 @@ struct Scope {
                 // cleanup on this worker, independently of the executor's TLS.
                 vd::NativeCode::LeaseScope failure_scope({});
                 worker_task=task;vd::RuntimeFailure failure;
-                task->resume(task->frame.get(),&failure);
-                if(!failure.message && !task->work->completed)failure.message="Worker returned without checked completion";
+                if (task->work->native) {
+                    vd::Runtime::Native safe(runtime);
+                    if (task->work->abandoning) {
+                        task->work->native->abandon(&failure);
+                    } else if (task->cancel_requested.load(std::memory_order_relaxed)) {
+                        task->work->native->cancel_queued();
+                        task->work->cancelled = true;
+                    } else {
+                        task->work->native->execute(task->cancel_requested, &failure);
+                    }
+                } else {
+                    task->resume(task->frame.get(),&failure);
+                    if(!failure.message && !task->work->completed)failure.message="Worker returned without checked completion";
+                }
                 task->work->failure.assign(failure);worker_task=nullptr;
                 // Only the executor reads the private payload after this release.
                 {std::lock_guard lock(work_mutex);task->work->done.store(true,std::memory_order_release);}work_changed.notify_all();
@@ -122,6 +136,10 @@ struct Scope {
     bool work_pending() const noexcept {for(const auto& task:tasks)if(task->state==Task::working)return true;return false;}
     void receive() noexcept {
         for(auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire)){
+            if (task->work->native) {
+                receive_native(*task);
+                continue;
+            }
             task->state=Task::finished;const auto& failure=task->work->failure.value;
             if(failure.message){task->failure.assign(failure);task->outcome=task->work->cancelled?Task::cancelled:Task::failed;if(task->outcome==Task::cancelled)task->failure.value={};}
             else{std::int32_t complete=1;std::memcpy(task->address,&complete,sizeof(complete));}
@@ -129,6 +147,81 @@ struct Scope {
             // The acquire handoff proves the worker has returned from resume,
             // removed its scratch roots and stopped accessing this frame.
             task->frame.reset(nullptr);
+        }
+    }
+    void abandon(Task& task) noexcept {
+        task.work->abandoning = true;
+        task.work->done.store(false, std::memory_order_relaxed);
+        // Workers were admitted before this resource could be acquired. Reuse
+        // the completed job and intrusive queue; cleanup cannot allocate.
+        task.state = Task::working;
+        task.next_worker = nullptr;
+        {
+            std::lock_guard lock(work_mutex);
+            if (work_tail) work_tail->next_worker = &task;
+            else work_head = &task;
+            work_tail = &task;
+        }
+        work_changed.notify_one();
+    }
+    void receive_native(Task& task) noexcept {
+        auto& work = *task.work;
+        if (work.failure.value.message) {
+            if (task.failure.value.message) task.failure.append(work.failure.value);
+            else task.failure.assign(work.failure.value);
+            task.outcome = Task::failed;
+        }
+        if (!work.abandoning && task.outcome != Task::failed) {
+            if (work.cancelled || task.cancel_requested.load(std::memory_order_relaxed)) {
+                task.outcome = Task::cancelled;
+            } else {
+                try {
+                    work.native->publish(runtime, task.address);
+                } catch (const std::bad_alloc&) {
+                    vd::RuntimeFailure failure;
+                    failure.message = "Native job result allocation failed";
+                    task.failure.assign(failure);
+                    task.outcome = Task::failed;
+                } catch (...) {
+                    vd::RuntimeFailure failure;
+                    failure.message = "Native job result publication failed";
+                    task.failure.assign(failure);
+                    task.outcome = Task::failed;
+                }
+            }
+        }
+        if (!work.abandoning && task.outcome != Task::success && work.native->acquired()) {
+            abandon(task);
+            return;
+        }
+        task.state = Task::finished;
+        if (task.outcome == Task::success) {
+            std::int32_t complete = 1;
+            std::memcpy(task.address, &complete, sizeof(complete));
+        }
+        failed_child(task);
+    }
+    void finish_native_children(Task& owner) noexcept {
+        bool pending_cleanup = false;
+        for (auto& child : tasks) {
+            if (!owned(*child, owner) || !child->work || !child->work->native) continue;
+            auto& work = *child->work;
+            if (child->state == Task::working) {
+                pending_cleanup = true;
+            } else if (work.native->acquired()) {
+                if (owner.outcome == Task::success) work.native->commit();
+                else {
+                    abandon(*child);
+                    pending_cleanup = true;
+                }
+            }
+        }
+        if (pending_cleanup) owner.state = Task::finishing;
+        else {
+            collect(owner);
+            owner.state = Task::finished;
+            failed_child(owner);
+            owner.frame.reset(nullptr);
         }
     }
     void wait_work(){
@@ -306,6 +399,7 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
             for(auto& task:s.tasks){
                 if(task->state==Task::waiting && (task->dependency->state==Task::finished || task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
                 else if(task->state==Task::joining && !s.pending(*task,task->joining_group))s.enqueue(*task);
+                else if (task->state == Task::finishing && !s.pending(*task)) s.finish_native_children(*task);
             }
             Task* next=s.pop();bool pending=false;
             for(auto& task:s.tasks){pending|=task->state!=Task::finished && task->state!=Task::prepared;}
@@ -327,7 +421,7 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
             // uses the activation. Retire its root only after resume returned.
             // Result handles, diagnostics, ordering records and the enclosing
             // generation lease remain intact for repeated awaits and drains.
-            if(next->state==Task::finished)next->frame.reset(nullptr);
+            if(next->state==Task::finished)s.finish_native_children(*next);
         }
         const vd::RuntimeFailure* outcome=initial.message?&root_failure.value:root && root->failure.value.message?&root->failure.value:nullptr;
         if(!outcome)for(auto& task:s.tasks)if(task->failure.value.message && !task->observed){outcome=&task->failure.value;break;}
@@ -342,4 +436,43 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
 }
 }
 
-namespace vd { const void* async_execution_context() noexcept {return active?active->current:nullptr;} }
+namespace vd {
+const void* async_execution_context() noexcept {return active?active->current:nullptr;}
+
+bool async_context_descends_from(const void* ancestor) noexcept {
+    for (auto* task = active ? active->current : nullptr; task;
+         task = task->group ? task->group->owner : nullptr) {
+        if (task == ancestor) return true;
+    }
+    return false;
+}
+
+void async_submit_native(void** output, const TypeLayout& layout,
+                         const void* generation, std::shared_ptr<NativeJob> job) {
+    auto& executor = scope();
+    if (!executor.current || executor.current->draining || executor.current->cleanup_depth) {
+        throw std::logic_error("Native jobs cannot enqueue outside an active async body");
+    }
+    if (executor.generation != generation || !job) {
+        throw std::logic_error("Invalid native job generation or payload");
+    }
+    auto item = std::make_unique<Task>(executor.runtime);
+    item->work = std::make_unique<Task::Work>();
+    item->work->native = std::move(job);
+    item->group = executor.current->active_group;
+    executor.runtime.allocate_into(output, layout);
+    item->task.reset(*output);
+    item->address = *output;
+    executor.tasks.push_back(std::move(item));
+    try {
+        executor.publish(*executor.tasks.back());
+    } catch (...) {
+        // No native operation has been queued if admission fails. Retire the
+        // reserved file-operation count before source cleanup can run.
+        executor.tasks.back()->work->native->cancel_queued();
+        executor.tasks.pop_back();
+        *output = nullptr;
+        throw;
+    }
+}
+}

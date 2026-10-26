@@ -1,0 +1,20 @@
+use io
+
+struct notification:
+    value: i32
+
+async func ready() -> i32:
+    var marker = notification(value = 1234567)
+    return marker.value
+
+async func entry(input: i32) -> i32:
+    var blocked = io.read_bytes_async("blocked file.bin")
+    var other = ready()
+    var marker = await other
+    var outcome = await blocked
+
+    if outcome is Ok(var bytes):
+        if marker == 1234567 and bytes.count == 7:
+            return 7
+
+    return 1

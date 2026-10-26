@@ -308,6 +308,23 @@ void Runtime::async_worker_limit(unsigned count) {
 unsigned Runtime::async_worker_limit() const {std::lock_guard lock(mutex_);return async_worker_limit_;}
 bool Runtime::enter_async(){require_managed();std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)return false;async_owner_=std::this_thread::get_id();return true;}
 void Runtime::leave_async() noexcept {std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};}
+void Runtime::begin_native_job() {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    if (closing_) throw std::runtime_error("Native job admission rejected during shutdown");
+    if (native_jobs_ == std::numeric_limits<std::size_t>::max()) {
+        throw std::overflow_error("Native job admission exhausted");
+    }
+    ++native_jobs_;
+}
+
+void Runtime::end_native_job() noexcept {
+    std::lock_guard lock(mutex_);
+    if (!native_jobs_) std::terminate();
+    --native_jobs_;
+    changed_.notify_all();
+}
+
 std::int64_t Runtime::console_checkpoint() const {
     std::shared_ptr<console::Context> context;{std::lock_guard lock(mutex_);context=console_context_;}return context?context->mode_checkpoint():1;
 }
@@ -319,9 +336,26 @@ console::Error Runtime::close() {
     if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("close requires NativeSafe state");
     if(current_runtime_ && current_thread_->state==State::managed){Native safe(*current_runtime_);return close();}
     std::shared_ptr<console::Context> context;
-    {std::lock_guard lock(mutex_);if(console_context_)console_context_->check_drain();closing_ = true;context=console_context_;changed_.notify_all();}
+    {
+        std::lock_guard lock(mutex_);
+        if (async_owner_ == std::this_thread::get_id() && native_jobs_) {
+            throw std::logic_error("Runtime cannot drain native jobs from their owning executor");
+        }
+        if (console_context_) console_context_->check_drain();
+        closing_ = true;
+        context = console_context_;
+        changed_.notify_all();
+    }
     auto error=context?context->close():console::Error{}; // Wake/cancel/drain without the GC mutex.
-    native_shutdown(*this);
+    {
+        std::unique_lock lock(mutex_);
+        changed_.wait(lock, [&] { return native_jobs_ == 0; });
+    }
+    auto native_error = native_shutdown(*this);
+    if (native_error) {
+        if (!error) error = {console::ErrorKind::io_failure, native_error.value()};
+        else if (!error.cleanup_code) error.cleanup_code = native_error.value();
+    }
     std::vector<std::unique_ptr<Handle>> roots;
     { std::lock_guard lock(mutex_); roots.swap(globals_); }
     roots.clear(); // Native providers drain while global roots remain valid.

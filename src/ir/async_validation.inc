@@ -55,7 +55,7 @@ while(!work.empty()){
     const auto& block=f.blocks[b];
     for(unsigned n=0;n<block.instructions.size();++n){const auto& i=block.instructions[n];
         if(i.op==Op::async_drain){state.groups.clear();state.drained=true;}
-        if(state.drained && (i.op==Op::async_call || i.op==Op::async_cancel_children || i.op==Op::async_cancel || i.op==Op::async_group_enter || i.op==Op::async_group_join || i.op==Op::await))fail("async operation after structured drain");
+        if(state.drained && (i.op==Op::filesystem_async || i.op==Op::async_call || i.op==Op::async_cancel_children || i.op==Op::async_cancel || i.op==Op::async_group_enter || i.op==Op::async_group_join || i.op==Op::await))fail("async operation after structured drain");
         if(i.op==Op::async_group_enter)state.groups.push_back({b,n});
         if(i.op==Op::async_group_join){const auto& source=block.instructions[i.a];GroupToken token{b,i.a};if(source.op==Op::load){if(!group_homes.contains(source.a))fail("forged async group token");token=group_homes.at(source.a);}else if(source.op!=Op::async_group_enter)fail("forged async group token");
             if(state.groups.empty() || state.groups.back()!=token)fail("invalid async group join order");state.groups.pop_back();

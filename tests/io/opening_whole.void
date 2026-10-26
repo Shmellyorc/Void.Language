@@ -1,0 +1,9 @@
+use io
+
+async func entry(input: i32) -> i32:
+    var written = await io.write_text_async("opening file.bin", "owned whole-file bytes")
+
+    if written is Ok(var count):
+        return 7
+
+    return 99

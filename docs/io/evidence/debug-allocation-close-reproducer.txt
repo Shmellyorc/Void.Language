@@ -1,0 +1,5 @@
+149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+I/O retained unreachable roots after async allocation budget 580

@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 135: io_async_source
+1/1 Test #135: io_async_source ..................   Passed   28.70 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  28.71 sec

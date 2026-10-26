@@ -1,0 +1,10 @@
+use io
+
+async func entry(input: i32) -> i32:
+    var opened = await io.open_async("opening file.bin", io.open_mode.create)
+
+    if opened is Ok(var handle):
+        var closed = await handle.close_async()
+        return 7
+
+    return 99

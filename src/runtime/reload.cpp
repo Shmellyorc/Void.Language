@@ -46,7 +46,14 @@ std::int32_t NativeCode::invoke(std::int32_t value) const {
         finish_console(*runtime_,checkpoint,&failure);
     } else result = checked_(value, &failure);
     if (failure.message) {
-        if (runtime_) runtime_->cleanup_failed_globals();
+        if (runtime_) {
+            auto error = runtime_->cleanup_failed_globals();
+            if (error) {
+                RuntimeFailure cleanup;
+                cleanup.message = "Native resource cleanup failed after global initialization";
+                vd_cleanup_failure(&failure, &cleanup);
+            }
+        }
         // Copy borrowed generation strings before leaving the owning code lease.
         std::string message = failure.message;
         for (std::uint32_t i = 0; i < failure.count && i < 32; ++i) message += failure.frames[i];

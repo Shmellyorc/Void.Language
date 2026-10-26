@@ -1,0 +1,12 @@
+{
+  "head": "084fe1ebf26e3f6376ed3e569e1b6c1a74499b17",
+  "sha256": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "stdlib/time.void": "e912ee71333545e3c6d938b66d58f2dff34932ac8b16e01dc20dfdf5d9967f77",
+    "stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+    "stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+    "stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+    "stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+    "stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d"
+  }
+}

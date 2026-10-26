@@ -1,4 +1,5 @@
 #include "void/native_runtime.hpp"
+#include "void/native_resource.hpp"
 #include "void/native.hpp"
 #include "void/callback.hpp"
 #include "../native/fixture.h"
@@ -36,12 +37,10 @@ PROVIDER(fixture,"void.fixture.v1")
 PROVIDER(sink,"void.sink.v1")
 #undef PROVIDER
 
-struct Resource final:vd::CallbackProvider {
-    vd::Runtime& runtime;std::thread::id owner=std::this_thread::get_id();
+struct Resource final : vd::CallbackProvider, vd::NativeResource {
     struct Capture {vd::Runtime::Handle environment;std::shared_ptr<void> lease;std::uint64_t function;vd::NativeCallbackEntry entry;
         Capture(vd::Runtime& r,void* env,std::uint64_t id,vd::NativeCallbackEntry callback):environment(r,env),lease(vd::NativeCode::active_lease()),function(id),entry(callback){}
     };
-    vd::Runtime::Handle wrapper;
     std::shared_ptr<Capture> capture;
     std::mutex mutex;std::condition_variable changed;
     Provider& provider;void* native=nullptr;
@@ -50,19 +49,37 @@ struct Resource final:vd::CallbackProvider {
 
     std::mutex error_mutex;vd::OwnedRuntimeFailure callback_error;bool callback_rejected=false;
     vd::CallbackRegistration registration; // Last: no throwing member construction after admission.
-    explicit Resource(vd::Runtime& r,void* identity,Provider& p):runtime(r),wrapper(r,identity),provider(p),registration(r,*this){}
+    explicit Resource(vd::Runtime& r, void* identity, Provider& p)
+        : NativeResource(r, identity), provider(p), registration(r, *this) {}
     ~Resource(){close();}
-    void own_thread(){if(owner!=std::this_thread::get_id())throw std::runtime_error("Native resource requires its owning thread");}
+    const void* kind() const noexcept override {
+        return &provider;
+    }
     void unregister_and_quiesce() noexcept override {
         std::unique_lock lock(mutex);provider_closed=true;registered=false;if(native)provider.unregister(native);changed.wait(lock,[&]{return !dispatched;});
     }
-    void close(){
-        if(runtime.is_managed()){vd::Runtime::Native native_safe(runtime);close();return;}
+    std::error_code close() override {
+        if (runtime.is_managed()) {
+            vd::Runtime::Native native_safe(runtime);
+            return close();
+        }
         registration.close();
         std::shared_ptr<Capture> retired;
-        {std::lock_guard lock(mutex);if(native){provider.retain(native,nullptr,0);provider.destroy(native);native=nullptr;--provider.live;}retired=std::move(capture);retained.clear();}
+        {
+            std::lock_guard lock(mutex);
+            if (native) {
+                provider.retain(native, nullptr, 0);
+                provider.destroy(native);
+                native = nullptr;
+                --provider.live;
+            }
+            retired = std::move(capture);
+            retained.clear();
+        }
         // No scheduler/provider locks during Runtime root or ORC lease release.
-        retired.reset();wrapper.reset(nullptr);
+        retired.reset();
+        wrapper.reset(nullptr);
+        return {};
     }
     static std::int32_t callback(void* context,std::int32_t value) noexcept {
         auto& self=*static_cast<Resource*>(context);std::int32_t result=0;
@@ -83,20 +100,8 @@ struct Resource final:vd::CallbackProvider {
 };
 }
 namespace vd {
-class NativeLibrary {
-    Runtime& runtime_;std::mutex mutex_,shutdown_mutex_;std::map<void*,std::shared_ptr<Resource>> resources_;
-public:
-    explicit NativeLibrary(Runtime& runtime):runtime_(runtime){}
-    static std::shared_ptr<NativeLibrary> get(Runtime& runtime,bool cleanup=false){std::lock_guard lock(runtime.mutex_);if(runtime.closing_ && !cleanup)throw std::runtime_error("Native library admission rejected during shutdown");if(!runtime.native_library_)runtime.native_library_=std::make_shared<NativeLibrary>(runtime);return runtime.native_library_;}
-    void publish(void* key,std::shared_ptr<Resource> value){std::lock_guard admission(runtime_.mutex_);if(runtime_.closing_)throw std::runtime_error("Native resource publication rejected during shutdown");std::lock_guard lock(mutex_);if(!resources_.emplace(key,std::move(value)).second)throw std::runtime_error("Duplicate native identity");}
-    std::shared_ptr<Resource> find(void* key,bool cleanup=false){std::lock_guard lock(mutex_);auto found=resources_.find(key);if(found==resources_.end()){if(cleanup)return {};throw std::runtime_error("Native resource is closed or invalid");}return found->second;}
-    void* identity(Provider& provider){std::lock_guard lock(mutex_);void* result=nullptr;for(const auto& [key,resource]:resources_)if(&resource->provider==&provider){if(result)throw std::runtime_error("Provider inspection requires exactly one resource");result=key;}if(!result)throw std::runtime_error("Provider inspection requires exactly one resource");return result;}
-    void erase(void* key){std::shared_ptr<Resource> retired;{std::lock_guard lock(mutex_);auto found=resources_.find(key);if(found!=resources_.end()){retired=std::move(found->second);resources_.erase(found);}}}
-    void shutdown(){std::lock_guard drain(shutdown_mutex_);std::map<void*,std::shared_ptr<Resource>> retired;{std::lock_guard lock(mutex_);retired.swap(resources_);}for(auto& [key,resource]:retired)resource->close();}
-};
-void native_shutdown(Runtime& runtime){std::shared_ptr<NativeLibrary> library;{std::lock_guard lock(runtime.mutex_);library=runtime.native_library_;}if(library)library->shutdown();}
 std::size_t native_fixture_live() noexcept{return fixture_provider.live.load();}
-void* native_fixture_identity(Runtime& runtime){if(!runtime.is_managed())throw std::logic_error("Native fixture identity requires Managed state");return NativeLibrary::get(runtime)->identity(fixture_provider);}
+void* native_fixture_identity(Runtime& runtime){if(!runtime.is_managed())throw std::logic_error("Native fixture identity requires Managed state");return NativeLibrary::get(runtime)->identity(&fixture_provider);}
 }
 static std::uint64_t native_call(Provider& provider,std::uint32_t op,std::uint64_t bits,void* object,void* text,std::uint64_t function,void* environment,vd::NativeCallbackEntry entry,void** out,const char* key,vd::RuntimeFailure* failure) noexcept {
     try {
@@ -122,7 +127,14 @@ static std::uint64_t native_call(Provider& provider,std::uint32_t op,std::uint64
             {vd::Runtime::Native native(runtime);resource->native=provider.create(bits!=0);if(resource->native)++provider.live;}
             if(!resource->native){*out=nullptr;return 0;}library->publish(*out,resource);return 0;
         }
-        auto library=vd::NativeLibrary::get(runtime,op==16);auto resource=library->find(object,op==16);if(!resource)return 0;if(&resource->provider!=&provider)throw std::runtime_error("Native resource belongs to another provider");resource->own_thread();
+        auto library = vd::NativeLibrary::get(runtime, op == 16);
+        auto found = library->find(object, op == 16);
+        if (!found) return 0;
+        if (found->kind() != &provider) {
+            throw std::runtime_error("Native resource belongs to another provider");
+        }
+        auto resource = std::static_pointer_cast<Resource>(found);
+        resource->own_thread();
         if(op==15 || op==16){{vd::Runtime::Native native(runtime);resource->close();}library->erase(object);return 0;}
         if(op==20){
             if(!entry || !function)throw std::runtime_error("Invalid native callback identity");auto capture=std::make_shared<Resource::Capture>(runtime,environment,function,entry);
@@ -143,7 +155,7 @@ static std::uint64_t native_call(Provider& provider,std::uint32_t op,std::uint64
 
 namespace vd {
 std::size_t native_sink_live() noexcept{return sink_provider.live.load();}
-void* native_sink_identity(Runtime& runtime){if(!runtime.is_managed())throw std::logic_error("Native sink identity requires Managed state");return NativeLibrary::get(runtime)->identity(sink_provider);}
+void* native_sink_identity(Runtime& runtime){if(!runtime.is_managed())throw std::logic_error("Native sink identity requires Managed state");return NativeLibrary::get(runtime)->identity(&sink_provider);}
 }
 #define BRIDGE(N) extern "C" std::uint64_t vd_native_##N##_call(std::uint32_t op,std::uint64_t bits,void* object,void* text,std::uint64_t function,void* environment,vd::NativeCallbackEntry entry,void** out,const char* key,vd::RuntimeFailure* failure) noexcept {return native_call(N##_provider,op,bits,object,text,function,environment,entry,out,key,failure);}
 BRIDGE(fixture)

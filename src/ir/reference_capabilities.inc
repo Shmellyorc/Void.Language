@@ -178,6 +178,20 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     case Op::gc_construct:
                         for(unsigned field=0;field<i.arguments.size();++field)retain(values[i.arguments[field]],field_type(i.type,field));
                         break;
+                    case Op::filesystem_control:
+                    case Op::filesystem_native:
+                    case Op::filesystem_async: {
+                        const auto& contract = filesystem::source_operations.at(i.immediate);
+                        for (unsigned n = 0; n < i.arguments.size(); ++n) {
+                            if (contract.arguments[n] != 'F') continue;
+                            const auto& facts = values[i.arguments[n]];
+                            if (auto leaf = facts.find({}); leaf != facts.end()) {
+                                effect(summary.mutations, leaf->second);
+                                if (leaf->second.readonly) fail("mutation through readonly file authority");
+                            }
+                        }
+                        break;
+                    }
                     case Op::memory_write: {
                         const auto& destination = values[i.arguments[0]];
                         if (auto found = destination.find({}); found != destination.end()) {

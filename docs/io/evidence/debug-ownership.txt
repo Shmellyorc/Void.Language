@@ -1,0 +1,25 @@
+Start testing: Oct 26 07:42 PDT
+----------------------------------------------------------
+135/226 Testing: io_ownership
+135/226 Test: io_ownership
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_ownership" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership_async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+"io_ownership" start time: Oct 26 07:42 PDT
+Output:
+----------------------------------------------------------
+149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 602 checked allocation failures recovered
+async O2: 602 checked allocation failures recovered
+7093 I/O ownership/documentation checks passed
+<end of output>
+Test time =  46.56 sec
+----------------------------------------------------------
+Test Passed.
+"io_ownership" end time: Oct 26 07:43 PDT
+"io_ownership" time elapsed: 00:00:46
+----------------------------------------------------------
+
+End testing: Oct 26 07:43 PDT

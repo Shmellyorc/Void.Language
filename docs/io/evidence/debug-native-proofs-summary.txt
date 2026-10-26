@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start 139: io_native_responsiveness
+1/5 Test #139: io_native_responsiveness .........   Passed   20.64 sec
+    Start 140: io_native_pending_close
+2/5 Test #140: io_native_pending_close ..........   Passed   21.14 sec
+    Start 141: io_probe_normal
+3/5 Test #141: io_probe_normal ..................   Passed    0.01 sec
+    Start 142: io_probe_optimized
+4/5 Test #142: io_probe_optimized ...............   Passed    0.01 sec
+    Start 148: io_kernel
+5/5 Test #148: io_kernel ........................   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  41.92 sec

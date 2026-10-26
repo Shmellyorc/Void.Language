@@ -4,7 +4,7 @@
 namespace vd {
 class NativeLibrary;
 using NativeCallbackEntry=std::int32_t(*)(std::uint64_t,void*,std::int32_t,RuntimeFailure*);
-void native_shutdown(Runtime&);
+std::error_code native_shutdown(Runtime&);
 std::size_t native_fixture_live() noexcept;
 std::size_t native_sink_live() noexcept;
 void* native_sink_identity(Runtime&);

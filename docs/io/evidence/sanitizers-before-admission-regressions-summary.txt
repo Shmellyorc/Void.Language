@@ -1,0 +1,61 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+      Start 110: stage10_console_source
+      Start 101: combined_execution
+ 1/28 Test #101: combined_execution ...............   Passed  191.02 sec
+      Start 103: memory_execution
+ 2/28 Test #110: stage10_console_source ...........   Passed  243.43 sec
+      Start  94: binary_execution
+ 3/28 Test  #94: binary_execution .................   Passed   44.66 sec
+      Start  98: combined_ownership
+ 4/28 Test  #98: combined_ownership ...............   Passed   21.71 sec
+      Start 105: memory_ownership
+ 5/28 Test #105: memory_ownership .................   Passed    8.81 sec
+      Start 102: lsp_combined
+ 6/28 Test #102: lsp_combined .....................   Passed    5.59 sec
+      Start  97: lsp_const_recovery
+ 7/28 Test  #97: lsp_const_recovery ...............   Passed    3.70 sec
+      Start 109: stage11_globals
+ 8/28 Test #109: stage11_globals ..................   Passed    2.58 sec
+      Start 104: lsp_memory
+ 9/28 Test #104: lsp_memory .......................   Passed    1.73 sec
+      Start  96: binary_ownership
+10/28 Test  #96: binary_ownership .................   Passed    1.14 sec
+      Start  83: runtime_callbacks
+11/28 Test  #83: runtime_callbacks ................   Passed    0.93 sec
+      Start  33: runtime_coordination
+12/28 Test  #33: runtime_coordination .............   Passed    2.06 sec
+      Start  95: lsp_binary
+13/28 Test  #95: lsp_binary .......................   Passed    0.27 sec
+      Start  90: lsp_stage11_globals
+14/28 Test  #90: lsp_stage11_globals ..............   Passed    0.16 sec
+      Start   9: format_temporal
+15/28 Test   #9: format_temporal ..................   Passed    0.09 sec
+      Start 100: combined_async_optimized
+16/28 Test #100: combined_async_optimized .........   Passed    0.05 sec
+      Start  99: combined_async_normal
+17/28 Test  #99: combined_async_normal ............   Passed    0.05 sec
+      Start  87: runtime_invariants
+18/28 Test  #87: runtime_invariants ...............   Passed    0.05 sec
+      Start  84: runtime_failures
+19/28 Test  #84: runtime_failures .................   Passed    0.02 sec
+      Start  10: stage10_hooks
+20/28 Test  #10: stage10_hooks ....................   Passed    6.46 sec
+      Start  15: format_zones
+21/28 Test  #15: format_zones .....................   Passed    0.51 sec
+      Start 112: native_source
+22/28 Test #103: memory_execution .................   Passed  155.81 sec
+      Start 113: stage6_integrated
+23/28 Test #112: native_source ....................   Passed    9.62 sec
+      Start 155: async_source
+24/28 Test #113: stage6_integrated ................   Passed   11.40 sec
+      Start 156: async_ir
+25/28 Test #156: async_ir .........................   Passed    0.11 sec
+      Start 157: async_parallel
+26/28 Test #157: async_parallel ...................   Passed    4.00 sec
+      Start 158: async_lifecycle
+27/28 Test #158: async_lifecycle ..................   Passed    6.74 sec
+28/28 Test #155: async_source .....................   Passed   18.98 sec
+
+100% tests passed, 0 tests failed out of 28
+
+Total Test time (real) = 372.62 sec

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="63"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1020"
+	timestamp="2026-10-26T09:27:16"
+	>
+	<testcase name="format_temporal" classname="format_temporal" time="0.207361" status="run">
+		<properties/>
+		<system-out>1311 temporal core checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_hooks" classname="stage10_hooks" time="5.48622" status="run">
+		<properties/>
+		<system-out>77 nominal/custom display checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_zones" classname="format_zones" time="5.64204" status="run">
+		<properties/>
+		<system-out>2026e: 344 zones, 253 links, 1720 projections; embedded gap/overlap/history passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_coordination" classname="runtime_coordination" time="2.04627" status="run">
+		<properties/>
+		<system-out>NativeSafe rendezvous baseline (1000, one frozen object): mean 1.70223 us, max 19.38 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_callbacks" classname="runtime_callbacks" time="0.616204" status="run">
+		<properties/>
+		<system-out>callback provider quiescence, shutdown, self-drain, generated native roots/reentry, exceptions and code leases passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_failures" classname="runtime_failures" time="0.00339635" status="run">
+		<properties/>
+		<system-out>deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+</system-out>
+	</testcase>
+	<testcase name="runtime_invariants" classname="runtime_invariants" time="0.0379938" status="run">
+		<properties/>
+		<system-out>corrupt roots and frame order cannot resume managed execution
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="0.115993" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_execution" classname="binary_execution" time="40.667" status="run">
+		<properties/>
+		<system-out>Binary execution: 356 independent vectors; 19 processes passed (check, JIT/O2, linked AOT/O2, rejection checks)
+</system-out>
+	</testcase>
+	<testcase name="lsp_binary" classname="lsp_binary" time="0.257683" status="run">
+		<properties/>
+		<system-out>Binary LSP: 81 import, completion, navigation, hover and active-parameter checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_ownership" classname="binary_ownership" time="1.02091" status="run">
+		<properties/>
+		<system-out>normal: 183 allocation failure budgets, collection and retry passed
+O2: 183 allocation failure budgets, collection and retry passed
+Binary ownership: 2253 checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_stack" classname="binary_stack" time="1.57301" status="run">
+		<properties/>
+		<system-out>Binary 1 MiB stack: 7 processes passed (check, JIT/O2, linked build/execution/O2)
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery" classname="lsp_const_recovery" time="4.49747" status="run">
+		<properties/>
+		<system-out>Const/global completion recovery: 472 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery_stack" classname="lsp_const_recovery_stack" time="4.77774" status="run">
+		<properties/>
+		<system-out>Const/global completion recovery: 472 assertions passed with actual 1 MiB server stack
+</system-out>
+	</testcase>
+	<testcase name="combined_ownership" classname="combined_ownership" time="20.0096" status="run">
+		<properties/>
+		<system-out>268 installed public declarations documented
+normal: 351 allocation failure budgets passed across all derived errors and unwrap
+O2: 351 allocation failure budgets passed across all derived errors and unwrap
+Combined ownership/documentation: 4867 checks passed
+</system-out>
+	</testcase>
+	<testcase name="combined_async_normal" classname="combined_async_normal" time="0.0336484" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="combined_async_optimized" classname="combined_async_optimized" time="0.0392745" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="combined_execution" classname="combined_execution" time="196.255" status="run">
+		<properties/>
+		<system-out>Combined execution: 246 parsing assertions; 74 processes passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_combined" classname="lsp_combined" time="7.46073" status="run">
+		<properties/>
+		<system-out>Combined LSP: 97 documentation, completion, signature and navigation assertions passed
+</system-out>
+	</testcase>
+	<testcase name="combined_stack" classname="combined_stack" time="194.63" status="run">
+		<properties/>
+		<system-out>Combined execution: 246 parsing assertions; 74 processes passed with actual 1 MiB stack
+</system-out>
+	</testcase>
+	<testcase name="memory_execution" classname="memory_execution" time="163.392" status="run">
+		<properties/>
+		<system-out>Memory execution: 268 numeric/IEEE vectors, 64 model transitions, semantic fixture, 14 rejection cases; 35 processes passed (check, JIT/O2, linked AOT/O2)
+</system-out>
+	</testcase>
+	<testcase name="lsp_memory" classname="lsp_memory" time="1.86593" status="run">
+		<properties/>
+		<system-out>Memory LSP: 156 completion, navigation, hover, constructor/method signature and documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="memory_ownership" classname="memory_ownership" time="7.79395" status="run">
+		<properties/>
+		<system-out>normal scenario 0: 30 allocation failure budgets passed
+normal scenario 1: 90 allocation failure budgets passed
+normal scenario 2: 26 allocation failure budgets passed
+normal scenario 3: 32 allocation failure budgets passed
+normal scenario 4: 75 allocation failure budgets passed
+normal scenario 5: 67 allocation failure budgets passed
+normal scenario 6: 24 allocation failure budgets passed
+normal scenario 7: 5 allocation failure budgets passed
+normal scenario 8: 61 allocation failure budgets passed
+normal scenario 9: 28 allocation failure budgets passed
+normal scenario 10: 21 allocation failure budgets passed
+normal scenario 11: 44 allocation failure budgets passed
+normal scenario 12: 19 allocation failure budgets passed
+normal scenario 13: 20 allocation failure budgets passed
+normal: 542 failure budgets across 14 operations; atomic state and retry passed
+O2 scenario 0: 30 allocation failure budgets passed
+O2 scenario 1: 90 allocation failure budgets passed
+O2 scenario 2: 26 allocation failure budgets passed
+O...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="memory_stack" classname="memory_stack" time="6.50142" status="run">
+		<properties/>
+		<system-out>Memory 1 MiB stack: 7 processes passed (check, JIT/O2, linked build and native execution/O2)
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="1.89474" status="run">
+		<properties/>
+		<system-out>101 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_source" classname="stage10_console_source" time="231.039" status="run">
+		<properties/>
+		<system-out>source console checks: 4492
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="8.79403" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="10.9465" status="run">
+		<properties/>
+		<system-out>combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="io_ownership" classname="io_ownership" time="52.8155" status="run">
+		<properties/>
+		<system-out>149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 622 checked allocation failures recovered
+async O2: 622 checked allocation failures recovered
+7213 I/O ownership/documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="175.471" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_async_execution" classname="io_async_execution" time="125.581" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="io_wire_normal" classname="io_wire_normal" time="0.45904" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_wire_optimized" classname="io_wire_optimized" time="0.446695" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="lsp_io" classname="lsp_io" time="5.95728" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_stack" classname="io_stack" time="176.677" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=True
+</system-out>
+	</testcase>
+	<testcase name="io_async_stack" classname="io_async_stack" time="125.636" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="lsp_io_stack" classname="lsp_io_stack" time="5.93638" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_native_responsiveness" classname="io_native_responsiveness" time="22.5318" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_native_close_failure" classname="io_native_close_failure" time="22.2852" status="run">
+		<properties/>
+		<system-out>JIT: recoverable close failure retained its diagnostic, retired once and released roots
+O2: recoverable close failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_shutdown" classname="io_native_shutdown" time="23.4378" status="run">
+		<properties/>
+		<system-out>JIT: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+O2: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_opening_shutdown" classname="io_native_opening_shutdown" time="22.3092" status="run">
+		<properties/>
+		<system-out>JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+</system-out>
+	</testcase>
+	<testcase name="io_native_whole_shutdown" classname="io_native_whole_shutdown" time="21.5719" status="run">
+		<properties/>
+		<system-out>JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+</system-out>
+	</testcase>
+	<testcase name="io_native_pending_close" classname="io_native_pending_close" time="22.6328" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_native_cancelled" classname="io_native_cancelled" time="22.9252" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_probe_normal" classname="io_probe_normal" time="0.00637742" status="run">
+		<properties/>
+		<system-out>linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_probe_optimized" classname="io_probe_optimized" time="0.00697615" status="run">
+		<properties/>
+		<system-out>linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_async_source" classname="io_async_source" time="35.6239" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_source" classname="io_errors_source" time="31.0513" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_async" classname="io_errors_async" time="35.3518" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_examples_install" classname="io_examples_install" time="98.4962" status="run">
+		<properties/>
+		<system-out>11 example/install checks passed: Unicode config, game save/load, binary asset, memory/file wire interoperability, JIT/O2/linked AOT and relocated stdlib
+</system-out>
+	</testcase>
+	<testcase name="io_async_acquisition" classname="io_async_acquisition" time="0.438884" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_async_normal" classname="io_async_normal" time="0.0512957" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_async_optimized" classname="io_async_optimized" time="0.0618066" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_native_jobs" classname="io_native_jobs" time="0.0045282" status="run">
+		<properties/>
+		<system-out>native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback and cleanup diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="io_kernel" classname="io_kernel" time="0.11354" status="run">
+		<properties/>
+		<system-out>native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+</system-out>
+	</testcase>
+	<testcase name="io_ir" classname="io_ir" time="3.30298" status="run">
+		<properties/>
+		<system-out>11 independent filesystem IR authority, arity, reply and opcode rejections passed
+</system-out>
+	</testcase>
+	<testcase name="io_cross_volume" classname="io_cross_volume" time="25.3068" status="run">
+		<properties/>
+		<system-out>Cross-device file and directory renames preserved both source entries in actual JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="async_source" classname="async_source" time="47.7237" status="run">
+		<properties/>
+		<system-out>async activations passed
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.0587983" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_parallel" classname="async_parallel" time="3.31984" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_lifecycle" classname="async_lifecycle" time="6.26908" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="stage11_globals_stack" classname="stage11_globals_stack" time="1.94559" status="run">
+		<properties/>
+		<system-out>1 MiB inferred-global guard and explicit-type chain passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_aot" classname="stage11_globals_aot" time="7.91505" status="run">
+		<properties/>
+		<system-out>157 real-program global commands passed
+</system-out>
+	</testcase>
+</testsuite>

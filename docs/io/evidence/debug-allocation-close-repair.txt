@@ -1,0 +1,7 @@
+149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 622 checked allocation failures recovered
+async O2: 622 checked allocation failures recovered
+7213 I/O ownership/documentation checks passed

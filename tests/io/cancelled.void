@@ -1,0 +1,24 @@
+use io
+
+struct notification:
+    value: i32
+
+async func stop<t>(pending: t) -> i32:
+    var marker = notification(value = 1234567)
+    pending.cancel()
+    return marker.value
+
+async func entry(input: i32) -> i32:
+    var opened = await io.open_async("blocked file.bin")
+
+    if opened is Ok(var handle):
+        with handle as scope:
+            var pending = handle.read_exact_async(7)
+            var canceller = stop(pending)
+            var marker = await canceller
+            var outcome = await pending
+
+            if outcome is Ok(var bytes):
+                return 1
+
+    return 2

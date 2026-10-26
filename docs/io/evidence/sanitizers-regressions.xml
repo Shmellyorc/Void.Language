@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="28"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="372"
+	timestamp="2026-10-26T09:11:05"
+	>
+	<testcase name="format_temporal" classname="format_temporal" time="0.0894002" status="run">
+		<properties/>
+		<system-out>1311 temporal core checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_hooks" classname="stage10_hooks" time="6.46004" status="run">
+		<properties/>
+		<system-out>77 nominal/custom display checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_zones" classname="format_zones" time="0.505817" status="run">
+		<properties/>
+		<system-out>2026e: 344 zones, 253 links, 1720 projections; embedded gap/overlap/history passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_coordination" classname="runtime_coordination" time="2.0629" status="run">
+		<properties/>
+		<system-out>NativeSafe rendezvous baseline (1000, one frozen object): mean 1.61824 us, max 16.86 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_callbacks" classname="runtime_callbacks" time="0.925531" status="run">
+		<properties/>
+		<system-out>callback provider quiescence, shutdown, self-drain, generated native roots/reentry, exceptions and code leases passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_failures" classname="runtime_failures" time="0.0225249" status="run">
+		<properties/>
+		<system-out>deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+</system-out>
+	</testcase>
+	<testcase name="runtime_invariants" classname="runtime_invariants" time="0.0517662" status="run">
+		<properties/>
+		<system-out>corrupt roots and frame order cannot resume managed execution
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="0.160588" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_execution" classname="binary_execution" time="44.6601" status="run">
+		<properties/>
+		<system-out>Binary execution: 356 independent vectors; 19 processes passed (check, JIT/O2, linked AOT/O2, rejection checks)
+</system-out>
+	</testcase>
+	<testcase name="lsp_binary" classname="lsp_binary" time="0.268759" status="run">
+		<properties/>
+		<system-out>Binary LSP: 81 import, completion, navigation, hover and active-parameter checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_ownership" classname="binary_ownership" time="1.14311" status="run">
+		<properties/>
+		<system-out>normal: 183 allocation failure budgets, collection and retry passed
+O2: 183 allocation failure budgets, collection and retry passed
+Binary ownership: 2253 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery" classname="lsp_const_recovery" time="3.69975" status="run">
+		<properties/>
+		<system-out>Const/global completion recovery: 472 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="combined_ownership" classname="combined_ownership" time="21.7144" status="run">
+		<properties/>
+		<system-out>268 installed public declarations documented
+normal: 351 allocation failure budgets passed across all derived errors and unwrap
+O2: 351 allocation failure budgets passed across all derived errors and unwrap
+Combined ownership/documentation: 4867 checks passed
+</system-out>
+	</testcase>
+	<testcase name="combined_async_normal" classname="combined_async_normal" time="0.0519956" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="combined_async_optimized" classname="combined_async_optimized" time="0.0500883" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="combined_execution" classname="combined_execution" time="191.021" status="run">
+		<properties/>
+		<system-out>Combined execution: 246 parsing assertions; 74 processes passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_combined" classname="lsp_combined" time="5.59172" status="run">
+		<properties/>
+		<system-out>Combined LSP: 97 documentation, completion, signature and navigation assertions passed
+</system-out>
+	</testcase>
+	<testcase name="memory_execution" classname="memory_execution" time="155.81" status="run">
+		<properties/>
+		<system-out>Memory execution: 268 numeric/IEEE vectors, 64 model transitions, semantic fixture, 14 rejection cases; 35 processes passed (check, JIT/O2, linked AOT/O2)
+</system-out>
+	</testcase>
+	<testcase name="lsp_memory" classname="lsp_memory" time="1.72941" status="run">
+		<properties/>
+		<system-out>Memory LSP: 156 completion, navigation, hover, constructor/method signature and documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="memory_ownership" classname="memory_ownership" time="8.81085" status="run">
+		<properties/>
+		<system-out>normal scenario 0: 30 allocation failure budgets passed
+normal scenario 1: 90 allocation failure budgets passed
+normal scenario 2: 26 allocation failure budgets passed
+normal scenario 3: 32 allocation failure budgets passed
+normal scenario 4: 75 allocation failure budgets passed
+normal scenario 5: 67 allocation failure budgets passed
+normal scenario 6: 24 allocation failure budgets passed
+normal scenario 7: 5 allocation failure budgets passed
+normal scenario 8: 61 allocation failure budgets passed
+normal scenario 9: 28 allocation failure budgets passed
+normal scenario 10: 21 allocation failure budgets passed
+normal scenario 11: 44 allocation failure budgets passed
+normal scenario 12: 19 allocation failure budgets passed
+normal scenario 13: 20 allocation failure budgets passed
+normal: 542 failure budgets across 14 operations; atomic state and retry passed
+O2 scenario 0: 30 allocation failure budgets passed
+O2 scenario 1: 90 allocation failure budgets passed
+O2 scenario 2: 26 allocation failure budgets passed
+O...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="2.58052" status="run">
+		<properties/>
+		<system-out>101 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_source" classname="stage10_console_source" time="243.425" status="run">
+		<properties/>
+		<system-out>source console checks: 4492
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="9.62043" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="11.3975" status="run">
+		<properties/>
+		<system-out>combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="async_source" classname="async_source" time="18.9782" status="run">
+		<properties/>
+		<system-out>async activations passed
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.109421" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_parallel" classname="async_parallel" time="3.99731" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_lifecycle" classname="async_lifecycle" time="6.74395" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+</testsuite>

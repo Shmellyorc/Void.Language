@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="27"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="499"
+	timestamp="2026-10-26T09:00:05"
+	>
+	<testcase name="io_ownership" classname="io_ownership" time="65.2082" status="run">
+		<properties/>
+		<system-out>149 I/O/path public declarations documented
+sync Debug: 437 checked allocation failures recovered
+sync O2: 437 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 622 checked allocation failures recovered
+async O2: 622 checked allocation failures recovered
+7213 I/O ownership/documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="163.885" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_async_execution" classname="io_async_execution" time="133.22" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="io_wire_normal" classname="io_wire_normal" time="0.477189" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_wire_optimized" classname="io_wire_optimized" time="0.694119" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="lsp_io" classname="lsp_io" time="6.54207" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_stack" classname="io_stack" time="162.784" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=True
+</system-out>
+	</testcase>
+	<testcase name="io_async_stack" classname="io_async_stack" time="99.3637" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="lsp_io_stack" classname="lsp_io_stack" time="5.87686" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_native_responsiveness" classname="io_native_responsiveness" time="26.0526" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_native_close_failure" classname="io_native_close_failure" time="27.2217" status="run">
+		<properties/>
+		<system-out>JIT: recoverable close failure retained its diagnostic, retired once and released roots
+O2: recoverable close failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_shutdown" classname="io_native_shutdown" time="23.4572" status="run">
+		<properties/>
+		<system-out>JIT: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+O2: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_pending_close" classname="io_native_pending_close" time="25.8337" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_native_cancelled" classname="io_native_cancelled" time="22.3646" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_probe_normal" classname="io_probe_normal" time="0.0326576" status="run">
+		<properties/>
+		<system-out>linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_probe_optimized" classname="io_probe_optimized" time="0.0175908" status="run">
+		<properties/>
+		<system-out>linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_async_source" classname="io_async_source" time="42.5118" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_source" classname="io_errors_source" time="30.979" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_async" classname="io_errors_async" time="40.3084" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_examples_install" classname="io_examples_install" time="84.3589" status="run">
+		<properties/>
+		<system-out>11 example/install checks passed: Unicode config, game save/load, binary asset, memory/file wire interoperability, JIT/O2/linked AOT and relocated stdlib
+</system-out>
+	</testcase>
+	<testcase name="io_async_acquisition" classname="io_async_acquisition" time="0.455291" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_async_normal" classname="io_async_normal" time="0.0853505" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_async_optimized" classname="io_async_optimized" time="0.114042" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_native_jobs" classname="io_native_jobs" time="0.0122116" status="run">
+		<properties/>
+		<system-out>native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback and cleanup diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="io_kernel" classname="io_kernel" time="0.206379" status="run">
+		<properties/>
+		<system-out>native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+</system-out>
+	</testcase>
+	<testcase name="io_ir" classname="io_ir" time="3.27447" status="run">
+		<properties/>
+		<system-out>11 independent filesystem IR authority, arity, reply and opcode rejections passed
+</system-out>
+	</testcase>
+	<testcase name="io_cross_volume" classname="io_cross_volume" time="22.7909" status="run">
+		<properties/>
+		<system-out>Cross-device file and directory renames preserved both source entries in actual JIT/O2
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,12 @@
+Final local audit — 26 October 2026
+Baseline: 084fe1ebf26e3f6376ed3e569e1b6c1a74499b17
+debug: 63/63; failures=0; skipped=0; disabled=0
+release: 63/63; failures=0; skipped=0; disabled=0
+sanitizers: 56/56; failures=0; skipped=0; disabled=0
+source_sha256: 53/53 hashes verified
+protected_sha256: 7/7 hashes verified
+stdlib/io.void: four-space indentation; no tabs/trailing whitespace
+stdlib/path.void: four-space indentation; no tabs/trailing whitespace
+149 public declarations mapped in API.tsv and API-AUDIT.tsv; zero documentation warnings.
+Earlier Release SIGSEGV remains unclassified/unresolved; see HANDOFF.md.
+Native Windows/macOS execution unverified; no hosted CI or Git mutation.

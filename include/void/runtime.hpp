@@ -13,6 +13,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <system_error>
 
 namespace vd {
 namespace console { class Streams; class Context; struct Error; }
@@ -51,7 +52,7 @@ public:
     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
     // One explicitly admitted application owns these persistent precise roots.
     void admit_globals(std::string_view contract, bool replacement = false, bool commit = true);
-    void cleanup_failed_globals();
+    std::error_code cleanup_failed_globals();
     void require_globals_ready() const;
     int globals_begin(std::string_view contract, std::size_t count, RuntimeFailure&);
     void globals_finish(RuntimeFailure&);
@@ -151,13 +152,17 @@ public:
     unsigned async_worker_limit() const;
     bool enter_async(); // Claim one owning executor for this Runtime.
     void leave_async() noexcept;
+    // Private native-job admission. Shutdown drains entered work and unpublished
+    // acquisitions before retiring resources; it does not cancel source tasks.
+    void begin_native_job();
+    void end_native_job() noexcept;
     std::int64_t console_checkpoint() const;
     console::Error console_finish(std::int64_t checkpoint);
     console::Error close(); // Reject new attachments; existing participants must drain.
 private:
     friend class CallbackRegistration;
     friend class NativeLibrary;
-    friend void native_shutdown(Runtime&);
+    friend std::error_code native_shutdown(Runtime&);
     std::shared_ptr<NativeLibrary> native_library_;
     std::shared_ptr<console::Context> console_context_;
     unsigned async_worker_limit_ = 4;
@@ -229,6 +234,7 @@ private:
     bool global_admitted_ = false;
     OwnedRuntimeFailure global_failure_;
     std::thread::id async_owner_ = {};
+    std::size_t native_jobs_ = 0;
     bool closing_ = false;
     bool requested_ = false;
     std::size_t callbacks_ = 0;

@@ -1,0 +1,27 @@
+use io
+use path
+use encoding/binary
+
+func exercise() -> result<i32, io.error>:
+    with io.open("io ownership.bin", io.open_mode.create, binary.byte_order.big)? as handle:
+        var alias = handle
+        var count = handle.write_pascal_string("owned 雪")?
+        var beginning = alias.seek(0)?
+        var text = handle.read_pascal_string()?
+
+        if text != "owned 雪" or count != 13:
+            return Ok(1)
+
+        const readonly_view = alias
+        var cursor = readonly_view.position()?
+
+        if cursor != 13:
+            return Ok(2)
+
+        return Ok(7)
+
+func entry(input: i32) -> i32:
+    if exercise() is Ok(var answer):
+        return answer
+
+    return 99

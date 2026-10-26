@@ -1,0 +1,27 @@
+use io
+
+func exercise() -> result<i32, io.error>:
+    var handle = io.open("close failure.bin", io.open_mode.create)?
+    var alias = handle
+    var written = handle.write_string("payload")?
+    var closed = handle.close()
+
+    if closed is Err(var reason):
+        if not (reason.kind is io.error_kind.io_failure) or reason.os_code != 5:
+            return Ok(1)
+    else:
+        return Ok(2)
+
+    var reopened = alias.read_bytes(1)
+
+    if not (reopened is Err(var unavailable)):
+        return Ok(3)
+
+    var repeated = alias.close()?
+    return Ok(7)
+
+func entry(input: i32) -> i32:
+    if exercise() is Ok(var answer):
+        return answer
+
+    return 99
