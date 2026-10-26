@@ -1,13 +1,27 @@
 # VOID documentation
 
-## Documentation/hover repair: authorized separate sprint, 25 October 2026
+## Documentation/hover repair: OFFICIALLY ACCEPTED AND LOCKED, 26 October 2026
 
-Boss approved full implementation after Golden Wrench's architecture review,
-including uniform automatic/manual suppression for undocumented parameters.
-[Approved contract](DOCUMENTATION_HOVER.md), [local implementation and verification](DOCUMENTATION_HOVER_IMPLEMENTATION.md).
-This repair is separate from the locked Stage 11 runtime-globals acceptance below;
-its historical evidence is preserved. Golden Wrench review and Boss-controlled
-acceptance remain required. Git, hosted CI and root README are unchanged.
+**Boss confirms Golden Wrench source review and final hosted acceptance** at tested
+commit `94b00c682314fb239ba2dfdd99c02df87ba0a8af`.
+[Final CI 40271408951](https://github.com/Shmellyorc/Void.Language/actions/runs/40271408951) used
+`ci-link-experiment.yml`, mode `thinlto-cache`: **7/7 jobs passed on attempt 1;
+1,421/1,421 CTests passed**. Ubuntu Debug/Release/Sanitizers passed **205/205 each**,
+Windows Debug/Release **199/199 each**, macOS ARM64 Debug/Release **204/204 each**.
+Documentation-specific LSP and execution tests passed in all seven configurations;
+hosted Debug editor integration passed on Linux, Windows and macOS. Prior local
+focused acceptance remains **57/57**, with additional editor and stack evidence.
+
+[Accepted contract](DOCUMENTATION_HOVER.md) and
+[acceptance record, historical local evidence and client/version limits](DOCUMENTATION_HOVER_IMPLEMENTATION.md)
+retain uniform automatic/manual suppression for undocumented parameters, nonfatal
+warnings, filtered hover and compiler-owned result/pattern metadata. This is a
+separately accepted tooling/documentation repair. Stage 11's locked evidence and
+historical LLVM DSE observation below remain unchanged; no DSE fix is claimed.
+Earlier future/pending hover-repair statements are superseded only for this scope.
+Boss retains Git, CI and release control; root README remains protected.
+**No next-stage engineering is authorized. Stop for Golden Wrench documentation
+review of this documentation-only acceptance lock.**
 
 
 ## STAGE 11: OFFICIALLY LOCKED, October 25, 2026

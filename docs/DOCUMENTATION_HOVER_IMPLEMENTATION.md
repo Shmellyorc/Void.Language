@@ -1,11 +1,42 @@
 # Documentation and hover repair: implementation handoff
 
-25 October 2026. **Implemented and locally verified; Golden Wrench review and
-Boss-controlled acceptance remain pending.** This is the separately authorized
-bounded documentation sprint, based on `7895608714c63451ff0c5c27eab7c02b42230d0c`.
-Stage 11's tested implementation `e8633b2`, documentation lock and historical
-acceptance evidence are unchanged. No Git mutation, hosted CI, root README,
-Runtime/GC/LLVM feature work, language syntax or native ABI change is included.
+## OFFICIALLY ACCEPTED AND LOCKED: 26 October 2026
+
+**Boss confirms Golden Wrench source review and final hosted acceptance of the
+separate documentation/hover repair** at tested commit `94b00c682314fb239ba2dfdd99c02df87ba0a8af`.
+[Final GitHub Actions run 40271408951](https://github.com/Shmellyorc/Void.Language/actions/runs/40271408951) used
+`ci-link-experiment.yml`, mode `thinlto-cache`: **7/7 jobs passed on attempt 1;
+1,421/1,421 CTests passed**.
+
+| Hosted configuration | CTests passed |
+|---|---|
+| Ubuntu Debug | 205/205 |
+| Ubuntu Release | 205/205 |
+| Ubuntu Sanitizers | 205/205 |
+| Windows Debug | 199/199 |
+| Windows Release | 199/199 |
+| macOS ARM64 Debug | 204/204 |
+| macOS ARM64 Release | 204/204 |
+| **Total** | **1,421/1,421** |
+
+Documentation-specific LSP and execution tests passed in all seven configurations.
+Hosted Debug editor integration passed on Linux, Windows and macOS. The previously
+recorded local focused acceptance remains **57/57 CTests**, with the additional
+editor, Unicode, execution and 1 MiB stack receipts retained below.
+
+This is a separately accepted tooling/documentation repair. Its acceptance does
+not reopen Stage 11 or authorize next-stage engineering. Stage 11's tested
+implementation `e8633b2`, documentation lock and historical LLVM 19.1.7 DSE
+observation remain unchanged; no DSE fix is claimed. Boss retains Git, hosted CI
+and release control. This acceptance-lock update changes internal documentation
+only and performs no build, test, Git mutation or hosted run.
+
+The original local implementation was based on
+`7895608714c63451ff0c5c27eab7c02b42230d0c`. Its source freezes, hashes and test
+records remain historical receipts: the retained local manifest is not regenerated
+for these later documentation-only status edits. The accepted warning, hover,
+signature-help and result-pattern contract below is unchanged. Earlier pending
+implementation-acceptance statements are superseded by this official lock.
 
 ## Implemented behavior
 
@@ -101,9 +132,9 @@ filename edit, which is not part of the visible label.
 | Actual terminal Neovim/Vim automatic completion | **5/5 import prefixes in each editor** | [Neovim](documentation-hover/evidence/neovim-terminal.json), [Vim](documentation-hover/evidence/vim-terminal.json) |
 | Actual terminal Vim signature transitions | **documented → undocumented → documented and named last passed**, including manual suppression | [Popup states](documentation-hover/evidence/vim-terminal.json) |
 
-The focused configuration totals are **57/57 CTests**, not full-suite or hosted
-acceptance. The later expanded Unicode regression was rerun independently in all
-three configurations; no implementation changes followed those configuration
+The focused configuration totals are **57/57 local CTests**. The separate
+hosted acceptance is recorded above. The later expanded Unicode regression was
+rerun independently in all three configurations; no implementation changes followed those configuration
 runs. The tests retain prior binding/navigation/rename/formatting coverage rather
 than deleting assertions for the new suppression policy. Only affected fixtures
 and their real source locations changed.
@@ -168,9 +199,11 @@ assignment corrected it. Final builds and all required gates above passed.
 The actual client defects and their measured UI repairs are described separately
 above. No sanitizer finding or remaining compiler failure is being deferred.
 
-- This is Linux local verification. Windows/macOS execution and Boss-controlled
-  hosted acceptance were not performed or claimed. Stage 11's prior acceptance
-  cannot certify these new changes.
+- The retained development receipts describe Linux local verification. Final
+  hosted acceptance now supplies the Windows/macOS compiler results and Debug
+  editor integration recorded above. Hosted editor success covers the clients
+  actually executed by those jobs; it does not establish native Windows/macOS
+  Vim/Neovim verification or any other unexecuted client/version.
 - The installed versions above were tested. Exact minimum VS Code 1.141.0 and
   Neovim 0.11.5 binaries, and VSCodium, were **not executed** in this sprint.
 - Neovim's shipped adapter provides explicit Ctrl-K help and automatic completion;
@@ -185,9 +218,10 @@ above. No sanitizer finding or remaining compiler failure is being deferred.
   original proposal/unresolved-policy text is historical; the approved contract
   records the Boss's final policy.
 
-## Changed files
+## Historical implementation changed files
 
-The following inventory lists task changes only; it excludes the pre-existing
+The following 25 October implementation inventory excludes this later four-file
+acceptance-lock edit; it excludes the then-pre-existing
 untracked research/roadmap files. Machine-readable paths, source/binary hashes and
 result counts are in [the manifest](documentation-hover/RESULTS.json).
 
@@ -261,4 +295,11 @@ docs/documentation-hover/evidence/vscode.log
 docs/documentation-hover/RESULTS.json
 ```
 
-Stopped for Golden Wrench review and Boss-controlled acceptance.
+**Implementation acceptance is locked. Stopped for Golden Wrench documentation
+review of this acceptance record. No next-stage engineering is authorized.**
+
+Suggested future Boss commit title:
+
+```text
+docs: lock documentation hover repair [skip ci]
+```

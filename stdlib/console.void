@@ -1,4 +1,5 @@
 # Borrowed compiler-owned standard endpoints. There are no source native handles.
+
 ## Borrowed standard input endpoint; all reads share one Runtime queue.
 value struct input:
     internal const _id: i64

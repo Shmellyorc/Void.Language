@@ -1,5 +1,24 @@
 # Compiler documentation contract
 
+## OFFICIALLY ACCEPTED AND LOCKED: 26 October 2026
+
+Boss confirms Golden Wrench source review and final hosted acceptance at tested
+commit `94b00c682314fb239ba2dfdd99c02df87ba0a8af`.
+[GitHub Actions 40271408951](https://github.com/Shmellyorc/Void.Language/actions/runs/40271408951),
+`ci-link-experiment.yml`, mode `thinlto-cache`: **7/7 jobs passed, attempt 1;
+1,421/1,421 CTests**. Ubuntu Debug/Release/Sanitizers passed **205/205 each**,
+Windows Debug/Release **199/199 each**, and macOS ARM64 Debug/Release **204/204 each**.
+Documentation-specific LSP and execution tests passed in all seven configurations;
+hosted Debug editor integration passed on Linux, Windows and macOS. Local focused
+acceptance remains **57/57**, with additional editor and stack evidence.
+
+[The acceptance record and client/version limits](DOCUMENTATION_HOVER_IMPLEMENTATION.md)
+retain the exact scope and historical receipts. This is a separately accepted
+tooling/documentation repair. Stage 11's lock and historical LLVM DSE observation
+are preserved. The complete contract below remains in force; no next-stage
+engineering is authorized. This documentation lock awaits Golden Wrench
+**documentation review**, not implementation acceptance.
+
 Boss approved full implementation on 25 October 2026 after Golden Wrench review.
 This bounded repair follows the nine dependencies in
 [the roadmap](DOCUMENTATION_HOVER_ROADMAP.md). The research and roadmap retain their
