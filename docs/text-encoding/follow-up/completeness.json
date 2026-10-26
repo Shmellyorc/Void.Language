@@ -1,0 +1,169 @@
+{
+  "completed_utc": "2026-10-26T21:21:14.828397+00:00",
+  "baseline_head": "108d7639f1dda45df201ea950d9abd751d024ff7",
+  "source_sha256": {
+    "CMakeLists.txt": "626af709bbbcbab1a3517a5a1aa24c011d37e1c27bcf6f96d049251ae97e05c8",
+    "tests/io/execution.py": "d8a59b5113251ddbebe66ba7ff2f5a0541a687464bb991546a18f3bf7d85acbb",
+    "tests/io/preservation.py": "305ec5c7c3b1dd270a703b7df2afc06de6028eac5e56bfed42abba5222561d1b",
+    "tests/text_encoding/crash.py": "de6f8c02b0e4537961fdee6b9220c982c3f9e8fd5e14e49cece7c0f24b49cf95",
+    "tests/text_encoding/crash_test.py": "5acc108a619bd24abb357f337545bdce2bde0b385b1bc827f10dc7e17190c944"
+  },
+  "verification": {
+    "debug": {
+      "crash-audit": {
+        "passed": 7,
+        "total": 7,
+        "tests": [
+          "lsp_protocol",
+          "lsp_stage11_globals",
+          "lsp_stage8",
+          "lsp_const_recovery",
+          "lsp_const_recovery_stack",
+          "lsp_text_encoding",
+          "text_encoding_semantic_depth"
+        ],
+        "log": "verification/crash-audit-debug.log",
+        "log_sha256": "726e77fb0fe30a80074c5d666c4db56403827a6030d60484c63c8916ea3e09a9",
+        "junit": "verification/crash-audit-debug-junit.xml",
+        "junit_sha256": "c99a42d71c421d75dc1ff9a4a9ea2dd15e95870050e9375da1146a1d776164b8"
+      },
+      "io": {
+        "passed": 4,
+        "total": 4,
+        "tests": [
+          "text_encoding_crash_preservation",
+          "io_execution",
+          "io_crash_preservation",
+          "io_async_execution"
+        ],
+        "log": "verification/io-debug.log",
+        "log_sha256": "8b0df3ad2f3d6c9f4372a7099c19f9bd407e38b693af9fcc4df8e5696a85c49b",
+        "junit": "verification/io-debug-junit.xml",
+        "junit_sha256": "a7f37419184f4c55b4ad31337adb3aec45767e5a1efd2539606ae36de94b6fcc"
+      },
+      "preservation-final": {
+        "passed": 2,
+        "total": 2,
+        "tests": [
+          "text_encoding_crash_preservation",
+          "io_crash_preservation"
+        ],
+        "log": "verification/preservation-final-debug.log",
+        "log_sha256": "fc7b73ca582c17db071c9c0fbf564da1500ad79e4b63c1cece29789b88febbf0",
+        "junit": "verification/preservation-final-debug-junit.xml",
+        "junit_sha256": "aeca598f5d10a8ffb2c095d1e1af4b686379fd4638afa666353bc340f5c3807e"
+      }
+    },
+    "release": {
+      "crash-audit": {
+        "passed": 7,
+        "total": 7,
+        "tests": [
+          "lsp_protocol",
+          "lsp_stage11_globals",
+          "lsp_stage8",
+          "lsp_const_recovery",
+          "lsp_const_recovery_stack",
+          "lsp_text_encoding",
+          "text_encoding_semantic_depth"
+        ],
+        "log": "verification/crash-audit-release.log",
+        "log_sha256": "d6efc97ff998ebbd621aecbee92022b4c22a21d781de8ae5ddc19653c6d7cec1",
+        "junit": "verification/crash-audit-release-junit.xml",
+        "junit_sha256": "2c499a839f6e4930fb3894dcdb5f98c9e9bafb8d1b41564e0a5f9ab67e649d3d"
+      },
+      "io": {
+        "passed": 4,
+        "total": 4,
+        "tests": [
+          "text_encoding_crash_preservation",
+          "io_execution",
+          "io_crash_preservation",
+          "io_async_execution"
+        ],
+        "log": "verification/io-release.log",
+        "log_sha256": "5dbada0e58ae8d2abd08b519e2a7012c96f9449f58b5bf43a386d91bda1f7200",
+        "junit": "verification/io-release-junit.xml",
+        "junit_sha256": "3e45da3d17df941a6caa545b89ba95c86f690b46223ecc6c2a039de86b9132c9"
+      },
+      "preservation-final": {
+        "passed": 2,
+        "total": 2,
+        "tests": [
+          "text_encoding_crash_preservation",
+          "io_crash_preservation"
+        ],
+        "log": "verification/preservation-final-release.log",
+        "log_sha256": "3cf2c35c39074e00eafd73bfc12d5e760bcc46481942368ac3e0112d58e57416",
+        "junit": "verification/preservation-final-release-junit.xml",
+        "junit_sha256": "78f105548d161a2c49a86702450df8a85ddf20e27dd53ca32921d6143267b63a"
+      }
+    },
+    "sanitizers": {
+      "crash-audit": {
+        "passed": 6,
+        "total": 6,
+        "tests": [
+          "lsp_protocol",
+          "lsp_stage11_globals",
+          "lsp_stage8",
+          "lsp_const_recovery",
+          "lsp_text_encoding",
+          "text_encoding_semantic_depth"
+        ],
+        "log": "verification/crash-audit-sanitizers.log",
+        "log_sha256": "056d9bcef9359fee642b1ec9f19c5de81059b0ead5522d29fdc32c0d15726fde",
+        "junit": "verification/crash-audit-sanitizers-junit.xml",
+        "junit_sha256": "156865b3e19295d9257a2e4db9685c2037bc7a86c8ac88980f809f4e4fa507b1"
+      },
+      "io": {
+        "passed": 4,
+        "total": 4,
+        "tests": [
+          "text_encoding_crash_preservation",
+          "io_execution",
+          "io_crash_preservation",
+          "io_async_execution"
+        ],
+        "log": "verification/io-sanitizers.log",
+        "log_sha256": "eb9c98c9beb8ec1be34f81d590da25c5f3b2738e03eb388586a4fca1416f69db",
+        "junit": "verification/io-sanitizers-junit.xml",
+        "junit_sha256": "95d6aab9ef82a73e2568aa6b7852ce5035d27997db54badef41cbb99d4bc5530"
+      },
+      "preservation-final": {
+        "passed": 2,
+        "total": 2,
+        "tests": [
+          "text_encoding_crash_preservation",
+          "io_crash_preservation"
+        ],
+        "log": "verification/preservation-final-sanitizers.log",
+        "log_sha256": "c4136ecb33c251aa6490f9050ba0ff416baed43edc2e2bef43df49c430cc19da",
+        "junit": "verification/preservation-final-sanitizers-junit.xml",
+        "junit_sha256": "11ea21fe75320203feb02c397a1ac850e19df9c4ba72f1c1d39871452bcb7cfd"
+      }
+    }
+  },
+  "original_evidence_and_protected_hashes_unchanged": 2937,
+  "genuine_source_snapshots_unchanged_readonly": 13,
+  "genuine_provenance_hashes_unchanged": 14,
+  "original_private_executable_hash_matches": true,
+  "new_genuine_crashes": 0,
+  "production_source_changes": 0,
+  "removed_synthetic_files": 940,
+  "synthetic_repository_subtree_absent": true,
+  "root_readme_unchanged": true,
+  "all_stdlib_sources_unchanged": true,
+  "git_staging_changes": false,
+  "git_ref_mutations": false,
+  "hosted_ci": false,
+  "source_generator_outputs_unchanged_against_baseline": true,
+  "remaining": [
+    "historical filesystem SIGSEGV unresolved",
+    "historical LLVM JIT DSE observation unresolved",
+    "historical Clang BDCE/DemandedBits observation unresolved",
+    "retained LLD GVN trace lacks a proven abnormal exit",
+    "native Windows/macOS execution pending",
+    "Golden Wrench review pending"
+  ]
+}

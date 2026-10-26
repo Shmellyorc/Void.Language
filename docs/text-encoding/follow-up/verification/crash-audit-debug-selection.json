@@ -1,0 +1,71 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "--show-only=json-v1",
+    "-R",
+    "^(text_encoding_semantic_depth|lsp_const_recovery|lsp_const_recovery_stack|lsp_protocol|lsp_stage11_globals|lsp_stage8|lsp_text_encoding)$"
+  ],
+  "tests": [
+    {
+      "name": "lsp_protocol",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/lsp fixtures"
+      ]
+    },
+    {
+      "name": "lsp_stage11_globals",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_globals.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+      ]
+    },
+    {
+      "name": "lsp_stage8",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+      ]
+    },
+    {
+      "name": "lsp_const_recovery",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+      ]
+    },
+    {
+      "name": "lsp_const_recovery_stack",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage11/lsp_const_recovery.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+        "--small-stack"
+      ]
+    },
+    {
+      "name": "lsp_text_encoding",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls"
+      ]
+    },
+    {
+      "name": "text_encoding_semantic_depth",
+      "command": [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/integration/semantic_depth.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc"
+      ]
+    }
+  ]
+}

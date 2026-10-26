@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="4"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="242"
+	timestamp="2026-10-26T14:10:24"
+	>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.295774" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest fcwau9z9/evidence/incident-y4qwx6cb
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fcwau9z9/evidence/incident-s3yj16zi
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fcwau9z9/evidence/incident-60d9_krn
+{"intentional_incidents_verified": 3, "checked_crash_preserved": true, "colliding_filenames_verified": true, "editor_snapshot_verified": true, "ordinary_rejection_ignored": true, "temporary_outputs_removed": true, "repository_artifacts_added": 0}
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="144.859" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.367811" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation hif0b6gt/incidents/incident-iqnlopmg
+CRASH EVIDENCE: /tmp/VOID disposable io preservation hif0b6gt/incidents/incident-o21ghxld
+CRASH EVIDENCE: /tmp/VOID disposable io preservation hif0b6gt/incidents/incident-ru38aeq1
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+	<testcase name="io_async_execution" classname="io_async_execution" time="97.0841" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+</testsuite>

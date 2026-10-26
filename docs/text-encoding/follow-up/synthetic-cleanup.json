@@ -1,0 +1,315 @@
+{
+  "baseline": "108d7639f1dda45df201ea950d9abd751d024ff7",
+  "scope": "docs/text-encoding/evidence/synthetic-preservation",
+  "removed_tracked_files": 940,
+  "removed_directories_including_root": 221,
+  "removed_bytes": 7504348,
+  "intentional_incidents": 33,
+  "selftest_runs": 11,
+  "file_extensions": {
+    ".bin": 77,
+    ".json": 33,
+    ".void": 440,
+    ".py": 390
+  },
+  "verification": "All files belong to receipt-backed Python -c self-signal incidents; every saved fixture has the synthetic marker and its recorded hash. No compiler/runner incident is in this subtree.",
+  "incidents": [
+    {
+      "receipt": "selftest-fpxoa5bd/incident-z0y8vnhk/receipt.json",
+      "receipt_sha256": "879b08b523ae8cfa518221865240370b400489b6f85dc87df62d4d67934f3e5c",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-fpxoa5bd/incident-_0zjbywp/receipt.json",
+      "receipt_sha256": "22c2c3f809a908a1b4949e18c3129d26f4ccf33976bedbed7c196a6923ea9c05",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-fpxoa5bd/incident-aq5x9nyc/receipt.json",
+      "receipt_sha256": "74f7da45f1c70a4e863315dc451254be4f7ef304d135eb804b37e7891338d96a",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-1ur3om0n/incident-yhnoswta/receipt.json",
+      "receipt_sha256": "1e988a349c631865456183ff30ec4a875ed4135fbd79ac3a0631180846f72cce",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-1ur3om0n/incident-gemg5ct_/receipt.json",
+      "receipt_sha256": "9064932cb0ddf26d0a19730a225194b73adba57d35ece8489a4d69a1f53c77d9",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-1ur3om0n/incident-r1gqwd9w/receipt.json",
+      "receipt_sha256": "e162131f7e37c5ae5684c55467a5eb02a41ccd4ff9e19f6978935644ad18942c",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-icxiykme/incident-89ydb0gr/receipt.json",
+      "receipt_sha256": "361f5c5830aa0307966209196c60c45b8b5a72a1051448ff55c0d93451e2dc8f",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-icxiykme/incident-4ed03294/receipt.json",
+      "receipt_sha256": "3d2f9f64961762eac37a4993b18119a0b86065c4f5c24ab3904ecb1956faf85f",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-icxiykme/incident-p0jvw4uj/receipt.json",
+      "receipt_sha256": "ebd3f0492daf20bf8777fbc180e500f7d731fb3fc94ef2929c03058d40aaefd1",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-az685wyr/incident-bnc7br9z/receipt.json",
+      "receipt_sha256": "048db94308a90c74c4cc0ac526cca01dc7355e4939804434807ec3e52276c57f",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-az685wyr/incident-zajw14aa/receipt.json",
+      "receipt_sha256": "1024555f450eb1b8cad0d2f10954b9afea3cac3407460f9a1b13b76e5e59dc23",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-az685wyr/incident-qmy0jkha/receipt.json",
+      "receipt_sha256": "03786df581671007e905336cfdedbb9556f94026c0b49ba9c3227e3a071e30b5",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-9zkvebhp/incident-rtrks2ww/receipt.json",
+      "receipt_sha256": "5de10e8a453efa29349a91c9fce59ef1ca60d9206c5a2476caccf8e5ddce6bfb",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-9zkvebhp/incident-iwh4jj79/receipt.json",
+      "receipt_sha256": "120baefc72385eac031efebd7500ad99a720e5e99b3305fa555725d08b9c287f",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-9zkvebhp/incident-4mohy8v9/receipt.json",
+      "receipt_sha256": "2afae4f36f217559a8a1612ad2533fa10326b49364077d7a394012e9834fafe2",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-3wcrqedu/incident-qnztwg3o/receipt.json",
+      "receipt_sha256": "0f5d0912fb08d6eeae4fdd080c6997d612357d2601bbc8c9b5507d6de56a447c",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-3wcrqedu/incident-ou_j87ik/receipt.json",
+      "receipt_sha256": "1e82cd9776944b274da6a34d875b59d203598cb7f670e47223b7b49551388d2b",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-3wcrqedu/incident-ijpg878j/receipt.json",
+      "receipt_sha256": "57da6f52208dbdbad0b7e101ea7f496c4720f03ea86bbcc8154307b611801bcc",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-ut__gftk/incident-tza9i901/receipt.json",
+      "receipt_sha256": "c897ba299f71388006b312b4704b211bd673a7be7356104ac869a83725b8092f",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-ut__gftk/incident-_fkq2i_k/receipt.json",
+      "receipt_sha256": "78c2ae4b0331c36a8a826114bb3c3993e26647bdbef9788e6e70b2518b6c9277",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-ut__gftk/incident-9os_828u/receipt.json",
+      "receipt_sha256": "50c638f94a32c22077f9c3f623ac70f1cc3e04a571bf8c96ca5c7dbeb30f2fab",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-a3ksg05b/incident-7rxvgefc/receipt.json",
+      "receipt_sha256": "57b9cb1c30f1ad4ccf2e15a7c662fefa17a06522235ae39a0db68c390b247c4a",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-a3ksg05b/incident-16mccpq6/receipt.json",
+      "receipt_sha256": "1598a87f90c8d3221072feb61aa0687f264c21b221e60872867f6907b22eb280",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-a3ksg05b/incident-6puovdi4/receipt.json",
+      "receipt_sha256": "e156ca9cc2ec1859b77bdcf19ea1bed9ec11b4060f554c75e6e3a37fa6aba3a0",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-co7n2ypd/incident-wq2f6_41/receipt.json",
+      "receipt_sha256": "c4b4b27adb8e3a71c3826b27019a4ef41b9c2d0ffcc95859a3e3a6ff441a32dc",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-co7n2ypd/incident-_2wh4uay/receipt.json",
+      "receipt_sha256": "99d182ec3ffbb0b7725a4a81b7d3693fa266af9340501e896bf075a63ae16f30",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-co7n2ypd/incident-r72jkyi9/receipt.json",
+      "receipt_sha256": "4a48903338003e408965315f540e58becc2bec31440fa4d9fafa8457bf3217b4",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-zrxer1zf/incident-rp7u0kwq/receipt.json",
+      "receipt_sha256": "694466d2c137b394e5b36171dcfed41aaf1c1fbeab596c9e2524a72e1eed5e57",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-zrxer1zf/incident-9qx15i0q/receipt.json",
+      "receipt_sha256": "33166c86ba855970aff3923406f2ddf03dd58ad30b18e90ee2009037534a7159",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-zrxer1zf/incident-uivtqc51/receipt.json",
+      "receipt_sha256": "a5c97a4aebaa93e53deec365b6fe1f60d9b5bdbf3a5909e668b3cdbb21c93298",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-lj4gci_g/incident-zkjzn7ru/receipt.json",
+      "receipt_sha256": "64f2b6357dad7e993ed2e3884c831d5917eb1b64a46d266fb349f2d9f2e86dbb",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-lj4gci_g/incident-9u2eyzb1/receipt.json",
+      "receipt_sha256": "9d063f018662dfd1fcd2def7e5da08c034bc9b0e4f07b077041708142e4c625a",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    },
+    {
+      "receipt": "selftest-lj4gci_g/incident-yddvm4fh/receipt.json",
+      "receipt_sha256": "649ef37921523a6f4b0bc9db2b0d44f4b4e7185bd59b40c24f84030554f381e2",
+      "classification": "intentional Python signal-only preservation test",
+      "returncode": -11,
+      "input_sha256": [
+        "e6e7502d87205d42655697fb1079df7a5fcaef825471607a2f9ffd204856164a"
+      ]
+    }
+  ]
+}

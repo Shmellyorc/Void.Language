@@ -1,0 +1,83 @@
+{
+  "debug": {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-debug",
+      "-V",
+      "-R",
+      "^(text_encoding_crash_preservation|io_crash_preservation)$",
+      "--output-junit",
+      "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/preservation-final-debug-junit.xml"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "returncode": 0,
+    "environment": {
+      "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+      "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "source_sha256": {
+      "CMakeLists.txt": "626af709bbbcbab1a3517a5a1aa24c011d37e1c27bcf6f96d049251ae97e05c8",
+      "tests/io/execution.py": "d8a59b5113251ddbebe66ba7ff2f5a0541a687464bb991546a18f3bf7d85acbb",
+      "tests/io/preservation.py": "305ec5c7c3b1dd270a703b7df2afc06de6028eac5e56bfed42abba5222561d1b",
+      "tests/text_encoding/crash.py": "de6f8c02b0e4537961fdee6b9220c982c3f9e8fd5e14e49cece7c0f24b49cf95",
+      "tests/text_encoding/crash_test.py": "5acc108a619bd24abb357f337545bdce2bde0b385b1bc827f10dc7e17190c944"
+    }
+  },
+  "release": {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-release",
+      "-V",
+      "-R",
+      "^(text_encoding_crash_preservation|io_crash_preservation)$",
+      "--output-junit",
+      "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/preservation-final-release-junit.xml"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "returncode": 0,
+    "environment": {
+      "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+      "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "source_sha256": {
+      "CMakeLists.txt": "626af709bbbcbab1a3517a5a1aa24c011d37e1c27bcf6f96d049251ae97e05c8",
+      "tests/io/execution.py": "d8a59b5113251ddbebe66ba7ff2f5a0541a687464bb991546a18f3bf7d85acbb",
+      "tests/io/preservation.py": "305ec5c7c3b1dd270a703b7df2afc06de6028eac5e56bfed42abba5222561d1b",
+      "tests/text_encoding/crash.py": "de6f8c02b0e4537961fdee6b9220c982c3f9e8fd5e14e49cece7c0f24b49cf95",
+      "tests/text_encoding/crash_test.py": "5acc108a619bd24abb357f337545bdce2bde0b385b1bc827f10dc7e17190c944"
+    }
+  },
+  "sanitizers": {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-sanitizers",
+      "-V",
+      "-R",
+      "^(text_encoding_crash_preservation|io_crash_preservation)$",
+      "--output-junit",
+      "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/preservation-final-sanitizers-junit.xml"
+    ],
+    "cwd": "/home/shmellyorc/Documents/Void.Language",
+    "returncode": 0,
+    "environment": {
+      "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+      "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "source_sha256": {
+      "CMakeLists.txt": "626af709bbbcbab1a3517a5a1aa24c011d37e1c27bcf6f96d049251ae97e05c8",
+      "tests/io/execution.py": "d8a59b5113251ddbebe66ba7ff2f5a0541a687464bb991546a18f3bf7d85acbb",
+      "tests/io/preservation.py": "305ec5c7c3b1dd270a703b7df2afc06de6028eac5e56bfed42abba5222561d1b",
+      "tests/text_encoding/crash.py": "de6f8c02b0e4537961fdee6b9220c982c3f9e8fd5e14e49cece7c0f24b49cf95",
+      "tests/text_encoding/crash_test.py": "5acc108a619bd24abb357f337545bdce2bde0b385b1bc827f10dc7e17190c944"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "baseline": "108d7639f1dda45df201ea950d9abd751d024ff7",
+  "method": "Generators evaluated in memory without main() or writing .void files.",
+  "scope_limit": "Identity with the authorized committed baseline does not recover the historical crashing temporary file.",
+  "variants": {
+    "sync": {
+      "bytes": 15377,
+      "identical": true,
+      "sha256": "a94bb03b40f3884cd74fcecc1d8451a0f2bd5d92222b5c09747918ebab284ce5"
+    },
+    "async": {
+      "bytes": 17032,
+      "identical": true,
+      "sha256": "64b6a7abbf71eb627d80a0244acb9a0db061e5f6c6f5d582e38732d510befaab"
+    },
+    "errors_async": {
+      "bytes": 3753,
+      "identical": true,
+      "sha256": "7a49f432cea96ff2d6239b13a62716ce3adab9c820e27c877b5cf6794f14e149"
+    }
+  }
+}

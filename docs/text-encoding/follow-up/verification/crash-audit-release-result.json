@@ -1,0 +1,35 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "-V",
+    "-R",
+    "^(text_encoding_semantic_depth|lsp_const_recovery|lsp_const_recovery_stack|lsp_protocol|lsp_stage11_globals|lsp_stage8|lsp_text_encoding)$",
+    "-j",
+    "2",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/crash-audit-release-junit.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "started_utc": "2026-10-26T21:10:02.539361+00:00",
+  "environment": {
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "source_sha256": {
+    "tests/text_encoding/crash.py": "35dbec8c37c1942367f7dab716bafff49a72d7514f8decfaa2b857b53e06c098",
+    "tests/text_encoding/sitecustomize.py": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+    "tests/integration/semantic_depth.py": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d",
+    "tests/stage11/lsp_const_recovery.py": "cc9c22a55a263578004fcba47ff47ab16cc89b509cb6ecb1361c5b34800ef7bc",
+    "src/frontend/compiler.cpp": "c6dcb46f41a378502848a9b442df70b3b6e7bebf96680da63198bd59a4217683"
+  },
+  "executables": {
+    "voidc": "49037597669211d753bc667e8ced1a329dddf37b7e62adac94db747e205d69c5",
+    "voidls": "1906aca61ca416fa6325af7349f1b02e7c0ff4cfc1c9fa19d34f80814a870a37"
+  },
+  "returncode": 0,
+  "elapsed_seconds": 1.868,
+  "log": "docs/text-encoding/follow-up/verification/crash-audit-release.log"
+}

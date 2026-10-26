@@ -1,2 +1,0 @@
-func main():
-    print("雪\0")

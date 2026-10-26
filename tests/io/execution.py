@@ -2,9 +2,11 @@
 from pathlib import Path
 import os
 import struct
-import subprocess
 import sys
 import tempfile
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'text_encoding'))
+from crash import run as run_preserving
 
 compiler = None
 small = '--small-stack' in sys.argv
@@ -16,10 +18,17 @@ def stack():
     resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
 
 
-def run(arguments, cwd, expected=b'', success=True):
+def run(arguments, cwd, expected=b'', success=True, source_inputs=(), provenance_inputs=()):
     global checks
-    result = subprocess.run(list(map(str, arguments)), cwd=cwd, capture_output=True,
-                            timeout=180, preexec_fn=stack if small else None)
+    result = run_preserving(
+        list(map(str, arguments)),
+        cwd=cwd,
+        capture_output=True,
+        timeout=180,
+        preexec_fn=stack if small else None,
+        source_inputs=source_inputs,
+        provenance_inputs=(Path(__file__).resolve(), *provenance_inputs),
+    )
     expected_status = 0 if success else 1
     assert result.returncode == expected_status, (arguments, result.returncode, result.stdout, result.stderr)
     assert b'warning' not in result.stderr.lower(), result.stderr
@@ -205,8 +214,9 @@ def main():
             root = Path(directory)
             fixture = root / 'main.void'
             fixture.write_text(async_fixture())
-            run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n')
-            run([runner, '--async', fixture], root, expected=None)
+            run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n',
+                source_inputs=(fixture,))
+            run([runner, '--async', fixture], root, expected=None, source_inputs=(fixture,))
             for endian in ('little', 'big'):
                 expected = b''.join(wire if endian == 'little' else wire[::-1] for _, _, wire in vectors)
                 expected += (5).to_bytes(4, endian) + '雪\0x'.encode() + b'raw'
@@ -217,7 +227,8 @@ def main():
         root = Path(directory)
         fixture = root / 'main.void'
         fixture.write_text('\n'.join(source))
-        run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n')
+        run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n',
+            source_inputs=(fixture,))
         for mode in ('jit', 'optimized', 'native', 'native-optimized'):
             cwd = root / mode
             cwd.mkdir()
@@ -230,9 +241,9 @@ def main():
                 arguments = [compiler, 'build', fixture, '-o', executable]
                 if mode == 'native':
                     arguments += ['--no-opt']
-                run(arguments, cwd, expected=None)
+                run(arguments, cwd, expected=None, source_inputs=(fixture,))
                 command = [executable]
-            run(command, cwd)
+            run(command, cwd, source_inputs=(fixture,))
             for endian in ('little', 'big'):
                 payload = b''.join(wire if endian == 'little' else wire[::-1] for _, _, wire in vectors)
                 payload += (5).to_bytes(4, endian) + '雪\0x'.encode() + b'raw'
@@ -247,7 +258,8 @@ def main():
             'async func entry(value: i32) -> i32:\n    return await spawn worker()\n',
         ):
             fixture.write_text('use io\n' + body)
-            run([compiler, 'check', fixture], root, expected=None, success=False)
+            run([compiler, 'check', fixture], root, expected=None, success=False,
+                source_inputs=(fixture,))
     print(f'{checks} public source/file checks passed; {len(vectors)} numeric vectors, both byte orders, '
           f'JIT/O2/linked AOT; 1 MiB stack={small}')
 

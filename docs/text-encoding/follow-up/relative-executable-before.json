@@ -1,0 +1,11 @@
+{
+  "classification": "intentional disposable preservation metadata test",
+  "demonstrated_defect": "relative executable exists under subprocess cwd, but previous resolver used harness cwd",
+  "command_executable": "../../usr/bin/python3.14",
+  "subprocess_cwd": "/tmp/VOID relative executable proof 688ha5rx",
+  "actual_executable": "/usr/bin/python3.14",
+  "actual_executable_sha256": "5df6fc3c12b724dfb82819028e3b7d1f9d67567f331c616cc28d9d6d41fe39f7",
+  "receipt_executable": null,
+  "receipt_executable_sha256": null,
+  "temporary_evidence_removed": true
+}

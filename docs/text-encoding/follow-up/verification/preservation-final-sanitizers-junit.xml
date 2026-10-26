@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="0"
+	timestamp="2026-10-26T14:16:50"
+	>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.332951" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest uwlvgnl4/evidence/incident-ib44r0ip
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest uwlvgnl4/evidence/incident-ofw1ofve
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest uwlvgnl4/evidence/incident-73hpzcn_
+{"intentional_incidents_verified": 3, "checked_crash_preserved": true, "colliding_filenames_verified": true, "editor_snapshot_verified": true, "ordinary_rejection_ignored": true, "temporary_outputs_removed": true, "repository_artifacts_added": 0}
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.335209" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation 9o_fikr4/incidents/incident-dulrlbwn
+CRASH EVIDENCE: /tmp/VOID disposable io preservation 9o_fikr4/incidents/incident-ohaedbj6
+CRASH EVIDENCE: /tmp/VOID disposable io preservation 9o_fikr4/incidents/incident-m4c6aazy
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+</testsuite>

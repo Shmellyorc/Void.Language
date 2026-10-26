@@ -1,0 +1,157 @@
+{
+  "baseline": "108d7639f1dda45df201ea950d9abd751d024ff7",
+  "sources_verified": [
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/console_crash.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/convert_crash.void",
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/encoding/ascii_crash.void",
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/encoding/base64_crash.void",
+      "sha256": "06b4a3b98db6d91f0213eca5e2221e6bd11dd6d7d8aba579ebcd4bdc91036cb4",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/encoding/binary_crash.void",
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/encoding/hex_crash.void",
+      "sha256": "ae7ec3e276f0ed594e0f0088b69224201212e587837939ccc0941bc44604dcbc",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/error_crash.void",
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/io/memory_crash.void",
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/io_crash.void",
+      "sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/path_crash.void",
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/text_crash.void",
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/stdlib/time_crash.void",
+      "sha256": "e912ee71333545e3c6d938b66d58f2dff34932ac8b16e01dc20dfdf5d9967f77",
+      "readonly_mode": true
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/inputs/deep-methods_crash.void",
+      "sha256": "73871bef34c030e336699c8e7ff706917428d0450dfa5e7c7b923c9419245b00",
+      "readonly_mode": true
+    }
+  ],
+  "provenance_verified": [
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/acceptance.py",
+      "sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/crash.py",
+      "sha256": "d916795d774ccbf8e1e1cc69c4d6a274aff898554cc71fd270bdf5d95b47c685"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/crash_test.py",
+      "sha256": "a5882d1b50cedffc5b402af75a28b25bf83806b6c96afcc15be2f6f85df2acb9"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/depth.py",
+      "sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/execution.py",
+      "sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/final_checks.py",
+      "sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/focused.py",
+      "sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/install.py",
+      "sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/lsp.py",
+      "sha256": "87d085341d8b66f35fbed167b2a26169255ca78cf22fdf70190a41c6d33f3cab"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/oracles.py",
+      "sha256": "cfb7464d19234d8b642c301718e280f31f308ad83bbea637e7c1bf4c3f2e5e27"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/process.py",
+      "sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/sitecustomize.py",
+      "sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/semantic_depth.py",
+      "sha256": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d"
+    },
+    {
+      "path": "docs/text-encoding/evidence/crashes/incident-splghldg/provenance/compiler.cpp",
+      "sha256": "e4f61723aac0ee9fa3289e9d286dd6ff623b6636b575aada67e4e9d776da561c"
+    }
+  ],
+  "original_executable": {
+    "path": "build/text-encoding-crash-binaries/voidc-before-stack-repair",
+    "sha256": "f257c677824af8a9feba6c2bf31667dc2a7b9978a8c004109e76c4d411793a3d"
+  },
+  "original_exit": -11,
+  "stdout_bytes": 0,
+  "stderr_bytes": 0,
+  "prologues": {
+    "before": {
+      "anchor": {
+        "stack_subtraction_bytes": 3840,
+        "prologue": "\n/home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n0000000000c652a0 <vd::(anonymous namespace)::Semantics::anchor(vd::(anonymous namespace)::Expr&)>:\n  c652a0:\t55                   \tpush   %rbp\n  c652a1:\t48 89 e5             \tmov    %rsp,%rbp\n  c652a4:\t48 81 ec 00 0f 00 00 \tsub    $0xf00,%rsp\n  c652ab:\t48 89 bd 50 f2 ff ff \tmov    %rdi,-0xdb0(%rbp)\n  c652b2:\t48 89 f8             \tmov    %rdi,%rax\n  c652b5:\t48                   \trex.W\n  c652b6:\t89                   \t.byte 0x89\n  c652b7:\t85                   \t.byte 0x85\n"
+      },
+      "call_expression": {
+        "stack_subtraction_bytes": 19904,
+        "prologue": "\n/home/shmellyorc/Documents/Void.Language/build/text-encoding-crash-binaries/voidc-before-stack-repair:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n0000000000c250a0 <vd::(anonymous namespace)::Semantics::call_expression(vd::(anonymous namespace)::Expr&)>:\n  c250a0:\t55                   \tpush   %rbp\n  c250a1:\t48 89 e5             \tmov    %rsp,%rbp\n  c250a4:\t48 81 ec c0 4d 00 00 \tsub    $0x4dc0,%rsp\n  c250ab:\t48 89 bd 20 b6 ff ff \tmov    %rdi,-0x49e0(%rbp)\n  c250b2:\t48 89 f8             \tmov    %rdi,%rax\n  c250b5:\t48                   \trex.W\n  c250b6:\t89                   \t.byte 0x89\n  c250b7:\t85                   \t.byte 0x85\n"
+      }
+    },
+    "current_debug": {
+      "anchor": {
+        "stack_subtraction_bytes": 3584,
+        "prologue": "\n/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n0000000000c64eb0 <vd::(anonymous namespace)::Semantics::anchor(vd::(anonymous namespace)::Expr&)>:\n  c64eb0:\t55                   \tpush   %rbp\n  c64eb1:\t48 89 e5             \tmov    %rsp,%rbp\n  c64eb4:\t48 81 ec 00 0e 00 00 \tsub    $0xe00,%rsp\n  c64ebb:\t48 89 bd 08 f3 ff ff \tmov    %rdi,-0xcf8(%rbp)\n  c64ec2:\t48 89 f8             \tmov    %rdi,%rax\n  c64ec5:\t48                   \trex.W\n  c64ec6:\t89                   \t.byte 0x89\n  c64ec7:\t85                   \t.byte 0x85\n"
+      },
+      "call_expression": {
+        "stack_subtraction_bytes": 16224,
+        "prologue": "\n/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n0000000000c250e0 <vd::(anonymous namespace)::Semantics::call_expression(vd::(anonymous namespace)::Expr&)>:\n  c250e0:\t55                   \tpush   %rbp\n  c250e1:\t48 89 e5             \tmov    %rsp,%rbp\n  c250e4:\t48 81 ec 60 3f 00 00 \tsub    $0x3f60,%rsp\n  c250eb:\t48 89 bd 50 c4 ff ff \tmov    %rdi,-0x3bb0(%rbp)\n  c250f2:\t48 89 f8             \tmov    %rdi,%rax\n  c250f5:\t48                   \trex.W\n  c250f6:\t89                   \t.byte 0x89\n  c250f7:\t85                   \t.byte 0x85\n"
+      }
+    }
+  }
+}

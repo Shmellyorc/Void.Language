@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="0"
+	timestamp="2026-10-26T14:16:46"
+	>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.348132" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest cq7zrs1v/evidence/incident-5c_2acxr
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest cq7zrs1v/evidence/incident-7s1ip44_
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest cq7zrs1v/evidence/incident-ad69xklw
+{"intentional_incidents_verified": 3, "checked_crash_preserved": true, "colliding_filenames_verified": true, "editor_snapshot_verified": true, "ordinary_rejection_ignored": true, "temporary_outputs_removed": true, "repository_artifacts_added": 0}
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.341936" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation o_p0ao63/incidents/incident-ok_vm0n6
+CRASH EVIDENCE: /tmp/VOID disposable io preservation o_p0ao63/incidents/incident-ot2cog58
+CRASH EVIDENCE: /tmp/VOID disposable io preservation o_p0ao63/incidents/incident-r3vdky_x
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+</testsuite>

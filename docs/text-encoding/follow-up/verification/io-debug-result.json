@@ -1,0 +1,24 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/io-debug-junit.xml",
+    "-j1",
+    "-R",
+    "^(io_execution|io_async_execution|io_crash_preservation|text_encoding_crash_preservation)$"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "started_utc": "2026-10-26T21:10:24.552376+00:00",
+  "elapsed_seconds": 242.6262682749948,
+  "returncode": 0,
+  "environment": {
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/evidence/crashes"
+  },
+  "log": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/io-debug.log",
+  "junit": "/home/shmellyorc/Documents/Void.Language/docs/text-encoding/follow-up/verification/io-debug-junit.xml",
+  "synthetic_subtree_absent": true
+}

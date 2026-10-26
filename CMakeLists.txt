@@ -833,6 +833,8 @@ if(BUILD_TESTING)
 
   add_test(NAME io_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(io_execution PROPERTIES TIMEOUT 600)
+  add_test(NAME io_crash_preservation COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/io/preservation.py")
   add_test(NAME io_async_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py"
     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_io_runner>" --async)
   set_tests_properties(io_async_execution PROPERTIES TIMEOUT 600)

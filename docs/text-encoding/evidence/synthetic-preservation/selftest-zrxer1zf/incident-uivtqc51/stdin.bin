@@ -1,3 +1,0 @@
-Content-Length: 240
-
-{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": {"textDocument": {"uri": "file:///tmp/VOID%20crash%20preservation%20selftest%20oq3a4k33/arbitrary_name.void", "version": 2, "text": "func main():\n    print(\"\u96ea\\0\")\n"}}}

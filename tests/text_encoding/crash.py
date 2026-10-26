@@ -22,14 +22,14 @@ def crashed(status):
     return status < 0 or status >= 0x80000000
 
 
-def preserve(command, cwd, result, source_inputs=()):
+def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
     target = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes'))
     target.mkdir(parents=True, exist_ok=True)
     incident = Path(tempfile.mkdtemp(prefix='incident-', dir=target))
     working = Path(cwd or Path.cwd()).resolve()
     arguments = list(map(str, command)) if not isinstance(command, str) else [command]
     sources = set(working.glob('*.void'))
-    sources.update(Path(item).resolve() for item in source_inputs)
+    sources.update((working / item).resolve() for item in source_inputs)
     for argument in arguments:
         candidate = Path(argument)
         if not candidate.is_absolute():
@@ -54,22 +54,43 @@ def preserve(command, cwd, result, source_inputs=()):
         with copy.open('xb') as stream:
             stream.write(raw)
         original_hash = hashlib.sha256(raw).hexdigest()
-        assert digest(copy) == original_hash
+        preserved_hash = digest(copy)
+        assert preserved_hash == original_hash
         copy.chmod(0o444)
-        records.append({'original': str(original), 'copy': str(copy), 'sha256': original_hash})
+        records.append({'original': str(original), 'copy': str(copy), 'sha256': original_hash,
+                        'original_sha256': original_hash, 'preserved_sha256': preserved_hash})
     provenance = incident / 'provenance'
     provenance.mkdir()
-    for original in sorted((ROOT / 'tests/text_encoding').glob('*.py')):
-        shutil.copyfile(original, provenance / original.name)
+    generators = set((ROOT / 'tests/text_encoding').glob('*.py'))
+    generators.update((working / item).resolve() for item in provenance_inputs)
     for argument in arguments:
         original = Path(argument)
+        if not original.is_absolute():
+            original = working / original
         if original.suffix == '.py' and original.is_file():
-            destination = provenance / original.name
-            if not destination.exists():
-                shutil.copyfile(original, destination)
-    executable = shutil.which(arguments[0])
-    if executable is None and Path(arguments[0]).is_file():
-        executable = arguments[0]
+            generators.add(original.resolve())
+    provenance_records = []
+    for original in sorted(generators):
+        destination = provenance / original.name
+        serial = 2
+        while destination.exists():
+            destination = provenance / f'{original.stem}_{serial}{original.suffix}'
+            serial += 1
+        raw = original.read_bytes()
+        with destination.open('xb') as stream:
+            stream.write(raw)
+        original_hash = hashlib.sha256(raw).hexdigest()
+        preserved_hash = digest(destination)
+        assert preserved_hash == original_hash
+        destination.chmod(0o444)
+        provenance_records.append({'original': str(original), 'copy': str(destination),
+                                   'sha256': original_hash, 'original_sha256': original_hash,
+                                   'preserved_sha256': preserved_hash})
+    if os.path.dirname(arguments[0]):
+        candidate = (working / arguments[0]).resolve()
+        executable = str(candidate) if candidate.is_file() else None
+    else:
+        executable = shutil.which(arguments[0])
     build_inputs = []
     for cache in (ROOT / 'build').glob('ci-official-*/CMakeCache.txt'):
         build_inputs.append({'path': str(cache), 'sha256': digest(cache),
@@ -81,7 +102,10 @@ def preserve(command, cwd, result, source_inputs=()):
               'executable': executable,
               'executable_sha256': digest(Path(executable)) if executable else None,
               'sources': records, 'build_inputs': build_inputs,
-              'trigger': 'Exact failing entry is identified by argv; full stdlib retained conservatively.',
+              'provenance_inputs': provenance_records,
+              'trigger': 'Sources come from argv and explicit source_inputs; working-directory '
+                         'companions and canonical stdlib are retained conservatively. '
+                         'The exact causal subset is not inferred.',
               'build': str(ROOT / 'build'),
               'environment': {key: os.environ[key] for key in
                               ('ASAN_OPTIONS', 'UBSAN_OPTIONS', 'VOID_STDLIB_ROOT') if key in os.environ}}
@@ -133,6 +157,7 @@ def preserve(command, cwd, result, source_inputs=()):
 
 def run(command, *args, **kwargs):
     source_inputs = kwargs.pop('source_inputs', ())
+    provenance_inputs = kwargs.pop('provenance_inputs', ())
     checked = kwargs.pop('check', False)
     previous = getattr(_RUN_CONTEXT, 'active', False)
     _RUN_CONTEXT.active = True
@@ -141,7 +166,7 @@ def run(command, *args, **kwargs):
     finally:
         _RUN_CONTEXT.active = previous
     if crashed(result.returncode):
-        preserve(command, kwargs.get('cwd'), result, source_inputs)
+        preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs)
     if checked:
         result.check_returncode()
     return result
