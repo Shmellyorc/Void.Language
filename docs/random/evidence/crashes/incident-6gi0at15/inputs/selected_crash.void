@@ -1,0 +1,6 @@
+use "./game.void" as game
+var score = 0
+func main():
+    game.reward_player()
+    print(score)
+    print(game.enemies_defeated)

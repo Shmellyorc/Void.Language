@@ -1,0 +1,72 @@
+[
+  {
+    "log": "evidence/focused/execution.log",
+    "sha256": "7c36ad15359250c6c09e039c575d4eb5c079b142d201f080ac35235bb8671c4a",
+    "last_line": "Random execution: 779 vectors x 4 modes; 7 processes passed; 1 MiB=False"
+  },
+  {
+    "log": "evidence/focused/frontend3.log",
+    "sha256": "a66d7327f663c2fd71314206b4510288844bcd3f1802d89ca291da4f28ce4426",
+    "last_line": "Random frontend: 116 processes passed; 1 MiB=False"
+  },
+  {
+    "log": "evidence/focused/stack.log",
+    "sha256": "b706bfd867309732803be4838bd354b9cde4f733243e5466e0f7a864598fae75",
+    "last_line": "Random execution: 779 vectors x 4 modes; 7 processes passed; 1 MiB=True"
+  },
+  {
+    "log": "evidence/focused/frontend-stack.log",
+    "sha256": "0a7c4f7382d8686b55f9d27d8a2462b1645ef2d0e1e5288a990cefbd9f2543bf",
+    "last_line": "Random frontend: 116 processes passed; 1 MiB=True"
+  },
+  {
+    "log": "evidence/focused/errors.log",
+    "sha256": "2588d826a6232976385195f8e7f9d89f649bdfe6653ce4fb7d43b4890403cee1",
+    "last_line": "Random checked errors/defers: 24 processes passed"
+  },
+  {
+    "log": "evidence/focused/install.log",
+    "sha256": "ba761f8d072ff96d69532a4fadb13e1d95d7baaa6cdb49f73d9cd780dd9e52ac",
+    "last_line": "Random install/real OS entropy: 13 processes passed"
+  },
+  {
+    "log": "evidence/focused/host13.log",
+    "sha256": "de36a6e40aa2d402bc0a7b503ad1157b747f8aa2fc20c9d006a32678e7a752e5",
+    "last_line": "Random host: 2279 checks passed"
+  },
+  {
+    "log": "evidence/focused/host14.log",
+    "sha256": "58963ad8d660e08974a1ec59440ab6e4167d9aca53315bdd66a89a5fbcb70ac7",
+    "last_line": "Random host: 2281 checks passed"
+  },
+  {
+    "log": "evidence/focused/worker2.log",
+    "sha256": "a362b058dc7c600a2b0ff8e57c61b153775faf12d9bebd84e350be5dc00c3e54",
+    "last_line": "Random worker snapshot execution: 8 processes passed"
+  },
+  {
+    "log": "evidence/focused/lsp5.log",
+    "sha256": "266450c373437c319829afdcc48f3e9aede6549b1c9a55a23b7a60ac4a705caf",
+    "last_line": "Random LSP: 40 checks passed"
+  },
+  {
+    "log": "evidence/focused/preservation-text.log",
+    "sha256": "12b41d05a80cab88bfecc98c9dca2d9fb6b3692849895bda8d0c87db89732fea",
+    "last_line": "{\"intentional_incidents_verified\": 8, \"checked_crash_preserved\": true, \"sanitizer_exits_verified\": [87, 86], \"run_and_popen_verified\": true, \"signed_windows_receipt_simulation_verified\": true, \"windows_native_branch_executed\": false, \"colliding_filenames_verified\": true, \"editor_snapshot_verified\": true, \"ordinary_rejection_ignored\": true, \"temporary_outputs_removed\": true, \"repository_artifacts_added\": 0}"
+  },
+  {
+    "log": "evidence/focused/preservation-io-final.log",
+    "sha256": "6095f5368c5780cf4ce7e24b0bcbe100c567d09eaf67830f0a52cc40c2cebb7a",
+    "last_line": "IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed"
+  },
+  {
+    "log": "evidence/focused/preservation3.log",
+    "sha256": "12bfad49dbe3525ac273a5326d1afd9a0c0bdd1a11df8aeb0f9edcc045b7b06c",
+    "last_line": "Random preservation: 3 synthetic reserved-status/timeout incidents verified and disposed"
+  },
+  {
+    "log": "evidence/focused/partition-debug.log",
+    "sha256": "d928d295dbf92db7b213db4305e91cb100bfcbad5129bbcd24708d0edfcdced2",
+    "last_line": "Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=False"
+  }
+]

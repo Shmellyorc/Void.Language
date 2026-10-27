@@ -1,0 +1,19 @@
+use random
+use convert
+func entry(n: i32) -> i32:
+    random.seed(42)
+    var raw = random.rand_i32
+    if raw() != -1787294930:
+        return 1
+    var engine = random.generator(seed = 42)
+    var snapshot_draw = engine.rand_u64
+    if snapshot_draw() != (1546998764402558742 as u64):
+        return 2
+    if snapshot_draw() != (6990951692964543102 as u64):
+        return 3
+    if engine.rand_u64() != (1546998764402558742 as u64):
+        return 4
+    var bounded = engine.try_rand_i32
+    if convert.unwrap(bounded(10)) != 2:
+        return 5
+    return 0

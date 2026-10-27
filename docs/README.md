@@ -1,5 +1,19 @@
 # VOID documentation
 
+## Standard-library Sprint 4 — random, 26 October 2026
+
+Boss authorized the complete [random contract](random/DESIGN.md) with mandatory
+zero/one/two-argument `rand_T` spellings and a canonical-only compiler adapter.
+[Roadmap](random/ROADMAP.md), [research and approved decisions](random/RESEARCH.md)
+and [implementation/evidence](random/IMPLEMENTATION.md) cover the source engine,
+all numeric widths, explicit/default streams, collections, OS entropy and tooling.
+The [Golden Wrench handoff](random/HANDOFF.md) records effective local **93/93**
+selected areas after retained focused corrections, 792 four-mode numeric vectors
+and actual 1 MiB checks in Debug/Release/strict profiles. No hosted/native
+Windows/macOS acceptance or independent review approval is claimed. Historical
+crash research is unchanged; root README and Git remain protected. Engineering
+stops for independent source review.
+
 ## Standard-library Sprint 3 — text and encodings, 26 October 2026
 
 Boss authorized complete text, hex, Base64 and ASCII source modules from `e24d3a9`.

@@ -1,0 +1,3 @@
+use "./api.void" as api
+func main():
+    var value = api.save("hero")

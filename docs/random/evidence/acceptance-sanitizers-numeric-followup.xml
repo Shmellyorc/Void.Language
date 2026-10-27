@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="151"
+	timestamp="2026-10-26T18:35:57"
+	>
+	<testcase name="random_execution" classname="random_execution" time="150.68" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="random_stack" classname="random_stack" time="151.629" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+</testsuite>

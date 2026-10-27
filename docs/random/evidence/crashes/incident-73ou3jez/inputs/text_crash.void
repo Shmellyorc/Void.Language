@@ -1,0 +1,67 @@
+func decode(const bytes: [u8]) -> result<string, string>:
+    return string.from_utf8(bytes = bytes)
+func entry(input: i32) -> i32:
+    var empty = ""
+    if empty.length != 0 or empty.byte_length != 0 or empty.to_utf8().count != 0:
+        return 10
+    var text = "A🎮\0e\u{301}"
+    if text.length != 5 or text.byte_length != 9:
+        return 11
+    if text[0] != "A" or text[1 as u8] != "🎮" or text[2 as i16] != "\0" or text[-2 as i64] != "e" or text[-1] != "\u{301}" or text[-5 as i8] != "A":
+        return 12
+    var bytes = text.to_utf8()
+    if bytes.count != 9 or bytes[1] != 240 or bytes[5] != 0:
+        return 13
+    var alias = bytes
+    var copy = text.to_utf8()
+    if decode(bytes) is Ok(var original):
+        bytes[0] = 66
+        if original != text or copy[0] != 65 or alias[0] != 66:
+            return 14
+    else:
+        return 15
+    const owned: [u8] = [65, 0, 240, 159, 142, 174]
+    if decode(owned) is Ok(var decoded):
+        if decoded != "A\0🎮":
+            return 16
+    else:
+        return 17
+    var zero: [u8] = []
+    if decode(zero) is Ok(var nothing):
+        if nothing != "":
+            return 18
+    else:
+        return 19
+    var allbytes: [u8] = []
+    for byte in 0..127:
+        allbytes.push(byte as u8)
+    if decode(allbytes) is Ok(var ascii):
+        if ascii.length != 128 or ascii.byte_length != 128 or ascii[0] != "\0" or ascii[-1] != "\u{7f}":
+            return 20
+    else:
+        return 21
+    var index_i8: i8 = 1
+    if text[index_i8] != "🎮":
+        return 22
+    var index_i16: i16 = 1
+    if text[index_i16] != "🎮":
+        return 22
+    var index_i32: i32 = 1
+    if text[index_i32] != "🎮":
+        return 22
+    var index_i64: i64 = 1
+    if text[index_i64] != "🎮":
+        return 22
+    var index_u8: u8 = 1
+    if text[index_u8] != "🎮":
+        return 22
+    var index_u16: u16 = 1
+    if text[index_u16] != "🎮":
+        return 22
+    var index_u32: u32 = 1
+    if text[index_u32] != "🎮":
+        return 22
+    var index_u64: u64 = 1
+    if text[index_u64] != "🎮":
+        return 22
+    return 1

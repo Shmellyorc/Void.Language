@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="4"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="411"
+	timestamp="2026-10-26T18:16:12"
+	>
+	<testcase name="random_host" classname="random_host" time="61.3048" status="run">
+		<properties/>
+		<system-out>Swap fault sweep: operation=0 failures=200 successes=1
+Swap fault sweep: operation=1 failures=133 successes=1
+Swap fault sweep: operation=0 failures=200 successes=1
+Swap fault sweep: operation=1 failures=133 successes=1
+Benchmark O2: 20000 iterations (raw, typed, bounded, four-item shuffle), 3.07289 s, 6508.53 iterations/s
+Random host: 2281 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_execution" classname="random_execution" time="322.816" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/random/evidence/crashes/incident-s6lvo23q
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 191, in run
+    stdout, stderr = process.communicate(supplied, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 289, in communicate
+    result = super().communicate(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc', 'run', '/tmp/VOID random execution gmstgdab/random_test.void']' timed out after 180 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/execution.py", line 165, in &lt;module&gt;
+    h.run([compiler,'run',fixture,*flags],work,oracle,small=small)
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 19, in run
+    result = preserving_run(args, cwd=cwd, capture_output=True, timeout=timeout,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 198, in run
+    raise subprocess.TimeoutExpired(command, timeout, output=stdout, stderr=stderr)
+subprocess.TimeoutExpired: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc', 'run', '/tmp/VOID random execution gmstgdab/random_test.void']' timed out after 180 seconds
+</system-out>
+	</testcase>
+	<testcase name="lsp_random" classname="lsp_random" time="2.98552" status="run">
+		<properties/>
+		<system-out>Random LSP: 40 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_stack" classname="random_stack" time="411.706" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+</testsuite>

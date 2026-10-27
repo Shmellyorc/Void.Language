@@ -6,7 +6,7 @@ if(NOT native_status EQUAL 0 OR NOT native_version MATCHES "clang version 19\\.1
 endif()
 set(native_flags "-pthread\n")
 if(WIN32)
-  string(APPEND native_flags "-fms-runtime-lib=dll\n-llegacy_stdio_definitions\n")
+  string(APPEND native_flags "-fms-runtime-lib=dll\n-llegacy_stdio_definitions\n-lbcrypt\n")
 elseif(APPLE)
   # Xcode may retain an SDK name where other generators resolve a physical
   # directory. Clang's stage working directory must never reinterpret that name.

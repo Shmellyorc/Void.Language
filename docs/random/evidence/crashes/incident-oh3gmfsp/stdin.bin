@@ -1,0 +1,67 @@
+Content-Length: 170
+
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{"textDocument":{"signatureHelp":{"signatureInformation":{"documentationFormat":["plaintext"]}}}}}}Content-Length: 52
+
+{"jsonrpc":"2.0","method":"initialized","params":{}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":2,"method":"void/barrier"}Content-Length: 325
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","languageId":"void","version":1,"text":"use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var a = rng.rand_i32(10)\n    var b = engine.rand_f32(1.0, 2.0)\n"}}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":3,"method":"void/barrier"}Content-Length: 180
+
+{"jsonrpc":"2.0","id":4,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":17}}}Content-Length: 185
+
+{"jsonrpc":"2.0","id":5,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":17}}}Content-Length: 180
+
+{"jsonrpc":"2.0","id":6,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":4,"character":20}}}Content-Length: 185
+
+{"jsonrpc":"2.0","id":7,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":4,"character":20}}}Content-Length: 228
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":2},"contentChanges":[{"text":"use random\nfunc main():\n    var v = random."}]}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":8,"method":"void/barrier"}Content-Length: 185
+
+{"jsonrpc":"2.0","id":9,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":2,"character":19}}}Content-Length: 284
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":3},"contentChanges":[{"text":"use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var x = rng.rand_i32("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":10,"method":"void/barrier"}Content-Length: 237
+
+{"jsonrpc":"2.0","id":11,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":25},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 287
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":4},"contentChanges":[{"text":"use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var x = rng.rand_i32(1, "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":12,"method":"void/barrier"}Content-Length: 237
+
+{"jsonrpc":"2.0","id":13,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":28},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 287
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":5},"contentChanges":[{"text":"use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var x = engine.rand_f32("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":14,"method":"void/barrier"}Content-Length: 237
+
+{"jsonrpc":"2.0","id":15,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":28},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 312
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":6},"contentChanges":[{"text":"use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var x = engine.try_rand_f32(lower = 1.0, upper = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":16,"method":"void/barrier"}Content-Length: 237
+
+{"jsonrpc":"2.0","id":17,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":53},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":7},"contentChanges":[{"text":"use ran"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":18,"method":"void/barrier"}Content-Length: 185
+
+{"jsonrpc":"2.0","id":19,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":0,"character":7}}}Content-Length: 328
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void","version":8},"contentChanges":[{"text":"use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var a = rng.rand_i32(10)\n    var b = engine.rand_f32(1.0, 2.0)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":20,"method":"void/barrier"}Content-Length: 224
+
+{"jsonrpc":"2.0","id":21,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":17},"context":{"includeDeclaration":true}}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":22,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20ko8i1wn6/main.void"},"position":{"line":3,"character":17},"newName":"renamed"}}Content-Length: 53
+
+{"jsonrpc":"2.0","id":"shutdown","method":"shutdown"}Content-Length: 33
+
+{"jsonrpc":"2.0","method":"exit"}

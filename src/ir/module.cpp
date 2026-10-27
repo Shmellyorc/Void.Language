@@ -489,7 +489,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 const auto element=Type(*t.definition->element);
                 if(element==Type::none || element.kind==Type::prepared_receiver || element.kind==Type::invalid || element.kind==Type::unresolved ||
                    element.construction || element.readonly || !element.readonly_references.empty() ||
-                   t.definition->identity!=array_identity(element,t.definition->extent)) fail("invalid array element or identity");
+                   t.definition->identity!=array_identity(element,t.definition->extent)) fail("invalid array element or identity: "+t.definition->identity+"; expected "+array_identity(element,t.definition->extent)+"; element readonly="+std::to_string(element.readonly)+"; readonly paths="+std::to_string(element.readonly_references.size()));
                 if(checked.insert(t.definition.get()).second) {
                     try {if(t.kind==Type::fixed_array)compact_value_shape(t);}
                     catch(const std::length_error& failure) {fail(failure.what());}
@@ -1202,6 +1202,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     }
                     result=Type::none; break;
                 }
+                case Op::random_xor:
+                    if (operand(i.a)!=Type::u64 || operand(i.b)!=Type::u64 || i.type!=Type::u64 || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) fail("invalid random XOR");
+                    result=Type::u64; break;
+                case Op::random_seed:
+                    valid_type(i.type);
+                    if (!m.coordinated || i.a || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition->result_type || field_type(i.type,1)!=Type::u64 || field_type(i.type,2)!=Type::i32) fail("invalid random entropy result");
+                    result=i.type; break;
                 case Op::bitcast:
                     valid_type(i.type);
                     if(!numeric::number(operand(i.a)) || !numeric::number(i.type) || numeric::width(operand(i.a))!=numeric::width(i.type) || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid numeric bitcast");
@@ -1375,6 +1382,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
+                case Op::random_seed:fail("worker cannot acquire OS entropy");break;
                 case Op::global_cell:fail("worker cannot access runtime globals");break;
                 case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;

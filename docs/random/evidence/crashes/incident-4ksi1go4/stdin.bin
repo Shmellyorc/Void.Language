@@ -1,0 +1,75 @@
+Content-Length: 233
+
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{"textDocument":{"publishDiagnostics":{"versionSupport":true}},"workspace":{"workspaceEdit":{"documentChanges":true,"failureHandling":"textOnlyTransactional"}}}}}Content-Length: 52
+
+{"jsonrpc":"2.0","method":"initialized","params":{}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":2,"method":"void/barrier"}Content-Length: 389
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":1,"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    print(\"🎮\", score, game.defeated)\n    print(shared.count)\n"}}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":3,"method":"void/barrier"}Content-Length: 205
+
+{"jsonrpc":"2.0","id":4,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":16}}}Content-Length: 210
+
+{"jsonrpc":"2.0","id":5,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":28}}}Content-Length: 247
+
+{"jsonrpc":"2.0","id":6,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":3,"character":4},"context":{"includeDeclaration":true}}}Content-Length: 224
+
+{"jsonrpc":"2.0","id":7,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":3,"character":4},"newName":"points"}}Content-Length: 222
+
+{"jsonrpc":"2.0","id":8,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":3,"character":4},"newName":"game"}}Content-Length: 205
+
+{"jsonrpc":"2.0","id":9,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":7,"character":17}}}Content-Length: 227
+
+{"jsonrpc":"2.0","id":10,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":7,"character":17},"newName":"changed"}}Content-Length: 387
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":2},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    print(game.)\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":11,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":12,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":15}}}Content-Length: 386
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":3},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    sco = score\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":13,"method":"void/barrier"}Content-Length: 210
+
+{"jsonrpc":"2.0","id":14,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":7}}}Content-Length: 387
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":4},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    game.def = 3\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":15,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":16,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":12}}}Content-Length: 386
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":5},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    score = sco\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":17,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":18,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":15}}}Content-Length: 418
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":6},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = missing\nfunc main():\n    game.reward()\n    print(\"🎮\", score, game.defeated)\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":19,"method":"void/barrier"}Content-Length: 206
+
+{"jsonrpc":"2.0","id":20,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":16}}}Content-Length: 412
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":7},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    print(\"🎮\", score, game.defeated)\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":21,"method":"void/barrier"}Content-Length: 418
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":6},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = missing\nfunc main():\n    game.reward()\n    print(\"🎮\", score, game.defeated)\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":22,"method":"void/barrier"}Content-Length: 206
+
+{"jsonrpc":"2.0","id":23,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":16}}}Content-Length: 413
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","languageId":"void","version":8},"contentChanges":[{"text":"use \"./game.void\" as game\nuse state as shared\n## Shared score.\nvar score = 12\nfunc main():\n    game.reward()\n    print(\"🎮\", score, game.defeated)\n    print(shared.count)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":24,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":25,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},"position":{"line":6,"character":16}}}Content-Length: 53
+
+{"jsonrpc":"2.0","id":"shutdown","method":"shutdown"}Content-Length: 33
+
+{"jsonrpc":"2.0","method":"exit"}

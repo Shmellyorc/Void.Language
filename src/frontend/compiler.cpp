@@ -453,13 +453,35 @@ struct Function {
 };
 // Presentation uses the selected compiler function, including concrete generic
 // types. Source identities remain shared for navigation and references.
+std::string random_public_name(const Function& f) {
+    auto name=f.token.text;
+    if (f.symbol.starts_with("/@stdlib/random.void::") && name.starts_with("_arity_")) {
+        name=name.substr(7); name.resize(name.rfind('_'));
+    }
+    return name;
+}
+bool random_numeric_function(const Function& f) {
+    if(!f.symbol.starts_with("/@stdlib/random.void::"))return false;
+    auto name=random_public_name(f);
+    auto suffix=name.starts_with("try_rand_")?name.substr(9):name.starts_with("rand_")?name.substr(5):"";
+    return numeric::number(numeric::primitive(suffix));
+}
 std::string editor_signature(const Function& f) {
-    std::string out=f.visibility+" ";
+    std::string out=(random_numeric_function(f) && f.token.text.starts_with("_arity_") ? "public" : f.visibility)+std::string(" ");
     if(!f.operator_glyph.empty())out+="operator "+f.operator_glyph;
-    else out+=f.token.text;
+    else out+=random_public_name(f);
     out+="(";
     for(unsigned n=0;n<f.parameters.size();++n){if(n)out+=", ";const auto& p=f.parameters[n];out+=p.token.text+": "+ir::type_name(p.type);if(p.default_expression)out+=" = …";}
     out+=") -> "+ir::type_name(f.result);
+    if (f.symbol.starts_with("/@stdlib/random.void::") && !f.token.text.starts_with("_arity_")) {
+        auto name=random_public_name(f);
+        auto suffix=name.starts_with("try_rand_")?name.substr(9):name.starts_with("rand_")?name.substr(5):"";
+        if (numeric::number(numeric::primitive(suffix))) {
+            if(f.parameters.empty())out+="\n"+name+"(maximum: "+suffix+") -> "+ir::type_name(f.result);
+            out+="\n"+name+"(lower: "+suffix+", upper: "+suffix+") -> "+ir::type_name(f.result);
+            out+="\nBounded forms are direct calls; function values retain the declared signature.";
+        }
+    }
     if(!f.operator_glyph.empty())out+="\nDeclared by "+ir::type_name(f.operator_owner);
     else if(f.receiver)out+="\nDeclared by "+ir::type_name(f.receiver->type);
     if(f.capability_contract.empty())return out+"\nEffects: pending analysis";
@@ -1744,6 +1766,7 @@ class Semantics {
     // Resolve the receiver before reserving mutation/member-check temporaries.
     // Deep receiver chains must reach the existing semantic nesting guard on
     // the supported 1 MiB native stack in Debug as well as optimized builds.
+    #include "random.inc"
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
         if(numeric::number(receiver))return numeric_call(e,receiver,false);
         if(receiver.kind==Type::string || (ir::collection_type(receiver) && (e.token.text=="get" || e.token.text=="pop")))return core_call(e,receiver);
@@ -1804,7 +1827,7 @@ class Semantics {
                 if (!selected.function) error(source,e.token,Code::not_callable,"Field '"+e.token.text+"' is not callable.");
                 for (auto index:selected.path) embedded_receiver(e.parts[0],index,e.token);
                 receiver=e.parts[0]->type;
-                return *selected.function;
+                return random_arity(e,*selected.function,1);
             }
             catch (const CompilationError&) { check_arguments(); throw; }
             catch (const Poison&) { check_arguments(); throw; }
@@ -1865,11 +1888,11 @@ class Semantics {
             }
         }
         if(!active)return;
-        auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=target.token.text+"(";
+        auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=random_public_name(target)+"(";
         Documentation docs;
         if(selected_docs)docs=*selected_docs;
         else {
-            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target)docs=source_documentation(u->source,target.token.offset);
+            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target || (target.symbol.starts_with("/@stdlib/random.void::") && f.token.text==random_public_name(target) && bool(f.receiver)==bool(target.receiver)))docs=source_documentation(u->source,f.token.offset);
             if(auto builtin=unit.builtins.find(target.symbol);builtin!=unit.builtins.end())docs=builtin->second.documentation;
         }
         if(target.symbol.starts_with("$numeric::"))docs=numeric_documentation(*numeric::member(target.token.text));
@@ -1890,7 +1913,7 @@ class Semantics {
             out.documentation=std::string(numeric::member(target.token.text)->documentation);
             if(e.op=="$bound_numeric" && !out.parameters.empty()) {
                 out.parameters.erase(out.parameters.begin());out.parameter_documentation.erase(out.parameter_documentation.begin());out.active_parameter=out.active_parameter?out.active_parameter-1:0;
-                out.signature=target.token.text+"(";for(const auto& p:out.parameters){if(out.signature.back()!='(')out.signature+=", ";out.signature+=p;}out.signature+=") -> "+ir::type_name(target.result);
+                out.signature=random_public_name(target)+"(";for(const auto& p:out.parameters){if(out.signature.back()!='(')out.signature+=", ";out.signature+=p;}out.signature+=") -> "+ir::type_name(target.result);
             }
         }
     }
@@ -2032,7 +2055,14 @@ class Semantics {
         if (actual != expected) error(source, token, Code::type_mismatch, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".", {}, {}, ir::type_name(expected), ir::type_name(actual));
     }
     unsigned declare(const Token& token, Type type, bool readonly = false) {
-        if (lookup(token.text) || visible_names.contains(token.text)) {
+        // The approved random constructor and module seeder both spell `seed`.
+        // Permit only this canonical initializer parameter to shadow that function.
+        const bool random_seed_parameter = unit.identity == "/@stdlib/random.void" &&
+            current && current->initializer && current->receiver &&
+            Type::key(current->receiver->type) == "/@stdlib/random.void::generator" &&
+            token.text == "seed" && !current->parameters.empty() &&
+            token.offset == current->parameters[0].token.offset;
+        if (lookup(token.text) || (visible_names.contains(token.text) && !random_seed_parameter)) {
             std::vector<RelatedLocation> related;
             if (auto* previous = lookup(token.text)) {
                 related.push_back({span(source, previous->declaration), "Previously declared"});
@@ -2318,8 +2348,10 @@ class Semantics {
                 auto selected = member(t, token);
                 if(selected.function) {
                     if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
-                    if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2))
+                    if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2)) {
+                        if(random_numeric_function(*selected.function))candidate->detail=editor_signature(*selected.function);
                         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);
+                    }
                 } else {
                     if(t.definition->native_resource)continue; // Source methods remain visible; native payloads do not.
                     auto type=t;bool readonly=false;std::string declaring;
@@ -2370,6 +2402,7 @@ class Semantics {
                     }
 
                     if (auto* candidate = add(name, result, 3)) {
+                        if(random_numeric_function(function))candidate->detail=editor_signature(function);
                         for (const auto& [id, owner] : units) {
                             if (owner->declarations.contains(function.token.text) &&
                                 owner->declarations.at(function.token.text) == &function) {
@@ -2641,7 +2674,11 @@ class Semantics {
         return e.type=*expected;
     }
     Type slice_type(Type source) {
-        auto element=ir::array_element(source);auto definition=std::make_shared<ir::ValueType>();definition->identity=definition->name=ir::array_identity(element,{});definition->element=ir::FieldType(element);
+        auto element=ir::array_element(source);auto definition=std::make_shared<ir::ValueType>();definition->identity=definition->name=ir::array_identity(element,{});
+        // Structural element definitions are authority-free. Project the const
+        // source's child permissions onto the new list type below, never embed
+        // those permissions in its shared physical element definition.
+        definition->element=ir::FieldType(ir::with_readonly_paths(element,{}));
         Type result(definition,Type::growable_array);ir::ReferencePaths paths;
         for(auto path:ir::readonly_paths(element)){path.insert(path.begin(),ir::array_element_path);paths.insert(std::move(path));}
         return ir::with_readonly_paths(result,paths);
@@ -3014,6 +3051,9 @@ class Semantics {
             return e.type = unit.make_result(Type::string, Type::string);
         }
 
+        if (e.target.starts_with("$random.") || (unit.identity == "/@stdlib/random.void" && e.qualifier.empty() &&
+            (e.token.text == "_random_xor" || e.token.text == "_random_domain_max" || e.token.text == "_random_seed"))) return random_private_call(e);
+
         if (unit.identity == "/@stdlib/encoding/binary.void" && e.qualifier.empty() &&
             (e.token.text == "_binary_width" || e.token.text == "_binary_bits" ||
              e.token.text == "_binary_value")) {
@@ -3092,7 +3132,7 @@ class Semantics {
         }
         const auto& target = [&]() -> const Function& {
             auto check_arguments = [&] { for (auto& argument : e.parts) expression(*argument); };
-            try { return concrete_function(e,resolve(e)); }
+            try { return random_arity(e,concrete_function(e,resolve(e)),0); }
             catch (const CompilationError&) { check_arguments(); throw; }
             catch (const Poison&) { check_arguments(); throw; }
         }();
@@ -3785,6 +3825,7 @@ class Lowering {
             i.op == ir::Op::scalar_parse ||
             i.op == ir::Op::result_unwrap ||
             i.op == ir::Op::temporal_native ||
+            i.op == ir::Op::random_seed ||
             i.op == ir::Op::scalar_display ||
             i.op == ir::Op::scalar_format;
         if (coordinated_operation) {
@@ -4246,6 +4287,9 @@ class Lowering {
                 std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
                 ir::Instruction operation{ir::Op::console_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(9));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
             }
+            if (e.target == "$random.domain") { ir::Instruction i{ir::Op::constant}; i.type=Type::u64; i.immediate=e.value; return emit(i,e.token); }
+            if (e.target == "$random.xor") { auto a=expression(*e.parts[0]); auto b=expression(*e.parts[1]); ir::Instruction i{ir::Op::random_xor,a,b}; i.type=Type::u64; return emit(i,e.token); }
+            if (e.target == "$random.seed") { ir::Instruction i{ir::Op::random_seed}; i.type=e.type; return emit(i,e.token); }
             if (e.target.starts_with("$binary.")) {
                 if (e.target == "$binary.width") {
                     return constant(Type::i64, {e.value, {}}, e.token);
@@ -5778,7 +5822,7 @@ struct AnalysisAccess {
         std::map<std::string,std::string> owner_names;
         for(const auto& [id,u]:*graph)for(const auto& structure:u->structures)owner_names.emplace(structure.definition->identity,ir::type_name(Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate)));
         std::map<std::string,std::string> signatures;
-        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver)signatures.emplace(f.symbol,editor_signature(f));
+        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f))signatures.emplace(f.symbol,editor_signature(f));
         // Hook calls already selected in ordinary display adapter bodies supply
         // navigation. No editor-side method lookup or runtime hook search.
         std::map<std::string,std::map<std::string,std::string>> display_hooks;
@@ -5842,6 +5886,7 @@ struct AnalysisAccess {
             std::string binding;
             if(native_contract){field(binding,from);field(binding,to);if(auto spec=format_specification(e))field(binding,*spec);}
             std::string presentation=signatures.contains(to)?signatures.at(to):"";
+            if(!e.source_target.empty() && e.source_target==to && e.target.starts_with("/@stdlib/random.void::") && signatures.contains(e.target))presentation=signatures.at(e.target);
             if(e.kind==Expr::Kind::field && !e.parts.empty() && e.parts[0]->type.definition && e.slot<e.parts[0]->type.definition->fields.size()) {
                 const auto& member=e.parts[0]->type.definition->fields[e.slot];
                 if(to==member.owner+"::field::"+member.name)presentation=(member.visibility=="public"?"":member.visibility+" ")+(member.readonly?"const ":"")+member.name+": "+ir::type_name(e.type)+" (declared by "+(owner_names.contains(member.owner)?owner_names.at(member.owner):member.owner)+")";
@@ -6024,7 +6069,7 @@ struct AnalysisAccess {
                 if(!f.operator_glyph.empty()){method_record.owner=Type::key(f.operator_owner);method_record.operator_glyph=f.operator_glyph;method_record.editor_symbol_kind=25;}
                 if(f.accessor)method_record.editor_symbol_kind=7;
                 method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application" && !f.global_initializer;
-                if(!f.operator_glyph.empty() || f.receiver)method_record.signature=editor_signature(f);
+                if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f))method_record.signature=editor_signature(f);
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
                 if(f.overriding) method_record.override_target=f.virtual_slot;

@@ -1,0 +1,72 @@
+{
+  "profile": "sanitizers",
+  "repair": false,
+  "infrastructure_repair": false,
+  "numeric_followup": true,
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "-R",
+    "^(random_execution|random_stack)$",
+    "-j",
+    "2",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/random/evidence/acceptance-sanitizers-numeric-followup.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "status": 0,
+  "seconds": 151.6547544002533,
+  "tests": [
+    {
+      "name": "random_execution",
+      "seconds": 150.68,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_stack",
+      "seconds": 151.629,
+      "failed": false,
+      "skipped": false
+    }
+  ],
+  "passed": 2,
+  "failed": 0,
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/random/evidence/crashes",
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+  },
+  "compiler_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5",
+  "sources": {
+    "CMakeLists.txt": "01cacc0fd445667087f7eb69ec46d604937e84bb9cd9ea2c2535e08870c6857b",
+    "cmake/NativeBuild.cmake": "d996d4a029de2ec4a9ff3970845c6edff33b47dc9cb2328942f24b449473eda9",
+    "include/void/ir.hpp": "5af4701d92de613c846a31c0a3bcf280ea9f6d1a36c4a68910e98904e2f373f4",
+    "include/void/runtime_abi.hpp": "7d43064a058bbc712340b5745ed886666a529394090b5f3b77d1e1fc93543cb1",
+    "src/frontend/compiler.cpp": "44c3112d6246cdd01952db1037f5757c62bfbe3394b95a52363c2eba5d13246c",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/capabilities.inc": "5e0df17360678ba7b7793c2afcd8345470dd248e772167765eda40f8febfcc07",
+    "src/ir/module.cpp": "eee3524031a54e1b491d20161f8788d0c9cf96bc498ac250153a80a26b4d5d21",
+    "src/backend/llvm/backend.cpp": "6c672e9a6013da92dce29d25ced6df9558036debf6606f77e93bc4316d68b211",
+    "src/runtime/random.cpp": "b56c4cad835e54fac6b25f7f7597269d348c45492f27ea108a0fe6dd41fa69cf",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec",
+    "tests/random/reference.py": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+    "tests/random/harness.py": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950",
+    "tests/random/execution.py": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c",
+    "tests/random/frontend.py": "cd6c517531ce4a0bd157f71c3de3d94a4a94de16ac795f7aac87db6d30cd24fc",
+    "tests/random/host.cpp": "21c10bdc76a6c973b1935f52137d124949c088300beec7291e1af9f82408be9a",
+    "tests/random/host.py": "d30ae41d663bd4701e56d8329afbf55fb865ef7690d5267e2cfce1b6c5dfa971",
+    "tests/random/lsp.py": "14967a736e1083bf7eb81c547fd6632215ba13c0e7de3d5edd673b6481277827",
+    "tests/random/entropy.void": "551f38d9d7603577bfc0c6d171e8674963c796b31ea91a1947d2289e3241065b",
+    "tests/random/install.py": "319fec06e59841d3e39359a00957ad622b76f0f08a708c402a6fffb4eaea4097",
+    "tests/random/errors.py": "2116dc1717990c685ee07be50750781a7092ed85c98753b461c9562bf8639f8e",
+    "tests/random/preservation.py": "61d92d52c1d246148184a9053e9b908830d567203e511d95a404af1c2fb310de",
+    "tests/random/worker.void": "b80850327b56b06cdb5b125eca67ffd459b5e055800025b038aa8e19486831d8",
+    "tests/random/worker.py": "72d130bb265c56c0a350d0f1ea95795fa95db71cb2a26a65f0bb2298cdb15a61",
+    "tests/random/acceptance.py": "d8712aba2ad61c4d2b3cf8c44f09eb3401463633d13b9f01117bb1586813ea2a"
+  }
+}

@@ -1,0 +1,1246 @@
+use encoding/binary
+
+func equal(const left: [u8], const right: [u8]) -> bool:
+    if left.count != right.count:
+        return false
+
+    for item, index in left:
+        if item != right[index]:
+            return false
+
+    return true
+
+func numeric<t>(value: t, const expected: [u8], order: binary.byte_order) -> bool:
+    var encoded = binary.encode(value, order)
+
+    if not equal(encoded, expected):
+        return false
+
+    if binary.decode<t>(expected, order) is Ok(var decoded):
+        return decoded == value and equal(binary.encode(decoded, order), expected)
+
+    return false
+
+func pattern<t>(const expected: [u8]) -> bool:
+    if binary.decode<t>(expected) is Ok(var decoded):
+        if not equal(binary.encode(decoded), expected):
+            return false
+
+        var reversed = expected[expected.count - 1..0]
+
+        if not equal(binary.encode(decoded, binary.byte_order.big), reversed):
+            return false
+
+        if binary.decode<t>(reversed, binary.byte_order.big) is Ok(var big):
+            return equal(binary.encode(big), expected)
+
+    return false
+
+func invalid<t>() -> bool:
+    for count in 0..16:
+        var bytes: [u8] = []
+
+        for index in 0..<count:
+            bytes.push(255)
+
+        for selection in 0..1:
+            var order = binary.byte_order.little
+
+            if selection == 1:
+                order = binary.byte_order.big
+
+            var result = binary.decode<t>(bytes, order)
+            var width = binary.encode<t>(0).count
+
+            if (count as i64) == width:
+                if result is Err(var reason):
+                    return false
+            else:
+                if result is Ok(var value):
+                    return false
+
+                if result is Err(var reason):
+                    if not (reason.kind is binary.error_kind.wrong_width):
+                        return false
+
+    return true
+
+func propagated(const bytes: [u8]) -> result<i64, binary.error>:
+    var value = binary.decode<i64>(bytes)?
+    return Ok(value)
+
+func ownership() -> bool:
+    var first = binary.encode<i64>(-1)
+    var second = binary.encode<i64>(-1)
+    second[0] = 0
+
+    if first[0] != 255:
+        return false
+
+    const input: [u8] = [1, 0, 0, 0]
+
+    if binary.decode<i32>(input) is Ok(var value):
+        if value != 1 or input[0] != 1:
+            return false
+    else:
+        return false
+
+    if propagated([]) is Err(var reason):
+        return reason.kind is binary.error_kind.wrong_width
+
+    return false
+
+func integer_i8() -> i32:
+    if not numeric<i8>(-128, [128], binary.byte_order.little):
+        return 1
+
+    if not numeric<i8>(-128, [128], binary.byte_order.big):
+        return 2
+
+    if not numeric<i8>(-127, [129], binary.byte_order.little):
+        return 3
+
+    if not numeric<i8>(-127, [129], binary.byte_order.big):
+        return 4
+
+    if not numeric<i8>(-124, [132], binary.byte_order.little):
+        return 5
+
+    if not numeric<i8>(-124, [132], binary.byte_order.big):
+        return 6
+
+    if not numeric<i8>(-123, [133], binary.byte_order.little):
+        return 7
+
+    if not numeric<i8>(-123, [133], binary.byte_order.big):
+        return 8
+
+    if not numeric<i8>(-83, [173], binary.byte_order.little):
+        return 9
+
+    if not numeric<i8>(-83, [173], binary.byte_order.big):
+        return 10
+
+    if not numeric<i8>(-70, [186], binary.byte_order.little):
+        return 11
+
+    if not numeric<i8>(-70, [186], binary.byte_order.big):
+        return 12
+
+    if not numeric<i8>(-60, [196], binary.byte_order.little):
+        return 13
+
+    if not numeric<i8>(-60, [196], binary.byte_order.big):
+        return 14
+
+    if not numeric<i8>(-12, [244], binary.byte_order.little):
+        return 15
+
+    if not numeric<i8>(-12, [244], binary.byte_order.big):
+        return 16
+
+    if not numeric<i8>(-2, [254], binary.byte_order.little):
+        return 17
+
+    if not numeric<i8>(-2, [254], binary.byte_order.big):
+        return 18
+
+    if not numeric<i8>(-1, [255], binary.byte_order.little):
+        return 19
+
+    if not numeric<i8>(-1, [255], binary.byte_order.big):
+        return 20
+
+    if not numeric<i8>(0, [0], binary.byte_order.little):
+        return 21
+
+    if not numeric<i8>(0, [0], binary.byte_order.big):
+        return 22
+
+    if not numeric<i8>(1, [1], binary.byte_order.little):
+        return 23
+
+    if not numeric<i8>(1, [1], binary.byte_order.big):
+        return 24
+
+    if not numeric<i8>(77, [77], binary.byte_order.little):
+        return 25
+
+    if not numeric<i8>(77, [77], binary.byte_order.big):
+        return 26
+
+    if not numeric<i8>(79, [79], binary.byte_order.little):
+        return 27
+
+    if not numeric<i8>(79, [79], binary.byte_order.big):
+        return 28
+
+    if not numeric<i8>(120, [120], binary.byte_order.little):
+        return 29
+
+    if not numeric<i8>(120, [120], binary.byte_order.big):
+        return 30
+
+    if not numeric<i8>(123, [123], binary.byte_order.little):
+        return 31
+
+    if not numeric<i8>(123, [123], binary.byte_order.big):
+        return 32
+
+    if not numeric<i8>(126, [126], binary.byte_order.little):
+        return 33
+
+    if not numeric<i8>(126, [126], binary.byte_order.big):
+        return 34
+
+    if not numeric<i8>(127, [127], binary.byte_order.little):
+        return 35
+
+    if not numeric<i8>(127, [127], binary.byte_order.big):
+        return 36
+
+    if not invalid<i8>():
+        return 37
+
+    return 0
+
+func integer_u8() -> i32:
+    if not numeric<u8>(0, [0], binary.byte_order.little):
+        return 38
+
+    if not numeric<u8>(0, [0], binary.byte_order.big):
+        return 39
+
+    if not numeric<u8>(1, [1], binary.byte_order.little):
+        return 40
+
+    if not numeric<u8>(1, [1], binary.byte_order.big):
+        return 41
+
+    if not numeric<u8>(98, [98], binary.byte_order.little):
+        return 42
+
+    if not numeric<u8>(98, [98], binary.byte_order.big):
+        return 43
+
+    if not numeric<u8>(128, [128], binary.byte_order.little):
+        return 44
+
+    if not numeric<u8>(128, [128], binary.byte_order.big):
+        return 45
+
+    if not numeric<u8>(138, [138], binary.byte_order.little):
+        return 46
+
+    if not numeric<u8>(138, [138], binary.byte_order.big):
+        return 47
+
+    if not numeric<u8>(169, [169], binary.byte_order.little):
+        return 48
+
+    if not numeric<u8>(169, [169], binary.byte_order.big):
+        return 49
+
+    if not numeric<u8>(174, [174], binary.byte_order.little):
+        return 50
+
+    if not numeric<u8>(174, [174], binary.byte_order.big):
+        return 51
+
+    if not numeric<u8>(181, [181], binary.byte_order.little):
+        return 52
+
+    if not numeric<u8>(181, [181], binary.byte_order.big):
+        return 53
+
+    if not numeric<u8>(190, [190], binary.byte_order.little):
+        return 54
+
+    if not numeric<u8>(190, [190], binary.byte_order.big):
+        return 55
+
+    if not numeric<u8>(254, [254], binary.byte_order.little):
+        return 56
+
+    if not numeric<u8>(254, [254], binary.byte_order.big):
+        return 57
+
+    if not numeric<u8>(255, [255], binary.byte_order.little):
+        return 58
+
+    if not numeric<u8>(255, [255], binary.byte_order.big):
+        return 59
+
+    if not invalid<u8>():
+        return 60
+
+    return 0
+
+func integer_i16() -> i32:
+    if not numeric<i16>(-32768, [0, 128], binary.byte_order.little):
+        return 61
+
+    if not numeric<i16>(-32768, [128, 0], binary.byte_order.big):
+        return 62
+
+    if not numeric<i16>(-32767, [1, 128], binary.byte_order.little):
+        return 63
+
+    if not numeric<i16>(-32767, [128, 1], binary.byte_order.big):
+        return 64
+
+    if not numeric<i16>(-25835, [21, 155], binary.byte_order.little):
+        return 65
+
+    if not numeric<i16>(-25835, [155, 21], binary.byte_order.big):
+        return 66
+
+    if not numeric<i16>(-15849, [23, 194], binary.byte_order.little):
+        return 67
+
+    if not numeric<i16>(-15849, [194, 23], binary.byte_order.big):
+        return 68
+
+    if not numeric<i16>(-5655, [233, 233], binary.byte_order.little):
+        return 69
+
+    if not numeric<i16>(-5655, [233, 233], binary.byte_order.big):
+        return 70
+
+    if not numeric<i16>(-4098, [254, 239], binary.byte_order.little):
+        return 71
+
+    if not numeric<i16>(-4098, [239, 254], binary.byte_order.big):
+        return 72
+
+    if not numeric<i16>(-123, [133, 255], binary.byte_order.little):
+        return 73
+
+    if not numeric<i16>(-123, [255, 133], binary.byte_order.big):
+        return 74
+
+    if not numeric<i16>(-2, [254, 255], binary.byte_order.little):
+        return 75
+
+    if not numeric<i16>(-2, [255, 254], binary.byte_order.big):
+        return 76
+
+    if not numeric<i16>(-1, [255, 255], binary.byte_order.little):
+        return 77
+
+    if not numeric<i16>(-1, [255, 255], binary.byte_order.big):
+        return 78
+
+    if not numeric<i16>(0, [0, 0], binary.byte_order.little):
+        return 79
+
+    if not numeric<i16>(0, [0, 0], binary.byte_order.big):
+        return 80
+
+    if not numeric<i16>(1, [1, 0], binary.byte_order.little):
+        return 81
+
+    if not numeric<i16>(1, [0, 1], binary.byte_order.big):
+        return 82
+
+    if not numeric<i16>(123, [123, 0], binary.byte_order.little):
+        return 83
+
+    if not numeric<i16>(123, [0, 123], binary.byte_order.big):
+        return 84
+
+    if not numeric<i16>(16179, [51, 63], binary.byte_order.little):
+        return 85
+
+    if not numeric<i16>(16179, [63, 51], binary.byte_order.big):
+        return 86
+
+    if not numeric<i16>(18036, [116, 70], binary.byte_order.little):
+        return 87
+
+    if not numeric<i16>(18036, [70, 116], binary.byte_order.big):
+        return 88
+
+    if not numeric<i16>(32280, [24, 126], binary.byte_order.little):
+        return 89
+
+    if not numeric<i16>(32280, [126, 24], binary.byte_order.big):
+        return 90
+
+    if not numeric<i16>(32288, [32, 126], binary.byte_order.little):
+        return 91
+
+    if not numeric<i16>(32288, [126, 32], binary.byte_order.big):
+        return 92
+
+    if not numeric<i16>(32766, [254, 127], binary.byte_order.little):
+        return 93
+
+    if not numeric<i16>(32766, [127, 254], binary.byte_order.big):
+        return 94
+
+    if not numeric<i16>(32767, [255, 127], binary.byte_order.little):
+        return 95
+
+    if not numeric<i16>(32767, [127, 255], binary.byte_order.big):
+        return 96
+
+    if not invalid<i16>():
+        return 97
+
+    return 0
+
+func integer_u16() -> i32:
+    if not numeric<u16>(0, [0, 0], binary.byte_order.little):
+        return 98
+
+    if not numeric<u16>(0, [0, 0], binary.byte_order.big):
+        return 99
+
+    if not numeric<u16>(1, [1, 0], binary.byte_order.little):
+        return 100
+
+    if not numeric<u16>(1, [0, 1], binary.byte_order.big):
+        return 101
+
+    if not numeric<u16>(128, [128, 0], binary.byte_order.little):
+        return 102
+
+    if not numeric<u16>(128, [0, 128], binary.byte_order.big):
+        return 103
+
+    if not numeric<u16>(255, [255, 0], binary.byte_order.little):
+        return 104
+
+    if not numeric<u16>(255, [0, 255], binary.byte_order.big):
+        return 105
+
+    if not numeric<u16>(9176, [216, 35], binary.byte_order.little):
+        return 106
+
+    if not numeric<u16>(9176, [35, 216], binary.byte_order.big):
+        return 107
+
+    if not numeric<u16>(28535, [119, 111], binary.byte_order.little):
+        return 108
+
+    if not numeric<u16>(28535, [111, 119], binary.byte_order.big):
+        return 109
+
+    if not numeric<u16>(37334, [214, 145], binary.byte_order.little):
+        return 110
+
+    if not numeric<u16>(37334, [145, 214], binary.byte_order.big):
+        return 111
+
+    if not numeric<u16>(40357, [165, 157], binary.byte_order.little):
+        return 112
+
+    if not numeric<u16>(40357, [157, 165], binary.byte_order.big):
+        return 113
+
+    if not numeric<u16>(42280, [40, 165], binary.byte_order.little):
+        return 114
+
+    if not numeric<u16>(42280, [165, 40], binary.byte_order.big):
+        return 115
+
+    if not numeric<u16>(51363, [163, 200], binary.byte_order.little):
+        return 116
+
+    if not numeric<u16>(51363, [200, 163], binary.byte_order.big):
+        return 117
+
+    if not numeric<u16>(53621, [117, 209], binary.byte_order.little):
+        return 118
+
+    if not numeric<u16>(53621, [209, 117], binary.byte_order.big):
+        return 119
+
+    if not numeric<u16>(56611, [35, 221], binary.byte_order.little):
+        return 120
+
+    if not numeric<u16>(56611, [221, 35], binary.byte_order.big):
+        return 121
+
+    if not numeric<u16>(65534, [254, 255], binary.byte_order.little):
+        return 122
+
+    if not numeric<u16>(65534, [255, 254], binary.byte_order.big):
+        return 123
+
+    if not numeric<u16>(65535, [255, 255], binary.byte_order.little):
+        return 124
+
+    if not numeric<u16>(65535, [255, 255], binary.byte_order.big):
+        return 125
+
+    if not invalid<u16>():
+        return 126
+
+    return 0
+
+func integer_i32() -> i32:
+    if not numeric<i32>(-2147483648, [0, 0, 0, 128], binary.byte_order.little):
+        return 127
+
+    if not numeric<i32>(-2147483648, [128, 0, 0, 0], binary.byte_order.big):
+        return 128
+
+    if not numeric<i32>(-2147483647, [1, 0, 0, 128], binary.byte_order.little):
+        return 129
+
+    if not numeric<i32>(-2147483647, [128, 0, 0, 1], binary.byte_order.big):
+        return 130
+
+    if not numeric<i32>(-1905722908, [228, 249, 104, 142], binary.byte_order.little):
+        return 131
+
+    if not numeric<i32>(-1905722908, [142, 104, 249, 228], binary.byte_order.big):
+        return 132
+
+    if not numeric<i32>(-544760018, [46, 159, 135, 223], binary.byte_order.little):
+        return 133
+
+    if not numeric<i32>(-544760018, [223, 135, 159, 46], binary.byte_order.big):
+        return 134
+
+    if not numeric<i32>(-331214659, [189, 16, 66, 236], binary.byte_order.little):
+        return 135
+
+    if not numeric<i32>(-331214659, [236, 66, 16, 189], binary.byte_order.big):
+        return 136
+
+    if not numeric<i32>(-139355554, [94, 154, 177, 247], binary.byte_order.little):
+        return 137
+
+    if not numeric<i32>(-139355554, [247, 177, 154, 94], binary.byte_order.big):
+        return 138
+
+    if not numeric<i32>(-123, [133, 255, 255, 255], binary.byte_order.little):
+        return 139
+
+    if not numeric<i32>(-123, [255, 255, 255, 133], binary.byte_order.big):
+        return 140
+
+    if not numeric<i32>(-2, [254, 255, 255, 255], binary.byte_order.little):
+        return 141
+
+    if not numeric<i32>(-2, [255, 255, 255, 254], binary.byte_order.big):
+        return 142
+
+    if not numeric<i32>(-1, [255, 255, 255, 255], binary.byte_order.little):
+        return 143
+
+    if not numeric<i32>(-1, [255, 255, 255, 255], binary.byte_order.big):
+        return 144
+
+    if not numeric<i32>(0, [0, 0, 0, 0], binary.byte_order.little):
+        return 145
+
+    if not numeric<i32>(0, [0, 0, 0, 0], binary.byte_order.big):
+        return 146
+
+    if not numeric<i32>(1, [1, 0, 0, 0], binary.byte_order.little):
+        return 147
+
+    if not numeric<i32>(1, [0, 0, 0, 1], binary.byte_order.big):
+        return 148
+
+    if not numeric<i32>(123, [123, 0, 0, 0], binary.byte_order.little):
+        return 149
+
+    if not numeric<i32>(123, [0, 0, 0, 123], binary.byte_order.big):
+        return 150
+
+    if not numeric<i32>(210029266, [210, 202, 132, 12], binary.byte_order.little):
+        return 151
+
+    if not numeric<i32>(210029266, [12, 132, 202, 210], binary.byte_order.big):
+        return 152
+
+    if not numeric<i32>(274606823, [231, 42, 94, 16], binary.byte_order.little):
+        return 153
+
+    if not numeric<i32>(274606823, [16, 94, 42, 231], binary.byte_order.big):
+        return 154
+
+    if not numeric<i32>(1826557105, [177, 12, 223, 108], binary.byte_order.little):
+        return 155
+
+    if not numeric<i32>(1826557105, [108, 223, 12, 177], binary.byte_order.big):
+        return 156
+
+    if not numeric<i32>(1893092715, [107, 77, 214, 112], binary.byte_order.little):
+        return 157
+
+    if not numeric<i32>(1893092715, [112, 214, 77, 107], binary.byte_order.big):
+        return 158
+
+    if not numeric<i32>(2147483646, [254, 255, 255, 127], binary.byte_order.little):
+        return 159
+
+    if not numeric<i32>(2147483646, [127, 255, 255, 254], binary.byte_order.big):
+        return 160
+
+    if not numeric<i32>(2147483647, [255, 255, 255, 127], binary.byte_order.little):
+        return 161
+
+    if not numeric<i32>(2147483647, [127, 255, 255, 255], binary.byte_order.big):
+        return 162
+
+    if not invalid<i32>():
+        return 163
+
+    return 0
+
+func integer_u32() -> i32:
+    if not numeric<u32>(0, [0, 0, 0, 0], binary.byte_order.little):
+        return 164
+
+    if not numeric<u32>(0, [0, 0, 0, 0], binary.byte_order.big):
+        return 165
+
+    if not numeric<u32>(1, [1, 0, 0, 0], binary.byte_order.little):
+        return 166
+
+    if not numeric<u32>(1, [0, 0, 0, 1], binary.byte_order.big):
+        return 167
+
+    if not numeric<u32>(128, [128, 0, 0, 0], binary.byte_order.little):
+        return 168
+
+    if not numeric<u32>(128, [0, 0, 0, 128], binary.byte_order.big):
+        return 169
+
+    if not numeric<u32>(255, [255, 0, 0, 0], binary.byte_order.little):
+        return 170
+
+    if not numeric<u32>(255, [0, 0, 0, 255], binary.byte_order.big):
+        return 171
+
+    if not numeric<u32>(295726289, [209, 108, 160, 17], binary.byte_order.little):
+        return 172
+
+    if not numeric<u32>(295726289, [17, 160, 108, 209], binary.byte_order.big):
+        return 173
+
+    if not numeric<u32>(481328410, [26, 125, 176, 28], binary.byte_order.little):
+        return 174
+
+    if not numeric<u32>(481328410, [28, 176, 125, 26], binary.byte_order.big):
+        return 175
+
+    if not numeric<u32>(961755306, [170, 56, 83, 57], binary.byte_order.little):
+        return 176
+
+    if not numeric<u32>(961755306, [57, 83, 56, 170], binary.byte_order.big):
+        return 177
+
+    if not numeric<u32>(2957279985, [241, 130, 68, 176], binary.byte_order.little):
+        return 178
+
+    if not numeric<u32>(2957279985, [176, 68, 130, 241], binary.byte_order.big):
+        return 179
+
+    if not numeric<u32>(2964673247, [223, 82, 181, 176], binary.byte_order.little):
+        return 180
+
+    if not numeric<u32>(2964673247, [176, 181, 82, 223], binary.byte_order.big):
+        return 181
+
+    if not numeric<u32>(3241474624, [64, 250, 52, 193], binary.byte_order.little):
+        return 182
+
+    if not numeric<u32>(3241474624, [193, 52, 250, 64], binary.byte_order.big):
+        return 183
+
+    if not numeric<u32>(3584677392, [16, 214, 169, 213], binary.byte_order.little):
+        return 184
+
+    if not numeric<u32>(3584677392, [213, 169, 214, 16], binary.byte_order.big):
+        return 185
+
+    if not numeric<u32>(3625922134, [86, 46, 31, 216], binary.byte_order.little):
+        return 186
+
+    if not numeric<u32>(3625922134, [216, 31, 46, 86], binary.byte_order.big):
+        return 187
+
+    if not numeric<u32>(4294967294, [254, 255, 255, 255], binary.byte_order.little):
+        return 188
+
+    if not numeric<u32>(4294967294, [255, 255, 255, 254], binary.byte_order.big):
+        return 189
+
+    if not numeric<u32>(4294967295, [255, 255, 255, 255], binary.byte_order.little):
+        return 190
+
+    if not numeric<u32>(4294967295, [255, 255, 255, 255], binary.byte_order.big):
+        return 191
+
+    if not invalid<u32>():
+        return 192
+
+    return 0
+
+func integer_i64() -> i32:
+    if not numeric<i64>(-9223372036854775808, [0, 0, 0, 0, 0, 0, 0, 128], binary.byte_order.little):
+        return 193
+
+    if not numeric<i64>(-9223372036854775808, [128, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 194
+
+    if not numeric<i64>(-9223372036854775807, [1, 0, 0, 0, 0, 0, 0, 128], binary.byte_order.little):
+        return 195
+
+    if not numeric<i64>(-9223372036854775807, [128, 0, 0, 0, 0, 0, 0, 1], binary.byte_order.big):
+        return 196
+
+    if not numeric<i64>(-9033482292951798475, [53, 173, 211, 75, 183, 159, 162, 130], binary.byte_order.little):
+        return 197
+
+    if not numeric<i64>(-9033482292951798475, [130, 162, 159, 183, 75, 211, 173, 53], binary.byte_order.big):
+        return 198
+
+    if not numeric<i64>(-8328574628320592543, [97, 189, 158, 145, 128, 245, 106, 140], binary.byte_order.little):
+        return 199
+
+    if not numeric<i64>(-8328574628320592543, [140, 106, 245, 128, 145, 158, 189, 97], binary.byte_order.big):
+        return 200
+
+    if not numeric<i64>(-8199731405088821544, [216, 238, 16, 42, 187, 179, 52, 142], binary.byte_order.little):
+        return 201
+
+    if not numeric<i64>(-8199731405088821544, [142, 52, 179, 187, 42, 16, 238, 216], binary.byte_order.big):
+        return 202
+
+    if not numeric<i64>(-6869629535125775255, [105, 220, 75, 172, 85, 44, 170, 160], binary.byte_order.little):
+        return 203
+
+    if not numeric<i64>(-6869629535125775255, [160, 170, 44, 85, 172, 75, 220, 105], binary.byte_order.big):
+        return 204
+
+    if not numeric<i64>(-3423482656601182355, [109, 111, 147, 134, 169, 88, 125, 208], binary.byte_order.little):
+        return 205
+
+    if not numeric<i64>(-3423482656601182355, [208, 125, 88, 169, 134, 147, 111, 109], binary.byte_order.big):
+        return 206
+
+    if not numeric<i64>(-1589912329019278517, [75, 187, 202, 20, 41, 127, 239, 233], binary.byte_order.little):
+        return 207
+
+    if not numeric<i64>(-1589912329019278517, [233, 239, 127, 41, 20, 202, 187, 75], binary.byte_order.big):
+        return 208
+
+    if not numeric<i64>(-123, [133, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.little):
+        return 209
+
+    if not numeric<i64>(-123, [255, 255, 255, 255, 255, 255, 255, 133], binary.byte_order.big):
+        return 210
+
+    if not numeric<i64>(-2, [254, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.little):
+        return 211
+
+    if not numeric<i64>(-2, [255, 255, 255, 255, 255, 255, 255, 254], binary.byte_order.big):
+        return 212
+
+    if not numeric<i64>(-1, [255, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.little):
+        return 213
+
+    if not numeric<i64>(-1, [255, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.big):
+        return 214
+
+    if not numeric<i64>(0, [0, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 215
+
+    if not numeric<i64>(0, [0, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 216
+
+    if not numeric<i64>(1, [1, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 217
+
+    if not numeric<i64>(1, [0, 0, 0, 0, 0, 0, 0, 1], binary.byte_order.big):
+        return 218
+
+    if not numeric<i64>(123, [123, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 219
+
+    if not numeric<i64>(123, [0, 0, 0, 0, 0, 0, 0, 123], binary.byte_order.big):
+        return 220
+
+    if not numeric<i64>(4045221003417704551, [103, 88, 169, 242, 17, 131, 35, 56], binary.byte_order.little):
+        return 221
+
+    if not numeric<i64>(4045221003417704551, [56, 35, 131, 17, 242, 169, 88, 103], binary.byte_order.big):
+        return 222
+
+    if not numeric<i64>(9208869382749428249, [25, 26, 192, 181, 233, 121, 204, 127], binary.byte_order.little):
+        return 223
+
+    if not numeric<i64>(9208869382749428249, [127, 204, 121, 233, 181, 192, 26, 25], binary.byte_order.big):
+        return 224
+
+    if not numeric<i64>(9223372036854775806, [254, 255, 255, 255, 255, 255, 255, 127], binary.byte_order.little):
+        return 225
+
+    if not numeric<i64>(9223372036854775806, [127, 255, 255, 255, 255, 255, 255, 254], binary.byte_order.big):
+        return 226
+
+    if not numeric<i64>(9223372036854775807, [255, 255, 255, 255, 255, 255, 255, 127], binary.byte_order.little):
+        return 227
+
+    if not numeric<i64>(9223372036854775807, [127, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.big):
+        return 228
+
+    if not invalid<i64>():
+        return 229
+
+    return 0
+
+func integer_u64() -> i32:
+    if not numeric<u64>(0, [0, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 230
+
+    if not numeric<u64>(0, [0, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 231
+
+    if not numeric<u64>(1, [1, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 232
+
+    if not numeric<u64>(1, [0, 0, 0, 0, 0, 0, 0, 1], binary.byte_order.big):
+        return 233
+
+    if not numeric<u64>(128, [128, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 234
+
+    if not numeric<u64>(128, [0, 0, 0, 0, 0, 0, 0, 128], binary.byte_order.big):
+        return 235
+
+    if not numeric<u64>(255, [255, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 236
+
+    if not numeric<u64>(255, [0, 0, 0, 0, 0, 0, 0, 255], binary.byte_order.big):
+        return 237
+
+    if not numeric<u64>(649944080032394253, [13, 236, 50, 126, 178, 16, 5, 9], binary.byte_order.little):
+        return 238
+
+    if not numeric<u64>(649944080032394253, [9, 5, 16, 178, 126, 50, 236, 13], binary.byte_order.big):
+        return 239
+
+    if not numeric<u64>(6501208877375301211, [91, 38, 146, 114, 7, 239, 56, 90], binary.byte_order.little):
+        return 240
+
+    if not numeric<u64>(6501208877375301211, [90, 56, 239, 7, 114, 146, 38, 91], binary.byte_order.big):
+        return 241
+
+    if not numeric<u64>(8193445751578885722, [90, 254, 74, 21, 128, 247, 180, 113], binary.byte_order.little):
+        return 242
+
+    if not numeric<u64>(8193445751578885722, [113, 180, 247, 128, 21, 74, 254, 90], binary.byte_order.big):
+        return 243
+
+    if not numeric<u64>(12720206386431980843, [43, 245, 238, 92, 80, 64, 135, 176], binary.byte_order.little):
+        return 244
+
+    if not numeric<u64>(12720206386431980843, [176, 135, 64, 80, 92, 238, 245, 43], binary.byte_order.big):
+        return 245
+
+    if not numeric<u64>(15352030168399062339, [67, 165, 129, 128, 25, 94, 13, 213], binary.byte_order.little):
+        return 246
+
+    if not numeric<u64>(15352030168399062339, [213, 13, 94, 25, 128, 129, 165, 67], binary.byte_order.big):
+        return 247
+
+    if not numeric<u64>(17281574505362063944, [72, 130, 141, 111, 115, 124, 212, 239], binary.byte_order.little):
+        return 248
+
+    if not numeric<u64>(17281574505362063944, [239, 212, 124, 115, 111, 141, 130, 72], binary.byte_order.big):
+        return 249
+
+    if not numeric<u64>(17892662503750323135, [191, 75, 253, 109, 191, 129, 79, 248], binary.byte_order.little):
+        return 250
+
+    if not numeric<u64>(17892662503750323135, [248, 79, 129, 191, 109, 253, 75, 191], binary.byte_order.big):
+        return 251
+
+    if not numeric<u64>(18036890600330428140, [236, 254, 70, 253, 111, 232, 79, 250], binary.byte_order.little):
+        return 252
+
+    if not numeric<u64>(18036890600330428140, [250, 79, 232, 111, 253, 70, 254, 236], binary.byte_order.big):
+        return 253
+
+    if not numeric<u64>(18446744073709551614, [254, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.little):
+        return 254
+
+    if not numeric<u64>(18446744073709551614, [255, 255, 255, 255, 255, 255, 255, 254], binary.byte_order.big):
+        return 255
+
+    if not numeric<u64>(18446744073709551615, [255, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.little):
+        return 256
+
+    if not numeric<u64>(18446744073709551615, [255, 255, 255, 255, 255, 255, 255, 255], binary.byte_order.big):
+        return 257
+
+    if not invalid<u64>():
+        return 258
+
+    return 0
+
+func float_f32() -> i32:
+    if not numeric<f32>(0.0f, [0, 0, 0, 0], binary.byte_order.little):
+        return 259
+
+    if not numeric<f32>(0.0f, [0, 0, 0, 0], binary.byte_order.big):
+        return 260
+
+    if not numeric<f32>(-0.0f, [0, 0, 0, 128], binary.byte_order.little):
+        return 261
+
+    if not numeric<f32>(-0.0f, [128, 0, 0, 0], binary.byte_order.big):
+        return 262
+
+    if not numeric<f32>(1.0f, [0, 0, 128, 63], binary.byte_order.little):
+        return 263
+
+    if not numeric<f32>(1.0f, [63, 128, 0, 0], binary.byte_order.big):
+        return 264
+
+    if not numeric<f32>(-1.0f, [0, 0, 128, 191], binary.byte_order.little):
+        return 265
+
+    if not numeric<f32>(-1.0f, [191, 128, 0, 0], binary.byte_order.big):
+        return 266
+
+    if not numeric<f32>(1.5f, [0, 0, 192, 63], binary.byte_order.little):
+        return 267
+
+    if not numeric<f32>(1.5f, [63, 192, 0, 0], binary.byte_order.big):
+        return 268
+
+    if not numeric<f32>(-123.25f, [0, 128, 246, 194], binary.byte_order.little):
+        return 269
+
+    if not numeric<f32>(-123.25f, [194, 246, 128, 0], binary.byte_order.big):
+        return 270
+
+    if not numeric<f32>(0.1f, [205, 204, 204, 61], binary.byte_order.little):
+        return 271
+
+    if not numeric<f32>(0.1f, [61, 204, 204, 205], binary.byte_order.big):
+        return 272
+
+    if not pattern<f32>([0, 0, 0, 0]):
+        return 273
+
+    if not pattern<f32>([1, 0, 0, 0]):
+        return 274
+
+    if not pattern<f32>([255, 255, 127, 0]):
+        return 275
+
+    if not pattern<f32>([0, 0, 128, 0]):
+        return 276
+
+    if not pattern<f32>([255, 255, 127, 127]):
+        return 277
+
+    if not pattern<f32>([0, 0, 128, 127]):
+        return 278
+
+    if not pattern<f32>([1, 0, 128, 127]):
+        return 279
+
+    if not pattern<f32>([0, 0, 192, 127]):
+        return 280
+
+    if not pattern<f32>([57, 48, 128, 127]):
+        return 281
+
+    if not pattern<f32>([0, 0, 0, 128]):
+        return 282
+
+    if not pattern<f32>([1, 0, 0, 128]):
+        return 283
+
+    if not pattern<f32>([255, 255, 127, 128]):
+        return 284
+
+    if not pattern<f32>([0, 0, 128, 128]):
+        return 285
+
+    if not pattern<f32>([255, 255, 127, 255]):
+        return 286
+
+    if not pattern<f32>([0, 0, 128, 255]):
+        return 287
+
+    if not pattern<f32>([1, 0, 128, 255]):
+        return 288
+
+    if not pattern<f32>([0, 0, 192, 255]):
+        return 289
+
+    if not pattern<f32>([57, 48, 128, 255]):
+        return 290
+
+    if not pattern<f32>([210, 81, 61, 245]):
+        return 291
+
+    if not pattern<f32>([157, 129, 119, 132]):
+        return 292
+
+    if not pattern<f32>([253, 78, 153, 115]):
+        return 293
+
+    if not pattern<f32>([9, 144, 162, 193]):
+        return 294
+
+    if not pattern<f32>([165, 253, 30, 20]):
+        return 295
+
+    if not pattern<f32>([98, 78, 246, 228]):
+        return 296
+
+    if not pattern<f32>([32, 134, 14, 34]):
+        return 297
+
+    if not pattern<f32>([34, 219, 109, 81]):
+        return 298
+
+    if not pattern<f32>([137, 175, 79, 85]):
+        return 299
+
+    if not pattern<f32>([177, 85, 176, 250]):
+        return 300
+
+    if not pattern<f32>([43, 84, 206, 244]):
+        return 301
+
+    if not pattern<f32>([95, 104, 232, 19]):
+        return 302
+
+    if not pattern<f32>([165, 127, 121, 174]):
+        return 303
+
+    if not pattern<f32>([26, 58, 127, 9]):
+        return 304
+
+    if not pattern<f32>([159, 16, 117, 122]):
+        return 305
+
+    if not pattern<f32>([187, 155, 11, 196]):
+        return 306
+
+    if not invalid<f32>():
+        return 307
+
+    return 0
+
+func float_f64() -> i32:
+    if not numeric<f64>(0.0d, [0, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.little):
+        return 308
+
+    if not numeric<f64>(0.0d, [0, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 309
+
+    if not numeric<f64>(-0.0d, [0, 0, 0, 0, 0, 0, 0, 128], binary.byte_order.little):
+        return 310
+
+    if not numeric<f64>(-0.0d, [128, 0, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 311
+
+    if not numeric<f64>(1.0d, [0, 0, 0, 0, 0, 0, 240, 63], binary.byte_order.little):
+        return 312
+
+    if not numeric<f64>(1.0d, [63, 240, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 313
+
+    if not numeric<f64>(-1.0d, [0, 0, 0, 0, 0, 0, 240, 191], binary.byte_order.little):
+        return 314
+
+    if not numeric<f64>(-1.0d, [191, 240, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 315
+
+    if not numeric<f64>(1.5d, [0, 0, 0, 0, 0, 0, 248, 63], binary.byte_order.little):
+        return 316
+
+    if not numeric<f64>(1.5d, [63, 248, 0, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 317
+
+    if not numeric<f64>(-123.25d, [0, 0, 0, 0, 0, 208, 94, 192], binary.byte_order.little):
+        return 318
+
+    if not numeric<f64>(-123.25d, [192, 94, 208, 0, 0, 0, 0, 0], binary.byte_order.big):
+        return 319
+
+    if not numeric<f64>(0.1d, [154, 153, 153, 153, 153, 153, 185, 63], binary.byte_order.little):
+        return 320
+
+    if not numeric<f64>(0.1d, [63, 185, 153, 153, 153, 153, 153, 154], binary.byte_order.big):
+        return 321
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 0, 0]):
+        return 322
+
+    if not pattern<f64>([1, 0, 0, 0, 0, 0, 0, 0]):
+        return 323
+
+    if not pattern<f64>([255, 255, 255, 255, 255, 255, 15, 0]):
+        return 324
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 16, 0]):
+        return 325
+
+    if not pattern<f64>([255, 255, 255, 255, 255, 255, 239, 127]):
+        return 326
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 240, 127]):
+        return 327
+
+    if not pattern<f64>([1, 0, 0, 0, 0, 0, 240, 127]):
+        return 328
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 248, 127]):
+        return 329
+
+    if not pattern<f64>([57, 48, 0, 0, 0, 0, 240, 127]):
+        return 330
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 0, 128]):
+        return 331
+
+    if not pattern<f64>([1, 0, 0, 0, 0, 0, 0, 128]):
+        return 332
+
+    if not pattern<f64>([255, 255, 255, 255, 255, 255, 15, 128]):
+        return 333
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 16, 128]):
+        return 334
+
+    if not pattern<f64>([255, 255, 255, 255, 255, 255, 239, 255]):
+        return 335
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 240, 255]):
+        return 336
+
+    if not pattern<f64>([1, 0, 0, 0, 0, 0, 240, 255]):
+        return 337
+
+    if not pattern<f64>([0, 0, 0, 0, 0, 0, 248, 255]):
+        return 338
+
+    if not pattern<f64>([57, 48, 0, 0, 0, 0, 240, 255]):
+        return 339
+
+    if not pattern<f64>([121, 172, 181, 209, 12, 0, 98, 246]):
+        return 340
+
+    if not pattern<f64>([78, 226, 254, 94, 41, 120, 94, 182]):
+        return 341
+
+    if not pattern<f64>([139, 248, 176, 213, 230, 104, 179, 91]):
+        return 342
+
+    if not pattern<f64>([246, 0, 65, 49, 140, 26, 32, 213]):
+        return 343
+
+    if not pattern<f64>([190, 45, 98, 78, 128, 69, 91, 77]):
+        return 344
+
+    if not pattern<f64>([17, 74, 140, 190, 19, 192, 172, 142]):
+        return 345
+
+    if not pattern<f64>([180, 221, 28, 67, 178, 107, 25, 132]):
+        return 346
+
+    if not pattern<f64>([147, 163, 41, 194, 117, 231, 69, 76]):
+        return 347
+
+    if not pattern<f64>([207, 170, 171, 40, 9, 145, 217, 90]):
+        return 348
+
+    if not pattern<f64>([253, 242, 146, 180, 113, 93, 240, 87]):
+        return 349
+
+    if not pattern<f64>([110, 58, 99, 180, 98, 144, 234, 177]):
+        return 350
+
+    if not pattern<f64>([65, 185, 71, 100, 166, 246, 60, 240]):
+        return 351
+
+    if not pattern<f64>([73, 77, 192, 134, 19, 244, 69, 105]):
+        return 352
+
+    if not pattern<f64>([15, 97, 204, 117, 35, 14, 250, 49]):
+        return 353
+
+    if not pattern<f64>([154, 178, 157, 228, 105, 255, 70, 132]):
+        return 354
+
+    if not pattern<f64>([173, 133, 168, 93, 93, 2, 47, 108]):
+        return 355
+
+    if not invalid<f64>():
+        return 356
+
+    return 0
+
+func main() -> i32:
+    var failure_integer_i8 = integer_i8()
+    if failure_integer_i8 != 0:
+        print(failure_integer_i8)
+        return 1
+
+    var failure_integer_u8 = integer_u8()
+    if failure_integer_u8 != 0:
+        print(failure_integer_u8)
+        return 1
+
+    var failure_integer_i16 = integer_i16()
+    if failure_integer_i16 != 0:
+        print(failure_integer_i16)
+        return 1
+
+    var failure_integer_u16 = integer_u16()
+    if failure_integer_u16 != 0:
+        print(failure_integer_u16)
+        return 1
+
+    var failure_integer_i32 = integer_i32()
+    if failure_integer_i32 != 0:
+        print(failure_integer_i32)
+        return 1
+
+    var failure_integer_u32 = integer_u32()
+    if failure_integer_u32 != 0:
+        print(failure_integer_u32)
+        return 1
+
+    var failure_integer_i64 = integer_i64()
+    if failure_integer_i64 != 0:
+        print(failure_integer_i64)
+        return 1
+
+    var failure_integer_u64 = integer_u64()
+    if failure_integer_u64 != 0:
+        print(failure_integer_u64)
+        return 1
+
+    var failure_float_f32 = float_f32()
+    if failure_float_f32 != 0:
+        print(failure_float_f32)
+        return 1
+
+    var failure_float_f64 = float_f64()
+    if failure_float_f64 != 0:
+        print(failure_float_f64)
+        return 1
+
+    if not ownership():
+        return 2
+
+    print("binary: 356 vectors passed")
+    return 0

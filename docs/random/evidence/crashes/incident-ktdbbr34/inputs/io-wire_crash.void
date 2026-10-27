@@ -1,0 +1,351 @@
+use io
+use path
+use encoding/binary
+use io/memory
+
+func same(const left: [u8], const right: [u8]) -> bool:
+    if left.count != right.count:
+        return false
+    var index: i64 = 0
+    for byte in left:
+        if byte != right[index]:
+            return false
+        index += 1
+    return true
+
+async func wire(order: binary.byte_order, name: string) -> result<i32, io.error>:
+    with (await io.open_async(name, io.open_mode.create, order))? as handle:
+        var written0 = (await handle.write_async(-128 as i8))?
+        var written1 = (await handle.write_async(0 as i8))?
+        var written2 = (await handle.write_async(1 as i8))?
+        var written3 = (await handle.write_async(127 as i8))?
+        var written4 = (await handle.write_async(-32768 as i16))?
+        var written5 = (await handle.write_async(0 as i16))?
+        var written6 = (await handle.write_async(1 as i16))?
+        var written7 = (await handle.write_async(32767 as i16))?
+        var written8 = (await handle.write_async(-2147483648 as i32))?
+        var written9 = (await handle.write_async(0 as i32))?
+        var written10 = (await handle.write_async(1 as i32))?
+        var written11 = (await handle.write_async(2147483647 as i32))?
+        var written12 = (await handle.write_async(-9223372036854775808 as i64))?
+        var written13 = (await handle.write_async(0 as i64))?
+        var written14 = (await handle.write_async(1 as i64))?
+        var written15 = (await handle.write_async(9223372036854775807 as i64))?
+        var written16 = (await handle.write_async(0 as u8))?
+        var written17 = (await handle.write_async(1 as u8))?
+        var written18 = (await handle.write_async(255 as u8))?
+        var written19 = (await handle.write_async(0 as u16))?
+        var written20 = (await handle.write_async(1 as u16))?
+        var written21 = (await handle.write_async(65535 as u16))?
+        var written22 = (await handle.write_async(0 as u32))?
+        var written23 = (await handle.write_async(1 as u32))?
+        var written24 = (await handle.write_async(4294967295 as u32))?
+        var written25 = (await handle.write_async(0 as u64))?
+        var written26 = (await handle.write_async(1 as u64))?
+        var written27 = (await handle.write_async(18446744073709551615 as u64))?
+        var bits28 = binary.decode<f32>([0, 0, 0, 0])
+        if bits28 is Ok(var number28):
+            var written28 = (await handle.write_async(number28))?
+        var bits29 = binary.decode<f32>([0, 0, 0, 128])
+        if bits29 is Ok(var number29):
+            var written29 = (await handle.write_async(number29))?
+        var bits30 = binary.decode<f32>([1, 0, 0, 0])
+        if bits30 is Ok(var number30):
+            var written30 = (await handle.write_async(number30))?
+        var bits31 = binary.decode<f32>([0, 0, 128, 127])
+        if bits31 is Ok(var number31):
+            var written31 = (await handle.write_async(number31))?
+        var bits32 = binary.decode<f32>([0, 0, 128, 255])
+        if bits32 is Ok(var number32):
+            var written32 = (await handle.write_async(number32))?
+        var bits33 = binary.decode<f32>([69, 35, 193, 127])
+        if bits33 is Ok(var number33):
+            var written33 = (await handle.write_async(number33))?
+        var bits34 = binary.decode<f32>([69, 35, 129, 127])
+        if bits34 is Ok(var number34):
+            var written34 = (await handle.write_async(number34))?
+        var bits35 = binary.decode<f64>([0, 0, 0, 0, 0, 0, 0, 0])
+        if bits35 is Ok(var number35):
+            var written35 = (await handle.write_async(number35))?
+        var bits36 = binary.decode<f64>([0, 0, 0, 0, 0, 0, 0, 128])
+        if bits36 is Ok(var number36):
+            var written36 = (await handle.write_async(number36))?
+        var bits37 = binary.decode<f64>([1, 0, 0, 0, 0, 0, 0, 0])
+        if bits37 is Ok(var number37):
+            var written37 = (await handle.write_async(number37))?
+        var bits38 = binary.decode<f64>([0, 0, 0, 0, 0, 0, 240, 127])
+        if bits38 is Ok(var number38):
+            var written38 = (await handle.write_async(number38))?
+        var bits39 = binary.decode<f64>([0, 0, 0, 0, 0, 0, 240, 255])
+        if bits39 is Ok(var number39):
+            var written39 = (await handle.write_async(number39))?
+        var bits40 = binary.decode<f64>([188, 154, 120, 86, 52, 18, 248, 127])
+        if bits40 is Ok(var number40):
+            var written40 = (await handle.write_async(number40))?
+        var bits41 = binary.decode<f64>([188, 154, 120, 86, 52, 18, 240, 127])
+        if bits41 is Ok(var number41):
+            var written41 = (await handle.write_async(number41))?
+        var framed = (await handle.write_pascal_string_async("雪\0x"))?
+        var raw = (await handle.write_string_async("raw"))?
+        var beginning = (await handle.seek_async(0))?
+        var restored0 = (await handle.read_async<i8>())?
+        var oracle0 = binary.encode(restored0)
+        if not same(oracle0, [128]):
+            return Ok(1)
+        var restored1 = (await handle.read_async<i8>())?
+        var oracle1 = binary.encode(restored1)
+        if not same(oracle1, [0]):
+            return Ok(2)
+        var restored2 = (await handle.read_async<i8>())?
+        var oracle2 = binary.encode(restored2)
+        if not same(oracle2, [1]):
+            return Ok(3)
+        var restored3 = (await handle.read_async<i8>())?
+        var oracle3 = binary.encode(restored3)
+        if not same(oracle3, [127]):
+            return Ok(4)
+        var restored4 = (await handle.read_async<i16>())?
+        var oracle4 = binary.encode(restored4)
+        if not same(oracle4, [0, 128]):
+            return Ok(5)
+        var restored5 = (await handle.read_async<i16>())?
+        var oracle5 = binary.encode(restored5)
+        if not same(oracle5, [0, 0]):
+            return Ok(6)
+        var restored6 = (await handle.read_async<i16>())?
+        var oracle6 = binary.encode(restored6)
+        if not same(oracle6, [1, 0]):
+            return Ok(7)
+        var restored7 = (await handle.read_async<i16>())?
+        var oracle7 = binary.encode(restored7)
+        if not same(oracle7, [255, 127]):
+            return Ok(8)
+        var restored8 = (await handle.read_async<i32>())?
+        var oracle8 = binary.encode(restored8)
+        if not same(oracle8, [0, 0, 0, 128]):
+            return Ok(9)
+        var restored9 = (await handle.read_async<i32>())?
+        var oracle9 = binary.encode(restored9)
+        if not same(oracle9, [0, 0, 0, 0]):
+            return Ok(10)
+        var restored10 = (await handle.read_async<i32>())?
+        var oracle10 = binary.encode(restored10)
+        if not same(oracle10, [1, 0, 0, 0]):
+            return Ok(11)
+        var restored11 = (await handle.read_async<i32>())?
+        var oracle11 = binary.encode(restored11)
+        if not same(oracle11, [255, 255, 255, 127]):
+            return Ok(12)
+        var restored12 = (await handle.read_async<i64>())?
+        var oracle12 = binary.encode(restored12)
+        if not same(oracle12, [0, 0, 0, 0, 0, 0, 0, 128]):
+            return Ok(13)
+        var restored13 = (await handle.read_async<i64>())?
+        var oracle13 = binary.encode(restored13)
+        if not same(oracle13, [0, 0, 0, 0, 0, 0, 0, 0]):
+            return Ok(14)
+        var restored14 = (await handle.read_async<i64>())?
+        var oracle14 = binary.encode(restored14)
+        if not same(oracle14, [1, 0, 0, 0, 0, 0, 0, 0]):
+            return Ok(15)
+        var restored15 = (await handle.read_async<i64>())?
+        var oracle15 = binary.encode(restored15)
+        if not same(oracle15, [255, 255, 255, 255, 255, 255, 255, 127]):
+            return Ok(16)
+        var restored16 = (await handle.read_async<u8>())?
+        var oracle16 = binary.encode(restored16)
+        if not same(oracle16, [0]):
+            return Ok(17)
+        var restored17 = (await handle.read_async<u8>())?
+        var oracle17 = binary.encode(restored17)
+        if not same(oracle17, [1]):
+            return Ok(18)
+        var restored18 = (await handle.read_async<u8>())?
+        var oracle18 = binary.encode(restored18)
+        if not same(oracle18, [255]):
+            return Ok(19)
+        var restored19 = (await handle.read_async<u16>())?
+        var oracle19 = binary.encode(restored19)
+        if not same(oracle19, [0, 0]):
+            return Ok(20)
+        var restored20 = (await handle.read_async<u16>())?
+        var oracle20 = binary.encode(restored20)
+        if not same(oracle20, [1, 0]):
+            return Ok(21)
+        var restored21 = (await handle.read_async<u16>())?
+        var oracle21 = binary.encode(restored21)
+        if not same(oracle21, [255, 255]):
+            return Ok(22)
+        var restored22 = (await handle.read_async<u32>())?
+        var oracle22 = binary.encode(restored22)
+        if not same(oracle22, [0, 0, 0, 0]):
+            return Ok(23)
+        var restored23 = (await handle.read_async<u32>())?
+        var oracle23 = binary.encode(restored23)
+        if not same(oracle23, [1, 0, 0, 0]):
+            return Ok(24)
+        var restored24 = (await handle.read_async<u32>())?
+        var oracle24 = binary.encode(restored24)
+        if not same(oracle24, [255, 255, 255, 255]):
+            return Ok(25)
+        var restored25 = (await handle.read_async<u64>())?
+        var oracle25 = binary.encode(restored25)
+        if not same(oracle25, [0, 0, 0, 0, 0, 0, 0, 0]):
+            return Ok(26)
+        var restored26 = (await handle.read_async<u64>())?
+        var oracle26 = binary.encode(restored26)
+        if not same(oracle26, [1, 0, 0, 0, 0, 0, 0, 0]):
+            return Ok(27)
+        var restored27 = (await handle.read_async<u64>())?
+        var oracle27 = binary.encode(restored27)
+        if not same(oracle27, [255, 255, 255, 255, 255, 255, 255, 255]):
+            return Ok(28)
+        var restored28 = (await handle.read_async<f32>())?
+        var oracle28 = binary.encode(restored28)
+        if not same(oracle28, [0, 0, 0, 0]):
+            return Ok(29)
+        var restored29 = (await handle.read_async<f32>())?
+        var oracle29 = binary.encode(restored29)
+        if not same(oracle29, [0, 0, 0, 128]):
+            return Ok(30)
+        var restored30 = (await handle.read_async<f32>())?
+        var oracle30 = binary.encode(restored30)
+        if not same(oracle30, [1, 0, 0, 0]):
+            return Ok(31)
+        var restored31 = (await handle.read_async<f32>())?
+        var oracle31 = binary.encode(restored31)
+        if not same(oracle31, [0, 0, 128, 127]):
+            return Ok(32)
+        var restored32 = (await handle.read_async<f32>())?
+        var oracle32 = binary.encode(restored32)
+        if not same(oracle32, [0, 0, 128, 255]):
+            return Ok(33)
+        var restored33 = (await handle.read_async<f32>())?
+        var oracle33 = binary.encode(restored33)
+        if not same(oracle33, [69, 35, 193, 127]):
+            return Ok(34)
+        var restored34 = (await handle.read_async<f32>())?
+        var oracle34 = binary.encode(restored34)
+        if not same(oracle34, [69, 35, 129, 127]):
+            return Ok(35)
+        var restored35 = (await handle.read_async<f64>())?
+        var oracle35 = binary.encode(restored35)
+        if not same(oracle35, [0, 0, 0, 0, 0, 0, 0, 0]):
+            return Ok(36)
+        var restored36 = (await handle.read_async<f64>())?
+        var oracle36 = binary.encode(restored36)
+        if not same(oracle36, [0, 0, 0, 0, 0, 0, 0, 128]):
+            return Ok(37)
+        var restored37 = (await handle.read_async<f64>())?
+        var oracle37 = binary.encode(restored37)
+        if not same(oracle37, [1, 0, 0, 0, 0, 0, 0, 0]):
+            return Ok(38)
+        var restored38 = (await handle.read_async<f64>())?
+        var oracle38 = binary.encode(restored38)
+        if not same(oracle38, [0, 0, 0, 0, 0, 0, 240, 127]):
+            return Ok(39)
+        var restored39 = (await handle.read_async<f64>())?
+        var oracle39 = binary.encode(restored39)
+        if not same(oracle39, [0, 0, 0, 0, 0, 0, 240, 255]):
+            return Ok(40)
+        var restored40 = (await handle.read_async<f64>())?
+        var oracle40 = binary.encode(restored40)
+        if not same(oracle40, [188, 154, 120, 86, 52, 18, 248, 127]):
+            return Ok(41)
+        var restored41 = (await handle.read_async<f64>())?
+        var oracle41 = binary.encode(restored41)
+        if not same(oracle41, [188, 154, 120, 86, 52, 18, 240, 127]):
+            return Ok(42)
+        var text = (await handle.read_pascal_string_async())?
+        var tail = (await handle.read_string_async(3))?
+        var empty = (await handle.read_bytes_async(0))?
+        if empty.count != 0:
+            return Ok(73)
+        if text != "雪\0x" or tail != "raw":
+            return Ok(70)
+        var exhausted = (await handle.read_exact_async(1))
+        if exhausted is Err(var reason):
+            if not (reason.kind is io.error_kind.unexpected_eof):
+                return Ok(71)
+        else:
+            return Ok(72)
+        var closed = (await handle.close_async())?
+    return Ok(7)
+
+async func exercise() -> result<i32, io.error>:
+    var little = (await wire(binary.byte_order.little, "little.bin"))?
+    var big = (await wire(binary.byte_order.big, "big.bin"))?
+    if little != 7 or big != 7:
+        return Ok(80)
+    var made = (await io.create_directories_async("tree/nested"))?
+    var wrote = (await io.write_text_async("tree/a.txt", "first\0雪"))?
+    var appended = (await io.append_text_async("tree/a.txt", " tail"))?
+    var text = (await io.read_text_async("tree/a.txt"))?
+    if text != "first\0雪 tail":
+        return Ok(81)
+    var nested = (await io.write_bytes_async("tree/nested/b.bin", [1, 2, 3]))?
+    var added = (await io.append_bytes_async("tree/nested/b.bin", [4, 5]))?
+    var appended_bytes = (await io.read_bytes_async("tree/nested/b.bin"))?
+    if appended_bytes.count != 5 or appended_bytes[4] != 5:
+        return Ok(89)
+    var bad = (await io.write_bytes_async("bad.txt", [192, 175]))?
+    var invalid = (await io.read_text_async("bad.txt"))
+    if invalid is Err(var malformed):
+        if not (malformed.kind is io.error_kind.invalid_utf8) or malformed.partial.count != 2:
+            return Ok(82)
+    else:
+        return Ok(83)
+    var files = (await io.get_files_async("tree", "*.bin", true))?
+    var directories = (await io.get_directories_async("tree", "nest*", true))?
+    var observed_entries = (await io.entries_async("tree", "*", true))?
+    if files.count != 1 or directories.count != 1 or observed_entries.count != 3:
+        return Ok(84)
+    var copied = (await io.copy_directory_async("tree", "copy"))?
+    var moved = (await io.move_directory_async("copy", "moved"))?
+    var copied_file = (await io.copy_file_async("tree/a.txt", "one.txt"))?
+    var moved_file = (await io.move_file_async("one.txt", "two.txt"))?
+    var details = (await io.metadata_async("two.txt"))?
+    if details.size != 14:
+        return Ok(85)
+    var deleted = (await io.remove_file_async("two.txt"))?
+    var link_target = path.absolute("tree/a.txt")?
+    var link_created = (await io.create_symlink_async(link_target, "link.txt"))
+    if link_created is Ok(var link_count):
+        var link_value = (await io.read_link_async("link.txt"))?
+        var link_metadata = (await io.metadata_async("link.txt"))?
+        if link_value != link_target or not (link_metadata.kind is io.entry_kind.symlink):
+            return Ok(90)
+        var link_removed = (await io.remove_file_async("link.txt"))?
+    else:
+        return Ok(91)
+    var empty = (await io.create_directory_async("empty"))?
+    var removed_empty = (await io.remove_directory_async("empty"))?
+    var removed = (await io.remove_tree_async("moved"))?
+    var present = (await io.exists_async("moved"))?
+    if present:
+        return Ok(86)
+    var normalized = path.normalize("a/./b/../c")?
+    var joined = path.join(["a", "b.txt"])?
+    var observed_filename = path.filename(joined)?
+    var observed_extension = path.extension(joined)?
+    var observed_stem = path.stem(joined)?
+    var changed = path.change_extension(joined, "bin")?
+    var observed_parent = path.parent(joined)?
+    var observed_absolute = path.absolute(joined)?
+    var rooted = path.is_rooted(observed_absolute)?
+    var observed_is_absolute = path.is_absolute(observed_absolute)?
+    var observed_is_relative = path.is_relative(joined)?
+    var observed_root = path.root(observed_absolute)?
+    var observed_relative = path.relative(observed_absolute)?
+    var observed_separator = path.separator()?
+    if normalized != "a/c" or observed_filename != "b.txt" or observed_extension != ".txt" or observed_stem != "b":
+        return Ok(87)
+    if observed_parent != "a" or not rooted or not observed_is_absolute or not observed_is_relative or observed_relative != joined:
+        return Ok(88)
+    return Ok(7)
+
+async func entry(input: i32) -> i32:
+    var outcome = await exercise()
+    if outcome is Ok(var answer):
+        return answer
+    return 99

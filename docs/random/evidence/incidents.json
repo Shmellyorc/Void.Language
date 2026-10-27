@@ -1,0 +1,319 @@
+{
+  "incidents": [
+    {
+      "receipt": "evidence/crashes/incident-4ksi1go4/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls",
+        "--entry",
+        "/tmp/VOID globals editor \u00e9\ud83c\udfae uiyk23ys/main.void"
+      ],
+      "executable_sha256": "a63d1ea388004bb50f9c3b3ecf8359400c7e5f9b57cc7dc8c82e3d015ad9fd94"
+    },
+    {
+      "receipt": "evidence/crashes/incident-6b17bj2y/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID random execution x2cgnqkz/random_test.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-6gi0at15/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID globals w7ry8grk/selected.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-73ou3jez/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID sprint3 1oxhdg0n/text.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-8s8_06w8/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID random frontend 5m8bbof2/case1.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-_9l0jth0/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID nonfatal docs \u00e9\ud83d\ude00 pczbodzm/main.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-ast3kivk/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID binary \u00e9\ud83d\ude00 t3lknnhm/main.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-auh0wdaq/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/tmp/VOID random relocated lpiw8fsy/relocated install/bin/voidc",
+        "run",
+        "/tmp/VOID random relocated lpiw8fsy/main.void",
+        "--no-opt"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-b439capv/receipt.json",
+      "category": "checked internal IR rejection",
+      "status": 1,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 39,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_random_host",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/random host fixtures"
+      ],
+      "executable_sha256": "4eccb5f5ccc55c1400ff112eb561bad83c0ebbf8f2c8d8af3aec9cb057701b7f"
+    },
+    {
+      "receipt": "evidence/crashes/incident-dnlb1wk5/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls",
+        "--entry",
+        "/tmp/VOID binary LSP q98rwkly/main.void"
+      ],
+      "executable_sha256": "a63d1ea388004bb50f9c3b3ecf8359400c7e5f9b57cc7dc8c82e3d015ad9fd94"
+    },
+    {
+      "receipt": "evidence/crashes/incident-h98cjcah/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID random worker uwxoh_gj/worker.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-hm0cqgn4/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID random frontend fh8fqhpv/case1.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-ktdbbr34/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls",
+        "--entry",
+        "/tmp/VOID documentation \u00e9\ud83d\ude00 uzwov069/main.void"
+      ],
+      "executable_sha256": "a63d1ea388004bb50f9c3b3ecf8359400c7e5f9b57cc7dc8c82e3d015ad9fd94"
+    },
+    {
+      "receipt": "evidence/crashes/incident-oh3gmfsp/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidls",
+        "--entry",
+        "/tmp/VOID random LSP ko8i1wn6/main.void"
+      ],
+      "executable_sha256": "a63d1ea388004bb50f9c3b3ecf8359400c7e5f9b57cc7dc8c82e3d015ad9fd94"
+    },
+    {
+      "receipt": "evidence/crashes/incident-r0det1pn/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID sprint2 z07aq80b/binding.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-s6lvo23q/receipt.json",
+      "category": "harness timeout",
+      "status": -9,
+      "signal": "SIGKILL",
+      "timed_out": true,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/VOID random execution gmstgdab/random_test.void"
+      ],
+      "executable_sha256": "02c584e76f0acc61e5ac305055043f283ea4d1e223c38a5a5504051609f07ee3"
+    },
+    {
+      "receipt": "evidence/crashes/incident-syxieyo4/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "run",
+        "/tmp/void-cache-rlme6vgb/main.void",
+        "7",
+        "--cache"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-txqdy2m_/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 16,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID global stack pmccxj92/main.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-ufxjdxfw/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "check",
+        "/tmp/VOID random execution fxxbiuoq/random_test.void"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-um02aka4/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 14,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+        "run",
+        "/tmp/VOID random errors 0bfju8s2/error0.void",
+        "--no-opt"
+      ],
+      "executable_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5"
+    },
+    {
+      "receipt": "evidence/crashes/incident-zcn2dvex/receipt.json",
+      "category": "sandbox LeakSanitizer infrastructure exit",
+      "status": 86,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 37,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_random_host",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/random host fixtures"
+      ],
+      "executable_sha256": "82c68d7d48700de13521ab0c889a753f351e973d4d3213248c408bf5b14d3164"
+    },
+    {
+      "receipt": "evidence/internal-validation/incident-5tv3becw/receipt.json",
+      "category": "checked internal IR rejection",
+      "status": 1,
+      "signal": null,
+      "timed_out": false,
+      "source_count": 20,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_random_host",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/random host fixtures"
+      ],
+      "executable_sha256": "e91635037b2c0d14738ff990d83ef654a1202499cff0ce66f942b369a1ab6bbd"
+    }
+  ],
+  "categories": {
+    "sandbox LeakSanitizer infrastructure exit": 19,
+    "checked internal IR rejection": 2,
+    "harness timeout": 1
+  },
+  "copied_source_and_provenance_hashes_verified": true
+}

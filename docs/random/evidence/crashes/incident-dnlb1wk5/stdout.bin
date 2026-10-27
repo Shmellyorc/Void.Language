@@ -1,0 +1,99 @@
+Content-Length: 581
+
+{"id":1,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":false,"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}Content-Length: 172
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void"}}Content-Length: 162
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/error.void"}}Content-Length: 149
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":2,"jsonrpc":"2.0"}Content-Length: 172
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void"}}Content-Length: 162
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/error.void"}}Content-Length: 149
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":3,"jsonrpc":"2.0"}Content-Length: 595
+
+{"id":4,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"encode(value: t, order: byte_order = …) -> [u8]\n\nEncode one fixed-width number into a fresh owned byte array.\nSupports i8/u8, i16/u16, i32/u32, i64/u64 and f32/f64; other types fail compilation.\nPreserves two's-complement and IEEE bits, including signed zero and NaN payloads.\nAllocation failures follow the ordinary Runtime array failure policy.\n\nReturns: Exactly the numeric type's width in bytes, in independent writable storage."},"range":{"end":{"character":29,"line":3},"start":{"character":23,"line":3}}}}Content-Length: 196
+
+{"id":5,"jsonrpc":"2.0","result":{"range":{"end":{"character":11,"line":31},"start":{"character":5,"line":31}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void"}}Content-Length: 561
+
+{"id":6,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"decode(bytes: [u8], order: byte_order = …) -> result\n\nDecode exactly one fixed-width number without modifying or retaining the input.\nSupports i8/u8, i16/u16, i32/u32, i64/u64 and f32/f64; other types fail compilation.\nEvery exact-width bit pattern is valid, including infinities and all IEEE NaNs.\n\nReturns: Ok with the exact represented number, or a managed wrong_width error for a count mismatch."},"range":{"end":{"character":30,"line":4},"start":{"character":24,"line":4}}}}Content-Length: 196
+
+{"id":7,"jsonrpc":"2.0","result":{"range":{"end":{"character":11,"line":52},"start":{"character":5,"line":52}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void"}}Content-Length: 318
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1102","message":"Expected a lowercase identifier.","range":{"end":{"character":23,"line":3},"start":{"character":23,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":8,"jsonrpc":"2.0"}Content-Length: 1858
+
+{"id":9,"jsonrpc":"2.0","result":[{"detail":"type","documentation":"Byte order for portable fixed-width numeric representations.","kind":7,"label":"byte_order","textEdit":{"newText":"byte_order","range":{"end":{"character":23,"line":3},"start":{"character":23,"line":3}}}},{"detail":"result<t, error>","documentation":"Decode exactly one fixed-width number without modifying or retaining the input.\nSupports i8/u8, i16/u16, i32/u32, i64/u64 and f32/f64; other types fail compilation.\nEvery exact-width bit pattern is valid, including infinities and all IEEE NaNs.\n\nReturns: Ok with the exact represented number, or a managed wrong_width error for a count mismatch.","kind":3,"label":"decode","textEdit":{"newText":"decode","range":{"end":{"character":23,"line":3},"start":{"character":23,"line":3}}}},{"detail":"[u8]","documentation":"Encode one fixed-width number into a fresh owned byte array.\nSupports i8/u8, i16/u16, i32/u32, i64/u64 and f32/f64; other types fail compilation.\nPreserves two's-complement and IEEE bits, including signed zero and NaN payloads.\nAllocation failures follow the ordinary Runtime array failure policy.\n\nReturns: Exactly the numeric type's width in bytes, in independent writable storage.","kind":3,"label":"encode","textEdit":{"newText":"encode","range":{"end":{"character":23,"line":3},"start":{"character":23,"line":3}}}},{"detail":"type","documentation":"Recoverable codec failure with exact category and common diagnostic fields.","kind":7,"label":"error","textEdit":{"newText":"error","range":{"end":{"character":23,"line":3},"start":{"character":23,"line":3}}}},{"detail":"type","documentation":"Recoverable errors when decoding a fixed-width numeric representation.","kind":7,"label":"error_kind","textEdit":{"newText":"error_kind","range":{"end":{"character":23,"line":3},"start":{"character":23,"line":3}}}}]}Content-Length: 329
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID3001","message":"Expected a standard module segment after /.","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":10,"jsonrpc":"2.0"}Content-Length: 791
+
+{"id":11,"jsonrpc":"2.0","result":{"isIncomplete":false,"items":[{"detail":"standard module","documentation":"","kind":17,"label":"ascii","textEdit":{"newText":"ascii","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"standard module","documentation":"","kind":17,"label":"base64","textEdit":{"newText":"base64","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"standard module","documentation":"","kind":17,"label":"binary","textEdit":{"newText":"binary","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"standard module","documentation":"","kind":17,"label":"hex","textEdit":{"newText":"hex","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}}]}}Content-Length: 328
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":37,"line":3},"start":{"character":37,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":12,"jsonrpc":"2.0"}Content-Length: 404
+
+{"id":13,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"encode(value: i32, order: /@stdlib/encoding/binary.void::byte_order = …) -> [u8]","parameters":[{"documentation":{"kind":"plaintext","value":"Numeric value whose representation is encoded without conversion."},"label":"value: i32"},{"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 404
+
+{"id":14,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"encode(value: i32, order: /@stdlib/encoding/binary.void::byte_order = …) -> [u8]","parameters":[{"documentation":{"kind":"plaintext","value":"Numeric value whose representation is encoded without conversion."},"label":"value: i32"},{"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 404
+
+{"id":15,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"encode(value: i32, order: /@stdlib/encoding/binary.void::byte_order = …) -> [u8]","parameters":[{"documentation":{"kind":"plaintext","value":"Numeric value whose representation is encoded without conversion."},"label":"value: i32"},{"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 328
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":42,"line":3},"start":{"character":42,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":16,"jsonrpc":"2.0"}Content-Length: 407
+
+{"id":17,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"encode(value: i32, order: /@stdlib/encoding/binary.void::byte_order = …) -> [u8]","parameters":[{"label":"value: i32"},{"documentation":{"kind":"plaintext","value":"Byte order; defaults to little endian independently of the host CPU."},"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 407
+
+{"id":18,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"encode(value: i32, order: /@stdlib/encoding/binary.void::byte_order = …) -> [u8]","parameters":[{"label":"value: i32"},{"documentation":{"kind":"plaintext","value":"Byte order; defaults to little endian independently of the host CPU."},"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 407
+
+{"id":19,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"encode(value: i32, order: /@stdlib/encoding/binary.void::byte_order = …) -> [u8]","parameters":[{"label":"value: i32"},{"documentation":{"kind":"plaintext","value":"Byte order; defaults to little endian independently of the host CPU."},"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 328
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":37,"line":3},"start":{"character":37,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":20,"jsonrpc":"2.0"}Content-Length: 486
+
+{"id":21,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"decode(bytes: readonly [u8], order: /@stdlib/encoding/binary.void::byte_order = …) -> result<i32, /@stdlib/encoding/binary.void::error>","parameters":[{"documentation":{"kind":"plaintext","value":"Complete representation; short and oversized arrays return error_kind.wrong_width."},"label":"bytes: readonly [u8]"},{"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 486
+
+{"id":22,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"decode(bytes: readonly [u8], order: /@stdlib/encoding/binary.void::byte_order = …) -> result<i32, /@stdlib/encoding/binary.void::error>","parameters":[{"documentation":{"kind":"plaintext","value":"Complete representation; short and oversized arrays return error_kind.wrong_width."},"label":"bytes: readonly [u8]"},{"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 486
+
+{"id":23,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"decode(bytes: readonly [u8], order: /@stdlib/encoding/binary.void::byte_order = …) -> result<i32, /@stdlib/encoding/binary.void::error>","parameters":[{"documentation":{"kind":"plaintext","value":"Complete representation; short and oversized arrays return error_kind.wrong_width."},"label":"bytes: readonly [u8]"},{"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 328
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":59,"line":3},"start":{"character":59,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":24,"jsonrpc":"2.0"}Content-Length: 472
+
+{"id":25,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"decode(bytes: readonly [u8], order: /@stdlib/encoding/binary.void::byte_order = …) -> result<i32, /@stdlib/encoding/binary.void::error>","parameters":[{"label":"bytes: readonly [u8]"},{"documentation":{"kind":"plaintext","value":"Byte order; defaults to little endian independently of the host CPU."},"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 472
+
+{"id":26,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"decode(bytes: readonly [u8], order: /@stdlib/encoding/binary.void::byte_order = …) -> result<i32, /@stdlib/encoding/binary.void::error>","parameters":[{"label":"bytes: readonly [u8]"},{"documentation":{"kind":"plaintext","value":"Byte order; defaults to little endian independently of the host CPU."},"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 472
+
+{"id":27,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"decode(bytes: readonly [u8], order: /@stdlib/encoding/binary.void::byte_order = …) -> result<i32, /@stdlib/encoding/binary.void::error>","parameters":[{"label":"bytes: readonly [u8]"},{"documentation":{"kind":"plaintext","value":"Byte order; defaults to little endian independently of the host CPU."},"label":"order: /@stdlib/encoding/binary.void::byte_order = …"}]}]}}Content-Length: 172
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void"}}Content-Length: 162
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/error.void"}}Content-Length: 149
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":28,"jsonrpc":"2.0"}Content-Length: 249
+
+{"id":29,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"const big: /@stdlib/encoding/binary.void::byte_order\n\nStore the most significant byte first."},"range":{"end":{"character":64,"line":4},"start":{"character":61,"line":4}}}}Content-Length: 172
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void"}}Content-Length: 162
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/error.void"}}Content-Length: 149
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20binary%20LSP%20q98rwkly/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":30,"jsonrpc":"2.0"}Content-Length: 47
+
+{"id":"shutdown","jsonrpc":"2.0","result":null}

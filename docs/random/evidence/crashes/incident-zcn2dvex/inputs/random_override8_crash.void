@@ -1,0 +1,1099 @@
+use error as core
+use convert
+
+## Version of the seed, transition, sampling and draw-consumption contract.
+const algorithm_version: i32 = 1
+
+## Recoverable argument, collection and operating-system seed failures.
+enum error_kind:
+    ## Exclusive bounds are empty/nonpositive, or bounds are reversed.
+    invalid_bounds
+    ## A floating endpoint is NaN or infinity.
+    nonfinite_bounds
+    ## Choosing from an empty list has no valid position.
+    empty_collection
+    ## The operating system could not supply a complete eight-byte seed.
+    entropy_unavailable
+
+## Structured random failure; allocation failures use ordinary checked Runtime failure.
+struct error extends core.error:
+    ## Portable failure category; inherited code is the category number 1 through 4.
+    kind: error_kind
+    ## Preserved errno or signed NTSTATUS; zero for argument errors.
+    native_code: i32 = 0
+
+private func _error(kind: error_kind, native_code: i32 = 0) -> error:
+    match kind:
+        error_kind.invalid_bounds:
+            return error(message = "Random bounds are empty or reversed", code = 1, kind = kind)
+        error_kind.nonfinite_bounds:
+            return error(message = "Random bounds must be finite", code = 2, kind = kind)
+        error_kind.empty_collection:
+            return error(message = "Cannot choose from an empty list", code = 3, kind = kind)
+        error_kind.entropy_unavailable:
+            return error(message = "OS random seed is unavailable", code = 4, kind = kind, native_code = native_code)
+    return error(message = "Unknown random error", kind = kind)
+
+## Copyable version-1 xoshiro256** stream with four private words and no native resource.
+## Equal explicit seeds and call sequences replay exactly. Gameplay use only, never cryptography.
+## Assignment snapshots the stream; mutating draws require writable receiver storage.
+value struct generator:
+    private s0: u64
+    private s1: u64
+    private s2: u64
+    private s3: u64
+    private extra: u64
+
+private func _mix(value: u64) -> u64:
+    var word = _random_xor(value, value / 1073741824) * (13787848793156543929 as u64)
+    word = _random_xor(word, word / 134217728) * (10723151780598845931 as u64)
+    return _random_xor(word, word / (2147483648 as u64))
+
+## Construct a deterministic independent stream without requesting OS entropy.
+## @param seed Exact u64 seed, including zero and u64.max_value.
+func (self generator) init(seed: u64):
+    var word = seed + (11400714819323198485 as u64)
+    self.s0 = _mix(word)
+    word += (11400714819323198485 as u64)
+    self.s1 = _mix(word)
+    word += (11400714819323198485 as u64)
+    self.s2 = _mix(word)
+    word += (11400714819323198485 as u64)
+    self.s3 = _mix(word)
+
+## Reset this stream to an explicit seed without entropy.
+## @param value Seed whose initial stream position replaces this receiver.
+func (self generator) seed(value: u64):
+    self = generator(seed = value)
+
+private func (self generator) _word() -> u64:
+    var product = self.s1 * 5
+    var output = (product * 128 + product / (144115188075855872 as u64)) * 9
+    var shifted = self.s1 * 131072
+    self.s2 = _random_xor(self.s2, self.s0)
+    self.s3 = _random_xor(self.s3, self.s1)
+    self.s1 = _random_xor(self.s1, self.s2)
+    self.s0 = _random_xor(self.s0, self.s3)
+    self.s2 = _random_xor(self.s2, shifted)
+    self.s3 = self.s3 * (35184372088832 as u64) + self.s3 / 524288
+    return output
+
+private func _ordinal<t>(value: t) -> u64:
+    var domain = _random_domain_max<t>()
+    if t.min_value < 0:
+        if value < 0:
+            return (value - t.min_value) as u64
+        return (value as u64) + domain / 2 + 1
+    return value as u64
+
+private func _value<t>(ordinal: u64) -> t:
+    var domain = _random_domain_max<t>()
+    if t.min_value < 0:
+        var offset = domain / 2 + 1
+        if ordinal < offset:
+            return t.min_value + (ordinal as t)
+        return (ordinal - offset) as t
+    return ordinal as t
+
+private func _width<t>(lower: t, upper: t, inclusive: bool) -> result<u64, error>:
+    var domain = _random_domain_max<t>()
+    if lower > upper or (not inclusive and lower == upper):
+        return Err(_error(error_kind.invalid_bounds))
+    var width = _ordinal(upper) - _ordinal(lower)
+    if inclusive:
+        width += 1
+    return Ok(width)
+
+private func (self generator) _candidate(domain: u64) -> u64:
+    var word = self._word()
+    if domain == u64.max_value:
+        return word
+    return word / (u64.max_value / (domain + 1) + 1)
+
+private func (self generator) _sample(width: u64, domain: u64) -> u64:
+    if width == 1:
+        return 0
+    if width == 0:
+        return self._word()
+    var threshold: u64 = 0
+    if domain == u64.max_value:
+        threshold = (0 - width) % width
+    else:
+        threshold = (domain + 1) % width
+    for true:
+        var candidate = self._candidate(domain)
+        if candidate >= threshold:
+            return candidate % width
+    return 0
+
+private func (self generator) _integer<t>(lower: t, upper: t, inclusive: bool) -> result<t, error>:
+    var width = _width(lower, upper, inclusive)?
+    return Ok(_value<t>(_ordinal(lower) + self._sample(width, _random_domain_max<t>())))
+
+private func _finite_bounds<t>(lower: t, upper: t) -> result<bool, error>:
+    if lower != lower or upper != upper or lower < t.min_value or lower > t.max_value or upper < t.min_value or upper > t.max_value:
+        return Err(_error(error_kind.nonfinite_bounds))
+    if lower >= upper:
+        return Err(_error(error_kind.invalid_bounds))
+    return Ok(true)
+
+## Draw one Boolean from the most significant bit of one new word.
+## @return True exactly when that bit is one.
+func (self generator) boolean() -> bool:
+    return self._word() >= (9223372036854775808 as u64)
+
+## Draw an inclusive integer interval; equal bounds consume no word.
+## @param lower Inclusive lower endpoint, with exact inferred integer type.
+## @param upper Inclusive upper endpoint of that same integer primitive.
+## @return Value including either endpoint; reversed bounds raise checked failure.
+func (self generator) rand_range<t>(lower: t, upper: t) -> t:
+    return convert.unwrap(self.try_rand_range(lower, upper))
+
+## Recoverably draw an inclusive integer interval, including full i64/u64 domains.
+## @param lower Inclusive lower endpoint.
+## @param upper Inclusive upper endpoint; lower must not exceed upper.
+## @return Ok value or invalid_bounds; errors and singletons consume no words.
+func (self generator) try_rand_range<t>(lower: t, upper: t) -> result<t, error>:
+    return self._integer(lower, upper, true)
+
+## Draw i8: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: i8 for [0, maximum), or lower/upper: i8 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_i8() -> i8:
+    return _value<i8>(self._candidate(_random_domain_max<i8>()))
+
+## Recoverably draw a bounded i8; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_i8(maximum: i8) -> result<i8, error>:
+    return self._arity_try_rand_i8_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i8.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i8_1(maximum: i8) -> i8:
+    return convert.unwrap(self.try_rand_i8(maximum))
+
+## Bounded direct-call implementation of rand_i8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i8_2(lower: i8, upper: i8) -> i8:
+    return convert.unwrap(self._arity_try_rand_i8_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_i8_2(lower: i8, upper: i8) -> result<i8, error>:
+    return self._integer(lower, upper, false)
+
+## Draw u8: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: u8 for [0, maximum), or lower/upper: u8 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_u8() -> u8:
+    return _value<u8>(self._candidate(_random_domain_max<u8>()))
+
+## Recoverably draw a bounded u8; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_u8(maximum: u8) -> result<u8, error>:
+    return self._arity_try_rand_u8_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u8.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u8_1(maximum: u8) -> u8:
+    return convert.unwrap(self.try_rand_u8(maximum))
+
+## Bounded direct-call implementation of rand_u8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u8_2(lower: u8, upper: u8) -> u8:
+    return convert.unwrap(self._arity_try_rand_u8_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_u8_2(lower: u8, upper: u8) -> result<u8, error>:
+    return self._integer(lower, upper, false)
+
+## Draw i16: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: i16 for [0, maximum), or lower/upper: i16 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_i16() -> i16:
+    return _value<i16>(self._candidate(_random_domain_max<i16>()))
+
+## Recoverably draw a bounded i16; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_i16(maximum: i16) -> result<i16, error>:
+    return self._arity_try_rand_i16_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i16.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i16_1(maximum: i16) -> i16:
+    return convert.unwrap(self.try_rand_i16(maximum))
+
+## Bounded direct-call implementation of rand_i16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i16_2(lower: i16, upper: i16) -> i16:
+    return convert.unwrap(self._arity_try_rand_i16_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_i16_2(lower: i16, upper: i16) -> result<i16, error>:
+    return self._integer(lower, upper, false)
+
+## Draw u16: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: u16 for [0, maximum), or lower/upper: u16 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_u16() -> u16:
+    return _value<u16>(self._candidate(_random_domain_max<u16>()))
+
+## Recoverably draw a bounded u16; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_u16(maximum: u16) -> result<u16, error>:
+    return self._arity_try_rand_u16_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u16.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u16_1(maximum: u16) -> u16:
+    return convert.unwrap(self.try_rand_u16(maximum))
+
+## Bounded direct-call implementation of rand_u16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u16_2(lower: u16, upper: u16) -> u16:
+    return convert.unwrap(self._arity_try_rand_u16_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_u16_2(lower: u16, upper: u16) -> result<u16, error>:
+    return self._integer(lower, upper, false)
+
+## Draw i32: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: i32 for [0, maximum), or lower/upper: i32 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_i32() -> i32:
+    return _value<i32>(self._candidate(_random_domain_max<i32>()))
+
+## Recoverably draw a bounded i32; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_i32(maximum: i32) -> result<i32, error>:
+    return self._arity_try_rand_i32_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i32_1(maximum: i32) -> i32:
+    return convert.unwrap(self.try_rand_i32(maximum))
+
+## Bounded direct-call implementation of rand_i32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i32_2(lower: i32, upper: i32) -> i32:
+    return convert.unwrap(self._arity_try_rand_i32_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_i32_2(lower: i32, upper: i32) -> result<i32, error>:
+    return self._integer(lower, upper, false)
+
+## Draw u32: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: u32 for [0, maximum), or lower/upper: u32 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_u32() -> u32:
+    return _value<u32>(self._candidate(_random_domain_max<u32>()))
+
+## Recoverably draw a bounded u32; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_u32(maximum: u32) -> result<u32, error>:
+    return self._arity_try_rand_u32_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u32_1(maximum: u32) -> u32:
+    return convert.unwrap(self.try_rand_u32(maximum))
+
+## Bounded direct-call implementation of rand_u32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u32_2(lower: u32, upper: u32) -> u32:
+    return convert.unwrap(self._arity_try_rand_u32_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_u32_2(lower: u32, upper: u32) -> result<u32, error>:
+    return self._integer(lower, upper, false)
+
+## Draw i64: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: i64 for [0, maximum), or lower/upper: i64 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_i64() -> i64:
+    return _value<i64>(self._candidate(_random_domain_max<i64>()))
+
+## Recoverably draw a bounded i64; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_i64(maximum: i64) -> result<i64, error>:
+    return self._arity_try_rand_i64_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i64_1(maximum: i64) -> i64:
+    return convert.unwrap(self.try_rand_i64(maximum))
+
+## Bounded direct-call implementation of rand_i64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_i64_2(lower: i64, upper: i64) -> i64:
+    return convert.unwrap(self._arity_try_rand_i64_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_i64_2(lower: i64, upper: i64) -> result<i64, error>:
+    return self._integer(lower, upper, false)
+
+## Draw u64: zero arguments cover the full signed/unsigned domain.
+## Direct calls also accept maximum: u64 for [0, maximum), or lower/upper: u64 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_u64() -> u64:
+    return _value<u64>(self._candidate(_random_domain_max<u64>()))
+
+## Recoverably draw a bounded u64; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_u64(maximum: u64) -> result<u64, error>:
+    return self._arity_try_rand_u64_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u64_1(maximum: u64) -> u64:
+    return convert.unwrap(self.try_rand_u64(maximum))
+
+## Bounded direct-call implementation of rand_u64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_u64_2(lower: u64, upper: u64) -> u64:
+    return convert.unwrap(self._arity_try_rand_u64_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_u64_2(lower: u64, upper: u64) -> result<u64, error>:
+    return self._integer(lower, upper, false)
+
+## Draw f32: zero arguments sample the precise [0, 1) unit grid.
+## Direct calls also accept maximum: f32 for [0, maximum), or lower/upper: f32 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_f32() -> f32:
+    return ((self._word() / (1099511627776 as u64)) as f32) / 16777216.0
+
+## Recoverably draw a bounded f32; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive and finite.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_f32(maximum: f32) -> result<f32, error>:
+    return self._arity_try_rand_f32_2(0, maximum)
+
+## Bounded direct-call implementation of rand_f32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_f32_1(maximum: f32) -> f32:
+    return convert.unwrap(self.try_rand_f32(maximum))
+
+## Bounded direct-call implementation of rand_f32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_f32_2(lower: f32, upper: f32) -> f32:
+    return convert.unwrap(self._arity_try_rand_f32_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_f32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_f32_2(lower: f32, upper: f32) -> result<f32, error>:
+    var valid = _finite_bounds(lower, upper)?
+    for true:
+        var unit = self.rand_f32()
+        var value: f32 = 0
+        if lower < 0 and upper > 0:
+            value = lower * (1 - unit) + upper * unit
+        else:
+            value = lower + (upper - lower) * unit
+        if value >= lower and value < upper:
+            return Ok(value)
+    return Ok(lower)
+
+## Draw f64: zero arguments sample the precise [0, 1) unit grid.
+## Direct calls also accept maximum: f64 for [0, maximum), or lower/upper: f64 for [lower, upper).
+## Bounded arguments must be exact types; literals adapt contextually. Invalid bounds raise checked failure.
+## @return Sample; each attempted candidate consumes one word, except integer singleton intervals.
+func (self generator) rand_f64() -> f64:
+    return ((self._word() / 2048) as f64) / 9007199254740992.0
+
+## Recoverably draw a bounded f64; two bounds select [lower, upper).
+## @param maximum Exclusive upper endpoint; must be positive and finite.
+## @return Ok sample or structured bounds error without advancing on invalid input.
+func (self generator) try_rand_f64(maximum: f64) -> result<f64, error>:
+    return self._arity_try_rand_f64_2(0, maximum)
+
+## Bounded direct-call implementation of rand_f64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_f64_1(maximum: f64) -> f64:
+    return convert.unwrap(self.try_rand_f64(maximum))
+
+## Bounded direct-call implementation of rand_f64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_rand_f64_2(lower: f64, upper: f64) -> f64:
+    return convert.unwrap(self._arity_try_rand_f64_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_f64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func (self generator) _arity_try_rand_f64_2(lower: f64, upper: f64) -> result<f64, error>:
+    var valid = _finite_bounds(lower, upper)?
+    for true:
+        var unit = self.rand_f64()
+        var value: f64 = 0
+        if lower < 0 and upper > 0:
+            value = lower * (1 - unit) + upper * unit
+        else:
+            value = lower + (upper - lower) * unit
+        if value >= lower and value < upper:
+            return Ok(value)
+    return Ok(lower)
+
+private func _collection_index(count: i64) -> result<i64, error>:
+    if count == 0:
+        return Err(_error(error_kind.empty_collection))
+    if count == 1:
+        return Ok(0)
+    var ready = try_initialize()?
+    return _default.try_rand_i64(count)
+
+private func (self generator) _index(count: i64) -> result<i64, error>:
+    if count == 0:
+        return Err(_error(error_kind.empty_collection))
+    return self.try_rand_i64(count)
+
+## Choose a position uniformly for preserving readonly child identity.
+## @param items Growable list; fixed callers must slice explicitly.
+## @return Selected element; empty input raises checked failure, singleton consumes no word.
+func (self generator) choose<t>(const items: [t]) -> t:
+    var index = convert.unwrap(self._index(items.count))
+    return items[index]
+
+## Recoverably choose a position uniformly; const-input child references stay readonly.
+## @param items Growable list, with no equality/hash/display requirements.
+## @return Ok element or empty_collection; singleton consumes no word.
+func (self generator) try_choose<t>(const items: [t]) -> result<t, error>:
+    var index = self._index(items.count)?
+    return Ok(items[index])
+
+## Shuffle in place using descending unbiased Fisher-Yates; aliases observe replacements.
+## @param items Mutable growable list with authority-compatible elements; count is unchanged.
+func (self generator) shuffle<t>(items: [t]):
+    var index = items.count - 1
+    for index > 0:
+        var selected = self.rand_range<i64>(0, index)
+        if selected != index:
+            var saved = items[index]
+            items[index] = items[selected]
+            items[selected] = saved
+        index -= 1
+
+## Shuffle a fresh outer copy; source and readonly child authority are preserved.
+## @param items Growable list to slice and shuffle; no deep clone is performed.
+## @return Independent outer list with shared readonly referenced children and copied value elements.
+func (self generator) shuffled<t>(const items: [t]) -> [t]:
+    var copy = items[0..<items.count]
+    var index = copy.count - 1
+    for index > 0:
+        var selected = self.rand_range<i64>(0, index)
+        if selected != index:
+            var saved = copy[index]
+            copy[index] = copy[selected]
+            copy[selected] = saved
+        index -= 1
+    return copy
+
+private var _default = generator(seed = 0)
+private var _ready: bool = false
+
+## Explicitly seed the Runtime-local default, bypassing OS entropy.
+## @param value Exact u64 seed whose initial position replaces the default stream.
+func seed(value: u64):
+    _default.seed(value)
+    _ready = true
+
+## Construct an independent stream from exactly eight successful OS bytes, decoded little endian.
+## @return Ok generator or entropy_unavailable with errno/NTSTATUS; no fallback seed is invented.
+func from_entropy() -> result<generator, error>:
+    var outcome = _random_seed()
+    if outcome is Ok(var value):
+        return Ok(generator(seed = value))
+    if outcome is Err(var native):
+        return Err(_error(error_kind.entropy_unavailable, native))
+    return Err(_error(error_kind.entropy_unavailable))
+
+## Lazily initialize the Runtime-local default; a ready stream is never reseeded.
+## @return Ok(true) once ready; entropy failure leaves default state unchanged and permits retry.
+func try_initialize() -> result<bool, error>:
+    if _ready:
+        return Ok(true)
+    var state = from_entropy()?
+    _default = state
+    _ready = true
+    return Ok(true)
+
+## Draw a Boolean from the Runtime-local default stream, lazily seeded by the OS.
+## @return Most significant bit of one word; seed errors raise checked Runtime failure.
+func boolean() -> bool:
+    return convert.unwrap(try_boolean())
+
+## Recoverably draw a default Boolean, including first-use entropy initialization errors.
+## @return Ok Boolean or entropy_unavailable; seed failure publishes no state.
+func try_boolean() -> result<bool, error>:
+    var ready = try_initialize()?
+    return Ok(_default.boolean())
+
+## Draw an inclusive integer interval using the shared default stream.
+## @param lower Inclusive lower endpoint.
+## @param upper Inclusive upper endpoint of the exact same integer primitive.
+## @return Sample; reversed bounds raise checked failure, singleton skips entropy and draws.
+func rand_range<t>(lower: t, upper: t) -> t:
+    return convert.unwrap(try_rand_range(lower, upper))
+
+## Recoverably draw an inclusive interval, including full-width integer extrema.
+## @param lower Inclusive lower endpoint.
+## @param upper Inclusive upper endpoint; reversed bounds fail without initialization.
+## @return Ok sample, invalid_bounds or entropy_unavailable; singleton consumes no word.
+func try_rand_range<t>(lower: t, upper: t) -> result<t, error>:
+    var width = _width(lower, upper, true)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default.try_rand_range(lower, upper)
+
+## Draw i8 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_i8() -> i8:
+    return convert.unwrap(try_rand_i8())
+
+## Recoverable i8 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_i8() -> result<i8, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_i8())
+
+## Bounded direct-call implementation of rand_i8.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i8_1(maximum: i8) -> i8:
+    return convert.unwrap(_arity_try_rand_i8_1(maximum))
+
+## Bounded direct-call implementation of try_rand_i8.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i8_1(maximum: i8) -> result<i8, error>:
+    return _arity_try_rand_i8_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i8_2(lower: i8, upper: i8) -> i8:
+    return convert.unwrap(_arity_try_rand_i8_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i8_2(lower: i8, upper: i8) -> result<i8, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_i8_2(lower, upper)
+
+## Draw u8 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_u8() -> u8:
+    return convert.unwrap(try_rand_u8())
+
+## Recoverable u8 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_u8() -> result<u8, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_u8())
+
+## Bounded direct-call implementation of rand_u8.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u8_1(maximum: u8) -> u8:
+    return convert.unwrap(_arity_try_rand_u8_1(maximum))
+
+## Bounded direct-call implementation of try_rand_u8.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u8_1(maximum: u8) -> result<u8, error>:
+    return _arity_try_rand_u8_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u8_2(lower: u8, upper: u8) -> u8:
+    return convert.unwrap(_arity_try_rand_u8_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u8.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u8_2(lower: u8, upper: u8) -> result<u8, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_u8_2(lower, upper)
+
+## Draw i16 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_i16() -> i16:
+    return convert.unwrap(try_rand_i16())
+
+## Recoverable i16 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_i16() -> result<i16, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_i16())
+
+## Bounded direct-call implementation of rand_i16.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i16_1(maximum: i16) -> i16:
+    return convert.unwrap(_arity_try_rand_i16_1(maximum))
+
+## Bounded direct-call implementation of try_rand_i16.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i16_1(maximum: i16) -> result<i16, error>:
+    return _arity_try_rand_i16_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i16_2(lower: i16, upper: i16) -> i16:
+    return convert.unwrap(_arity_try_rand_i16_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i16_2(lower: i16, upper: i16) -> result<i16, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_i16_2(lower, upper)
+
+## Draw u16 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_u16() -> u16:
+    return convert.unwrap(try_rand_u16())
+
+## Recoverable u16 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_u16() -> result<u16, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_u16())
+
+## Bounded direct-call implementation of rand_u16.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u16_1(maximum: u16) -> u16:
+    return convert.unwrap(_arity_try_rand_u16_1(maximum))
+
+## Bounded direct-call implementation of try_rand_u16.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u16_1(maximum: u16) -> result<u16, error>:
+    return _arity_try_rand_u16_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u16_2(lower: u16, upper: u16) -> u16:
+    return convert.unwrap(_arity_try_rand_u16_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u16.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u16_2(lower: u16, upper: u16) -> result<u16, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_u16_2(lower, upper)
+
+## Draw i32 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_i32() -> i32:
+    return convert.unwrap(try_rand_i32())
+
+## Recoverable i32 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_i32() -> result<i32, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_i32())
+
+## Bounded direct-call implementation of rand_i32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i32_1(maximum: i32) -> i32:
+    return convert.unwrap(_arity_try_rand_i32_1(maximum))
+
+## Bounded direct-call implementation of try_rand_i32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i32_1(maximum: i32) -> result<i32, error>:
+    return _arity_try_rand_i32_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i32_2(lower: i32, upper: i32) -> i32:
+    return convert.unwrap(_arity_try_rand_i32_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i32_2(lower: i32, upper: i32) -> result<i32, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_i32_2(lower, upper)
+
+## Draw u32 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_u32() -> u32:
+    return convert.unwrap(try_rand_u32())
+
+## Recoverable u32 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_u32() -> result<u32, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_u32())
+
+## Bounded direct-call implementation of rand_u32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u32_1(maximum: u32) -> u32:
+    return convert.unwrap(_arity_try_rand_u32_1(maximum))
+
+## Bounded direct-call implementation of try_rand_u32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u32_1(maximum: u32) -> result<u32, error>:
+    return _arity_try_rand_u32_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u32_2(lower: u32, upper: u32) -> u32:
+    return convert.unwrap(_arity_try_rand_u32_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u32_2(lower: u32, upper: u32) -> result<u32, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_u32_2(lower, upper)
+
+## Draw i64 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_i64() -> i64:
+    return convert.unwrap(try_rand_i64())
+
+## Recoverable i64 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_i64() -> result<i64, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_i64())
+
+## Bounded direct-call implementation of rand_i64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i64_1(maximum: i64) -> i64:
+    return convert.unwrap(_arity_try_rand_i64_1(maximum))
+
+## Bounded direct-call implementation of try_rand_i64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i64_1(maximum: i64) -> result<i64, error>:
+    return _arity_try_rand_i64_2(0, maximum)
+
+## Bounded direct-call implementation of rand_i64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_i64_2(lower: i64, upper: i64) -> i64:
+    return convert.unwrap(_arity_try_rand_i64_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_i64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_i64_2(lower: i64, upper: i64) -> result<i64, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_i64_2(lower, upper)
+
+## Draw u64 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments cover the entire integer domain.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_u64() -> u64:
+    return convert.unwrap(try_rand_u64())
+
+## Recoverable u64 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_u64() -> result<u64, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_u64())
+
+## Bounded direct-call implementation of rand_u64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u64_1(maximum: u64) -> u64:
+    return convert.unwrap(_arity_try_rand_u64_1(maximum))
+
+## Bounded direct-call implementation of try_rand_u64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u64_1(maximum: u64) -> result<u64, error>:
+    return _arity_try_rand_u64_2(0, maximum)
+
+## Bounded direct-call implementation of rand_u64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_u64_2(lower: u64, upper: u64) -> u64:
+    return convert.unwrap(_arity_try_rand_u64_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_u64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_u64_2(lower: u64, upper: u64) -> result<u64, error>:
+    var width = _width(lower, upper, false)?
+    if width == 1:
+        return Ok(lower)
+    var ready = try_initialize()?
+    return _default._arity_try_rand_u64_2(lower, upper)
+
+## Draw f32 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments sample [0, 1) with 24 high random bits.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_f32() -> f32:
+    return convert.unwrap(try_rand_f32())
+
+## Recoverable f32 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_f32() -> result<f32, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_f32())
+
+## Bounded direct-call implementation of rand_f32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_f32_1(maximum: f32) -> f32:
+    return convert.unwrap(_arity_try_rand_f32_1(maximum))
+
+## Bounded direct-call implementation of try_rand_f32.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_f32_1(maximum: f32) -> result<f32, error>:
+    return _arity_try_rand_f32_2(0, maximum)
+
+## Bounded direct-call implementation of rand_f32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_f32_2(lower: f32, upper: f32) -> f32:
+    return convert.unwrap(_arity_try_rand_f32_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_f32.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_f32_2(lower: f32, upper: f32) -> result<f32, error>:
+    var valid = _finite_bounds(lower, upper)?
+    var ready = try_initialize()?
+    return _default._arity_try_rand_f32_2(lower, upper)
+
+## Draw f64 from the shared Runtime default; first needed draw initializes from OS entropy.
+## Direct calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).
+## Zero arguments sample [0, 1) with 53 high random bits.
+## @return Sample; invalid arguments or entropy failures raise checked Runtime failure.
+func rand_f64() -> f64:
+    return convert.unwrap(try_rand_f64())
+
+## Recoverable f64 draw with zero, one maximum, or two lower/upper arguments.
+## Integer bounds are exclusive and must be ordered; float bounds must also be finite.
+## @return Ok sample or structured bounds/entropy failure; invalid input consumes no state.
+func try_rand_f64() -> result<f64, error>:
+    var ready = try_initialize()?
+    return Ok(_default.rand_f64())
+
+## Bounded direct-call implementation of rand_f64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_f64_1(maximum: f64) -> f64:
+    return convert.unwrap(_arity_try_rand_f64_1(maximum))
+
+## Bounded direct-call implementation of try_rand_f64.
+## @param maximum Exclusive positive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_f64_1(maximum: f64) -> result<f64, error>:
+    return _arity_try_rand_f64_2(0, maximum)
+
+## Bounded direct-call implementation of rand_f64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_rand_f64_2(lower: f64, upper: f64) -> f64:
+    return convert.unwrap(_arity_try_rand_f64_2(lower, upper))
+
+## Bounded direct-call implementation of try_rand_f64.
+## @param lower Inclusive lower endpoint; finite for floats.
+## @param upper Exclusive upper endpoint; finite for floats.
+## @return Sample or checked result; invalid input consumes no word.
+private func _arity_try_rand_f64_2(lower: f64, upper: f64) -> result<f64, error>:
+    var valid = _finite_bounds(lower, upper)?
+    var ready = try_initialize()?
+    return _default._arity_try_rand_f64_2(lower, upper)
+
+## Choose uniformly by position, preserving managed identity and readonly child authority.
+## @param items Growable source list; fixed callers use an explicit slice.
+## @return Selected element; empty input raises checked failure and singleton skips entropy.
+func choose<t>(const items: [t]) -> t:
+    var index = convert.unwrap(_collection_index(items.count))
+    return items[index]
+
+## Recoverably choose by position without equality/hash/display constraints.
+## @param items Source list whose readonly referenced children remain readonly in the result.
+## @return Ok element, empty_collection or entropy_unavailable; singleton consumes no word.
+func try_choose<t>(const items: [t]) -> result<t, error>:
+    var index = _collection_index(items.count)?
+    return Ok(items[index])
+
+## Shuffle a mutable growable list in place, preserving identity, count and structural version.
+## @param items Authority-compatible list; aliases see swaps, allocation failure need not roll back.
+func shuffle<t>(items: [t]):
+    var done = convert.unwrap(try_shuffle(items))
+
+## Recoverably initialize and shuffle in place with unbiased descending Fisher-Yates.
+## @param items Mutable growable list; empty/singleton inputs skip entropy and draws.
+## @return Ok(true), or entropy_unavailable before any swap; allocation failures use Runtime policy.
+func try_shuffle<t>(items: [t]) -> result<bool, error>:
+    if items.count > 1:
+        var ready = try_initialize()?
+        _default.shuffle(items)
+    return Ok(true)
+
+## Return a shuffled outer copy for preserving readonly referenced children.
+## @param items Const-input growable list; input outer storage is never changed.
+## @return Fresh list; entropy/allocation failures use checked Runtime failure.
+func shuffled<t>(const items: [t]) -> [t]:
+    if items.count > 1:
+        var ready = convert.unwrap(try_initialize())
+    return _default.shuffled(items)
+
+## Recoverably initialize and shuffle an independent outer copy.
+## @param items Const-input list; fixed arrays require an explicit slice.
+## @return Ok copy or entropy_unavailable; empty/singleton copies skip entropy and draws.
+func try_shuffled<t>(const items: [t]) -> result<[t], error>:
+    if items.count > 1:
+        var ready = try_initialize()?
+    return Ok(_default.shuffled(items))

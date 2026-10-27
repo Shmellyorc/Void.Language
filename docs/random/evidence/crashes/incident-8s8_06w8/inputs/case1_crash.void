@@ -1,0 +1,7 @@
+use random
+func main():
+    var a = random.rand_i8()
+    var b = random.rand_i8(maximum = 2)
+    var c = random.rand_i8(upper = 2, lower = 1)
+    var d = random.try_rand_i8(2)
+    var e = random.try_rand_i8(lower = 1, upper = 2)

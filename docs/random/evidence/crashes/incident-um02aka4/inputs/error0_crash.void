@@ -1,0 +1,6 @@
+use random
+func finish():
+    print("cleanup")
+func main():
+    defer finish()
+    var value = random.rand_i32(0)

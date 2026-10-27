@@ -1,0 +1,10 @@
+use random
+func work(value: u64) -> u64:
+    var engine = random.generator(seed = value)
+    return engine.rand_u64()
+async func entry(n: i32) -> i32:
+    var task = spawn work(42)
+    var answer = await task
+    if n < 0:
+        var unused = random.from_entropy()
+    return (answer % 100) as i32

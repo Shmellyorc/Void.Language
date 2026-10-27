@@ -1430,6 +1430,19 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
+                case Op::random_xor: v=b.CreateXor(values[instruction.a],values[instruction.b]); break;
+                case Op::random_seed: {
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                    auto* word=allocations.CreateAlloca(b.getInt64Ty());
+                    auto* status=allocations.CreateAlloca(b.getInt32Ty());
+                    b.CreateStore(b.getInt64(0),word); b.CreateStore(b.getInt32(0),status);
+                    b.CreateCall(module->getOrInsertFunction("vd_random_seed",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{word,status,failure});
+                    array_failure();
+                    auto* code=b.CreateLoad(b.getInt32Ty(),status);
+                    auto* value=b.CreateInsertValue(llvm::Constant::getNullValue(type(instruction.type)),b.CreateZExt(b.CreateICmpNE(code,b.getInt32(0)),b.getInt32Ty()),0);
+                    value=b.CreateInsertValue(value,b.CreateLoad(b.getInt64Ty(),word),1);
+                    v=b.CreateInsertValue(value,code,2); break;
+                }
                 case Op::bitcast: v=b.CreateBitCast(values[instruction.a],type(instruction.type));break;
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
@@ -1746,6 +1759,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
         return std::move(object);
     });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_random_seed", vd_random_seed);
     bind("vd_filesystem_call", vd_filesystem_call);
     bind("vd_file_control", vd_file_control);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);

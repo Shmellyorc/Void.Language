@@ -1,0 +1,35 @@
+/tmp/VOID global stack pmccxj92/main.void:65:5: error: Source nesting limit exceeded.
+    code: VOID1107
+
+ 65 | var item_64 = item_65
+    |     ^^^^^^^
+    Module: /main.void
+    Hint: Split deeply nested expressions or blocks into smaller functions.
+
+/tmp/VOID global stack pmccxj92/main.void:129:5: error: Source nesting limit exceeded.
+    code: VOID1107
+
+ 129 | var item_128 = item_129
+     |     ^^^^^^^^
+    Module: /main.void
+    Hint: Split deeply nested expressions or blocks into smaller functions.
+
+/tmp/VOID global stack pmccxj92/main.void:193:5: error: Source nesting limit exceeded.
+    code: VOID1107
+
+ 193 | var item_192 = item_193
+     |     ^^^^^^^^
+    Module: /main.void
+    Hint: Split deeply nested expressions or blocks into smaller functions.
+
+/tmp/VOID global stack pmccxj92/main.void:257:5: error: Source nesting limit exceeded.
+    code: VOID1107
+
+ 257 | var item_256 = item_257
+     |     ^^^^^^^^
+    Module: /main.void
+    Hint: Split deeply nested expressions or blocks into smaller functions.
+
+==58==LeakSanitizer has encountered a fatal error.
+==58==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==58==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)

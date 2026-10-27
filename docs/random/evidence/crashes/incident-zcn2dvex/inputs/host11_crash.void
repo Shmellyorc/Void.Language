@@ -1,0 +1,23 @@
+use random
+value struct row:
+    data: [i32, 2]
+    nested: [i32]
+func initial() -> [row]:
+    return [row(data = [1, 2], nested = [5]), row(data = [3, 4], nested = [7]), row(data = [5, 6], nested = [9])]
+var source = initial()
+func entry(n: i32) -> i32:
+    if n == -1:
+        return source[0].data[0] * 100 + source[1].data[0] * 10 + source[2].data[0]
+    if n == -2:
+        return source[0].data[0] + source[1].data[0] + source[2].data[0]
+    if n == -3:
+        return source.count as i32
+    if n == -4:
+        source = initial()
+        return 0
+    var engine = random.generator(seed = 42)
+    if n == 0:
+        var copy = engine.shuffled(source)
+    else:
+        engine.shuffle(source)
+    return 0

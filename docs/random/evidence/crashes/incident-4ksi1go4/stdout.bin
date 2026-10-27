@@ -1,0 +1,87 @@
+Content-Length: 600
+
+{"id":1,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}Content-Length: 184
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/standard/state.void"}}Content-Length: 174
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void"}}Content-Length: 174
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":2,"jsonrpc":"2.0"}Content-Length: 184
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/standard/state.void"}}Content-Length: 174
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void"}}Content-Length: 186
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":1}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":3,"jsonrpc":"2.0"}Content-Length: 192
+
+{"id":4,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"public var score: i32\n\nShared score."},"range":{"end":{"character":21,"line":6},"start":{"character":16,"line":6}}}}Content-Length: 196
+
+{"id":5,"jsonrpc":"2.0","result":{"range":{"end":{"character":12,"line":1},"start":{"character":4,"line":1}},"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void"}}Content-Length: 523
+
+{"id":6,"jsonrpc":"2.0","result":[{"range":{"end":{"character":9,"line":3},"start":{"character":4,"line":3}},"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"},{"range":{"end":{"character":9,"line":4},"start":{"character":4,"line":4}},"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void"},{"range":{"end":{"character":21,"line":6},"start":{"character":16,"line":6}},"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"}]}Content-Length: 599
+
+{"id":7,"jsonrpc":"2.0","result":{"documentChanges":[{"edits":[{"newText":"points","range":{"end":{"character":9,"line":4},"start":{"character":4,"line":4}}}],"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void","version":null}},{"edits":[{"newText":"points","range":{"end":{"character":9,"line":3},"start":{"character":4,"line":3}}},{"newText":"points","range":{"end":{"character":21,"line":6},"start":{"character":16,"line":6}}}],"textDocument":{"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":1}}]}}Content-Length: 93
+
+{"error":{"code":-32602,"message":"Rename fails compiler validation"},"id":8,"jsonrpc":"2.0"}Content-Length: 204
+
+{"id":9,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"public var count: i32\n\nInstalled shared counter."},"range":{"end":{"character":22,"line":7},"start":{"character":17,"line":7}}}}Content-Length: 102
+
+{"error":{"code":-32602,"message":"Installed standard sources are read-only"},"id":10,"jsonrpc":"2.0"}Content-Length: 355
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1102","message":"Expected a lowercase identifier.","range":{"end":{"character":16,"line":6},"start":{"character":15,"line":6}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":2}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":11,"jsonrpc":"2.0"}Content-Length: 406
+
+{"id":12,"jsonrpc":"2.0","result":[{"detail":"i32","documentation":"Shared defeat count.","kind":6,"label":"defeated","textEdit":{"newText":"defeated","range":{"end":{"character":15,"line":6},"start":{"character":15,"line":6}}}},{"detail":"no result","documentation":"","kind":3,"label":"reward","textEdit":{"newText":"reward","range":{"end":{"character":15,"line":6},"start":{"character":15,"line":6}}}}]}Content-Length: 392
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'sco'.\nHint: Declare it with var before assignment.","range":{"end":{"character":7,"line":6},"start":{"character":4,"line":6}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":3}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":13,"jsonrpc":"2.0"}Content-Length: 215
+
+{"id":14,"jsonrpc":"2.0","result":[{"detail":"i32","documentation":"Shared score.","kind":6,"label":"score","textEdit":{"newText":"score","range":{"end":{"character":7,"line":6},"start":{"character":4,"line":6}}}}]}Content-Length: 416
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2007","message":"Cannot mutate readonly const or declaration 'game'.\nHint: Use var for a mutable local binding.","range":{"end":{"character":8,"line":6},"start":{"character":4,"line":6}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":4}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":15,"jsonrpc":"2.0"}Content-Length: 229
+
+{"id":16,"jsonrpc":"2.0","result":[{"detail":"i32","documentation":"Shared defeat count.","kind":6,"label":"defeated","textEdit":{"newText":"defeated","range":{"end":{"character":12,"line":6},"start":{"character":9,"line":6}}}}]}Content-Length: 387
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'sco'.\nHint: Declare it with var before use.","range":{"end":{"character":15,"line":6},"start":{"character":12,"line":6}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":5}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":17,"jsonrpc":"2.0"}Content-Length: 217
+
+{"id":18,"jsonrpc":"2.0","result":[{"detail":"i32","documentation":"Shared score.","kind":6,"label":"score","textEdit":{"newText":"score","range":{"end":{"character":15,"line":6},"start":{"character":12,"line":6}}}}]}Content-Length: 391
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'missing'.\nHint: Declare it with var before use.","range":{"end":{"character":19,"line":3},"start":{"character":12,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":6}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":19,"jsonrpc":"2.0"}Content-Length: 39
+
+{"id":20,"jsonrpc":"2.0","result":null}Content-Length: 184
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/standard/state.void"}}Content-Length: 174
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void"}}Content-Length: 186
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":7}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":21,"jsonrpc":"2.0"}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":22,"jsonrpc":"2.0"}Content-Length: 193
+
+{"id":23,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"public var score: i32\n\nShared score."},"range":{"end":{"character":21,"line":6},"start":{"character":16,"line":6}}}}Content-Length: 184
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/standard/state.void"}}Content-Length: 174
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/game.void"}}Content-Length: 186
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void","version":8}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":24,"jsonrpc":"2.0"}Content-Length: 196
+
+{"id":25,"jsonrpc":"2.0","result":{"range":{"end":{"character":9,"line":3},"start":{"character":4,"line":3}},"uri":"file:///tmp/VOID%20globals%20editor%20%C3%A9%F0%9F%8E%AE%20uiyk23ys/main.void"}}Content-Length: 47
+
+{"id":"shutdown","jsonrpc":"2.0","result":null}

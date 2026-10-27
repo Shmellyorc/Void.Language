@@ -99,3 +99,37 @@ rejects whitespace, mixed alphabets, malformed padding and nonzero unused bits.
 ASCII byte casing. NUL is data in every module. Allocation exhaustion follows the
 existing checked Runtime failure channel. See the [text/encoding contract](../docs/text-encoding/CONTRACT.md),
 [API inventory](../docs/text-encoding/API.md) and [engineering record](../docs/text-encoding/IMPLEMENTATION.md).
+
+
+## Gameplay randomness
+
+`use random` provides version-1 xoshiro256** streams expanded from exact u64
+seeds with SplitMix64. `var world = random.generator(seed = 42)` creates a
+mutable value stream; assigning it copies its current position independently.
+`world.seed(42)` resets it. Module `random.seed(42)` sets a shared per-Runtime
+default; otherwise its first needed draw lazily seeds from eight OS bytes.
+Explicit generators never request entropy. This module is for gameplay,
+never cryptography.
+
+For every integer type and f32/f64, `rand_T()` / `rand_T(maximum)` /
+`rand_T(lower, upper)` draw full-domain integers or unit floats, [0,maximum),
+and [lower,upper), respectively. Exact typed operands are required; literals
+adapt to the chosen type. `rand_range(lower,upper)` is integer-only and
+inclusive, including full i64/u64 extrema. `boolean()` uses one high bit.
+`try_rand_T` handles argument/entropy failures recoverably; explicit generator
+checked methods take one or two bounds. Default checked zero-argument draws,
+`try_boolean`, `from_entropy` and `try_initialize` expose seed failures.
+
+`choose` / `try_choose`, in-place `shuffle`, and copy-returning `shuffled`
+operate on growable lists; defaults also offer `try_shuffle` / `try_shuffled`.
+Fixed arrays require explicit slicing. Const-input choices and shuffled copies
+preserve readonly referenced children and their identity; value elements copy.
+Invalid calls and integer singleton intervals do not consume a word, and default
+singletons skip entropy. Finite float bounds must form a nonempty interval.
+Module functions as values keep their declared zero-argument signature;
+bounded forms are direct-call syntax, rather than general function overloads.
+
+[Complete contract](../docs/random/DESIGN.md),
+[API inventory](../docs/random/API.md),
+[verification](../docs/random/IMPLEMENTATION.md),
+[replay example](../examples/random/gameplay.void).

@@ -1,0 +1,11 @@
+use random
+func entry(n: i32) -> i32:
+    var engine = random.generator(seed = 42)
+    var total: u64 = 0
+    var items = [0, 1, 2, 3]
+    for index in 0..<n:
+        total += engine.rand_u64()
+        total += ((engine.rand_i32() as i64) + (2147483648 as i64)) as u64
+        total += engine.rand_i32(1000) as u64
+        engine.shuffle(items)
+    return (total % 1000000) as i32

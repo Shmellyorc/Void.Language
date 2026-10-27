@@ -1,0 +1,31 @@
+use random
+struct box:
+    n: i32
+value struct packet:
+    refs: [box?, 2]
+    values: [i32, 2]
+    nested: [i32]
+func entry(n: i32) -> i32:
+    var engine = random.generator(seed = 42)
+    var first = box(n = 11)
+    var second = box(n = 19)
+    var single = [first]
+    var selected = engine.choose(single)
+    first.n += 1
+    if selected.n != 12:
+        return 1
+    var data = [packet(refs = [first, second], values = [1, 2], nested = [5]), packet(refs = [second, first], values = [3, 4], nested = [7])]
+    var alias = data
+    for item in data:
+        engine.shuffle(data)
+    var copy = engine.shuffled(data)
+    copy[0].values[0] = 80
+    if data[0].values[0] == 80:
+        return 2
+    first.n = 31
+    var total = 0
+    for item in copy:
+        total += (item.refs[0] as box).n + (item.refs[1] as box).n
+    if total != 100 or alias.count != 2:
+        return 3
+    return 0

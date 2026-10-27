@@ -1,0 +1,6 @@
+use random
+func main():
+    var engine = random.generator(seed = 42)
+    print(engine.rand_u64())
+    print(engine.rand_u8(129))
+    print(engine.rand_i32(-4, 8))

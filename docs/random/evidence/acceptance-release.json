@@ -1,0 +1,242 @@
+{
+  "profile": "release",
+  "repair": false,
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+    "-R",
+    "^(random_.*|lsp_random|core|numeric|frontend|modules|collections_source|binary_execution|binary_ownership|lsp_binary|stage11_globals|stage11_globals_stack|stage11_globals_aot|lsp_stage11_globals|documentation_execution|lsp_documentation|debug_cache|debug_cache_processes|numeric_sprint2|text_collections_sprint3|text_encoding_crash_preservation|io_crash_preservation)$",
+    "-j",
+    "2",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/random/evidence/acceptance-release.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "status": 0,
+  "seconds": 453.4295792579651,
+  "tests": [
+    {
+      "name": "collections_source",
+      "seconds": 13.9663,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "debug_cache",
+      "seconds": 1.36443,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "debug_cache_processes",
+      "seconds": 5.38126,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage11_globals",
+      "seconds": 0.0673148,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "documentation_execution",
+      "seconds": 0.653585,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_documentation",
+      "seconds": 0.118415,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_host",
+      "seconds": 23.4272,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_execution",
+      "seconds": 335.798,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_frontend",
+      "seconds": 6.40572,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_random",
+      "seconds": 0.451124,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_install",
+      "seconds": 9.79573,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_errors",
+      "seconds": 19.4236,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_preservation",
+      "seconds": 0.324701,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_worker",
+      "seconds": 4.36317,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_reference",
+      "seconds": 0.045059,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_stack",
+      "seconds": 362.721,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_frontend_stack",
+      "seconds": 7.35745,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "binary_execution",
+      "seconds": 19.6997,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_binary",
+      "seconds": 0.086993,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "binary_ownership",
+      "seconds": 0.365879,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "text_encoding_crash_preservation",
+      "seconds": 0.68417,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "stage11_globals",
+      "seconds": 1.12799,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "io_crash_preservation",
+      "seconds": 0.334889,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "core",
+      "seconds": 0.00986445,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric",
+      "seconds": 2.1981,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "frontend",
+      "seconds": 4.72065,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "modules",
+      "seconds": 0.81695,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric_sprint2",
+      "seconds": 1.38292,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "stage11_globals_stack",
+      "seconds": 0.354165,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "stage11_globals_aot",
+      "seconds": 5.22673,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "text_collections_sprint3",
+      "seconds": 52.2329,
+      "failed": false,
+      "skipped": false
+    }
+  ],
+  "passed": 31,
+  "failed": 0,
+  "environment": {
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/random/evidence/crashes",
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+  },
+  "compiler_sha256": "99611bbb3ab0db1d8ea0daec3a314c879b33bacff47b6794c891a40cbcdae8e8",
+  "sources": {
+    "CMakeLists.txt": "01cacc0fd445667087f7eb69ec46d604937e84bb9cd9ea2c2535e08870c6857b",
+    "cmake/NativeBuild.cmake": "d996d4a029de2ec4a9ff3970845c6edff33b47dc9cb2328942f24b449473eda9",
+    "include/void/ir.hpp": "5af4701d92de613c846a31c0a3bcf280ea9f6d1a36c4a68910e98904e2f373f4",
+    "include/void/runtime_abi.hpp": "7d43064a058bbc712340b5745ed886666a529394090b5f3b77d1e1fc93543cb1",
+    "src/frontend/compiler.cpp": "44c3112d6246cdd01952db1037f5757c62bfbe3394b95a52363c2eba5d13246c",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/capabilities.inc": "5e0df17360678ba7b7793c2afcd8345470dd248e772167765eda40f8febfcc07",
+    "src/ir/module.cpp": "eee3524031a54e1b491d20161f8788d0c9cf96bc498ac250153a80a26b4d5d21",
+    "src/backend/llvm/backend.cpp": "6c672e9a6013da92dce29d25ced6df9558036debf6606f77e93bc4316d68b211",
+    "src/runtime/random.cpp": "b56c4cad835e54fac6b25f7f7597269d348c45492f27ea108a0fe6dd41fa69cf",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec",
+    "tests/random/reference.py": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+    "tests/random/harness.py": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950",
+    "tests/random/execution.py": "6329dd779d8865d37ff90c2ce7ee7b47a1997f75fc8778ce2d6ffdea1fa2f1dc",
+    "tests/random/frontend.py": "cd6c517531ce4a0bd157f71c3de3d94a4a94de16ac795f7aac87db6d30cd24fc",
+    "tests/random/host.cpp": "21c10bdc76a6c973b1935f52137d124949c088300beec7291e1af9f82408be9a",
+    "tests/random/host.py": "d30ae41d663bd4701e56d8329afbf55fb865ef7690d5267e2cfce1b6c5dfa971",
+    "tests/random/lsp.py": "14967a736e1083bf7eb81c547fd6632215ba13c0e7de3d5edd673b6481277827",
+    "tests/random/entropy.void": "551f38d9d7603577bfc0c6d171e8674963c796b31ea91a1947d2289e3241065b",
+    "tests/random/install.py": "319fec06e59841d3e39359a00957ad622b76f0f08a708c402a6fffb4eaea4097",
+    "tests/random/errors.py": "2116dc1717990c685ee07be50750781a7092ed85c98753b461c9562bf8639f8e",
+    "tests/random/preservation.py": "61d92d52c1d246148184a9053e9b908830d567203e511d95a404af1c2fb310de",
+    "tests/random/worker.void": "b80850327b56b06cdb5b125eca67ffd459b5e055800025b038aa8e19486831d8",
+    "tests/random/worker.py": "72d130bb265c56c0a350d0f1ea95795fa95db71cb2a26a65f0bb2298cdb15a61",
+    "tests/random/acceptance.py": "85153dd973459082be225129b0bff8479929f02db05bb543e109b85464d18948"
+  }
+}

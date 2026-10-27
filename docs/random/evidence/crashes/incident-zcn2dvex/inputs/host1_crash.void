@@ -1,0 +1,6 @@
+use random as rng
+func entry(n: i32) -> i32:
+    var a = rng.rand_i32()
+    var b = rng.rand_i32(maximum = n)
+    var c = rng.rand_i32(upper = n, lower = 1)
+    return a + b + c

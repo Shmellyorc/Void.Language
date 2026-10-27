@@ -1,0 +1,4 @@
+use random
+func entry(n: i32) -> i32:
+    var outcome = random.from_entropy()
+    return n

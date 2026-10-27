@@ -108,7 +108,7 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
                              'flags': [line for line in cache.read_text().splitlines()
                                        if line.startswith(('CMAKE_BUILD_TYPE:', 'CMAKE_CXX_COMPILER:',
                                                            'CMAKE_CXX_FLAGS', 'VOID_SANITIZERS:', 'LLVM_DIR:'))]})
-    record = {'command': arguments, 'cwd': str(working), 'returncode': result.returncode,
+    record = {'timed_out': getattr(result, 'timed_out', False), 'command': arguments, 'cwd': str(working), 'returncode': result.returncode,
               'signal': _signal_name(result.returncode),
               'executable': executable,
               'executable_sha256': digest(Path(executable)) if executable else None,
@@ -173,7 +173,34 @@ def run(command, *args, **kwargs):
     previous = getattr(_RUN_CONTEXT, 'active', False)
     _RUN_CONTEXT.active = True
     try:
-        result = REAL_RUN(command, *args, check=False, **kwargs)
+        # Follow subprocess.run's communication contract while retaining the
+        # actual native exit status after timeout termination (also on Windows).
+        timeout = kwargs.pop('timeout', None)
+        supplied = kwargs.pop('input', None)
+        capture = kwargs.pop('capture_output', False)
+        if supplied is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used')
+            kwargs['stdin'] = subprocess.PIPE
+        if capture:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr may not be used with capture_output')
+            kwargs['stdout'] = kwargs['stderr'] = subprocess.PIPE
+        with subprocess.Popen(command, *args, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(supplied, timeout=timeout)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                stdout, stderr = process.communicate()
+                result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+                result.timed_out = True
+                preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs)
+                raise subprocess.TimeoutExpired(command, timeout, output=stdout, stderr=stderr)
+            except BaseException:
+                process.kill()
+                process.wait()
+                raise
+            result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
     finally:
         _RUN_CONTEXT.active = previous
     if crashed(result.returncode):

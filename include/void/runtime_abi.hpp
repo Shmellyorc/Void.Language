@@ -118,3 +118,6 @@ void vd_value_array_copy(void**,void**,const vd::NativeArrayElement*,std::uint64
 }
 
 namespace vd { void finish_console(Runtime&,std::int64_t,RuntimeFailure*) noexcept; }
+
+// Checked OS seed bridge: OS status is separate from Runtime failure.
+extern "C" bool vd_random_seed(std::uint64_t*, std::int32_t*, vd::RuntimeFailure*) noexcept;

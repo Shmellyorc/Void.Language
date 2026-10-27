@@ -1,0 +1,8 @@
+use random
+use random as alias
+var started = begin_stream()
+func begin_stream() -> i32:
+    random.seed(43)
+    return 1
+func entry(n: i32) -> i32:
+    return (alias.rand_u64() % 1000000) as i32

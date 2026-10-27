@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="31"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="453"
+	timestamp="2026-10-26T18:14:51"
+	>
+	<testcase name="collections_source" classname="collections_source" time="13.9663" status="run">
+		<properties/>
+		<system-out>native operation 0: 19 allocation failures; rollback passed
+native operation 1: 4 allocation failures; rollback passed
+native operation 2: 36 allocation failures; rollback passed
+main normal: 276 allocation failures, roots/publication/cleanup/retry passed
+nested normal: 2170 allocation failures, roots/publication/cleanup/retry passed
+main O2: 276 allocation failures, roots/publication/cleanup/retry passed
+nested O2: 2170 allocation failures, roots/publication/cleanup/retry passed
+Collections: source/GC/rollback/readonly/iteration/reload passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache" classname="debug_cache" time="1.36443" status="run">
+		<properties/>
+		<system-out>cache generations, source/build invalidation, revisions, roots, failures and fallback passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="5.38126" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="0.0673148" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="documentation_execution" classname="documentation_execution" time="0.653585" status="run">
+		<properties/>
+		<system-out>Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.118415" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="random_host" classname="random_host" time="23.4272" status="run">
+		<properties/>
+		<system-out>Swap fault sweep: operation=0 failures=200 successes=1
+Swap fault sweep: operation=1 failures=133 successes=1
+Swap fault sweep: operation=0 failures=200 successes=1
+Swap fault sweep: operation=1 failures=133 successes=1
+Benchmark O2: 20000 iterations (raw, typed, bounded, four-item shuffle), 0.408303 s, 48983.2 iterations/s
+Random host: 2281 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_execution" classname="random_execution" time="335.798" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="random_frontend" classname="random_frontend" time="6.40572" status="run">
+		<properties/>
+		<system-out>Random frontend: 116 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_random" classname="lsp_random" time="0.451124" status="run">
+		<properties/>
+		<system-out>Random LSP: 40 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_install" classname="random_install" time="9.79573" status="run">
+		<properties/>
+		<system-out>Random install/real OS entropy: 13 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_errors" classname="random_errors" time="19.4236" status="run">
+		<properties/>
+		<system-out>Random checked errors/defers: 24 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_preservation" classname="random_preservation" time="0.324701" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID random synthetic preservation _y3v2xcu/evidence/incident-te2nn7vq
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation _y3v2xcu/evidence/incident-_g_90hzx
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation _y3v2xcu/evidence/incident-3fepadob
+Random preservation: 3 synthetic reserved-status/timeout incidents verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="random_worker" classname="random_worker" time="4.36317" status="run">
+		<properties/>
+		<system-out>Random worker snapshot execution: 8 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_reference" classname="random_reference" time="0.045059" status="run">
+		<properties/>
+		<system-out>Independent oracle: 24 published words, mixed 11-word sequence, 256 exhaustive residue domains and forced integer/float rejection passed
+</system-out>
+	</testcase>
+	<testcase name="random_stack" classname="random_stack" time="362.721" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="random_frontend_stack" classname="random_frontend_stack" time="7.35745" status="run">
+		<properties/>
+		<system-out>Random frontend: 116 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="binary_execution" classname="binary_execution" time="19.6997" status="run">
+		<properties/>
+		<system-out>Binary execution: 356 independent vectors; 19 processes passed (check, JIT/O2, linked AOT/O2, rejection checks)
+</system-out>
+	</testcase>
+	<testcase name="lsp_binary" classname="lsp_binary" time="0.086993" status="run">
+		<properties/>
+		<system-out>Binary LSP: 81 import, completion, navigation, hover and active-parameter checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_ownership" classname="binary_ownership" time="0.365879" status="run">
+		<properties/>
+		<system-out>normal: 183 allocation failure budgets, collection and retry passed
+O2: 183 allocation failure budgets, collection and retry passed
+Binary ownership: 2253 checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.68417" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-qv5gpp_o
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-qp7pguxr
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-pzg_41ij
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-l3dywols
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-okl0mnct
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-zw4wf564
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-uktbjwll
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest av2_pqbg/evidence/incident-of_v6g6d
+{"intentional_incidents_verified": 8, "checked_crash_preserved": true, "sanitizer_exits_verified": [87, 86], "run_and_popen_verified": true, "signed_windows_receipt_simulation_verified": true, "windows_native_branch_executed": false, "colliding_filenames_verified": true, "editor_snapshot_verified": true...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="1.12799" status="run">
+		<properties/>
+		<system-out>101 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.334889" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation d0zdsigy/incidents/incident-16ix9tzi
+CRASH EVIDENCE: /tmp/VOID disposable io preservation d0zdsigy/incidents/incident-zhp81phz
+CRASH EVIDENCE: /tmp/VOID disposable io preservation d0zdsigy/incidents/incident-hyn1b2od
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.00986445" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="2.1981" status="run">
+		<properties/>
+		<system-out>192 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="4.72065" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="0.81695" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="1.38292" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_stack" classname="stage11_globals_stack" time="0.354165" status="run">
+		<properties/>
+		<system-out>1 MiB inferred-global guard and explicit-type chain passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_aot" classname="stage11_globals_aot" time="5.22673" status="run">
+		<properties/>
+		<system-out>157 real-program global commands passed
+</system-out>
+	</testcase>
+	<testcase name="text_collections_sprint3" classname="text_collections_sprint3" time="52.2329" status="run">
+		<properties/>
+		<system-out>Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed
+</system-out>
+	</testcase>
+</testsuite>

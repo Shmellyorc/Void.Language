@@ -1,0 +1,9 @@
+{
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/voidc",
+  "compiler_sha256": "76d3deb2683b6de18c28a4b12d7c8348daedf7fd4aa1d6c816b578bbaa140fd5",
+  "source_sha256": "13f0331f5e59fc7462e4f7234366de663fa24f5269a94f66a4ad77294cc697ca",
+  "oracle_sha256": "36e56674f9715a31baa2cfee1245056faca1ec27b5143c56200d063aa19fe8d1",
+  "vectors": 792,
+  "processes": 7,
+  "small_stack": true
+}

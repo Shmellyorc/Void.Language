@@ -1,0 +1,8 @@
+use "./game.void" as game
+use state as shared
+## Shared score.
+var score = 0
+func main():
+    game.reward()
+    print("🎮", score, game.defeated)
+    print(shared.count)

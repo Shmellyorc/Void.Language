@@ -1,0 +1,22 @@
+use random
+use convert
+func entry(n: i32) -> i32:
+    if n == 0:
+        var invalid = random.try_rand_i32(0)
+        var lone = random.rand_range(7, 7)
+        var single = [1]
+        var picked = random.try_choose(single)
+        var copied = random.try_shuffled(single)
+        var done = random.try_shuffle(single)
+        return lone
+    if n == 1:
+        var outcome = random.try_initialize()
+        if outcome is Err(var reason):
+            return reason.native_code
+        return 0
+    if n == 2:
+        return (random.rand_u64() % 1000000) as i32
+    if n == 3:
+        random.seed(42)
+        return (random.rand_u64() % 1000000) as i32
+    return 0

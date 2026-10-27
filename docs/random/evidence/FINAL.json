@@ -1,0 +1,611 @@
+{
+  "effective": {
+    "debug": {
+      "passed": 31,
+      "failed": 0,
+      "receipts": [
+        "acceptance-debug.json",
+        "acceptance-debug-repair.json",
+        "acceptance-debug-numeric-followup.json"
+      ],
+      "tests": [
+        {
+          "name": "collections_source",
+          "seconds": 64.808,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "debug_cache",
+          "seconds": 2.4472,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "debug_cache_processes",
+          "seconds": 21.0957,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_stage11_globals",
+          "seconds": 0.118687,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "documentation_execution",
+          "seconds": 0.896502,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_documentation",
+          "seconds": 0.321157,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_host",
+          "seconds": 61.3048,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_execution",
+          "seconds": 211.89,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_frontend",
+          "seconds": 25.4991,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_random",
+          "seconds": 2.98552,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_install",
+          "seconds": 19.7873,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_errors",
+          "seconds": 38.6371,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_preservation",
+          "seconds": 0.310738,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_worker",
+          "seconds": 9.46852,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_reference",
+          "seconds": 0.0467531,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_stack",
+          "seconds": 212.897,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_frontend_stack",
+          "seconds": 26.6004,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "binary_execution",
+          "seconds": 37.9985,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_binary",
+          "seconds": 0.236796,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "binary_ownership",
+          "seconds": 0.99136,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.712836,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals",
+          "seconds": 1.8119,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "io_crash_preservation",
+          "seconds": 0.350621,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "core",
+          "seconds": 0.0176936,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "numeric",
+          "seconds": 5.11545,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "frontend",
+          "seconds": 10.1353,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "modules",
+          "seconds": 1.25271,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": 2.6307,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals_stack",
+          "seconds": 1.84391,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals_aot",
+          "seconds": 7.02721,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "text_collections_sprint3",
+          "seconds": 53.1515,
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    "release": {
+      "passed": 31,
+      "failed": 0,
+      "receipts": [
+        "acceptance-release.json",
+        "acceptance-release-numeric-followup.json"
+      ],
+      "tests": [
+        {
+          "name": "collections_source",
+          "seconds": 13.9663,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "debug_cache",
+          "seconds": 1.36443,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "debug_cache_processes",
+          "seconds": 5.38126,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_stage11_globals",
+          "seconds": 0.0673148,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "documentation_execution",
+          "seconds": 0.653585,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_documentation",
+          "seconds": 0.118415,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_host",
+          "seconds": 23.4272,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_execution",
+          "seconds": 187.878,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_frontend",
+          "seconds": 6.40572,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_random",
+          "seconds": 0.451124,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_install",
+          "seconds": 9.79573,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_errors",
+          "seconds": 19.4236,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_preservation",
+          "seconds": 0.324701,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_worker",
+          "seconds": 4.36317,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_reference",
+          "seconds": 0.045059,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_stack",
+          "seconds": 187.414,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_frontend_stack",
+          "seconds": 7.35745,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "binary_execution",
+          "seconds": 19.6997,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_binary",
+          "seconds": 0.086993,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "binary_ownership",
+          "seconds": 0.365879,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.68417,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals",
+          "seconds": 1.12799,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "io_crash_preservation",
+          "seconds": 0.334889,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "core",
+          "seconds": 0.00986445,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "numeric",
+          "seconds": 2.1981,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "frontend",
+          "seconds": 4.72065,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "modules",
+          "seconds": 0.81695,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": 1.38292,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals_stack",
+          "seconds": 0.354165,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals_aot",
+          "seconds": 5.22673,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "text_collections_sprint3",
+          "seconds": 52.2329,
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    },
+    "sanitizers": {
+      "passed": 31,
+      "failed": 0,
+      "receipts": [
+        "acceptance-sanitizers.json",
+        "acceptance-sanitizers-infrastructure-repair.json",
+        "acceptance-sanitizers-numeric-followup.json"
+      ],
+      "tests": [
+        {
+          "name": "collections_source",
+          "seconds": 56.4296,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "debug_cache",
+          "seconds": 3.49451,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "debug_cache_processes",
+          "seconds": 14.9215,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_stage11_globals",
+          "seconds": 0.204378,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "documentation_execution",
+          "seconds": 1.51873,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_documentation",
+          "seconds": 0.396366,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_host",
+          "seconds": 73.4502,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_execution",
+          "seconds": 150.68,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_frontend",
+          "seconds": 25.9095,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_random",
+          "seconds": 2.37091,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_install",
+          "seconds": 29.2853,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_errors",
+          "seconds": 45.3479,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_preservation",
+          "seconds": 0.380582,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_worker",
+          "seconds": 10.4878,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_reference",
+          "seconds": 0.0692392,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_stack",
+          "seconds": 151.629,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "random_frontend_stack",
+          "seconds": 24.7516,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "binary_execution",
+          "seconds": 43.4538,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "lsp_binary",
+          "seconds": 0.298099,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "binary_ownership",
+          "seconds": 1.2857,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.859596,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals",
+          "seconds": 2.55218,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "io_crash_preservation",
+          "seconds": 0.420831,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "core",
+          "seconds": 0.0533297,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "numeric",
+          "seconds": 6.90512,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "frontend",
+          "seconds": 16.4513,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "modules",
+          "seconds": 2.49174,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": 5.92016,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals_stack",
+          "seconds": 1.42769,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "stage11_globals_aot",
+          "seconds": 17.0572,
+          "failed": false,
+          "skipped": false
+        },
+        {
+          "name": "text_collections_sprint3",
+          "seconds": 87.0242,
+          "failed": false,
+          "skipped": false
+        }
+      ]
+    }
+  },
+  "effective_passed": 93,
+  "ctest_executions": 130,
+  "observed_passing_executions": 101,
+  "observed_failed_executions": 29,
+  "initial_failures_resolved_by_focused_followups": true,
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "native_windows_executed": false,
+  "native_macos_executed": false,
+  "vectors_per_execution": 792,
+  "executed_mode_stack_profile_comparisons": 19008,
+  "incidents": {
+    "sandbox LeakSanitizer infrastructure exit": 19,
+    "checked internal IR rejection": 2,
+    "harness timeout": 1
+  },
+  "final_fixture_sha256": "13f0331f5e59fc7462e4f7234366de663fa24f5269a94f66a4ad77294cc697ca",
+  "oracle_sha256": "36e56674f9715a31baa2cfee1245056faca1ec27b5143c56200d063aa19fe8d1"
+}

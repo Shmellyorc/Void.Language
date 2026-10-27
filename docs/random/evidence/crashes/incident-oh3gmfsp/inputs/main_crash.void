@@ -1,0 +1,5 @@
+use random as rng
+func main():
+    var engine = rng.generator(seed = 42)
+    var a = rng.rand_i32(10)
+    var b = engine.rand_f32(1.0, 2.0)

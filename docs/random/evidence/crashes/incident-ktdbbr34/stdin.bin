@@ -1,0 +1,335 @@
+Content-Length: 241
+
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{"textDocument":{"publishDiagnostics":{"versionSupport":true,"relatedInformation":true},"signatureHelp":{"signatureInformation":{"documentationFormat":["plaintext"]}}}}}}Content-Length: 52
+
+{"jsonrpc":"2.0","method":"initialized","params":{}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":2,"method":"void/barrier"}Content-Length: 279
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","languageId":"void","version":1,"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\")\n"}}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":3,"method":"void/barrier"}Content-Length: 202
+
+{"jsonrpc":"2.0","id":4,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":21}}}Content-Length: 271
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":2},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":5,"method":"void/barrier"}Content-Length: 210
+
+{"jsonrpc":"2.0","id":6,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25}}}Content-Length: 281
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":3},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", "}]}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":7,"method":"void/barrier"}Content-Length: 210
+
+{"jsonrpc":"2.0","id":8,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":33}}}Content-Length: 288
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":4},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", last = "}]}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":9,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":10,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":40}}}Content-Length: 271
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":5},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":11,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":12,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25}}}Content-Length: 274
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":6},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.no_docs("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":13,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":14,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":28}}}Content-Length: 271
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":7},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":15,"method":"void/barrier"}Content-Length: 239
+
+{"jsonrpc":"2.0","id":16,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25},"context":{"triggerKind":1}}}Content-Length: 281
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":8},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":17,"method":"void/barrier"}Content-Length: 239
+
+{"jsonrpc":"2.0","id":18,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":33},"context":{"triggerKind":1}}}Content-Length: 288
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":9},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", last = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":19,"method":"void/barrier"}Content-Length: 239
+
+{"jsonrpc":"2.0","id":20,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":40},"context":{"triggerKind":1}}}Content-Length: 272
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":10},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":21,"method":"void/barrier"}Content-Length: 239
+
+{"jsonrpc":"2.0","id":22,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25},"context":{"triggerKind":1}}}Content-Length: 275
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":11},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.no_docs("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":23,"method":"void/barrier"}Content-Length: 239
+
+{"jsonrpc":"2.0","id":24,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":28},"context":{"triggerKind":1}}}Content-Length: 272
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":12},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":25,"method":"void/barrier"}Content-Length: 262
+
+{"jsonrpc":"2.0","id":26,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25},"context":{"triggerKind":2,"triggerCharacter":","}}}Content-Length: 282
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":13},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":27,"method":"void/barrier"}Content-Length: 262
+
+{"jsonrpc":"2.0","id":28,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":33},"context":{"triggerKind":2,"triggerCharacter":","}}}Content-Length: 289
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":14},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", last = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":29,"method":"void/barrier"}Content-Length: 262
+
+{"jsonrpc":"2.0","id":30,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":40},"context":{"triggerKind":2,"triggerCharacter":","}}}Content-Length: 272
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":15},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":31,"method":"void/barrier"}Content-Length: 262
+
+{"jsonrpc":"2.0","id":32,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25},"context":{"triggerKind":2,"triggerCharacter":","}}}Content-Length: 275
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":16},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.no_docs("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":33,"method":"void/barrier"}Content-Length: 262
+
+{"jsonrpc":"2.0","id":34,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":28},"context":{"triggerKind":2,"triggerCharacter":","}}}Content-Length: 272
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":17},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":35,"method":"void/barrier"}Content-Length: 258
+
+{"jsonrpc":"2.0","id":36,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25},"context":{"triggerKind":3,"isRetrigger":true}}}Content-Length: 282
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":18},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":37,"method":"void/barrier"}Content-Length: 258
+
+{"jsonrpc":"2.0","id":38,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":33},"context":{"triggerKind":3,"isRetrigger":true}}}Content-Length: 289
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":19},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\", last = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":39,"method":"void/barrier"}Content-Length: 258
+
+{"jsonrpc":"2.0","id":40,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":40},"context":{"triggerKind":3,"isRetrigger":true}}}Content-Length: 272
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":20},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":41,"method":"void/barrier"}Content-Length: 258
+
+{"jsonrpc":"2.0","id":42,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25},"context":{"triggerKind":3,"isRetrigger":true}}}Content-Length: 275
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":21},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.no_docs("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":43,"method":"void/barrier"}Content-Length: 258
+
+{"jsonrpc":"2.0","id":44,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":28},"context":{"triggerKind":3,"isRetrigger":true}}}Content-Length: 277
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":22},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.duplicate("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":45,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":46,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":30}}}Content-Length: 289
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":23},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(last = 4, name = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":47,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":48,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":42}}}Content-Length: 286
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":24},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(api.duplicate("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":49,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":50,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":39}}}Content-Length: 269
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":25},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":51,"method":"void/barrier"}Content-Length: 208
+
+{"jsonrpc":"2.0","id":52,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":20}}}Content-Length: 304
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":26},"contentChanges":[{"text":"## Description only.\nfunc value(x: i32) -> i32:\n    return x\nfunc main():\n    var n = value(1)"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":53,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":54,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":4,"character":13}}}Content-Length: 211
+
+{"jsonrpc":"2.0","id":55,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":4,"character":18}}}Content-Length: 307
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":27},"contentChanges":[{"text":"## @return Return only.\nfunc value(x: i32) -> i32:\n    return x\nfunc main():\n    var n = value(1)"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":56,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":57,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":4,"character":13}}}Content-Length: 211
+
+{"jsonrpc":"2.0","id":58,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":4,"character":18}}}Content-Length: 329
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":28},"contentChanges":[{"text":"## Description only.\n## @return Return only.\nfunc value(x: i32) -> i32:\n    return x\nfunc main():\n    var n = value(1)"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":59,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":60,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":5,"character":13}}}Content-Length: 211
+
+{"jsonrpc":"2.0","id":61,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":5,"character":18}}}Content-Length: 303
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":29},"contentChanges":[{"text":"## Description.\n## @return Ignored return.\nfunc action():\n    pass\nfunc main():\n    action()"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":62,"method":"void/barrier"}Content-Length: 202
+
+{"jsonrpc":"2.0","id":63,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":6}}}Content-Length: 474
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":30},"contentChanges":[{"text":"value struct box<t>:\n    value: t\n## @param value Method input.\n## @param last Method last.\nfunc (self box<t>) update(value: t, middle: i32 = 1, last: i32 = 2) -> t:\n    return value\nfunc main():\n    var item = box<i32>(value = 1)\n    var result = item.update("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":64,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":65,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":8,"character":29}}}Content-Length: 477
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":31},"contentChanges":[{"text":"value struct box<t>:\n    value: t\n## @param value Method input.\n## @param last Method last.\nfunc (self box<t>) update(value: t, middle: i32 = 1, last: i32 = 2) -> t:\n    return value\nfunc main():\n    var item = box<i32>(value = 1)\n    var result = item.update(1, "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":66,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":67,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":8,"character":32}}}Content-Length: 484
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":32},"contentChanges":[{"text":"value struct box<t>:\n    value: t\n## @param value Method input.\n## @param last Method last.\nfunc (self box<t>) update(value: t, middle: i32 = 1, last: i32 = 2) -> t:\n    return value\nfunc main():\n    var item = box<i32>(value = 1)\n    var result = item.update(1, last = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":68,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":69,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":8,"character":39}}}Content-Length: 283
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":33},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\")\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":70,"method":"void/barrier"}Content-Length: 871
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/api.void","languageId":"void","version":7,"text":"## Save plain_name <value> é😀.\n## Mention @param inline inside ordinary prose.\n## @param name Unsaved name é😀.\n## @param last Last payload.\n## @return Saved value.\nfunc save(name: string, middle: i32 = 1, last: i32 = 2) -> i32:\n    return middle + last\n## @param wrong Unknown name.\nfunc no_docs(first: i32, second: i32) -> i32:\n    return first + second\n## @param value Generic payload.\nfunc unused<t>(value: t, missing: t) -> t:\n    return value\n## @param value\n## @param value First nonempty.\n## @param value Later ignored.\n## @return\n## @return First return.\n## @return Later ignored.\nfunc duplicate(value: i32) -> i32:\n    return value\n"}}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":71,"method":"void/barrier"}Content-Length: 272
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":34},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":72,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":73,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25}}}Content-Length: 210
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/api.void","version":6},"contentChanges":[{"text":"broken"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":74,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":75,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25}}}Content-Length: 160
+
+{"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/api.void"}}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":76,"method":"void/barrier"}Content-Length: 211
+
+{"jsonrpc":"2.0","id":77,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25}}}Content-Length: 399
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":35},"contentChanges":[{"text":"## Description é😀.\n## @param x\n## @param x Payload.\n## @param unknown_é😀 Unknown.\nfunc local(x: i32, missing: i32) -> i32:\n    return x\nfunc main():\n    var value = local(1, 2)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":78,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":79,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":7,"character":17}}}Content-Length: 415
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":36},"contentChanges":[{"text":"## Description é😀.\r\n## @param x\r\n## @param x Payload.\r\n## @param unknown_é😀 Unknown.\r\nfunc local(x: i32, missing: i32) -> i32:\r\n    return x\r\nfunc main():\r\n    var value = local(1, 2)\r\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":80,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":81,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":7,"character":17}}}Content-Length: 399
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":37},"contentChanges":[{"text":"## Description é😀.\r## @param x\r## @param x Payload.\r## @param unknown_é😀 Unknown.\rfunc local(x: i32, missing: i32) -> i32:\r    return x\rfunc main():\r    var value = local(1, 2)\r"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":82,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":83,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":7,"character":17}}}Content-Length: 312
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":38},"contentChanges":[{"text":"## @param wrong Wrong.\n\nfunc local(x: i32) -> i32:\n    return x\nfunc main():\n    var value = local(1)"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":84,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":85,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":5,"character":17}}}Content-Length: 322
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":39},"contentChanges":[{"text":"## @param wrong Wrong.\n# ordinary\nfunc local(x: i32) -> i32:\n    return x\nfunc main():\n    var value = local(1)"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":86,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":87,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":5,"character":17}}}Content-Length: 1119
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":40},"contentChanges":[{"text":"enum parcel:\n    empty\n    ## A parcel carrying a result.\n    data(item: result<i32, string>)\nstruct box:\n    value: i32\nfunc unused<t>(value: t) -> result<t, string>:\n    return Ok(value)\nfunc main():\n    var value: result<i32, string> = Ok(3)\n    var error: result<i32, string> = Err(\"bad\")\n    if value is Ok(var success):\n        print(success)\n    match value:\n        Ok(i32(var matched)):\n            print(matched)\n        Err(var failure):\n            print(failure)\n    var nested = parcel.data(value)\n    match nested:\n        parcel.data(Ok(var inner)):\n            print(inner)\n        _:\n            pass\n    var doubly: result<result<i32, string>, string> = Ok(Ok(5))\n    match doubly:\n        Ok(Ok(var deep)):\n            print(deep)\n        _:\n            pass\n    var maybe: box? = box(value = 2)\n    if maybe is Ok(var present):\n        print(present.value)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":88,"method":"void/barrier"}Content-Length: 203
+
+{"jsonrpc":"2.0","id":89,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":3,"character":16}}}Content-Length: 203
+
+{"jsonrpc":"2.0","id":90,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":6,"character":29}}}Content-Length: 203
+
+{"jsonrpc":"2.0","id":91,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":9,"character":38}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":92,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":10,"character":38}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":93,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":11,"character":17}}}Content-Length: 203
+
+{"jsonrpc":"2.0","id":94,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":14,"character":9}}}Content-Length: 203
+
+{"jsonrpc":"2.0","id":95,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":16,"character":9}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":96,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":20,"character":21}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":97,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":20,"character":16}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":98,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":31,"character":17}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":99,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":15,"character":19}}}Content-Length: 205
+
+{"jsonrpc":"2.0","id":100,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":17,"character":19}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":101,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":26,"character":9}}}Content-Length: 205
+
+{"jsonrpc":"2.0","id":102,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":26,"character":12}}}Content-Length: 205
+
+{"jsonrpc":"2.0","id":103,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":27,"character":19}}}Content-Length: 1159
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":41},"contentChanges":[{"text":"enum parcel:\n    empty\n    ## A parcel carrying a result.\n    data(item: result<i32, string>)\nstruct box:\n    value: i32\nfunc unused<t>(value: t) -> result<t, string>:\n    return Ok(value)\nfunc main():\n    var value: result<i32, string> = Ok(3)\n    var error: result<i32, string> = Err(\"bad\")\n    if value is Ok(var success):\n        print(success)\n    match value:\n        Ok(i32(var matched)):\n            print(matched)\n        Err(var failure):\n            print(failure)\n    var nested = parcel.data(value)\n    match nested:\n        parcel.data(Ok(var inner)):\n            print(inner)\n        _:\n            pass\n    var doubly: result<result<i32, string>, string> = Ok(Ok(5))\n    match doubly:\n        Ok(Ok(var deep)):\n            print(deep)\n        _:\n            pass\n    var maybe: box? = box(value = 2)\n    if maybe is Ok(var present):\n        print(present.value)\n    var choice: result<i32, string> = Ok"}]}}Content-Length: 50
+
+{"jsonrpc":"2.0","id":104,"method":"void/barrier"}Content-Length: 210
+
+{"jsonrpc":"2.0","id":105,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":33,"character":40}}}Content-Length: 1160
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":42},"contentChanges":[{"text":"enum parcel:\n    empty\n    ## A parcel carrying a result.\n    data(item: result<i32, string>)\nstruct box:\n    value: i32\nfunc unused<t>(value: t) -> result<t, string>:\n    return Ok(value)\nfunc main():\n    var value: result<i32, string> = Ok(3)\n    var error: result<i32, string> = Err(\"bad\")\n    if value is Ok(var success):\n        print(success)\n    match value:\n        Ok(i32(var matched)):\n            print(matched)\n        Err(var failure):\n            print(failure)\n    var nested = parcel.data(value)\n    match nested:\n        parcel.data(Ok(var inner)):\n            print(inner)\n        _:\n            pass\n    var doubly: result<result<i32, string>, string> = Ok(Ok(5))\n    match doubly:\n        Ok(Ok(var deep)):\n            print(deep)\n        _:\n            pass\n    var maybe: box? = box(value = 2)\n    if maybe is Ok(var present):\n        print(present.value)\n    var choice: result<i32, string> = Err"}]}}Content-Length: 50
+
+{"jsonrpc":"2.0","id":106,"method":"void/barrier"}Content-Length: 210
+
+{"jsonrpc":"2.0","id":107,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":33,"character":41}}}Content-Length: 1119
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":43},"contentChanges":[{"text":"enum parcel:\n    empty\n    ## A parcel carrying a result.\n    data(item: result<i32, string>)\nstruct box:\n    value: i32\nfunc unused<t>(value: t) -> result<t, string>:\n    return Ok(value)\nfunc main():\n    var value: result<i32, string> = Ok(3)\n    var error: result<i32, string> = Err(\"bad\")\n    if value is Ok(var success):\n        print(success)\n    match value:\n        Ok(i32(var matched)):\n            print(matched)\n        Err(var failure):\n            print(failure)\n    var nested = parcel.data(value)\n    match nested:\n        parcel.data(Ok(var inner)):\n            print(inner)\n        _:\n            pass\n    var doubly: result<result<i32, string>, string> = Ok(Ok(5))\n    match doubly:\n        Ok(Ok(var deep)):\n            print(deep)\n        _:\n            pass\n    var maybe: box? = box(value = 2)\n    if maybe is Ok(var present):\n        print(present.value)\n"}]}}Content-Length: 50
+
+{"jsonrpc":"2.0","id":108,"method":"void/barrier"}Content-Length: 209
+
+{"jsonrpc":"2.0","id":109,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":9,"character":38}}}Content-Length: 283
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":44},"contentChanges":[{"text":"use \"./api.void\" as api\nfunc main():\n    var value = api.save(\"hero\")\n"}]}}Content-Length: 50
+
+{"jsonrpc":"2.0","id":110,"method":"void/barrier"}Content-Length: 212
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void","version":43},"contentChanges":[{"text":"broken"}]}}Content-Length: 50
+
+{"jsonrpc":"2.0","id":111,"method":"void/barrier"}Content-Length: 204
+
+{"jsonrpc":"2.0","id":112,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":21}}}Content-Length: 219
+
+{"jsonrpc":"2.0","id":"old-docs","method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"},"position":{"line":2,"character":25}}}Content-Length: 71
+
+{"jsonrpc":"2.0","method":"$/cancelRequest","params":{"id":"old-docs"}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":{"uri":"file:///tmp/VOID%20documentation%20%C3%A9%F0%9F%98%80%20uzwov069/main.void"}}}Content-Length: 50
+
+{"jsonrpc":"2.0","id":113,"method":"void/barrier"}Content-Length: 53
+
+{"jsonrpc":"2.0","id":"shutdown","method":"shutdown"}Content-Length: 33
+
+{"jsonrpc":"2.0","method":"exit"}

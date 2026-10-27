@@ -1,0 +1,753 @@
+use random
+use convert
+use encoding/binary
+
+func raw_bits<t>(value: t) -> u64:
+    var bytes = binary.encode(value)
+    var result: u64 = 0
+    for index in bytes.count - 1..0:
+        result = result * 256 + (bytes[index] as u64)
+    return result
+
+func numeric_case_0():
+    var engine0 = random.generator(seed = 0)
+    for index in 0..<64:
+        print(engine0.rand_u64())
+
+func numeric_case_1():
+    var engine1 = random.generator(seed = 1)
+    for index in 0..<64:
+        print(engine1.rand_u64())
+
+func numeric_case_2():
+    var engine2 = random.generator(seed = 42)
+    for index in 0..<64:
+        print(engine2.rand_u64())
+
+func numeric_case_3():
+    var engine3 = random.generator(seed = 9223372036854775808)
+    for index in 0..<64:
+        print(engine3.rand_u64())
+
+func numeric_case_4():
+    var engine4 = random.generator(seed = 18446744073709551615)
+    for index in 0..<64:
+        print(engine4.rand_u64())
+
+func numeric_case_5():
+    var gu8 = random.generator(seed = 42)
+    print(gu8.rand_u8())
+    print(gu8.rand_u8(1))
+    print(convert.unwrap(gu8.try_rand_u8(maximum = 1)))
+    print(gu8.rand_u8(2))
+    print(convert.unwrap(gu8.try_rand_u8(maximum = 2)))
+    print(gu8.rand_u8(3))
+    print(convert.unwrap(gu8.try_rand_u8(maximum = 3)))
+    print(gu8.rand_u8(129))
+    print(convert.unwrap(gu8.try_rand_u8(maximum = 129)))
+    print(gu8.rand_u8(255))
+    print(convert.unwrap(gu8.try_rand_u8(maximum = 255)))
+    print(gu8.rand_u8(upper = 255, lower = 0))
+    print(convert.unwrap(gu8.try_rand_u8(0, 255)))
+    print(gu8.rand_u8(upper = 1, lower = 0))
+    print(convert.unwrap(gu8.try_rand_u8(0, 1)))
+    print(gu8.rand_u8(upper = 255, lower = 254))
+    print(convert.unwrap(gu8.try_rand_u8(254, 255)))
+    print(gu8.rand_u8(upper = 7, lower = 0))
+    print(convert.unwrap(gu8.try_rand_u8(0, 7)))
+    print(gu8.rand_range<u8>(0, 255))
+    print(convert.unwrap(gu8.try_rand_range<u8>(0, 255)))
+    print(gu8.rand_range<u8>(255, 255))
+    random.seed(42)
+    print(random.rand_u8())
+    print(convert.unwrap(random.try_rand_u8()))
+    print(random.rand_u8(7))
+    print(convert.unwrap(random.try_rand_u8(7)))
+    print(random.rand_u8(0, 255))
+    print(convert.unwrap(random.try_rand_u8(upper = 255, lower = 0)))
+    print(random.rand_range<u8>(0, 255))
+    print(convert.unwrap(random.try_rand_range<u8>(0, 255)))
+    if gu8.try_rand_u8(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu8.try_rand_u8(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu8.try_rand_u8(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu8.try_rand_range<u8>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u8(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u8(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gu8.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_6():
+    var gi8 = random.generator(seed = 42)
+    print(gi8.rand_i8())
+    print(gi8.rand_i8(1))
+    print(convert.unwrap(gi8.try_rand_i8(maximum = 1)))
+    print(gi8.rand_i8(2))
+    print(convert.unwrap(gi8.try_rand_i8(maximum = 2)))
+    print(gi8.rand_i8(3))
+    print(convert.unwrap(gi8.try_rand_i8(maximum = 3)))
+    print(gi8.rand_i8(127))
+    print(convert.unwrap(gi8.try_rand_i8(maximum = 127)))
+    print(gi8.rand_i8(upper = 127, lower = -128))
+    print(convert.unwrap(gi8.try_rand_i8(-128, 127)))
+    print(gi8.rand_i8(upper = -127, lower = -128))
+    print(convert.unwrap(gi8.try_rand_i8(-128, -127)))
+    print(gi8.rand_i8(upper = 127, lower = 126))
+    print(convert.unwrap(gi8.try_rand_i8(126, 127)))
+    print(gi8.rand_i8(upper = 7, lower = -3))
+    print(convert.unwrap(gi8.try_rand_i8(-3, 7)))
+    print(gi8.rand_range<i8>(-128, 127))
+    print(convert.unwrap(gi8.try_rand_range<i8>(-128, 127)))
+    print(gi8.rand_range<i8>(127, 127))
+    random.seed(42)
+    print(random.rand_i8())
+    print(convert.unwrap(random.try_rand_i8()))
+    print(random.rand_i8(7))
+    print(convert.unwrap(random.try_rand_i8(7)))
+    print(random.rand_i8(-128, 127))
+    print(convert.unwrap(random.try_rand_i8(upper = 127, lower = -128)))
+    print(random.rand_range<i8>(-128, 127))
+    print(convert.unwrap(random.try_rand_range<i8>(-128, 127)))
+    if gi8.try_rand_i8(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi8.try_rand_i8(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi8.try_rand_i8(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi8.try_rand_range<i8>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i8(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i8(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gi8.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_7():
+    var gu16 = random.generator(seed = 42)
+    print(gu16.rand_u16())
+    print(gu16.rand_u16(1))
+    print(convert.unwrap(gu16.try_rand_u16(maximum = 1)))
+    print(gu16.rand_u16(2))
+    print(convert.unwrap(gu16.try_rand_u16(maximum = 2)))
+    print(gu16.rand_u16(3))
+    print(convert.unwrap(gu16.try_rand_u16(maximum = 3)))
+    print(gu16.rand_u16(32769))
+    print(convert.unwrap(gu16.try_rand_u16(maximum = 32769)))
+    print(gu16.rand_u16(65535))
+    print(convert.unwrap(gu16.try_rand_u16(maximum = 65535)))
+    print(gu16.rand_u16(upper = 65535, lower = 0))
+    print(convert.unwrap(gu16.try_rand_u16(0, 65535)))
+    print(gu16.rand_u16(upper = 1, lower = 0))
+    print(convert.unwrap(gu16.try_rand_u16(0, 1)))
+    print(gu16.rand_u16(upper = 65535, lower = 65534))
+    print(convert.unwrap(gu16.try_rand_u16(65534, 65535)))
+    print(gu16.rand_u16(upper = 7, lower = 0))
+    print(convert.unwrap(gu16.try_rand_u16(0, 7)))
+    print(gu16.rand_range<u16>(0, 65535))
+    print(convert.unwrap(gu16.try_rand_range<u16>(0, 65535)))
+    print(gu16.rand_range<u16>(65535, 65535))
+    random.seed(42)
+    print(random.rand_u16())
+    print(convert.unwrap(random.try_rand_u16()))
+    print(random.rand_u16(7))
+    print(convert.unwrap(random.try_rand_u16(7)))
+    print(random.rand_u16(0, 65535))
+    print(convert.unwrap(random.try_rand_u16(upper = 65535, lower = 0)))
+    print(random.rand_range<u16>(0, 65535))
+    print(convert.unwrap(random.try_rand_range<u16>(0, 65535)))
+    if gu16.try_rand_u16(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu16.try_rand_u16(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu16.try_rand_u16(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu16.try_rand_range<u16>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u16(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u16(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gu16.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_8():
+    var gi16 = random.generator(seed = 42)
+    print(gi16.rand_i16())
+    print(gi16.rand_i16(1))
+    print(convert.unwrap(gi16.try_rand_i16(maximum = 1)))
+    print(gi16.rand_i16(2))
+    print(convert.unwrap(gi16.try_rand_i16(maximum = 2)))
+    print(gi16.rand_i16(3))
+    print(convert.unwrap(gi16.try_rand_i16(maximum = 3)))
+    print(gi16.rand_i16(32767))
+    print(convert.unwrap(gi16.try_rand_i16(maximum = 32767)))
+    print(gi16.rand_i16(upper = 32767, lower = -32768))
+    print(convert.unwrap(gi16.try_rand_i16(-32768, 32767)))
+    print(gi16.rand_i16(upper = -32767, lower = -32768))
+    print(convert.unwrap(gi16.try_rand_i16(-32768, -32767)))
+    print(gi16.rand_i16(upper = 32767, lower = 32766))
+    print(convert.unwrap(gi16.try_rand_i16(32766, 32767)))
+    print(gi16.rand_i16(upper = 7, lower = -3))
+    print(convert.unwrap(gi16.try_rand_i16(-3, 7)))
+    print(gi16.rand_range<i16>(-32768, 32767))
+    print(convert.unwrap(gi16.try_rand_range<i16>(-32768, 32767)))
+    print(gi16.rand_range<i16>(32767, 32767))
+    random.seed(42)
+    print(random.rand_i16())
+    print(convert.unwrap(random.try_rand_i16()))
+    print(random.rand_i16(7))
+    print(convert.unwrap(random.try_rand_i16(7)))
+    print(random.rand_i16(-32768, 32767))
+    print(convert.unwrap(random.try_rand_i16(upper = 32767, lower = -32768)))
+    print(random.rand_range<i16>(-32768, 32767))
+    print(convert.unwrap(random.try_rand_range<i16>(-32768, 32767)))
+    if gi16.try_rand_i16(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi16.try_rand_i16(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi16.try_rand_i16(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi16.try_rand_range<i16>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i16(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i16(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gi16.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_9():
+    var gu32 = random.generator(seed = 42)
+    print(gu32.rand_u32())
+    print(gu32.rand_u32(1))
+    print(convert.unwrap(gu32.try_rand_u32(maximum = 1)))
+    print(gu32.rand_u32(2))
+    print(convert.unwrap(gu32.try_rand_u32(maximum = 2)))
+    print(gu32.rand_u32(3))
+    print(convert.unwrap(gu32.try_rand_u32(maximum = 3)))
+    print(gu32.rand_u32(2147483649))
+    print(convert.unwrap(gu32.try_rand_u32(maximum = 2147483649)))
+    print(gu32.rand_u32(4294967295))
+    print(convert.unwrap(gu32.try_rand_u32(maximum = 4294967295)))
+    print(gu32.rand_u32(upper = 4294967295, lower = 0))
+    print(convert.unwrap(gu32.try_rand_u32(0, 4294967295)))
+    print(gu32.rand_u32(upper = 1, lower = 0))
+    print(convert.unwrap(gu32.try_rand_u32(0, 1)))
+    print(gu32.rand_u32(upper = 4294967295, lower = 4294967294))
+    print(convert.unwrap(gu32.try_rand_u32(4294967294, 4294967295)))
+    print(gu32.rand_u32(upper = 7, lower = 0))
+    print(convert.unwrap(gu32.try_rand_u32(0, 7)))
+    print(gu32.rand_range<u32>(0, 4294967295))
+    print(convert.unwrap(gu32.try_rand_range<u32>(0, 4294967295)))
+    print(gu32.rand_range<u32>(4294967295, 4294967295))
+    random.seed(42)
+    print(random.rand_u32())
+    print(convert.unwrap(random.try_rand_u32()))
+    print(random.rand_u32(7))
+    print(convert.unwrap(random.try_rand_u32(7)))
+    print(random.rand_u32(0, 4294967295))
+    print(convert.unwrap(random.try_rand_u32(upper = 4294967295, lower = 0)))
+    print(random.rand_range<u32>(0, 4294967295))
+    print(convert.unwrap(random.try_rand_range<u32>(0, 4294967295)))
+    if gu32.try_rand_u32(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu32.try_rand_u32(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu32.try_rand_u32(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu32.try_rand_range<u32>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u32(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u32(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gu32.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_10():
+    var gi32 = random.generator(seed = 42)
+    print(gi32.rand_i32())
+    print(gi32.rand_i32(1))
+    print(convert.unwrap(gi32.try_rand_i32(maximum = 1)))
+    print(gi32.rand_i32(2))
+    print(convert.unwrap(gi32.try_rand_i32(maximum = 2)))
+    print(gi32.rand_i32(3))
+    print(convert.unwrap(gi32.try_rand_i32(maximum = 3)))
+    print(gi32.rand_i32(2147483647))
+    print(convert.unwrap(gi32.try_rand_i32(maximum = 2147483647)))
+    print(gi32.rand_i32(upper = 2147483647, lower = -2147483648))
+    print(convert.unwrap(gi32.try_rand_i32(-2147483648, 2147483647)))
+    print(gi32.rand_i32(upper = -2147483647, lower = -2147483648))
+    print(convert.unwrap(gi32.try_rand_i32(-2147483648, -2147483647)))
+    print(gi32.rand_i32(upper = 2147483647, lower = 2147483646))
+    print(convert.unwrap(gi32.try_rand_i32(2147483646, 2147483647)))
+    print(gi32.rand_i32(upper = 7, lower = -3))
+    print(convert.unwrap(gi32.try_rand_i32(-3, 7)))
+    print(gi32.rand_range<i32>(-2147483648, 2147483647))
+    print(convert.unwrap(gi32.try_rand_range<i32>(-2147483648, 2147483647)))
+    print(gi32.rand_range<i32>(2147483647, 2147483647))
+    random.seed(42)
+    print(random.rand_i32())
+    print(convert.unwrap(random.try_rand_i32()))
+    print(random.rand_i32(7))
+    print(convert.unwrap(random.try_rand_i32(7)))
+    print(random.rand_i32(-2147483648, 2147483647))
+    print(convert.unwrap(random.try_rand_i32(upper = 2147483647, lower = -2147483648)))
+    print(random.rand_range<i32>(-2147483648, 2147483647))
+    print(convert.unwrap(random.try_rand_range<i32>(-2147483648, 2147483647)))
+    if gi32.try_rand_i32(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi32.try_rand_i32(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi32.try_rand_i32(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi32.try_rand_range<i32>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i32(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i32(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gi32.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_11():
+    var gu64 = random.generator(seed = 42)
+    print(gu64.rand_u64())
+    print(gu64.rand_u64(1))
+    print(convert.unwrap(gu64.try_rand_u64(maximum = 1)))
+    print(gu64.rand_u64(2))
+    print(convert.unwrap(gu64.try_rand_u64(maximum = 2)))
+    print(gu64.rand_u64(3))
+    print(convert.unwrap(gu64.try_rand_u64(maximum = 3)))
+    print(gu64.rand_u64(9223372036854775809))
+    print(convert.unwrap(gu64.try_rand_u64(maximum = 9223372036854775809)))
+    print(gu64.rand_u64(18446744073709551615))
+    print(convert.unwrap(gu64.try_rand_u64(maximum = 18446744073709551615)))
+    print(gu64.rand_u64(upper = 18446744073709551615, lower = 0))
+    print(convert.unwrap(gu64.try_rand_u64(0, 18446744073709551615)))
+    print(gu64.rand_u64(upper = 1, lower = 0))
+    print(convert.unwrap(gu64.try_rand_u64(0, 1)))
+    print(gu64.rand_u64(upper = 18446744073709551615, lower = 18446744073709551614))
+    print(convert.unwrap(gu64.try_rand_u64(18446744073709551614, 18446744073709551615)))
+    print(gu64.rand_u64(upper = 7, lower = 0))
+    print(convert.unwrap(gu64.try_rand_u64(0, 7)))
+    print(gu64.rand_range<u64>(0, 18446744073709551615))
+    print(convert.unwrap(gu64.try_rand_range<u64>(0, 18446744073709551615)))
+    print(gu64.rand_range<u64>(18446744073709551615, 18446744073709551615))
+    random.seed(42)
+    print(random.rand_u64())
+    print(convert.unwrap(random.try_rand_u64()))
+    print(random.rand_u64(7))
+    print(convert.unwrap(random.try_rand_u64(7)))
+    print(random.rand_u64(0, 18446744073709551615))
+    print(convert.unwrap(random.try_rand_u64(upper = 18446744073709551615, lower = 0)))
+    print(random.rand_range<u64>(0, 18446744073709551615))
+    print(convert.unwrap(random.try_rand_range<u64>(0, 18446744073709551615)))
+    if gu64.try_rand_u64(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu64.try_rand_u64(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu64.try_rand_u64(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gu64.try_rand_range<u64>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u64(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_u64(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gu64.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_12():
+    var gi64 = random.generator(seed = 42)
+    print(gi64.rand_i64())
+    print(gi64.rand_i64(1))
+    print(convert.unwrap(gi64.try_rand_i64(maximum = 1)))
+    print(gi64.rand_i64(2))
+    print(convert.unwrap(gi64.try_rand_i64(maximum = 2)))
+    print(gi64.rand_i64(3))
+    print(convert.unwrap(gi64.try_rand_i64(maximum = 3)))
+    print(gi64.rand_i64(9223372036854775807))
+    print(convert.unwrap(gi64.try_rand_i64(maximum = 9223372036854775807)))
+    print(gi64.rand_i64(upper = 9223372036854775807, lower = -9223372036854775808))
+    print(convert.unwrap(gi64.try_rand_i64(-9223372036854775808, 9223372036854775807)))
+    print(gi64.rand_i64(upper = -9223372036854775807, lower = -9223372036854775808))
+    print(convert.unwrap(gi64.try_rand_i64(-9223372036854775808, -9223372036854775807)))
+    print(gi64.rand_i64(upper = 9223372036854775807, lower = 9223372036854775806))
+    print(convert.unwrap(gi64.try_rand_i64(9223372036854775806, 9223372036854775807)))
+    print(gi64.rand_i64(upper = 7, lower = -3))
+    print(convert.unwrap(gi64.try_rand_i64(-3, 7)))
+    print(gi64.rand_range<i64>(-9223372036854775808, 9223372036854775807))
+    print(convert.unwrap(gi64.try_rand_range<i64>(-9223372036854775808, 9223372036854775807)))
+    print(gi64.rand_range<i64>(9223372036854775807, 9223372036854775807))
+    random.seed(42)
+    print(random.rand_i64())
+    print(convert.unwrap(random.try_rand_i64()))
+    print(random.rand_i64(7))
+    print(convert.unwrap(random.try_rand_i64(7)))
+    print(random.rand_i64(-9223372036854775808, 9223372036854775807))
+    print(convert.unwrap(random.try_rand_i64(upper = 9223372036854775807, lower = -9223372036854775808)))
+    print(random.rand_range<i64>(-9223372036854775808, 9223372036854775807))
+    print(convert.unwrap(random.try_rand_range<i64>(-9223372036854775808, 9223372036854775807)))
+    if gi64.try_rand_i64(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi64.try_rand_i64(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi64.try_rand_i64(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gi64.try_rand_range<i64>(3, 1) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i64(0) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_i64(2, 2) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gi64.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_13():
+    var reject_integer = random.generator(seed = 42)
+    print(reject_integer.rand_u8(129))
+    print(reject_integer.rand_u64())
+
+func numeric_case_14():
+    var gf32 = random.generator(seed = 0)
+    for index in 0..<32:
+        print(raw_bits(gf32.rand_f32()))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([0,0,128,63])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([0,0,128,63]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,63])), convert.unwrap(binary.decode<f32>([1,0,128,63])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,63])), convert.unwrap(binary.decode<f32>([1,0,128,63]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,191])), convert.unwrap(binary.decode<f32>([0,0,128,63])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,191])), convert.unwrap(binary.decode<f32>([0,0,128,63]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([0,0,32,193])), convert.unwrap(binary.decode<f32>([0,0,160,192])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,32,193])), convert.unwrap(binary.decode<f32>([0,0,160,192]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,63])), convert.unwrap(binary.decode<f32>([0,0,128,63])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,63])), convert.unwrap(binary.decode<f32>([0,0,128,63]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([1,0,0,0])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([1,0,0,0]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([1,0,0,128])), convert.unwrap(binary.decode<f32>([0,0,0,0])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([1,0,0,128])), convert.unwrap(binary.decode<f32>([0,0,0,0]))))))
+    print(raw_bits(gf32.rand_f32(convert.unwrap(binary.decode<f32>([255,255,127,255])), convert.unwrap(binary.decode<f32>([255,255,127,127])))))
+    print(raw_bits(convert.unwrap(gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([255,255,127,255])), convert.unwrap(binary.decode<f32>([255,255,127,127]))))))
+    gf32.seed(0)
+    print(raw_bits(gf32.rand_f32(1.0, convert.unwrap(binary.decode<f32>([1,0,128,63])))))
+    print(gf32.rand_u64())
+    random.seed(42)
+    print(raw_bits(random.rand_f32()))
+    print(raw_bits(convert.unwrap(random.try_rand_f32())))
+    print(raw_bits(random.rand_f32(10.0)))
+    print(raw_bits(convert.unwrap(random.try_rand_f32(10.0))))
+    print(raw_bits(random.rand_f32(5.0, 10.0)))
+    print(raw_bits(convert.unwrap(random.try_rand_f32(5.0, 10.0))))
+    if gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,64])), convert.unwrap(binary.decode<f32>([0,0,128,63]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,64])), convert.unwrap(binary.decode<f32>([0,0,128,63]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,127])), convert.unwrap(binary.decode<f32>([0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,127])), convert.unwrap(binary.decode<f32>([0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([0,0,192,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,0,0])), convert.unwrap(binary.decode<f32>([0,0,192,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf32.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,255])), convert.unwrap(binary.decode<f32>([0,0,128,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f32(convert.unwrap(binary.decode<f32>([0,0,128,255])), convert.unwrap(binary.decode<f32>([0,0,128,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gf32.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_15():
+    var gf64 = random.generator(seed = 0)
+    for index in 0..<32:
+        print(raw_bits(gf64.rand_f64()))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63])), convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,240,63])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63])), convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,240,63]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,191])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,191])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,36,192])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,20,192])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,36,192])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,20,192]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,224,63])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,224,63])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,0,0])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,0,0]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,0,128])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,0,128])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0]))))))
+    print(raw_bits(gf64.rand_f64(convert.unwrap(binary.decode<f64>([255,255,255,255,255,255,239,255])), convert.unwrap(binary.decode<f64>([255,255,255,255,255,255,239,127])))))
+    print(raw_bits(convert.unwrap(gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([255,255,255,255,255,255,239,255])), convert.unwrap(binary.decode<f64>([255,255,255,255,255,255,239,127]))))))
+    gf64.seed(0)
+    print(raw_bits(gf64.rand_f64(1.0, convert.unwrap(binary.decode<f64>([1,0,0,0,0,0,240,63])))))
+    print(gf64.rand_u64())
+    random.seed(42)
+    print(raw_bits(random.rand_f64()))
+    print(raw_bits(convert.unwrap(random.try_rand_f64())))
+    print(raw_bits(random.rand_f64(10.0)))
+    print(raw_bits(convert.unwrap(random.try_rand_f64(10.0))))
+    print(raw_bits(random.rand_f64(5.0, 10.0)))
+    print(raw_bits(convert.unwrap(random.try_rand_f64(5.0, 10.0))))
+    if gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,64])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,64])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,63]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,127])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,127])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,248,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,0,0])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,248,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if gf64.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,255])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    if random.try_rand_f64(convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,255])), convert.unwrap(binary.decode<f64>([0,0,0,0,0,0,240,127]))) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    print(gf64.rand_u64())
+    print(random.rand_u64())
+
+func numeric_case_16():
+    var zero_f32 = random.generator(seed = 14092058508772706262)
+    print(raw_bits(zero_f32.rand_f32()))
+    var zero_f64 = random.generator(seed = 14092058508772706262)
+    print(raw_bits(zero_f64.rand_f64()))
+    var zero_i8 = random.generator(seed = 14092058508772706262)
+    print(zero_i8.rand_i8())
+    var zero_i16 = random.generator(seed = 14092058508772706262)
+    print(zero_i16.rand_i16())
+    var zero_i32 = random.generator(seed = 14092058508772706262)
+    print(zero_i32.rand_i32())
+    var zero_i64 = random.generator(seed = 14092058508772706262)
+    print(zero_i64.rand_i64())
+    var stream = random.generator(seed = 42)
+    var saved_stream = stream
+    print(stream.boolean())
+    print(saved_stream.rand_u64())
+    print(stream.rand_u64())
+    stream.seed(42)
+    var list = [0, 1, 2, 3]
+    var alias = list
+    stream.shuffle(list)
+    print(alias[0])
+    print(alias[1])
+    print(alias[2])
+    print(alias[3])
+    print(stream.rand_u64())
+    var empty: [i32] = []
+    var one = [17]
+    stream.shuffle(empty)
+    stream.shuffle(one)
+    print(stream.choose(one))
+    var one_copy = stream.shuffled(one)
+    one_copy[0] = 9
+    print(one[0])
+    print(stream.rand_range(-3, -3))
+    print(stream.rand_u64())
+    if stream.try_choose(empty) is Err(var reason):
+        print(reason.code)
+    else:
+        print(-99)
+    random.seed(42)
+    var data = [10, 20, 30]
+    var fixed: [i32, 3] = [10, 20, 30]
+    print(random.choose(data))
+    print(convert.unwrap(random.try_choose(fixed[0..<fixed.count])))
+    var copy = random.shuffled(data)
+    print(copy[0])
+    print(copy[1])
+    print(copy[2])
+    var checked_copy = random.try_shuffled(data)
+    if checked_copy is Ok(var inner):
+        print(inner[0])
+        print(inner[1])
+        print(inner[2])
+    var done = random.try_shuffle(data)
+    print(data[0])
+    print(data[1])
+    print(data[2])
+    print(random.rand_u64())
+
+func numeric_case_17():
+    var histogram = [0, 0, 0, 0, 0, 0, 0]
+    var histogram_engine = random.generator(seed = 42)
+    for index in 0..<4096:
+        var position = histogram_engine.rand_i32(7)
+        histogram[position] += 1
+    print(histogram[0])
+    print(histogram[1])
+    print(histogram[2])
+    print(histogram[3])
+    print(histogram[4])
+    print(histogram[5])
+    print(histogram[6])
+
+func main():
+    numeric_case_0()
+    numeric_case_1()
+    numeric_case_2()
+    numeric_case_3()
+    numeric_case_4()
+    numeric_case_5()
+    numeric_case_6()
+    numeric_case_7()
+    numeric_case_8()
+    numeric_case_9()
+    numeric_case_10()
+    numeric_case_11()
+    numeric_case_12()
+    numeric_case_13()
+    numeric_case_14()
+    numeric_case_15()
+    numeric_case_16()
+    numeric_case_17()
