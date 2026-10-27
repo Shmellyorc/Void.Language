@@ -1,12 +1,23 @@
 # Compiler stabilization: ordered engineering roadmap
 
+**STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
+
+The [await syntax handoff](../async-await-syntax/HANDOFF.md) records completion
+of Boss's local gate and authorization to resume the normal approval workflow.
+This does not authorize unspecified modules or claim hosted acceptance or repair
+of historical H1–H7 incidents.
+
 Boss authorized the complete stabilization scope on 27 October 2026, including
 automatic optimized caching and further measured cold-compile repair. The
 [active engineering record](stabilization/IMPLEMENTATION.md) tracks execution.
 The [completed local implementation and verification](stabilization/HANDOFF.md)
-are ready for independent review; standard-library resumption remains owner-gated.
+are ready for independent review. Boss has since lifted the special hold after
+the locally verified syntax delivery linked above.
 The proposal below remains design history; its 2× experiment target is not
 final acceptance. The owner objective is seconds, aiming below 10 s for DTO128.
+
+
+## Historical research freeze — superseded by Boss decision above
 
 Baseline **`1d4ad15f5215838d209e48bb47ac7c3f52b05371`**, 27 October 2026.
 Proposal for independent Golden Wrench architecture review and Boss approval.

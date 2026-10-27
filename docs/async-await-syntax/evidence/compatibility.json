@@ -1,0 +1,362 @@
+[
+  {
+    "fixture": "values",
+    "spelling": "sugar",
+    "version": "baseline",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct ledger:\n    receivers: i32 = 0\n    arguments: i32 = 0\n    calls: i32 = 0\n\nvalue struct packet:\n    items: [i32, 2]\n    owner: ledger\n\nfunc receiver(owner: ledger) -> ledger:\n    owner.receivers += 1\n    return owner\n\nfunc argument(owner: ledger) -> i32:\n    owner.arguments += 1\n    return owner.arguments\n\nasync func tick() -> i32:\n    return 1\n\nasync func (owner ledger) pair(first: i32, second: i32) -> result<i32, fault>:\n    owner.calls += 1\n    var ignored = await tick()\n    return Ok(first * 10 + second)\n\nasync func deliver(item: packet) -> result<packet, fault>:\n    var ignored = await tick()\n    return Ok(item)\n\nasync func nested(value: i32) -> result<result<i32, fault>, fault>:\n    var ignored = await tick()\n    return Ok(Ok(value))\n\nasync func numbers(value: i32) -> result<[i32, 2], fault>:\n    return Ok([value, value + 1])\n\nfunc envelope<t>(job: t) -> result<t, fault>:\n    return Ok(job)\n\nasync func identity<t>(item: t) -> t:\n    return item\n\nasync func calculate(owner: ledger, value: i32) -> result<i32, fault>:\n    var pending = receiver(owner).pair(argument(owner), argument(owner))\n    var first = await pending?\n    var again = (await pending)?\n    if first != 12 or again != first:\n        return Err(fault(message = \"repeated await\", code = 1))\n    var ordered = await receiver(owner).pair(second = argument(owner), first = argument(owner))?\n    if ordered != 43 or owner.receivers != 2 or owner.arguments != 4 or owner.calls != 2:\n        return Err(fault(message = \"evaluation order\", code = 2))\n    var original = packet(owner = owner)\n    original.items[0] = value\n    var copy_job = deliver(original)\n    original.items[0] = 100\n    var copied = await copy_job?\n    copied.items[0] += 1\n    copied.owner.calls += 10\n    var prior = (await copy_job)?\n    if prior.items[0] != value or prior.owner.calls != 12:\n        return Err(fault(message = \"copy and reference identity\", code = 3))\n    var chained = await deliver(prior)?.items[0]\n    var indexed = await numbers(value)?[1]\n    var doubled = await nested(await identity(value))??\n    var envelope_job = envelope(identity(value))\n    var grouped = await (envelope_job?)\n    var inner_argument = await identity(envelope(value)?)\n    var inner_index = await [identity(value)][envelope(0)?]\n    return Ok(first + again * 2 + ordered + copied.items[0] + chained + indexed + doubled + grouped + inner_argument + inner_index)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await calculate(ledger(), value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(var error):\n            return -error.code\n",
+    "source_sha256": "07567022794df6b164978b9264b7e044b6324c181987d043c1847c7e47ba399b",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 1,
+    "expected_status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:49:17: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 49 |     var first = await pending?\n    |                 ^^^^^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:49:30: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 49 |     var first = await pending?\n    |                              ^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:53:19: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 53 |     var ordered = await receiver(owner).pair(second = argument(owner), first = argument(owner))?\n    |                   ^^^^^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:53:96: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 53 |     var ordered = await receiver(owner).pair(second = argument(owner), first = argument(owner))?\n    |                                                                                                ^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:60:18: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 60 |     var copied = await copy_job?\n    |                  ^^^^^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:60:32: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 60 |     var copied = await copy_job?\n    |                                ^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:66:19: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 66 |     var chained = await deliver(prior)?.items[0]\n    |                   ^^^^^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:66:39: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 66 |     var chained = await deliver(prior)?.items[0]\n    |                                       ^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:67:19: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 67 |     var indexed = await numbers(value)?[1]\n    |                   ^^^^^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:67:39: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 67 |     var indexed = await numbers(value)?[1]\n    |                                       ^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:68:19: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 68 |     var doubled = await nested(await identity(value))??\n    |                   ^^^^^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:68:54: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 68 |     var doubled = await nested(await identity(value))??\n    |                                                      ^\n    Module: /values-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void:68:55: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 68 |     var doubled = await nested(await identity(value))??\n    |                                                       ^\n    Module: /values-sugar.void\n\n"
+  },
+  {
+    "fixture": "values",
+    "spelling": "sugar",
+    "version": "syntax",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct ledger:\n    receivers: i32 = 0\n    arguments: i32 = 0\n    calls: i32 = 0\n\nvalue struct packet:\n    items: [i32, 2]\n    owner: ledger\n\nfunc receiver(owner: ledger) -> ledger:\n    owner.receivers += 1\n    return owner\n\nfunc argument(owner: ledger) -> i32:\n    owner.arguments += 1\n    return owner.arguments\n\nasync func tick() -> i32:\n    return 1\n\nasync func (owner ledger) pair(first: i32, second: i32) -> result<i32, fault>:\n    owner.calls += 1\n    var ignored = await tick()\n    return Ok(first * 10 + second)\n\nasync func deliver(item: packet) -> result<packet, fault>:\n    var ignored = await tick()\n    return Ok(item)\n\nasync func nested(value: i32) -> result<result<i32, fault>, fault>:\n    var ignored = await tick()\n    return Ok(Ok(value))\n\nasync func numbers(value: i32) -> result<[i32, 2], fault>:\n    return Ok([value, value + 1])\n\nfunc envelope<t>(job: t) -> result<t, fault>:\n    return Ok(job)\n\nasync func identity<t>(item: t) -> t:\n    return item\n\nasync func calculate(owner: ledger, value: i32) -> result<i32, fault>:\n    var pending = receiver(owner).pair(argument(owner), argument(owner))\n    var first = await pending?\n    var again = (await pending)?\n    if first != 12 or again != first:\n        return Err(fault(message = \"repeated await\", code = 1))\n    var ordered = await receiver(owner).pair(second = argument(owner), first = argument(owner))?\n    if ordered != 43 or owner.receivers != 2 or owner.arguments != 4 or owner.calls != 2:\n        return Err(fault(message = \"evaluation order\", code = 2))\n    var original = packet(owner = owner)\n    original.items[0] = value\n    var copy_job = deliver(original)\n    original.items[0] = 100\n    var copied = await copy_job?\n    copied.items[0] += 1\n    copied.owner.calls += 10\n    var prior = (await copy_job)?\n    if prior.items[0] != value or prior.owner.calls != 12:\n        return Err(fault(message = \"copy and reference identity\", code = 3))\n    var chained = await deliver(prior)?.items[0]\n    var indexed = await numbers(value)?[1]\n    var doubled = await nested(await identity(value))??\n    var envelope_job = envelope(identity(value))\n    var grouped = await (envelope_job?)\n    var inner_argument = await identity(envelope(value)?)\n    var inner_index = await [identity(value)][envelope(0)?]\n    return Ok(first + again * 2 + ordered + copied.items[0] + chained + indexed + doubled + grouped + inner_argument + inner_index)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await calculate(ledger(), value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(var error):\n            return -error.code\n",
+    "source_sha256": "07567022794df6b164978b9264b7e044b6324c181987d043c1847c7e47ba399b",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "values",
+    "spelling": "parenthesized",
+    "version": "baseline",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct ledger:\n    receivers: i32 = 0\n    arguments: i32 = 0\n    calls: i32 = 0\n\nvalue struct packet:\n    items: [i32, 2]\n    owner: ledger\n\nfunc receiver(owner: ledger) -> ledger:\n    owner.receivers += 1\n    return owner\n\nfunc argument(owner: ledger) -> i32:\n    owner.arguments += 1\n    return owner.arguments\n\nasync func tick() -> i32:\n    return 1\n\nasync func (owner ledger) pair(first: i32, second: i32) -> result<i32, fault>:\n    owner.calls += 1\n    var ignored = await tick()\n    return Ok(first * 10 + second)\n\nasync func deliver(item: packet) -> result<packet, fault>:\n    var ignored = await tick()\n    return Ok(item)\n\nasync func nested(value: i32) -> result<result<i32, fault>, fault>:\n    var ignored = await tick()\n    return Ok(Ok(value))\n\nasync func numbers(value: i32) -> result<[i32, 2], fault>:\n    return Ok([value, value + 1])\n\nfunc envelope<t>(job: t) -> result<t, fault>:\n    return Ok(job)\n\nasync func identity<t>(item: t) -> t:\n    return item\n\nasync func calculate(owner: ledger, value: i32) -> result<i32, fault>:\n    var pending = receiver(owner).pair(argument(owner), argument(owner))\n    var first = (await pending)?\n    var again = (await pending)?\n    if first != 12 or again != first:\n        return Err(fault(message = \"repeated await\", code = 1))\n    var ordered = (await receiver(owner).pair(second = argument(owner), first = argument(owner)))?\n    if ordered != 43 or owner.receivers != 2 or owner.arguments != 4 or owner.calls != 2:\n        return Err(fault(message = \"evaluation order\", code = 2))\n    var original = packet(owner = owner)\n    original.items[0] = value\n    var copy_job = deliver(original)\n    original.items[0] = 100\n    var copied = (await copy_job)?\n    copied.items[0] += 1\n    copied.owner.calls += 10\n    var prior = (await copy_job)?\n    if prior.items[0] != value or prior.owner.calls != 12:\n        return Err(fault(message = \"copy and reference identity\", code = 3))\n    var chained = (await deliver(prior))?.items[0]\n    var indexed = (await numbers(value))?[1]\n    var doubled = (await nested(await identity(value)))??\n    var envelope_job = envelope(identity(value))\n    var grouped = await (envelope_job?)\n    var inner_argument = await identity(envelope(value)?)\n    var inner_index = await [identity(value)][envelope(0)?]\n    return Ok(first + again * 2 + ordered + copied.items[0] + chained + indexed + doubled + grouped + inner_argument + inner_index)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await calculate(ledger(), value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(var error):\n            return -error.code\n",
+    "source_sha256": "6320f690186d9ff5033195254402cf5baccbcb0c57f9f6cd21ec13bf51843e11",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "values",
+    "spelling": "parenthesized",
+    "version": "syntax",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct ledger:\n    receivers: i32 = 0\n    arguments: i32 = 0\n    calls: i32 = 0\n\nvalue struct packet:\n    items: [i32, 2]\n    owner: ledger\n\nfunc receiver(owner: ledger) -> ledger:\n    owner.receivers += 1\n    return owner\n\nfunc argument(owner: ledger) -> i32:\n    owner.arguments += 1\n    return owner.arguments\n\nasync func tick() -> i32:\n    return 1\n\nasync func (owner ledger) pair(first: i32, second: i32) -> result<i32, fault>:\n    owner.calls += 1\n    var ignored = await tick()\n    return Ok(first * 10 + second)\n\nasync func deliver(item: packet) -> result<packet, fault>:\n    var ignored = await tick()\n    return Ok(item)\n\nasync func nested(value: i32) -> result<result<i32, fault>, fault>:\n    var ignored = await tick()\n    return Ok(Ok(value))\n\nasync func numbers(value: i32) -> result<[i32, 2], fault>:\n    return Ok([value, value + 1])\n\nfunc envelope<t>(job: t) -> result<t, fault>:\n    return Ok(job)\n\nasync func identity<t>(item: t) -> t:\n    return item\n\nasync func calculate(owner: ledger, value: i32) -> result<i32, fault>:\n    var pending = receiver(owner).pair(argument(owner), argument(owner))\n    var first = (await pending)?\n    var again = (await pending)?\n    if first != 12 or again != first:\n        return Err(fault(message = \"repeated await\", code = 1))\n    var ordered = (await receiver(owner).pair(second = argument(owner), first = argument(owner)))?\n    if ordered != 43 or owner.receivers != 2 or owner.arguments != 4 or owner.calls != 2:\n        return Err(fault(message = \"evaluation order\", code = 2))\n    var original = packet(owner = owner)\n    original.items[0] = value\n    var copy_job = deliver(original)\n    original.items[0] = 100\n    var copied = (await copy_job)?\n    copied.items[0] += 1\n    copied.owner.calls += 10\n    var prior = (await copy_job)?\n    if prior.items[0] != value or prior.owner.calls != 12:\n        return Err(fault(message = \"copy and reference identity\", code = 3))\n    var chained = (await deliver(prior))?.items[0]\n    var indexed = (await numbers(value))?[1]\n    var doubled = (await nested(await identity(value)))??\n    var envelope_job = envelope(identity(value))\n    var grouped = await (envelope_job?)\n    var inner_argument = await identity(envelope(value)?)\n    var inner_index = await [identity(value)][envelope(0)?]\n    return Ok(first + again * 2 + ordered + copied.items[0] + chained + indexed + doubled + grouped + inner_argument + inner_index)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await calculate(ledger(), value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(var error):\n            return -error.code\n",
+    "source_sha256": "6320f690186d9ff5033195254402cf5baccbcb0c57f9f6cd21ec13bf51843e11",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/values-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "errors",
+    "spelling": "sugar",
+    "version": "baseline",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct special_fault extends fault:\n    detail: string\n\nstruct ledger:\n    trace: i32 = 0\n    stopped: i32 = 0\n\nstruct resource:\n    log: ledger\n\nfunc (owner resource) deinit():\n    owner.log.trace = owner.log.trace * 10 + 3\n\nasync func tick() -> i32:\n    return 1\n\nasync func sibling(owner: ledger):\n    defer {\n        owner.stopped += 1\n    }\n    for:\n        var ignored = await tick()\n\nasync func fail(value: i32) -> result<i32, special_fault>:\n    var ignored = await tick()\n    return Err(special_fault(message = \"retained\", code = value, detail = \"same error\"))\n\nasync func leave(owner: ledger, value: i32) -> result<i32, special_fault>:\n    defer {\n        owner.trace = owner.trace * 10 + 4\n    }\n    with resource(log = owner) as lease:\n        with tasks.group() as jobs:\n            var running = sibling(owner)\n            defer {\n                owner.trace = owner.trace * 10 + 2\n            }\n            var answer = await fail(value)?\n            owner.trace = 999\n            return Ok(answer)\n    return Ok(-1)\n\nasync func inner_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Ok(Err(special_fault(message = \"inner\", code = value, detail = \"nested\")))\n\nasync func outer_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Err(special_fault(message = \"outer\", code = value, detail = \"nested\"))\n\nasync func nested_error(value: i32, outer: bool) -> result<i32, special_fault>:\n    if outer:\n        return Ok(await outer_error(value)??)\n    return Ok(await inner_error(value)??)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    var job = leave(owner, value)\n    var outcome = await job\n    var repeated = await job\n    match outcome:\n        Ok(_):\n            return -1\n        Err(var error):\n            if error.message != \"retained\" or error.detail != \"same error\" or error.code != value:\n                return -2\n            match repeated:\n                Ok(_):\n                    return -3\n                Err(var same):\n                    if same != error:\n                        return -4\n    if owner.trace != 234 or owner.stopped != 1:\n        return -5\n    for outer in [false, true]:\n        var nested = await nested_error(value, outer)\n        match nested:\n            Ok(_):\n                return -6\n            Err(var error):\n                if error.code != value or error.detail != \"nested\":\n                    return -7\n    return value\n",
+    "source_sha256": "c8ffaf27d81783e6d3465e3b0318805b805b0c090a280c48aae2258888af77aa",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 1,
+    "expected_status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:42:26: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 42 |             var answer = await fail(value)?\n    |                          ^^^^^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:42:43: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 42 |             var answer = await fail(value)?\n    |                                           ^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:55:19: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 55 |         return Ok(await outer_error(value)??)\n    |                   ^^^^^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:55:43: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 55 |         return Ok(await outer_error(value)??)\n    |                                           ^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:55:44: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 55 |         return Ok(await outer_error(value)??)\n    |                                            ^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:56:15: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 56 |     return Ok(await inner_error(value)??)\n    |               ^^^^^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:56:39: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 56 |     return Ok(await inner_error(value)??)\n    |                                       ^\n    Module: /errors-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void:56:40: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 56 |     return Ok(await inner_error(value)??)\n    |                                        ^\n    Module: /errors-sugar.void\n\n"
+  },
+  {
+    "fixture": "errors",
+    "spelling": "sugar",
+    "version": "syntax",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct special_fault extends fault:\n    detail: string\n\nstruct ledger:\n    trace: i32 = 0\n    stopped: i32 = 0\n\nstruct resource:\n    log: ledger\n\nfunc (owner resource) deinit():\n    owner.log.trace = owner.log.trace * 10 + 3\n\nasync func tick() -> i32:\n    return 1\n\nasync func sibling(owner: ledger):\n    defer {\n        owner.stopped += 1\n    }\n    for:\n        var ignored = await tick()\n\nasync func fail(value: i32) -> result<i32, special_fault>:\n    var ignored = await tick()\n    return Err(special_fault(message = \"retained\", code = value, detail = \"same error\"))\n\nasync func leave(owner: ledger, value: i32) -> result<i32, special_fault>:\n    defer {\n        owner.trace = owner.trace * 10 + 4\n    }\n    with resource(log = owner) as lease:\n        with tasks.group() as jobs:\n            var running = sibling(owner)\n            defer {\n                owner.trace = owner.trace * 10 + 2\n            }\n            var answer = await fail(value)?\n            owner.trace = 999\n            return Ok(answer)\n    return Ok(-1)\n\nasync func inner_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Ok(Err(special_fault(message = \"inner\", code = value, detail = \"nested\")))\n\nasync func outer_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Err(special_fault(message = \"outer\", code = value, detail = \"nested\"))\n\nasync func nested_error(value: i32, outer: bool) -> result<i32, special_fault>:\n    if outer:\n        return Ok(await outer_error(value)??)\n    return Ok(await inner_error(value)??)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    var job = leave(owner, value)\n    var outcome = await job\n    var repeated = await job\n    match outcome:\n        Ok(_):\n            return -1\n        Err(var error):\n            if error.message != \"retained\" or error.detail != \"same error\" or error.code != value:\n                return -2\n            match repeated:\n                Ok(_):\n                    return -3\n                Err(var same):\n                    if same != error:\n                        return -4\n    if owner.trace != 234 or owner.stopped != 1:\n        return -5\n    for outer in [false, true]:\n        var nested = await nested_error(value, outer)\n        match nested:\n            Ok(_):\n                return -6\n            Err(var error):\n                if error.code != value or error.detail != \"nested\":\n                    return -7\n    return value\n",
+    "source_sha256": "c8ffaf27d81783e6d3465e3b0318805b805b0c090a280c48aae2258888af77aa",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "errors",
+    "spelling": "parenthesized",
+    "version": "baseline",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct special_fault extends fault:\n    detail: string\n\nstruct ledger:\n    trace: i32 = 0\n    stopped: i32 = 0\n\nstruct resource:\n    log: ledger\n\nfunc (owner resource) deinit():\n    owner.log.trace = owner.log.trace * 10 + 3\n\nasync func tick() -> i32:\n    return 1\n\nasync func sibling(owner: ledger):\n    defer {\n        owner.stopped += 1\n    }\n    for:\n        var ignored = await tick()\n\nasync func fail(value: i32) -> result<i32, special_fault>:\n    var ignored = await tick()\n    return Err(special_fault(message = \"retained\", code = value, detail = \"same error\"))\n\nasync func leave(owner: ledger, value: i32) -> result<i32, special_fault>:\n    defer {\n        owner.trace = owner.trace * 10 + 4\n    }\n    with resource(log = owner) as lease:\n        with tasks.group() as jobs:\n            var running = sibling(owner)\n            defer {\n                owner.trace = owner.trace * 10 + 2\n            }\n            var answer = (await fail(value))?\n            owner.trace = 999\n            return Ok(answer)\n    return Ok(-1)\n\nasync func inner_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Ok(Err(special_fault(message = \"inner\", code = value, detail = \"nested\")))\n\nasync func outer_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Err(special_fault(message = \"outer\", code = value, detail = \"nested\"))\n\nasync func nested_error(value: i32, outer: bool) -> result<i32, special_fault>:\n    if outer:\n        return Ok((await outer_error(value))??)\n    return Ok((await inner_error(value))??)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    var job = leave(owner, value)\n    var outcome = await job\n    var repeated = await job\n    match outcome:\n        Ok(_):\n            return -1\n        Err(var error):\n            if error.message != \"retained\" or error.detail != \"same error\" or error.code != value:\n                return -2\n            match repeated:\n                Ok(_):\n                    return -3\n                Err(var same):\n                    if same != error:\n                        return -4\n    if owner.trace != 234 or owner.stopped != 1:\n        return -5\n    for outer in [false, true]:\n        var nested = await nested_error(value, outer)\n        match nested:\n            Ok(_):\n                return -6\n            Err(var error):\n                if error.code != value or error.detail != \"nested\":\n                    return -7\n    return value\n",
+    "source_sha256": "4e3a233551b58a8738397b68bdd0f6253b486605d836de7a3784bd8cee030293",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "errors",
+    "spelling": "parenthesized",
+    "version": "syntax",
+    "source": "struct fault:\n    message: string\n    code: i32\n\nstruct special_fault extends fault:\n    detail: string\n\nstruct ledger:\n    trace: i32 = 0\n    stopped: i32 = 0\n\nstruct resource:\n    log: ledger\n\nfunc (owner resource) deinit():\n    owner.log.trace = owner.log.trace * 10 + 3\n\nasync func tick() -> i32:\n    return 1\n\nasync func sibling(owner: ledger):\n    defer {\n        owner.stopped += 1\n    }\n    for:\n        var ignored = await tick()\n\nasync func fail(value: i32) -> result<i32, special_fault>:\n    var ignored = await tick()\n    return Err(special_fault(message = \"retained\", code = value, detail = \"same error\"))\n\nasync func leave(owner: ledger, value: i32) -> result<i32, special_fault>:\n    defer {\n        owner.trace = owner.trace * 10 + 4\n    }\n    with resource(log = owner) as lease:\n        with tasks.group() as jobs:\n            var running = sibling(owner)\n            defer {\n                owner.trace = owner.trace * 10 + 2\n            }\n            var answer = (await fail(value))?\n            owner.trace = 999\n            return Ok(answer)\n    return Ok(-1)\n\nasync func inner_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Ok(Err(special_fault(message = \"inner\", code = value, detail = \"nested\")))\n\nasync func outer_error(value: i32) -> result<result<i32, special_fault>, special_fault>:\n    return Err(special_fault(message = \"outer\", code = value, detail = \"nested\"))\n\nasync func nested_error(value: i32, outer: bool) -> result<i32, special_fault>:\n    if outer:\n        return Ok((await outer_error(value))??)\n    return Ok((await inner_error(value))??)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    var job = leave(owner, value)\n    var outcome = await job\n    var repeated = await job\n    match outcome:\n        Ok(_):\n            return -1\n        Err(var error):\n            if error.message != \"retained\" or error.detail != \"same error\" or error.code != value:\n                return -2\n            match repeated:\n                Ok(_):\n                    return -3\n                Err(var same):\n                    if same != error:\n                        return -4\n    if owner.trace != 234 or owner.stopped != 1:\n        return -5\n    for outer in [false, true]:\n        var nested = await nested_error(value, outer)\n        match nested:\n            Ok(_):\n                return -6\n            Err(var error):\n                if error.code != value or error.detail != \"nested\":\n                    return -7\n    return value\n",
+    "source_sha256": "4e3a233551b58a8738397b68bdd0f6253b486605d836de7a3784bd8cee030293",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/errors-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "cancelled",
+    "spelling": "sugar",
+    "version": "baseline",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value)\n\nasync func stop<t>(pending: t):\n    pending.cancel()\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    var pending = child(owner, value)\n    var canceller = stop(pending)\n    return Ok(await pending?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "cf54f140641ebf9fb2a3a64825594f846bd6a7cd073391665dfe1564175b566f",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/cancelled-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 1,
+    "expected_status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/cancelled-sugar.void:23:15: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 23 |     return Ok(await pending?)\n    |               ^^^^^\n    Module: /cancelled-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/cancelled-sugar.void:23:28: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 23 |     return Ok(await pending?)\n    |                            ^\n    Module: /cancelled-sugar.void\n\n"
+  },
+  {
+    "fixture": "cancelled",
+    "spelling": "sugar",
+    "version": "syntax",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value)\n\nasync func stop<t>(pending: t):\n    pending.cancel()\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    var pending = child(owner, value)\n    var canceller = stop(pending)\n    return Ok(await pending?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "cf54f140641ebf9fb2a3a64825594f846bd6a7cd073391665dfe1564175b566f",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/cancelled-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "cancelled",
+    "spelling": "parenthesized",
+    "version": "baseline",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value)\n\nasync func stop<t>(pending: t):\n    pending.cancel()\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    var pending = child(owner, value)\n    var canceller = stop(pending)\n    return Ok((await pending)?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "0a530bd963ee20f802822a10b83b2900ad2b13bf7a5fb7cadfde1afce677a406",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/cancelled-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "cancelled",
+    "spelling": "parenthesized",
+    "version": "syntax",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value)\n\nasync func stop<t>(pending: t):\n    pending.cancel()\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    var pending = child(owner, value)\n    var canceller = stop(pending)\n    return Ok((await pending)?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "0a530bd963ee20f802822a10b83b2900ad2b13bf7a5fb7cadfde1afce677a406",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/cancelled-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "failure",
+    "spelling": "sugar",
+    "version": "baseline",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value / (value - value))\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    return Ok(await child(owner, value)?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "9090acc2c2919e04544cd2223032e74a74316caabd8e897d05da8216e4fd4909",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/failure-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 1,
+    "expected_status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/failure-sugar.void:18:15: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 18 |     return Ok(await child(owner, value)?)\n    |               ^^^^^\n    Module: /failure-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/failure-sugar.void:18:40: error: ? requires a result value in a result-returning function.\n    code: VOID2001\n\n 18 |     return Ok(await child(owner, value)?)\n    |                                        ^\n    Module: /failure-sugar.void\n\n"
+  },
+  {
+    "fixture": "failure",
+    "spelling": "sugar",
+    "version": "syntax",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value / (value - value))\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    return Ok(await child(owner, value)?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "9090acc2c2919e04544cd2223032e74a74316caabd8e897d05da8216e4fd4909",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/failure-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "failure",
+    "spelling": "parenthesized",
+    "version": "baseline",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value / (value - value))\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    return Ok((await child(owner, value))?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "9b64f382956d12214fe06b3adaafc7d03a0e88908f76dcf83ac482aa8381eb9a",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/failure-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "failure",
+    "spelling": "parenthesized",
+    "version": "syntax",
+    "source": "struct ledger:\n    number: i32 = 0\n\nasync func tick() -> i32:\n    return 1\n\nasync func child(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 1\n    }\n    var ignored = await tick()\n    return Ok(value / (value - value))\n\nasync func propagate(owner: ledger, value: i32) -> result<i32, string>:\n    defer {\n        owner.number += 10\n    }\n    return Ok((await child(owner, value))?)\n\nasync func entry(value: i32) -> i32:\n    var owner = ledger()\n    defer {\n        owner.number += 100\n    }\n    var outcome = await propagate(owner, value)\n    match outcome:\n        Ok(_):\n            return -1\n        Err(_):\n            return -2\n",
+    "source_sha256": "9b64f382956d12214fe06b3adaafc7d03a0e88908f76dcf83ac482aa8381eb9a",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/failure-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "spawn",
+    "spelling": "sugar",
+    "version": "baseline",
+    "source": "func worker(first: i32, second: i32) -> result<i32, string>:\n    return Ok(first + second)\n\nasync func identity(value: i32) -> i32:\n    return value\n\nasync func compute(value: i32) -> result<i32, string>:\n    return Ok(await spawn worker(value, await identity(2))?)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await compute(value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(_):\n            return -1\n",
+    "source_sha256": "6e23a63daaf3267261e54e0f419ee4916950b8be07b02ef706cf6ffcba5e4fff",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/spawn-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 1,
+    "expected_status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/spawn-sugar.void:8:15: error: await requires a non-null inferred task handle.\n    code: VOID2001\n\n 8 |     return Ok(await spawn worker(value, await identity(2))?)\n   |               ^^^^^\n    Module: /spawn-sugar.void\n\n/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/spawn-sugar.void:8:21: error: spawn requires a directly named synchronous noncapturing function.\n    code: VOID1103\n\n 8 |     return Ok(await spawn worker(value, await identity(2))?)\n   |                     ^^^^^\n    Module: /spawn-sugar.void\n\n"
+  },
+  {
+    "fixture": "spawn",
+    "spelling": "sugar",
+    "version": "syntax",
+    "source": "func worker(first: i32, second: i32) -> result<i32, string>:\n    return Ok(first + second)\n\nasync func identity(value: i32) -> i32:\n    return value\n\nasync func compute(value: i32) -> result<i32, string>:\n    return Ok(await spawn worker(value, await identity(2))?)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await compute(value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(_):\n            return -1\n",
+    "source_sha256": "6e23a63daaf3267261e54e0f419ee4916950b8be07b02ef706cf6ffcba5e4fff",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/spawn-sugar.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "spawn",
+    "spelling": "parenthesized",
+    "version": "baseline",
+    "source": "func worker(first: i32, second: i32) -> result<i32, string>:\n    return Ok(first + second)\n\nasync func identity(value: i32) -> i32:\n    return value\n\nasync func compute(value: i32) -> result<i32, string>:\n    return Ok((await spawn worker(value, await identity(2)))?)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await compute(value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(_):\n            return -1\n",
+    "source_sha256": "6dd76d6845960a839f05c066c597161368748750a06a2474317a427db6747d4d",
+    "compiler_sha256": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/spawn-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "fixture": "spawn",
+    "spelling": "parenthesized",
+    "version": "syntax",
+    "source": "func worker(first: i32, second: i32) -> result<i32, string>:\n    return Ok(first + second)\n\nasync func identity(value: i32) -> i32:\n    return value\n\nasync func compute(value: i32) -> result<i32, string>:\n    return Ok((await spawn worker(value, await identity(2)))?)\n\nasync func entry(value: i32) -> i32:\n    var outcome = await compute(value)\n    match outcome:\n        Ok(var answer):\n            return answer\n        Err(_):\n            return -1\n",
+    "source_sha256": "6dd76d6845960a839f05c066c597161368748750a06a2474317a427db6747d4d",
+    "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/async-await-syntax/compatibility/spawn-parenthesized.void"
+    ],
+    "stack_bytes": 1048576,
+    "status": 0,
+    "expected_status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  }
+]

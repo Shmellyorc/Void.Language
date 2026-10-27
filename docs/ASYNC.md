@@ -125,6 +125,45 @@ on one Runtime and nested adapters are checked failures. Separate Runtime owners
 retain their existing independence. Bounded parallel source jobs use the same scheduler, as described below.
 Detachment, cancellation recovery and general native bindings remain deferred.
 
+## Await and result propagation
+
+`await job?` means `(await job)?`: await the task, then propagate its result.
+Both spellings use the same checked await, result inspection and early-exit
+cleanup. Calls, member selection and indexing that form the task operand still
+bind before await. A postfix chain after `?` acts on the successful payload:
+
+```typescript
+async func load_scene() -> result<bool, string>:
+    var world_job = load_world()  # Application-defined async result producer.
+    var world = await world_job?
+    var audio = await load_audio()?
+    return Ok(true)
+```
+
+This example assumes application loading functions with the matching result
+error type. No standard `error` module is added by this syntax change.
+
+| Source | Grouping |
+|---|---|
+| `await job?` | `(await job)?` |
+| `(await job)?` | `(await job)?` |
+| `await (job?)` | `await (job?)` |
+| `await load()?.name` | `((await load())?).name` |
+| `await load()??` | `((await load())?)?` |
+| `await job? + 1` | `((await job)?) + 1` |
+
+Explicit parentheses retain their grouping. In `await (job?)`, `job` must be a
+result whose successful payload is a task; an ordinary task handle diagnoses at
+the inner `?`. Call arguments and index expressions also retain their own
+expression boundaries, for example `await identity(envelope(value)?)`.
+Propagation still requires exactly matching error types in a result-returning
+function. An awaited `Err` is ordinary task completion; the `?` then follows the
+existing early-exit cancellation/draining, reached defer and resource cleanup
+rules below. Runtime failure and cancellation remain distinct from `Err`.
+
+The [syntax handoff](async-await-syntax/HANDOFF.md) records local verification;
+hosted acceptance remains Boss-controlled.
+
 ## Structured task lifecycle (Delivery 2)
 
 Every activation owns an implicit child scope. An explicit lexical group owns

@@ -903,7 +903,7 @@ class Parser {
         if (op == "*" || op == "/" || op == "%") return 5;
         return 0;
     }
-    std::unique_ptr<Expr> postfix(std::unique_ptr<Expr> e) {
+    std::unique_ptr<Expr> postfix(std::unique_ptr<Expr> e, bool propagation = true) {
         while(true) {
             if(accept(".")) {
                 auto member=std::make_unique<Expr>(Expr::Kind::field,at("string")?take():name());
@@ -914,7 +914,7 @@ class Parser {
                 selected->parts.push_back(std::move(e));selected->parts.push_back(expression());
                 if(at("..") || at("..<")){selected->kind=Expr::Kind::array_slice;selected->op=take().text;selected->parts.push_back(expression());}
                 need("]");e=std::move(selected);
-            } else if(accept("?")) {
+            } else if(propagation && accept("?")) {
                 auto propagation=std::make_unique<Expr>(Expr::Kind::propagate,tokens[p-1]);propagation->parts.push_back(std::move(e));e=std::move(propagation);
             } else if(type_call(true) && (e->kind==Expr::Kind::name || e->kind==Expr::Kind::field)) {
                 e->type_arguments=type_arguments();
@@ -935,7 +935,7 @@ class Parser {
         }
         return e;
     }
-    std::unique_ptr<Expr> primary() {
+    std::unique_ptr<Expr> primary(bool propagation) {
         if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
         auto token=take();
         if(token.text=="func") {
@@ -957,39 +957,42 @@ class Parser {
         if(token.text=="{") {
             auto e=std::make_unique<Expr>(Expr::Kind::dictionary_literal,token);
             if(!at("}"))do{e->parts.push_back(expression());need(":");e->parts.push_back(expression());}while(accept(",") && !at("}"));
-            need("}");return postfix(std::move(e));
+            need("}");return postfix(std::move(e),propagation);
         }
         if(token.text=="[") {
             auto e=std::make_unique<Expr>(Expr::Kind::array_literal,token);
             if(!at("]")) do { e->parts.push_back(expression()); } while(accept(","));
-            need("]");return postfix(std::move(e));
+            need("]");return postfix(std::move(e),propagation);
         }
         if(token.kind==TokenKind::string || token.kind==TokenKind::number || token.text=="true" || token.text=="false" || token.text=="null") {
             auto e=std::make_unique<Expr>(Expr::Kind::literal,token);
             if(token.kind==TokenKind::string) {e->type=Type::string;e->aggregate_value.text=token.decoded;}
             else if(token.kind==TokenKind::number) e->literal_text=token.text;
             else {e->type=token.text=="null" ? Type::null_value : Type::boolean;e->value=token.text=="true";}
-            return postfix(std::move(e));
+            return postfix(std::move(e),propagation);
         }
-        if(token.text=="(") {auto e=expression();need(")");return postfix(std::move(e));}
-        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || ((numeric::primitive(token.text)!=Type::none || token.text=="string") && at(".")) || (token.text=="string" && at("(")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
+        if(token.text=="(") {auto e=expression();need(")");return postfix(std::move(e),propagation);}
+        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || ((numeric::primitive(token.text)!=Type::none || token.text=="string") && at(".")) || (token.text=="string" && at("(")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token),propagation);
         error(source,token,Code::syntax,"Expected an expression, found '"+token.text+"'.");
     }
-    std::unique_ptr<Expr> unary() {
+    std::unique_ptr<Expr> unary(bool propagation = true) {
         Depth guard(depth, source, peek());
-        if(accept("spawn")) {auto e=std::make_unique<Expr>(Expr::Kind::spawned,tokens[p-1]);e->parts.push_back(unary());return e;}
-        if(accept("await")) {auto e=std::make_unique<Expr>(Expr::Kind::awaited,tokens[p-1]);e->parts.push_back(unary());return e;}
+        if(accept("spawn")) {auto e=std::make_unique<Expr>(Expr::Kind::spawned,tokens[p-1]);e->parts.push_back(unary(propagation));return e;}
+        // Calls/member/index chains belong to the task operand, but an ungrouped
+        // '?' belongs to its awaited result. Parentheses (and argument/index
+        // expressions) enter expression() afresh, retaining explicit grouping.
+        if(accept("await")) {auto e=std::make_unique<Expr>(Expr::Kind::awaited,tokens[p-1]);e->parts.push_back(unary(false));return postfix(std::move(e),propagation);}
         if (at("not") || at("-") || at("+")) {
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::unary, token); e->op = token.text;
             // not binds below comparisons: not a < b means not (a < b).
-            e->parts.push_back(token.text == "not" ? expression(3) : unary());
+            e->parts.push_back(token.text == "not" ? expression(3) : unary(propagation));
             if ((token.text == "-" || token.text == "+") && e->parts[0]->kind == Expr::Kind::literal && !e->parts[0]->literal_text.empty() &&
                 e->parts[0]->literal_text.front() != '-' && e->parts[0]->literal_text.front() != '+') {
                 e->kind = Expr::Kind::literal; e->literal_text = token.text + e->parts[0]->literal_text; e->parts.clear();
             }
             return e;
         }
-        return primary();
+        return primary(propagation);
     }
     VOID_SEMANTIC_HANDLER std::unique_ptr<Expr> has_expression() {
         auto left=type();auto site=need("has");auto right=type();

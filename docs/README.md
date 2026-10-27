@@ -1,19 +1,21 @@
 # VOID documentation
 
-**STATUS: NEW STANDARD-LIBRARY DEVELOPMENT PAUSED — COMPILER STABILIZATION IN PROGRESS.**
+**STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
 
-The 27 October compiler stabilization sprint is authorized from
-`1d4ad15f5215838d209e48bb47ac7c3f52b05371`. Follow
-[the active inventory](compiler-health/ISSUES.md) and
-[the engineering record](compiler-health/stabilization/IMPLEMENTATION.md).
-The [cache policy](compiler-health/stabilization/CACHE.md) documents automatic
-optimized runs, `--no-cache` and the retained legacy `--cache` behavior.
-The [review handoff](compiler-health/stabilization/HANDOFF.md) links final
-measurements, verification and frozen evidence. Local engineering is complete;
-independent acceptance remains pending.
-Existing generated JSON adapters may be repaired for compiler performance.
-The hold remains until independent Golden Wrench review and Boss authorization
-to resume. Earlier dated sections below remain historical.
+Boss authorized lifting the special stabilization hold after local acceptance of
+the `await job?` shorthand. That condition is now satisfied. The
+[syntax implementation and Golden Wrench handoff](async-await-syntax/HANDOFF.md)
+records Debug/Release/strict sanitizer, JIT/AOT, editor, actual 1 MiB and
+stabilization regression evidence. Hosted acceptance remains pending Boss CI.
+
+Normal VOID development may resume under the existing Boss approval, Research, Wrench review and Keyboard implementation workflow. This lifts the special stabilization freeze; it does not approve unspecified modules or unrelated features. No new standard-library development was performed in this syntax sprint.
+
+The [completed stabilization handoff](compiler-health/stabilization/HANDOFF.md),
+[measurements](compiler-health/stabilization/BENCHMARKS.md) and
+[cache policy](compiler-health/stabilization/CACHE.md) remain the prior engineering
+record. Historical freeze records are preserved there. H1–H7 remain unresolved
+historical incidents; this decision does not claim their repair. Earlier dated
+sections below remain historical.
 
 ## Historical JSON module research proposal, 27 October 2026
 

@@ -6,6 +6,7 @@
 #include <future>
 #include <latch>
 void async_ir_tests();
+void async_syntax_tests(const std::filesystem::path&,bool);
 void async_parallel_tests(const std::filesystem::path&,const std::filesystem::path&);
 void async_lifecycle_tests(const std::filesystem::path&,const std::filesystem::path&);
 void async_lifetime_tests(const std::filesystem::path&);
@@ -18,6 +19,7 @@ void require(bool value,const char* message){if(!value)throw std::runtime_error(
 std::shared_ptr<const vd::ValidatedAnalysis> analyze(const std::filesystem::path& file){auto result=vd::analyze_project(file);if(!result.succeeded())throw vd::CompilationError(result.diagnostics);return result.program;}
 }
 int main(int argc,char** argv){try{
+    if(argc==3 && (std::string(argv[1])=="--syntax" || std::string(argv[1])=="--syntax-stack")){async_syntax_tests(argv[2],std::string(argv[1])=="--syntax-stack");return 0;}
     if(argc==4 && std::string(argv[1])=="--parallel"){async_parallel_tests(argv[2],argv[3]);return 0;}
     if(argc==4 && std::string(argv[1])=="--lifecycle"){async_lifecycle_tests(argv[2],argv[3]);return 0;}
     if(argc==5 && std::string(argv[1])=="--emit"){auto analysis=analyze(argv[2]);vd::emit_async_object(analysis->lower(),argv[3],std::string(argv[4])=="optimized");return 0;}

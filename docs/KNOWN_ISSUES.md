@@ -1,19 +1,20 @@
 # Known issues and deferred work
 
-**STATUS: NEW STANDARD-LIBRARY DEVELOPMENT PAUSED — COMPILER STABILIZATION IN PROGRESS.**
+**STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
 
-Boss authorized implementation of the complete compiler stabilization sprint
-on 27 October 2026. The research-only boundary below describes the preceding
-audit. [Active engineering record](compiler-health/stabilization/IMPLEMENTATION.md).
-The hold remains until independent Golden Wrench review and Boss authorization
-to resume. Historical incident classifications remain unchanged.
+Boss authorized this status change once `await job?` passed local acceptance.
+The [syntax handoff](async-await-syntax/HANDOFF.md) records the completed gates.
+Hosted acceptance remains Boss-controlled, and H1–H7 retain their unresolved
+historical classifications. Historical freeze records remain in the original
+[stabilization engineering log](compiler-health/stabilization/IMPLEMENTATION.md).
 
-## Current disposition — compiler stabilization, 27 October 2026
+Normal VOID development may resume under the existing Boss approval, Research, Wrench review and Keyboard implementation workflow. This lifts the special stabilization freeze; it does not approve unspecified modules or unrelated features. No new standard-library development was performed in this syntax sprint.
 
-Audited baseline: `1d4ad15f5215838d209e48bb47ac7c3f52b05371`.
-**Boss has paused all new standard-library development.** Current work is
-compiler correctness, reliability and measured performance, under the explicit
-Boss implementation directive. Git mutations and hosted CI remain owner actions.
+## Current disposition — stabilization completed and async syntax, 27 October 2026
+
+The stabilization audit used baseline `1d4ad15f5215838d209e48bb47ac7c3f52b05371`;
+this syntax sprint started at `9a2488972d4c2674317492f2640d3b8c7357fb11`.
+Git mutations and hosted CI remain owner actions.
 
 The [compiler-health inventory](compiler-health/ISSUES.md),
 [measurements](compiler-health/BENCHMARKS.md), [findings](compiler-health/REPORT.md)
@@ -24,9 +25,9 @@ them. Their original text and evidence are retained.**
 
 | Current classification | Disposition |
 |---|---|
-| Active frontend correctness | Nested `?` generic inference can select the result wrapper instead of its payload. Related await/async-call and if-expression hints also have independent reductions. These are shared compiler defects, not permanent JSON limitations. |
-| Active frontend performance | Primitive left-associated arithmetic can cause exponentially repeated hint traversal even in `voidc check`. Balanced/extracted controls are much faster. |
-| Measured compilation performance | JSON DTO compilation remains severely slow, with large generated root frames/LLVM blocks and expensive optimization/machine scheduling. A 600-second timeout does not repair a 300-second failure. |
+| Locally completed frontend correctness | Shared result/task/choice inference and rejected-chain stack repairs remain verified. `await job?` now means `(await job)?`, with explicit `await (job?)` preserved. See both engineering handoffs for evidence. |
+| Locally completed frontend performance | Exponential hint revisits were removed; arithmetic and generic regressions remain verified in this syntax sprint. |
+| Locally completed compilation performance | The stabilization record reduced DTO128 uncached O2 compilation from 297.021 seconds to 8.149–8.609 seconds. The syntax sprint rechecks the same frozen DTO bytes against its stabilized starting compiler; automatic optimized caching and entry emission remain intact. |
 | Historical unresolved crashes | LLVM DSE, Release async IO, Stage 9 preliminary process faults and separate pinned-Clang/LLD/ThinLTO incidents retain distinct identities. Passing retries do not prove fixes; see the inventory for exact evidence and limitations. |
 | Verified repaired | CI88/89 Windows paths/manifests/deep output are superseded by [CI95 native Debug/Release 320/320](stage9/CI95_WINDOWS_ACCEPTANCE.json). Earlier valid-chain/small-stack issues and JSON readonly/capture/pattern-recovery defects have specific later repairs/regressions. Do not reclassify them as unexplained current crashes. |
 | Current intentional/performance boundaries | Function-duration roots, coordinated nonmoving GC, root-duration task/result retention, full-graph editor analysis and Windows cache fallback remain distinct from correctness failures. Automatic O2 caching and separate no-IR-O2 objects now follow the stabilization cache policy. Runtime root lookup still scans registered words. |

@@ -1,5 +1,16 @@
 # Compiler and Runtime audit
 
+**STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
+
+Boss authorized this change after local acceptance of the await/propagation
+syntax. See the [syntax delivery and current authorization](../../async-await-syntax/HANDOFF.md).
+Normal VOID development may resume under the existing Boss approval, Research, Wrench review and Keyboard implementation workflow. This lifts the special stabilization freeze; it does not approve unspecified modules or unrelated features. No new standard-library development was performed in this syntax sprint.
+
+H1–H7 remain unresolved historical observations. Independent review and hosted
+acceptance are not inferred from the lifted hold.
+
+## Historical stabilization record — original hold superseded above
+
 The production CLI, identical-fixture comparisons, full ladder, profile matrix,
 cache workflow and edit/run results are in [the measurement tables](BENCHMARKS.md).
 The following attribution uses preserved IR, actual LLVM pass timings, native

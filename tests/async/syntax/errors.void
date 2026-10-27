@@ -1,0 +1,85 @@
+struct fault:
+    message: string
+    code: i32
+
+struct special_fault extends fault:
+    detail: string
+
+struct ledger:
+    trace: i32 = 0
+    stopped: i32 = 0
+
+struct resource:
+    log: ledger
+
+func (owner resource) deinit():
+    owner.log.trace = owner.log.trace * 10 + 3
+
+async func tick() -> i32:
+    return 1
+
+async func sibling(owner: ledger):
+    defer {
+        owner.stopped += 1
+    }
+    for:
+        var ignored = await tick()
+
+async func fail(value: i32) -> result<i32, special_fault>:
+    var ignored = await tick()
+    return Err(special_fault(message = "retained", code = value, detail = "same error"))
+
+async func leave(owner: ledger, value: i32) -> result<i32, special_fault>:
+    defer {
+        owner.trace = owner.trace * 10 + 4
+    }
+    with resource(log = owner) as lease:
+        with tasks.group() as jobs:
+            var running = sibling(owner)
+            defer {
+                owner.trace = owner.trace * 10 + 2
+            }
+            var answer = await fail(value)?
+            owner.trace = 999
+            return Ok(answer)
+    return Ok(-1)
+
+async func inner_error(value: i32) -> result<result<i32, special_fault>, special_fault>:
+    return Ok(Err(special_fault(message = "inner", code = value, detail = "nested")))
+
+async func outer_error(value: i32) -> result<result<i32, special_fault>, special_fault>:
+    return Err(special_fault(message = "outer", code = value, detail = "nested"))
+
+async func nested_error(value: i32, outer: bool) -> result<i32, special_fault>:
+    if outer:
+        return Ok(await outer_error(value)??)
+    return Ok(await inner_error(value)??)
+
+async func entry(value: i32) -> i32:
+    var owner = ledger()
+    var job = leave(owner, value)
+    var outcome = await job
+    var repeated = await job
+    match outcome:
+        Ok(_):
+            return -1
+        Err(var error):
+            if error.message != "retained" or error.detail != "same error" or error.code != value:
+                return -2
+            match repeated:
+                Ok(_):
+                    return -3
+                Err(var same):
+                    if same != error:
+                        return -4
+    if owner.trace != 234 or owner.stopped != 1:
+        return -5
+    for outer in [false, true]:
+        var nested = await nested_error(value, outer)
+        match nested:
+            Ok(_):
+                return -6
+            Err(var error):
+                if error.code != value or error.detail != "nested":
+                    return -7
+    return value

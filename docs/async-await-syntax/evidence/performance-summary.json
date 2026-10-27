@@ -1,0 +1,86 @@
+{
+  "measurements": 38,
+  "failed": 0,
+  "cases": {
+    "baseline-dto128": {
+      "wall_seconds": [
+        8.423566335986834,
+        8.553943178994814,
+        8.293751424003858
+      ],
+      "median_wall_seconds": 8.423566335986834,
+      "median_cpu_seconds": 8.36378,
+      "peak_rss_kib": 137760
+    },
+    "baseline-tiny": {
+      "wall_seconds": [
+        0.024280156998429447,
+        0.021485141973244026,
+        0.026526595000177622
+      ],
+      "median_wall_seconds": 0.024280156998429447,
+      "median_cpu_seconds": 0.022690000000000002,
+      "peak_rss_kib": 43860
+    },
+    "baseline-import-json": {
+      "wall_seconds": [
+        0.2343460830161348,
+        0.2305444449884817,
+        0.23874399001942948
+      ],
+      "median_wall_seconds": 0.2343460830161348,
+      "median_cpu_seconds": 0.231539,
+      "peak_rss_kib": 62120
+    },
+    "baseline-gameplay": {
+      "wall_seconds": [
+        0.06313743398641236,
+        0.06673175399191678,
+        0.06668770400574431
+      ],
+      "median_wall_seconds": 0.06668770400574431,
+      "median_cpu_seconds": 0.064374,
+      "peak_rss_kib": 49404
+    },
+    "syntax-dto128": {
+      "wall_seconds": [
+        8.769344201980857,
+        8.421121511986712,
+        8.674362769990694
+      ],
+      "median_wall_seconds": 8.674362769990694,
+      "median_cpu_seconds": 8.609026,
+      "peak_rss_kib": 139144
+    },
+    "syntax-tiny": {
+      "wall_seconds": [
+        0.022809345013229176,
+        0.024063397984718904,
+        0.025997898017521948
+      ],
+      "median_wall_seconds": 0.024063397984718904,
+      "median_cpu_seconds": 0.022789999999999998,
+      "peak_rss_kib": 45328
+    },
+    "syntax-import-json": {
+      "wall_seconds": [
+        0.24127297598170117,
+        0.23756525601493195,
+        0.23300713099888526
+      ],
+      "median_wall_seconds": 0.23756525601493195,
+      "median_cpu_seconds": 0.234501,
+      "peak_rss_kib": 63264
+    },
+    "syntax-gameplay": {
+      "wall_seconds": [
+        0.06076420599129051,
+        0.06809031599550508,
+        0.06236353699932806
+      ],
+      "median_wall_seconds": 0.06236353699932806,
+      "median_cpu_seconds": 0.06059,
+      "peak_rss_kib": 50664
+    }
+  }
+}

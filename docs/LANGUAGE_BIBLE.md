@@ -2169,9 +2169,16 @@ async func main():
 
 ```python
 async func load_settings() -> result<string, error>:
-    var data = (await files.read_text("settings.dat"))?
+    var data = await files.read_text("settings.dat")?
     return Ok(data)
 ```
+
+`await job?` is the supported shorthand for `(await job)?`. Explicit
+`await (job?)` keeps propagation inside the await operand. Postfix chains and
+arithmetic follow the same grouping as the parenthesized form; see
+[ASYNC.md](ASYNC.md#await-and-result-propagation). The file API and `error` type
+in this illustrative example are application dependencies; this syntax sprint
+does not introduce a standard `error` module.
 
 A propagated error still runs registered defers. A task returning `Err(...)` is a normal completed task carrying a failure result, not necessarily a runtime panic. Panics and cancellation have separate rules.
 
@@ -2964,8 +2971,7 @@ On `Err`, `?` propagates the result while running all registered defers in rever
 ## 63. Example: asynchronous scene loading with a task group
 
 ```python
-use "tasks"
-
+# Application-provided files API and error type.
 private async func load_world_data() -> result<string, error>:
     return await files.read_text("world.dat")
 
@@ -2974,11 +2980,11 @@ private async func load_audio_data() -> result<string, error>:
 
 async func load_scene() -> result<bool, error>:
     with tasks.group() as jobs:
-        var world_job = jobs.spawn(load_world_data)
-        var audio_job = jobs.spawn(load_audio_data)
+        var world_job = load_world_data()
+        var audio_job = load_audio_data()
 
-        var world = (await world_job)?
-        var audio = (await audio_job)?
+        var world = await world_job?
+        var audio = await audio_job?
 
         print("World: {world}")
         print("Audio: {audio}")
@@ -2986,7 +2992,11 @@ async func load_scene() -> result<bool, error>:
     return Ok(true)
 ```
 
-**Architecture note:** The precise async task-group API, how `jobs.spawn` consumes `async func` references, and async `with` cleanup grammar must be defined consistently before implementation. The example demonstrates the desired developer-facing simplicity, not a settled scheduling ABI.
+**Architecture note:** Ordinary async calls already enqueue tasks in the
+contextual `tasks.group()` scope. `jobs.spawn` remains deferred. The two `await
+job?` expressions use the existing await/result/cleanup machinery. File loading,
+the `error` type and application display dependencies in this example remain
+illustrative; see [ASYNC.md](ASYNC.md) for implemented scheduling restrictions.
 
 ## 64. Example: a small game-like style with very little code
 

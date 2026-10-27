@@ -1,0 +1,81 @@
+struct fault:
+    message: string
+    code: i32
+
+struct ledger:
+    receivers: i32 = 0
+    arguments: i32 = 0
+    calls: i32 = 0
+
+value struct packet:
+    items: [i32, 2]
+    owner: ledger
+
+func receiver(owner: ledger) -> ledger:
+    owner.receivers += 1
+    return owner
+
+func argument(owner: ledger) -> i32:
+    owner.arguments += 1
+    return owner.arguments
+
+async func tick() -> i32:
+    return 1
+
+async func (owner ledger) pair(first: i32, second: i32) -> result<i32, fault>:
+    owner.calls += 1
+    var ignored = await tick()
+    return Ok(first * 10 + second)
+
+async func deliver(item: packet) -> result<packet, fault>:
+    var ignored = await tick()
+    return Ok(item)
+
+async func nested(value: i32) -> result<result<i32, fault>, fault>:
+    var ignored = await tick()
+    return Ok(Ok(value))
+
+async func numbers(value: i32) -> result<[i32, 2], fault>:
+    return Ok([value, value + 1])
+
+func envelope<t>(job: t) -> result<t, fault>:
+    return Ok(job)
+
+async func identity<t>(item: t) -> t:
+    return item
+
+async func calculate(owner: ledger, value: i32) -> result<i32, fault>:
+    var pending = receiver(owner).pair(argument(owner), argument(owner))
+    var first = await pending?
+    var again = (await pending)?
+    if first != 12 or again != first:
+        return Err(fault(message = "repeated await", code = 1))
+    var ordered = await receiver(owner).pair(second = argument(owner), first = argument(owner))?
+    if ordered != 43 or owner.receivers != 2 or owner.arguments != 4 or owner.calls != 2:
+        return Err(fault(message = "evaluation order", code = 2))
+    var original = packet(owner = owner)
+    original.items[0] = value
+    var copy_job = deliver(original)
+    original.items[0] = 100
+    var copied = await copy_job?
+    copied.items[0] += 1
+    copied.owner.calls += 10
+    var prior = (await copy_job)?
+    if prior.items[0] != value or prior.owner.calls != 12:
+        return Err(fault(message = "copy and reference identity", code = 3))
+    var chained = await deliver(prior)?.items[0]
+    var indexed = await numbers(value)?[1]
+    var doubled = await nested(await identity(value))??
+    var envelope_job = envelope(identity(value))
+    var grouped = await (envelope_job?)
+    var inner_argument = await identity(envelope(value)?)
+    var inner_index = await [identity(value)][envelope(0)?]
+    return Ok(first + again * 2 + ordered + copied.items[0] + chained + indexed + doubled + grouped + inner_argument + inner_index)
+
+async func entry(value: i32) -> i32:
+    var outcome = await calculate(ledger(), value)
+    match outcome:
+        Ok(var answer):
+            return answer
+        Err(var error):
+            return -error.code

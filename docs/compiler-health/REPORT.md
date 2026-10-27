@@ -1,9 +1,19 @@
 # Compiler stabilization and performance investigation
 
+**STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
+
+The [await syntax handoff](../async-await-syntax/HANDOFF.md) records completion
+of Boss's local gate and authorization to resume the normal approval workflow.
+This does not authorize unspecified modules or claim hosted acceptance or repair
+of historical H1–H7 incidents.
+
 Current engineering is locally verified and ready for independent review:
 [handoff](stabilization/HANDOFF.md), [measurements](stabilization/BENCHMARKS.md)
 and [implementation evidence](stabilization/IMPLEMENTATION.md).
 The baseline findings below retain their original research scope.
+
+
+## Historical research freeze — superseded by Boss decision above
 
 27 October 2026. Audited baseline: **`1d4ad15f5215838d209e48bb47ac7c3f52b05371`**.
 Research for Golden Wrench review; no production repair is implemented or

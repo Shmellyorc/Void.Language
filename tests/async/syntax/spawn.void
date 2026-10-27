@@ -1,0 +1,16 @@
+func worker(first: i32, second: i32) -> result<i32, string>:
+    return Ok(first + second)
+
+async func identity(value: i32) -> i32:
+    return value
+
+async func compute(value: i32) -> result<i32, string>:
+    return Ok(await spawn worker(value, await identity(2))?)
+
+async func entry(value: i32) -> i32:
+    var outcome = await compute(value)
+    match outcome:
+        Ok(var answer):
+            return answer
+        Err(_):
+            return -1

@@ -1,0 +1,21 @@
+{
+  "product_failures_in_final_acceptance": 0,
+  "first_full_release": {
+    "receipt": "acceptance-release-1793128469287261569.json",
+    "passed": 130,
+    "failed": 1,
+    "classification": "new LSP fixture expected signature help for an undocumented parameter; existing policy correctly suppressed it; corrected parameter documentation"
+  },
+  "initial_authoring_failures": [
+    "new fixture local child shadowed function child",
+    "grouped await of a task returning result expected box instead of result<box,string>",
+    "test client omitted version-safe rename capability",
+    "unclosed-delimiter test expected recovery past existing lexer continuation; baseline diagnostics proved identical",
+    "64 grouping levels exceeded the original 128 nesting guard; original accepted 40-level control used, guard unchanged",
+    "GC observer accessed its retained Handle outside Runtime Attachment"
+  ],
+  "build_setup_failures": [
+    "Debug/San outer generated Makefile invocation lacked newly added AOT targets; regenerated files and rebuilt all 82 selected targets"
+  ],
+  "preservation": "original logs and initial source controls are in reproduction archive; no original stabilization evidence overwritten"
+}

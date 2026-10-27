@@ -1,6 +1,22 @@
 # 🔧🤖 THE WRENCH CLANKER
 
-## Current compiler stabilization sprint — 27 October 2026
+## Current async syntax delivery and Boss status decision — 27 October 2026
+
+**STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
+
+The `await job?` shorthand is implemented and locally verified through the
+existing async/result machinery. Boss explicitly authorized lifting the special
+standard-library freeze when those gates passed; no second authorization is
+required. [Golden Wrench syntax handoff](async-await-syntax/HANDOFF.md).
+Independent review and hosted CI acceptance for this syntax remain unclaimed.
+H1–H7 remain historical unresolved incidents.
+
+Normal VOID development may resume under the existing Boss approval, Research, Wrench review and Keyboard implementation workflow. This lifts the special stabilization freeze; it does not approve unspecified modules or unrelated features. No new standard-library development was performed in this syntax sprint.
+
+No Git staging, branches, commits, pushes, hosted CI or root README edits.
+Earlier scope restrictions below describe their dated deliveries.
+
+## Historical compiler stabilization hold (superseded above) — 27 October 2026
 
 **STATUS: NEW STANDARD-LIBRARY DEVELOPMENT PAUSED — COMPILER STABILIZATION IN PROGRESS.**
 
