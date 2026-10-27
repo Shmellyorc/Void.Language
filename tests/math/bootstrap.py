@@ -63,7 +63,7 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
     # those actual bytes too, without recursively scanning the repository root.
     controlled = (working != ROOT and 'math' in str(working).lower() and
                   (working.is_relative_to(Path(tempfile.gettempdir()).resolve()) or working.is_relative_to(ROOT / 'build')))
-    descendants = tuple(working.rglob('*.void')) if controlled else ()
+    descendants = tuple(p for p in working.rglob('*.void') if p.is_file()) if controlled else ()
     return _original_preserve(command, cwd, result,
                               (*source_inputs, *descendants),
                               (*provenance_inputs, *HERE.glob('*.*'), *((IDENTITY,) if IDENTITY else ())))

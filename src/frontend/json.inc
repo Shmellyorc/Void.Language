@@ -122,7 +122,39 @@ VOID_SEMANTIC_HANDLER Type json_call(Expr& e) {
             if(ir::collection_type(t)){
                 if(t.kind==Type::dictionary){line(3,"frame.key = frame.names[cursor]");line(3,"context.path.push(frame.key)");push(child,"snapshots"+id+"[-1][cursor]","frame.depth",3);}
                 else {line(3,"var indexed = _push_index(context, cursor)?");push(child,t.kind==Type::growable_array?"snapshots"+id+"[-1][cursor]":"owner[cursor]","frame.depth",3);}
-            } else for(unsigned field=0;field<t.definition->fields.size();++field){const auto& member=t.definition->fields[field];line(3,"if cursor == "+std::to_string(field)+":");line(4,"frame.key = "+quote(member.name));line(4,"context.path.push(frame.key)");push(member.type,"owner."+member.name,"frame.depth",4);}
+            } else {
+                // The measured wide encoder repeats the same fallible scalar
+                // conversion for every field. Select names and typed values,
+                // then share conversion/descent per concrete child type.
+                std::map<unsigned,std::vector<unsigned>> fields_by_tag;
+                line(3,"var child_tag: i64 = -1");
+                for(unsigned field=0;field<t.definition->fields.size();++field){const auto& member=t.definition->fields[field];
+                    fields_by_tag[tag(member.type)].push_back(field);
+                    line(3,"if cursor == "+std::to_string(field)+":");line(4,"frame.key = "+quote(member.name));line(4,"child_tag = "+std::to_string(tag(member.type)));}
+                line(3,"context.path.push(frame.key)");
+                for(const auto& [child_tag,fields]:fields_by_tag) {
+                    line(3,"if child_tag == "+std::to_string(child_tag)+":");
+                    const auto field_type=Type(t.definition->fields[fields.front()].type);
+                    // A choice stores its value at every join. Keep the
+                    // original path for fixed/value data so selecting a field
+                    // cannot introduce extra owned-array snapshots.
+                    if(field_type.kind==Type::fixed_array || field_type.kind==Type::aggregate) {
+                        for(auto field:fields){line(4,"if cursor == "+std::to_string(field)+":");push(t.definition->fields[field].type,"owner."+t.definition->fields[field].name,"frame.depth",5);}
+                        continue;
+                    }
+                    if(fields.size()==1){push(t.definition->fields[fields.front()].type,"owner."+t.definition->fields[fields.front()].name,"frame.depth",4);continue;}
+                    // Balanced ordinary if-expressions keep parser/checker
+                    // depth logarithmic even for very wide repeated schemas.
+                    std::function<void(unsigned,unsigned,unsigned,const std::string&)> select;
+                    select=[&](unsigned first,unsigned last,unsigned level,const std::string& prefix) {
+                        if(last-first==1){line(level,prefix+"owner."+t.definition->fields[fields[first]].name);return;}
+                        auto middle=first+(last-first)/2;
+                        line(level,prefix+"if cursor < "+std::to_string(fields[middle])+":");select(first,middle,level+1,"");
+                        line(level,"else:");select(middle,last,level+1,"");
+                    };
+                    select(0,fields.size(),4,"var selected = ");push(t.definition->fields[fields.front()].type,"selected","frame.depth",4);
+                }
+            }
             line(3,"continue");
         }
         // A scalar-only graph still has a syntactically valid, unreachable loop.
@@ -157,7 +189,14 @@ VOID_SEMANTIC_HANDLER Type json_call(Expr& e) {
             else if(t.kind==Type::dictionary){line(4,"var builder: jt"+id+" = {}");line(4,"builders"+id+".push(builder)");}
             else {
                 line(4,"if unknown is unknown_fields.reject:");line(5,"for key, index in node.keys()?:");line(6,"var known = false");
-                for(const auto& member:t.definition->fields){line(6,"if _same(context, key, "+quote(member.name)+")?:");line(7,"known = true");}
+                // Selection is cheap; the fallible comparison and its roots
+                // have one body, including comparisons after a successful match.
+                line(6,"var field_index: i64 = 0");
+                line(6,"for field_index < "+std::to_string(t.definition->fields.size())+":");
+                line(7,"var field_name = \"\"");
+                for(unsigned field=0;field<t.definition->fields.size();++field){line(7,"if field_index == "+std::to_string(field)+":");line(8,"field_name = "+quote(t.definition->fields[field].name));}
+                line(7,"if _same(context, key, field_name)?:");line(8,"known = true");
+                line(7,"field_index += 1");
                 line(6,"if not known:");line(7,"return Err(context.fail(error_kind.unknown_property, \"Unknown object property\", node.member_offset(index), \"/\" + _segment(key)))");
                 line(4,"frame.count = "+std::to_string(t.definition->fields.size()));
             }
@@ -193,12 +232,25 @@ VOID_SEMANTIC_HANDLER Type json_call(Expr& e) {
                 if(t.kind==Type::dictionary){line(3,"context.path.push(node.member_name(frame.cursor))");push(child,"node.member_child(frame.cursor)?","frame.depth",3);}
                 else {line(3,"var indexed = _push_index(context, frame.cursor)?");push(child,"node.at(frame.cursor)?","frame.depth",3);}
                 line(3,"continue");
-            } else for(unsigned field=0;field<t.definition->fields.size();++field) {
-                const auto& member=t.definition->fields[field];const auto suffix=std::to_string(field);
-                line(3,"if frame.cursor == "+suffix+":");line(4,"var child = _find(node, "+quote(member.name)+", context)?");line(4,"context.path.push("+quote(member.name)+")");line(4,"if child == null:");
-                if(Type(member.type).nullable){line(5,"var admitted = context.node(frame.depth)?");line(5,"results"+std::to_string(tag(member.type))+".push(null)");line(5,"frame.cursor += 1");line(5,"var segment = context.path.remove_at(context.path.count - 1)");line(5,"continue");}
-                else line(5,"return Err(context.fail(error_kind.missing_property, \"Missing required object property\"))");
-                line(4,"frame.awaiting = true");push(member.type,"child as value","frame.depth",4);line(4,"continue");
+            } else {
+                line(3,"var field_name = \"\"");line(3,"var child_tag: i64 = -1");
+                std::set<unsigned> nullable_tags;
+                for(unsigned field=0;field<t.definition->fields.size();++field) {
+                    const auto& member=t.definition->fields[field];
+                    line(3,"if frame.cursor == "+std::to_string(field)+":");
+                    line(4,"field_name = "+quote(member.name));line(4,"child_tag = "+std::to_string(tag(member.type)));
+                    if(Type(member.type).nullable)nullable_tags.insert(tag(member.type));
+                }
+                // _find must precede the path push, just as in every original
+                // field arm. Missing nullable values retain their concrete stack.
+                line(3,"var child = _find(node, field_name, context)?");line(3,"context.path.push(field_name)");
+                line(3,"if child == null:");
+                for(auto nullable:nullable_tags){line(4,"if child_tag == "+std::to_string(nullable)+":");
+                    line(5,"var admitted = context.node(frame.depth)?");line(5,"results"+std::to_string(nullable)+".push(null)");
+                    line(5,"frame.cursor += 1");line(5,"var segment = context.path.remove_at(context.path.count - 1)");line(5,"continue");}
+                line(4,"return Err(context.fail(error_kind.missing_property, \"Missing required object property\"))");
+                line(3,"frame.awaiting = true");line(3,"frames.push(_decode_frame(node = child as value, depth = frame.depth))");
+                line(3,"work.push(child_tag)");line(3,"continue");
             }
         }
         line(2,"return Err(context.fail(error_kind.limit_exceeded, \"Invalid decoder continuation\"))");line(1,"return Ok(results0.remove_at(results0.count - 1))");

@@ -211,6 +211,10 @@ struct Module {
     std::vector<Global> globals = {};
 };
 inline constexpr std::size_t string_constant_limit = 16 * 1024 * 1024;
+// CLI execution may emit only the closed entry graph. Embedders retain all
+// source exports unless they explicitly choose this policy.
+enum class Emission { all, entry };
+void retain_entry(Module&);
 inline constexpr std::size_t string_pool_limit = 64 * 1024 * 1024;
 bool reference_value(Type);
 bool async_boundary_safe(Type);

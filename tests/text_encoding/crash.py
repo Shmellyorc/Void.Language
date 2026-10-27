@@ -39,7 +39,7 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
     incident = Path(tempfile.mkdtemp(prefix='incident-', dir=target))
     working = Path(cwd or Path.cwd()).resolve()
     arguments = list(map(str, command)) if not isinstance(command, str) else [command]
-    sources = set(working.glob('*.void'))
+    sources = {p for p in working.glob('*.void') if p.is_file()}
     sources.update((working / item).resolve() for item in source_inputs)
     for argument in arguments:
         candidate = Path(argument)
@@ -48,9 +48,11 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
         if candidate.suffix == '.void' and candidate.is_file():
             sources.add(candidate.resolve())
     # Import resolution can involve several modules; retain the canonical input set.
-    sources.update((ROOT / 'stdlib').rglob('*.void'))
+    sources.update(p for p in (ROOT / 'stdlib').rglob('*.void') if p.is_file())
     records = []
     for original in sorted(sources):
+        if original.is_dir():
+            continue
         destination = incident / ('stdlib' if original.is_relative_to(ROOT / 'stdlib') else 'inputs')
         if original.is_relative_to(ROOT / 'stdlib'):
             destination /= original.relative_to(ROOT / 'stdlib').parent
@@ -82,6 +84,8 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
             generators.add(original.resolve())
     provenance_records = []
     for original in sorted(generators):
+        if original.is_dir():
+            continue
         destination = provenance / original.name
         serial = 2
         while destination.exists():

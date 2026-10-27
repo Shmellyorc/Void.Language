@@ -14,35 +14,36 @@ with tempfile.TemporaryDirectory(prefix="void-stage6-") as temporary:
     # A worker's real synchronous frame needs the Windows ABI stack-probe helper.
     text = text.replace("return answer + 1", "return stack(answer) + 1")
     text += "\nfunc stack(value: i32) -> i32:\n" + "".join(
-        f'    var root{i} = "native root {i}"\n' for i in range(160)) + "    return value\n"
+        f'    var root{i} = "native root {i}"\n' for i in range(640)) + "    return value\n"
     source.write_text(text, encoding="utf-8")
-    cache = root / "cache"
-    cache.mkdir()
+    for optimized in (False, True):
+        cache = root / ("cache-O2" if optimized else "cache-O0")
+        cache.mkdir()
 
-    def run(expected=None):
-        result = subprocess.run([str(host), "--cached-integrated", str(source), str(cache)],
-                                text=True, capture_output=True, timeout=90)
-        assert result.returncode == 0, result
-        status, value = result.stdout.strip().split(":")
-        assert value == "32" and (expected is None or status == expected), result
-        return status
+        def run(expected=None):
+            result = subprocess.run([str(host), "--cached-integrated", str(source), str(cache), *(["optimized"] if optimized else [])],
+                                    text=True, capture_output=True, timeout=90)
+            assert result.returncode == 0, result
+            status, value = result.stdout.strip().split(":")
+            assert value == "32" and (expected is None or status == expected), result
+            return status
 
-    first = run()
-    if os.name == "nt":
-        assert first == "unavailable", "Windows private cache admission must retain its safe bypass"
-    if first == "unavailable":
-        run("unavailable")
-    else:
-        assert first == "miss", first
-        run("hit")
-        entries = list((cache / ".void/cache/v1").iterdir())
-        assert len(entries) == 1, entries
-        entries[0].write_bytes(b"incomplete integrated native artifact")
-        run("miss")
-        # Publication never overwrites a rejected entry; preserve Stage 5 policy.
-        run("miss")
-        assert entries[0].read_bytes() == b"incomplete integrated native artifact"
-        entries[0].unlink()
-        run("miss")
-        run("hit")
-    print("Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed")
+        first = run()
+        if os.name == "nt":
+            assert first == "unavailable", "Windows private cache admission must retain its safe bypass"
+        if first == "unavailable":
+            run("unavailable")
+        else:
+            assert first == "miss", first
+            run("hit")
+            entries = list((cache / ".void/cache/v1").iterdir())
+            assert len(entries) == 1, entries
+            entries[0].write_bytes(b"incomplete integrated native artifact")
+            run("miss")
+            # Publication never overwrites a rejected entry; preserve Stage 5 policy.
+            run("miss")
+            assert entries[0].read_bytes() == b"incomplete integrated native artifact"
+            entries[0].unlink()
+            run("miss")
+            run("hit")
+        print("Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed")

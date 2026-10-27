@@ -17,8 +17,8 @@ def stack():
 
 def run(args,source,expected=None,status=0,cwd=None,env=None,timeout=180):
     args=list(map(str,args));cwd=Path(cwd or ROOT)
-    inputs={p.resolve() for p in (ROOT/'stdlib').rglob('*.void')}
-    inputs.update(p.resolve() for p in Path(source).parent.glob('*.void'))
+    inputs={p.resolve() for p in (ROOT/'stdlib').rglob('*.void') if p.is_file()}
+    inputs.update(p.resolve() for p in Path(source).parent.glob('*.void') if p.is_file())
     before={str(p):digest(p) for p in inputs}
     r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
         source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))

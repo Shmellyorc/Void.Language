@@ -2,6 +2,7 @@ from pathlib import Path
 import tempfile, sys
 import harness as h
 expected={
+ 'nested_inference':b'7\n6\n',
  'validated':b'{"score":7}\nScore must be nonnegative\n',
  'accessors':b'missing 4 0 /missing\n/@stdlib/json.void::value_kind.null_value\nwrong 6\n30\n10\nrange 5 /-4\nrange 5 /-9223372036854775808\nkey 0 4\nkey 1 5\nkey 2 2\n3\ntrue\n',
  'dynamic_smoke':b'bytes 6\n0: 10\n1: 20\n2: 30\n/@stdlib/json.void::value_kind.null_value\n',

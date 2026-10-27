@@ -6,6 +6,10 @@ Unit& generic_owner(const Function& function) {
 }
 Type inference_type(Expr& e) {
     if(auto hinted=anchor(e);hinted && hinted->kind!=Type::unresolved && *hinted!=Type::none)return *hinted;
+    if(e.kind==Expr::Kind::choice) {
+        auto branch=inference_type(*e.parts[1]);
+        return branch!=error_type ? branch : inference_type(*e.parts[2]);
+    }
     if(e.kind==Expr::Kind::dictionary_literal && !e.parts.empty()){auto key=inference_type(*e.parts[0]),value=inference_type(*e.parts[1]);if(key!=error_type && value!=error_type)return unit.make_dictionary(key,value);}
     if(e.kind==Expr::Kind::array_literal) {
         if(e.parts.empty())return error_type;

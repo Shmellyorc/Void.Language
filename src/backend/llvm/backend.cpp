@@ -585,11 +585,29 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         std::vector<llvm::Value*> slots;
         b.SetInsertPoint(async?setup:blocks.front());
         b.SetCurrentDebugLocation(llvm::DebugLoc());
+        // Pointer-shaped locals share one lifetime. Keep compound values in
+        // their own precise descriptors, preserving nested-layout root proofs,
+        // and scalar locals separate for ordinary promotion.
+        std::vector<unsigned> local_root_indexes(f.locals.size(),~0u);
+        std::vector<llvm::Type*> local_root_types;
+        std::vector<std::vector<std::uint64_t>> local_root_offsets(f.locals.size());
+        if(!async)for(unsigned n=0;n<f.locals.size();++n) {
+            if(f.receiver && n==0 && f.locals[n].kind==ir::Type::aggregate)continue;
+            reference_offsets(f.locals[n],0,local_root_offsets[n]);
+            if(!local_root_offsets[n].empty() && type(f.locals[n])->isPointerTy()){local_root_indexes[n]=local_root_types.size();local_root_types.push_back(type(f.locals[n]));}
+        }
+        auto* local_roots_type=llvm::StructType::get(context,local_root_types);
+        llvm::Value* local_roots=nullptr;
+        if(!local_root_types.empty()) {
+            local_roots=home(b.CreateAlloca(local_roots_type),StorageRole::local,llvm_backend::HomeKind::value);
+            b.CreateMemSet(local_roots,b.getInt8(0),layout.getTypeAllocSize(local_roots_type),layout.getABITypeAlign(local_roots_type));
+        }
         for (unsigned n = 0; n < f.locals.size(); ++n) {
             auto t = f.locals[n];
             if (f.receiver && n == 0 && t.kind==ir::Type::aggregate) { slots.push_back(fn->getArg(0)); continue; }
-            llvm::Value* slot = async?frame_home(async->locals[n]):home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
-            if(!async)b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
+            const bool packed=local_root_indexes[n]!=~0u;
+            llvm::Value* slot = async?frame_home(async->locals[n]):packed?b.CreateStructGEP(local_roots_type,local_roots,local_root_indexes[n]):home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
+            if(!async && (!packed || (f.receiver && n==0)))b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
         }
         std::map<unsigned,llvm::Value*> stage_storage;
         for (const auto& block:f.blocks) for (const auto& instruction:block.instructions) if (instruction.op==ir::Op::stage_begin) {
@@ -679,19 +697,21 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 slot_layout->getElementOffset(2) != offsetof(Runtime::Slot,offsets) ||
                 slot_layout->getElementOffset(3) != offsetof(Runtime::Slot,count))
                 throw std::invalid_argument("runtime root ABI does not match target");
-            std::vector<llvm::Value*> entries;
-            auto add_root = [&](ir::Type t, llvm::Value* address) {
-                std::vector<std::uint64_t> offsets;
-                reference_offsets(t, 0, offsets);
-                if (offsets.empty()) return;
-                llvm::Value* entry = llvm::UndefValue::get(slot_type);
-                entry = b.CreateInsertValue(entry,address,{0});
-                entry = b.CreateInsertValue(entry,llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(t))),{1});
-                entry = b.CreateInsertValue(entry,offset_map(offsets),{2});
-                entry = b.CreateInsertValue(entry,llvm::ConstantInt::get(size_type,offsets.size()),{3});
-                entries.push_back(entry);
+            struct RootEntry {llvm::Value* address;std::uint64_t bytes;llvm::Constant* offsets;std::uint64_t count;};
+            std::vector<RootEntry> entries;
+            auto add_storage_root = [&](std::uint64_t bytes, llvm::Value* address, const std::vector<std::uint64_t>& offsets) {
+                if(!offsets.empty())entries.push_back({address,bytes,offset_map(offsets),offsets.size()});
             };
-            for (unsigned i = 0; i < slots.size(); ++i) add_root(f.locals[i],slots[i]);
+            auto add_root = [&](ir::Type t, llvm::Value* address) {
+                std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
+                add_storage_root(layout.getTypeAllocSize(type(t)),address,offsets);
+            };
+            std::vector<std::uint64_t> local_offsets;
+            for (unsigned i = 0; i < slots.size(); ++i) {
+                if(local_root_indexes[i]==~0u)add_root(f.locals[i],slots[i]);
+                else for(auto offset:local_root_offsets[i])local_offsets.push_back(layout.getStructLayout(local_roots_type)->getElementOffset(local_root_indexes[i])+offset);
+            }
+            if(local_roots)add_storage_root(layout.getTypeAllocSize(local_roots_type),local_roots,local_offsets);
             for(auto [t,storage]:copy_staging) add_root(t,storage);
             for(auto [t,storage]:element_staging) add_root(t,storage);
             for(auto [t,storage]:array_sources) add_root(t,storage);
@@ -705,22 +725,58 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 auto* storage = home(b.CreateAlloca(type(f.parameters[i])),StorageRole::parameter,llvm_backend::HomeKind::argument);
                 b.CreateStore(fn->getArg(i),storage); add_root(f.parameters[i],storage);
             }
+            // Pointer-shaped instruction values have one function-duration
+            // lifetime. Pack their homes into a target-layout aggregate and register
+            // its exact reference offsets as one ordinary Slot. A single zero
+            // fill replaces thousands of allocas, null stores and descriptors;
+            // every reference word remains visible at every original safepoint.
+            // Compound values retain their independent layout descriptors.
+            std::vector<llvm::Type*> root_types;
+            std::vector<std::vector<std::uint64_t>> root_offsets;
+            if(!async)for(const auto& block:instruction_types)for(auto t:block) {
+                std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
+                if(!offsets.empty() && type(t)->isPointerTy()){root_types.push_back(type(t));root_offsets.push_back(std::move(offsets));}
+            }
+            auto* packed_type=llvm::StructType::get(context,root_types);
+            llvm::Value* packed=nullptr;
+            if(!root_types.empty()) {
+                packed=home(b.CreateAlloca(packed_type),StorageRole::instruction,llvm_backend::HomeKind::root);
+                const auto* geometry=layout.getStructLayout(packed_type);
+                b.CreateMemSet(packed,b.getInt8(0),geometry->getSizeInBytes(),layout.getABITypeAlign(packed_type));
+                std::vector<std::uint64_t> offsets;
+                for(unsigned n=0;n<root_offsets.size();++n)for(auto offset:root_offsets[n])offsets.push_back(geometry->getElementOffset(n)+offset);
+                add_storage_root(geometry->getSizeInBytes(),packed,offsets);
+            }
+            unsigned root_index=0;
             for (unsigned block = 0; block < f.blocks.size(); ++block)
                 for (unsigned position=0;position<instruction_types[block].size();++position) {
                     auto t=instruction_types[block][position];
                     std::vector<std::uint64_t> offsets; reference_offsets(t,0,offsets);
                     llvm::Value* storage = nullptr;
                     if (!offsets.empty()) {
-                        storage = async?frame_home(async->values[block][position]):home(b.CreateAlloca(type(t)),StorageRole::instruction,llvm_backend::HomeKind::root);
-                        if(!async)b.CreateStore(llvm::Constant::getNullValue(type(t)),storage);
-                        add_root(t,storage);
+                        if(async || !type(t)->isPointerTy()) {
+                            storage=async?frame_home(async->values[block][position]):home(b.CreateAlloca(type(t)),StorageRole::instruction,llvm_backend::HomeKind::root);
+                            if(!async)b.CreateStore(llvm::Constant::getNullValue(type(t)),storage);
+                            add_root(t,storage);
+                        }
+                        else storage=b.CreateStructGEP(packed_type,packed,root_index++);
                     }
                     value_roots[block].push_back(storage);
                 }
             auto* root_array_type = llvm::ArrayType::get(slot_type,entries.size());
             auto* root_array = home(b.CreateAlloca(root_array_type),StorageRole::roots,llvm_backend::HomeKind::slots);
-            for (unsigned i = 0; i < entries.size(); ++i)
-                b.CreateStore(entries[i],b.CreateInBoundsGEP(root_array_type,root_array,{b.getInt32(0),b.getInt32(i)}));
+            // Sizes and exact reference maps are immutable. Bulk-initialize
+            // descriptors, then install each stack address before frame_enter.
+            // This preserves every home/descriptor and avoids thousands of
+            // independent constant stores in wide generated functions.
+            if(!entries.empty()) {
+                std::vector<llvm::Constant*> descriptors;
+                for(const auto& entry:entries)descriptors.push_back(llvm::ConstantStruct::get(slot_type,{llvm::ConstantPointerNull::get(b.getPtrTy()),llvm::ConstantInt::get(size_type,entry.bytes),entry.offsets,llvm::ConstantInt::get(size_type,entry.count)}));
+                auto* initial=new llvm::GlobalVariable(*module,root_array_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(root_array_type,descriptors),"gc.slot.template");
+                auto alignment=layout.getABITypeAlign(root_array_type);initial->setAlignment(alignment);
+                b.CreateMemCpy(root_array,alignment,initial,alignment,layout.getTypeAllocSize(root_array_type));
+                for(unsigned i=0;i<entries.size();++i){auto* entry=b.CreateInBoundsGEP(root_array_type,root_array,{b.getInt32(0),b.getInt32(i)});b.CreateStore(entries[i].address,b.CreateStructGEP(slot_type,entry,0));}
+            }
             auto* frame = home(b.CreateAlloca(b.getInt8Ty(), b.getInt64(sizeof(Runtime::Frame))),StorageRole::roots,llvm_backend::HomeKind::frame);
             frame->setAlignment(llvm::Align(alignof(Runtime::Frame))); root_frame = frame;
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
@@ -1712,6 +1768,7 @@ struct Jit::Impl {
     std::shared_ptr<llvm::orc::LLJIT> jit;
     std::uint64_t serial = 0;
     DebugCache cache;
+    ir::Emission emission = ir::Emission::all;
     std::string cache_status="disabled", target_identity, captured;
     bool custom_bindings=false, capture=false, canonical=false;
     std::shared_ptr<Runtime> source_runtime;
@@ -1781,10 +1838,12 @@ struct Jit::Impl {
         return result;
     }
 };
-Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
+Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>()) {
     impl_->cache=std::move(cache);
+    impl_->emission=emission;
     initialize();
     auto machine=unwrap(llvm::orc::JITTargetMachineBuilder::detectHost());
+    machine.setCodeGenOptLevel(llvm::CodeGenOptLevel::Default);
     impl_->target_identity=machine.getTargetTriple().str()+"|"+machine.getCPU()+"|"+machine.getFeatures().getString()+"|default-codegen|default-relocation|default-code-model";
     impl_->jit = unwrap(llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(machine)).create());
     impl_->target_identity+="|"+impl_->jit->getDataLayout().getStringRepresentation();
@@ -1942,14 +2001,16 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     }
     require_source_entry(analysis);
     impl_->cache_status="disabled";
-    auto cold=[&]{auto module=analysis.lower();module.async_root=async_root;return compile(module,module.entry_symbol,optimize,contract,runtime);};
+    auto cold=[&]{auto module=analysis.lower(impl_->emission);module.async_root=async_root;return compile(module,module.entry_symbol,optimize,contract,runtime);};
     if(!impl_->cache.project_root.empty() && impl_->cache.build_identity.empty()){impl_->cache_status="unavailable";return cold();}
-    if(optimize || impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
+    if(impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
     std::string identity;
     try {
-    identity="VOID-debug-object-v1";
+    identity="VOID-native-object-v2";
     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
     field(impl_->cache.build_identity);field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
+    field(optimize?"ir-O2":"no-ir-O2");
+    field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
     field(std::to_string(analysis.modules().size()));
     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}

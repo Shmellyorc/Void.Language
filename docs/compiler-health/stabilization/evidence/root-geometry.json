@@ -1,0 +1,86 @@
+[
+  {
+    "workload": "dto8",
+    "version": "baseline",
+    "max_reference_words": 948,
+    "sum_reference_words": 6660,
+    "functions": 73
+  },
+  {
+    "workload": "dto8",
+    "version": "final",
+    "max_reference_words": 659,
+    "sum_reference_words": 4911,
+    "functions": 62
+  },
+  {
+    "workload": "dto16",
+    "version": "baseline",
+    "max_reference_words": 1628,
+    "sum_reference_words": 7596,
+    "functions": 73
+  },
+  {
+    "workload": "dto16",
+    "version": "final",
+    "max_reference_words": 659,
+    "sum_reference_words": 5007,
+    "functions": 62
+  },
+  {
+    "workload": "dto32",
+    "version": "baseline",
+    "max_reference_words": 2870,
+    "sum_reference_words": 9550,
+    "functions": 76
+  },
+  {
+    "workload": "dto32",
+    "version": "final",
+    "max_reference_words": 659,
+    "sum_reference_words": 5281,
+    "functions": 65
+  },
+  {
+    "workload": "dto64",
+    "version": "baseline",
+    "max_reference_words": 5462,
+    "sum_reference_words": 13358,
+    "functions": 76
+  },
+  {
+    "workload": "dto64",
+    "version": "final",
+    "max_reference_words": 659,
+    "sum_reference_words": 5729,
+    "functions": 65
+  },
+  {
+    "workload": "dto128",
+    "version": "baseline",
+    "max_reference_words": 10646,
+    "sum_reference_words": 20974,
+    "functions": 76
+  },
+  {
+    "workload": "dto128",
+    "version": "final",
+    "max_reference_words": 826,
+    "sum_reference_words": 6625,
+    "functions": 65
+  },
+  {
+    "workload": "import-json",
+    "version": "baseline",
+    "max_reference_words": 659,
+    "sum_reference_words": 4815,
+    "functions": 64
+  },
+  {
+    "workload": "import-json",
+    "version": "final",
+    "max_reference_words": 9,
+    "sum_reference_words": 9,
+    "functions": 2
+  }
+]

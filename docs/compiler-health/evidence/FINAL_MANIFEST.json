@@ -1,0 +1,550 @@
+{
+  "baseline": "1d4ad15f5215838d209e48bb47ac7c3f52b05371",
+  "date_local": "2026-10-27",
+  "root_operations": 121,
+  "matched_expected_status": 121,
+  "status_2_usage_control": 1,
+  "independent_inference_checks": 24,
+  "independent_inference_expected_source_errors": 7,
+  "signals": 0,
+  "timeouts": 0,
+  "internal_ir_failures": 0,
+  "ptrace_used": false,
+  "hosted_CI_used": false,
+  "production_inputs_verified": 134,
+  "all_production_input_hashes_match": true,
+  "compiler_sha256": "3342a2153fc909a98111207db82a8c7b2736983a5311e33a4f68369ec391a952",
+  "aslr_after": "2",
+  "artifacts": {
+    "fixtures/dto128/main.void": {
+      "bytes": 6386,
+      "sha256": "1d2bb0cb9050e948c16c36f29e45fc0afe8d8203d88a346a5e0e99a33c589778",
+      "archived": true
+    },
+    "fixtures/dto16/main.void": {
+      "bytes": 981,
+      "sha256": "420b8de4bc6a96700eb2e71a6a63142edc1f5b739cc0c6968adbb6856f921ae1",
+      "archived": true
+    },
+    "fixtures/dto32/main.void": {
+      "bytes": 1733,
+      "sha256": "c475fe932c66277baac3bc80465ae10f36b82480425ead65f74824c13e26a20c",
+      "archived": true
+    },
+    "fixtures/dto64/main.void": {
+      "bytes": 3237,
+      "sha256": "e3d6a3e0f3e0e2db4a8924cd122cfb0d5d0375e02845cf392e40be1f486ccc70",
+      "archived": true
+    },
+    "fixtures/dto8/.void/cache/v1/a098079635c7728d9af68ff3ed2c2bb6a7cf818d24041645e4bfebb5c3166815": {
+      "bytes": 1893297,
+      "sha256": "6d2de69b8330cc980e4765a67bb628e0ed42beef1e2b35ad7af4d706dc95f817",
+      "archived": false
+    },
+    "fixtures/dto8/main.void": {
+      "bytes": 614,
+      "sha256": "d951800f766b408217b6ef7eb74f90c9ca13b581c2365aa1e30a3118c4c7368c",
+      "archived": true
+    },
+    "fixtures/dto8/native-O2": {
+      "bytes": 2814280,
+      "sha256": "89719a71784628b264aa945464d576a292d7622cd25554734195f07be045a34a",
+      "archived": false
+    },
+    "fixtures/gameplay/.void/cache/v1/18976f3f97cebfd40bb32b19026c8b35c613bf351408aa935016e907dcd207eb": {
+      "bytes": 21801,
+      "sha256": "58bbea4ce1b51243aaa834126ef18cf6130dabde4affed6f432afa85d176da9c",
+      "archived": false
+    },
+    "fixtures/gameplay/main.void": {
+      "bytes": 321,
+      "sha256": "6b7e81de8368d96cd19ab717fd68e51a5808ce380be1434ed9e67ffd020fb114",
+      "archived": true
+    },
+    "fixtures/gameplay/native-O2": {
+      "bytes": 1847904,
+      "sha256": "ae6797f6a52b46d21d1cf5416e9a16dd752b879321bd444828d18eccd00440bc",
+      "archived": false
+    },
+    "fixtures/import-json/main.void": {
+      "bytes": 43,
+      "sha256": "1fe5a3339cd687455302ff3029e3946b7faa299b380f09e28096f2c5380c07cd",
+      "archived": true
+    },
+    "fixtures/import-text/main.void": {
+      "bytes": 43,
+      "sha256": "26f9aa868013c95046d01534ae9912726b457e1a829394bab6616ae18846bbe6",
+      "archived": true
+    },
+    "fixtures/plain128/main.void": {
+      "bytes": 4091,
+      "sha256": "cec9ffd7ecb178b939d8983544722efb244cc8cb8c4bebc22f32bb80253a3100",
+      "archived": true
+    },
+    "fixtures/plain16/main.void": {
+      "bytes": 534,
+      "sha256": "62a2b10366f5ffcc29cd0a961efd008c55e41ce256dcad5aeeb7c23557b90e3f",
+      "archived": true
+    },
+    "fixtures/plain32/main.void": {
+      "bytes": 1030,
+      "sha256": "a1ea683e769ce4adc9eb143c9b0a49a344211285238b564cd1f8f41656fb81ac",
+      "archived": true
+    },
+    "fixtures/plain64/main.void": {
+      "bytes": 2022,
+      "sha256": "adedd1f2acd4bb9fb742b2060244cc80730827483bfd800b9506150577051725",
+      "archived": true
+    },
+    "fixtures/plain8/main.void": {
+      "bytes": 291,
+      "sha256": "4189e27bd531a30df34740bf8f435ba417222a4b9a1009462841a81ad5dcb9b6",
+      "archived": true
+    },
+    "fixtures/tiny/.void/cache/v1/0283645740c5ab791d5fef517817541db005022b2f3435672ab737598cbabe9d": {
+      "bytes": 6729,
+      "sha256": "6bac42b56bdc0528829ad7d1e9ca33a99ab63d96eb4999efaf9313bfdcc3988d",
+      "archived": false
+    },
+    "fixtures/tiny/main.void": {
+      "bytes": 26,
+      "sha256": "421f4e56b540c47b2fe20f4d868788e646e66a5310a02fc2c667f469e25cfb1f",
+      "archived": true
+    },
+    "fixtures/tiny/native-O2": {
+      "bytes": 1810432,
+      "sha256": "4aae9e103dbfb2eede6af7e2cd28db9bd5a167ed39e3d6725987b28e2b8f5686",
+      "archived": false
+    },
+    "phases/dto128.post.cg2.o": {
+      "bytes": 3093200,
+      "sha256": "677bd135825798eb6b3510c5c5854e27a3b87262ac4d7aa33d76d6deced5093b",
+      "archived": false
+    },
+    "phases/dto128.post.ll": {
+      "bytes": 20120094,
+      "sha256": "1d02b4dd5ced580c44b03e2178b291c3bb3798e8680eb6d39f76f21cb1d01f0c",
+      "archived": true
+    },
+    "phases/dto128.post.tsv": {
+      "bytes": 7507,
+      "sha256": "83150975806edfee656a6607c84c8c15b6d6f2120a4b4298bd8d7e33d1090c0e",
+      "archived": true
+    },
+    "phases/dto128.pre.cg0.o": {
+      "bytes": 7728640,
+      "sha256": "a51593876ebe5a9189fce8346fcb9e38fdf4ba1ca98ff2cb813e802477e075c2",
+      "archived": false
+    },
+    "phases/dto128.pre.cg2.o": {
+      "bytes": 5630384,
+      "sha256": "870de7c4588b857ac9f3c97e41f6f7d1455a0d62c6ecb85cf587bee158256c8c",
+      "archived": false
+    },
+    "phases/dto128.pre.ll": {
+      "bytes": 27397013,
+      "sha256": "ec4ad7f219e8b2a41dd1173b89114706bb06e93d05af456cde2ea944cd2ee283",
+      "archived": true
+    },
+    "phases/dto128.pre.tsv": {
+      "bytes": 8498,
+      "sha256": "140ef1ea6718318228c20a9f2251cb2bfba499d64ad18d804ae45bc49fc34bcb",
+      "archived": true
+    },
+    "phases/dto128.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/dto128.typed.tsv": {
+      "bytes": 3728,
+      "sha256": "d4c4181e8ecd4c884f525ac8174e200c7d64561c73fd89412327d0b946695086",
+      "archived": true
+    },
+    "phases/dto16.post.ll": {
+      "bytes": 7271643,
+      "sha256": "d821ee1eb6b79e527c896d359827ee41bad7dfd4bb7e98ac92b06e30639fa9af",
+      "archived": true
+    },
+    "phases/dto16.post.tsv": {
+      "bytes": 7376,
+      "sha256": "254d5bcdd5a60b28a59d2925c07d7778a328dd560db2e89465273e695a30485d",
+      "archived": true
+    },
+    "phases/dto16.pre.ll": {
+      "bytes": 10272195,
+      "sha256": "365a471f98daab48e775c48ffd821dd3126222eeb7d94bae52be03b8007a5873",
+      "archived": true
+    },
+    "phases/dto16.pre.tsv": {
+      "bytes": 8305,
+      "sha256": "e88d30e8b6b0abf33b131086d5a1927239967a1e372a84f752e40291cd543f4f",
+      "archived": true
+    },
+    "phases/dto16.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/dto16.typed.tsv": {
+      "bytes": 3668,
+      "sha256": "7c1f737db6a9ec8cd97ecf12846848c13bf1694896dbc4bcd70ecb860121bdc2",
+      "archived": true
+    },
+    "phases/dto32.post.cg2.o": {
+      "bytes": 1644744,
+      "sha256": "98263a6f29ff7ed1cc3538c5f847606453ee8fc41675d7a57ae19d7fb2690e7d",
+      "archived": false
+    },
+    "phases/dto32.post.ll": {
+      "bytes": 9120555,
+      "sha256": "091aae20a99607017468a42e328da1858d013ab48be9d232956e499f71fe2a82",
+      "archived": true
+    },
+    "phases/dto32.post.tsv": {
+      "bytes": 7499,
+      "sha256": "0e55339a0d0ad8dc077c07da5bb0627f85e6a8d22c5040f4a6a590384a90e66b",
+      "archived": true
+    },
+    "phases/dto32.pre.cg0.o": {
+      "bytes": 3641352,
+      "sha256": "b175c6c77a60bffb6613e8cdc239530aa350ea24e0b6734227c3a60761209629",
+      "archived": false
+    },
+    "phases/dto32.pre.cg2.o": {
+      "bytes": 2650880,
+      "sha256": "5a6ceb05d1a60ab4ecdda74fe61b2a96596c4921313bef26ac9f8b2a5501ec1a",
+      "archived": false
+    },
+    "phases/dto32.pre.ll": {
+      "bytes": 12757503,
+      "sha256": "b0263e07ca20ead4fefe6d5c650b918fedc756c560722960da2220a35464df66",
+      "archived": true
+    },
+    "phases/dto32.pre.tsv": {
+      "bytes": 8488,
+      "sha256": "e90c9da3ff77d18020af59c05fed05c29e35ab7cb79873490369b1ec777801f7",
+      "archived": true
+    },
+    "phases/dto32.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/dto32.typed.tsv": {
+      "bytes": 3723,
+      "sha256": "664c4a5100e88a12a75c54bcc10e9ababd4387cf89f20d27502786cdcbd3f2aa",
+      "archived": true
+    },
+    "phases/dto64.post.ll": {
+      "bytes": 12772959,
+      "sha256": "9f5c7aceb103179f8ce945c3c338aeea77cc90011bf0fb8c427e09578e6b88c0",
+      "archived": true
+    },
+    "phases/dto64.post.tsv": {
+      "bytes": 7502,
+      "sha256": "8087dd9b9912dff5c6494bccb5a762bb36e79533ada6f4afca11aaf7404773d8",
+      "archived": true
+    },
+    "phases/dto64.pre.ll": {
+      "bytes": 17629739,
+      "sha256": "a4c9814d05687f5cacaff5a9be013fb191f4385102c2e93acf6522f4adba877b",
+      "archived": true
+    },
+    "phases/dto64.pre.tsv": {
+      "bytes": 8491,
+      "sha256": "abd6067c7b029693fe1422f179d1033c62632e2200e7ac8d8e1cdcf6040ba487",
+      "archived": true
+    },
+    "phases/dto64.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/dto64.typed.tsv": {
+      "bytes": 3725,
+      "sha256": "8b8311406998f69ee5cf48091b3dcf5491904acdd59838235464412836a6524d",
+      "archived": true
+    },
+    "phases/dto8-api0.typed.tsv": {
+      "bytes": 3668,
+      "sha256": "654d7a76b0283dfa2c5546a5e35dc1a39ab84e26595fe0e8259878c128031d62",
+      "archived": true
+    },
+    "phases/dto8-api1.typed.tsv": {
+      "bytes": 3668,
+      "sha256": "654d7a76b0283dfa2c5546a5e35dc1a39ab84e26595fe0e8259878c128031d62",
+      "archived": true
+    },
+    "phases/dto8.post.cg2.o": {
+      "bytes": 1276944,
+      "sha256": "819d2b99d91545971e846a68490af234b1fb5c1bd8d13fdd42548160844d2711",
+      "archived": false
+    },
+    "phases/dto8.post.ll": {
+      "bytes": 6380766,
+      "sha256": "f721ae521e0e31b921f23f1cc95e37a35c30f2d361dbd5adf47e22505d0633b0",
+      "archived": true
+    },
+    "phases/dto8.post.tsv": {
+      "bytes": 7373,
+      "sha256": "432faccc533fa72d7a1c039aa1bbd4a0eacd7f3fe787379182613ca257fd2ba0",
+      "archived": true
+    },
+    "phases/dto8.pre.cg0.o": {
+      "bytes": 2604088,
+      "sha256": "3cf8527c2d15b1f31183ceaf986c24dae35c281a7b9d0dcdf217847d970d340d",
+      "archived": false
+    },
+    "phases/dto8.pre.cg2.o": {
+      "bytes": 1893616,
+      "sha256": "6e15c5a3deec9ef9656e6aea6e06f00ba908d295f9276aa6edef25a30b0e5b53",
+      "archived": false
+    },
+    "phases/dto8.pre.ll": {
+      "bytes": 9085356,
+      "sha256": "1fb46bbdc38bc37f255131325a3d81018c8f65ec9ecb4e9d0adc89bfefba3b14",
+      "archived": true
+    },
+    "phases/dto8.pre.tsv": {
+      "bytes": 8302,
+      "sha256": "9057b1126aa0f65c551f7659ea185264940db94d53f44c4702e27b795397f53b",
+      "archived": true
+    },
+    "phases/dto8.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/dto8.typed.tsv": {
+      "bytes": 3668,
+      "sha256": "654d7a76b0283dfa2c5546a5e35dc1a39ab84e26595fe0e8259878c128031d62",
+      "archived": true
+    },
+    "phases/gameplay-api0.typed.tsv": {
+      "bytes": 341,
+      "sha256": "92661a81fb56f5f262ddd224d64ad5476d0bfba2b828de31574f9ba8cfb0c36a",
+      "archived": true
+    },
+    "phases/gameplay-api1.typed.tsv": {
+      "bytes": 341,
+      "sha256": "92661a81fb56f5f262ddd224d64ad5476d0bfba2b828de31574f9ba8cfb0c36a",
+      "archived": true
+    },
+    "phases/gameplay.post.ll": {
+      "bytes": 61248,
+      "sha256": "3bf5414c27c9f771caa349fa26aae2b4317bc204928cd5221c91526be00369a5",
+      "archived": true
+    },
+    "phases/gameplay.post.tsv": {
+      "bytes": 670,
+      "sha256": "e9f416a82bab08470954d33c85a7d78b6ad40035cb30b90888fdd5dbd7032a8b",
+      "archived": true
+    },
+    "phases/gameplay.pre.ll": {
+      "bytes": 78291,
+      "sha256": "74212b0977b56f58e6e35b0033e2ccf44c83a31f1e3b40c4f22421fba5c44b25",
+      "archived": true
+    },
+    "phases/gameplay.pre.tsv": {
+      "bytes": 749,
+      "sha256": "661fc011547a321c4b211086835d98b6c98a89e8ae8bac5d606ee535e68252a3",
+      "archived": true
+    },
+    "phases/gameplay.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/gameplay.typed.tsv": {
+      "bytes": 341,
+      "sha256": "92661a81fb56f5f262ddd224d64ad5476d0bfba2b828de31574f9ba8cfb0c36a",
+      "archived": true
+    },
+    "phases/import-json.post.ll": {
+      "bytes": 2904934,
+      "sha256": "1782dc7720ba0a9eb2a855ae4d001c53bfbd5ab6f2b964b79dc12490584327cb",
+      "archived": true
+    },
+    "phases/import-json.post.tsv": {
+      "bytes": 4249,
+      "sha256": "f59d62f4fe5af1f76dd7effe170e4e9d501451616e20b6bc91fe21e770a230d4",
+      "archived": true
+    },
+    "phases/import-json.pre.ll": {
+      "bytes": 6700001,
+      "sha256": "777d7f347d925ab10b4902b8d5e998456dd3bd774f462715ddc6565a96337896",
+      "archived": true
+    },
+    "phases/import-json.pre.tsv": {
+      "bytes": 7268,
+      "sha256": "eb5768096e437c098605db97cd651f51f45fe2ab876680cde54d219e1f024ce5",
+      "archived": true
+    },
+    "phases/import-json.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/import-json.typed.tsv": {
+      "bytes": 3210,
+      "sha256": "7c0c53a147b2062e0f211db490d92a36b78778b9ccfd5e8406ef8a6c90063c2d",
+      "archived": true
+    },
+    "phases/import-text.post.ll": {
+      "bytes": 1258046,
+      "sha256": "7ab66ec9852bd30485594cbed43f2c7348e0b40953b51e8d856cb3428bb3aef0",
+      "archived": true
+    },
+    "phases/import-text.post.tsv": {
+      "bytes": 3527,
+      "sha256": "925a174b048560cdf5c1aabd09c678b3b862588fc8da3506e28e5f6d674e1c5d",
+      "archived": true
+    },
+    "phases/import-text.pre.ll": {
+      "bytes": 1544553,
+      "sha256": "bbf684155163a947a653db087e2037296f3bdda4c8b6ff68d299279f4930f9a5",
+      "archived": true
+    },
+    "phases/import-text.pre.tsv": {
+      "bytes": 3544,
+      "sha256": "c3630a9b5053c7c3f41d63b9ec83ca579ee877c13778b44e92315c4f2c4dd758",
+      "archived": true
+    },
+    "phases/import-text.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/import-text.typed.tsv": {
+      "bytes": 1535,
+      "sha256": "5cdbc16cdbb2a65007f313164d08d4159ca9d21e99d47a28c4b5368c01ec5c73",
+      "archived": true
+    },
+    "phases/tiny-api0.typed.tsv": {
+      "bytes": 106,
+      "sha256": "bca46dad07254b472519773479eb34342dcc8abeffa1aab02b81a1f28b017cb9",
+      "archived": true
+    },
+    "phases/tiny-api1.typed.tsv": {
+      "bytes": 106,
+      "sha256": "bca46dad07254b472519773479eb34342dcc8abeffa1aab02b81a1f28b017cb9",
+      "archived": true
+    },
+    "phases/tiny.post.ll": {
+      "bytes": 14254,
+      "sha256": "58f42fa7d34472a939e014b93fac83bf11a556250e654a8c37f702af03f15dc7",
+      "archived": true
+    },
+    "phases/tiny.post.tsv": {
+      "bytes": 216,
+      "sha256": "0695ec733d23dc5f66764b606a81cca6343984203ffea16f4d0979fc05ab41a4",
+      "archived": true
+    },
+    "phases/tiny.pre.ll": {
+      "bytes": 15663,
+      "sha256": "a59d09534af01be320a4bbae35ae26c77b2e17768b42fadb543e42efb4de30be",
+      "archived": true
+    },
+    "phases/tiny.pre.tsv": {
+      "bytes": 216,
+      "sha256": "4d3b47a2d880207de1c2009507c5c6fa9550dfb16ee57bac9c75784f95378334",
+      "archived": true
+    },
+    "phases/tiny.target.txt": {
+      "bytes": 964,
+      "sha256": "57fe57e604353925bfca285346bb81b679272d348ab89a8d7f54b985b5304105",
+      "archived": true
+    },
+    "phases/tiny.typed.tsv": {
+      "bytes": 106,
+      "sha256": "bca46dad07254b472519773479eb34342dcc8abeffa1aab02b81a1f28b017cb9",
+      "archived": true
+    }
+  },
+  "toolchain": {
+    "clang++": {
+      "path": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "sha256": "c57e2928bc629e58da157867bb9af550edfc1195e7b003edfcfecd57faf2b71b",
+      "version": "clang version 19.1.7 (/home/runner/work/llvm-project/llvm-project/clang cd708029e0b2869e80abe31ddb175f7c35361f90)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin\n"
+    },
+    "llc": {
+      "path": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llc",
+      "sha256": "ad70e4f1b9a0357d59e0774957476ee24f9b61a65a64d066e6f4e484cd7d3ec8",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 19.1.7\n  Optimized build.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: znver1\n\n  Registered Targets:\n    aarch64     - AArch64 (little endian)\n    aarch64_32  - AArch64 (little endian ILP32)\n    aarch64_be  - AArch64 (big endian)\n    amdgcn      - AMD GCN GPUs\n    arm         - ARM\n    arm64       - ARM64 (little endian)\n    arm64_32    - ARM64 (little endian ILP32)\n    armeb       - ARM (big endian)\n    avr         - Atmel AVR Microcontroller\n    bpf         - BPF (host endian)\n    bpfeb       - BPF (big endian)\n    bpfel       - BPF (little endian)\n    hexagon     - Hexagon\n    lanai       - Lanai\n    loongarch32 - 32-bit LoongArch\n    loongarch64 - 64-bit LoongArch\n    mips        - MIPS (32-bit big endian)\n    mips64      - MIPS (64-bit big endian)\n    mips64el    - MIPS (64-bit little endian)\n    mipsel      - MIPS (32-bit little endian)\n    msp430      - MSP430 [experimental]\n    nvptx       - NVIDIA PTX 32-bit\n    nvptx64     - NVIDIA PTX 64-bit\n    ppc32       - PowerPC 32\n    ppc32le     - PowerPC 32 LE\n    ppc64       - PowerPC 64\n    ppc64le     - PowerPC 64 LE\n    r600        - AMD GPUs HD2XXX-HD6XXX\n    riscv32     - 32-bit RISC-V\n    riscv64     - 64-bit RISC-V\n    sparc       - Sparc\n    sparcel     - Sparc LE\n    sparcv9     - Sparc V9\n    systemz     - SystemZ\n    thumb       - Thumb\n    thumbeb     - Thumb (big endian)\n    ve          - VE\n    wasm32      - WebAssembly 32-bit\n    wasm64      - WebAssembly 64-bit\n    x86         - 32-bit X86: Pentium-Pro and above\n    x86-64      - 64-bit X86: EM64T and AMD64\n    xcore       - XCore\n"
+    },
+    "opt": {
+      "path": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/opt",
+      "sha256": "b0e435fa3b91f1234e8c3a6ca2be78f0657c2394a7ae73bf793f7b4b27b44ff7",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 19.1.7\n  Optimized build.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: znver1\n"
+    },
+    "ld.lld": {
+      "path": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld",
+      "sha256": "75f69d8a4e4a402585d0fc1e59ff97a8d38499f58e5119724e785360dfb0e225",
+      "version": "LLD 19.1.7 (/home/runner/work/llvm-project/llvm-project/llvm cd708029e0b2869e80abe31ddb175f7c35361f90) (compatible with GNU linkers)\n"
+    }
+  },
+  "header_witnesses": {
+    "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h": {
+      "sha256": "8b2880da23ab230c5e653fc95030d9248e1dac4b143ac41cf436495193e29a60",
+      "lines": {
+        "146": "private:",
+        "147": "  Triple TT;",
+        "148": "  std::string CPU;",
+        "149": "  SubtargetFeatures Features;",
+        "150": "  TargetOptions Options;",
+        "151": "  std::optional<Reloc::Model> RM;",
+        "152": "  std::optional<CodeModel::Model> CM;",
+        "153": "  CodeGenOptLevel OptLevel = CodeGenOptLevel::Default;",
+        "154": "};",
+        "155": ""
+      }
+    },
+    "llvm/MC/TargetRegistry.h": {
+      "sha256": "6122d32eb563a7b30bdb615b2f4cdf69671eef7f310f261355a4c6276f743afb",
+      "lines": {
+        "450": "  ///",
+        "451": "  /// \\param TT This argument is used to determine the target machine",
+        "452": "  /// feature set; it should always be provided. Generally this should be",
+        "453": "  /// either the target triple from the module, or the target triple of the",
+        "454": "  /// host if that does not exist.",
+        "455": "  TargetMachine *createTargetMachine(",
+        "456": "      StringRef TT, StringRef CPU, StringRef Features,",
+        "457": "      const TargetOptions &Options, std::optional<Reloc::Model> RM,",
+        "458": "      std::optional<CodeModel::Model> CM = std::nullopt,",
+        "459": "      CodeGenOptLevel OL = CodeGenOptLevel::Default, bool JIT = false) const {",
+        "460": "    if (!TargetMachineCtorFn)",
+        "461": "      return nullptr;",
+        "462": "    return TargetMachineCtorFn(*this, Triple(TT), CPU, Features, Options, RM,",
+        "463": "                               CM, OL, JIT);",
+        "464": "  }"
+      }
+    }
+  },
+  "helper_input_hash_checks": {
+    "/tmp/void-health-phase-harness-1i3kr4z4/provenance.json": {
+      "/tmp/void-health-phase-harness-1i3kr4z4/phase.cpp": true,
+      "/tmp/void-health-phase-harness-1i3kr4z4/phase.o": true,
+      "/tmp/void-health-phase-harness-1i3kr4z4/phase": true,
+      "/tmp/void-health-phase-harness-1i3kr4z4/api.cpp": true,
+      "/tmp/void-health-phase-harness-1i3kr4z4/api.o": true,
+      "/tmp/void-health-phase-harness-1i3kr4z4/api": true,
+      "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp": true,
+      "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/native_cache.cpp": true,
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_core.a": true,
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a": true,
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/CMakeFiles/void_llvm.dir/src/backend/llvm/native_cache.cpp.o": true
+    },
+    "/tmp/void-root-scan-audit-fee887de/inputs.json": {
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a": true,
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_native_fixture.a": true,
+      "/home/shmellyorc/Documents/Void.Language/include/void/runtime.hpp": true
+    }
+  },
+  "environment_relevant": {
+    "VOID_STDLIB_ROOT": null,
+    "LANG": "en_US.UTF-8",
+    "LC_ALL": "C.UTF-8"
+  },
+  "note": "phases.py explicitly sets VOID_STDLIB_ROOT to repository stdlib for its children; remaining.py and CLI otherwise use existing discovery. inputs.json root helper executed:false is pre-execution build provenance; root execution receipt is in measurements.jsonl."
+}

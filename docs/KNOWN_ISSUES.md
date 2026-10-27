@@ -1,5 +1,47 @@
 # Known issues and deferred work
 
+**STATUS: NEW STANDARD-LIBRARY DEVELOPMENT PAUSED — COMPILER STABILIZATION IN PROGRESS.**
+
+Boss authorized implementation of the complete compiler stabilization sprint
+on 27 October 2026. The research-only boundary below describes the preceding
+audit. [Active engineering record](compiler-health/stabilization/IMPLEMENTATION.md).
+The hold remains until independent Golden Wrench review and Boss authorization
+to resume. Historical incident classifications remain unchanged.
+
+## Current disposition — compiler stabilization, 27 October 2026
+
+Audited baseline: `1d4ad15f5215838d209e48bb47ac7c3f52b05371`.
+**Boss has paused all new standard-library development.** Current work is
+compiler correctness, reliability and measured performance, under the explicit
+Boss implementation directive. Git mutations and hosted CI remain owner actions.
+
+The [compiler-health inventory](compiler-health/ISSUES.md),
+[measurements](compiler-health/BENCHMARKS.md), [findings](compiler-health/REPORT.md)
+and [bounded repair plan](compiler-health/ROADMAP.md) distinguish current defects
+from the dated records below. **Those older authorization, pending-platform and
+missing-feature statements are historical wherever newer evidence supersedes
+them. Their original text and evidence are retained.**
+
+| Current classification | Disposition |
+|---|---|
+| Active frontend correctness | Nested `?` generic inference can select the result wrapper instead of its payload. Related await/async-call and if-expression hints also have independent reductions. These are shared compiler defects, not permanent JSON limitations. |
+| Active frontend performance | Primitive left-associated arithmetic can cause exponentially repeated hint traversal even in `voidc check`. Balanced/extracted controls are much faster. |
+| Measured compilation performance | JSON DTO compilation remains severely slow, with large generated root frames/LLVM blocks and expensive optimization/machine scheduling. A 600-second timeout does not repair a 300-second failure. |
+| Historical unresolved crashes | LLVM DSE, Release async IO, Stage 9 preliminary process faults and separate pinned-Clang/LLD/ThinLTO incidents retain distinct identities. Passing retries do not prove fixes; see the inventory for exact evidence and limitations. |
+| Verified repaired | CI88/89 Windows paths/manifests/deep output are superseded by [CI95 native Debug/Release 320/320](stage9/CI95_WINDOWS_ACCEPTANCE.json). Earlier valid-chain/small-stack issues and JSON readonly/capture/pattern-recovery defects have specific later repairs/regressions. Do not reclassify them as unexplained current crashes. |
+| Current intentional/performance boundaries | Function-duration roots, coordinated nonmoving GC, root-duration task/result retention, full-graph editor analysis and Windows cache fallback remain distinct from correctness failures. Automatic O2 caching and separate no-IR-O2 objects now follow the stabilization cache policy. Runtime root lookup still scans registered words. |
+
+Source get/pop, string indexing/formatting, named/default calls, constructors,
+runtime globals, async, main discovery/native builds and compiler-owned editor
+completion/hover/signatures/navigation/rename/formatting/refresh are implemented
+under their respective later contracts. The older exclusions below are not the
+current capability checklist. Richer intentional language/native boundaries
+remain outside stabilization. JSON itself is implemented at this baseline;
+[its handoff](json/HANDOFF.md) retains 93/93 effective local groups, original
+failures and separate native-platform review limits.
+
+### Retained historical entries
+
 ## CI #89 verified Windows manifest repair — 21 October 2026
 
 Native diagnosis #1 confirmed Windows error 3 at a 353-unit deep directory; the

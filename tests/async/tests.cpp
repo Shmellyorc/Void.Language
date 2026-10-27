@@ -40,9 +40,16 @@ int main(int argc,char** argv){try{
         require(complete && failures>0,"async allocation sweep incomplete");
     }
     // Explicit adapters share the persistent source cache and old-generation leases.
-    write(vd::read_source(std::filesystem::path(argv[1])/"examples/async/activation.void").text());auto cached_analysis=analyze(source);
-    const auto identity=std::string(vd::compiler_build_identity());{vd::Jit jit({fixtures,identity});auto old=jit.compile_async(*cached_analysis,false);require(old->invoke(7)==17,"cached miss async result");bool supported=jit.cache_status()=="miss";auto hit=jit.compile_async(*cached_analysis,false);require(hit->invoke(7)==17 && (!supported || jit.cache_status()=="hit"),"cached hit async result");vd::ReloadSlot slot(old);
-        auto text=vd::read_source(source).text();auto at=text.find("return a + b");text.replace(at,12,"return a + b + 1");write(text);auto edited=analyze(source);require(jit.replace(slot,*edited,false) && slot.invoke(7)==18 && old->invoke(7)==17,"async leased reload");
+    const auto cached_text=vd::read_source(std::filesystem::path(argv[1])/"examples/async/activation.void").text();
+    const auto identity=std::string(vd::compiler_build_identity());
+    for(bool optimize:{false,true}){
+        write(cached_text);auto cached_analysis=analyze(source);vd::Jit jit({fixtures,identity});
+        auto old=jit.compile_async(*cached_analysis,optimize);require(old->invoke(7)==17,"cached miss async result");
+        bool supported=jit.cache_status()=="miss";vd::Jit fresh({fixtures,identity});auto hit=fresh.compile_async(*cached_analysis,optimize);
+        require(hit->invoke(7)==17 && fresh.cache_status()==(supported?"hit":"unavailable"),"fresh cached async result");
+        require(hit->runtime_owner()!=old->runtime_owner(),"async cache shared live Runtime state");vd::ReloadSlot slot(old);
+        auto text=cached_text;auto at=text.find("return a + b");text.replace(at,12,"return a + b + 1");write(text);auto edited=analyze(source);
+        require(jit.replace(slot,*edited,optimize) && slot.invoke(7)==18 && old->invoke(7)==17,"async leased reload");
     }
     // No new public task, cancellation, group or callable escape surface.
     for(const auto& text:{"func entry(value: i32) -> i32:\n    return await value\n", "async func entry(value: i32) -> func() -> i32:\n    return func() -> i32:\n        return value\n", "async func child(value: i32) -> i32:\n    return value\nasync func entry(value: i32) -> i32:\n    var f = child\n    return value\n"})require(!vd::analyze_source({"/invalid-async.void",text}).succeeded(),"invalid async source accepted");

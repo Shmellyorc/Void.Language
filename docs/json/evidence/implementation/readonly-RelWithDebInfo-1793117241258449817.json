@@ -1,0 +1,588 @@
+{
+  "profile": "RelWithDebInfo",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+  "compiler_sha256": "73cc460a71702688ef9ae94d9b4273aaf2ca04887227987e1869b58065f7033c",
+  "checks": 47,
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_identity.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "same identity\n43\n",
+      "stderr": "",
+      "source_sha256": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_identity.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_identity-O0",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_identity-O0\n",
+      "stderr": "",
+      "source_sha256": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_identity-O0"
+      ],
+      "status": 0,
+      "stdout": "same identity\n43\n",
+      "stderr": "",
+      "source_sha256": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_identity.void"
+      ],
+      "status": 0,
+      "stdout": "same identity\n43\n",
+      "stderr": "",
+      "source_sha256": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_identity.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_identity-O2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_identity-O2\n",
+      "stderr": "",
+      "source_sha256": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_identity-O2"
+      ],
+      "status": 0,
+      "stdout": "same identity\n43\n",
+      "stderr": "",
+      "source_sha256": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "direct readonly result\n",
+      "stderr": "",
+      "source_sha256": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/direct_const_get-O0",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/direct_const_get-O0\n",
+      "stderr": "",
+      "source_sha256": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/direct_const_get-O0"
+      ],
+      "status": 0,
+      "stdout": "direct readonly result\n",
+      "stderr": "",
+      "source_sha256": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void"
+      ],
+      "status": 0,
+      "stdout": "direct readonly result\n",
+      "stderr": "",
+      "source_sha256": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/direct_const_get-O2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/direct_const_get-O2\n",
+      "stderr": "",
+      "source_sha256": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/direct_const_get-O2"
+      ],
+      "status": 0,
+      "stdout": "direct readonly result\n",
+      "stderr": "",
+      "source_sha256": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "readonly result accepted\n",
+      "stderr": "",
+      "source_sha256": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_result_corrected-O0",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_result_corrected-O0\n",
+      "stderr": "",
+      "source_sha256": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_result_corrected-O0"
+      ],
+      "status": 0,
+      "stdout": "readonly result accepted\n",
+      "stderr": "",
+      "source_sha256": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void"
+      ],
+      "status": 0,
+      "stdout": "readonly result accepted\n",
+      "stderr": "",
+      "source_sha256": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_result_corrected-O2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_result_corrected-O2\n",
+      "stderr": "",
+      "source_sha256": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_result_corrected-O2"
+      ],
+      "status": 0,
+      "stdout": "readonly result accepted\n",
+      "stderr": "",
+      "source_sha256": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_reduced.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_reduced.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_reduced-O0",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_reduced-O0\n",
+      "stderr": "",
+      "source_sha256": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_reduced-O0"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_reduced.void"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_reduced.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_reduced-O2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_reduced-O2\n",
+      "stderr": "",
+      "source_sha256": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_reduced-O2"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_safe_route.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_safe_route.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_safe_route-O0",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_safe_route-O0\n",
+      "stderr": "",
+      "source_sha256": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_safe_route-O0"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_safe_route.void"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_safe_route.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_safe_route-O2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_safe_route-O2\n",
+      "stderr": "",
+      "source_sha256": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_safe_route-O2"
+      ],
+      "status": 0,
+      "stdout": "readonly child\n",
+      "stderr": "",
+      "source_sha256": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_paths.void",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "child 42\nlist 0: 42\nsnapshot 42\ndict leaf: 42\nget 42\n",
+      "stderr": "",
+      "source_sha256": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_paths.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_paths-O0",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_paths-O0\n",
+      "stderr": "",
+      "source_sha256": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_paths-O0"
+      ],
+      "status": 0,
+      "stdout": "child 42\nlist 0: 42\nsnapshot 42\ndict leaf: 42\nget 42\n",
+      "stderr": "",
+      "source_sha256": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_paths.void"
+      ],
+      "status": 0,
+      "stdout": "child 42\nlist 0: 42\nsnapshot 42\ndict leaf: 42\nget 42\n",
+      "stderr": "",
+      "source_sha256": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_paths.void",
+        "-o",
+        "/tmp/void-json-readonly-59naez48/readonly_paths-O2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/void-json-readonly-59naez48/readonly_paths-O2\n",
+      "stderr": "",
+      "source_sha256": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-readonly-59naez48/readonly_paths-O2"
+      ],
+      "status": 0,
+      "stdout": "child 42\nlist 0: 42\nsnapshot 42\ndict leaf: 42\nget 42\n",
+      "stderr": "",
+      "source_sha256": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/result_mutation.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/result_mutation.void:19:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 19 |         child.count = 1\n    |         ^^^^^\n    Module: /result_mutation.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/result_mutation.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /result_mutation.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "b54f3f0047ed8ed3ad1abb8499638dd8023fc6cbcaef40ca22508bdc9abda3af",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/propagated_mutation.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/propagated_mutation.void:19:24: error: Cannot mutate a readonly list.\n    code: VOID2007\n\n 19 |         child.children.push(leaf)\n    |                        ^^^^\n    Module: /propagated_mutation.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "b79f2fc22ee3f3d7c0291854b92a96c968b8c645f6b3be745f6172e96b9ea71a",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/result_escape.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/result_escape.void:19:39: error: Cannot store readonly reference leaf '[/result_escape.void::node][]' in mutable managed field storage.\n    code: VOID2007\n\n 19 |         var escaped = node(children = [child])\n    |                                       ^\n    Module: /result_escape.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "c92d674b5c28e83e60fd66b9721f4beea8e74fd1eee0fe51de942c494d0c5e63",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/mutable_parameter.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/mutable_parameter.void:19:9: error: Cannot assign readonly reference leaf 'node' to storage or a parameter promising mutable access.\n    code: VOID2007\n\n 19 |         mutate(child)\n    |         ^^^^^^\n    Module: /mutable_parameter.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/mutable_parameter.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /mutable_parameter.void\n    Parameter declared here; const accepts readonly reference leaves. at /tmp/void-json-readonly-59naez48/mutable_parameter.void:13:13\n\n 13 | func mutate(input: node):\n    |             ^^^^^\n    Module: /mutable_parameter.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "870ea9b38a112e86049eab4be1a52a44689d55e96241aaeb275f5e94a2f0cfab",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/iteration_mutation.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/iteration_mutation.void:19:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 19 |         child.count = 1\n    |         ^^^^^\n    Module: /iteration_mutation.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/iteration_mutation.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /iteration_mutation.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "354e11176b182fc14251f4f0f8601fbc9d4fec99f8bf38e1098c8afd546b7cae",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/snapshot_mutation.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/snapshot_mutation.void:19:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 19 |         child.count = 1\n    |         ^^^^^\n    Module: /snapshot_mutation.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/snapshot_mutation.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /snapshot_mutation.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "bab440bf4ec31ede068a23d30f6a496b713f7e48068778ffe31799a2009ea410",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/list_replacement.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/list_replacement.void:18:5: error: Cannot mutate readonly const or declaration 'root'.\n    code: VOID2007\n\n 18 |     root.children[0] = leaf\n    |     ^^^^\n    Module: /list_replacement.void\n    Hint: Use var for a mutable local binding.\n\n",
+      "source_sha256": "dfa126af5a96cfe65922f49a899b35911d8849d1f7449f7d24e1ec73067f9a53",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/pattern_narrowing.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/pattern_narrowing.void:19:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 19 |         alias.count = 1\n    |         ^^^^^\n    Module: /pattern_narrowing.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/pattern_narrowing.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /pattern_narrowing.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "201f589745ec6849b63796e7d200d77addfa05eeb19a68841d66c28d7f75b403",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/get_mutation.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/get_mutation.void:19:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 19 |         child.count = 1\n    |         ^^^^^\n    Module: /get_mutation.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/get_mutation.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /get_mutation.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "69bc19645706b9def8a6c2efd9e1afb712d197f7e98b4b53c9750146afdfad08",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/void-json-readonly-59naez48/parameter_escape.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-json-readonly-59naez48/parameter_escape.void:16:28: error: Cannot store readonly reference leaf '[/parameter_escape.void::node][]' in mutable managed field storage.\n    code: VOID2007\n\n 16 |     return node(children = [input])\n    |                            ^\n    Module: /parameter_escape.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n/tmp/void-json-readonly-59naez48/parameter_escape.void:20:5: error: A call may retain readonly reference leaf 'node' in mutable object storage.\n    code: VOID2007\n\n 20 |     escape(root)\n    |     ^^^^^^\n    Module: /parameter_escape.void\n    Reference type declared here. at /tmp/void-json-readonly-59naez48/parameter_escape.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /parameter_escape.void\n    Reference authority enters this declaration here. at /tmp/void-json-readonly-59naez48/parameter_escape.void:15:19\n\n 15 | func escape(const input: node) -> node:\n    |                   ^^^^^\n    Module: /parameter_escape.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source_sha256": "363cdf51904f29ff6f20593586dad43184e71d57298c69e5766c4575d5a8a3fb",
+      "stack_bytes": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/pattern_recovery_invalid.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/tests/json/pattern_recovery_invalid.void:5:17: error: Type mismatch: expected bool, received /pattern_recovery_invalid.void::kind.\n    code: VOID2001\n\n 5 |     if input is not kind.a:\n   |                 ^^^\n    Module: /pattern_recovery_invalid.void\n    Expected: bool\n    Received: /pattern_recovery_invalid.void::kind\n\n",
+      "source_sha256": "42f7002a0a22c57cc9b3bc504b002c115d85e094805d25359704bbff9292369f",
+      "stack_bytes": 1048576
+    }
+  ],
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  }
+}

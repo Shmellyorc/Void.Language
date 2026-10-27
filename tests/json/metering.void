@@ -1,0 +1,22 @@
+use json as json
+struct first:
+    item: i32
+struct second:
+    item: i32
+struct base:
+    id: i32
+struct record extends base:
+    left: first?
+    right: second?
+    label: string
+    active: bool
+func probe(text: string):
+    if json.parse(text) is Ok(var node):
+        for budget in 1..1024:
+            if json.from_value<record>(node, json.limits(max_work = budget as i64)) is Err(var failure):
+                print("{failure.code}@{failure.offset}:{failure.path}")
+            else:
+                print("ok")
+func main():
+    probe("{{\"id\":7,\"right\":null,\"label\":\"value\",\"active\":true}}")
+    probe("{{\"label\":false,\"extra\":0}}")

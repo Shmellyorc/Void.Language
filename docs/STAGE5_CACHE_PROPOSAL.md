@@ -1,5 +1,13 @@
 # Stage 5: persistent Debug cache proposal
 
+27 October 2026 stabilization update: ordinary CLI runs now automatically use
+the existing cache with IR O2. `--no-opt` has a separate object identity;
+`--no-cache` bypasses persistence. The legacy `--cache` spelling retains its
+no-IR-O2 behavior and status line. See the current
+[cache policy](compiler-health/stabilization/CACHE.md) and
+[verification](compiler-health/stabilization/VERIFICATION.md). The dated Stage 5
+delivery and hosted acceptance below remain historical records.
+
 ## Stage 11 global application isolation
 
 Global-bearing initial compilations and cache hits receive fresh application

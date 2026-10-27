@@ -34,12 +34,13 @@ static int run_cli(int argc, char** argv) {
         const std::string command=argv[1];
         if(command!="check" && command!="run" && command!="emit" && command!="build")
             throw UsageError("Unknown command: "+command);
-        bool optimize=true,cache=false,no_opt=false;
+        bool optimize=true,cache=false,no_cache=false,no_opt=false;
         std::vector<std::string> operands;std::optional<std::filesystem::path> output;
         for(int i=2;i<argc;++i) {
             const std::string arg=argv[i];
             if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
+            else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
             else if(arg=="-o") {
                 if(output || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one output path after -o.");
                 output=vd::utf8_path(argv[i]);
@@ -48,6 +49,8 @@ static int run_cli(int argc, char** argv) {
             else operands.push_back(arg);
         }
         if(cache && command!="run")throw UsageError("--cache is available only for Debug JIT runs.");
+        if(no_cache && command!="run")throw UsageError("--no-cache is available only for JIT runs.");
+        if(cache && no_cache)throw UsageError("--cache and --no-cache cannot be combined.");
         if(output && command!="emit" && command!="build")throw UsageError("-o is available only for emit/build.");
         if(command=="emit" && !output)throw UsageError("emit requires -o <object>.");
         if((command=="check" || command=="emit") && operands.empty())throw UsageError("Expected a file or directory.");
@@ -65,8 +68,8 @@ static int run_cli(int argc, char** argv) {
         vd::require_source_entry(*analysis.program);
         if(command=="run") {
             std::unique_ptr<vd::Jit> jit;
-            if(cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())});
-            else jit=std::make_unique<vd::Jit>();
+            if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())},vd::ir::Emission::entry);
+            else jit=std::make_unique<vd::Jit>(vd::DebugCache{},vd::ir::Emission::entry);
             auto code=jit->compile(*analysis.program,optimize);
             if(cache)std::cerr<<"Debug cache: "<<jit->cache_status()<<'\n';
             auto status=code->invoke(value);
@@ -91,7 +94,7 @@ static int run_cli(int argc, char** argv) {
         return 0;
     } catch(const UsageError& error) {
         std::cerr<<"Invalid invocation: "<<error.what()<<"\nUsage: voidc check <file-or-directory>\n"
-          "       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]\n"
+          "       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]\n"
           "       voidc build [file-or-directory] [-o executable] [--no-opt]\n"
           "       voidc emit <file-or-directory> -o <object> [--no-opt]\n";return 2;
     } catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}

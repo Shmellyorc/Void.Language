@@ -97,7 +97,7 @@ public:
     const std::string& compatibility_contract() const { return contract_; }
     const std::string& constant_contract() const { return constants_; }
     // Lowers the retained validated tree; no filesystem reads or reanalysis.
-    ir::Module lower() const;
+    ir::Module lower(ir::Emission emission = ir::Emission::all) const;
 };
 struct AnalysisResult {
     std::shared_ptr<const ValidatedAnalysis> program;

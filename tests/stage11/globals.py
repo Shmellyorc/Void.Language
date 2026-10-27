@@ -127,10 +127,16 @@ with tempfile.TemporaryDirectory(prefix="VOID globals ") as directory:
         else:
             os.environ["VOID_STDLIB_ROOT"] = prior_standard
     # Fresh cache executions must never serialize live cells or skip startup.
+    # Automatic caching populated other entries above. Give this corruption
+    # probe its own project so the selected artifact belongs to this source.
+    isolated = root / "cache-corruption"
+    isolated.mkdir()
+    cached_source = isolated / "only.void"
+    cached_source.write_bytes((root / "only.void").read_bytes())
     for _ in range(2):
-        result = run([compiler, "run", root / "only.void", "--cache"])
+        result = run([compiler, "run", cached_source, "--cache"])
         assert result.stdout == b"only\n"
-    cache_files = list((root / ".void/cache/v1").glob("*"))
+    cache_files = list((isolated / ".void/cache/v1").glob("*"))
     cache_files = [path for path in cache_files if path.is_file() and len(path.name) == 64]
     if cache_files:
         artifact = cache_files[0]
@@ -138,7 +144,7 @@ with tempfile.TemporaryDirectory(prefix="VOID globals ") as directory:
         assert data[128:129] == b"1"
         body = data[64:128] + b"0" + data[129:]
         artifact.write_bytes(hashlib.sha256(body).hexdigest().encode() + body)
-        repaired = run([compiler, "run", root / "only.void", "--cache"])
+        repaired = run([compiler, "run", cached_source, "--cache"])
         assert repaired.stdout == b"only\n" and b"miss" in repaired.stderr, repaired
     for text in (
         'use "./private.void" as hidden\nfunc main():\n    print(hidden.secret)\n',

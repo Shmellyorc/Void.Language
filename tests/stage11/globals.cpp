@@ -98,13 +98,16 @@ void close_during_root_setup() {
 void cache(const std::filesystem::path& directory) {
     std::filesystem::create_directories(directory);
     auto program = analyze("var counter = 10\nfunc entry(n: i32) -> i32:\n    counter += 1\n    return counter\n");
+    for(bool optimize:{false,true}) {
     vd::Jit jit({directory, std::string(vd::compiler_build_identity())});
-    auto first = jit.compile(*program, false); auto status = jit.cache_status();
+    auto first = jit.compile(*program, optimize); auto status = jit.cache_status();
     check(status == "miss" || status == "hit" || status == "unavailable", "invalid global cache cold status");
     check(first->invoke(0) == 11 && first->invoke(0) == 12, "cached cold global state changed");
-    auto hit = jit.compile(*program, false);
+    auto hit = jit.compile(*program, optimize);
     check(jit.cache_status() == (status == "unavailable" ? "unavailable" : "hit"), "global object cache did not hit");
     check(hit->invoke(0) == 11 && first->invoke(0) == 13, "cache-hit applications shared live cells");
+    check(hit->runtime_owner()!=first->runtime_owner(), "global cache reused a live Runtime");
+    }
 }
 void reload_contracts(bool optimize) {
     const std::string source = "struct box:\n    value: i32\nvar state = box(value = seed())\nvar count: i32 = 2\nfunc seed() -> i32:\n    return 7\nfunc entry(n: i32) -> i32:\n    state.value += n\n    return state.value + (count as i32)\n";

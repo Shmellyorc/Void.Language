@@ -77,7 +77,7 @@ with tempfile.TemporaryDirectory(prefix="void-cache-") as temporary:
     # the ordinary generated frame exceed a Windows stack page, requiring the
     # real ABI stack-probe helper. Exercise fresh source generations and objects.
     source.write_text("func entry(value: i32) -> i32:\n" +
-                      "".join(f'    var text{i} = "root{i}"\n' for i in range(160)) +
+                      "".join(f'    var text{i} = "root{i}"\n' for i in range(640)) +
                       "    return value + 1\n")
     run(mode="miss" if supported else "unavailable")
     run(mode="hit" if supported else "unavailable")

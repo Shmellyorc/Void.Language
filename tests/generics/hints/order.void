@@ -1,0 +1,31 @@
+struct tracker:
+    trace: i32
+    cleanups: i32
+func read(state: tracker, fail: bool) -> result<i32, string>:
+    state.trace = state.trace * 10 + 1
+    if fail:
+        return Err("stop")
+    return Ok(7)
+func later(state: tracker) -> i32:
+    state.trace = state.trace * 10 + 2
+    return 8
+func combine<t>(state: tracker, first: t, second: t) -> t:
+    state.trace = state.trace * 10 + 3
+    return first + second
+func work(state: tracker, fail: bool) -> result<i32, string>:
+    defer {
+        state.cleanups += 1
+    }
+    return Ok(combine(state, read(state, fail)?, later(state)))
+func entry(input: i32) -> i32:
+    var success = tracker()
+    if work(success, false) is Ok(15):
+        if success.trace != 123 or success.cleanups != 1:
+            return -1
+    else:
+        return -2
+    var failure = tracker()
+    if work(failure, true) is Err("stop"):
+        if failure.trace == 1 and failure.cleanups == 1:
+            return 7
+    return -3

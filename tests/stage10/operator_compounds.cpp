@@ -73,8 +73,21 @@ int main(int argc,char** argv){try{
     auto alias=analyze(managed+"left\n"+entry+"    var object = node()\n    var ignored = object + input\n    return input\n")->lower();
     for(auto& f:fresh.functions)if(!f.operator_glyph.empty())for(const auto& a:alias.functions)if(a.name==f.name)f.blocks=a.blocks;
     {bool denied=false;try{vd::ir::validate(fresh);}catch(const std::invalid_argument&){denied=true;}check(denied,"forged compound return authority bypassed storage validation");}
-    auto suspension=file(fixtures/"operator_compound_suspension.void")->lower();bool capture_removed=false;for(auto& f:suspension.functions)if(f.asynchronous)for(auto& b:f.blocks)for(auto& i:b.instructions)if(!capture_removed && i.op==vd::ir::Op::array_capture){i=vd::ir::Instruction{vd::ir::Op::gc_poll};capture_removed=true;}
-    {bool denied=false;try{vd::ir::validate(suspension);}catch(const std::invalid_argument&){denied=true;}check(capture_removed && denied,"async capture initialization was trusted without a write");}
+    auto suspension=file(fixtures/"operator_compound_suspension.void")->lower();
+    auto suspension_source=vd::read_source(fixtures/"operator_compound_suspension.void");
+    auto compound_line=suspension_source.location(suspension_source.text().find("items[0] %=")).line;
+    unsigned capture_mutants=0;
+    for(unsigned fn=0;fn<suspension.functions.size();++fn){const auto& f=suspension.functions[fn];if(f.name!=suspension.entry_symbol)continue;
+        for(unsigned block=0;block<f.blocks.size();++block)for(unsigned instruction=0;instruction<f.blocks[block].instructions.size();++instruction){const auto& i=f.blocks[block].instructions[instruction];
+            // Growable captures use ordinary stores; fixed arrays use
+            // array_capture. Remove each actual compound capture write.
+            if(i.source.line!=compound_line || !(i.op==vd::ir::Op::array_capture || (i.op==vd::ir::Op::store && vd::ir::array_type(f.locals.at(i.a)))))continue;
+            auto bad=suspension;bad.functions[fn].blocks[block].instructions[instruction]=vd::ir::Instruction{vd::ir::Op::gc_poll};
+            bool denied=false;try{vd::ir::validate(bad);}catch(const std::invalid_argument&){denied=true;}
+            check(denied,"async capture initialization was trusted without a write");++capture_mutants;
+        }
+    }
+    check(capture_mutants>0,"async compound capture mutation found no writes");
     auto worker=vd::analyze_project(fixtures/"operator_native_compound_worker.void",vd::native_fixture_project());check(!worker.succeeded(),"compound call edge omitted from worker effect graph");bool effect=false;for(const auto& d:worker.diagnostics)effect|=d.description.find("Worker")!=std::string::npos;check(effect,"compound worker rejection unrelated to effects");
     auto allocations=file(fixtures/"operator_compounds.void");
     for(bool optimized:{false,true}){vd::Jit jit;auto code=jit.compile(*allocations,optimized);bool success=false;unsigned failures=0;for(int budget=0;budget<=8192 && !success;budget=budget<128?budget+1:budget*2){managed_test::Probe p;p.inspect_roots=true;p.frames.reserve(1024);{managed_test::Observe observe(p);try{managed_test::AllocationFailure fault(budget);if(code->invoke(4)!=4)throw std::logic_error("compound allocation retry result");success=true;}catch(const std::bad_alloc&){++failures;}catch(const std::runtime_error&){++failures;}}check(p.roots_valid && p.commits_valid && p.frames.empty(),"compound allocation failure roots/frames");empty(*code->runtime_owner());}check(success && failures>0,"compound allocation sweep did not reach failure and success");}

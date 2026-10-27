@@ -30,6 +30,19 @@ void programs(const std::filesystem::path& root,bool optimized) {
         }
     }
 }
+// Independent of JSON: hints must describe the value the real checker lowers.
+void hints(const std::filesystem::path& root,bool optimized) {
+    for(const auto* name:{"nested_direct","nested_list","nested_dictionary","double_propagate",
+                         "choice_in_argument","choice_pattern","dictionary_identity","order","readonly","await_task_local","await_direct_argument","async_call_argument","spawn_argument","spawn_await","async_methods","async_qualified"}) {
+        auto source=read_source(root/"tests/generics/hints"/(std::string(name)+".void"));
+        auto result=std::string(name)=="async_qualified" ? analyze_project(root/"tests/generics/hints/async_qualified.void") : analyze_source(source);if(!result.succeeded())throw CompilationError(result.diagnostics);
+        auto module=result.program->lower();
+        const auto entry=std::find_if(module.functions.begin(),module.functions.end(),[&](const auto& f){return f.name==module.entry_symbol;});
+        Jit jit;
+        auto code=entry->asynchronous ? jit.compile_async(*result.program,optimized) : jit.compile(*result.program,optimized);
+        require(code->invoke(0)==(std::string(name)=="nested_dictionary"?1:7),"inferred wrapper/payload/branch result");
+    }
+}
 void failures(const std::filesystem::path& root,bool optimized) {
     for(auto [name,answer]:{std::pair{"failures",17},{"initialization",9}}) {
         auto program=compile_project(root/"examples/generics"/(std::string(name)+".void"));auto runtime=std::make_shared<Runtime>(1);Jit jit;
@@ -91,6 +104,24 @@ void identities() {
     require(module.interface_bindings.empty(),"unconstrained generics introduced interface erasure");
     for(bool optimized:{false,true}){Jit jit;auto code=jit.compile(module,module.entry_symbol,optimized);require(code->invoke(7)==14,"nominal generic identity result");}
 }
+void entry_emission() {
+    auto analysis=analyze_source({"entry-emission.void",
+        "var counter = 0\nvar total = initialize()\n"
+        "func initialize() -> i32:\n    counter += 1\n    return 4\n"
+        "func unused() -> i32:\n    return 99\n"
+        "func used() -> i32:\n    return 3\n"
+        "func relay(callback: func() -> i32) -> i32:\n    return callback()\n"
+        "func deferred<t>(input: t) -> t:\n    return input.missing\n"
+        "func entry(input: i32) -> i32:\n    return counter * 100 + total + relay(used)\n"});
+    if(!analysis.succeeded())throw CompilationError(analysis.diagnostics);
+    auto exports=analysis.program->lower();auto closed=analysis.program->lower(ir::Emission::entry);
+    require(closed.functions.size()<exports.functions.size(),"entry emission retained unused body");
+    require(std::none_of(closed.functions.begin(),closed.functions.end(),[](const auto& f){return f.source_name=="unused";}),"unused native body present");
+    require(std::any_of(exports.functions.begin(),exports.functions.end(),[](const auto& f){return f.source_name=="unused";}),"default embedding export disappeared");
+    ir::validate(closed);
+    for(bool optimize:{false,true}){Jit jit({},ir::Emission::entry);auto code=jit.compile(*analysis.program,optimize);
+        require(code->invoke(0)==107 && code->invoke(0)==107,"entry graph lost callback or eager exactly-once initializer");}
+}
 void tooling(const std::filesystem::path& root) {
     const std::string unused="interface readable:\n    func read() -> i32\nstruct node:\n    value: i32\nfunc unused<t: readable>(value: t, other: node) -> t:\n    return value\nfunc entry(x: i32) -> i32:\n    return x\n";
     auto original=analyze_source({"unused-navigation.void",unused});if(!original.succeeded())throw CompilationError(original.diagnostics);
@@ -129,6 +160,6 @@ void reload(const std::filesystem::path& root,bool optimized) {
 }
 }
 int main(int argc,char** argv) {
-    try{require(argc==2,"expected repository root");diagnostics();identities();tooling(argv[1]);for(bool optimize:{false,true}){programs(argv[1],optimize);failures(argv[1],optimize);retirement(argv[1],optimize);reload(argv[1],optimize);}std::cout<<"Generic source, diagnostics, tooling, GC, failures and reload passed\n";}
+    try{require(argc==2,"expected repository root");diagnostics();identities();entry_emission();tooling(argv[1]);for(bool optimize:{false,true}){programs(argv[1],optimize);hints(argv[1],optimize);failures(argv[1],optimize);retirement(argv[1],optimize);reload(argv[1],optimize);}std::cout<<"Generic source, diagnostics, tooling, GC, failures and reload passed\n";}
     catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

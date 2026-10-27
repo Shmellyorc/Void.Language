@@ -1,6 +1,21 @@
 # VOID documentation
 
-## JSON module — research proposal, 27 October 2026
+**STATUS: NEW STANDARD-LIBRARY DEVELOPMENT PAUSED — COMPILER STABILIZATION IN PROGRESS.**
+
+The 27 October compiler stabilization sprint is authorized from
+`1d4ad15f5215838d209e48bb47ac7c3f52b05371`. Follow
+[the active inventory](compiler-health/ISSUES.md) and
+[the engineering record](compiler-health/stabilization/IMPLEMENTATION.md).
+The [cache policy](compiler-health/stabilization/CACHE.md) documents automatic
+optimized runs, `--no-cache` and the retained legacy `--cache` behavior.
+The [review handoff](compiler-health/stabilization/HANDOFF.md) links final
+measurements, verification and frozen evidence. Local engineering is complete;
+independent acceptance remains pending.
+Existing generated JSON adapters may be repaired for compiler performance.
+The hold remains until independent Golden Wrench review and Boss authorization
+to resume. Earlier dated sections below remain historical.
+
+## Historical JSON module research proposal, 27 October 2026
 
 The [source audit and feasibility report](json/RESEARCH.md),
 [proposed API/data contract](json/DESIGN.md) and

@@ -174,7 +174,7 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     version(config.driver,"clang version 19.1.7",work/"version.txt");
     if(!config.linker.empty())version(config.linker,"LLD 19.1.7",work/"version.txt");
     const auto object=work/"program.o";
-    emit_object(analysis.lower(),object,optimize,true);
+    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true);
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
     args.insert(args.end(),config.flags.begin(),config.flags.end());

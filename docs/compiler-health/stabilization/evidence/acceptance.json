@@ -1,0 +1,40 @@
+[
+  {
+    "profile": "release",
+    "receipt": "docs/json/evidence/implementation/acceptance-release-1793118874837282109.json",
+    "passed": 94,
+    "failed": 0,
+    "seconds": 289.43209624290466,
+    "voidc": "fc2fa48b34678e4082456cddad78e0fd62d60934673a409d23a301ad4525f1f2",
+    "environment": {
+      "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/json/evidence/implementation/incidents",
+      "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+    }
+  },
+  {
+    "profile": "debug",
+    "receipt": "docs/json/evidence/implementation/acceptance-debug-1793118701113778258.json",
+    "passed": 94,
+    "failed": 0,
+    "seconds": 980.9523594379425,
+    "voidc": "05ebd7496bfeea13e06dd31ec3082d921003cd93dfbaf1fb655774a3bf604479",
+    "environment": {
+      "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/json/evidence/implementation/incidents",
+      "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+    }
+  },
+  {
+    "profile": "san",
+    "receipt": "docs/json/evidence/implementation/acceptance-san-1793119282860763137.json",
+    "passed": 93,
+    "failed": 0,
+    "seconds": 827.6416528224945,
+    "voidc": "b853f4441cca06f7907ebefd8de115d29e5ab1b54ae55f4b7dd4c540feb12a52",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/json/evidence/implementation/incidents",
+      "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+    }
+  }
+]

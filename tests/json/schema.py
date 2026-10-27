@@ -61,9 +61,9 @@ with tempfile.TemporaryDirectory(prefix='void-json-schema-') as tmp:
         assert b'ten numeric primitive' in r.stderr,r.stderr
     src=h.ROOT/'tests/json/task_rejected.void'
     r=h.run([h.compiler,'check',src],src,status=1)
-    # Existing generic inference selects the task's result type. Ordinary
-    # argument checking rejects the task before any JSON adapter can run.
-    assert b'VOID2001' in r.stderr and b'Type mismatch' in r.stderr and b'$task:' in r.stderr,r.stderr
+    # The shared async hint now infers the actual task wrapper, so JSON's
+    # ordinary schema admission must reject the unsupported task itself.
+    assert b'JSON does not support' in r.stderr and b'task' in r.stderr,r.stderr
     for accessor in ['at(0)','as_array()']:
         src=tmp/'readonly_node.void'
         expression='take(child)' if accessor=='at(0)' else 'take(child[0])'

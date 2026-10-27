@@ -15,6 +15,31 @@
 #include <limits>
 #include <stdexcept>
 namespace vd::ir {
+void retain_entry(Module& module) {
+    std::map<std::string,std::size_t> functions;
+    for(std::size_t n=0;n<module.functions.size();++n)functions.emplace(module.functions[n].name,n);
+    std::set<std::string> retained;
+    std::vector<std::string> pending;
+    auto keep=[&](const std::string& name){if(functions.contains(name) && retained.insert(name).second)pending.push_back(name);};
+    if(!functions.contains(module.entry_symbol))throw std::invalid_argument("Missing emission entry");
+    keep(module.entry_symbol);
+    // Globals are eager, ordered application state, including imported globals.
+    for(const auto& global:module.globals)keep(global.initializer);
+    // Generation metadata describes complete dispatch families. Conservatively
+    // retain these families even when no source call currently exercises them.
+    for(const auto& function:module.functions)if(!function.virtual_slot.empty())keep(function.name);
+    for(const auto& binding:module.interface_bindings)
+        for(const auto& [name,method]:binding.methods){(void)name;keep(method.second);}
+    while(!pending.empty()) {
+        auto name=std::move(pending.back());pending.pop_back();
+        for(const auto& block:module.functions[functions.at(name)].blocks)
+            for(const auto& instruction:block.instructions)keep(instruction.callee);
+        // Calls, async/spawn wrappers, constructor variants, cleanup closures,
+        // function values and bound-method adapters all carry ordinary callee
+        // identities. Indirect calls consume those compiler-owned function IDs.
+    }
+    std::erase_if(module.functions,[&](const auto& function){return !retained.contains(function.name);});
+}
 bool operator_arity(std::string_view glyph,std::size_t arity) {
     if(arity==1)return glyph=="+" || glyph=="-";
     return arity==2 && (glyph=="+" || glyph=="-" || glyph=="*" || glyph=="/" || glyph=="%" || glyph=="==" || glyph=="<" || glyph==">" || glyph=="<=" || glyph==">=");

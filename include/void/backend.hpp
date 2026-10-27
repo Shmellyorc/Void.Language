@@ -10,7 +10,7 @@ class ToolingSession;
 class SessionAnalysis;
 class Jit {
 public:
-    explicit Jit(DebugCache cache = {});
+    explicit Jit(DebugCache cache = {}, ir::Emission emission = ir::Emission::all);
     const std::string& cache_status() const;
     ~Jit();
     // Symbol mutation and compilation are serialized by the development host.

@@ -1748,7 +1748,7 @@ class Semantics {
         const auto result=call_arguments(e,target,type_level?0:1);
         return e.type=result;
     }
-    VOID_SEMANTIC_HANDLER Type method_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type method_expression(Expr& e) {
         if(!e.argument_indexes.empty())return e.type;
         if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
         if(text_type_base(*e.parts[0]))return text_type_call(e);
@@ -1769,7 +1769,6 @@ class Semantics {
             if(receiver.nullable)error(source,e.token,Code::type_mismatch,"Task cancellation requires a non-null handle.");
             e.kind=Expr::Kind::task_cancel;return e.type=Type::none;
         }
-        (void)expected;
         return resolved_method_expression(e,receiver);
     }
     // Resolve the receiver before reserving mutation/member-check temporaries.
@@ -2100,7 +2099,8 @@ class Semantics {
         if(kind==Expr::Kind::call) {
             auto [owner,structure]=structure_lookup(unit,root,units,qualified.qualifier+"."+e.token.text,qualified.qualifier_token);
             if(structure){auto& concrete=concrete_structure(e,*owner,*structure,1);return Type(concrete.definition,concrete.definition->managed?Type::managed_ref:Type::aggregate);}
-            return concrete_function(e,resolve(qualified),1).result;
+            const auto& target=concrete_function(e,resolve(qualified),1);
+            return call_result_anchor(target);
         }
         return anchor(qualified);
     }
@@ -2114,6 +2114,9 @@ class Semantics {
                 if(!type){known=false;break;}operands.push_back(*type);
             }
             if(known){auto selected=ir::select_operator(*root.member_catalog,e.op,operands,unit.identity,lexical_owner());if(selected.status==ir::MemberSelection::found)for(const auto& f:root.member_catalog->functions)if(f.name==selected.method)return f.result;}
+        // Builtin arithmetic uses the original child anchors. Do not walk the
+        // same children again after failing to select a custom operator.
+        for(const auto& hint:hints)if(hint)return hint;
         return {};
     }
     // Keep name/global resolution temporaries out of recursive hint frames so
@@ -2143,6 +2146,90 @@ class Semantics {
         return {};
     }
 
+    template<class Target> VOID_SEMANTIC_HANDLER std::optional<Type> call_result_anchor(const Target& target) {
+        if(target.asynchronous)return unit.make_task(target.result);
+        return target.result;
+    }
+    // These projections are type-only. Keep their Type temporaries out of
+    // every recursive receiver hint's frame, including in Debug builds.
+    VOID_SEMANTIC_HANDLER std::optional<Type> projected_anchor(Expr& e) {
+        auto operand=anchor(*e.parts[0]);
+        if(!operand)return {};
+        if(e.kind==Expr::Kind::spawned)return unit.make_task(*operand);
+        if(e.kind==Expr::Kind::propagate)
+            return operand->definition && operand->definition->result_type
+                ? std::optional<Type>(ir::field_type(*operand,1)) : std::nullopt;
+        if(!operand->definition || !operand->definition->task_result ||
+           operand->kind!=Type::managed_ref || operand->nullable || operand->construction)return {};
+        return Type(*operand->definition->task_result)==Type::none ? Type::none : ir::field_type(*operand,1);
+    }
+    VOID_SEMANTIC_HANDLER std::optional<Type> choice_anchor(Expr& e) {
+        // The condition may introduce pattern bindings. Ordinary checking owns
+        // those bindings; a hint only considers the value branches.
+        if(auto branch=anchor(*e.parts[1]))return branch;
+        return anchor(*e.parts[2]);
+    }
+
+    // Separate handlers keep the recursive dispatcher small at the supported
+    // 1 MiB stack size without changing its shared semantic-depth budget.
+    VOID_SEMANTIC_HANDLER std::optional<Type> indexed_anchor(Expr& e) {
+        using K=Expr::Kind;
+        auto owner=anchor(*e.parts[0]);
+        if(owner && owner->kind==Type::string && e.kind==K::array_index)return text_anchor();
+        if(owner && owner->kind==Type::dictionary && e.kind==K::array_index)return ir::dictionary_value(*owner);
+        if(owner && ir::array_type(*owner)) return e.kind==K::array_slice?slice_type(*owner):ir::array_element(*owner);
+        return {};
+    }
+    VOID_SEMANTIC_HANDLER std::optional<Type> method_anchor(Expr& e) {
+        using K=Expr::Kind;
+        if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
+        if(text_type_base(*e.parts[0]) && e.token.text=="from_utf8")return text_result_anchor();
+        if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
+        if (module_call(e)) {
+            return qualified_anchor(e,K::call);
+        }
+        auto receiver = anchor(*e.parts[0]);
+        if (!receiver) return std::nullopt;
+        if(receiver->kind==Type::string && e.token.text=="to_utf8")return byte_list_anchor();
+        if(ir::collection_type(*receiver) && (e.token.text=="get" || (receiver->kind==Type::growable_array && e.token.text=="pop")))return core_result_anchor(*receiver);
+        if(numeric::number(*receiver) && numeric::member(e.token.text))return *receiver;
+        if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
+        if(auto* specialized=concrete_method(e,*receiver))return call_result_anchor(*specialized);
+        auto selected=member(*receiver,e.token,true);
+        if(selected.function)return call_result_anchor(*selected.function);
+        return {};
+    }
+    VOID_SEMANTIC_HANDLER std::optional<Type> call_anchor(Expr& e) {
+        if(e.token.text=="$interpolation" || e.token.text=="$hole")return text_anchor();
+        if(e.target.starts_with("$display.") || display_prelude(e))return e.token.text=="string"?text_anchor():text_result_anchor();
+        if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
+        if(auto* value=lookup(e.token.text);value && value->type.definition && value->type.definition->callable)return Type(*value->type.definition->call_result);
+        if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
+        auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
+        if (structure) {auto& concrete=concrete_structure(e,*owner,*structure);return Type(concrete.definition,concrete.definition->interface_type?Type::interface_ref:concrete.definition->managed?Type::managed_ref:Type::aggregate);}
+        const auto& target=concrete_function(e,resolve(e));
+        return call_result_anchor(target);
+    }
+    VOID_SEMANTIC_HANDLER std::optional<Type> field_anchor(Expr& e) {
+        using K=Expr::Kind;
+        if (auto [owner, declaration] = enum_declaration(e); declaration) {
+            return Type(declaration->definition);
+        }
+        if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
+        const auto& operand = *e.parts[0];
+        if (operand.kind == K::name && !lookup(operand.token.text) && unit.qualifiers.contains(operand.token.text)) {
+            return qualified_anchor(e,K::name);
+        }
+        auto base = anchor(*e.parts[0]);
+        if(base && ((base->kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length")) || (ir::collection_type(*base) && e.token.text=="count")))return Type::i64;
+        if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
+            auto selected=member(*base,e.token);
+            if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
+            if(selected.function->accessor==1)return selected.function->result;
+        }
+        return {};
+    }
+
     // Hints resolve typed anchors without prematurely defaulting untyped literals.
     std::optional<Type> anchor(Expr& e) {
         try {
@@ -2159,63 +2246,17 @@ class Semantics {
         }
         if (e.kind == K::conversion) return e.type;
         if (e.kind == K::global) return e.type;
+        if (e.kind==K::spawned || e.kind==K::propagate || e.kind==K::awaited)return projected_anchor(e);
+        if (e.kind==K::choice)return choice_anchor(e);
         if (e.kind == K::name) {
             return name_anchor(e);
         }
-        if(e.kind==K::array_index || e.kind==K::array_slice) {
-            auto owner=anchor(*e.parts[0]);
-            if(owner && owner->kind==Type::string && e.kind==K::array_index)return text_anchor();
-            if(owner && owner->kind==Type::dictionary && e.kind==K::array_index)return ir::dictionary_value(*owner);
-            if(owner && ir::array_type(*owner)) return e.kind==K::array_slice?slice_type(*owner):ir::array_element(*owner);
-            return {};
-        }
-        if(e.kind==K::array_literal) return {};
-        if (e.kind == K::method_call) {
-            if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
-            if(text_type_base(*e.parts[0]) && e.token.text=="from_utf8")return text_result_anchor();
-            if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
-            if (module_call(e)) {
-                return qualified_anchor(e,K::call);
-            }
-            auto receiver = anchor(*e.parts[0]);
-            if (!receiver) return std::nullopt;
-            if(receiver->kind==Type::string && e.token.text=="to_utf8")return byte_list_anchor();
-            if(ir::collection_type(*receiver) && (e.token.text=="get" || (receiver->kind==Type::growable_array && e.token.text=="pop")))return core_result_anchor(*receiver);
-            if(numeric::number(*receiver) && numeric::member(e.token.text))return *receiver;
-            if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
-            if(auto* specialized=concrete_method(e,*receiver))return specialized->result;
-            auto selected=member(*receiver,e.token,true);
-            return selected.function ? std::optional<Type>(selected.function->result) : std::nullopt;
-        }
-        if (e.kind == K::call) {
-            if(e.token.text=="$interpolation" || e.token.text=="$hole")return text_anchor();
-            if(e.target.starts_with("$display.") || display_prelude(e))return e.token.text=="string"?text_anchor():text_result_anchor();
-            if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
-            if(auto* value=lookup(e.token.text);value && value->type.definition && value->type.definition->callable)return Type(*value->type.definition->call_result);
-            if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
-            auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
-            if (structure) {auto& concrete=concrete_structure(e,*owner,*structure);return Type(concrete.definition,concrete.definition->interface_type?Type::interface_ref:concrete.definition->managed?Type::managed_ref:Type::aggregate);}
-            return concrete_function(e,resolve(e)).result;
-        }
-        if (e.kind == K::field) {
-            if (auto [owner, declaration] = enum_declaration(e); declaration) {
-                return Type(declaration->definition);
-            }
-            if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
-            const auto& operand = *e.parts[0];
-            if (operand.kind == K::name && !lookup(operand.token.text) && unit.qualifiers.contains(operand.token.text)) {
-                return qualified_anchor(e,K::name);
-            }
-            auto base = anchor(*e.parts[0]);
-            if(base && ((base->kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length")) || (ir::collection_type(*base) && e.token.text=="count")))return Type::i64;
-            if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
-                auto selected=member(*base,e.token);
-                if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
-                if(selected.function->accessor==1)return selected.function->result;
-            }
-            return {};
-        }
-        if((e.kind==K::binary || e.kind==K::unary) && (e.op=="+" || e.op=="-" || e.op=="*" || e.op=="/" || e.op=="%"))if(auto selected=operator_anchor(e))return selected;
+        if(e.kind==K::array_index || e.kind==K::array_slice)return indexed_anchor(e);
+        if(e.kind==K::array_literal || e.kind==K::dictionary_literal) return {};
+        if(e.kind == K::method_call)return method_anchor(e);
+        if(e.kind == K::call)return call_anchor(e);
+        if(e.kind == K::field)return field_anchor(e);
+        if((e.kind==K::binary || e.kind==K::unary) && (e.op=="+" || e.op=="-" || e.op=="*" || e.op=="/" || e.op=="%"))return operator_anchor(e);
         if (e.op == "not" || e.op == "and" || e.op == "or" || e.op == "==" || e.op == "!=" || e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") return Type::boolean;
         for (auto& part : e.parts) if (auto t = anchor(*part)) return t;
         return {};
@@ -2461,7 +2502,9 @@ class Semantics {
         if(e.parts[0]->kind==Expr::Kind::name)if(auto* variable=lookup(e.parts[0]->token.text))type.readonly|=variable->readonly;
         editor_candidates(e,type);
     }
-    Type expression_impl(Expr& e, std::optional<Type> expected) {
+    // Borrow context through dispatch; handlers that infer a collection context
+    // own their copy. Per-branch copies inflate every recursive Debug frame.
+    Type expression_impl(Expr& e, const std::optional<Type>& expected) {
         if(editor_cursor(e) && e.kind==Expr::Kind::name) editor_name_candidates(e,expected);
         switch (e.kind) {
         case Expr::Kind::spawned:return spawned_expression(e);
@@ -2492,7 +2535,7 @@ class Semantics {
         case Expr::Kind::call:
             if(e.token.text=="Ok" || e.token.text=="Err")return result_expression(e,expected);
             return call_expression(e);
-        case Expr::Kind::method_call: return method_expression(e, expected);
+        case Expr::Kind::method_call: return method_expression(e);
         case Expr::Kind::conversion: return conversion_expression(e);
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
@@ -2502,7 +2545,7 @@ class Semantics {
         if(!current)error(source,e.token,Code::constant_call,"Patterns require a function body; compile-time pattern evaluation is not implemented.");
         auto subject=expression(*e.parts[0]);if(!pattern_bindings)scopes.emplace_back();check_pattern(e.patterns[0],subject);if(!pattern_bindings)scopes.pop_back();return e.type=Type::boolean;
     }
-    VOID_SEMANTIC_HANDLER Type match_expression(Expr& e,std::optional<Type> expected){
+    VOID_SEMANTIC_HANDLER Type match_expression(Expr& e,const std::optional<Type>& expected){
         if(!current)error(source,e.token,Code::constant_call,"Patterns require a function body; compile-time pattern evaluation is not implemented.");return check_match(e,expected);
     }
     VOID_SEMANTIC_HANDLER Type propagate_expression(Expr& e){
@@ -2614,7 +2657,7 @@ class Semantics {
     }
     // Keep the result signature's Function temporary out of the recursive
     // expression dispatcher, including when Release would inline this handler.
-    VOID_SEMANTIC_HANDLER Type result_expression(Expr& e,std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type result_expression(Expr& e,const std::optional<Type>& expected) {
         if(!expected || !expected->definition || !expected->definition->result_type)error(source,e.token,Code::type_mismatch,"Ok/Err require a contextual result<t, e> type.","Annotate the variable or the enclosing function result.");
         auto target=result_editor_target(*expected,e.token.text=="Ok"?0:1,e.token);
         if(diagnostics.editor)editor_call(e,target,0,false);
@@ -2665,7 +2708,8 @@ class Semantics {
         if(diagnostics.editor && call){Function target;target.token=e.token;target.result=Type(structure->definition);for(unsigned i=0;i<found->count;++i){const auto& field=structure->fields[found->begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,found->begin+i)});}auto docs=source_documentation(owner->source,structure->case_tokens[found-variants.begin()].offset);editor_call(e,target,1,false,&docs);}
         auto result=sum_expression(e,Type(structure->definition),static_cast<unsigned>(found-variants.begin()),1);e.target=structure->definition->identity+"::variant::"+found->name;return result;
     }
-    VOID_SEMANTIC_HANDLER Type dictionary_expression(Expr& e,std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type dictionary_expression(Expr& e,const std::optional<Type>& context) {
+        auto expected=context;
         if(!expected){
             if(e.parts.empty())error(source,e.token,Code::unsupported_type,"Empty dictionary literal requires a typed context.");
             std::optional<Type> key,value;for(unsigned n=0;n<e.parts.size();n+=2){if(!key)key=anchor(*e.parts[n]);if(!value)value=anchor(*e.parts[n+1]);}
@@ -2677,7 +2721,8 @@ class Semantics {
         for(unsigned n=0;n<e.parts.size();n+=2){expect(expression(*e.parts[n],ir::dictionary_key(*expected)),ir::dictionary_key(*expected),e.parts[n]->token);expect(expression(*e.parts[n+1],ir::dictionary_value(*expected)),ir::dictionary_value(*expected),e.parts[n+1]->token);}
         return e.type=*expected;
     }
-    VOID_SEMANTIC_HANDLER Type array_expression(Expr& e,std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type array_expression(Expr& e,const std::optional<Type>& context) {
+        auto expected=context;
         if(!expected) {
             if(e.parts.empty())error(source,e.token,Code::unsupported_type,"An empty array literal requires contextual typing.");
             std::optional<Type> element;
@@ -2744,7 +2789,7 @@ class Semantics {
         expect(expression(*e.parts[2],result),result,e.parts[2]->token);
         return e.type=result;
     }
-    VOID_SEMANTIC_HANDLER Type literal_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type literal_expression(Expr& e, const std::optional<Type>& expected) {
         if (e.token.text == "null") {
             if(expected && expected->definition && expected->definition->callable && expected->nullable){e.kind=Expr::Kind::function_null;return e.type=*expected;}
             if (!expected || !ir::reference_value(*expected) || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable managed-reference context.","Use a type annotation such as node?.");
@@ -2801,7 +2846,7 @@ class Semantics {
         if(v->task_group)error(source,e.token,Code::unsupported_type,"Task group aliases are lexical scopes, not first-class values; jobs.spawn is deferred.");
         e.slot = v->slot; return e.type = v->type;
     }
-    VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, const std::optional<Type>& expected) {
         using K = Expr::Kind;
         auto& base = *e.parts[0];
         if(text_type_base(base)){if(editor_cursor(e))editor_field_candidates(e,Type::string);error(source,e.token,Code::unknown_method,"String type methods require a call.");}
@@ -3277,7 +3322,7 @@ class Semantics {
         if(numeric::integer(type) && (s.op=="/=" || s.op=="%=") && s.expression->kind==Expr::Kind::literal && s.expression->value==0)
             error(source,s.expression->token,Code::zero_divisor,"Division or remainder by zero.");
     }
-    VOID_SEMANTIC_HANDLER Type unary_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type unary_expression(Expr& e, const std::optional<Type>& expected) {
         auto left = expression(*e.parts[0], e.op == "not" ? std::optional<Type>(Type::boolean) : expected);
         if (left == error_type) return error_type;
         if(e.op!="not" && operator_expression(e,{left}))return e.type;
@@ -3285,7 +3330,7 @@ class Semantics {
         else if (!numeric::number(left)) error(source,e.token,Code::numeric_operator,"Type mismatch: unary arithmetic requires a numeric operand.");
         return e.type = left;
     }
-    VOID_SEMANTIC_HANDLER Type binary_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type binary_expression(Expr& e, const std::optional<Type>& expected) {
         using K = Expr::Kind;
         bool logical = e.op == "and" || e.op == "or";
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
@@ -6229,8 +6274,11 @@ struct AnalysisAccess {
         return result;
     }
 };
-ir::Module ValidatedAnalysis::lower() const {
-    auto module = lower_(); module.constant_contract = constants_; module.analysis = shared_from_this(); return module;
+ir::Module ValidatedAnalysis::lower(ir::Emission emission) const {
+    auto module = lower_(); module.constant_contract = constants_; module.analysis = shared_from_this();
+    // The complete graph has already passed checking and typed-IR validation.
+    if(emission==ir::Emission::entry)ir::retain_entry(module);
+    return module;
 }
 AnalysisResult analyze_source(const SourceFile& source) {
     try { auto program=validated_source(source);return {program,program->warnings()}; }

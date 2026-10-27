@@ -1,0 +1,8 @@
+use json as json
+func nested(text: string) -> result<string, json.error>:
+    return Ok(json.stringify(json.parse_as<i32>(text)?)?)
+func main():
+    if nested("7") is Ok(var encoded):
+        print(encoded)
+    if nested("false") is Err(var failure):
+        print(failure.code)

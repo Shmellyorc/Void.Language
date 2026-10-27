@@ -51,7 +51,15 @@ int main(int argc,char**argv){try{
         std::filesystem::remove_all(root/".void");write(root/".void","blocked");auto unavailable=jit.compile(*a,false);require(jit.cache_status()=="unavailable" && unavailable->invoke(7)==47,"filesystem fallback");std::filesystem::remove(root/".void");
     }
     {vd::Jit changed_build({root,identity+"different"});require(changed_build.compile(*a,false)->invoke(7)==47 && changed_build.cache_status()!=("hit"),"build invalidation");}
-    {auto optimized=jit.compile(*a,true);require(optimized->invoke(7)==47 && jit.cache_status()==(identity.empty()?"unavailable":"disabled"),"optimized persistence bypass");}
+    {auto optimized=jit.compile(*a,true);require(optimized->invoke(7)==47 && jit.cache_status()==(supported?"miss":"unavailable"),"optimized mode cache separation");
+     vd::Jit fresh({root,identity});auto reused=fresh.compile(*a,true);
+     require(reused->invoke(7)==47 && fresh.cache_status()==(supported?"hit":"unavailable"),"optimized fresh JIT cache hit");
+     require(reused->runtime_owner()!=optimized->runtime_owner(),"cached object shared Runtime state");
+     vd::Jit changed_build({root,identity+"different"});
+     require(changed_build.compile(*a,true)->invoke(7)==47 && changed_build.cache_status()!="hit","optimized build invalidation");
+     vd::Jit entry_only({root,identity},vd::ir::Emission::entry);
+     require(entry_only.compile(*a,true)->invoke(7)==47 && entry_only.cache_status()==(supported?"miss":"unavailable"),"entry/export cache separation");
+     require(entry_only.compile(*a,true)->invoke(7)==47 && entry_only.cache_status()==(supported?"hit":"unavailable"),"entry-emission warm cache");}
     {vd::Jit custom({root,identity});custom.bind("cache_unused_import",identity_import);require(custom.compile(*a,false)->invoke(7)==47 && custom.cache_status()==(identity.empty()?"unavailable":"disabled"),"custom import persistence bypass");}
     old.reset();hit.reset();require(slot.invoke(7)==48,"retired old generation");empty(*runtime);
     std::cout<<"cache generations, source/build invalidation, revisions, roots, failures and fallback passed\n";return 0;
