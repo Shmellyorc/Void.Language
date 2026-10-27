@@ -1,5 +1,12 @@
 // Capability/effect analysis consumes the nominally checked AST. Logical leaf
 // operations are shared with the independent IR verifier; no runtime permission tags exist.
+VOID_SEMANTIC_HANDLER bool scalar_numeric_call(const Expr& expression) {
+    if (!numeric::number(expression.type)) return false;
+    // Exactly the two existing compiler-owned scalar kernels. Source/native
+    // function spellings cannot acquire this private target identity.
+    return expression.target==numeric::symbol(expression.type,"abs") ||
+           expression.target==numeric::symbol(expression.type,"clamp");
+}
 void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Diagnostics& diagnostics) {
     using ir::ReferenceFacts;
     using ir::ReferenceFact;
@@ -199,7 +206,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
             if(e.target.starts_with("$time.") && temporal::operations.at(std::stoul(e.target.substr(6))).clock)edges.unsafe=true;
             if(e.target == "$random.seed") edges.unsafe=true;
-            const bool intrinsic = e.target == "$random.xor" || e.target == "$random.domain" || e.target == "$random.seed" || e.target.starts_with("$collection.") ||
+            const bool intrinsic = scalar_numeric_call(e) || e.target.starts_with("$math.") || e.target == "$random.xor" || e.target == "$random.domain" || e.target == "$random.seed" || e.target.starts_with("$collection.") ||
                 e.target.starts_with("$array.") || e.target.starts_with("$dict.") ||
                 e.target.starts_with("$convert.") || e.target == "$temporal.result" ||
                 e.target.starts_with("$time.") || e.target.starts_with("$layout.") ||

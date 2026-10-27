@@ -29,6 +29,16 @@ auto check_constraints=[&](Unit& caller,Unit& owner,const std::vector<GenericPar
 for(auto& [id,u]:units) {
     u->specialize_function=[&](Unit& caller,Unit& owner,Function& generic,const std::vector<Type>& arguments,const Token& site,unsigned depth,Type receiver)->Function& {
         if(arguments.size()!=generic.generics.size())error(caller.source,site,Code::argument_count,"Incorrect number of generic type arguments.");
+        // Canonical Math's public contract is primitive-only even when nominal
+        // custom arithmetic/comparison operators could satisfy its source body.
+        if(owner.identity==math::source_module && !generic.receiver &&
+           (math::numeric_function(generic.token.text) || math::floating_function(generic.token.text))) {
+            const bool floating=math::floating_function(generic.token.text);
+            if(arguments.size()!=1 || !(floating?numeric::floating(arguments[0]):numeric::number(arguments[0])))
+                error(caller.source,site,Code::unsupported_type,floating?
+                      "Math function '"+generic.token.text+"' requires exactly f32 or f64.":
+                      "Math function '"+generic.token.text+"' requires a numeric primitive, excluding bool, enums and nominal types.");
+        }
         const auto method_name=generic.receiver?specialization_name(caller.source,site,generic.token.text,arguments):std::string{};
         const auto name=generic.receiver?receiver.definition->identity+"::method::"+method_name:specialization_name(caller.source,site,generic.symbol,arguments);
         if(auto found=owner.specialized_functions.find(name);found!=owner.specialized_functions.end())return *found->second;

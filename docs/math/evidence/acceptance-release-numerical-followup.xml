@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="80"
+	timestamp="2026-10-26T23:47:03"
+	>
+	<testcase name="math_execution" classname="math_execution" time="79.6252" status="run">
+		<properties/>
+		<system-out>Math check: 1372 vectors, 59675 source bytes
+Math JIT O0
+Math linked AOT O0
+Math JIT O2
+Math linked AOT O2
+Math execution: 1372 vectors x four real modes; 7 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="math_stack" classname="math_stack" time="80.7856" status="run">
+		<properties/>
+		<system-out>Math check: 1372 vectors, 59675 source bytes
+Math JIT O0
+Math linked AOT O0
+Math JIT O2
+Math linked AOT O2
+Math execution: 1372 vectors x four real modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+</testsuite>

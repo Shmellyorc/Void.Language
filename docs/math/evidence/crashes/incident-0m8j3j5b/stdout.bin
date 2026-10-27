@@ -1,0 +1,109 @@
+Content-Length: 600
+
+{"id":1,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":2,"jsonrpc":"2.0"}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":3,"jsonrpc":"2.0"}Content-Length: 459
+
+{"id":4,"jsonrpc":"2.0","result":{"documentChanges":[{"edits":[{"newText":"score","range":{"end":{"character":16,"line":1},"start":{"character":11,"line":1}}},{"newText":"score","range":{"end":{"character":29,"line":2},"start":{"character":24,"line":2}}},{"newText":"score","range":{"end":{"character":28,"line":3},"start":{"character":23,"line":3}}}],"textDocument":{"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void","version":1}}]}}Content-Length: 234
+
+{"id":5,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"string(value: f64) -> string\n\nDisplay a value using invariant type-aware text."},"range":{"end":{"character":20,"line":0},"start":{"character":14,"line":0}}}}Content-Length: 310
+
+{"id":6,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"format(value: i32, spec: string) -> result<string, string>\n\nFormat a value using invariant patterns; invalid specifications return Err with a byte offset."},"range":{"end":{"character":22,"line":3},"start":{"character":16,"line":3}}}}Content-Length: 186
+
+{"id":7,"jsonrpc":"2.0","result":{"range":{"end":{"character":16,"line":1},"start":{"character":11,"line":1}},"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 338
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found 'return'.","range":{"end":{"character":14,"line":5},"start":{"character":8,"line":5}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":8,"jsonrpc":"2.0"}Content-Length: 278
+
+{"id":9,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"format(value: i32, spec: string) -> result<string, string>","parameters":[{"label":"value: i32"},{"documentation":"The invariant format specification.","label":"spec: string"}]}]}}Content-Length: 358
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2009","message":"format at byte 3: Required fraction follows optional digit","range":{"end":{"character":34,"line":2},"start":{"character":33,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":10,"jsonrpc":"2.0"}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":11,"jsonrpc":"2.0"}Content-Length: 187
+
+{"id":12,"jsonrpc":"2.0","result":{"range":{"end":{"character":16,"line":1},"start":{"character":11,"line":1}},"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":13,"jsonrpc":"2.0"}Content-Length: 187
+
+{"id":14,"jsonrpc":"2.0","result":{"range":{"end":{"character":25,"line":2},"start":{"character":19,"line":2}},"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 234
+
+{"id":15,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"public string() -> string\nDeclared by /main.void::record\nEffects: synchronous"},"range":{"end":{"character":22,"line":9},"start":{"character":16,"line":9}}}}Content-Length: 332
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1102","message":"Expected a lowercase identifier.","range":{"end":{"character":16,"line":9},"start":{"character":16,"line":9}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":16,"jsonrpc":"2.0"}Content-Length: 398
+
+{"id":17,"jsonrpc":"2.0","result":[{"detail":"result<string, string>","documentation":"","kind":2,"label":"format","textEdit":{"newText":"format","range":{"end":{"character":16,"line":9},"start":{"character":16,"line":9}}}},{"detail":"string","documentation":"","kind":2,"label":"string","textEdit":{"newText":"string","range":{"end":{"character":16,"line":9},"start":{"character":16,"line":9}}}}]}Content-Length: 342
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":0,"line":10},"start":{"character":0,"line":10}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":18,"jsonrpc":"2.0"}Content-Length: 241
+
+{"id":19,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"format(spec: string) -> result<string, string>","parameters":[{"documentation":"The custom format specification.","label":"spec: string"}]}]}}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":20,"jsonrpc":"2.0"}Content-Length: 162
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/error.void"}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/time.void"}}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":21,"jsonrpc":"2.0"}Content-Length: 403
+
+{"id":22,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"make_date(year: i64, month: i64, day: i64) -> result</@stdlib/time.void::date, /@stdlib/time.void::error>\n\nValidate and construct a Gregorian calendar date.\n\nReturns: Validated value on success; a managed temporal error on invalid data or range."},"range":{"end":{"character":16,"line":2},"start":{"character":7,"line":2}}}}Content-Length: 188
+
+{"id":23,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":427},"start":{"character":5,"line":427}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/time.void"}}Content-Length: 332
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1102","message":"Expected a lowercase identifier.","range":{"end":{"character":19,"line":3},"start":{"character":19,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":24,"jsonrpc":"2.0"}Content-Length: 1521
+
+{"id":25,"jsonrpc":"2.0","result":[{"detail":"i64","documentation":"Read the validated day component.\n\nReturns: The stored validated component without changing this value.","kind":10,"label":"day","textEdit":{"newText":"day","range":{"end":{"character":19,"line":3},"start":{"character":19,"line":3}}}},{"detail":"result<string, /@stdlib/time.void::error>","documentation":"Format this temporal value with an invariant pattern.\n\nReturns: Validated value on success; a managed temporal error on invalid data or range.","kind":2,"label":"format","textEdit":{"newText":"format","range":{"end":{"character":19,"line":3},"start":{"character":19,"line":3}}}},{"detail":"i64","documentation":"Read the validated month component.\n\nReturns: The stored validated component without changing this value.","kind":10,"label":"month","textEdit":{"newText":"month","range":{"end":{"character":19,"line":3},"start":{"character":19,"line":3}}}},{"detail":"string","documentation":"Render the default invariant temporal display.\n\nReturns: Owned invariant display text; checked Runtime failure if default formatting fails.","kind":2,"label":"string","textEdit":{"newText":"string","range":{"end":{"character":19,"line":3},"start":{"character":19,"line":3}}}},{"detail":"i64","documentation":"Read the validated year component.\n\nReturns: The stored validated component without changing this value.","kind":10,"label":"year","textEdit":{"newText":"year","range":{"end":{"character":19,"line":3},"start":{"character":19,"line":3}}}}]}Content-Length: 338
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found 'return'.","range":{"end":{"character":10,"line":3},"start":{"character":4,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":26,"jsonrpc":"2.0"}Content-Length: 337
+
+{"id":27,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"make_date(year: i64, month: i64, day: i64) -> result</@stdlib/time.void::date, /@stdlib/time.void::error>","parameters":[{"label":"year: i64"},{"documentation":"The month from 1 through 12.","label":"month: i64"},{"label":"day: i64"}]}]}}Content-Length: 512
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found 'is'.","range":{"end":{"character":26,"line":2},"start":{"character":24,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Expected an expression, found '<indent>'.","range":{"end":{"character":8,"line":3},"start":{"character":8,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":28,"jsonrpc":"2.0"}Content-Length: 337
+
+{"id":29,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"make_date(year: i64, month: i64, day: i64) -> result</@stdlib/time.void::date, /@stdlib/time.void::error>","parameters":[{"label":"year: i64"},{"documentation":"The month from 1 through 12.","label":"month: i64"},{"label":"day: i64"}]}]}}Content-Length: 338
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found 'return'.","range":{"end":{"character":10,"line":3},"start":{"character":4,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":30,"jsonrpc":"2.0"}Content-Length: 337
+
+{"id":31,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"make_date(year: i64, month: i64, day: i64) -> result</@stdlib/time.void::date, /@stdlib/time.void::error>","parameters":[{"label":"year: i64"},{"documentation":"The month from 1 through 12.","label":"month: i64"},{"label":"day: i64"}]}]}}Content-Length: 361
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2009","message":"format at byte 0: Temporal token does not apply to this value","range":{"end":{"character":29,"line":3},"start":{"character":28,"line":3}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":32,"jsonrpc":"2.0"}Content-Length: 162
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/error.void"}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/time.void"}}Content-Length: 163
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20Stage10%20display%20editor%20ztr3r0b6/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":33,"jsonrpc":"2.0"}Content-Length: 47
+
+{"id":"shutdown","jsonrpc":"2.0","result":null}

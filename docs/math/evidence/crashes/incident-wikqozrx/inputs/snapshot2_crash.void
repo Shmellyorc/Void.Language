@@ -1,0 +1,4 @@
+use math
+func entry(n: i32) -> i32:
+    var input = n as f64
+    return 1 + (math.floor(math.sqrt(input * input)) + math.pow(2.0 as f64, 3.0 as f64) + math.atan2(0.0 as f64, 1.0 as f64)) as i32

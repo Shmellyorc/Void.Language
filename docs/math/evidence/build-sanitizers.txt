@@ -1,0 +1,135 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:666:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  666 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:673:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  673 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:674:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  674 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:687:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  687 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:28:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Transforms/Utils/ValueMapper.h:20:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/IR/ValueMap.h:33:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Mutex.h:16:
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/include/llvm/Support/Threading.h:21:
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros" [-W#warnings]
+   49 | #    warning "<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros"
+      |      ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+-- VOID LLVM: 19.1.7 at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- ASan/UBSan enabled; vptr checking requires an RTTI-enabled LLVM SDK and is unavailable in this ABI
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (8.5s)
+-- Generating done (1.3s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 50%] Built target void_lsp
+[ 50%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_managed_test_abi
+[100%] Building CXX object CMakeFiles/void_math_host.dir/tests/math/host.cpp.o
+[100%] Building CXX object CMakeFiles/void_math_host.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_math_host
+[100%] Built target void_math_host
+Built target void_zone_objects
+Built target void_format_objects
+Built target void_core
+Building CXX object CMakeFiles/void_math_ir.dir/tests/math/ir.cpp.o
+Linking CXX executable void_math_ir
+Built target void_math_ir
+[  0%] Generating io-errors-async.void
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[  0%] Built target void_io_error_fixture
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_io_runner.dir/tests/io/runner.cpp.o
+[100%] Linking CXX executable void_io_runner
+[100%] Built target void_io_runner

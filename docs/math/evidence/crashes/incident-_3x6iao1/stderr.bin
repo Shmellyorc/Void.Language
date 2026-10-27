@@ -1,0 +1,5 @@
+textDocument/didChange: Stale or duplicate document version
+textDocument/didChange: Stale or duplicate document version
+==66==LeakSanitizer has encountered a fatal error.
+==66==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==66==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)

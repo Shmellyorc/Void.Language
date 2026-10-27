@@ -1,0 +1,7 @@
+use time
+func entry(input: i32) -> i32:
+    if make_date(2024, 2, 29) is Ok(var day):
+        var text = "{day:}"
+        var shown = format(day, "")
+        return day.year as i32
+    return input

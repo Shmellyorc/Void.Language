@@ -1,0 +1,4 @@
+func add(value: i32, extra: i32 = 2) -> i32:
+    return value + extra
+func main():
+    print(add(40))

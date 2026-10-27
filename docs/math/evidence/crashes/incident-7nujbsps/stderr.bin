@@ -1,0 +1,16 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/math.void:49:14: runtime error: Signed minimum abs is out of range
+In function $numeric::i8::abs
+Called from /@stdlib/math.void::abs
+/home/shmellyorc/Documents/Void.Language/stdlib/math.void:49:14: source call
+    return t.abs(value)
+             ^
+Called from /checked0.void::main
+/tmp/VOID math checked errors 5tybigrl/checked0.void:6:22: source call
+    var value = math.abs<i8>(i8.min_value)
+                     ^
+Called from /checked0.void::$app_adapter
+/tmp/VOID math checked errors 5tybigrl/checked0.void:4:6: source call
+
+==93==LeakSanitizer has encountered a fatal error.
+==93==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==93==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)

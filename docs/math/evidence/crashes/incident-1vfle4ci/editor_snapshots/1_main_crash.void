@@ -1,0 +1,5 @@
+use encoding/binary
+
+func main():
+    var bytes = binary.encode<i32>(123)
+    var number = binary.decode<i32>(bytes, binary.byte_order.big)

@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+    Start  96: math_execution
+    Start 103: math_stack
+1/2 Test  #96: math_execution ...................   Passed  106.44 sec
+2/2 Test #103: math_stack .......................   Passed  106.54 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) = 106.55 sec

@@ -1,0 +1,9 @@
+use math
+struct box:
+    value: i32
+func entry(n: i32) -> i32:
+    var kept = box(value = n)
+    var total: f64 = 0.0
+    for i in 0..<20:
+        total += math.sqrt(9.0 as f64) + math.sin(0.0 as f64) + math.pow(2.0 as f64, 3.0 as f64)
+    return kept.value + (total as i32)

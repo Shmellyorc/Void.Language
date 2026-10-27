@@ -1,0 +1,18 @@
+{
+  "final_bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0",
+  "affected_original_receipts": [
+    {
+      "receipt": "execution-ci-official-release-before-freeze-57964ccb61d4.json",
+      "numerical_result": "Passed 1354 checks in all four modes against the 206-row native bank and 44-row interpolation bank loaded at startup.",
+      "provenance_limitation": "Old harness reread vectors.json at exit after 18 near-pole/zero rows were appended; the recorded bank hash belongs to the later 224-row bank. Original receipt retained without alteration.",
+      "required_followup": "Run only math_execution and math_stack against frozen final bank using corrected loaded-bytes hashing."
+    },
+    {
+      "receipt": "execution-ci-official-release-stack-before-freeze-7d9301d040d2.json",
+      "numerical_result": "Passed 1354 checks in all four modes against the 206-row native bank and 44-row interpolation bank loaded at startup.",
+      "provenance_limitation": "Old harness reread vectors.json at exit after 18 near-pole/zero rows were appended; the recorded bank hash belongs to the later 224-row bank. Original receipt retained without alteration.",
+      "required_followup": "Run only math_execution and math_stack against frozen final bank using corrected loaded-bytes hashing."
+    }
+  ],
+  "native_crash": false
+}

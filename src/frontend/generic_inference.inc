@@ -82,6 +82,13 @@ const Function& concrete_function(Expr& e,const Function& declaration,unsigned f
         return declaration;
     }
     auto& generic=const_cast<Function&>(declaration);auto& owner=generic_owner(generic);
+    // An incomplete call may have no argument from which to infer its types.
+    // Publish the source declaration before inference reaches the editor cursor;
+    // a successfully specialized call replaces this with its concrete signature.
+    if(diagnostics.editor) {
+        auto docs=source_documentation(owner.source,generic.token.offset);
+        editor_call(e,generic,first,false,&docs);
+    }
     auto mapping=argument_mapping(e,generic,first,false);
     std::vector<std::pair<Type,Expr*>> supplied;for(unsigned n=0;n<mapping.size();++n)supplied.emplace_back(generic.parameters[mapping[n]].type,e.parts[n+first].get());
     auto arguments=infer_arguments(owner,generic.generics,e.type_arguments,supplied,e.token);
@@ -163,6 +170,10 @@ const Function* concrete_method(Expr& e, Type receiver, bool reference = false) 
     auto [owner, generic] = generic_method_declaration(receiver, e.token);
 
     if (generic) {
+        if(diagnostics.editor && !reference) {
+            auto docs=source_documentation(owner->source,generic->token.offset);
+            editor_call(e,*generic,1,false,&docs);
+        }
         std::vector<std::pair<Type, Expr*>> supplied;
 
         if (!reference) {

@@ -1,0 +1,16 @@
+Observed before forced rebuild, 26 October 2026. No production source change was made.
+
+/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls
+sha256 101bf01ea80f60438d7602f8101fd5bb1df502f61058e88cd929124c9e2123bc
+  308bfd:	e8 0e 51 fd ff       	call   2ddd10 <vd::(anonymous namespace)::Semantics::argument_mapping(vd::(anonymous namespace)::Expr const&, vd::(anonymous namespace)::Function const&, unsigned long, bool)>
+  308cc9:	e8 b2 1b 00 00       	call   30a880 <vd::(anonymous namespace)::Semantics::infer_arguments(vd::(anonymous namespace)::Unit&, std::vector<vd::(anonymous namespace)::GenericParameter, std::allocator<vd::(anonymous namespace)::GenericParameter> > const&, std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > const&, std::vector<std::pair<vd::ir::Type, vd::(anonymous namespace)::Expr*>, std::allocator<std::pair<vd::ir::Type, vd::(anonymous namespace)::Expr*> > > const&, vd::(anonymous namespace)::Token const&)>
+
+/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls
+sha256 d1916d39202a1967bc662077fcb5d81bc26981eada5de341acf0c2a9d4e37ada
+  33843c:	e8 2f 3e f8 ff       	call   2bc270 <vd::(anonymous namespace)::source_documentation(vd::SourceFile const&, unsigned long)>
+  338462:	e8 f9 f8 fd ff       	call   317d60 <vd::(anonymous namespace)::Semantics::editor_call(vd::(anonymous namespace)::Expr const&, vd::(anonymous namespace)::Function const&, unsigned long, bool, vd::Documentation const*)>
+  3384b6:	e8 45 2c fe ff       	call   31b100 <vd::(anonymous namespace)::Semantics::argument_mapping(vd::(anonymous namespace)::Expr const&, vd::(anonymous namespace)::Function const&, unsigned long, bool)>
+  3385f4:	e8 f7 0e 00 00       	call   3394f0 <vd::(anonymous namespace)::Semantics::infer_arguments(vd::(anonymous namespace)::Unit&, std::vector<vd::(anonymous namespace)::GenericParameter, std::allocator<vd::(anonymous namespace)::GenericParameter> > const&, std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > const&, std::vector<std::pair<vd::ir::Type, vd::(anonymous namespace)::Expr*>, std::allocator<std::pair<vd::ir::Type, vd::(anonymous namespace)::Expr*> > > const&, vd::(anonymous namespace)::Token const&)>
+
+Current generic_inference.inc sha256 6b629f2436dfd6128e27339a2fb1e44263090c96c297d6ae4e6615657581b448
+The failing Release concrete_function calls argument_mapping then infer_arguments without the source_documentation/editor_call prepublication that is present in Debug and current source. The earlier object completion timestamp therefore did not establish current included source contents.

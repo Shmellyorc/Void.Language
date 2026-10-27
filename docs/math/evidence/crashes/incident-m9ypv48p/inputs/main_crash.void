@@ -1,0 +1,21 @@
+value struct box<t>:
+    value: t
+    ## Exact sum of two boxes.
+    operator +(const left: box<t>, const right: box<t>) -> box<t>:
+        return box<t>(value = left.value + right.value)
+    operator %(const left: box<t>, const right: box<t>) -> box<t>:
+        return box<t>(value = left.value % right.value)
+    operator ==(const left: box<t>, const right: box<t>) -> bool:
+        return left.value == right.value
+    private operator -(const left: box<t>, const right: box<t>) -> box<t>:
+        return left
+func entry(input: i32) -> i32:
+    var a = box<i32>(value = input)
+    var b = box<i32>(value = 3)
+    var c = a + b
+    c %= b
+    var x = box<i64>(value = 4)
+    var y = x + x
+    if c != a:
+        return c.value
+    return input

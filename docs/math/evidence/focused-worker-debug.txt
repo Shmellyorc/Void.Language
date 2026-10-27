@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/worker.py", line 16, in <module>
+    h.run([compiler,'check',source],work,sources=(source,))
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc', 'check', '/tmp/VOID math worker pp24fy5_/worker.void'], 1, b'', b'/tmp/VOID math worker pp24fy5_/worker.void:7:16: error: Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.\n    code: VOID1103\n\n 7 |     var task = spawn work(9.0 as f64)\n   |                ^^^^^\n    Module: /worker.void\n\n')

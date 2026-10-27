@@ -1,5 +1,16 @@
 # VOID documentation
 
+## Math module — research proposal, 26 October 2026
+
+Boss authorized research from `9eaefbd3`, following reported local Random Sprint 4
+acceptance. The [proposed API and numerical contract](math/DESIGN.md),
+[source findings and owner decisions](math/RESEARCH.md) and
+[one-sprint implementation roadmap](math/ROADMAP.md) cover one typed scalar Math
+module, reuse of numeric abs/clamp, source algorithms, a narrow LLVM/native
+boundary and focused verification. Math remains unimplemented. Stop for Golden
+Wrench architecture review and Boss contract approval; no production, root README,
+Git or hosted CI change is authorized by this research.
+
 ## Standard-library Sprint 4 — random, 26 October 2026
 
 Boss authorized the complete [random contract](random/DESIGN.md) with mandatory

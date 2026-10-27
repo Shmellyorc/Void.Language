@@ -1,0 +1,467 @@
+{
+  "archive_count": 20,
+  "archive_bytes": 10073224,
+  "source_copies": 360,
+  "provenance_copies": 536,
+  "editor_snapshots": 6,
+  "incidents_with_raw_diagnostic_capture": 18,
+  "incidents_with_upstream_ctest_diagnostic_only": 2,
+  "hash_or_integrity_issues": [],
+  "stream_capture_limitations": [
+    {
+      "incident": "docs/math/evidence/crashes/incident-dolt_pll",
+      "test": "lsp_stage8",
+      "limitation": "The subprocess inherited stderr, so its per-process stderr.bin is empty. Its stdout was captured (146 bytes).",
+      "upstream_xml": "docs/math/evidence/acceptance-sanitizers.xml",
+      "upstream_selector": "testcase[@name='lsp_stage8']/system-out",
+      "upstream_text": "docs/math/evidence/acceptance-sanitizers.txt",
+      "upstream_text_start_line": 52,
+      "upstream_system_out_text": "==38==LeakSanitizer has encountered a fatal error.\n==38==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==38==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\nCRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-dolt_pll\nTraceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\", line 55, in <module>\n    selected=discover(project,active)\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\", line 7, in discover\n    return json.loads(subprocess.check_output([server,'--discover',str(workspace),str(active),str(override)]))\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 466, in check_output\n    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py\", line 209, in run\n    result.check_returncode()\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 502, in check_returncode\n    raise CalledProcessError(self.returncode, self.args, self.stdout,\nsubprocess.CalledProcessError: Command '[PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls'), '--discover', '/tmp/VOID discovery \u00e9\ud83d\ude00 # % lh09x7a2/project', '/tmp/VOID discovery \u00e9\ud83d\ude00 # % lh09x7a2/project/app/systems/player.void', '']' returned non-zero exit status 86.\n",
+      "classification_basis": "Original upstream CTest output contains LSan fatal inspection/ptrace hint, and original receipt records exit86. Empty stream files were not filled or reconstructed."
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-f82zmimj",
+      "test": "gc_buffers",
+      "limitation": "The subprocess inherited stderr, so its per-process stderr.bin is empty. Its stdout was inherited too; per-process stdout.bin is empty.",
+      "upstream_xml": "docs/math/evidence/acceptance-sanitizers.xml",
+      "upstream_selector": "testcase[@name='gc_buffers']/system-out",
+      "upstream_text": "docs/math/evidence/acceptance-sanitizers.txt",
+      "upstream_text_start_line": 260,
+      "upstream_system_out_text": "reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=3 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=4 sites=4 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=4 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=5 sites=5 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=5 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=6 sites=6 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=6 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=7 sites=7 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=7 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=8 sites=8 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=8 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=9 sites=9 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=9 native_count=0 native_bytes=0\nreference sweep before owner teardown: baseline=0 ordinal=10 sites=10 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0\nreference sweep after owner teardown: baseline=0 ordinal=10 native_count=0 native_bytes=0\n==48==LeakSanitizer has encountered a fatal error.\n==48==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==48==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\nCRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-f82zmimj\nTraceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py\", line 4, in <module>\n    subprocess.run([sys.argv[1]], check=True, timeout=150)\n  File \"/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py\", line 209, in run\n    result.check_returncode()\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 502, in check_returncode\n    raise CalledProcessError(self.returncode, self.args, self.stdout,\nsubprocess.CalledProcessError: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_buffers']' returned non-zero exit status 86.\n",
+      "classification_basis": "Original upstream CTest output contains LSan fatal inspection/ptrace hint, and original receipt records exit86. Empty stream files were not filled or reconstructed."
+    }
+  ],
+  "incidents": [
+    {
+      "incident": "docs/math/evidence/crashes/incident-0m8j3j5b",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID Stage10 display editor ztr3r0b6/main.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 1,
+      "stdout_bytes": 13993,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 351077
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-1q_uqfti",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math frontend gu8s6t3b/case1.void"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 225,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 565678
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-1vfle4ci",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID binary LSP e4sfm53i/main.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 1,
+      "stdout_bytes": 16166,
+      "stderr_bytes": 225,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 349561
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-4551yu5i",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math worker d7i5_1ta/worker.void"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 566322
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-4c7uejry",
+      "returncode": 86,
+      "command": [
+        "/tmp/VOID math relocated j8j7dlsy/relocated install/bin/voidc",
+        "run",
+        "/tmp/VOID math relocated j8j7dlsy/installed_math.void",
+        "2",
+        "--no-opt"
+      ],
+      "source_copies": 29,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 17,
+      "stderr_bytes": 225,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": null,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 825930
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-4pkpyx2o",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/tmp/void-cache-_b3io2ct/main.void",
+        "7",
+        "--cache"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 237,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 324747
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-7nujbsps",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/tmp/VOID math checked errors 5tybigrl/checked0.void",
+        "--no-opt"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 8,
+      "stderr_bytes": 801,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 565861
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-_3x6iao1",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID documentation \u00e9\ud83d\ude00 5chxfxvw/main.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 2,
+      "stdout_bytes": 90877,
+      "stderr_bytes": 342,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 455416
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-bqbg12vn",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_ir",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math ir fixtures"
+      ],
+      "source_copies": 14,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "2985d14ce44dbefc174afb45b0c26126d1370c06ed425bae7d81ab11075e65d4",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 564722
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-dolt_pll",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--discover",
+        "/tmp/VOID discovery \u00e9\ud83d\ude00 # % lh09x7a2/project",
+        "/tmp/VOID discovery \u00e9\ud83d\ude00 # % lh09x7a2/project/app/systems/player.void",
+        ""
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 0,
+      "stdout_bytes": 146,
+      "stderr_bytes": 0,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "upstream original CTest system-out/text; per-process capture limitation",
+      "compiler_identity_correlation": {
+        "compiler_sha256_from_acceptance_json": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+        "acceptance_json": "docs/math/evidence/acceptance-sanitizers.json",
+        "lsp_sha256_from_original_classification": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+        "classification_json": "docs/math/evidence/sanitizers-environment-classification.json",
+        "receipt_executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+        "note": "These existing non-Math harnesses do not include a Math compiler-identity JSON; original executable digest and upstream acceptance compiler/configuration identities provide correlation."
+      },
+      "bytes": 324943
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-dzg7obfe",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math execution pmhbbpl6/math_test.void"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 624803
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-f82zmimj",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_buffers"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 12,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "6118744a4c5e43a2835808911966ee289aade4c1dd22aaf2f3de1381c5982b47",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "upstream original CTest system-out/text; per-process capture limitation",
+      "compiler_identity_correlation": {
+        "compiler_sha256_from_acceptance_json": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+        "acceptance_json": "docs/math/evidence/acceptance-sanitizers.json",
+        "lsp_sha256_from_original_classification": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+        "classification_json": "docs/math/evidence/sanitizers-environment-classification.json",
+        "receipt_executable_sha256": "6118744a4c5e43a2835808911966ee289aade4c1dd22aaf2f3de1381c5982b47",
+        "note": "These existing non-Math harnesses do not include a Math compiler-identity JSON; original executable digest and upstream acceptance compiler/configuration identities provide correlation."
+      },
+      "bytes": 323936
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-fkzjqqmk",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID sprint2 vug6sjn2/binding.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 325973
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-ick3gr_3",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID math LSP do5gph9o/main.void"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 29,
+      "editor_snapshots": 1,
+      "stdout_bytes": 26052,
+      "stderr_bytes": 225,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 532195
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-juh_od4i",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math execution 0m4utsa4/math_test.void"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 225,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 624806
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-m9ypv48p",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID Step38 \u00e9\ud83d\ude00 y01iobmb/main.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 1,
+      "stdout_bytes": 44813,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 401067
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-tkg39chs",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID nonfatal docs \u00e9\ud83d\ude00 3x9cbc_6/main.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 324814
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-wikqozrx",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_host",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math host fixtures"
+      ],
+      "source_copies": 53,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "feee2fe925760397c3fa6323dbee38883bc0c1445d71ed006334e354be9104bf",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 1094373
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-wvj0eu4t",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID binary \u00e9\ud83d\ude00 in3vbqbn/main.void"
+      ],
+      "source_copies": 16,
+      "provenance_copies": 12,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 225,
+      "compiler_identity_json_count": 0,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 361325
+    },
+    {
+      "incident": "docs/math/evidence/crashes/incident-ww8oorhr",
+      "returncode": 86,
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math frontend 4r7sszn1/case1.void"
+      ],
+      "source_copies": 15,
+      "provenance_copies": 43,
+      "editor_snapshots": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 222,
+      "compiler_identity_json_count": 1,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "live_executable_hash_matches": true,
+      "issues": [],
+      "output_evidence": "original per-process stdout.bin/stderr.bin",
+      "bytes": 565675
+    }
+  ],
+  "original_18_audit": {
+    "path": "docs/math/evidence/sanitizers-incident-audit.json",
+    "sha256": "14034fc47fd9a858251b5b75d81e220b564bf5fafc678972d72520eaa4a7db71",
+    "untouched": true
+  },
+  "upstream_originals": {
+    "docs/math/evidence/acceptance-sanitizers.xml": "382e84a074c8a1cc44f2f4f8e92db590ca7cda59f50edec18eb6bffd1ae94de8",
+    "docs/math/evidence/acceptance-sanitizers.txt": "41ca6dce2ecfcf4a1952fcf93a41b2abcc5ecd04e74d52180f923c14ecb14710",
+    "docs/math/evidence/acceptance-sanitizers.json": "0132b5b39520eb5ddb81a9b18c7b7023a802a3457fa5ba96fc358ea52b2b0c65"
+  },
+  "scope": "All20 sandbox strict incident archives audited. This supplements the preserved18-incident filtered audit; it does not claim complete per-process stream capture. Original archived files were never modified or populated from upstream text.",
+  "classification": "Exit86 plus retained raw or original upstream CTest LSan fatal-inspection diagnostics. The ptrace message is a runtime hint, not a traced syscall result. No LLVM attribution or leak finding is inferred."
+}

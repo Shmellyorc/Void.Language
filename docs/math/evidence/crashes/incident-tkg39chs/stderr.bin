@@ -1,0 +1,3 @@
+==63==LeakSanitizer has encountered a fatal error.
+==63==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==63==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)

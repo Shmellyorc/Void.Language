@@ -1,0 +1,725 @@
+use math
+use encoding/binary
+use convert
+
+func raw_bits<t>(value: t) -> u64:
+    var bytes = binary.encode(value)
+    var result: u64 = 0
+    for index in bytes.count - 1..0:
+        result = result * 256 + (bytes[index] as u64)
+    return result
+
+func stored_f32(raw: u64) -> f32:
+    var bytes: [u8] = []
+    for index in 0..<4:
+        bytes.push((raw % 256) as u8)
+        raw = raw / 256
+    return convert.unwrap(binary.decode<f32>(bytes))
+
+func stored_f64(raw: u64) -> f64:
+    var bytes: [u8] = []
+    for index in 0..<8:
+        bytes.push((raw % 256) as u8)
+        raw = raw / 256
+    return convert.unwrap(binary.decode<f64>(bytes))
+
+
+func core_i8():
+    print(math.min<i8>(-128, 127))
+    print(math.min<i8>(127, -128))
+    print(math.max<i8>(-128, 127))
+    print(math.max<i8>(127, -128))
+    print(math.clamp<i8>(-128, 0, 127))
+    print(math.clamp<i8>(127, -128, 127))
+    print(math.abs<i8>(127))
+    print(math.sign<i8>(-128))
+    print(math.sign<i8>(127))
+    print(math.sign<i8>(0))
+
+func core_u8():
+    print(math.min<u8>(0, 255))
+    print(math.min<u8>(255, 0))
+    print(math.max<u8>(0, 255))
+    print(math.max<u8>(255, 0))
+    print(math.clamp<u8>(0, 0, 255))
+    print(math.clamp<u8>(255, 0, 255))
+    print(math.abs<u8>(255))
+    print(math.sign<u8>(0))
+    print(math.sign<u8>(255))
+    print(math.sign<u8>(0))
+
+func core_i16():
+    print(math.min<i16>(-32768, 32767))
+    print(math.min<i16>(32767, -32768))
+    print(math.max<i16>(-32768, 32767))
+    print(math.max<i16>(32767, -32768))
+    print(math.clamp<i16>(-32768, 0, 32767))
+    print(math.clamp<i16>(32767, -32768, 32767))
+    print(math.abs<i16>(32767))
+    print(math.sign<i16>(-32768))
+    print(math.sign<i16>(32767))
+    print(math.sign<i16>(0))
+
+func core_u16():
+    print(math.min<u16>(0, 65535))
+    print(math.min<u16>(65535, 0))
+    print(math.max<u16>(0, 65535))
+    print(math.max<u16>(65535, 0))
+    print(math.clamp<u16>(0, 0, 65535))
+    print(math.clamp<u16>(65535, 0, 65535))
+    print(math.abs<u16>(65535))
+    print(math.sign<u16>(0))
+    print(math.sign<u16>(65535))
+    print(math.sign<u16>(0))
+
+func core_i32():
+    print(math.min<i32>(-2147483648, 2147483647))
+    print(math.min<i32>(2147483647, -2147483648))
+    print(math.max<i32>(-2147483648, 2147483647))
+    print(math.max<i32>(2147483647, -2147483648))
+    print(math.clamp<i32>(-2147483648, 0, 2147483647))
+    print(math.clamp<i32>(2147483647, -2147483648, 2147483647))
+    print(math.abs<i32>(2147483647))
+    print(math.sign<i32>(-2147483648))
+    print(math.sign<i32>(2147483647))
+    print(math.sign<i32>(0))
+
+func core_u32():
+    print(math.min<u32>(0, 4294967295))
+    print(math.min<u32>(4294967295, 0))
+    print(math.max<u32>(0, 4294967295))
+    print(math.max<u32>(4294967295, 0))
+    print(math.clamp<u32>(0, 0, 4294967295))
+    print(math.clamp<u32>(4294967295, 0, 4294967295))
+    print(math.abs<u32>(4294967295))
+    print(math.sign<u32>(0))
+    print(math.sign<u32>(4294967295))
+    print(math.sign<u32>(0))
+
+func core_i64():
+    print(math.min<i64>(-9223372036854775808, 9223372036854775807))
+    print(math.min<i64>(9223372036854775807, -9223372036854775808))
+    print(math.max<i64>(-9223372036854775808, 9223372036854775807))
+    print(math.max<i64>(9223372036854775807, -9223372036854775808))
+    print(math.clamp<i64>(-9223372036854775808, 0, 9223372036854775807))
+    print(math.clamp<i64>(9223372036854775807, -9223372036854775808, 9223372036854775807))
+    print(math.abs<i64>(9223372036854775807))
+    print(math.sign<i64>(-9223372036854775808))
+    print(math.sign<i64>(9223372036854775807))
+    print(math.sign<i64>(0))
+
+func core_u64():
+    print(math.min<u64>(0, 18446744073709551615))
+    print(math.min<u64>(18446744073709551615, 0))
+    print(math.max<u64>(0, 18446744073709551615))
+    print(math.max<u64>(18446744073709551615, 0))
+    print(math.clamp<u64>(0, 0, 18446744073709551615))
+    print(math.clamp<u64>(18446744073709551615, 0, 18446744073709551615))
+    print(math.abs<u64>(18446744073709551615))
+    print(math.sign<u64>(0))
+    print(math.sign<u64>(18446744073709551615))
+    print(math.sign<u64>(0))
+
+func constants_f32():
+    print(raw_bits(math.pi_f32))
+    print(raw_bits(math.tau_f32))
+    print(raw_bits(math.e_f32))
+
+func selectors_f32():
+    print(raw_bits(math.min<f32>(stored_f32(0), stored_f32(0))))
+    print(raw_bits(math.max<f32>(stored_f32(0), stored_f32(0))))
+    print(raw_bits(math.min<f32>(stored_f32(0), stored_f32(2147483648))))
+    print(raw_bits(math.max<f32>(stored_f32(0), stored_f32(2147483648))))
+    print(raw_bits(math.min<f32>(stored_f32(2147483648), stored_f32(0))))
+    print(raw_bits(math.max<f32>(stored_f32(2147483648), stored_f32(0))))
+    print(raw_bits(math.min<f32>(stored_f32(2147483648), stored_f32(2147483648))))
+    print(raw_bits(math.max<f32>(stored_f32(2147483648), stored_f32(2147483648))))
+    print(raw_bits(math.min<f32>(stored_f32(2143289344), stored_f32(1065353216))))
+    print(raw_bits(math.max<f32>(stored_f32(2143289344), stored_f32(1065353216))))
+    print(raw_bits(math.min<f32>(stored_f32(1065353216), stored_f32(2143289344))))
+    print(raw_bits(math.max<f32>(stored_f32(1065353216), stored_f32(2143289344))))
+    print(raw_bits(math.min<f32>(stored_f32(2143289344), stored_f32(2143289344))))
+    print(raw_bits(math.max<f32>(stored_f32(2143289344), stored_f32(2143289344))))
+    print(raw_bits(math.min<f32>(stored_f32(4286578687), stored_f32(2139095039))))
+    print(raw_bits(math.max<f32>(stored_f32(4286578687), stored_f32(2139095039))))
+    print(raw_bits(math.min<f32>(stored_f32(2139095039), stored_f32(4286578687))))
+    print(raw_bits(math.max<f32>(stored_f32(2139095039), stored_f32(4286578687))))
+    print(raw_bits(math.min<f32>(stored_f32(2139095040), stored_f32(4286578688))))
+    print(raw_bits(math.max<f32>(stored_f32(2139095040), stored_f32(4286578688))))
+    print(raw_bits(math.sign<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.abs<f32>(stored_f32(2143289344))))
+    print(math.is_nan<f32>(stored_f32(2143289344)))
+    print(math.is_infinite<f32>(stored_f32(2143289344)))
+    print(math.is_finite<f32>(stored_f32(2143289344)))
+    print(raw_bits(math.sign<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.abs<f32>(stored_f32(2139095040))))
+    print(math.is_nan<f32>(stored_f32(2139095040)))
+    print(math.is_infinite<f32>(stored_f32(2139095040)))
+    print(math.is_finite<f32>(stored_f32(2139095040)))
+    print(raw_bits(math.sign<f32>(stored_f32(4286578688))))
+    print(raw_bits(math.abs<f32>(stored_f32(4286578688))))
+    print(math.is_nan<f32>(stored_f32(4286578688)))
+    print(math.is_infinite<f32>(stored_f32(4286578688)))
+    print(math.is_finite<f32>(stored_f32(4286578688)))
+    print(raw_bits(math.sign<f32>(stored_f32(0))))
+    print(raw_bits(math.abs<f32>(stored_f32(0))))
+    print(math.is_nan<f32>(stored_f32(0)))
+    print(math.is_infinite<f32>(stored_f32(0)))
+    print(math.is_finite<f32>(stored_f32(0)))
+    print(raw_bits(math.sign<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.abs<f32>(stored_f32(2147483648))))
+    print(math.is_nan<f32>(stored_f32(2147483648)))
+    print(math.is_infinite<f32>(stored_f32(2147483648)))
+    print(math.is_finite<f32>(stored_f32(2147483648)))
+    print(raw_bits(math.sign<f32>(stored_f32(1))))
+    print(raw_bits(math.abs<f32>(stored_f32(1))))
+    print(math.is_nan<f32>(stored_f32(1)))
+    print(math.is_infinite<f32>(stored_f32(1)))
+    print(math.is_finite<f32>(stored_f32(1)))
+    print(raw_bits(math.sign<f32>(stored_f32(2147483649))))
+    print(raw_bits(math.abs<f32>(stored_f32(2147483649))))
+    print(math.is_nan<f32>(stored_f32(2147483649)))
+    print(math.is_infinite<f32>(stored_f32(2147483649)))
+    print(math.is_finite<f32>(stored_f32(2147483649)))
+    print(raw_bits(math.sign<f32>(stored_f32(2139095039))))
+    print(raw_bits(math.abs<f32>(stored_f32(2139095039))))
+    print(math.is_nan<f32>(stored_f32(2139095039)))
+    print(math.is_infinite<f32>(stored_f32(2139095039)))
+    print(math.is_finite<f32>(stored_f32(2139095039)))
+    print(raw_bits(math.sign<f32>(stored_f32(4286578687))))
+    print(raw_bits(math.abs<f32>(stored_f32(4286578687))))
+    print(math.is_nan<f32>(stored_f32(4286578687)))
+    print(math.is_infinite<f32>(stored_f32(4286578687)))
+    print(math.is_finite<f32>(stored_f32(4286578687)))
+    var batch0_arg0: [u64] = [2147483648, 0, 2143289344, 2139095040, 4286578688, 1065353216]
+    var batch0_arg1: [u64] = [3212836864, 2147483648, 4286578688, 4286578688, 4286578688, 1073741824]
+    var batch0_arg2: [u64] = [1065353216, 0, 2139095040, 2139095040, 2139095040, 1073741824]
+    for batch0_index in 0..<batch0_arg0.count:
+        print(raw_bits(math.clamp<f32>(stored_f32(batch0_arg0[batch0_index]), stored_f32(batch0_arg1[batch0_index]), stored_f32(batch0_arg2[batch0_index]))))
+
+func rounding_f32():
+    var batch1_arg0: [u64] = [0, 2147483648, 1, 2147483649, 2139095039, 4286578687, 2139095040, 4286578688, 2143289344, 1266679808, 1602224128, 3223322623, 3223322624, 3223322625, 3217031167, 3217031168, 3217031169, 3204448255, 3204448256, 3204448257, 1056964607, 1056964608, 1056964609, 1069547519, 1069547520, 1069547521, 1075838975, 1075838976, 1075838977]
+    for batch1_index in 0..<batch1_arg0.count:
+        print(raw_bits(math.floor<f32>(stored_f32(batch1_arg0[batch1_index]))))
+    var batch2_arg0: [u64] = [0, 2147483648, 1, 2147483649, 2139095039, 4286578687, 2139095040, 4286578688, 2143289344, 1266679808, 1602224128, 3223322623, 3223322624, 3223322625, 3217031167, 3217031168, 3217031169, 3204448255, 3204448256, 3204448257, 1056964607, 1056964608, 1056964609, 1069547519, 1069547520, 1069547521, 1075838975, 1075838976, 1075838977]
+    for batch2_index in 0..<batch2_arg0.count:
+        print(raw_bits(math.ceil<f32>(stored_f32(batch2_arg0[batch2_index]))))
+    var batch3_arg0: [u64] = [0, 2147483648, 1, 2147483649, 2139095039, 4286578687, 2139095040, 4286578688, 2143289344, 1266679808, 1602224128, 3223322623, 3223322624, 3223322625, 3217031167, 3217031168, 3217031169, 3204448255, 3204448256, 3204448257, 1056964607, 1056964608, 1056964609, 1069547519, 1069547520, 1069547521, 1075838975, 1075838976, 1075838977]
+    for batch3_index in 0..<batch3_arg0.count:
+        print(raw_bits(math.trunc<f32>(stored_f32(batch3_arg0[batch3_index]))))
+    var batch4_arg0: [u64] = [0, 2147483648, 1, 2147483649, 2139095039, 4286578687, 2139095040, 4286578688, 2143289344, 1266679808, 1602224128, 3223322623, 3223322624, 3223322625, 3217031167, 3217031168, 3217031169, 3204448255, 3204448256, 3204448257, 1056964607, 1056964608, 1056964609, 1069547519, 1069547520, 1069547521, 1075838975, 1075838976, 1075838977]
+    for batch4_index in 0..<batch4_arg0.count:
+        print(raw_bits(math.round<f32>(stored_f32(batch4_arg0[batch4_index]))))
+
+func interpolation_f32():
+    var batch5_arg0: [u64] = [2147483648, 2147483648, 2147483648, 1065353216, 0, 1092616192, 4286578687, 2139095039, 2139095039, 2147483648, 1065353216, 0, 0, 1, 1065353216, 4286578688, 0, 0, 0]
+    var batch5_arg1: [u64] = [0, 0, 0, 1065353216, 1092616192, 0, 2139095039, 4286578687, 2139095039, 1065353216, 2147483648, 1092616192, 1092616192, 3, 1065353217, 0, 2139095040, 1065353216, 1065353216]
+    var batch5_arg2: [u64] = [0, 1065353216, 1056964608, 2139095040, 1048576000, 1048576000, 1056964608, 1048576000, 1056964608, 0, 1065353216, 3212836864, 1073741824, 1056964608, 1056964608, 0, 1065353216, 2143289344, 2139095040]
+    for batch5_index in 0..<batch5_arg0.count:
+        print(raw_bits(math.lerp<f32>(stored_f32(batch5_arg0[batch5_index]), stored_f32(batch5_arg1[batch5_index]), stored_f32(batch5_arg2[batch5_index]))))
+    var batch6_arg0: [u64] = [0, 1092616192, 4286578687, 2139095039, 2139095039, 1, 0, 0, 2147483648, 0, 0, 0, 0, 4286578688, 0, 0]
+    var batch6_arg1: [u64] = [1092616192, 0, 2139095039, 4286578687, 2139095038, 3, 1, 0, 0, 1065353216, 1065353216, 1092616192, 1092616192, 0, 2139095040, 1065353216]
+    var batch6_arg2: [u64] = [1075838976, 1075838976, 0, 0, 4286578687, 2, 2, 1065353216, 0, 2147483648, 1065353216, 3240099840, 1101004800, 0, 1065353216, 2143289344]
+    for batch6_index in 0..<batch6_arg0.count:
+        print(raw_bits(math.inverse_lerp<f32>(stored_f32(batch6_arg0[batch6_index]), stored_f32(batch6_arg1[batch6_index]), stored_f32(batch6_arg2[batch6_index]))))
+
+func special_unary_f32():
+    print(raw_bits(math.sin<f32>(stored_f32(0))))
+    print(raw_bits(math.sin<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.tan<f32>(stored_f32(0))))
+    print(raw_bits(math.tan<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.asin<f32>(stored_f32(0))))
+    print(raw_bits(math.asin<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.atan<f32>(stored_f32(0))))
+    print(raw_bits(math.atan<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.sqrt<f32>(stored_f32(0))))
+    print(raw_bits(math.sqrt<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.radians<f32>(stored_f32(0))))
+    print(raw_bits(math.radians<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.degrees<f32>(stored_f32(0))))
+    print(raw_bits(math.degrees<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.sin<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.cos<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.tan<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.asin<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.acos<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.atan<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.sqrt<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.exp<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.exp2<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.log<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.log2<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.radians<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.degrees<f32>(stored_f32(2143289344))))
+    print(raw_bits(math.sin<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.sin<f32>(stored_f32(4286578688))))
+    print(raw_bits(math.cos<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.cos<f32>(stored_f32(4286578688))))
+    print(raw_bits(math.tan<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.tan<f32>(stored_f32(4286578688))))
+    print(raw_bits(math.asin<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.asin<f32>(stored_f32(4286578688))))
+    print(raw_bits(math.acos<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.acos<f32>(stored_f32(4286578688))))
+    var batch7_arg0: [u64] = [0, 2147483648, 2139095040, 4286578688]
+    for batch7_index in 0..<batch7_arg0.count:
+        print(raw_bits(math.exp<f32>(stored_f32(batch7_arg0[batch7_index]))))
+    var batch8_arg0: [u64] = [0, 2147483648, 2139095040, 4286578688]
+    for batch8_index in 0..<batch8_arg0.count:
+        print(raw_bits(math.exp2<f32>(stored_f32(batch8_arg0[batch8_index]))))
+    print(raw_bits(math.exp<f32>(stored_f32(1148846080))))
+    print(raw_bits(math.exp<f32>(stored_f32(3296329728))))
+    print(raw_bits(math.exp2<f32>(stored_f32(1157234688))))
+    print(raw_bits(math.exp2<f32>(stored_f32(3304718336))))
+    var batch9_arg0: [u64] = [0, 2147483648, 3212836864, 4286578688, 1065353216, 2139095040]
+    for batch9_index in 0..<batch9_arg0.count:
+        print(raw_bits(math.log<f32>(stored_f32(batch9_arg0[batch9_index]))))
+    var batch10_arg0: [u64] = [0, 2147483648, 3212836864, 4286578688, 1065353216, 2139095040]
+    for batch10_index in 0..<batch10_arg0.count:
+        print(raw_bits(math.log2<f32>(stored_f32(batch10_arg0[batch10_index]))))
+    var batch11_arg0: [u64] = [2139095040, 4286578688, 1065353216, 1127481344, 3283353600, 2139095039, 1]
+    for batch11_index in 0..<batch11_arg0.count:
+        print(raw_bits(math.radians<f32>(stored_f32(batch11_arg0[batch11_index]))))
+    var batch12_arg0: [u64] = [2139095040, 4286578688, 1065353216, 1127481344, 3283353600, 2139095039, 1]
+    for batch12_index in 0..<batch12_arg0.count:
+        print(raw_bits(math.degrees<f32>(stored_f32(batch12_arg0[batch12_index]))))
+    print(raw_bits(math.sqrt<f32>(stored_f32(3212836864))))
+    print(raw_bits(math.sqrt<f32>(stored_f32(4286578688))))
+    print(raw_bits(math.sqrt<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.asin<f32>(stored_f32(3212836864))))
+    print(raw_bits(math.acos<f32>(stored_f32(3212836864))))
+    print(raw_bits(math.asin<f32>(stored_f32(1065353216))))
+    print(raw_bits(math.acos<f32>(stored_f32(1065353216))))
+    print(raw_bits(math.cos<f32>(stored_f32(0))))
+    print(raw_bits(math.acos<f32>(stored_f32(0))))
+    print(raw_bits(math.cos<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.acos<f32>(stored_f32(2147483648))))
+    print(raw_bits(math.asin<f32>(stored_f32(3221225472))))
+    print(raw_bits(math.acos<f32>(stored_f32(3221225472))))
+    print(raw_bits(math.asin<f32>(stored_f32(1073741824))))
+    print(raw_bits(math.acos<f32>(stored_f32(1073741824))))
+    print(raw_bits(math.atan<f32>(stored_f32(2139095040))))
+    print(raw_bits(math.atan<f32>(stored_f32(4286578688))))
+
+func atan2_special_f32():
+    var batch13_arg0: [u64] = [4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 0, 0, 0, 0, 0, 0, 0, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344]
+    var batch13_arg1: [u64] = [4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344, 4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344, 4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344, 4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344, 4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344, 4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344, 4286578688, 3212836864, 2147483648, 0, 1065353216, 2139095040, 2143289344]
+    for batch13_index in 0..<batch13_arg0.count:
+        print(raw_bits(math.atan2<f32>(stored_f32(batch13_arg0[batch13_index]), stored_f32(batch13_arg1[batch13_index]))))
+
+func pow_special_f32():
+    var batch14_arg0: [u64] = [2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 2143289344, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 1065353216, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 3212836864, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 2147483648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 4286578688, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 2139095040, 3221225472, 3221225472, 3204448256, 3204448256, 1073741824, 1073741824, 1056964608, 1056964608, 3221225472, 3221225472, 3221225472, 3221225472, 3221225472, 3221225472, 3221225472, 3221225472, 3221225472, 3204448256, 3204448256, 3204448256, 3204448256, 3204448256, 3204448256, 3204448256, 3204448256, 3204448256]
+    var batch14_arg1: [u64] = [2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2143289344, 4286578688, 2139095040, 2147483648, 0, 3225419776, 3221225472, 3212836864, 3204448256, 1056964608, 1065353216, 1073741824, 1077936128, 1266679807, 3414163455, 1736441856, 3883925504, 2139095040, 4286578688, 2139095040, 4286578688, 2139095040, 4286578688, 2139095040, 4286578688, 3225419776, 3221225472, 1073741824, 1077936128, 1056964608, 1266679807, 3414163455, 1736441856, 3883925504, 3225419776, 3221225472, 1073741824, 1077936128, 1056964608, 1266679807, 3414163455, 1736441856, 3883925504]
+    for batch14_index in 0..<batch14_arg0.count:
+        print(raw_bits(math.pow<f32>(stored_f32(batch14_arg0[batch14_index]), stored_f32(batch14_arg1[batch14_index]))))
+
+func constants_f64():
+    print(raw_bits(math.pi_f64))
+    print(raw_bits(math.tau_f64))
+    print(raw_bits(math.e_f64))
+
+func selectors_f64():
+    print(raw_bits(math.min<f64>(stored_f64(0), stored_f64(0))))
+    print(raw_bits(math.max<f64>(stored_f64(0), stored_f64(0))))
+    print(raw_bits(math.min<f64>(stored_f64(0), stored_f64(9223372036854775808))))
+    print(raw_bits(math.max<f64>(stored_f64(0), stored_f64(9223372036854775808))))
+    print(raw_bits(math.min<f64>(stored_f64(9223372036854775808), stored_f64(0))))
+    print(raw_bits(math.max<f64>(stored_f64(9223372036854775808), stored_f64(0))))
+    print(raw_bits(math.min<f64>(stored_f64(9223372036854775808), stored_f64(9223372036854775808))))
+    print(raw_bits(math.max<f64>(stored_f64(9223372036854775808), stored_f64(9223372036854775808))))
+    print(raw_bits(math.min<f64>(stored_f64(9221120237041090560), stored_f64(4607182418800017408))))
+    print(raw_bits(math.max<f64>(stored_f64(9221120237041090560), stored_f64(4607182418800017408))))
+    print(raw_bits(math.min<f64>(stored_f64(4607182418800017408), stored_f64(9221120237041090560))))
+    print(raw_bits(math.max<f64>(stored_f64(4607182418800017408), stored_f64(9221120237041090560))))
+    print(raw_bits(math.min<f64>(stored_f64(9221120237041090560), stored_f64(9221120237041090560))))
+    print(raw_bits(math.max<f64>(stored_f64(9221120237041090560), stored_f64(9221120237041090560))))
+    print(raw_bits(math.min<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311))))
+    print(raw_bits(math.max<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311))))
+    print(raw_bits(math.min<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119))))
+    print(raw_bits(math.max<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119))))
+    print(raw_bits(math.min<f64>(stored_f64(9218868437227405312), stored_f64(18442240474082181120))))
+    print(raw_bits(math.max<f64>(stored_f64(9218868437227405312), stored_f64(18442240474082181120))))
+    print(raw_bits(math.sign<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.abs<f64>(stored_f64(9221120237041090560))))
+    print(math.is_nan<f64>(stored_f64(9221120237041090560)))
+    print(math.is_infinite<f64>(stored_f64(9221120237041090560)))
+    print(math.is_finite<f64>(stored_f64(9221120237041090560)))
+    print(raw_bits(math.sign<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.abs<f64>(stored_f64(9218868437227405312))))
+    print(math.is_nan<f64>(stored_f64(9218868437227405312)))
+    print(math.is_infinite<f64>(stored_f64(9218868437227405312)))
+    print(math.is_finite<f64>(stored_f64(9218868437227405312)))
+    print(raw_bits(math.sign<f64>(stored_f64(18442240474082181120))))
+    print(raw_bits(math.abs<f64>(stored_f64(18442240474082181120))))
+    print(math.is_nan<f64>(stored_f64(18442240474082181120)))
+    print(math.is_infinite<f64>(stored_f64(18442240474082181120)))
+    print(math.is_finite<f64>(stored_f64(18442240474082181120)))
+    print(raw_bits(math.sign<f64>(stored_f64(0))))
+    print(raw_bits(math.abs<f64>(stored_f64(0))))
+    print(math.is_nan<f64>(stored_f64(0)))
+    print(math.is_infinite<f64>(stored_f64(0)))
+    print(math.is_finite<f64>(stored_f64(0)))
+    print(raw_bits(math.sign<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.abs<f64>(stored_f64(9223372036854775808))))
+    print(math.is_nan<f64>(stored_f64(9223372036854775808)))
+    print(math.is_infinite<f64>(stored_f64(9223372036854775808)))
+    print(math.is_finite<f64>(stored_f64(9223372036854775808)))
+    print(raw_bits(math.sign<f64>(stored_f64(1))))
+    print(raw_bits(math.abs<f64>(stored_f64(1))))
+    print(math.is_nan<f64>(stored_f64(1)))
+    print(math.is_infinite<f64>(stored_f64(1)))
+    print(math.is_finite<f64>(stored_f64(1)))
+    print(raw_bits(math.sign<f64>(stored_f64(9223372036854775809))))
+    print(raw_bits(math.abs<f64>(stored_f64(9223372036854775809))))
+    print(math.is_nan<f64>(stored_f64(9223372036854775809)))
+    print(math.is_infinite<f64>(stored_f64(9223372036854775809)))
+    print(math.is_finite<f64>(stored_f64(9223372036854775809)))
+    print(raw_bits(math.sign<f64>(stored_f64(9218868437227405311))))
+    print(raw_bits(math.abs<f64>(stored_f64(9218868437227405311))))
+    print(math.is_nan<f64>(stored_f64(9218868437227405311)))
+    print(math.is_infinite<f64>(stored_f64(9218868437227405311)))
+    print(math.is_finite<f64>(stored_f64(9218868437227405311)))
+    print(raw_bits(math.sign<f64>(stored_f64(18442240474082181119))))
+    print(raw_bits(math.abs<f64>(stored_f64(18442240474082181119))))
+    print(math.is_nan<f64>(stored_f64(18442240474082181119)))
+    print(math.is_infinite<f64>(stored_f64(18442240474082181119)))
+    print(math.is_finite<f64>(stored_f64(18442240474082181119)))
+    var batch15_arg0: [u64] = [9223372036854775808, 0, 9221120237041090560, 9218868437227405312, 18442240474082181120, 4607182418800017408]
+    var batch15_arg1: [u64] = [13830554455654793216, 9223372036854775808, 18442240474082181120, 18442240474082181120, 18442240474082181120, 4611686018427387904]
+    var batch15_arg2: [u64] = [4607182418800017408, 0, 9218868437227405312, 9218868437227405312, 9218868437227405312, 4611686018427387904]
+    for batch15_index in 0..<batch15_arg0.count:
+        print(raw_bits(math.clamp<f64>(stored_f64(batch15_arg0[batch15_index]), stored_f64(batch15_arg1[batch15_index]), stored_f64(batch15_arg2[batch15_index]))))
+
+func rounding_f64():
+    var batch16_arg0: [u64] = [0, 9223372036854775808, 1, 9223372036854775809, 9218868437227405311, 18442240474082181119, 9218868437227405312, 18442240474082181120, 9221120237041090560, 4845873199050653696, 4895412794951729152, 13836183955189006335, 13836183955189006336, 13836183955189006337, 13832806255468478463, 13832806255468478464, 13832806255468478465, 13826050856027422719, 13826050856027422720, 13826050856027422721, 4602678819172646911, 4602678819172646912, 4602678819172646913, 4609434218613702655, 4609434218613702656, 4609434218613702657, 4612811918334230527, 4612811918334230528, 4612811918334230529]
+    for batch16_index in 0..<batch16_arg0.count:
+        print(raw_bits(math.floor<f64>(stored_f64(batch16_arg0[batch16_index]))))
+    var batch17_arg0: [u64] = [0, 9223372036854775808, 1, 9223372036854775809, 9218868437227405311, 18442240474082181119, 9218868437227405312, 18442240474082181120, 9221120237041090560, 4845873199050653696, 4895412794951729152, 13836183955189006335, 13836183955189006336, 13836183955189006337, 13832806255468478463, 13832806255468478464, 13832806255468478465, 13826050856027422719, 13826050856027422720, 13826050856027422721, 4602678819172646911, 4602678819172646912, 4602678819172646913, 4609434218613702655, 4609434218613702656, 4609434218613702657, 4612811918334230527, 4612811918334230528, 4612811918334230529]
+    for batch17_index in 0..<batch17_arg0.count:
+        print(raw_bits(math.ceil<f64>(stored_f64(batch17_arg0[batch17_index]))))
+    var batch18_arg0: [u64] = [0, 9223372036854775808, 1, 9223372036854775809, 9218868437227405311, 18442240474082181119, 9218868437227405312, 18442240474082181120, 9221120237041090560, 4845873199050653696, 4895412794951729152, 13836183955189006335, 13836183955189006336, 13836183955189006337, 13832806255468478463, 13832806255468478464, 13832806255468478465, 13826050856027422719, 13826050856027422720, 13826050856027422721, 4602678819172646911, 4602678819172646912, 4602678819172646913, 4609434218613702655, 4609434218613702656, 4609434218613702657, 4612811918334230527, 4612811918334230528, 4612811918334230529]
+    for batch18_index in 0..<batch18_arg0.count:
+        print(raw_bits(math.trunc<f64>(stored_f64(batch18_arg0[batch18_index]))))
+    var batch19_arg0: [u64] = [0, 9223372036854775808, 1, 9223372036854775809, 9218868437227405311, 18442240474082181119, 9218868437227405312, 18442240474082181120, 9221120237041090560, 4845873199050653696, 4895412794951729152, 13836183955189006335, 13836183955189006336, 13836183955189006337, 13832806255468478463, 13832806255468478464, 13832806255468478465, 13826050856027422719, 13826050856027422720, 13826050856027422721, 4602678819172646911, 4602678819172646912, 4602678819172646913, 4609434218613702655, 4609434218613702656, 4609434218613702657, 4612811918334230527, 4612811918334230528, 4612811918334230529]
+    for batch19_index in 0..<batch19_arg0.count:
+        print(raw_bits(math.round<f64>(stored_f64(batch19_arg0[batch19_index]))))
+
+func interpolation_f64():
+    var batch20_arg0: [u64] = [9223372036854775808, 9223372036854775808, 9223372036854775808, 4607182418800017408, 0, 4621819117588971520, 18442240474082181119, 9218868437227405311, 9218868437227405311, 9223372036854775808, 4607182418800017408, 0, 0, 1, 4607182418800017408, 18442240474082181120, 0, 0, 0]
+    var batch20_arg1: [u64] = [0, 0, 0, 4607182418800017408, 4621819117588971520, 0, 9218868437227405311, 18442240474082181119, 9218868437227405311, 4607182418800017408, 9223372036854775808, 4621819117588971520, 4621819117588971520, 3, 4607182418800017409, 0, 9218868437227405312, 4607182418800017408, 4607182418800017408]
+    var batch20_arg2: [u64] = [0, 4607182418800017408, 4602678819172646912, 9218868437227405312, 4598175219545276416, 4598175219545276416, 4602678819172646912, 4598175219545276416, 4602678819172646912, 0, 4607182418800017408, 13830554455654793216, 4611686018427387904, 4602678819172646912, 4602678819172646912, 0, 4607182418800017408, 9221120237041090560, 9218868437227405312]
+    for batch20_index in 0..<batch20_arg0.count:
+        print(raw_bits(math.lerp<f64>(stored_f64(batch20_arg0[batch20_index]), stored_f64(batch20_arg1[batch20_index]), stored_f64(batch20_arg2[batch20_index]))))
+    var batch21_arg0: [u64] = [0, 4621819117588971520, 18442240474082181119, 9218868437227405311, 9218868437227405311, 1, 0, 0, 9223372036854775808, 0, 0, 0, 0, 18442240474082181120, 0, 0]
+    var batch21_arg1: [u64] = [4621819117588971520, 0, 9218868437227405311, 18442240474082181119, 9218868437227405310, 3, 1, 0, 0, 4607182418800017408, 4607182418800017408, 4621819117588971520, 4621819117588971520, 0, 9218868437227405312, 4607182418800017408]
+    var batch21_arg2: [u64] = [4612811918334230528, 4612811918334230528, 0, 0, 18442240474082181119, 2, 2, 4607182418800017408, 0, 9223372036854775808, 4607182418800017408, 13845191154443747328, 4626322717216342016, 0, 4607182418800017408, 9221120237041090560]
+    for batch21_index in 0..<batch21_arg0.count:
+        print(raw_bits(math.inverse_lerp<f64>(stored_f64(batch21_arg0[batch21_index]), stored_f64(batch21_arg1[batch21_index]), stored_f64(batch21_arg2[batch21_index]))))
+
+func special_unary_f64():
+    print(raw_bits(math.sin<f64>(stored_f64(0))))
+    print(raw_bits(math.sin<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.tan<f64>(stored_f64(0))))
+    print(raw_bits(math.tan<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.asin<f64>(stored_f64(0))))
+    print(raw_bits(math.asin<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.atan<f64>(stored_f64(0))))
+    print(raw_bits(math.atan<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.sqrt<f64>(stored_f64(0))))
+    print(raw_bits(math.sqrt<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.radians<f64>(stored_f64(0))))
+    print(raw_bits(math.radians<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.degrees<f64>(stored_f64(0))))
+    print(raw_bits(math.degrees<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.sin<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.cos<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.tan<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.asin<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.acos<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.atan<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.sqrt<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.exp<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.exp2<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.log<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.log2<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.radians<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.degrees<f64>(stored_f64(9221120237041090560))))
+    print(raw_bits(math.sin<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.sin<f64>(stored_f64(18442240474082181120))))
+    print(raw_bits(math.cos<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.cos<f64>(stored_f64(18442240474082181120))))
+    print(raw_bits(math.tan<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.tan<f64>(stored_f64(18442240474082181120))))
+    print(raw_bits(math.asin<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.asin<f64>(stored_f64(18442240474082181120))))
+    print(raw_bits(math.acos<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.acos<f64>(stored_f64(18442240474082181120))))
+    var batch22_arg0: [u64] = [0, 9223372036854775808, 9218868437227405312, 18442240474082181120]
+    for batch22_index in 0..<batch22_arg0.count:
+        print(raw_bits(math.exp<f64>(stored_f64(batch22_arg0[batch22_index]))))
+    var batch23_arg0: [u64] = [0, 9223372036854775808, 9218868437227405312, 18442240474082181120]
+    for batch23_index in 0..<batch23_arg0.count:
+        print(raw_bits(math.exp2<f64>(stored_f64(batch23_arg0[batch23_index]))))
+    print(raw_bits(math.exp<f64>(stored_f64(4652007308841189376))))
+    print(raw_bits(math.exp<f64>(stored_f64(13875379345695965184))))
+    print(raw_bits(math.exp2<f64>(stored_f64(4656510908468559872))))
+    print(raw_bits(math.exp2<f64>(stored_f64(13879882945323335680))))
+    var batch24_arg0: [u64] = [0, 9223372036854775808, 13830554455654793216, 18442240474082181120, 4607182418800017408, 9218868437227405312]
+    for batch24_index in 0..<batch24_arg0.count:
+        print(raw_bits(math.log<f64>(stored_f64(batch24_arg0[batch24_index]))))
+    var batch25_arg0: [u64] = [0, 9223372036854775808, 13830554455654793216, 18442240474082181120, 4607182418800017408, 9218868437227405312]
+    for batch25_index in 0..<batch25_arg0.count:
+        print(raw_bits(math.log2<f64>(stored_f64(batch25_arg0[batch25_index]))))
+    var batch26_arg0: [u64] = [9218868437227405312, 18442240474082181120, 4607182418800017408, 4640537203540230144, 13868412840022376448, 9218868437227405311, 1]
+    for batch26_index in 0..<batch26_arg0.count:
+        print(raw_bits(math.radians<f64>(stored_f64(batch26_arg0[batch26_index]))))
+    var batch27_arg0: [u64] = [9218868437227405312, 18442240474082181120, 4607182418800017408, 4640537203540230144, 13868412840022376448, 9218868437227405311, 1]
+    for batch27_index in 0..<batch27_arg0.count:
+        print(raw_bits(math.degrees<f64>(stored_f64(batch27_arg0[batch27_index]))))
+    print(raw_bits(math.sqrt<f64>(stored_f64(13830554455654793216))))
+    print(raw_bits(math.sqrt<f64>(stored_f64(18442240474082181120))))
+    print(raw_bits(math.sqrt<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.asin<f64>(stored_f64(13830554455654793216))))
+    print(raw_bits(math.acos<f64>(stored_f64(13830554455654793216))))
+    print(raw_bits(math.asin<f64>(stored_f64(4607182418800017408))))
+    print(raw_bits(math.acos<f64>(stored_f64(4607182418800017408))))
+    print(raw_bits(math.cos<f64>(stored_f64(0))))
+    print(raw_bits(math.acos<f64>(stored_f64(0))))
+    print(raw_bits(math.cos<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.acos<f64>(stored_f64(9223372036854775808))))
+    print(raw_bits(math.asin<f64>(stored_f64(13835058055282163712))))
+    print(raw_bits(math.acos<f64>(stored_f64(13835058055282163712))))
+    print(raw_bits(math.asin<f64>(stored_f64(4611686018427387904))))
+    print(raw_bits(math.acos<f64>(stored_f64(4611686018427387904))))
+    print(raw_bits(math.atan<f64>(stored_f64(9218868437227405312))))
+    print(raw_bits(math.atan<f64>(stored_f64(18442240474082181120))))
+
+func atan2_special_f64():
+    var batch28_arg0: [u64] = [18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 0, 0, 0, 0, 0, 0, 0, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560]
+    var batch28_arg1: [u64] = [18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560, 18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560, 18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560, 18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560, 18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560, 18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560, 18442240474082181120, 13830554455654793216, 9223372036854775808, 0, 4607182418800017408, 9218868437227405312, 9221120237041090560]
+    for batch28_index in 0..<batch28_arg0.count:
+        print(raw_bits(math.atan2<f64>(stored_f64(batch28_arg0[batch28_index]), stored_f64(batch28_arg1[batch28_index]))))
+
+func pow_special_f64():
+    var batch29_arg0: [u64] = [9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 9221120237041090560, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 4607182418800017408, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 13830554455654793216, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 9223372036854775808, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 18442240474082181120, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 9218868437227405312, 13835058055282163712, 13835058055282163712, 13826050856027422720, 13826050856027422720, 4611686018427387904, 4611686018427387904, 4602678819172646912, 4602678819172646912, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13835058055282163712, 13826050856027422720, 13826050856027422720, 13826050856027422720, 13826050856027422720, 13826050856027422720, 13826050856027422720, 13826050856027422720, 13826050856027422720, 13826050856027422720]
+    var batch29_arg1: [u64] = [9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9221120237041090560, 18442240474082181120, 9218868437227405312, 9223372036854775808, 0, 13837309855095848960, 13835058055282163712, 13830554455654793216, 13826050856027422720, 4602678819172646912, 4607182418800017408, 4611686018427387904, 4613937818241073152, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 9218868437227405312, 18442240474082181120, 9218868437227405312, 18442240474082181120, 9218868437227405312, 18442240474082181120, 9218868437227405312, 18442240474082181120, 13837309855095848960, 13835058055282163712, 4611686018427387904, 4613937818241073152, 4602678819172646912, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896, 13837309855095848960, 13835058055282163712, 4611686018427387904, 4613937818241073152, 4602678819172646912, 4845873199050653695, 14069245235905429503, 4967470388989657088, 14190842425844432896]
+    for batch29_index in 0..<batch29_arg0.count:
+        print(raw_bits(math.pow<f64>(stored_f64(batch29_arg0[batch29_index]), stored_f64(batch29_arg1[batch29_index]))))
+
+func mathematical_lerp_f32():
+    var batch30_arg0: [u64] = [0, 1092616192, 4286578687, 4286578687, 2139095039, 2139095039, 0, 0, 1, 1065353216, 1065353217, 3184315597, 2139095038]
+    var batch30_arg1: [u64] = [1092616192, 0, 2139095039, 2139095039, 4286578687, 2139095039, 1092616192, 1092616192, 3, 1065353217, 1065353216, 1045220557, 2139095039]
+    var batch30_arg2: [u64] = [1048576000, 1048576000, 1056964608, 1048576000, 1048576000, 1056964608, 3212836864, 1073741824, 1056964608, 1056964608, 1056964608, 1050253722, 1061158912]
+    for batch30_index in 0..<batch30_arg0.count:
+        print(raw_bits(math.lerp<f32>(stored_f32(batch30_arg0[batch30_index]), stored_f32(batch30_arg1[batch30_index]), stored_f32(batch30_arg2[batch30_index]))))
+
+func mathematical_inverse_lerp_f32():
+    var batch31_arg0: [u64] = [0, 4286578687, 2139095039, 2139095039, 1, 0, 0, 3184315597, 1065353216]
+    var batch31_arg1: [u64] = [1092616192, 2139095039, 4286578687, 2139095038, 3, 1, 1092616192, 1045220557, 1065353217]
+    var batch31_arg2: [u64] = [1075838976, 0, 0, 4286578687, 2, 2, 3240099840, 1050253722, 1065353218]
+    for batch31_index in 0..<batch31_arg0.count:
+        print(raw_bits(math.inverse_lerp<f32>(stored_f32(batch31_arg0[batch31_index]), stored_f32(batch31_arg1[batch31_index]), stored_f32(batch31_arg2[batch31_index]))))
+
+func mathematical_lerp_f64():
+    var batch32_arg0: [u64] = [0, 4621819117588971520, 18442240474082181119, 18442240474082181119, 9218868437227405311, 9218868437227405311, 0, 0, 1, 4607182418800017408, 4607182418800017409, 13815242216921733530, 9218868437227405310]
+    var batch32_arg1: [u64] = [4621819117588971520, 0, 9218868437227405311, 9218868437227405311, 18442240474082181119, 9218868437227405311, 4621819117588971520, 4621819117588971520, 3, 4607182418800017409, 4607182418800017408, 4596373779694328218, 9218868437227405311]
+    var batch32_arg2: [u64] = [4598175219545276416, 4598175219545276416, 4602678819172646912, 4598175219545276416, 4598175219545276416, 4602678819172646912, 13830554455654793216, 4611686018427387904, 4602678819172646912, 4602678819172646912, 4602678819172646912, 4599075939470750515, 4604930618986332160]
+    for batch32_index in 0..<batch32_arg0.count:
+        print(raw_bits(math.lerp<f64>(stored_f64(batch32_arg0[batch32_index]), stored_f64(batch32_arg1[batch32_index]), stored_f64(batch32_arg2[batch32_index]))))
+
+func mathematical_inverse_lerp_f64():
+    var batch33_arg0: [u64] = [0, 18442240474082181119, 9218868437227405311, 9218868437227405311, 1, 0, 0, 13815242216921733530, 4607182418800017408]
+    var batch33_arg1: [u64] = [4621819117588971520, 9218868437227405311, 18442240474082181119, 9218868437227405310, 3, 1, 4621819117588971520, 4596373779694328218, 4607182418800017409]
+    var batch33_arg2: [u64] = [4612811918334230528, 0, 0, 18442240474082181119, 2, 2, 13845191154443747328, 4599075939470750515, 4607182418800017410]
+    for batch33_index in 0..<batch33_arg0.count:
+        print(raw_bits(math.inverse_lerp<f64>(stored_f64(batch33_arg0[batch33_index]), stored_f64(batch33_arg1[batch33_index]), stored_f64(batch33_arg2[batch33_index]))))
+
+func reference_sin_f32():
+    var batch34_arg0: [u64] = [3296329728, 3226468352, 3187671040, 1040187392, 1065353216, 1078984704, 1148846080, 2139095039, 4286578687, 1078530010, 1078530011, 1078530012]
+    for batch34_index in 0..<batch34_arg0.count:
+        print(raw_bits(math.sin<f32>(stored_f32(batch34_arg0[batch34_index]))))
+
+func reference_cos_f32():
+    var batch35_arg0: [u64] = [3296329728, 3226468352, 3187671040, 1040187392, 1065353216, 1078984704, 1148846080, 2139095039, 1070141402, 1070141403, 1070141404]
+    for batch35_index in 0..<batch35_arg0.count:
+        print(raw_bits(math.cos<f32>(stored_f32(batch35_arg0[batch35_index]))))
+
+func reference_tan_f32():
+    var batch36_arg0: [u64] = [3267887104, 3217031168, 3187671040, 1040187392, 1069547520, 1120403456, 2139095039, 1070141402, 1070141403, 1070141404]
+    for batch36_index in 0..<batch36_arg0.count:
+        print(raw_bits(math.tan<f32>(stored_f32(batch36_arg0[batch36_index]))))
+
+func reference_asin_f32():
+    var batch37_arg0: [u64] = [3212836864, 3212820087, 3204448256, 1, 1056964608, 1065336439, 1065353216]
+    for batch37_index in 0..<batch37_arg0.count:
+        print(raw_bits(math.asin<f32>(stored_f32(batch37_arg0[batch37_index]))))
+
+func reference_acos_f32():
+    var batch38_arg0: [u64] = [3212836864, 3212820087, 3204448256, 0, 1056964608, 1065336439, 1065353216]
+    for batch38_index in 0..<batch38_arg0.count:
+        print(raw_bits(math.acos<f32>(stored_f32(batch38_arg0[batch38_index]))))
+
+func reference_atan_f32():
+    var batch39_arg0: [u64] = [4286578687, 3267887104, 3212836864, 2147483649, 1, 1065353216, 1120403456, 2139095039]
+    for batch39_index in 0..<batch39_arg0.count:
+        print(raw_bits(math.atan<f32>(stored_f32(batch39_arg0[batch39_index]))))
+
+func reference_atan2_f32():
+    var batch40_arg0: [u64] = [1065353216, 1065353216, 3212836864, 3212836864, 2139095039, 1, 2139095039, 1065353216, 3235905536]
+    var batch40_arg1: [u64] = [1065353216, 3212836864, 3212836864, 1065353216, 1, 2139095039, 4286578687, 1077936128, 1040187392]
+    for batch40_index in 0..<batch40_arg0.count:
+        print(raw_bits(math.atan2<f32>(stored_f32(batch40_arg0[batch40_index]), stored_f32(batch40_arg1[batch40_index]))))
+
+func reference_sqrt_f32():
+    var batch41_arg0: [u64] = [1, 2, 8388607, 1040187392, 1073741824, 1077936128, 2139095039]
+    for batch41_index in 0..<batch41_arg0.count:
+        print(raw_bits(math.sqrt<f32>(stored_f32(batch41_arg0[batch41_index]))))
+
+func reference_pow_f32():
+    var batch42_arg0: [u64] = [1073741824, 1040187392, 1065361605, 1073741824, 1073741824, 1073741824, 1092616192, 1056964608, 1123418112]
+    var batch42_arg1: [u64] = [1056964608, 1067450368, 1106903040, 3272933376, 3271294976, 1123942400, 3226468352, 3217031168, 1040187392]
+    for batch42_index in 0..<batch42_arg0.count:
+        print(raw_bits(math.pow<f32>(stored_f32(batch42_arg0[batch42_index]), stored_f32(batch42_arg1[batch42_index]))))
+
+func reference_exp_f32():
+    var batch43_arg0: [u64] = [3267887104, 3266183168, 3212836864, 2147483649, 1, 1056964608, 1065353216, 1118830592]
+    for batch43_index in 0..<batch43_arg0.count:
+        print(raw_bits(math.exp<f32>(stored_f32(batch43_arg0[batch43_index]))))
+
+func reference_exp2_f32():
+    var batch44_arg0: [u64] = [3272933376, 3271294976, 3226468352, 2147483649, 1, 1056964608, 1078984704, 1123942400]
+    for batch44_index in 0..<batch44_arg0.count:
+        print(raw_bits(math.exp2<f32>(stored_f32(batch44_arg0[batch44_index]))))
+
+func reference_log_f32():
+    var batch45_arg0: [u64] = [1, 2, 1040187392, 1065336439, 1065361605, 1073741824, 1092616192, 2139095039]
+    for batch45_index in 0..<batch45_arg0.count:
+        print(raw_bits(math.log<f32>(stored_f32(batch45_arg0[batch45_index]))))
+
+func reference_log2_f32():
+    var batch46_arg0: [u64] = [1, 2, 1040187392, 1065336439, 1065361605, 1073741824, 1092616192, 2139095039]
+    for batch46_index in 0..<batch46_arg0.count:
+        print(raw_bits(math.log2<f32>(stored_f32(batch46_arg0[batch46_index]))))
+
+func reference_sin_f64():
+    var batch47_arg0: [u64] = [13875379345695965184, 13837872805049270272, 13817043656772681728, 4593671619917905920, 4607182418800017408, 4614500768194494464, 4652007308841189376, 9218868437227405311, 18442240474082181119, 4614256656552045847, 4614256656552045848, 4614256656552045849]
+    for batch47_index in 0..<batch47_arg0.count:
+        print(raw_bits(math.sin<f64>(stored_f64(batch47_arg0[batch47_index]))))
+
+func reference_cos_f64():
+    var batch48_arg0: [u64] = [13875379345695965184, 13837872805049270272, 13817043656772681728, 4593671619917905920, 4607182418800017408, 4614500768194494464, 4652007308841189376, 9218868437227405311, 4609753056924675351, 4609753056924675352, 4609753056924675353]
+    for batch48_index in 0..<batch48_arg0.count:
+        print(raw_bits(math.cos<f64>(stored_f64(batch48_arg0[batch48_index]))))
+
+func reference_tan_f64():
+    var batch49_arg0: [u64] = [13860109328209412096, 13832806255468478464, 13817043656772681728, 4593671619917905920, 4609434218613702656, 4636737291354636288, 9218868437227405311, 4609753056924675351, 4609753056924675352, 4609753056924675353]
+    for batch49_index in 0..<batch49_arg0.count:
+        print(raw_bits(math.tan<f64>(stored_f64(batch49_arg0[batch49_index]))))
+
+func reference_asin_f64():
+    var batch50_arg0: [u64] = [13830554455654793216, 13830545448455538475, 13826050856027422720, 1, 4602678819172646912, 4607173411600762667, 4607182418800017408]
+    for batch50_index in 0..<batch50_arg0.count:
+        print(raw_bits(math.asin<f64>(stored_f64(batch50_arg0[batch50_index]))))
+
+func reference_acos_f64():
+    var batch51_arg0: [u64] = [13830554455654793216, 13830545448455538475, 13826050856027422720, 0, 4602678819172646912, 4607173411600762667, 4607182418800017408]
+    for batch51_index in 0..<batch51_arg0.count:
+        print(raw_bits(math.acos<f64>(stored_f64(batch51_arg0[batch51_index]))))
+
+func reference_atan_f64():
+    var batch52_arg0: [u64] = [18442240474082181119, 13860109328209412096, 13830554455654793216, 9223372036854775809, 1, 4607182418800017408, 4636737291354636288, 9218868437227405311]
+    for batch52_index in 0..<batch52_arg0.count:
+        print(raw_bits(math.atan<f64>(stored_f64(batch52_arg0[batch52_index]))))
+
+func reference_atan2_f64():
+    var batch53_arg0: [u64] = [4607182418800017408, 4607182418800017408, 13830554455654793216, 13830554455654793216, 9218868437227405311, 1, 9218868437227405311, 4607182418800017408, 13842939354630062080]
+    var batch53_arg1: [u64] = [4607182418800017408, 13830554455654793216, 13830554455654793216, 4607182418800017408, 1, 9218868437227405311, 18442240474082181119, 4613937818241073152, 4593671619917905920]
+    for batch53_index in 0..<batch53_arg0.count:
+        print(raw_bits(math.atan2<f64>(stored_f64(batch53_arg0[batch53_index]), stored_f64(batch53_arg1[batch53_index]))))
+
+func reference_sqrt_f64():
+    var batch54_arg0: [u64] = [1, 2, 4503599627370495, 4593671619917905920, 4611686018427387904, 4613937818241073152, 9218868437227405311]
+    for batch54_index in 0..<batch54_arg0.count:
+        print(raw_bits(math.sqrt<f64>(stored_f64(batch54_arg0[batch54_index]))))
+
+func reference_pow_f64():
+    var batch55_arg0: [u64] = [4611686018427387904, 4593671619917905920, 4607186922399644778, 4611686018427387904, 4611686018427387904, 4611686018427387904, 4621819117588971520, 4602678819172646912, 4638355772470722560]
+    var batch55_arg1: [u64] = [4602678819172646912, 4608308318706860032, 4629489310704336896, 13875810354254053376, 13875572859742453760, 4652209618980700160, 13837872805049270272, 13832806255468478464, 4593671619917905920]
+    for batch55_index in 0..<batch55_arg0.count:
+        print(raw_bits(math.pow<f64>(stored_f64(batch55_arg0[batch55_index]), stored_f64(batch55_arg1[batch55_index]))))
+
+func reference_exp_f64():
+    var batch56_arg0: [u64] = [13873127545882279936, 13872819682626502656, 13830554455654793216, 9223372036854775809, 1, 4602678819172646912, 4607182418800017408, 4649447645771726848]
+    for batch56_index in 0..<batch56_arg0.count:
+        print(raw_bits(math.exp<f64>(stored_f64(batch56_arg0[batch56_index]))))
+
+func reference_exp2_f64():
+    var batch57_arg0: [u64] = [13875810354254053376, 13875572859742453760, 13837872805049270272, 9223372036854775809, 1, 4602678819172646912, 4614500768194494464, 4652209618980700160]
+    for batch57_index in 0..<batch57_arg0.count:
+        print(raw_bits(math.exp2<f64>(stored_f64(batch57_arg0[batch57_index]))))
+
+func reference_log_f64():
+    var batch58_arg0: [u64] = [1, 2, 4593671619917905920, 4607173411600762667, 4607186922399644778, 4611686018427387904, 4621819117588971520, 9218868437227405311]
+    for batch58_index in 0..<batch58_arg0.count:
+        print(raw_bits(math.log<f64>(stored_f64(batch58_arg0[batch58_index]))))
+
+func reference_log2_f64():
+    var batch59_arg0: [u64] = [1, 2, 4593671619917905920, 4607173411600762667, 4607186922399644778, 4611686018427387904, 4621819117588971520, 9218868437227405311]
+    for batch59_index in 0..<batch59_arg0.count:
+        print(raw_bits(math.log2<f64>(stored_f64(batch59_arg0[batch59_index]))))
+
+func entry(input: i32) -> i32:
+    core_i8()
+    core_u8()
+    core_i16()
+    core_u16()
+    core_i32()
+    core_u32()
+    core_i64()
+    core_u64()
+    constants_f32()
+    selectors_f32()
+    rounding_f32()
+    interpolation_f32()
+    special_unary_f32()
+    atan2_special_f32()
+    pow_special_f32()
+    constants_f64()
+    selectors_f64()
+    rounding_f64()
+    interpolation_f64()
+    special_unary_f64()
+    atan2_special_f64()
+    pow_special_f64()
+    mathematical_lerp_f32()
+    mathematical_inverse_lerp_f32()
+    mathematical_lerp_f64()
+    mathematical_inverse_lerp_f64()
+    reference_sin_f32()
+    reference_cos_f32()
+    reference_tan_f32()
+    reference_asin_f32()
+    reference_acos_f32()
+    reference_atan_f32()
+    reference_atan2_f32()
+    reference_sqrt_f32()
+    reference_pow_f32()
+    reference_exp_f32()
+    reference_exp2_f32()
+    reference_log_f32()
+    reference_log2_f32()
+    reference_sin_f64()
+    reference_cos_f64()
+    reference_tan_f64()
+    reference_asin_f64()
+    reference_acos_f64()
+    reference_atan_f64()
+    reference_atan2_f64()
+    reference_sqrt_f64()
+    reference_pow_f64()
+    reference_exp_f64()
+    reference_exp2_f64()
+    reference_log_f64()
+    reference_log2_f64()
+    print(raw_bits(math.sin(input as f64)))
+    return 0

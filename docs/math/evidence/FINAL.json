@@ -1,0 +1,1166 @@
+{
+  "completed_at_utc": "2026-10-27T07:05:46.713690+00:00",
+  "completion_date_local": "2026-10-27",
+  "timezone": "America/Los_Angeles",
+  "baseline": "9eaefbd339e2456295911cdecb2460d4143f34b0",
+  "status": "Implementation and local verification complete; STOP for independent Golden Wrench source review.",
+  "public_api": {
+    "functions": [
+      "abs",
+      "min",
+      "max",
+      "clamp",
+      "sign",
+      "is_nan",
+      "is_infinite",
+      "is_finite",
+      "floor",
+      "ceil",
+      "trunc",
+      "round",
+      "lerp",
+      "inverse_lerp",
+      "sin",
+      "cos",
+      "tan",
+      "asin",
+      "acos",
+      "atan",
+      "atan2",
+      "sqrt",
+      "pow",
+      "exp",
+      "exp2",
+      "log",
+      "log2",
+      "radians",
+      "degrees"
+    ],
+    "constants": [
+      "pi_f32",
+      "pi_f64",
+      "tau_f32",
+      "tau_f64",
+      "e_f32",
+      "e_f64"
+    ]
+  },
+  "profiles": {
+    "debug": {
+      "passed": 31,
+      "failed": 0,
+      "latest_tests": {
+        "gc_buffers": {
+          "name": "gc_buffers",
+          "seconds": 9.98052,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "gc_schemas": {
+          "name": "gc_schemas",
+          "seconds": 0.839999,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "debug_cache": {
+          "name": "debug_cache",
+          "seconds": 2.80509,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "debug_cache_processes": {
+          "name": "debug_cache_processes",
+          "seconds": 21.7339,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "lsp_stage8": {
+          "name": "lsp_stage8",
+          "seconds": 0.406653,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        },
+        "documentation_execution": {
+          "name": "documentation_execution",
+          "seconds": 0.883726,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "lsp_documentation": {
+          "name": "lsp_documentation",
+          "seconds": 0.339868,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        },
+        "math_host": {
+          "name": "math_host",
+          "seconds": 1.71648,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-cache-followup.json"
+        },
+        "math_ir": {
+          "name": "math_ir",
+          "seconds": 0.238031,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "math_execution": {
+          "name": "math_execution",
+          "seconds": 106.442,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-numerical-followup.json"
+        },
+        "math_frontend": {
+          "name": "math_frontend",
+          "seconds": 13.3473,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "math_errors": {
+          "name": "math_errors",
+          "seconds": 7.43365,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "math_worker": {
+          "name": "math_worker",
+          "seconds": 3.52837,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "lsp_math": {
+          "name": "lsp_math",
+          "seconds": 1.25135,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        },
+        "math_install": {
+          "name": "math_install",
+          "seconds": 1.58108,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "math_preservation": {
+          "name": "math_preservation",
+          "seconds": 1.09192,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "math_stack": {
+          "name": "math_stack",
+          "seconds": 106.543,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-numerical-followup.json"
+        },
+        "math_frontend_stack": {
+          "name": "math_frontend_stack",
+          "seconds": 13.2354,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "binary_execution": {
+          "name": "binary_execution",
+          "seconds": 40.7742,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "lsp_binary": {
+          "name": "lsp_binary",
+          "seconds": 0.26171,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        },
+        "binary_ownership": {
+          "name": "binary_ownership",
+          "seconds": 1.02272,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "text_encoding_crash_preservation": {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.770234,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "async_ir": {
+          "name": "async_ir",
+          "seconds": 0.0571105,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "core": {
+          "name": "core",
+          "seconds": 0.0192904,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "numeric": {
+          "name": "numeric",
+          "seconds": 5.54111,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "frontend": {
+          "name": "frontend",
+          "seconds": 10.9002,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "modules": {
+          "name": "modules",
+          "seconds": 1.38949,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "numeric_sprint2": {
+          "name": "numeric_sprint2",
+          "seconds": 3.06642,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug.json"
+        },
+        "lsp_stage10_display": {
+          "name": "lsp_stage10_display",
+          "seconds": 14.5344,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        },
+        "lsp_stage10_intelligence": {
+          "name": "lsp_stage10_intelligence",
+          "seconds": 0.653937,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        },
+        "generics_source": {
+          "name": "generics_source",
+          "seconds": 5.97035,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-debug-tooling-followup.json"
+        }
+      },
+      "receipts": [
+        {
+          "path": "docs/math/evidence/acceptance-debug.json",
+          "sha256": "b8801df1d31e4f9f03b027f0e8f9ae795b6eb7aab38f3d059bec62dcfb188237",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+            "-R",
+            "^(math_.*|lsp_math|core|numeric|frontend|modules|numeric_sprint2|binary_execution|binary_ownership|lsp_binary|debug_cache|debug_cache_processes|gc_schemas|gc_buffers|async_ir|documentation_execution|lsp_documentation|lsp_stage8|lsp_stage10_intelligence|lsp_stage10_display|text_encoding_crash_preservation)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-debug.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 29,
+          "failed": 1
+        },
+        {
+          "path": "docs/math/evidence/acceptance-debug-numerical-followup.json",
+          "sha256": "2bc7b56c39ba277f79a6d751d1a6889c88c6577da1d48b7b9e28491121948478",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+            "-R",
+            "^(math_execution|math_stack)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-debug-numerical-followup.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "path": "docs/math/evidence/acceptance-debug-tooling-followup.json",
+          "sha256": "1eb59b75b8ae48aa4d315c32258b4059d8da55080affd0a21c377a6457b74d2c",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+            "-R",
+            "^(lsp_math|lsp_binary|lsp_documentation|lsp_stage8|lsp_stage10_display|lsp_stage10_intelligence|generics_source)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-debug-tooling-followup.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "path": "docs/math/evidence/acceptance-debug-cache-followup.json",
+          "sha256": "5323f344c2d52a55410997caac85700be6e3e8776d12f9f6f2222da728259d11",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+            "-R",
+            "^math_host$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-debug-cache-followup.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "numerical": [
+        {
+          "receipt": "docs/math/evidence/execution-ci-official-debug.json",
+          "sha256": "bd53e5838d38c2acf5ffc5165cccb47a7d43e6f68a7efa8176b423cd5332d0ff",
+          "small_stack": false,
+          "vectors_per_mode": 1372,
+          "modes": [
+            "JIT O0",
+            "AOT O0",
+            "JIT O2",
+            "AOT O2"
+          ],
+          "native_max_ulp": 1,
+          "interpolation_mathematical_max_ulp": 5,
+          "source_artifact": "docs/math/evidence/math_test-ci-official-debug.void",
+          "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+          "bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0"
+        },
+        {
+          "receipt": "docs/math/evidence/execution-ci-official-debug-stack.json",
+          "sha256": "1661c9fd7c83091c02ea309d453e8ce21c5000cef069849925acb2657fa643fe",
+          "small_stack": true,
+          "vectors_per_mode": 1372,
+          "modes": [
+            "JIT O0",
+            "AOT O0",
+            "JIT O2",
+            "AOT O2"
+          ],
+          "native_max_ulp": 1,
+          "interpolation_mathematical_max_ulp": 5,
+          "source_artifact": "docs/math/evidence/math_test-ci-official-debug-stack.void",
+          "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+          "bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0"
+        }
+      ],
+      "cache_stdout": "Math native cache: first=miss repeated=hit\nMath native cache: first=miss repeated=hit\nMath host: 28 checks passed\n",
+      "build": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "binaries": {
+        "voidc": "fe184f4ee004af17db8a086653d6d3b06c1d7097945c7fb82ebdecdef108d656",
+        "voidls": "04e335f6b4da2b4039f9669d4dc611ef53f1590935496b88b0ea6263acdb8f04",
+        "void_math_host": "d73b810c08400290a1eb6907d101657d11630e57da64279474f4c8977ea807be",
+        "void_math_ir": "f7c19e4bb421304fd7171c011fda6ddb0cfe01f971451d7556800e21d94aff1d",
+        "void_io_runner": "3041b270a236abbf638a449e7e10af48b613e6eea4d3299fb297b83cfc9cee44"
+      },
+      "cmake_cache_sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "native_manifest_sha256": "f6fabf61d3f139287221a03a3236361c02d33fccaacc4920f5a785028ada27ab",
+      "compiler_build_identity_source": "#include <string_view>\nnamespace vd { std::string_view compiler_build_identity() { return \"9d0e974272280238bdf99ab883801a5b9126ea1b458ecb198033ee1ea1baefc0\"; } }\n"
+    },
+    "release": {
+      "passed": 31,
+      "failed": 0,
+      "latest_tests": {
+        "gc_buffers": {
+          "name": "gc_buffers",
+          "seconds": 0.955165,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "gc_schemas": {
+          "name": "gc_schemas",
+          "seconds": 0.0408993,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "debug_cache": {
+          "name": "debug_cache",
+          "seconds": 1.41258,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "debug_cache_processes": {
+          "name": "debug_cache_processes",
+          "seconds": 6.13572,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "lsp_stage8": {
+          "name": "lsp_stage8",
+          "seconds": 0.502468,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        },
+        "documentation_execution": {
+          "name": "documentation_execution",
+          "seconds": 0.59394,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "lsp_documentation": {
+          "name": "lsp_documentation",
+          "seconds": 0.134994,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        },
+        "math_host": {
+          "name": "math_host",
+          "seconds": 0.689716,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-cache-followup.json"
+        },
+        "math_ir": {
+          "name": "math_ir",
+          "seconds": 0.252187,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "math_execution": {
+          "name": "math_execution",
+          "seconds": 79.6252,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-numerical-followup.json"
+        },
+        "math_frontend": {
+          "name": "math_frontend",
+          "seconds": 4.09833,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "math_errors": {
+          "name": "math_errors",
+          "seconds": 4.07244,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "math_worker": {
+          "name": "math_worker",
+          "seconds": 1.83698,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "lsp_math": {
+          "name": "lsp_math",
+          "seconds": 0.297509,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        },
+        "math_install": {
+          "name": "math_install",
+          "seconds": 1.06738,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "math_preservation": {
+          "name": "math_preservation",
+          "seconds": 0.980813,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "math_stack": {
+          "name": "math_stack",
+          "seconds": 80.7856,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-numerical-followup.json"
+        },
+        "math_frontend_stack": {
+          "name": "math_frontend_stack",
+          "seconds": 5.62567,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "binary_execution": {
+          "name": "binary_execution",
+          "seconds": 20.3392,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "lsp_binary": {
+          "name": "lsp_binary",
+          "seconds": 0.115575,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        },
+        "binary_ownership": {
+          "name": "binary_ownership",
+          "seconds": 0.416676,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "text_encoding_crash_preservation": {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.734617,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "async_ir": {
+          "name": "async_ir",
+          "seconds": 0.0514362,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "core": {
+          "name": "core",
+          "seconds": 0.0107604,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "numeric": {
+          "name": "numeric",
+          "seconds": 2.21006,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "frontend": {
+          "name": "frontend",
+          "seconds": 4.97811,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "modules": {
+          "name": "modules",
+          "seconds": 0.916111,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "numeric_sprint2": {
+          "name": "numeric_sprint2",
+          "seconds": 1.43175,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release.json"
+        },
+        "lsp_stage10_display": {
+          "name": "lsp_stage10_display",
+          "seconds": 2.37363,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        },
+        "lsp_stage10_intelligence": {
+          "name": "lsp_stage10_intelligence",
+          "seconds": 0.185851,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        },
+        "generics_source": {
+          "name": "generics_source",
+          "seconds": 3.53926,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-release-tooling-followup.json"
+        }
+      },
+      "receipts": [
+        {
+          "path": "docs/math/evidence/acceptance-release.json",
+          "sha256": "5a3a354ac4e3ccdbb5a83594e0d24105b905de7c7ed068bd623ed1d5b0934ffd",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+            "-R",
+            "^(math_.*|lsp_math|core|numeric|frontend|modules|numeric_sprint2|binary_execution|binary_ownership|lsp_binary|debug_cache|debug_cache_processes|gc_schemas|gc_buffers|async_ir|documentation_execution|lsp_documentation|lsp_stage8|lsp_stage10_intelligence|lsp_stage10_display|text_encoding_crash_preservation)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-release.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 29,
+          "failed": 1
+        },
+        {
+          "path": "docs/math/evidence/acceptance-release-numerical-followup.json",
+          "sha256": "a75dc367efaf8e9183706aa6a40fd0b5cbcd1607cf405eed98daf16677df531b",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+            "-R",
+            "^(math_execution|math_stack)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-release-numerical-followup.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "path": "docs/math/evidence/acceptance-release-tooling-followup.json",
+          "sha256": "088cfc765820df1c42daef8ed18a0da5373064d8a7cbed549662096dfdb041d6",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+            "-R",
+            "^(lsp_math|lsp_binary|lsp_documentation|lsp_stage8|lsp_stage10_display|lsp_stage10_intelligence|generics_source)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-release-tooling-followup.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "path": "docs/math/evidence/acceptance-release-cache-followup.json",
+          "sha256": "e1b4d030230244c3514097f8cf66deeea6b846e6104550b44b8f78de4c5d8ab0",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+            "-R",
+            "^math_host$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-release-cache-followup.xml"
+          ],
+          "environment": {
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "numerical": [
+        {
+          "receipt": "docs/math/evidence/execution-ci-official-release.json",
+          "sha256": "c0706c7da1615d0eee170abeccb67e9f64395ea92094e36076f69d28952f3faf",
+          "small_stack": false,
+          "vectors_per_mode": 1372,
+          "modes": [
+            "JIT O0",
+            "AOT O0",
+            "JIT O2",
+            "AOT O2"
+          ],
+          "native_max_ulp": 1,
+          "interpolation_mathematical_max_ulp": 5,
+          "source_artifact": "docs/math/evidence/math_test-ci-official-release.void",
+          "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+          "bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0"
+        },
+        {
+          "receipt": "docs/math/evidence/execution-ci-official-release-stack.json",
+          "sha256": "70d6ee364cfe72f3e07896b9086d7f3f3220c1dd02f68b3c1d70ae12a970c2be",
+          "small_stack": true,
+          "vectors_per_mode": 1372,
+          "modes": [
+            "JIT O0",
+            "AOT O0",
+            "JIT O2",
+            "AOT O2"
+          ],
+          "native_max_ulp": 1,
+          "interpolation_mathematical_max_ulp": 5,
+          "source_artifact": "docs/math/evidence/math_test-ci-official-release-stack.void",
+          "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+          "bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0"
+        }
+      ],
+      "cache_stdout": "Math native cache: first=miss repeated=hit\nMath native cache: first=miss repeated=hit\nMath host: 28 checks passed\n",
+      "build": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+      "binaries": {
+        "voidc": "a892191eda109d6c212d0f6f247aa2979d8307f7933e5c63220bf39df81a6275",
+        "voidls": "1710663e54fa33687589f7cc94da0feaed4605b9d8481736434b4e416d7c495e",
+        "void_math_host": "20d99e40f8cdc794375b3982fb88a43521242d10a557c46a391b7e8b0fd4bac3",
+        "void_math_ir": "7b615d65c091153e609f0905167707d9658678fa7829f1c615390c2da34c435e",
+        "void_io_runner": "73dc198810a63c0f14bdd9488007797a58e98dba19b0f2bc936b5b645adea8bb"
+      },
+      "cmake_cache_sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "native_manifest_sha256": "b68eae90ecc1ab9d5bb64cde570194678a5ca64ece51b9185fff4ed3bccbf76a",
+      "compiler_build_identity_source": "#include <string_view>\nnamespace vd { std::string_view compiler_build_identity() { return \"80f758633d9a1390468c8659b19d9dfd46f03f80c27dcbb49ae50578ef9b0b3c\"; } }\n"
+    },
+    "sanitizers": {
+      "passed": 31,
+      "failed": 0,
+      "latest_tests": {
+        "gc_buffers": {
+          "name": "gc_buffers",
+          "seconds": 3.45661,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "gc_schemas": {
+          "name": "gc_schemas",
+          "seconds": 0.237586,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "debug_cache": {
+          "name": "debug_cache",
+          "seconds": 2.8109,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "debug_cache_processes": {
+          "name": "debug_cache_processes",
+          "seconds": 11.3593,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "lsp_stage8": {
+          "name": "lsp_stage8",
+          "seconds": 1.85452,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        },
+        "documentation_execution": {
+          "name": "documentation_execution",
+          "seconds": 1.36984,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "lsp_documentation": {
+          "name": "lsp_documentation",
+          "seconds": 0.354377,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        },
+        "math_host": {
+          "name": "math_host",
+          "seconds": 1.95885,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-cache-followup.json"
+        },
+        "math_ir": {
+          "name": "math_ir",
+          "seconds": 0.367566,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "math_execution": {
+          "name": "math_execution",
+          "seconds": 92.8118,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "math_frontend": {
+          "name": "math_frontend",
+          "seconds": 17.2469,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "math_errors": {
+          "name": "math_errors",
+          "seconds": 8.57499,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "math_worker": {
+          "name": "math_worker",
+          "seconds": 3.73031,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "lsp_math": {
+          "name": "lsp_math",
+          "seconds": 1.05039,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        },
+        "math_install": {
+          "name": "math_install",
+          "seconds": 2.18536,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "math_preservation": {
+          "name": "math_preservation",
+          "seconds": 1.04352,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers.json"
+        },
+        "math_stack": {
+          "name": "math_stack",
+          "seconds": 92.9906,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "math_frontend_stack": {
+          "name": "math_frontend_stack",
+          "seconds": 17.9465,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "binary_execution": {
+          "name": "binary_execution",
+          "seconds": 41.3766,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "lsp_binary": {
+          "name": "lsp_binary",
+          "seconds": 0.26005,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        },
+        "binary_ownership": {
+          "name": "binary_ownership",
+          "seconds": 1.06609,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "text_encoding_crash_preservation": {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.698503,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers.json"
+        },
+        "async_ir": {
+          "name": "async_ir",
+          "seconds": 0.133094,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "core": {
+          "name": "core",
+          "seconds": 0.0514717,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "numeric": {
+          "name": "numeric",
+          "seconds": 6.49269,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "frontend": {
+          "name": "frontend",
+          "seconds": 11.9354,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "modules": {
+          "name": "modules",
+          "seconds": 1.77774,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "numeric_sprint2": {
+          "name": "numeric_sprint2",
+          "seconds": 4.42378,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-followup.json"
+        },
+        "lsp_stage10_display": {
+          "name": "lsp_stage10_display",
+          "seconds": 11.4833,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        },
+        "lsp_stage10_intelligence": {
+          "name": "lsp_stage10_intelligence",
+          "seconds": 0.561027,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        },
+        "generics_source": {
+          "name": "generics_source",
+          "seconds": 5.88701,
+          "failed": false,
+          "skipped": false,
+          "receipt": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json"
+        }
+      },
+      "receipts": [
+        {
+          "path": "docs/math/evidence/acceptance-sanitizers.json",
+          "sha256": "0132b5b39520eb5ddb81a9b18c7b7023a802a3457fa5ba96fc358ea52b2b0c65",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+            "-R",
+            "^(math_.*|lsp_math|core|numeric|frontend|modules|numeric_sprint2|binary_execution|binary_ownership|lsp_binary|debug_cache|debug_cache_processes|gc_schemas|gc_buffers|async_ir|documentation_execution|lsp_documentation|lsp_stage8|lsp_stage10_intelligence|lsp_stage10_display|text_encoding_crash_preservation)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-sanitizers.xml"
+          ],
+          "environment": {
+            "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 2,
+          "failed": 28
+        },
+        {
+          "path": "docs/math/evidence/acceptance-sanitizers-followup.json",
+          "sha256": "667eda68e1e9ed00f9dbc38e4a5a01ebcdd077bd310a4116a6bb7f68288c24fc",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+            "-R",
+            "^(gc_buffers|gc_schemas|debug_cache|debug_cache_processes|lsp_stage8|documentation_execution|lsp_documentation|math_host|math_ir|math_execution|math_frontend|math_errors|math_worker|lsp_math|math_install|math_stack|math_frontend_stack|binary_execution|lsp_binary|binary_ownership|async_ir|core|numeric|frontend|modules|numeric_sprint2|lsp_stage10_display|lsp_stage10_intelligence)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-sanitizers-followup.xml"
+          ],
+          "environment": {
+            "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 28,
+          "failed": 0
+        },
+        {
+          "path": "docs/math/evidence/acceptance-sanitizers-tooling-followup.json",
+          "sha256": "b427b5cb8b8511a51aa0704639a5e2f74d7122ca6d6b356ccad7c21853bbed26",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+            "-R",
+            "^(lsp_math|lsp_binary|lsp_documentation|lsp_stage8|lsp_stage10_display|lsp_stage10_intelligence|generics_source)$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-sanitizers-tooling-followup.xml"
+          ],
+          "environment": {
+            "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "path": "docs/math/evidence/acceptance-sanitizers-cache-followup.json",
+          "sha256": "693388426543881d672f05eb60128cb848784b072e93323d68e8c4cc73b21426",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+            "-R",
+            "^math_host$",
+            "-j",
+            "2",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-sanitizers-cache-followup.xml"
+          ],
+          "environment": {
+            "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+            "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+          },
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "numerical": [
+        {
+          "receipt": "docs/math/evidence/execution-ci-official-san.json",
+          "sha256": "fbfed0805f44d164dbf2055a6a063ebddf5d2866cbcfebd10d1b8967ac502f49",
+          "small_stack": false,
+          "vectors_per_mode": 1372,
+          "modes": [
+            "JIT O0",
+            "AOT O0",
+            "JIT O2",
+            "AOT O2"
+          ],
+          "native_max_ulp": 1,
+          "interpolation_mathematical_max_ulp": 5,
+          "source_artifact": "docs/math/evidence/math_test-ci-official-san.void",
+          "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+          "bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0"
+        },
+        {
+          "receipt": "docs/math/evidence/execution-ci-official-san-stack.json",
+          "sha256": "e5b2711ae5e303dc37816bb862adf77bb81b43df3644c928399b5c7ecd8abf62",
+          "small_stack": true,
+          "vectors_per_mode": 1372,
+          "modes": [
+            "JIT O0",
+            "AOT O0",
+            "JIT O2",
+            "AOT O2"
+          ],
+          "native_max_ulp": 1,
+          "interpolation_mathematical_max_ulp": 5,
+          "source_artifact": "docs/math/evidence/math_test-ci-official-san-stack.void",
+          "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+          "bank_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0"
+        }
+      ],
+      "cache_stdout": "Math native cache: first=miss repeated=hit\nMath native cache: first=miss repeated=hit\nMath host: 28 checks passed\n",
+      "build": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+      "binaries": {
+        "voidc": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+        "voidls": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+        "void_math_host": "c34acd9ac824afbbb227f80b3f255821923b4c263e0058290b06999bb1773c34",
+        "void_math_ir": "2985d14ce44dbefc174afb45b0c26126d1370c06ed425bae7d81ab11075e65d4",
+        "void_io_runner": "128de44ae462dab60ffe43ab02e14b5a423d32aec2ddc48abf1bfce367f76174"
+      },
+      "cmake_cache_sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+      "native_manifest_sha256": "6bba6ca752fb81bfd39bc9c8b5464d791910cfdc1fd1f3a0ff2ae9668f8992ca",
+      "compiler_build_identity_source": "#include <string_view>\nnamespace vd { std::string_view compiler_build_identity() { return \"7d4447dbe510ecfa78d87131b08244dfa7db104a1ea26fb9984371336bcc7436\"; } }\n"
+    }
+  },
+  "effective_unique_profile_test_outcomes": 93,
+  "actual_ctest_executions": 146,
+  "actual_ctest_passed": 116,
+  "original_unsuccessful_executions": 30,
+  "vectors_per_mode": 1372,
+  "final_numerical_mode_runs": 24,
+  "final_numerical_comparisons": 32928,
+  "mpfr_native_vectors": 224,
+  "mpfr_interpolation_vectors": 44,
+  "preserved_incidents": 20,
+  "incident_audit": "docs/math/evidence/sanitizers-incident-audit-complete.json",
+  "incident_output_limits": "18 raw per-process diagnostic captures; 2 inherited-stream diagnostics preserved upstream in original CTest XML/text. No reconstructed bytes claimed as original.",
+  "strict_environment_resolution": "Identical frozen binaries and strict flags pass outside process sandbox. Initial LSan process-inspection exits retained. No sanitizer flag relaxed.",
+  "oracle_provenance_limit": "Two older successful Release receipts reread a later bank hash; originals and explicit limits retained in bank-freeze-provenance.json. Final loaded-byte hashes and immutable artifacts validated above.",
+  "unresolved_math_defects": [],
+  "limits": [
+    "Native Windows Debug/Release and macOS ARM64 execution unverified.",
+    "No hosted CI/acceptance/release lock.",
+    "No universal transcendental ULP or cross-platform bit-identity promise.",
+    "Host sanitizers do not instrument every generated JIT instruction; existing LLVM no-RTTI ABI excludes vptr sanitization.",
+    "Historical filesystem/optimizer/Random incidents remain unchanged and are not claimed repaired."
+  ],
+  "protected_files": "docs/math/evidence/protected-files.json",
+  "git_mutations": "none",
+  "source_manifest": "docs/math/evidence/MANIFEST.json"
+}

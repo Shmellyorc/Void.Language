@@ -1,0 +1,15 @@
+use random
+
+func work(value: random.generator) -> u64:
+    var independent = value
+    return independent.rand_u64()
+
+async func entry(n: i32) -> i32:
+    var original = random.generator(seed = 42)
+    var task = spawn work(original)
+    var sampled = await task
+    if sampled != (1546998764402558742 as u64):
+        return 1
+    if original.rand_u64() != sampled:
+        return 2
+    return n

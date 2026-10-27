@@ -1,0 +1,9 @@
+use math
+func entry(input: i32) -> i32:
+    var value: f64 = input as f64
+    print(math.floor(value + 0.75))
+    print(math.sqrt(value * value))
+    print(math.atan2(value, -value) > math.pi_f64 / 2)
+    print(math.pow(-value, 3.0))
+    print(math.sin(value) > 0.0)
+    return 0

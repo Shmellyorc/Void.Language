@@ -1,0 +1,10 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+    Start  96: math_execution
+    Start 103: math_stack
+1/2 Test  #96: math_execution ...................   Passed   79.63 sec
+2/2 Test #103: math_stack .......................   Passed   80.79 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  80.79 sec
+release: 2/2 selected CTests passed

@@ -10,6 +10,7 @@
 #include "void/frontend.hpp"
 #include "void/tooling.hpp"
 #include "void/numeric.hpp"
+#include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
@@ -1430,6 +1431,39 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
+                case Op::math: {
+                    const auto kind=static_cast<math::Kind>(instruction.immediate);
+                    auto* scalar=type(instruction.type);
+                    if(kind==math::Kind::identity) { v=values[instruction.a]; break; }
+                    if(kind==math::Kind::atan2) {
+                        // Fixed matching-precision C ABI; no stronger memory/errno attributes.
+                        auto target=module->getOrInsertFunction(instruction.type==ir::Type::f32?"atan2f":"atan2",
+                            llvm::FunctionType::get(scalar,{scalar,scalar},false));
+                        v=b.CreateCall(target,{values[instruction.a],values[instruction.b]});
+                        break;
+                    }
+                    llvm::Intrinsic::ID id=llvm::Intrinsic::not_intrinsic;
+                    switch(kind) {
+                    case math::Kind::floor:id=llvm::Intrinsic::floor;break;
+                    case math::Kind::sqrt:id=llvm::Intrinsic::sqrt;break;
+                    case math::Kind::sin:id=llvm::Intrinsic::sin;break;
+                    case math::Kind::cos:id=llvm::Intrinsic::cos;break;
+                    case math::Kind::tan:id=llvm::Intrinsic::tan;break;
+                    case math::Kind::asin:id=llvm::Intrinsic::asin;break;
+                    case math::Kind::acos:id=llvm::Intrinsic::acos;break;
+                    case math::Kind::atan:id=llvm::Intrinsic::atan;break;
+                    case math::Kind::pow:id=llvm::Intrinsic::pow;break;
+                    case math::Kind::exp:id=llvm::Intrinsic::exp;break;
+                    case math::Kind::exp2:id=llvm::Intrinsic::exp2;break;
+                    case math::Kind::log:id=llvm::Intrinsic::log;break;
+                    case math::Kind::log2:id=llvm::Intrinsic::log2;break;
+                    default:throw std::invalid_argument("invalid validated Math operation");
+                    }
+                    auto* target=llvm::Intrinsic::getDeclaration(module.get(),id,{scalar});
+                    if(kind==math::Kind::pow)v=b.CreateCall(target,{values[instruction.a],values[instruction.b]});
+                    else v=b.CreateCall(target,{values[instruction.a]});
+                    break;
+                }
                 case Op::random_xor: v=b.CreateXor(values[instruction.a],values[instruction.b]); break;
                 case Op::random_seed: {
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
@@ -1759,6 +1793,20 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
         return std::move(object);
     });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    // Intrinsic lowering may select these standard libcalls even in isolated
+    // source generations or a cache hit. Bind only the closed scalar Math set.
+#define VD_BIND_MATH_UNARY(name) \
+    bind(#name,static_cast<double(*)(double)>(std::name)); \
+    bind(#name "f",static_cast<float(*)(float)>(std::name))
+    VD_BIND_MATH_UNARY(floor);VD_BIND_MATH_UNARY(sqrt);
+    VD_BIND_MATH_UNARY(sin);VD_BIND_MATH_UNARY(cos);VD_BIND_MATH_UNARY(tan);
+    VD_BIND_MATH_UNARY(asin);VD_BIND_MATH_UNARY(acos);VD_BIND_MATH_UNARY(atan);
+    VD_BIND_MATH_UNARY(exp);VD_BIND_MATH_UNARY(exp2);VD_BIND_MATH_UNARY(log);VD_BIND_MATH_UNARY(log2);
+#undef VD_BIND_MATH_UNARY
+    bind("atan2",static_cast<double(*)(double,double)>(std::atan2));
+    bind("atan2f",static_cast<float(*)(float,float)>(std::atan2));
+    bind("pow",static_cast<double(*)(double,double)>(std::pow));
+    bind("powf",static_cast<float(*)(float,float)>(std::pow));
     bind("vd_random_seed", vd_random_seed);
     bind("vd_filesystem_call", vd_filesystem_call);
     bind("vd_file_control", vd_file_control);

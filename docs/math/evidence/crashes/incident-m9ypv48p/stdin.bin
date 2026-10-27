@@ -1,0 +1,219 @@
+Content-Length: 248
+
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{"textDocument":{"documentSymbol":{"hierarchicalDocumentSymbolSupport":true}},"workspace":{"workspaceEdit":{"documentChanges":true,"failureHandling":"textOnlyTransactional"}}}}}Content-Length: 52
+
+{"jsonrpc":"2.0","method":"initialized","params":{}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":2,"method":"void/barrier"}Content-Length: 962
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","languageId":"void","version":1,"text":"value struct box<t>:\n    value: t\n    ## Exact sum of two boxes.\n    operator +(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value + right.value)\n    operator %(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value % right.value)\n    operator ==(const left: box<t>, const right: box<t>) -> bool:\n        return left.value == right.value\n    private operator -(const left: box<t>, const right: box<t>) -> box<t>:\n        return left\nfunc entry(input: i32) -> i32:\n    var a = box<i32>(value = input)\n    var b = box<i32>(value = 3)\n    var c = a + b\n    c %= b\n    var x = box<i64>(value = 4)\n    var y = x + x\n    if c != a:\n        return c.value\n    return input\n"}}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":3,"method":"void/barrier"}Content-Length: 196
+
+{"jsonrpc":"2.0","id":4,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":14,"character":14}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":5,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":14,"character":14}}}Content-Length: 239
+
+{"jsonrpc":"2.0","id":6,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":14,"character":14},"context":{"includeDeclaration":true}}}Content-Length: 213
+
+{"jsonrpc":"2.0","id":7,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":14,"character":14},"newName":"sum"}}Content-Length: 196
+
+{"jsonrpc":"2.0","id":8,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":17,"character":14}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":9,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":17,"character":14}}}Content-Length: 240
+
+{"jsonrpc":"2.0","id":10,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":17,"character":14},"context":{"includeDeclaration":true}}}Content-Length: 214
+
+{"jsonrpc":"2.0","id":11,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":17,"character":14},"newName":"sum"}}Content-Length: 196
+
+{"jsonrpc":"2.0","id":12,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":15,"character":6}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":13,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":15,"character":6}}}Content-Length: 239
+
+{"jsonrpc":"2.0","id":14,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":15,"character":6},"context":{"includeDeclaration":true}}}Content-Length: 213
+
+{"jsonrpc":"2.0","id":15,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":15,"character":6},"newName":"sum"}}Content-Length: 196
+
+{"jsonrpc":"2.0","id":16,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":18,"character":9}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":17,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":18,"character":9}}}Content-Length: 239
+
+{"jsonrpc":"2.0","id":18,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":18,"character":9},"context":{"includeDeclaration":true}}}Content-Length: 213
+
+{"jsonrpc":"2.0","id":19,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":18,"character":9},"newName":"sum"}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":20,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":14,"character":14}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":21,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":15,"character":6}}}Content-Length: 168
+
+{"jsonrpc":"2.0","id":22,"method":"textDocument/documentSymbol","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"}}}Content-Length: 216
+
+{"jsonrpc":"2.0","id":23,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":11,"character":12},"newName":"score"}}Content-Length: 965
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":2},"contentChanges":[{"text":"value struct box<t>:\n    value: t\n    ## Exact sum of two boxes.\n    operator +(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value + right.value)\n    operator %(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value % right.value)\n    operator ==(const left: box<t>, const right: box<t>) -> bool:\n        return left.value == right.value\n    private operator -(const left: box<t>, const right: box<t>) -> box<t>:\n        return left\nfunc entry(input: i32) -> i32:\n    var a = box<i32>(value = input)\n    var b = box<i32>(value = 3)\n    var c = a - b\n    c %= b\n    var x = box<i64>(value = 4)\n    var y = x + x\n    if c != a:\n        return c.value\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":24,"method":"void/barrier"}Content-Length: 197
+
+{"jsonrpc":"2.0","id":25,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":14,"character":14}}}Content-Length: 965
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":3},"contentChanges":[{"text":"value struct box<t>:\n    value: t\n    ## Exact sum of two boxes.\n    operator +(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value + right.value)\n    operator %(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value % right.value)\n    operator ==(const left: box<t>, const right: box<t>) -> bool:\n        return left.value == right.value\n    private operator -(const left: box<t>, const right: box<t>) -> box<t>:\n        return left\nfunc entry(input: i32) -> i32:\n    var a = box<i32>(value = input)\n    var b = box<i32>(value = 3)\n    var c = a + b\n    c %= b\n    var x = box<i64>(value = 4)\n    var y = x + x\n    if c != a:\n        return c.value\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":26,"method":"void/barrier"}Content-Length: 197
+
+{"jsonrpc":"2.0","id":27,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":17,"character":14}}}Content-Length: 1087
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":4},"contentChanges":[{"text":"value struct box<t>:\n    value: t\n    ## Exact sum of two boxes.\n    operator +(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value + right.value)\n    operator %(const left: box<t>, const right: box<t>) -> box<t>:\n        return box<t>(value = left.value % right.value)\n    operator ==(const left: box<t>, const right: box<t>) -> bool:\n        return left.value == right.value\n    private operator -(const left: box<t>, const right: box<t>) -> box<t>:\n        return left\nvalue struct other:\n    value: i32\n    operator +(const left: other, const right: other) -> other:\n        return left\nfunc sum<t>(const left: t, const right: t) -> t:\n    return left + right\nfunc entry(input: i32) -> i32:\n    var a = sum(box<i32>(), box<i32>())\n    var b = sum(box<i64>(), box<i64>())\n    var c = sum(other(), other())\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":28,"method":"void/barrier"}Content-Length: 197
+
+{"jsonrpc":"2.0","id":29,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":16,"character":16}}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":30,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":16,"character":16}}}Content-Length: 240
+
+{"jsonrpc":"2.0","id":31,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":16,"character":16},"context":{"includeDeclaration":true}}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":32,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":16,"character":16}}}Content-Length: 214
+
+{"jsonrpc":"2.0","id":33,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":16,"character":16},"newName":"sum"}}Content-Length: 1681
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":5},"contentChanges":[{"text":"value struct number:\n    value: i32\n    operator +(const left: number, const right: number) -> number:\n        return left\n    operator -(const left: number, const right: number) -> number:\n        return left\n    operator *(const left: number, const right: number) -> number:\n        return left\n    operator /(const left: number, const right: number) -> number:\n        return left\n    operator %(const left: number, const right: number) -> number:\n        return left\n    operator ==(const left: number, const right: number) -> bool:\n        return true\n    operator <(const left: number, const right: number) -> bool:\n        return true\n    operator >(const left: number, const right: number) -> bool:\n        return true\n    operator <=(const left: number, const right: number) -> bool:\n        return true\n    operator >=(const left: number, const right: number) -> bool:\n        return true\n    operator +(const value: number) -> number:\n        return value\n    operator -(const value: number) -> number:\n        return value\nfunc entry(input: i32) -> i32:\n    var a = number(value = input)\n    var result_0 = a + a\n    var result_1 = a - a\n    var result_2 = a * a\n    var result_3 = a / a\n    var result_4 = a % a\n    var result_5 = a == a\n    var result_6 = a != a\n    var result_7 = a < a\n    var result_8 = a > a\n    var result_9 = a <= a\n    var result_10 = a >= a\n    var positive = +a\n    var negative = -a\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":34,"method":"void/barrier"}Content-Length: 197
+
+{"jsonrpc":"2.0","id":35,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":28,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":36,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":29,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":37,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":30,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":38,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":31,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":39,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":32,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":40,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":33,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":41,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":34,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":42,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":35,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":43,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":36,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":44,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":37,"character":21}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":45,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":38,"character":22}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":46,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":39,"character":19}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":47,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":40,"character":19}}}Content-Length: 343
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":6},"contentChanges":[{"text":"value struct shell<t>:\n    private secret: t\n    const id: t\nfunc entry(input: i32) -> i32:\n    var item = shell<i32>()\n    return item.id\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":48,"method":"void/barrier"}Content-Length: 196
+
+{"jsonrpc":"2.0","id":49,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":16}}}Content-Length: 341
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":7},"contentChanges":[{"text":"value struct shell<t>:\n    private secret: t\n    const id: t\nfunc entry(input: i32) -> i32:\n    var item = shell<i32>()\n    return item.\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":50,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":51,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":16}}}Content-Length: 311
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":8},"contentChanges":[{"text":"use \"foreign.void\" as f\nfunc entry(input: i32) -> i32:\n    var a = f.token(value = input)\n    return a + a\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":52,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":53,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":3,"character":13}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":54,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":3,"character":13}}}Content-Length: 689
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":9},"contentChanges":[{"text":"struct record:\n    private const value: i32 = 4\n## A readonly custom display hook.\nfunc (self record) string() -> string:\n    return \"{self.value}\"\n## A checked custom pattern hook.\nfunc (self record) format(spec: string) -> result<string, string>:\n    return format(self.value, spec)\nfunc entry(input: i32) -> i32:\n    var item = record()\n    var default_text = string(item)\n    var custom_text = format(item, \"000\")\n    var explicit_text = item.string()\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":55,"method":"void/barrier"}Content-Length: 197
+
+{"jsonrpc":"2.0","id":56,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":10,"character":25}}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":57,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":10,"character":25}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":58,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":11,"character":24}}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":59,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":11,"character":24}}}Content-Length: 197
+
+{"jsonrpc":"2.0","id":60,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":12,"character":29}}}Content-Length: 202
+
+{"jsonrpc":"2.0","id":61,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":12,"character":29}}}Content-Length: 240
+
+{"jsonrpc":"2.0","id":62,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":12,"character":29},"context":{"includeDeclaration":true}}}Content-Length: 736
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":10},"contentChanges":[{"text":"struct record:\n    private const value: i32 = 4\n## A readonly custom display hook.\nfunc (self record) string() -> string:\n    return \"{self.value}\"\n## A checked custom pattern hook.\nfunc (self record) format(spec: string) -> result<string, string>:\n    return format(self.value, spec)\nfunc entry(input: i32) -> i32:\n    var item = record()\n    var default_text = string(item)\n    var custom_text = format(item, \"000\")\n    var explicit_text = item.string()\n    var aligned_text = format(item, \"<12\")\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":63,"method":"void/barrier"}Content-Length: 202
+
+{"jsonrpc":"2.0","id":64,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":13,"character":25}}}Content-Length: 789
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":11},"contentChanges":[{"text":"struct record:\n    private const value: i32 = 4\n## A readonly custom display hook.\nfunc (self record) string() -> string:\n    return \"{self.value}\"\n## A checked custom pattern hook.\nfunc (self record) format(spec: string) -> result<string, string>:\n    return format(self.value, spec)\nfunc entry(input: i32) -> i32:\n    var item = record()\n    var default_text = string(item)\n    var custom_text = format(item, \"000\")\n    var explicit_text = item.string()\n    return input\nfunc render(item: record, spec: string) -> result<string, string>:\n    return format(item, spec)\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":65,"method":"void/barrier"}Content-Length: 202
+
+{"jsonrpc":"2.0","id":66,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":15,"character":13}}}Content-Length: 689
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":12},"contentChanges":[{"text":"struct record:\n    private const value: i32 = 4\n## A readonly custom display hook.\nfunc (self record) string() -> string:\n    return \"{self.value}\"\n## A checked custom pattern hook.\nfunc (self record) format(spec: string) -> result<string, string>:\n    return format(self.value, spec)\nfunc entry(input: i32) -> i32:\n    var item = record()\n    var default_text = string(item)\n    var custom_text = format(item, \"000\")\n    var explicit_text = item.string(\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":67,"method":"void/barrier"}Content-Length: 197
+
+{"jsonrpc":"2.0","id":68,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":10,"character":25}}}Content-Length: 690
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":13},"contentChanges":[{"text":"struct record:\n    private const value: i32 = 4\n## A readonly custom display hook.\nfunc (self record) string() -> string:\n    return \"{self.value}\"\n## A checked custom pattern hook.\nfunc (self record) format(spec: string) -> result<string, string>:\n    return format(self.value, spec)\nfunc entry(input: i32) -> i32:\n    var item = record()\n    var default_text = string(item)\n    var custom_text = format(item, \"000\")\n    var explicit_text = item.string()\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":69,"method":"void/barrier"}Content-Length: 474
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":14},"contentChanges":[{"text":"## @param value The input number.\r\nfunc identity(value: i32) -> i32:\r\n    return value\r\nfunc entry(input: i32) -> i32:\r\n    var text = \"\"\"é😀 {{escaped}}:\r\n        {identity(input):}\r\n    \"\"\"\r\n    var shown = format(input, \"\")\r\n    return input\r\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":70,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":71,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":25}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":72,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":7,"character":31}}}Content-Length: 196
+
+{"jsonrpc":"2.0","id":73,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":11}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":74,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":11}}}Content-Length: 239
+
+{"jsonrpc":"2.0","id":75,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":1,"character":15},"context":{"includeDeclaration":true}}}Content-Length: 204
+
+{"jsonrpc":"2.0","id":76,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":18}}}Content-Length: 472
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":15},"contentChanges":[{"text":"## @param value The input number.\r\nfunc identity(value: i32) -> i32:\r\n    return value\r\nfunc entry(input: i32) -> i32:\r\n    var text = \"\"\"é😀 {{escaped}}:\r\n        {identity(inp):}\r\n    \"\"\"\r\n    var shown = format(input, \"\")\r\n    return input\r\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":77,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":78,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":21}}}Content-Length: 474
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":16},"contentChanges":[{"text":"## @param value The input number.\r\nfunc identity(value: i32) -> i32:\r\n    return value\r\nfunc entry(input: i32) -> i32:\r\n    var text = \"\"\"é😀 {{escaped}}:\r\n        {identity(input) }\r\n    \"\"\"\r\n    var shown = format(input, \"\")\r\n    return input\r\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":79,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":80,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":25}}}Content-Length: 473
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":17},"contentChanges":[{"text":"## @param value The input number.\r\nfunc identity(value: i32) -> i32:\r\n    return value\r\nfunc entry(input: i32) -> i32:\r\n    var text = \"\"\"é😀 {{escaped}}:\r\n        {identity(input):}\r\n    \"\"\"\r\n    var shown = format(2.0d, \"\")\r\n    return input\r\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":81,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":82,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":7,"character":30}}}Content-Length: 408
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void","version":18},"contentChanges":[{"text":"use time\nfunc entry(input: i32) -> i32:\n    if make_date(2024, 2, 29) is Ok(var day):\n        var text = \"{day:}\"\n        var shown = format(day, \"\")\n        return day.year as i32\n    return input\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":83,"method":"void/barrier"}Content-Length: 201
+
+{"jsonrpc":"2.0","id":84,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":3,"character":25}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":85,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":4,"character":33}}}Content-Length: 201
+
+{"jsonrpc":"2.0","id":86,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":20}}}Content-Length: 215
+
+{"jsonrpc":"2.0","id":87,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":5,"character":20},"newName":"years"}}Content-Length: 195
+
+{"jsonrpc":"2.0","id":88,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20Step38%20%C3%A9%F0%9F%98%80%20y01iobmb/main.void"},"position":{"line":2,"character":9}}}Content-Length: 53
+
+{"jsonrpc":"2.0","id":"shutdown","method":"shutdown"}Content-Length: 33
+
+{"jsonrpc":"2.0","method":"exit"}

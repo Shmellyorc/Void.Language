@@ -1,0 +1,341 @@
+{
+  "timed_out": false,
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+    "check",
+    "/tmp/VOID binary \u00e9\ud83d\ude00 in3vbqbn/main.void"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+  "returncode": 86,
+  "signal": null,
+  "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+  "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+  "sources": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/io-errors-async.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/inputs/io-errors-async_crash.void",
+      "sha256": "7a49f432cea96ff2d6239b13a62716ce3adab9c820e27c877b5cf6794f14e149",
+      "original_sha256": "7a49f432cea96ff2d6239b13a62716ce3adab9c820e27c877b5cf6794f14e149",
+      "preserved_sha256": "7a49f432cea96ff2d6239b13a62716ce3adab9c820e27c877b5cf6794f14e149"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/console.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/console_crash.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "original_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "preserved_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/convert_crash.void",
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "original_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "preserved_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/encoding/ascii_crash.void",
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "original_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "preserved_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/encoding/base64_crash.void",
+      "sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "original_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "preserved_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/encoding/binary_crash.void",
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "original_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "preserved_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/encoding/hex_crash.void",
+      "sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "original_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "preserved_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/error.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/error_crash.void",
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "original_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "preserved_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/io/memory_crash.void",
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "original_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "preserved_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/io_crash.void",
+      "sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+      "original_sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+      "preserved_sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/math.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/math_crash.void",
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "original_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "preserved_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/path.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/path_crash.void",
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "original_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "preserved_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/random.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/random_crash.void",
+      "sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "original_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "preserved_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/text.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/text_crash.void",
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "original_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "preserved_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/time.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/stdlib/time_crash.void",
+      "sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "original_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "preserved_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b"
+    },
+    {
+      "original": "/tmp/VOID binary \u00e9\ud83d\ude00 in3vbqbn/main.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/inputs/main_crash.void",
+      "sha256": "eb0bcc9ae25b1db6d25607d284be39ca51437d0546d7e1762fa030a6eca6a39d",
+      "original_sha256": "eb0bcc9ae25b1db6d25607d284be39ca51437d0546d7e1762fa030a6eca6a39d",
+      "preserved_sha256": "eb0bcc9ae25b1db6d25607d284be39ca51437d0546d7e1762fa030a6eca6a39d"
+    }
+  ],
+  "build_inputs": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-gnu/CMakeCache.txt",
+      "sha256": "30fcf758fc2b547032431899ad55a0c555b2f09cfe174ed02118f228ee2327fc",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/CMakeCache.txt",
+      "sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/CMakeCache.txt",
+      "sha256": "05bad7ad190fbdbea3afdc7a700542adc7e7e147c8df85fd1aeace72158fdedb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/CMakeCache.txt",
+      "sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/CMakeCache.txt",
+      "sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/CMakeCache.txt",
+      "sha256": "bdb7b3bc0484036366e9ffbd79fc86e0e09658f1eefb17b7a52f4e532faf727b",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    }
+  ],
+  "provenance_inputs": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/acceptance.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/acceptance.py",
+      "sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "original_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "preserved_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/crash.py",
+      "sha256": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec",
+      "original_sha256": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec",
+      "preserved_sha256": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/crash_test.py",
+      "sha256": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625",
+      "original_sha256": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625",
+      "preserved_sha256": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/depth.py",
+      "sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "original_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "preserved_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/execution.py",
+      "sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "original_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "preserved_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/final_checks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/final_checks.py",
+      "sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "original_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "preserved_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/focused.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/focused.py",
+      "sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "original_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "preserved_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/install.py",
+      "sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "original_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "preserved_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/lsp.py",
+      "sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "original_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "preserved_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/oracles.py",
+      "sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "original_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "preserved_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/process.py",
+      "sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "original_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "preserved_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/sitecustomize.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t/provenance/sitecustomize.py",
+      "sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "original_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "preserved_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc"
+    }
+  ],
+  "trigger": "Sources come from argv and explicit source_inputs; working-directory companions and canonical stdlib are retained conservatively. The exact causal subset is not inferred.",
+  "build": "/home/shmellyorc/Documents/Void.Language/build",
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  }
+}

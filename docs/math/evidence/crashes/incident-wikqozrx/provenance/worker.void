@@ -1,0 +1,32 @@
+use math
+
+func source_only<t>(value: t) -> t:
+    var zero: t = 0
+    var one: t = 1
+    if math.abs(-value) != value or math.min(value, one) != one or math.max(value, one) != value:
+        return -one
+    if math.clamp(value, zero, one) != one or math.sign(-value) != -one:
+        return -one
+    if math.floor(value + (0.5 as t)) != value or math.round((2.5 as t)) != (2 as t):
+        return -one
+    if math.ceil((1.25 as t)) != (2 as t) or math.trunc((-1.25 as t)) != -one:
+        return -one
+    if math.lerp(zero, value, (0.5 as t)) != value / (2 as t):
+        return -one
+    if math.inverse_lerp(zero, value, value / (2 as t)) != (0.5 as t):
+        return -one
+    if not math.is_finite(value) or math.is_nan(value) or math.is_infinite(value):
+        return -one
+    return zero
+
+func work(value: f64) -> f64:
+    if source_only(value) != (0 as f64) or source_only(8 as f32) != (0 as f32):
+        return -100
+    return math.sqrt(value) + math.pow(2.0 as f64, 3.0 as f64) + math.sin(0.0 as f64) + math.atan2(0.0 as f64, 1.0 as f64)
+
+async func entry(n: i32) -> i32:
+    var task = spawn work(9.0 as f64)
+    var sampled = await task
+    if sampled != (11.0 as f64):
+        return 1
+    return n

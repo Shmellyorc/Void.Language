@@ -1,0 +1,559 @@
+use error as core
+use convert
+
+
+## Recoverable text argument and construction-limit failures.
+enum error_kind:
+    ## A scalar range, repetition count, width or part limit is invalid.
+    invalid_range
+
+    ## A literal delimiter/search is empty or padding is not one scalar.
+    invalid_argument
+
+    ## Construction would exceed 64 MiB or the requested field count.
+    limit_exceeded
+
+
+## Recoverable text failure; inputs remain unchanged on every path.
+struct error extends core.error:
+    ## Portable failure category.
+    kind: error_kind
+
+
+private const _limit: i64 = 67108864
+
+
+private func _error(kind: error_kind) -> error:
+    var code: i32 = 1
+
+    if kind is error_kind.invalid_argument:
+        code = 2
+    else if kind is error_kind.limit_exceeded:
+        code = 3
+
+    return error(
+        message = "Text operation rejected its arguments or output size",
+        code = code,
+        kind = kind
+    )
+
+
+private func _decode(const bytes: [u8]) -> string:
+    return convert.unwrap(string.from_utf8(bytes))
+
+
+private func _boundary(byte: u8) -> bool:
+    return byte < 128 or byte >= 192
+
+
+private func _space(const bytes: [u8], at: i64) -> bool:
+    var lead = bytes[at]
+
+    if lead == 32 or (lead >= 9 and lead <= 13):
+        return true
+
+    if lead == 194:
+        return bytes[at + 1] == 133 or bytes[at + 1] == 160
+
+    if lead == 225:
+        return bytes[at + 1] == 154 and bytes[at + 2] == 128
+
+    if lead == 227:
+        return bytes[at + 1] == 128 and bytes[at + 2] == 128
+
+    if lead == 226:
+        var middle = bytes[at + 1]
+        var tail = bytes[at + 2]
+        var early = middle == 128 and tail <= 138
+        var late = middle == 128 and (tail == 168 or tail == 169 or tail == 175)
+        return early or late or (middle == 129 and tail == 159)
+
+    return false
+
+
+private func _next(const bytes: [u8], at: i64) -> i64:
+    var cursor = at + 1
+
+    for cursor < bytes.count and not _boundary(bytes[cursor]):
+        cursor += 1
+
+    return cursor
+
+
+private func _trim(value: string, beginning: bool, ending: bool) -> string:
+    var bytes = value.to_utf8()
+    var first: i64 = 0
+    var last = bytes.count
+
+    if beginning:
+        for first < last and _space(bytes, first):
+            first = _next(bytes, first)
+
+    if ending:
+        var cursor = first
+        last = first
+
+        for cursor < bytes.count:
+            var following = _next(bytes, cursor)
+
+            if not _space(bytes, cursor):
+                last = following
+
+            cursor = following
+
+    return _decode(bytes[first..<last])
+
+
+## Remove leading and trailing Unicode 16.0 White_Space scalars; preserve NUL and interior text.
+## @param value Immutable input; BOM and zero-width space are not whitespace.
+## @return Trimmed immutable text, empty when every scalar is whitespace.
+func trim(value: string) -> string:
+    return _trim(value, true, true)
+
+
+## Remove leading Unicode 16.0 White_Space scalars.
+## @param value Immutable input; embedded NUL is ordinary non-whitespace data.
+## @return Text beginning at its first non-whitespace scalar, or empty.
+func trim_start(value: string) -> string:
+    return _trim(value, true, false)
+
+
+## Remove trailing Unicode 16.0 White_Space scalars.
+## @param value Immutable input; embedded NUL is ordinary non-whitespace data.
+## @return Text ending at its last non-whitespace scalar, or empty.
+func trim_end(value: string) -> string:
+    return _trim(value, false, true)
+
+
+## Inspect whether a string contains no UTF-8 bytes or Unicode scalars.
+## @param value Immutable text to inspect.
+## @return True exactly for the empty string.
+func is_empty(value: string) -> bool:
+    return value.byte_length == 0
+
+
+## Inspect whether every scalar is Unicode 16.0 White_Space.
+## @param value Immutable text; BOM, zero-width space and NUL are not whitespace.
+## @return True for empty or all-whitespace text.
+func is_blank(value: string) -> bool:
+    var bytes = value.to_utf8()
+    var cursor: i64 = 0
+
+    for cursor < bytes.count:
+        if not _space(bytes, cursor):
+            return false
+
+        cursor = _next(bytes, cursor)
+
+    return true
+
+
+private func _prefix(const needle: [u8]) -> [i64]:
+    var table: [i64] = []
+    var matched: i64 = 0
+
+    for index in 0..<needle.count:
+        if index != 0:
+            for matched > 0 and needle[index] != needle[matched]:
+                matched = table[matched - 1]
+
+            if needle[index] == needle[matched]:
+                matched += 1
+
+        table.push(matched)
+
+    return table
+
+
+private func _search(const bytes: [u8], const needle: [u8], const table: [i64], start: i64, last: bool = false) -> i64:
+    var matched: i64 = 0
+    var found: i64 = -1
+
+    for index in start..<bytes.count:
+        for matched > 0 and bytes[index] != needle[matched]:
+            matched = table[matched - 1]
+
+        if bytes[index] == needle[matched]:
+            matched += 1
+
+        if matched == needle.count:
+            found = index + 1 - matched
+
+            if not last:
+                return found
+
+            matched = table[matched - 1]
+
+    return found
+
+
+private func _index(value: string, search: string, last: bool) -> i64:
+    if search.byte_length == 0:
+        if last:
+            return value.length
+
+        return 0
+
+    var bytes = value.to_utf8()
+    var needle = search.to_utf8()
+    var found = _search(bytes, needle, _prefix(needle), 0, last)
+
+    if found < 0:
+        return -1
+
+    var scalars: i64 = 0
+
+    for index in 0..<found:
+        if _boundary(bytes[index]):
+            scalars += 1
+
+    return scalars
+
+
+## Find the first case-sensitive literal occurrence, without normalization.
+## @param value Immutable text to search.
+## @param search Literal text; empty matches at scalar position zero.
+## @return Unicode-scalar index of the first match, or -1 when absent.
+func index_of(value: string, search: string) -> i64:
+    return _index(value, search, false)
+
+
+## Find the last case-sensitive literal occurrence, including overlapping matches.
+## @param value Immutable text to search.
+## @param search Literal text; empty matches at value.length.
+## @return Unicode-scalar index of the last match, or -1 when absent.
+func last_index_of(value: string, search: string) -> i64:
+    return _index(value, search, true)
+
+
+## Inspect case-sensitive literal containment without regex or locale rules.
+## @param value Immutable text to search.
+## @param search Literal text; empty is contained in every string.
+## @return True when at least one complete literal occurrence exists.
+func contains(value: string, search: string) -> bool:
+    return index_of(value, search) >= 0
+
+
+private func _edge(value: string, search: string, ending: bool) -> bool:
+    var bytes = value.to_utf8()
+    var needle = search.to_utf8()
+
+    if needle.count > bytes.count:
+        return false
+
+    var start: i64 = 0
+
+    if ending:
+        start = bytes.count - needle.count
+
+    for index in 0..<needle.count:
+        if bytes[start + index] != needle[index]:
+            return false
+
+    return true
+
+
+## Inspect a case-sensitive literal prefix.
+## @param value Immutable text to inspect.
+## @param search Literal prefix; empty succeeds.
+## @return True exactly when the text begins with search.
+func starts_with(value: string, search: string) -> bool:
+    return _edge(value, search, false)
+
+
+## Inspect a case-sensitive literal suffix.
+## @param value Immutable text to inspect.
+## @param search Literal suffix; empty succeeds.
+## @return True exactly when the text ends with search.
+func ends_with(value: string, search: string) -> bool:
+    return _edge(value, search, true)
+
+
+## Extract complete Unicode scalars, accepting negative starts relative to scalar length.
+## @param value Immutable text, including combining scalars and NUL without normalization.
+## @param start Scalar boundary in [-value.length, value.length].
+## @param count Scalar count; -1 selects the remainder and other negatives reject.
+## @return Ok with text, or invalid_range/limit_exceeded; allocation uses checked Runtime failure.
+func substring(value: string, start: i64, count: i64 = -1) -> result<string, error>:
+    var length = value.length
+    var first = start
+
+    if first < 0:
+        if first < -length:
+            return Err(_error(error_kind.invalid_range))
+
+        first += length
+
+    if first > length or count < -1:
+        return Err(_error(error_kind.invalid_range))
+
+    var selected = count
+
+    if selected == -1:
+        selected = length - first
+
+    if selected > length - first:
+        return Err(_error(error_kind.invalid_range))
+
+    var bytes = value.to_utf8()
+    var cursor: i64 = 0
+
+    for index in 0..<first:
+        cursor = _next(bytes, cursor)
+
+    var begin = cursor
+
+    for index in 0..<selected:
+        cursor = _next(bytes, cursor)
+
+    if cursor - begin > _limit:
+        return Err(_error(error_kind.limit_exceeded))
+
+    return Ok(_decode(bytes[begin..<cursor]))
+
+
+private func _part(const bytes: [u8], first: i64, last: i64, parts: [string], maximum: i64) -> result<i64, error>:
+    if parts.count == maximum:
+        return Err(_error(error_kind.limit_exceeded))
+
+    parts.push(_decode(bytes[first..<last]))
+    return Ok(last)
+
+
+## Split on a nonempty literal delimiter, preserving adjacent and trailing empty fields.
+## @param value Immutable input; empty produces one empty field.
+## @param delimiter Nonempty literal separator, matched without overlap.
+## @param max_parts Positive maximum returned fields; exceeding it fails without truncation.
+## @return Ok with independent fields, or invalid_argument/invalid_range/limit_exceeded.
+func split(value: string, delimiter: string, max_parts: i64 = 1048576) -> result<[string], error>:
+    if delimiter.byte_length == 0:
+        return Err(_error(error_kind.invalid_argument))
+
+    if max_parts <= 0:
+        return Err(_error(error_kind.invalid_range))
+
+    if value.byte_length > _limit:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var bytes = value.to_utf8()
+    var needle = delimiter.to_utf8()
+    var table = _prefix(needle)
+    var parts: [string] = []
+    var cursor: i64 = 0
+    var found = _search(bytes, needle, table, cursor)
+
+    for found >= 0:
+        var added = _part(bytes, cursor, found, parts, max_parts)?
+        cursor = found + needle.count
+        found = _search(bytes, needle, table, cursor)
+
+    var added = _part(bytes, cursor, bytes.count, parts, max_parts)?
+    return Ok(parts)
+
+
+## Split LF, CRLF and lone CR, preserving empty and trailing lines.
+## @param value Immutable input; empty produces one empty line and CRLF is one separator.
+## @param max_parts Positive maximum returned lines; exceeding it fails without truncation.
+## @return Ok with independent lines, or invalid_range/limit_exceeded.
+func split_lines(value: string, max_parts: i64 = 1048576) -> result<[string], error>:
+    if max_parts <= 0:
+        return Err(_error(error_kind.invalid_range))
+
+    if value.byte_length > _limit:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var bytes = value.to_utf8()
+    var parts: [string] = []
+    var cursor: i64 = 0
+    var first: i64 = 0
+
+    for cursor < bytes.count:
+        if bytes[cursor] == 10 or bytes[cursor] == 13:
+            var added = _part(bytes, first, cursor, parts, max_parts)?
+
+            if bytes[cursor] == 13 and cursor + 1 < bytes.count and bytes[cursor + 1] == 10:
+                cursor += 1
+
+            first = cursor + 1
+
+        cursor += 1
+
+    var added = _part(bytes, first, bytes.count, parts, max_parts)?
+    return Ok(parts)
+
+
+private func _append(output: [u8], const bytes: [u8], first: i64 = 0, last: i64 = -1) -> result<i64, error>:
+    var stop = last
+
+    if stop < 0:
+        stop = bytes.count
+
+    var count = stop - first
+
+    if count > _limit - output.count:
+        return Err(_error(error_kind.limit_exceeded))
+
+    for index in first..<stop:
+        output.push(bytes[index])
+
+    return Ok(count)
+
+
+## Join text with literal separators using geometric byte accumulation.
+## @param values Readonly or mutable input array; empty returns empty text.
+## @param separator Text inserted only between elements; defaults to empty.
+## @return Ok with text bounded to 64 MiB, or limit_exceeded; input ownership is preserved.
+func join(const values: [string], separator: string = "") -> result<string, error>:
+    var total: i64 = 0
+    var first = true
+
+    for item in values:
+        if not first:
+            if separator.byte_length > _limit - total:
+                return Err(_error(error_kind.limit_exceeded))
+
+            total += separator.byte_length
+
+        if item.byte_length > _limit - total:
+            return Err(_error(error_kind.limit_exceeded))
+
+        total += item.byte_length
+        first = false
+
+    var output: [u8] = []
+    var between = separator.to_utf8()
+    first = true
+
+    for item in values:
+        if not first:
+            var added_separator = _append(output, between)?
+
+        var added = _append(output, item.to_utf8())?
+        first = false
+
+    return Ok(_decode(output))
+
+
+private func _replace(value: string, search: string, replacement: string, once: bool) -> result<string, error>:
+    if search.byte_length == 0:
+        return Err(_error(error_kind.invalid_argument))
+
+    var bytes = value.to_utf8()
+    var needle = search.to_utf8()
+    var table = _prefix(needle)
+    var substitute = replacement.to_utf8()
+    var output: [u8] = []
+    var cursor: i64 = 0
+    var found = _search(bytes, needle, table, cursor)
+
+    for found >= 0:
+        var added = _append(output, bytes, cursor, found)?
+        var inserted = _append(output, substitute)?
+        cursor = found + needle.count
+
+        if once:
+            break
+
+        found = _search(bytes, needle, table, cursor)
+
+    var tail = _append(output, bytes, cursor)?
+    return Ok(_decode(output))
+
+
+## Replace every nonoverlapping literal match from left to right.
+## @param value Immutable input, including NUL.
+## @param search Nonempty literal search; empty returns invalid_argument.
+## @param replacement Literal replacement, which may be empty and is not searched again.
+## @return Ok with text bounded to 64 MiB, or invalid_argument/limit_exceeded.
+func replace(value: string, search: string, replacement: string) -> result<string, error>:
+    return _replace(value, search, replacement, false)
+
+
+## Replace only the first literal match.
+## @param value Immutable input, returned unchanged in value when no match exists.
+## @param search Nonempty literal search; empty returns invalid_argument.
+## @param replacement Literal replacement, which may be empty.
+## @return Ok with text bounded to 64 MiB, or invalid_argument/limit_exceeded.
+func replace_first(value: string, search: string, replacement: string) -> result<string, error>:
+    return _replace(value, search, replacement, true)
+
+
+## Repeat text a nonnegative number of times with checked output sizing.
+## @param value Immutable text; empty remains empty for every valid count.
+## @param count Nonnegative repetition count, with zero returning empty.
+## @return Ok with text bounded to 64 MiB, or invalid_range/limit_exceeded.
+func repeat(value: string, count: i64) -> result<string, error>:
+    if count < 0:
+        return Err(_error(error_kind.invalid_range))
+
+    if value.byte_length == 0 or count == 0:
+        return Ok("")
+
+    if count > _limit / value.byte_length:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var bytes = value.to_utf8()
+    var output: [u8] = []
+
+    for index in 0..<count:
+        var added = _append(output, bytes)?
+
+    return Ok(_decode(output))
+
+
+private func _pad(value: string, width: i64, padding: string, left: bool) -> result<string, error>:
+    if width < 0:
+        return Err(_error(error_kind.invalid_range))
+
+    if padding.length != 1:
+        return Err(_error(error_kind.invalid_argument))
+
+    var missing = width - value.length
+
+    if value.byte_length > _limit:
+        return Err(_error(error_kind.limit_exceeded))
+
+    if missing <= 0:
+        return Ok(value)
+
+    if missing > (_limit - value.byte_length) / padding.byte_length:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var fill = repeat(padding, missing)?
+
+    if left:
+        return join([fill, value])
+
+    return join([value, fill])
+
+
+## Pad on the left to a Unicode-scalar width; existing wider strings are preserved.
+## @param value Immutable text without normalization or grapheme interpretation.
+## @param width Nonnegative minimum scalar count.
+## @param padding Exactly one Unicode scalar, default ASCII space, even when no padding is needed.
+## @return Ok with text bounded to 64 MiB, or invalid_range/invalid_argument/limit_exceeded.
+func pad_left(value: string, width: i64, padding: string = " ") -> result<string, error>:
+    return _pad(value, width, padding, true)
+
+
+## Pad on the right to a Unicode-scalar width; existing wider strings are preserved.
+## @param value Immutable text without normalization or grapheme interpretation.
+## @param width Nonnegative minimum scalar count.
+## @param padding Exactly one Unicode scalar, default ASCII space, even when no padding is needed.
+## @return Ok with text bounded to 64 MiB, or invalid_range/invalid_argument/limit_exceeded.
+func pad_right(value: string, width: i64, padding: string = " ") -> result<string, error>:
+    return _pad(value, width, padding, false)
+
+
+## Apply locale-independent Unicode 16.0 full lowercase, including expansions and Final_Sigma.
+## @param value Immutable Unicode text; no normalization, case folding or locale tailoring occurs.
+## @return Lowercase immutable text; resource exhaustion follows checked Runtime failure.
+func to_lower(value: string) -> string:
+    return _text_case(value, false)
+
+
+## Apply locale-independent Unicode 16.0 full uppercase, including multi-scalar expansions.
+## @param value Immutable Unicode text; no normalization, case folding or locale tailoring occurs.
+## @return Uppercase immutable text; resource exhaustion follows checked Runtime failure.
+func to_upper(value: string) -> string:
+    return _text_case(value, true)

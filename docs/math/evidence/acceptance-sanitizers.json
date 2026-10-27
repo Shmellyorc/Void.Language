@@ -1,0 +1,268 @@
+{
+  "profile": "sanitizers",
+  "failed_only": false,
+  "numerical_followup": false,
+  "tooling_followup": false,
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+    "-R",
+    "^(math_.*|lsp_math|core|numeric|frontend|modules|numeric_sprint2|binary_execution|binary_ownership|lsp_binary|debug_cache|debug_cache_processes|gc_schemas|gc_buffers|async_ir|documentation_execution|lsp_documentation|lsp_stage8|lsp_stage10_intelligence|lsp_stage10_display|text_encoding_crash_preservation)$",
+    "-j",
+    "2",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-sanitizers.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "status": 8,
+  "seconds": 20.702470302581787,
+  "tests": [
+    {
+      "name": "gc_buffers",
+      "seconds": 3.13528,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "gc_schemas",
+      "seconds": 0.21318,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "debug_cache",
+      "seconds": 2.76586,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "debug_cache_processes",
+      "seconds": 0.189714,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage8",
+      "seconds": 0.121835,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "documentation_execution",
+      "seconds": 0.171394,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "lsp_documentation",
+      "seconds": 0.407442,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_host",
+      "seconds": 2.23251,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_ir",
+      "seconds": 0.387064,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_execution",
+      "seconds": 1.01173,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_frontend",
+      "seconds": 0.305052,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_errors",
+      "seconds": 0.36704,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_worker",
+      "seconds": 0.381938,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "lsp_math",
+      "seconds": 1.09826,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_install",
+      "seconds": 0.749163,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_preservation",
+      "seconds": 1.04352,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_stack",
+      "seconds": 0.997176,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "math_frontend_stack",
+      "seconds": 0.315914,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "binary_execution",
+      "seconds": 0.5394,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "lsp_binary",
+      "seconds": 0.312845,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "binary_ownership",
+      "seconds": 1.03801,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "text_encoding_crash_preservation",
+      "seconds": 0.698503,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "async_ir",
+      "seconds": 0.0959313,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "core",
+      "seconds": 0.0348839,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "numeric",
+      "seconds": 6.34654,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "frontend",
+      "seconds": 12.0538,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "modules",
+      "seconds": 1.74843,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "numeric_sprint2",
+      "seconds": 0.184885,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage10_display",
+      "seconds": 0.893516,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage10_intelligence",
+      "seconds": 0.591464,
+      "failed": true,
+      "skipped": false
+    }
+  ],
+  "passed": 2,
+  "failed": 28,
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes",
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+  },
+  "compiler_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+  "build_config": {
+    "sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+    "flags": [
+      "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+      "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+      "CMAKE_CXX_FLAGS:STRING=",
+      "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+      "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+      "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+      "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+      "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+      "VOID_SANITIZERS:BOOL=ON",
+      "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+      "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+      "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+      "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+      "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+    ]
+  },
+  "native_manifest": "VOID native 19.1.7 v1\n/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang\n/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\n/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_runtime.a\n/home/shmellyorc/Documents/Void.Language/build/ci-official-san/libvoid_native_fixture.a\n-pthread\n-fsanitize=address,undefined\n",
+  "source_hashes": {
+    "CMakeLists.txt": "db4769146a00191086d32b367b2c7b3275d943022ecca4252fbff056dbeb3ef7",
+    "include/void/math_ops.hpp": "da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb",
+    "include/void/ir.hpp": "04394e5c85d2ecd56fecf65511aee5d36224aae6c935d04f211461cd5a47a869",
+    "src/frontend/compiler.cpp": "9adee741becd57926ff847e6eb7127b2ffee91fd2cd22011ae685f36c35f41d9",
+    "src/frontend/math.inc": "e316847a1bde10702da9b72f1af0f075f04071cbfb3b07c78052f7a6107ae239",
+    "src/frontend/generics.inc": "d114e5816315fef153430a4268a22d96fbc5108463818b692105d840ce511267",
+    "src/frontend/generic_inference.inc": "6b629f2436dfd6128e27339a2fb1e44263090c96c297d6ae4e6615657581b448",
+    "src/frontend/generic_tooling.inc": "8e1cc9c63abd20869ae79c90069c1f4aed6e6c4e738fec2f11d76df5e3f55cc2",
+    "src/frontend/capabilities.inc": "716c748ee5caac17ff4b4a21f2f5a75188ddab833a8264712cfb8a3ef5f5d6e5",
+    "src/ir/module.cpp": "7e0b74d982661bb5c7acad56c087b6eb1ad92ac8998c3b40934126f930402693",
+    "src/backend/llvm/backend.cpp": "a5ec78a9e82e652f57fd214001660d5402ae100e9ed02476f87093bad2eb8008",
+    "stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+    "tests/random/harness.py": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec",
+    "tests/math/bootstrap.py": "e4d41fc535b969a09deb87dad31a3112e668b53b62dadb0a7ed7269723d1d216",
+    "tests/math/reference.py": "0d512150a38c4402cb276a0948575702573db2cd186138f7506fc5ede4f4fd52",
+    "tests/math/generate_vectors.py": "10751e37ee3605768744b65ef3fff435dda01fe7e4140f2e50b2e9477c176818",
+    "tests/math/vectors.json": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0",
+    "tests/math/host.cpp": "59acb15c35eb3334c8a804a24ac4e6f63bc0ad682d6c6ea14ee032e3d92bd74f",
+    "tests/math/host.py": "04245824aae98855f894f229b5791fd471eca54d4c7ad1ad76361cebbd0bc0a6",
+    "tests/math/worker.void": "ad6a0770159315641596ce34ee143721ac46514436257707712e46e0928e3850",
+    "tests/math/worker.py": "d49e3c61a62cf6ae29579093c9f2c5ca75f8799c465db681e3ebbd2e779e8b15",
+    "tests/math/ir.cpp": "7310dcefd1a41661ac1deb49f4c592ad37dbc1bd515d74fa4f64594599c9523a",
+    "tests/math/execution.py": "a88ac6c1c80cb086fde14b56582226a78090b310d851cb5461fdbf6a4c60b82f",
+    "tests/math/frontend.py": "1e1b34e416eae0efd5a7380cc7ba38f6c3ab434a890fa3bf8fefac76156f5cae",
+    "tests/math/errors.py": "83634c9dd318b80632ce18ce6542425337a58e1ea19612720a38b2b5a5af54e2",
+    "tests/math/lsp.py": "e2aacaa8746de5d695905cc423ec9c3d8ea5f2384bdcb85c2b213c2ece03751f",
+    "tests/math/install.py": "fd7437bbea8936d8fae2754e91dfc0ac4beb137dbb9dc1fb64074324b88e4ffe",
+    "tests/math/acceptance.py": "6c5d43255be3bf9febeb76b6e37db4af98bf30b7a85b2659d346f6fba647192b",
+    "tests/math/preservation.py": "9876fb60bdc5fd10dba50a8a795c8118970032efe72226e7c2ed3f743f624ec8"
+  },
+  "limits": [
+    "Linux host evidence only; native Windows/macOS checks remain pending authorization.",
+    "Host sanitizers do not instrument every generated JIT instruction."
+  ]
+}

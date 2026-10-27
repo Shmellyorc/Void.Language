@@ -1,0 +1,3 @@
+==112==LeakSanitizer has encountered a fatal error.
+==112==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==112==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)

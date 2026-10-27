@@ -1,0 +1,6 @@
+use math
+func finish():
+    print("cleanup")
+func main():
+    defer finish()
+    var value = math.abs<i8>(i8.min_value)

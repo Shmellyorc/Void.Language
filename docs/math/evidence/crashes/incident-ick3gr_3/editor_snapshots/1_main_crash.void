@@ -1,0 +1,5 @@
+use math as m
+func main():
+    var wave = m.sin<f64>(0.5)
+    var angle = m.atan2(1.0, -1.0)
+    var turn = m.tau_f64

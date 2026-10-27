@@ -1,6 +1,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/numeric.hpp"
+#include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
@@ -465,6 +466,13 @@ bool random_numeric_function(const Function& f) {
     auto name=random_public_name(f);
     auto suffix=name.starts_with("try_rand_")?name.substr(9):name.starts_with("rand_")?name.substr(5):"";
     return numeric::number(numeric::primitive(suffix));
+}
+// Uninstantiated generic declarations retain source type spellings, including
+// collection/result/callable patterns whose concrete layouts do not exist yet.
+Type editor_pattern_type(Type raw) {
+    if(raw.kind!=Type::unresolved && !ir::collection_type(raw) && !(raw.definition && (raw.definition->result_type || raw.definition->callable)))return raw;
+    auto name=std::make_shared<ir::ValueType>();name->name=raw.definition->name;name->identity=name->name;
+    return Type(name,Type::unresolved);
 }
 std::string editor_signature(const Function& f) {
     std::string out=(random_numeric_function(f) && f.token.text.starts_with("_arity_") ? "public" : f.visibility)+std::string(" ");
@@ -1900,10 +1908,10 @@ class Semantics {
         out.parameter_documentation.clear();
         for(const auto& p:target.parameters) {
             out.parameter_documentation.push_back(docs.parameter(p.token.text));
-            auto label=p.token.text+": "+ir::type_name(p.type);if(p.default_expression)label+=" = …";
+            auto label=p.token.text+": "+ir::type_name(target.generics.empty()?p.type:editor_pattern_type(p.type));if(p.default_expression)label+=" = …";
             if(!out.parameters.empty())out.signature+=", ";out.signature+=label;out.parameters.push_back(label);
         }
-        out.signature+=") -> "+ir::type_name(target.result);
+        out.signature+=") -> "+ir::type_name(target.generics.empty()?target.result:editor_pattern_type(target.result));
         out.active_parameter=static_cast<unsigned>(*active-first);
         if(*active-first<e.names.size() && !e.names[*active-first].text.empty()) {
             auto found=std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p){return p.token.text==e.names[*active-first].text;});
@@ -2981,6 +2989,7 @@ class Semantics {
 #include "filesystem.inc"
 #include "binary_codec.inc"
 #include "stdlib_conversion.inc"
+#include "math.inc"
 
     VOID_SEMANTIC_HANDLER Type text_case_call(Expr& e) {
         Function target;
@@ -2994,6 +3003,11 @@ class Semantics {
     }
 
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (e.target.starts_with("$math.")) return e.type;
+        if (unit.identity == math::source_module && e.qualifier.empty()) {
+            if (const auto* operation = math::operation(e.token.text); operation && math_private_selected(e))
+                return math_private_call(e, *operation);
+        }
         if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
             for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
                 auto name = filesystem::source_operations[n].name;
@@ -4290,6 +4304,17 @@ class Lowering {
             if (e.target == "$random.domain") { ir::Instruction i{ir::Op::constant}; i.type=Type::u64; i.immediate=e.value; return emit(i,e.token); }
             if (e.target == "$random.xor") { auto a=expression(*e.parts[0]); auto b=expression(*e.parts[1]); ir::Instruction i{ir::Op::random_xor,a,b}; i.type=Type::u64; return emit(i,e.token); }
             if (e.target == "$random.seed") { ir::Instruction i{ir::Op::random_seed}; i.type=e.type; return emit(i,e.token); }
+            if (e.target.starts_with("$math.")) return frontend_case([&]() -> unsigned {
+                std::vector<unsigned> slots(e.parts.size());
+                for (unsigned n = 0; n < e.parts.size(); ++n)
+                    slots.at(e.argument_indexes.at(n)) = snapshot(expression(*e.parts[n]), expression_type(*e.parts[n]), e.parts[n]->token);
+                ir::Instruction operation{ir::Op::math};
+                operation.immediate = std::stoll(e.target.substr(6));
+                operation.type = e.type;
+                operation.a = emit({ir::Op::load, slots.at(0)}, e.token);
+                if (slots.size() == 2) operation.b = emit({ir::Op::load, slots.at(1)}, e.token);
+                return emit(operation, e.token);
+            });
             if (e.target.starts_with("$binary.")) {
                 if (e.target == "$binary.width") {
                     return constant(Type::i64, {e.value, {}}, e.token);

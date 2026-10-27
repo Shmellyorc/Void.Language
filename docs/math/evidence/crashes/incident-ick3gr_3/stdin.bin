@@ -1,0 +1,123 @@
+Content-Length: 170
+
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{"textDocument":{"signatureHelp":{"signatureInformation":{"documentationFormat":["plaintext"]}}}}}}Content-Length: 52
+
+{"jsonrpc":"2.0","method":"initialized","params":{}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":2,"method":"void/barrier"}Content-Length: 301
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","languageId":"void","version":1,"text":"use math as m\nfunc main():\n    var wave = m.sin<f64>(0.5)\n    var angle = m.atan2(1.0, -1.0)\n    var turn = m.tau_f64\n"}}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":3,"method":"void/barrier"}Content-Length: 178
+
+{"jsonrpc":"2.0","id":4,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":17}}}Content-Length: 183
+
+{"jsonrpc":"2.0","id":5,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":17}}}Content-Length: 178
+
+{"jsonrpc":"2.0","id":6,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":3,"character":18}}}Content-Length: 183
+
+{"jsonrpc":"2.0","id":7,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":3,"character":18}}}Content-Length: 178
+
+{"jsonrpc":"2.0","id":8,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":4,"character":17}}}Content-Length: 183
+
+{"jsonrpc":"2.0","id":9,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":4,"character":17}}}Content-Length: 188
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":2},"contentChanges":[{"text":"use mat"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":10,"method":"void/barrier"}Content-Length: 183
+
+{"jsonrpc":"2.0","id":11,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":0,"character":7}}}Content-Length: 187
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":3},"contentChanges":[{"text":"use ma"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":12,"method":"void/barrier"}Content-Length: 183
+
+{"jsonrpc":"2.0","id":13,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":0,"character":6}}}Content-Length: 228
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":4},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m."}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":14,"method":"void/barrier"}Content-Length: 184
+
+{"jsonrpc":"2.0","id":15,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":18}}}Content-Length: 232
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":5},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.sin("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":16,"method":"void/barrier"}Content-Length: 235
+
+{"jsonrpc":"2.0","id":17,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":22},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 237
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":6},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.pow(1.0, "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":18,"method":"void/barrier"}Content-Length: 235
+
+{"jsonrpc":"2.0","id":19,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":27},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 247
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":7},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.atan2(y = 1.0, x = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":20,"method":"void/barrier"}Content-Length: 235
+
+{"jsonrpc":"2.0","id":21,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":37},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 255
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":8},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.clamp(upper = 1.0, value = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":22,"method":"void/barrier"}Content-Length: 235
+
+{"jsonrpc":"2.0","id":23,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":45},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 243
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":9},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.lerp(0.0, 1.0, "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":24,"method":"void/barrier"}Content-Length: 235
+
+{"jsonrpc":"2.0","id":25,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":33},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 252
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":10},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.inverse_lerp(0.0, 1.0, "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":26,"method":"void/barrier"}Content-Length: 235
+
+{"jsonrpc":"2.0","id":27,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":41},"context":{"triggerKind":1,"isRetrigger":false}}}Content-Length: 305
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":11},"contentChanges":[{"text":"use math as m\nfunc main():\n    var wave = m.sin<f64>(0.5)\n    var angle = m.atan2(1.0, -1.0)\n    var turn = m.tau_f64\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":28,"method":"void/barrier"}Content-Length: 222
+
+{"jsonrpc":"2.0","id":29,"method":"textDocument/references","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":17},"context":{"includeDeclaration":true}}}Content-Length: 200
+
+{"jsonrpc":"2.0","id":30,"method":"textDocument/rename","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":17},"newName":"renamed"}}Content-Length: 239
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":12},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.atan2(y = "}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":31,"method":"void/barrier"}Content-Length: 187
+
+{"jsonrpc":"2.0","id":32,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":28}}}Content-Length: 238
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":13},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.pow<f64>("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":33,"method":"void/barrier"}Content-Length: 187
+
+{"jsonrpc":"2.0","id":34,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":27}}}Content-Length: 233
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":14},"contentChanges":[{"text":"use math as m\nfunc main():\n    var value = m.sin("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":35,"method":"void/barrier"}Content-Length: 187
+
+{"jsonrpc":"2.0","id":36,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":2,"character":22}}}Content-Length: 318
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":15},"contentChanges":[{"text":"use math as m\nfunc note(text: string, value: f32) -> f32:\n    return value\nfunc main():\n    var value = note(\"🔥\", m.sin(0.5))\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":37,"method":"void/barrier"}Content-Length: 179
+
+{"jsonrpc":"2.0","id":38,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":4,"character":29}}}Content-Length: 342
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":16},"contentChanges":[{"text":"## Source generic documentation.\n## @param value Source generic parameter.\nfunc echo<t>(value: t) -> t:\n    return value\nfunc main():\n    var value = echo("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":39,"method":"void/barrier"}Content-Length: 187
+
+{"jsonrpc":"2.0","id":40,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"},"position":{"line":5,"character":21}}}Content-Length: 305
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void","version":17},"contentChanges":[{"text":"use math as m\nfunc main():\n    var wave = m.sin<f64>(0.5)\n    var angle = m.atan2(1.0, -1.0)\n    var turn = m.tau_f64\n"}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":41,"method":"void/barrier"}Content-Length: 53
+
+{"jsonrpc":"2.0","id":"shutdown","method":"shutdown"}Content-Length: 33
+
+{"jsonrpc":"2.0","method":"exit"}

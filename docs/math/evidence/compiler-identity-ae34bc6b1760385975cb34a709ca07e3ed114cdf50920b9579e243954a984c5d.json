@@ -1,0 +1,6 @@
+{
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+  "compiler_sha256": "ae34bc6b1760385975cb34a709ca07e3ed114cdf50920b9579e243954a984c5d",
+  "native_manifest_sha256": "f6fabf61d3f139287221a03a3236361c02d33fccaacc4920f5a785028ada27ab",
+  "native_manifest": "VOID native 19.1.7 v1\n/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang\n/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\n/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a\n/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a\n-pthread\n"
+}

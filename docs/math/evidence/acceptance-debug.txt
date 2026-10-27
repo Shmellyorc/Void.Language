@@ -1,0 +1,80 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start 116: binary_execution
+      Start  44: debug_cache_processes
+ 1/30 Test  #44: debug_cache_processes ..............   Passed   21.73 sec
+      Start 274: lsp_stage10_display
+ 2/30 Test #274: lsp_stage10_display ................   Passed   15.06 sec
+      Start 256: numeric_sprint2
+ 3/30 Test #256: numeric_sprint2 ....................   Passed    3.07 sec
+      Start  43: debug_cache
+ 4/30 Test #116: binary_execution ...................   Passed   40.77 sec
+      Start 118: binary_ownership
+ 5/30 Test #118: binary_ownership ...................   Passed    1.02 sec
+      Start  92: documentation_execution
+ 6/30 Test  #43: debug_cache ........................   Passed    2.81 sec
+      Start 253: numeric
+ 7/30 Test  #92: documentation_execution ............   Passed    0.88 sec
+      Start  19: gc_buffers
+ 8/30 Test #253: numeric ............................   Passed    5.54 sec
+      Start 254: frontend
+ 9/30 Test  #19: gc_buffers .........................   Passed    9.98 sec
+      Start  93: lsp_documentation
+10/30 Test  #93: lsp_documentation ..................   Passed    0.39 sec
+      Start 255: modules
+11/30 Test #255: modules ............................   Passed    1.39 sec
+      Start 138: text_encoding_crash_preservation
+12/30 Test #138: text_encoding_crash_preservation ...   Passed    0.77 sec
+      Start 117: lsp_binary
+13/30 Test #117: lsp_binary .........................***Failed    0.12 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 96, in <module>
+    signature = query("signatureHelp", call, len(call), **context)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 59, in query
+    check("error" not in response, response)
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 16, in check
+    assert value, message
+           ^^^^^
+AssertionError: {'error': {'code': -32602, 'message': 'VOID IR: missing array element'}, 'id': 13, 'jsonrpc': '2.0'}
+
+      Start 275: lsp_stage10_intelligence
+14/30 Test #275: lsp_stage10_intelligence ...........   Passed    0.68 sec
+      Start  91: lsp_stage8
+15/30 Test  #91: lsp_stage8 .........................   Passed    0.46 sec
+      Start  20: gc_schemas
+16/30 Test  #20: gc_schemas .........................   Passed    0.84 sec
+      Start 206: async_ir
+17/30 Test #206: async_ir ...........................   Passed    0.06 sec
+      Start 243: core
+18/30 Test #243: core ...............................   Passed    0.02 sec
+      Start  94: math_host
+19/30 Test #254: frontend ...........................   Passed   10.90 sec
+      Start  95: math_ir
+20/30 Test  #95: math_ir ............................   Passed    0.24 sec
+      Start  96: math_execution
+21/30 Test  #94: math_host ..........................   Passed    2.11 sec
+      Start  97: math_frontend
+22/30 Test  #97: math_frontend ......................   Passed   13.35 sec
+      Start  98: math_errors
+23/30 Test  #98: math_errors ........................   Passed    7.43 sec
+      Start  99: math_worker
+24/30 Test  #99: math_worker ........................   Passed    3.53 sec
+      Start 100: lsp_math
+25/30 Test #100: lsp_math ...........................   Passed    1.39 sec
+      Start 102: math_preservation
+26/30 Test #102: math_preservation ..................   Passed    1.09 sec
+      Start 103: math_stack
+27/30 Test  #96: math_execution .....................   Passed  113.35 sec
+      Start 104: math_frontend_stack
+28/30 Test #104: math_frontend_stack ................   Passed   13.24 sec
+29/30 Test #103: math_stack .........................   Passed  104.05 sec
+      Start 101: math_install
+30/30 Test #101: math_install .......................   Passed    1.58 sec
+
+97% tests passed, 1 tests failed out of 30
+
+Total Test time (real) = 191.93 sec
+
+The following tests FAILED:
+	117 - lsp_binary (Failed)
+Errors while running CTest

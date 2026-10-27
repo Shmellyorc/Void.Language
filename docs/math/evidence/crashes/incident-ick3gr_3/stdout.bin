@@ -1,0 +1,131 @@
+Content-Length: 581
+
+{"id":1,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":false,"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 147
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":2,"jsonrpc":"2.0"}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 147
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 77
+
+{"error":{"code":-32601,"message":"Method not found"},"id":3,"jsonrpc":"2.0"}Content-Length: 293
+
+{"id":4,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"sin(value: t) -> t\n\nReturn the sine of an f32/f64 angle in radians.\n\nReturns: Same-precision sine; NaN and either infinity produce NaN."},"range":{"end":{"character":20,"line":2},"start":{"character":17,"line":2}}}}Content-Length: 186
+
+{"id":5,"jsonrpc":"2.0","result":{"range":{"end":{"character":8,"line":235},"start":{"character":5,"line":235}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 398
+
+{"id":6,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"atan2(y: t, x: t) -> t\n\nReturn a quadrant-aware f32/f64 angle in radians, with y first and x second.\nSigned origins, axes and infinities follow y's sign and typed pi subdivisions.\n\nReturns: Type t angle in [-pi, pi]; either NaN propagates."},"range":{"end":{"character":23,"line":3},"start":{"character":18,"line":3}}}}Content-Length: 187
+
+{"id":7,"jsonrpc":"2.0","result":{"range":{"end":{"character":10,"line":325},"start":{"character":5,"line":325}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 233
+
+{"id":8,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"const tau_f64: f64\n\nOne full turn in radians, rounded to f64 as twice pi_f64."},"range":{"end":{"character":24,"line":4},"start":{"character":17,"line":4}}}}Content-Length: 185
+
+{"id":9,"jsonrpc":"2.0","result":{"range":{"end":{"character":13,"line":13},"start":{"character":6,"line":13}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 407
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID3002","message":"Cannot find imported file '/@stdlib/mat.void'.\nHint: Check this path relative to the importing file or virtual project root.","range":{"end":{"character":7,"line":0},"start":{"character":4,"line":0}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":10,"jsonrpc":"2.0"}Content-Length: 244
+
+{"id":11,"jsonrpc":"2.0","result":{"isIncomplete":false,"items":[{"detail":"standard module","documentation":"","kind":17,"label":"math","textEdit":{"newText":"math","range":{"end":{"character":7,"line":0},"start":{"character":4,"line":0}}}}]}}Content-Length: 406
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID3002","message":"Cannot find imported file '/@stdlib/ma.void'.\nHint: Check this path relative to the importing file or virtual project root.","range":{"end":{"character":6,"line":0},"start":{"character":4,"line":0}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":12,"jsonrpc":"2.0"}Content-Length: 244
+
+{"id":13,"jsonrpc":"2.0","result":{"isIncomplete":false,"items":[{"detail":"standard module","documentation":"","kind":17,"label":"math","textEdit":{"newText":"math","range":{"end":{"character":6,"line":0},"start":{"character":4,"line":0}}}}]}}Content-Length: 316
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1102","message":"Expected a lowercase identifier.","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":14,"jsonrpc":"2.0"}Content-Length: 10927
+
+{"id":15,"jsonrpc":"2.0","result":[{"detail":"t","documentation":"Return the same-type absolute value of any numeric primitive.\nSigned integer minimum raises checked Runtime failure; float abs clears the sign bit.\n\nReturns: Magnitude of type t, including positive zero for either floating zero.","kind":3,"label":"abs","textEdit":{"newText":"abs","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the principal inverse cosine in radians for an f32/f64 value.\n\nReturns: Type t angle in [0, pi]; outside the domain or NaN returns NaN.","kind":3,"label":"acos","textEdit":{"newText":"acos","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the principal inverse sine in radians for an f32/f64 value.\n\nReturns: Type t angle in [-pi/2, pi/2]; outside the domain or NaN returns NaN.","kind":3,"label":"asin","textEdit":{"newText":"asin","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the principal inverse tangent in radians for an f32/f64 value.\n\nReturns: Same-precision angle in [-pi/2, pi/2]; NaN propagates.","kind":3,"label":"atan","textEdit":{"newText":"atan","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return a quadrant-aware f32/f64 angle in radians, with y first and x second.\nSigned origins, axes and infinities follow y's sign and typed pi subdivisions.\n\nReturns: Type t angle in [-pi, pi]; either NaN propagates.","kind":3,"label":"atan2","textEdit":{"newText":"atan2","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Round an f32 or f64 toward positive infinity, retaining floating precision.\n\nReturns: Integral floating value of type t, preserving negative zero.","kind":3,"label":"ceil","textEdit":{"newText":"ceil","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Constrain a numeric value to inclusive same-type bounds.\nNaN or reversed bounds raise checked Runtime failure before NaN input propagates.\n\nReturns: The input or selected endpoint, retaining type t.","kind":3,"label":"clamp","textEdit":{"newText":"clamp","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the cosine of an f32/f64 angle in radians.\n\nReturns: Same-precision cosine; NaN and either infinity produce NaN.","kind":3,"label":"cos","textEdit":{"newText":"cos","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Convert f32/f64 radians to degrees using pi rounded to the input precision.\n\nReturns: Type t degrees, computed as value times (180 / pi); finite scaling may overflow or underflow.","kind":3,"label":"degrees","textEdit":{"newText":"degrees","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"f32","documentation":"Euler's number rounded to f32.","kind":21,"label":"e_f32","textEdit":{"newText":"e_f32","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"f64","documentation":"Euler's number rounded to f64.","kind":21,"label":"e_f64","textEdit":{"newText":"e_f64","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Raise e to an f32/f64 exponent using the target's standard math facility.\n\nReturns: Type t result; negative infinity gives positive zero, positive infinity/overflow gives infinity, NaN propagates.","kind":3,"label":"exp","textEdit":{"newText":"exp","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Raise two to an f32/f64 exponent using the target's standard math facility.\n\nReturns: Type t result; negative infinity gives positive zero, positive infinity/overflow gives infinity, NaN propagates.","kind":3,"label":"exp2","textEdit":{"newText":"exp2","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Round an f32 or f64 toward negative infinity, retaining floating precision.\n\nReturns: Integral floating value of type t; use an explicit checked as for integers.","kind":3,"label":"floor","textEdit":{"newText":"floor","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Find an unclamped fraction along a finite, nondegenerate f32/f64 segment.\n\nReturns: Type t fraction; nonfinite inputs or equal endpoints return NaN; extrapolation may overflow.","kind":3,"label":"inverse_lerp","textEdit":{"newText":"inverse_lerp","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"bool","documentation":"Test an f32 or f64 value for finiteness.\n\nReturns: False for NaN and either infinity; true for zero and subnormal values.","kind":3,"label":"is_finite","textEdit":{"newText":"is_finite","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"bool","documentation":"Test an f32 or f64 value for either infinity.\n\nReturns: True for positive or negative infinity; false for NaN.","kind":3,"label":"is_infinite","textEdit":{"newText":"is_infinite","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"bool","documentation":"Test an f32 or f64 value for NaN.\n\nReturns: True exactly for NaN; payload and sign are not inspected.","kind":3,"label":"is_nan","textEdit":{"newText":"is_nan","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Interpolate or extrapolate finite f32/f64 values without clamping the weight.\nValidation precedes exact endpoint returns; interior weights give a finite in-range value.\n\nReturns: Type t result; any nonfinite input returns NaN, and extrapolation may overflow.","kind":3,"label":"lerp","textEdit":{"newText":"lerp","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the natural logarithm of an f32/f64 value.\n\nReturns: Type t logarithm; either zero gives negative infinity, negative values give NaN, NaN propagates.","kind":3,"label":"log","textEdit":{"newText":"log","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the base-two logarithm of an f32/f64 value.\n\nReturns: Type t logarithm; either zero gives negative infinity, negative values give NaN, NaN propagates.","kind":3,"label":"log2","textEdit":{"newText":"log2","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Select the larger of two values of one exact numeric primitive type.\n\nReturns: Same-type maximum; zero ties select positive zero if present.","kind":3,"label":"max","textEdit":{"newText":"max","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Select the smaller of two values of one exact numeric primitive type.\n\nReturns: Same-type minimum; zero ties select negative zero if present.","kind":3,"label":"min","textEdit":{"newText":"min","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"f32","documentation":"Pi rounded to f32; angles in the math module use radians.","kind":21,"label":"pi_f32","textEdit":{"newText":"pi_f32","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"f64","documentation":"Pi rounded to f64; angles in the math module use radians.","kind":21,"label":"pi_f64","textEdit":{"newText":"pi_f64","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Raise an f32/f64 base to a same-type real floating exponent.\nZero exponents and positive-one bases yield one before NaN handling; overflow yields infinity.\n\nReturns: Type t power; zero/infinity signs follow odd integral exponents, invalid real domains return NaN.","kind":3,"label":"pow","textEdit":{"newText":"pow","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Convert f32/f64 degrees to radians using pi rounded to the input precision.\n\nReturns: Type t radians, computed as value times (pi / 180); finite scaling may overflow or underflow.","kind":3,"label":"radians","textEdit":{"newText":"radians","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Round an f32 or f64 to nearest integral value, with halfway ties to even.\n\nReturns: Same-precision floating result; a result of zero retains the input sign.","kind":3,"label":"round","textEdit":{"newText":"round","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return a numeric value's sign in its original type.\n\nReturns: Same-type negative one, zero or one; unsigned returns zero/one, floats retain NaN and zero sign.","kind":3,"label":"sign","textEdit":{"newText":"sign","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the sine of an f32/f64 angle in radians.\n\nReturns: Same-precision sine; NaN and either infinity produce NaN.","kind":3,"label":"sin","textEdit":{"newText":"sin","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the nearest principal square root of an f32/f64 value.\n\nReturns: Same-precision nonnegative root; negative nonzero values and NaN return NaN.","kind":3,"label":"sqrt","textEdit":{"newText":"sqrt","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Return the tangent of an f32/f64 angle in radians.\n\nReturns: Same-precision tangent; NaN and either infinity produce NaN.","kind":3,"label":"tan","textEdit":{"newText":"tan","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"f32","documentation":"One full turn in radians, rounded to f32 as twice pi_f32.","kind":21,"label":"tau_f32","textEdit":{"newText":"tau_f32","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"f64","documentation":"One full turn in radians, rounded to f64 as twice pi_f64.","kind":21,"label":"tau_f64","textEdit":{"newText":"tau_f64","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}},{"detail":"t","documentation":"Round an f32 or f64 toward zero, retaining floating precision.\n\nReturns: Integral floating value of type t, preserving the input zero sign.","kind":3,"label":"trunc","textEdit":{"newText":"trunc","range":{"end":{"character":18,"line":2},"start":{"character":18,"line":2}}}}]}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":22,"line":2},"start":{"character":22,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":16,"jsonrpc":"2.0"}Content-Length: 245
+
+{"id":17,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"sin(value: t) -> t","parameters":[{"documentation":{"kind":"plaintext","value":"Radian angle; either zero is preserved."},"label":"value: t"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":27,"line":2},"start":{"character":27,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":18,"jsonrpc":"2.0"}Content-Length: 321
+
+{"id":19,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"pow(base: f32, exponent: f32) -> f32","parameters":[{"label":"base: f32"},{"documentation":{"kind":"plaintext","value":"Same-precision exponent; parity is determined without an integer cast."},"label":"exponent: f32"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":37,"line":2},"start":{"character":37,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":20,"jsonrpc":"2.0"}Content-Length: 300
+
+{"id":21,"jsonrpc":"2.0","result":{"activeParameter":1,"activeSignature":0,"signatures":[{"label":"atan2(y: f32, x: f32) -> f32","parameters":[{"label":"y: f32"},{"documentation":{"kind":"plaintext","value":"Horizontal same-type coordinate, including signed zero or infinity."},"label":"x: f32"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":45,"line":2},"start":{"character":45,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":22,"jsonrpc":"2.0"}Content-Length: 341
+
+{"id":23,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"clamp(value: f32, lower: f32, upper: f32) -> f32","parameters":[{"documentation":{"kind":"plaintext","value":"Numeric input; in-range floating signed zero is retained."},"label":"value: f32"},{"label":"lower: f32"},{"label":"upper: f32"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":33,"line":2},"start":{"character":33,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":24,"jsonrpc":"2.0"}Content-Length: 352
+
+{"id":25,"jsonrpc":"2.0","result":{"activeParameter":2,"activeSignature":0,"signatures":[{"label":"lerp(start: f32, end: f32, weight: f32) -> f32","parameters":[{"label":"start: f32"},{"label":"end: f32"},{"documentation":{"kind":"plaintext","value":"Finite same-type fraction; values outside zero through one extrapolate."},"label":"weight: f32"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":41,"line":2},"start":{"character":41,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":26,"jsonrpc":"2.0"}Content-Length: 336
+
+{"id":27,"jsonrpc":"2.0","result":{"activeParameter":2,"activeSignature":0,"signatures":[{"label":"inverse_lerp(start: f32, end: f32, value: f32) -> f32","parameters":[{"label":"start: f32"},{"label":"end: f32"},{"documentation":{"kind":"plaintext","value":"Finite same-type value; an equal end returns one."},"label":"value: f32"}]}]}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 147
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":28,"jsonrpc":"2.0"}Content-Length: 326
+
+{"id":29,"jsonrpc":"2.0","result":[{"range":{"end":{"character":8,"line":235},"start":{"character":5,"line":235}},"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"},{"range":{"end":{"character":20,"line":2},"start":{"character":17,"line":2}},"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}]}Content-Length: 102
+
+{"error":{"code":-32602,"message":"Installed standard sources are read-only"},"id":30,"jsonrpc":"2.0"}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":28,"line":2},"start":{"character":28,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":31,"jsonrpc":"2.0"}Content-Length: 297
+
+{"id":32,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"atan2(y: t, x: t) -> t","parameters":[{"documentation":{"kind":"plaintext","value":"Vertical same-type coordinate; its sign determines signed special results."},"label":"y: t"},{"label":"x: t"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":27,"line":2},"start":{"character":27,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":33,"jsonrpc":"2.0"}Content-Length: 327
+
+{"id":34,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"pow(base: f64, exponent: f64) -> f64","parameters":[{"documentation":{"kind":"plaintext","value":"Floating base; a negative finite nonzero base requires an integral exponent."},"label":"base: f64"},{"label":"exponent: f64"}]}]}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":22,"line":2},"start":{"character":22,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":35,"jsonrpc":"2.0"}Content-Length: 245
+
+{"id":36,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"sin(value: t) -> t","parameters":[{"documentation":{"kind":"plaintext","value":"Radian angle; either zero is preserved."},"label":"value: t"}]}]}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 147
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":37,"jsonrpc":"2.0"}Content-Length: 294
+
+{"id":38,"jsonrpc":"2.0","result":{"contents":{"kind":"plaintext","value":"sin(value: t) -> t\n\nReturn the sine of an f32/f64 angle in radians.\n\nReturns: Same-precision sine; NaN and either infinity produce NaN."},"range":{"end":{"character":32,"line":4},"start":{"character":29,"line":4}}}}Content-Length: 326
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":21,"line":5},"start":{"character":21,"line":5}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":39,"jsonrpc":"2.0"}Content-Length: 232
+
+{"id":40,"jsonrpc":"2.0","result":{"activeParameter":0,"activeSignature":0,"signatures":[{"label":"echo(value: t) -> t","parameters":[{"documentation":{"kind":"plaintext","value":"Source generic parameter."},"label":"value: t"}]}]}}Content-Length: 161
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///home/shmellyorc/Documents/Void.Language/stdlib/math.void"}}Content-Length: 147
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20math%20LSP%20do5gph9o/main.void"}}Content-Length: 78
+
+{"error":{"code":-32601,"message":"Method not found"},"id":41,"jsonrpc":"2.0"}Content-Length: 47
+
+{"id":"shutdown","jsonrpc":"2.0","result":null}

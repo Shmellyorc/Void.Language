@@ -1,0 +1,20 @@
+Math frontend / independent IR audit — 26 October 2026
+
+Closed boundary: include/void/math_ops.hpp lists 15 fixed kinds: identity plus floor, sqrt, sin, cos, tan, asin, acos, atan, atan2, pow, exp, exp2, log, log2. Unary values use a with b=0; atan2 and pow use both a and b. Result type is a clean f32/f64, equal to each operand precision. The independent validator requires exact canonical function.module_identity /@stdlib/math.void and rejects unused argument/callee/receiver/initialization/array-repeat/operator-proof state, invalid tags and non-scalar type metadata. Identity remains in typed IR until backend lowering.
+
+Readonly scalar operands are deliberately accepted. Existing const scalar function parameters retain readonly in their parameter/local Type, and Lowering::snapshot preserves that type. Type equality ignores primitive readonly because the Math operation copies the scalar value. Result readonly is rejected. Nullable, construction, preparation, definition and reference-path metadata remain rejected on operands and results. Positive independent readonly-operand tests cover every kind and both precisions.
+
+Frontend hook selection requires the exact canonical unit. Own/local declarations, imported declarations, generic substitutions, constants, globals, structures and invalid declarations retain ordinary shadowing. Qualified calls resolve through normal source declarations, so imported private-hook spellings gain no compiler privilege. The ordinary binder handles exact type arguments, arity/names and written argument evaluation order; lowering snapshots each written operand before loading it in bound parameter order.
+
+The 29 public source generic names are checked before specialization cache lookup/body parsing. abs/min/max/clamp/sign require existing numeric::number; the other 24 require existing numeric::floating. This rejects nominal custom operators without changing private helper generic semantics. Diagnostics use the caller source/token.
+
+Scalar Math has no managed/reference effects. The capability analyzer recognizes closed Math targets and exactly numeric::symbol(result, abs/clamp), needed by Math pow and its inherited core facades. Arbitrary native calls, globals, asynchronous/indirect calls and resources keep their existing worker restrictions; all argument expressions remain recursively analyzed for effects.
+
+Focused Debug observations:
+- void_core built successfully.
+- Final frontend.py: 352 preserved processes passed, including canonical private-hook arity/type/shadowing cases.
+- Final frontend.py --small-stack: 352 preserved processes passed at 1 MiB.
+- Final independent IR wrapper: 799 checks passed, including every kind/precision, readonly scalar operands and forged shape rejections.
+- Initial worker rejection traced to existing numeric abs/clamp missing from the AST intrinsic classification; exact closed-symbol classification was corrected. Original worker evidence remains in focused-worker-debug.txt.
+
+Final focused receipts: focused-ir-debug-final.txt, focused-frontend-debug-final.txt, focused-frontend-stack-debug-final.txt. Worker repair receipt reports eight preserved processes passing. Final consolidated counts, compiler identities and worker/LSP results are recorded by the parent acceptance run. No native Windows/macOS execution is inferred from these Linux checks.

@@ -1,0 +1,512 @@
+# Scalar mathematics. Public functions retain the exact numeric argument type.
+# Floating source policies use ordinary t-precision operations without widening.
+
+## Pi rounded to f64; angles in the math module use radians.
+const pi_f64: f64 = 3.0
+
+## Pi rounded to f32; angles in the math module use radians.
+const pi_f32: f32 = pi_f64 as f32
+
+## One full turn in radians, rounded to f32 as twice pi_f32.
+const tau_f32: f32 = pi_f32 * 2
+
+## One full turn in radians, rounded to f64 as twice pi_f64.
+const tau_f64: f64 = pi_f64 * 2
+
+## Euler's number rounded to f64.
+const e_f64: f64 = 2.71828182845904523536028747135266249775724709369995
+
+## Euler's number rounded to f32.
+const e_f32: f32 = e_f64 as f32
+
+private func _nan<t>() -> t:
+    var zero: t = 0
+    return zero / zero
+
+private func _infinity<t>() -> t:
+    var zero: t = 0
+    var one: t = 1
+    return one / zero
+
+private func _pi<t>() -> t:
+    return pi_f64 as t
+
+private func _negative<t>(value: t) -> bool:
+    var zero: t = 0
+    var one: t = 1
+    return value < zero or (value == zero and one / value < zero)
+
+private func _signed<t>(magnitude: t, value: t) -> t:
+    if _negative(value):
+        return -magnitude
+    return magnitude
+
+## Return the same-type absolute value of any numeric primitive.
+## Signed integer minimum raises checked Runtime failure; float abs clears the sign bit.
+## @param value Numeric value; unsigned values are unchanged.
+## @return Magnitude of type t, including positive zero for either floating zero.
+func abs<t>(value: t) -> t:
+    return t.abs(value)
+
+## Select the smaller of two values of one exact numeric primitive type.
+## @param left First numeric value; either NaN propagates.
+## @param right Second value of the same type.
+## @return Same-type minimum; zero ties select negative zero if present.
+func min<t>(left: t, right: t) -> t:
+    if left != left:
+        return left
+    if right != right:
+        return right
+    var zero: t = 0
+    if left == zero and right == zero:
+        return -((-left) + (-right))
+    if left < right:
+        return left
+    return right
+
+## Select the larger of two values of one exact numeric primitive type.
+## @param left First numeric value; either NaN propagates.
+## @param right Second value of the same type.
+## @return Same-type maximum; zero ties select positive zero if present.
+func max<t>(left: t, right: t) -> t:
+    if left != left:
+        return left
+    if right != right:
+        return right
+    var zero: t = 0
+    if left == zero and right == zero:
+        return left + right
+    if left > right:
+        return left
+    return right
+
+## Constrain a numeric value to inclusive same-type bounds.
+## NaN or reversed bounds raise checked Runtime failure before NaN input propagates.
+## @param value Numeric input; in-range floating signed zero is retained.
+## @param lower Inclusive lower bound of the same exact type.
+## @param upper Inclusive upper bound; equal and ordered infinite bounds are valid.
+## @return The input or selected endpoint, retaining type t.
+func clamp<t>(value: t, lower: t, upper: t) -> t:
+    return t.clamp(value, lower, upper)
+
+## Return a numeric value's sign in its original type.
+## @param value Numeric primitive, including signed integer minimum.
+## @return Same-type negative one, zero or one; unsigned returns zero/one, floats retain NaN and zero sign.
+func sign<t>(value: t) -> t:
+    if value != value:
+        return value
+    var zero: t = 0
+    var one: t = 1
+    if value == zero:
+        return value
+    if value < zero:
+        return zero - one
+    return one
+
+## Test an f32 or f64 value for NaN.
+## @param value Floating input of either precision.
+## @return True exactly for NaN; payload and sign are not inspected.
+func is_nan<t>(value: t) -> bool:
+    var input = _math_float<t>(value)
+    return input != input
+
+## Test an f32 or f64 value for either infinity.
+## @param value Floating input of either precision.
+## @return True for positive or negative infinity; false for NaN.
+func is_infinite<t>(value: t) -> bool:
+    var input = _math_float<t>(value)
+    return input < t.min_value or input > t.max_value
+
+## Test an f32 or f64 value for finiteness.
+## @param value Floating input of either precision.
+## @return False for NaN and either infinity; true for zero and subnormal values.
+func is_finite<t>(value: t) -> bool:
+    var input = _math_float<t>(value)
+    return input >= t.min_value and input <= t.max_value
+
+## Round an f32 or f64 toward negative infinity, retaining floating precision.
+## @param value Floating input; zero signs, infinities and NaN pass through.
+## @return Integral floating value of type t; use an explicit checked as for integers.
+func floor<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    if input == zero or not is_finite(input):
+        return input
+    return _math_floor<t>(input)
+
+## Round an f32 or f64 toward positive infinity, retaining floating precision.
+## @param value Floating input; zero signs, infinities and NaN pass through.
+## @return Integral floating value of type t, preserving negative zero.
+func ceil<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    if input == zero or not is_finite(input):
+        return input
+    return -floor(-input)
+
+## Round an f32 or f64 toward zero, retaining floating precision.
+## @param value Floating input; zero signs, infinities and NaN pass through.
+## @return Integral floating value of type t, preserving the input zero sign.
+func trunc<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    if input == zero or not is_finite(input):
+        return input
+    if input < zero:
+        return -floor(-input)
+    return floor(input)
+
+## Round an f32 or f64 to nearest integral value, with halfway ties to even.
+## @param value Floating input; signed zero, infinities and NaN pass through.
+## @return Same-precision floating result; a result of zero retains the input sign.
+func round<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    var two: t = 2
+    var half: t = 0.5
+    if input == zero or not is_finite(input):
+        return input
+    var base = floor(input)
+    var fraction = input - base
+    var rounded = base
+    if fraction > half:
+        rounded = base + one
+    else if fraction == half:
+        if two * floor(base / two) != base:
+            rounded = base + one
+    if rounded == zero:
+        return input * zero
+    return rounded
+
+## Interpolate or extrapolate finite f32/f64 values without clamping the weight.
+## Validation precedes exact endpoint returns; interior weights give a finite in-range value.
+## @param start Finite start value; weight zero returns its original bits.
+## @param end Finite end value of the same type; weight one returns its original bits.
+## @param weight Finite same-type fraction; values outside zero through one extrapolate.
+## @return Type t result; any nonfinite input returns NaN, and extrapolation may overflow.
+func lerp<t>(start: t, end: t, weight: t) -> t:
+    var first = _math_float<t>(start)
+    var zero: t = 0
+    var one: t = 1
+    if not is_finite(first) or not is_finite(end) or not is_finite(weight):
+        return _nan<t>()
+    if weight == zero:
+        return first
+    if weight == one:
+        return end
+    if first == end:
+        return first
+    var blended: t = zero
+    if (first < zero and end > zero) or (first > zero and end < zero):
+        blended = first * (one - weight) + end * weight
+    else:
+        blended = first + (end - first) * weight
+    if weight > zero and weight < one:
+        return t.clamp(blended, min(first, end), max(first, end))
+    return blended
+
+## Find an unclamped fraction along a finite, nondegenerate f32/f64 segment.
+## @param start Finite start value; an equal input value returns positive zero.
+## @param end Finite distinct endpoint of the same type; reversed endpoints are valid.
+## @param value Finite same-type value; an equal end returns one.
+## @return Type t fraction; nonfinite inputs or equal endpoints return NaN; extrapolation may overflow.
+func inverse_lerp<t>(start: t, end: t, value: t) -> t:
+    var first = _math_float<t>(start)
+    var zero: t = 0
+    var one: t = 1
+    var two: t = 2
+    if not is_finite(first) or not is_finite(end) or not is_finite(value):
+        return _nan<t>()
+    if first == end:
+        return _nan<t>()
+    if value == first:
+        return zero
+    if value == end:
+        return one
+    var numerator = value - first
+    var denominator = end - first
+    if is_infinite(numerator) or is_infinite(denominator):
+        return (value / two - first / two) / (end / two - first / two)
+    return numerator / denominator
+
+## Return the sine of an f32/f64 angle in radians.
+## @param value Radian angle; either zero is preserved.
+## @return Same-precision sine; NaN and either infinity produce NaN.
+func sin<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    if input != input or input == zero:
+        return input
+    if is_infinite(input):
+        return _nan<t>()
+    return _math_sin<t>(input)
+
+## Return the cosine of an f32/f64 angle in radians.
+## @param value Radian angle; either zero produces one.
+## @return Same-precision cosine; NaN and either infinity produce NaN.
+func cos<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    if input != input:
+        return input
+    if input == zero:
+        return one
+    if is_infinite(input):
+        return _nan<t>()
+    return _math_cos<t>(input)
+
+## Return the tangent of an f32/f64 angle in radians.
+## @param value Radian angle; either zero is preserved.
+## @return Same-precision tangent; NaN and either infinity produce NaN.
+func tan<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    if input != input or input == zero:
+        return input
+    if is_infinite(input):
+        return _nan<t>()
+    return _math_tan<t>(input)
+
+## Return the principal inverse sine in radians for an f32/f64 value.
+## @param value Input in negative one through one; either zero is preserved.
+## @return Type t angle in [-pi/2, pi/2]; outside the domain or NaN returns NaN.
+func asin<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    var two: t = 2
+    if input != input or input == zero:
+        return input
+    if input < -one or input > one:
+        return _nan<t>()
+    if input == one or input == -one:
+        return _signed(_pi<t>() / two, input)
+    return _math_asin<t>(input)
+
+## Return the principal inverse cosine in radians for an f32/f64 value.
+## @param value Input in negative one through one; endpoints and zero use typed pi.
+## @return Type t angle in [0, pi]; outside the domain or NaN returns NaN.
+func acos<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    var two: t = 2
+    if input != input:
+        return input
+    if input < -one or input > one:
+        return _nan<t>()
+    if input == one:
+        return zero
+    if input == -one:
+        return _pi<t>()
+    if input == zero:
+        return _pi<t>() / two
+    return _math_acos<t>(input)
+
+## Return the principal inverse tangent in radians for an f32/f64 value.
+## @param value Floating input; zero sign is preserved and infinities select signed pi/2.
+## @return Same-precision angle in [-pi/2, pi/2]; NaN propagates.
+func atan<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var two: t = 2
+    if input != input or input == zero:
+        return input
+    if is_infinite(input):
+        return _signed(_pi<t>() / two, input)
+    return _math_atan<t>(input)
+
+## Return a quadrant-aware f32/f64 angle in radians, with y first and x second.
+## Signed origins, axes and infinities follow y's sign and typed pi subdivisions.
+## @param y Vertical same-type coordinate; its sign determines signed special results.
+## @param x Horizontal same-type coordinate, including signed zero or infinity.
+## @return Type t angle in [-pi, pi]; either NaN propagates.
+func atan2<t>(y: t, x: t) -> t:
+    var vertical = _math_float<t>(y)
+    var zero: t = 0
+    var two: t = 2
+    var four: t = 4
+    if vertical != vertical:
+        return vertical
+    if x != x:
+        return x
+    var pi = _pi<t>()
+    var half = pi / two
+    var quarter = pi / four
+    if vertical == zero:
+        if _negative(x):
+            return _signed(pi, vertical)
+        return vertical
+    if x == zero:
+        return _signed(half, vertical)
+    if is_infinite(vertical):
+        if is_infinite(x):
+            if x < zero:
+                return _signed(pi - quarter, vertical)
+            return _signed(quarter, vertical)
+        return _signed(half, vertical)
+    if is_infinite(x):
+        if x < zero:
+            return _signed(pi, vertical)
+        return _signed(zero, vertical)
+    return _math_atan2<t>(vertical, x)
+
+## Return the nearest principal square root of an f32/f64 value.
+## @param value Floating input; either zero and positive infinity are preserved.
+## @return Same-precision nonnegative root; negative nonzero values and NaN return NaN.
+func sqrt<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    if input != input or input == zero:
+        return input
+    if input < zero:
+        return _nan<t>()
+    if is_infinite(input):
+        return input
+    return _math_sqrt<t>(input)
+
+## Raise an f32/f64 base to a same-type real floating exponent.
+## Zero exponents and positive-one bases yield one before NaN handling; overflow yields infinity.
+## @param base Floating base; a negative finite nonzero base requires an integral exponent.
+## @param exponent Same-precision exponent; parity is determined without an integer cast.
+## @return Type t power; zero/infinity signs follow odd integral exponents, invalid real domains return NaN.
+func pow<t>(base: t, exponent: t) -> t:
+    var input = _math_float<t>(base)
+    var zero: t = 0
+    var one: t = 1
+    var two: t = 2
+    if exponent == zero or input == one:
+        return one
+    if input != input:
+        return input
+    if exponent != exponent:
+        return exponent
+    var magnitude = t.abs(input)
+    if is_infinite(exponent):
+        if magnitude == one:
+            return one
+        if (magnitude < one and exponent > zero) or (magnitude > one and exponent < zero):
+            return zero
+        return _infinity<t>()
+    var integral = floor(exponent) == exponent
+    var odd = false
+    if integral:
+        odd = two * floor(exponent / two) != exponent
+    if input == zero:
+        var result: t = zero
+        if exponent < zero:
+            result = _infinity<t>()
+        if _negative(input) and odd:
+            return -result
+        return result
+    if is_infinite(input):
+        var result: t = zero
+        if exponent > zero:
+            result = _infinity<t>()
+        if input < zero and odd:
+            return -result
+        return result
+    if input < zero:
+        if not integral:
+            return _nan<t>()
+        var result = _math_pow<t>(-input, exponent)
+        if odd:
+            return -result
+        return result
+    return _math_pow<t>(input, exponent)
+
+## Raise e to an f32/f64 exponent using the target's standard math facility.
+## @param value Floating exponent; either zero returns one.
+## @return Type t result; negative infinity gives positive zero, positive infinity/overflow gives infinity, NaN propagates.
+func exp<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    if input != input:
+        return input
+    if input == zero:
+        return one
+    if is_infinite(input):
+        if input < zero:
+            return zero
+        return input
+    return _math_exp<t>(input)
+
+## Raise two to an f32/f64 exponent using the target's standard math facility.
+## @param value Floating exponent; either zero returns one.
+## @return Type t result; negative infinity gives positive zero, positive infinity/overflow gives infinity, NaN propagates.
+func exp2<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    if input != input:
+        return input
+    if input == zero:
+        return one
+    if is_infinite(input):
+        if input < zero:
+            return zero
+        return input
+    return _math_exp2<t>(input)
+
+## Return the natural logarithm of an f32/f64 value.
+## @param value Floating input; one produces positive zero and positive infinity is preserved.
+## @return Type t logarithm; either zero gives negative infinity, negative values give NaN, NaN propagates.
+func log<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    if input != input:
+        return input
+    if input == zero:
+        return -_infinity<t>()
+    if input < zero:
+        return _nan<t>()
+    if input == one:
+        return zero
+    if is_infinite(input):
+        return input
+    return _math_log<t>(input)
+
+## Return the base-two logarithm of an f32/f64 value.
+## @param value Floating input; one produces positive zero and positive infinity is preserved.
+## @return Type t logarithm; either zero gives negative infinity, negative values give NaN, NaN propagates.
+func log2<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var one: t = 1
+    if input != input:
+        return input
+    if input == zero:
+        return -_infinity<t>()
+    if input < zero:
+        return _nan<t>()
+    if input == one:
+        return zero
+    if is_infinite(input):
+        return input
+    return _math_log2<t>(input)
+
+## Convert f32/f64 degrees to radians using pi rounded to the input precision.
+## @param value Degree angle; zero sign, infinity sign and NaN are retained.
+## @return Type t radians, computed as value times (pi / 180); finite scaling may overflow or underflow.
+func radians<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var straight: t = 180
+    if input == zero or not is_finite(input):
+        return input
+    return input * (_pi<t>() / straight)
+
+## Convert f32/f64 radians to degrees using pi rounded to the input precision.
+## @param value Radian angle; zero sign, infinity sign and NaN are retained.
+## @return Type t degrees, computed as value times (180 / pi); finite scaling may overflow or underflow.
+func degrees<t>(value: t) -> t:
+    var input = _math_float<t>(value)
+    var zero: t = 0
+    var straight: t = 180
+    if input == zero or not is_finite(input):
+        return input
+    return input * (straight / _pi<t>())

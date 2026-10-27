@@ -1,6 +1,7 @@
 #include "void/ir.hpp"
 #include "void/native_binding.hpp"
 #include "void/numeric.hpp"
+#include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
@@ -1201,6 +1202,24 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                         for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],found->second->parameters[n+1]);
                     }
                     result=Type::none; break;
+                }
+                case Op::math: {
+                    const auto* operation=math::operation(i.immediate);
+                    auto scalar=[](Type t) {
+                        return numeric::floating(t) && !t.nullable && !t.construction &&
+                               !t.definition && t.preparation.empty() && t.readonly_references.empty();
+                    };
+                    if(f.module_identity!=math::source_module || !operation ||
+                       !scalar(i.type) || i.type.readonly || i.receiver || !i.arguments.empty() ||
+                       !i.callee.empty() || i.initialization || i.array_repeat ||
+                       !scalar(operand(i.a)) || operand(i.a)!=i.type)
+                        fail("invalid scalar Math operation");
+                    if(operation->arity==1) {
+                        if(i.b)fail("unused operand on unary Math operation");
+                    } else if(!scalar(operand(i.b)) || operand(i.b)!=i.type) {
+                        fail("mismatched binary Math operand");
+                    }
+                    result=i.type;break;
                 }
                 case Op::random_xor:
                     if (f.module_identity!="/@stdlib/random.void" || operand(i.a)!=Type::u64 || operand(i.b)!=Type::u64 || i.type!=Type::u64 || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) fail("invalid random XOR");

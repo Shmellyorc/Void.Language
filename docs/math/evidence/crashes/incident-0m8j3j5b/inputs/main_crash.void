@@ -1,0 +1,7 @@
+const shown = string(2.125d)
+func entry(input: i32) -> i32:
+    var text = "Score: {input:000}"
+    var value = format(input, "000")
+    if value is Ok(var formatted):
+        return formatted.length as i32
+    return 0
