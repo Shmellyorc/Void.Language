@@ -1,0 +1,7 @@
+{
+  "baseline": "a4fd7fb0b79c1fb2ac17073bde492118a50516b3",
+  "binary": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+  "binary_sha256": "4187c7fcec58575b75e4855c7e9f03fd80a25f24d2fc9945b5a4b9fe91b30470",
+  "regression_source_sha256": "f8b7ee697e93e458d046acdfb7d25bbc973eb556b372725d28e3b72a113e24a1",
+  "lifecycle": "On expected assertion failure, instrumented baseline regression shuts down LSP server before raising."
+}

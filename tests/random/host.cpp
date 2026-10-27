@@ -38,18 +38,38 @@ void invalid(vd::ir::Module module,const std::string& reason={}) {
 }
 void ir_contracts() {
     using namespace vd::ir;
+    auto noncanonical_owners=[](const Module& canonical,const std::string& reason) {
+        for(const auto* owner:{"","/main.void","/random.void","/@stdlib/random.void.fake","/@stdlib/random.void::forged"})for(bool canonical_root:{false,true}) {
+            auto forged=canonical;auto& function=forged.functions[0];
+            function.module_identity=owner;
+            function.name=function.module_identity.empty()?function.source_name:function.module_identity+"::"+function.source_name;
+            if(canonical_root)forged.identity=forged.root_identity="/@stdlib/random.void";
+            invalid(forged,reason);
+        }
+    };
     Module module; module.identity="random-independent";
-    Function f; f.name="xor";f.result=Type::u64;
+    Function f;f.module_identity="/@stdlib/random.void";f.source_name="xor";f.name=f.module_identity+"::"+f.source_name;f.result=Type::u64;
     Instruction a{Op::constant};a.type=Type::u64;a.immediate=-1;
     Instruction b=a;b.immediate=15;
     Instruction operation{Op::random_xor,0,1};operation.type=Type::u64;
     f.blocks={{{a,b,operation},{Terminator::Kind::return_value,2}}};
     module.functions={f};validate(module);++checks;
+    noncanonical_owners(module,"invalid random XOR");
     for(unsigned mutation=0;mutation<8;++mutation) {
         auto forged=module;auto& i=forged.functions[0].blocks[0].instructions[2];
         switch(mutation){case 0:i.type=Type::i64;break;case 1:i.a=99;break;case 2:i.immediate=1;break;case 3:i.arguments={0};break;case 4:i.callee="user";break;case 5:i.receiver=Place{0,{}};break;case 6:forged.functions[0].blocks[0].instructions[0].type=Type::i64;break;case 7:i.initialization=true;break;}
         invalid(forged);
     }
+    // Seed ownership is validated independently of frontend/private-name gates.
+    auto outcome=std::make_shared<ValueType>();outcome->identity="$random-seed-result";outcome->name="result";
+    outcome->result_type=true;outcome->fields={{"tag",Type::i32},{"value",Type::u64},{"error",Type::i32}};
+    outcome->cases={{"Ok",1,1},{"Err",2,1}};
+    auto seed_module=module;seed_module.coordinated=true;
+    auto& seed_function=seed_module.functions[0];seed_function.source_name="seed";seed_function.name=seed_function.module_identity+"::seed";seed_function.parameters.clear();seed_function.result=Type(outcome);
+    Instruction seed{Op::random_seed};seed.type=seed_function.result;
+    seed_function.blocks={{{seed},{Terminator::Kind::return_value,0}}};
+    validate(seed_module);++checks;
+    noncanonical_owners(seed_module,"invalid random entropy result");
     auto calls=analyze("use random as rng\nfunc entry(n: i32) -> i32:\n    var a = rng.rand_i32()\n    var b = rng.rand_i32(maximum = n)\n    var c = rng.rand_i32(upper = n, lower = 1)\n    return a + b + c\n")->lower();
     unsigned forms=0;
     for(const auto& fn:calls.functions)if(fn.module_identity=="/main.void")for(const auto& block:fn.blocks)for(const auto& i:block.instructions)if(i.op==Op::call) {
@@ -74,13 +94,19 @@ void ir_contracts() {
     }
     // Independently forge a worker path reaching entropy after valid frontend analysis.
     auto worker=analyze("use random\nfunc work(value: u64) -> u64:\n    var engine = random.generator(seed = value)\n    return engine.rand_u64()\nasync func entry(n: i32) -> i32:\n    var task = spawn work(42)\n    var answer = await task\n    if n < 0:\n        var unused = random.from_entropy()\n    return (answer % 100) as i32\n")->lower();
-    Type entropy_type=Type::none;
-    for(const auto& fn:worker.functions)for(const auto& block:fn.blocks)for(const auto& i:block.instructions)if(i.op==Op::random_seed)entropy_type=i.type;
-    check(entropy_type!=Type::none,"entropy result type not found");
-    for(auto& function:worker.functions)if(function.worker) {
-        Instruction seed{Op::random_seed};seed.type=entropy_type;
-        auto& block=function.blocks[0];block.instructions.push_back(seed);
+    validate(worker);++checks; // Canonical deterministic generation remains worker-safe.
+    std::string entropy_function;Type entropy_result=Type::none;
+    for(const auto& fn:worker.functions)for(const auto& block:fn.blocks)for(const auto& i:block.instructions)if(i.op==Op::random_seed) {
+        check(fn.module_identity=="/@stdlib/random.void" && fn.parameters.empty() && !fn.receiver,"unexpected canonical entropy function");
+        entropy_function=fn.name;entropy_result=fn.result;
     }
+    check(!entropy_function.empty(),"canonical entropy function not found");
+    unsigned workers=0;
+    for(auto& function:worker.functions)if(function.worker) {
+        Instruction call{Op::call};call.callee=entropy_function;call.type=entropy_result;
+        auto& block=function.blocks[0];block.instructions.push_back(call);++workers;
+    }
+    check(workers!=0,"deterministic worker entry not found");
     worker.coordinated=true;invalid(worker,"worker cannot acquire OS entropy");
 }
 struct StandardRoot {

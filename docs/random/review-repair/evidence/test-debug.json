@@ -1,0 +1,116 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+    "-R",
+    "^(random_host|lsp_random|random_frontend|random_frontend_stack|random_worker|random_reference|core|frontend|numeric|modules|lsp_documentation|lsp_binary)$",
+    "-j",
+    "2",
+    "-V",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/random/review-repair/evidence/test-debug.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "status": 0,
+  "seconds": 77.58734560012817,
+  "environment": {
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/random/review-repair/evidence/crashes"
+  },
+  "sources": {
+    "src/ir/module.cpp": "24a670a84130b28ffa264846998e6442fe47f7a12f7196254d24b131c11f1b8d",
+    "src/frontend/compiler.cpp": "972cae4970b9b4af680dcd94ab20a2cabd00a227c510995f98959944d7abddf7",
+    "tests/random/host.cpp": "b709544f3a1513d42bae9544054d78db9b94753831984c52269c7bdee85a1caa",
+    "tests/random/lsp.py": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/capabilities.inc": "5e0df17360678ba7b7793c2afcd8345470dd248e772167765eda40f8febfcc07",
+    "src/runtime/random.cpp": "b56c4cad835e54fac6b25f7f7597269d348c45492f27ea108a0fe6dd41fa69cf",
+    "src/backend/llvm/backend.cpp": "6c672e9a6013da92dce29d25ced6df9558036debf6606f77e93bc4316d68b211",
+    "tests/random/reference.py": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+    "tests/random/execution.py": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec"
+  },
+  "tests": [
+    {
+      "name": "lsp_documentation",
+      "seconds": 0.388691,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_host",
+      "seconds": 62.766,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_frontend",
+      "seconds": 27.8115,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_random",
+      "seconds": 3.72223,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_worker",
+      "seconds": 10.0067,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_reference",
+      "seconds": 0.0549055,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_frontend_stack",
+      "seconds": 28.1859,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_binary",
+      "seconds": 0.265647,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "core",
+      "seconds": 0.0177306,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric",
+      "seconds": 5.13674,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "frontend",
+      "seconds": 11.0761,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "modules",
+      "seconds": 1.5915,
+      "failed": false,
+      "skipped": false
+    }
+  ],
+  "binaries": {
+    "voidc": "df90b85995488b1498331442c2d0a9f5b39d0f1c9fb0834bf2621e09157a5c8e",
+    "voidls": "8c1f27049b547fffa344711e1c07072231adbc4a6bc9c0b5ec6f11add56dda2f",
+    "void_random_host": "08aac7ac72bdeb229e324f0e85dc6098b6aac2da70f63da39b094b542e4ff289",
+    "void_tests": "30b4022eb3812d7b14a4922868977f41326e1eac586e26218e6c3926a9c612fb",
+    "void_io_runner": "12486d302e9e09c7964145e60ede1ebd8f989d8949a0fc2183d5387f21427749"
+  }
+}

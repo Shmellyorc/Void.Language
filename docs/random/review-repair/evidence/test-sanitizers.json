@@ -1,0 +1,118 @@
+{
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+    "-R",
+    "^(random_host|lsp_random|random_frontend|random_frontend_stack|random_worker|random_reference|core|frontend|numeric|modules|lsp_documentation|lsp_binary)$",
+    "-j",
+    "2",
+    "-V",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/random/review-repair/evidence/test-sanitizers.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "status": 0,
+  "seconds": 73.88036155700684,
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/random/review-repair/evidence/crashes"
+  },
+  "sources": {
+    "src/ir/module.cpp": "24a670a84130b28ffa264846998e6442fe47f7a12f7196254d24b131c11f1b8d",
+    "src/frontend/compiler.cpp": "972cae4970b9b4af680dcd94ab20a2cabd00a227c510995f98959944d7abddf7",
+    "tests/random/host.cpp": "b709544f3a1513d42bae9544054d78db9b94753831984c52269c7bdee85a1caa",
+    "tests/random/lsp.py": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/capabilities.inc": "5e0df17360678ba7b7793c2afcd8345470dd248e772167765eda40f8febfcc07",
+    "src/runtime/random.cpp": "b56c4cad835e54fac6b25f7f7597269d348c45492f27ea108a0fe6dd41fa69cf",
+    "src/backend/llvm/backend.cpp": "6c672e9a6013da92dce29d25ced6df9558036debf6606f77e93bc4316d68b211",
+    "tests/random/reference.py": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+    "tests/random/execution.py": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec"
+  },
+  "tests": [
+    {
+      "name": "lsp_documentation",
+      "seconds": 0.367004,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_host",
+      "seconds": 63.1596,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_frontend",
+      "seconds": 23.8118,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_random",
+      "seconds": 2.85632,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_worker",
+      "seconds": 10.8508,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_reference",
+      "seconds": 0.0626757,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "random_frontend_stack",
+      "seconds": 24.6195,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_binary",
+      "seconds": 0.277558,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "core",
+      "seconds": 0.0474112,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric",
+      "seconds": 6.7472,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "frontend",
+      "seconds": 12.7045,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "modules",
+      "seconds": 1.86161,
+      "failed": false,
+      "skipped": false
+    }
+  ],
+  "binaries": {
+    "voidc": "5467ee2758ab90ec6a51134fe28f1a641ba67e9f3589d54f1eefa3ec209fc467",
+    "voidls": "e1c40a416f52b44bad849f5a5440f2e5f80009e12657c0b1d386db90df1b811b",
+    "void_random_host": "e1f603796af30f8c7a2a388ddbf50c9b757f73e20e75ee524dc952339677794f",
+    "void_tests": "937e3d5b56e13b7e301699d5f1b28a92016f98002b4a9293070667425fe97a9e",
+    "void_io_runner": "98d218fd92d2154bb123b363460a5e826619bf4f4fc6ba374f4b770b3537df27"
+  }
+}

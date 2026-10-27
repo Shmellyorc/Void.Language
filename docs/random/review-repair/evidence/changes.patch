@@ -1,0 +1,205 @@
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index b3fe990..1c675c4 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -1892,7 +1892,7 @@ class Semantics {
+         Documentation docs;
+         if(selected_docs)docs=*selected_docs;
+         else {
+-            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target || (target.symbol.starts_with("/@stdlib/random.void::") && f.token.text==random_public_name(target) && bool(f.receiver)==bool(target.receiver)))docs=source_documentation(u->source,f.token.offset);
++            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target || (id=="/@stdlib/random.void" && target.symbol.starts_with("/@stdlib/random.void::") && f.token.text==random_public_name(target) && bool(f.receiver)==bool(target.receiver)))docs=source_documentation(u->source,f.token.offset);
+             if(auto builtin=unit.builtins.find(target.symbol);builtin!=unit.builtins.end())docs=builtin->second.documentation;
+         }
+         if(target.symbol.starts_with("$numeric::"))docs=numeric_documentation(*numeric::member(target.token.text));
+diff --git a/src/ir/module.cpp b/src/ir/module.cpp
+index 011cf81..439c54c 100644
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -1203,11 +1203,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     result=Type::none; break;
+                 }
+                 case Op::random_xor:
+-                    if (operand(i.a)!=Type::u64 || operand(i.b)!=Type::u64 || i.type!=Type::u64 || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) fail("invalid random XOR");
++                    if (f.module_identity!="/@stdlib/random.void" || operand(i.a)!=Type::u64 || operand(i.b)!=Type::u64 || i.type!=Type::u64 || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) fail("invalid random XOR");
+                     result=Type::u64; break;
+                 case Op::random_seed:
+                     valid_type(i.type);
+-                    if (!m.coordinated || i.a || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition->result_type || field_type(i.type,1)!=Type::u64 || field_type(i.type,2)!=Type::i32) fail("invalid random entropy result");
++                    if (!m.coordinated || f.module_identity!="/@stdlib/random.void" || i.a || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition->result_type || field_type(i.type,1)!=Type::u64 || field_type(i.type,2)!=Type::i32) fail("invalid random entropy result");
+                     result=i.type; break;
+                 case Op::bitcast:
+                     valid_type(i.type);
+diff --git a/tests/random/host.cpp b/tests/random/host.cpp
+index e017461..ddde61b 100644
+--- a/tests/random/host.cpp
++++ b/tests/random/host.cpp
+@@ -38,18 +38,38 @@ void invalid(vd::ir::Module module,const std::string& reason={}) {
+ }
+ void ir_contracts() {
+     using namespace vd::ir;
++    auto noncanonical_owners=[](const Module& canonical,const std::string& reason) {
++        for(const auto* owner:{"","/main.void","/random.void","/@stdlib/random.void.fake","/@stdlib/random.void::forged"})for(bool canonical_root:{false,true}) {
++            auto forged=canonical;auto& function=forged.functions[0];
++            function.module_identity=owner;
++            function.name=function.module_identity.empty()?function.source_name:function.module_identity+"::"+function.source_name;
++            if(canonical_root)forged.identity=forged.root_identity="/@stdlib/random.void";
++            invalid(forged,reason);
++        }
++    };
+     Module module; module.identity="random-independent";
+-    Function f; f.name="xor";f.result=Type::u64;
++    Function f;f.module_identity="/@stdlib/random.void";f.source_name="xor";f.name=f.module_identity+"::"+f.source_name;f.result=Type::u64;
+     Instruction a{Op::constant};a.type=Type::u64;a.immediate=-1;
+     Instruction b=a;b.immediate=15;
+     Instruction operation{Op::random_xor,0,1};operation.type=Type::u64;
+     f.blocks={{{a,b,operation},{Terminator::Kind::return_value,2}}};
+     module.functions={f};validate(module);++checks;
++    noncanonical_owners(module,"invalid random XOR");
+     for(unsigned mutation=0;mutation<8;++mutation) {
+         auto forged=module;auto& i=forged.functions[0].blocks[0].instructions[2];
+         switch(mutation){case 0:i.type=Type::i64;break;case 1:i.a=99;break;case 2:i.immediate=1;break;case 3:i.arguments={0};break;case 4:i.callee="user";break;case 5:i.receiver=Place{0,{}};break;case 6:forged.functions[0].blocks[0].instructions[0].type=Type::i64;break;case 7:i.initialization=true;break;}
+         invalid(forged);
+     }
++    // Seed ownership is validated independently of frontend/private-name gates.
++    auto outcome=std::make_shared<ValueType>();outcome->identity="$random-seed-result";outcome->name="result";
++    outcome->result_type=true;outcome->fields={{"tag",Type::i32},{"value",Type::u64},{"error",Type::i32}};
++    outcome->cases={{"Ok",1,1},{"Err",2,1}};
++    auto seed_module=module;seed_module.coordinated=true;
++    auto& seed_function=seed_module.functions[0];seed_function.source_name="seed";seed_function.name=seed_function.module_identity+"::seed";seed_function.parameters.clear();seed_function.result=Type(outcome);
++    Instruction seed{Op::random_seed};seed.type=seed_function.result;
++    seed_function.blocks={{{seed},{Terminator::Kind::return_value,0}}};
++    validate(seed_module);++checks;
++    noncanonical_owners(seed_module,"invalid random entropy result");
+     auto calls=analyze("use random as rng\nfunc entry(n: i32) -> i32:\n    var a = rng.rand_i32()\n    var b = rng.rand_i32(maximum = n)\n    var c = rng.rand_i32(upper = n, lower = 1)\n    return a + b + c\n")->lower();
+     unsigned forms=0;
+     for(const auto& fn:calls.functions)if(fn.module_identity=="/main.void")for(const auto& block:fn.blocks)for(const auto& i:block.instructions)if(i.op==Op::call) {
+@@ -74,13 +94,19 @@ void ir_contracts() {
+     }
+     // Independently forge a worker path reaching entropy after valid frontend analysis.
+     auto worker=analyze("use random\nfunc work(value: u64) -> u64:\n    var engine = random.generator(seed = value)\n    return engine.rand_u64()\nasync func entry(n: i32) -> i32:\n    var task = spawn work(42)\n    var answer = await task\n    if n < 0:\n        var unused = random.from_entropy()\n    return (answer % 100) as i32\n")->lower();
+-    Type entropy_type=Type::none;
+-    for(const auto& fn:worker.functions)for(const auto& block:fn.blocks)for(const auto& i:block.instructions)if(i.op==Op::random_seed)entropy_type=i.type;
+-    check(entropy_type!=Type::none,"entropy result type not found");
++    validate(worker);++checks; // Canonical deterministic generation remains worker-safe.
++    std::string entropy_function;Type entropy_result=Type::none;
++    for(const auto& fn:worker.functions)for(const auto& block:fn.blocks)for(const auto& i:block.instructions)if(i.op==Op::random_seed) {
++        check(fn.module_identity=="/@stdlib/random.void" && fn.parameters.empty() && !fn.receiver,"unexpected canonical entropy function");
++        entropy_function=fn.name;entropy_result=fn.result;
++    }
++    check(!entropy_function.empty(),"canonical entropy function not found");
++    unsigned workers=0;
+     for(auto& function:worker.functions)if(function.worker) {
+-        Instruction seed{Op::random_seed};seed.type=entropy_type;
+-        auto& block=function.blocks[0];block.instructions.push_back(seed);
++        Instruction call{Op::call};call.callee=entropy_function;call.type=entropy_result;
++        auto& block=function.blocks[0];block.instructions.push_back(call);++workers;
+     }
++    check(workers!=0,"deterministic worker entry not found");
+     worker.coordinated=true;invalid(worker,"worker cannot acquire OS entropy");
+ }
+ struct StandardRoot {
+diff --git a/tests/random/lsp.py b/tests/random/lsp.py
+index 12e27f6..d007327 100644
+--- a/tests/random/lsp.py
++++ b/tests/random/lsp.py
+@@ -1,5 +1,7 @@
+ """Compiler-owned random discovery, arity presentation and navigation through aliases."""
+ from pathlib import Path
++from contextlib import contextmanager
++import os
+ import sys
+ import tempfile
+ import harness as h
+@@ -18,9 +20,41 @@ def point(text,needle,delta=0):
+     prefix=text[:text.index(needle)+delta]
+     return {'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1])}
+ 
+-with tempfile.TemporaryDirectory(prefix='VOID random LSP ') as directory:
++@contextmanager
++def project_directory(directory):
++    previous=Path.cwd()
++    os.chdir(directory)
++    try:
++        yield
++    finally:
++        os.chdir(previous)
++
++with tempfile.TemporaryDirectory(prefix='VOID random LSP ') as directory, project_directory(directory):
+     entry=Path(directory)/'main.void'
+-    base='use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var a = rng.rand_i32(10)\n    var b = engine.rand_f32(1.0, 2.0)\n'
++    # The working directory also lets the crash harness retain this imported fixture.
++    (Path(directory)/'conflict.void').write_text('''## CONFLICT module documentation.
++## @param maximum CONFLICT maximum documentation.
++## @param lower CONFLICT lower documentation.
++## @param upper CONFLICT upper documentation.
++func rand_i32(maximum: i32, lower: i32, upper: i32) -> i32:
++    return maximum
++value struct generator:
++    value: i32
++## CONFLICT receiver documentation.
++## @param maximum CONFLICT maximum documentation.
++## @param lower CONFLICT lower documentation.
++## @param upper CONFLICT upper documentation.
++func (self generator) rand_f32(maximum: f32, lower: f32, upper: f32) -> f32:
++    return maximum
++## CONFLICT checked receiver documentation.
++## @param maximum CONFLICT maximum documentation.
++## @param lower CONFLICT lower documentation.
++## @param upper CONFLICT upper documentation.
++func (self generator) try_rand_f32(maximum: f32, lower: f32, upper: f32) -> f32:
++    return maximum
++''')
++    imports='use random as rng\nuse "./conflict.void" as conflict\n'
++    base=imports+'func main():\n    var engine = rng.generator(seed = 42)\n    var a = rng.rand_i32(10)\n    var b = engine.rand_f32(1.0, 2.0)\n    var unrelated = conflict.rand_i32(3, 0, 4)\n'
+     entry.write_text(base)
+     with Client(server,entry) as client:
+         client.request('initialize',{'capabilities':{'textDocument':{'signatureHelp':{'signatureInformation':{'documentationFormat':['plaintext']}}}}})
+@@ -38,13 +72,16 @@ with tempfile.TemporaryDirectory(prefix='VOID random LSP ') as directory:
+             return response['result']
+         notes=replace(base)
+         check(all(not x['diagnostics'] for x in notes),notes)
+-        for needle in ('rng.rand_i32','engine.rand_f32'):
++        for needle,description in [('rng.rand_i32','Draw i32 from the shared Runtime default'),('engine.rand_f32','Draw f32: zero arguments sample the precise [0, 1) unit grid.')]:
+             delta=needle.index('.')+2
+             hover=query('hover',needle,delta)['contents']['value']
+             check('_arity_' not in hover and 'private ' not in hover,hover)
+             check('maximum' in hover or 'lower' in hover,hover)
++            check(description in hover and 'CONFLICT' not in hover,hover)
+             definition=query('definition',needle,delta)
+             check('random.void' in str(definition),definition)
++        unrelated=query('hover','conflict.rand_i32',len('conflict.'))['contents']['value']
++        check('CONFLICT module documentation.' in unrelated,unrelated)
+         replace('use random\nfunc main():\n    var v = random.')
+         response=query('completion','random.',7)
+         items=response.get('items',[]) if isinstance(response,dict) else response
+@@ -52,15 +89,27 @@ with tempfile.TemporaryDirectory(prefix='VOID random LSP ') as directory:
+         check({'rand_i32','try_rand_f64','generator','seed','choose','shuffled'}<=names.keys(),names)
+         check(not any(x.startswith(('_','below_','between_')) for x in names),names)
+         check('maximum' in names['rand_i32']['detail'] and 'lower' in names['rand_i32']['detail'],names['rand_i32'])
+-        for call,expected,active in [('rng.rand_i32(',['maximum: i32'],0),('rng.rand_i32(1, ',['lower: i32','upper: i32'],1),('engine.rand_f32(',['maximum: f32'],0),('engine.try_rand_f32(lower = 1.0, upper = ',['lower: f32','upper: f32'],1)]:
+-            prefix='use random as rng\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var x = '
++        for call,expected,active,description,cursor in [
++            ('rng.rand_i32(',['maximum: i32'],0,'Exclusive positive upper endpoint; finite for floats.',None),
++            ('rng.rand_i32(1, ',['lower: i32','upper: i32'],1,'Exclusive upper endpoint; finite for floats.',None),
++            ('rng.rand_i32(lower, 2)',['lower: i32','upper: i32'],0,'Inclusive lower endpoint; finite for floats.',len('rng.rand_i32(lo')),
++            ('engine.rand_f32(',['maximum: f32'],0,'Exclusive positive upper endpoint; finite for floats.',None),
++            ('engine.try_rand_f32(lower = 1.0, upper = ',['lower: f32','upper: f32'],1,'Exclusive upper endpoint; finite for floats.',None),
++        ]:
++            prefix=imports+'func main():\n    var engine = rng.generator(seed = 42)\n    var lower: i32 = 1\n    var x = '
+             replace(prefix+call)
+-            result=query('signatureHelp',call,len(call),context={'triggerKind':1,'isRetrigger':False})
++            result=query('signatureHelp',call,len(call) if cursor is None else cursor,context={'triggerKind':1,'isRetrigger':False})
+             check(bool(result),(call,result))
+             shown=result['signatures'][0]
+             check('_arity_' not in shown['label'],shown)
+             check([x['label'] for x in shown['parameters']]==expected,(call,shown))
+             check(result['activeParameter']==active,(call,result))
++            check(shown['parameters'][active]['documentation']=={'kind':'plaintext','value':description},(call,shown))
++            check('CONFLICT' not in str(shown),shown)
++        # Ordinary same-name functions still use their own module documentation.
++        replace(imports+'func main():\n    var x = conflict.rand_i32(')
++        unrelated=query('signatureHelp','conflict.rand_i32(',len('conflict.rand_i32('))
++        check(unrelated['signatures'][0]['parameters'][0]['documentation']=={'kind':'plaintext','value':'CONFLICT maximum documentation.'},unrelated)
+         replace('use ran')
+         response=query('completion','ran',3)
+         items=response.get('items',[]) if isinstance(response,dict) else response

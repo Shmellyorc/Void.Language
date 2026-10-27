@@ -1,0 +1,31 @@
+Content-Length: 170
+
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{"textDocument":{"signatureHelp":{"signatureInformation":{"documentationFormat":["plaintext"]}}}}}}Content-Length: 52
+
+{"jsonrpc":"2.0","method":"initialized","params":{}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":2,"method":"void/barrier"}Content-Length: 410
+
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void","languageId":"void","version":1,"text":"use random as rng\nuse \"./conflict.void\" as conflict\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var a = rng.rand_i32(10)\n    var b = engine.rand_f32(1.0, 2.0)\n    var unrelated = conflict.rand_i32(3, 0, 4)\n"}}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":3,"method":"void/barrier"}Content-Length: 180
+
+{"jsonrpc":"2.0","id":4,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void"},"position":{"line":4,"character":17}}}Content-Length: 185
+
+{"jsonrpc":"2.0","id":5,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void"},"position":{"line":4,"character":17}}}Content-Length: 180
+
+{"jsonrpc":"2.0","id":6,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void"},"position":{"line":5,"character":20}}}Content-Length: 185
+
+{"jsonrpc":"2.0","id":7,"method":"textDocument/definition","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void"},"position":{"line":5,"character":20}}}Content-Length: 228
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void","version":2},"contentChanges":[{"text":"use random\nfunc main():\n    var v = random."}]}}Content-Length: 48
+
+{"jsonrpc":"2.0","id":8,"method":"void/barrier"}Content-Length: 185
+
+{"jsonrpc":"2.0","id":9,"method":"textDocument/completion","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void"},"position":{"line":2,"character":19}}}Content-Length: 321
+
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void","version":3},"contentChanges":[{"text":"use random as rng\nuse \"./conflict.void\" as conflict\nfunc main():\n    var engine = rng.generator(seed = 42)\n    var x = rng.rand_i32("}]}}Content-Length: 49
+
+{"jsonrpc":"2.0","id":10,"method":"void/barrier"}Content-Length: 237
+
+{"jsonrpc":"2.0","id":11,"method":"textDocument/signatureHelp","params":{"textDocument":{"uri":"file:///tmp/VOID%20random%20LSP%20wbxwvl89/main.void"},"position":{"line":4,"character":25},"context":{"triggerKind":1,"isRetrigger":false}}}

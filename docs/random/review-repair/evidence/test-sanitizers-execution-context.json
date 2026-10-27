@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "docs/random/review-repair/verify.py",
+    "test",
+    "sanitizers"
+  ],
+  "tool": "exec_command",
+  "sandbox_permissions": "require_escalated",
+  "reason": "Existing strict LeakSanitizer evidence establishes ptrace sandbox failure; authorized focused tests run outside that sandbox with leak detection enabled.",
+  "same_strict_options_as_historical_acceptance": true
+}

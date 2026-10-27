@@ -1,0 +1,41 @@
+{
+  "baseline": "a4fd7fb0b79c1fb2ac17073bde492118a50516b3",
+  "sources": {
+    "src/ir/module.cpp": "24a670a84130b28ffa264846998e6442fe47f7a12f7196254d24b131c11f1b8d",
+    "src/frontend/compiler.cpp": "972cae4970b9b4af680dcd94ab20a2cabd00a227c510995f98959944d7abddf7",
+    "tests/random/host.cpp": "b709544f3a1513d42bae9544054d78db9b94753831984c52269c7bdee85a1caa",
+    "tests/random/lsp.py": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/capabilities.inc": "5e0df17360678ba7b7793c2afcd8345470dd248e772167765eda40f8febfcc07",
+    "src/runtime/random.cpp": "b56c4cad835e54fac6b25f7f7597269d348c45492f27ea108a0fe6dd41fa69cf",
+    "src/backend/llvm/backend.cpp": "6c672e9a6013da92dce29d25ced6df9558036debf6606f77e93bc4316d68b211",
+    "tests/random/reference.py": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+    "tests/random/execution.py": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec"
+  },
+  "changed_source_files": [
+    "src/ir/module.cpp",
+    "src/frontend/compiler.cpp",
+    "tests/random/host.cpp",
+    "tests/random/lsp.py"
+  ],
+  "full_matrix_run": false,
+  "historical_files_unchanged": 932,
+  "root_readme_unchanged": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "tests": {
+    "debug": {
+      "passed": 12,
+      "failed": 0
+    },
+    "release": {
+      "passed": 12,
+      "failed": 0
+    },
+    "sanitizers": {
+      "passed": 12,
+      "failed": 0
+    }
+  },
+  "new_incident_receipts": []
+}

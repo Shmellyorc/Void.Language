@@ -1,0 +1,8 @@
+Baseline probe (linked against untouched baseline Debug libraries):
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++ --ld-path=.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld -std=c++20 -fno-rtti -Iinclude /tmp/void-review-ir/ownership_probe.cpp build/ci-official-debug/libvoid_core.a build/ci-official-debug/libvoid_runtime.a build/ci-official-debug/libvoid_native_fixture.a .toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/libLLVMSupport.a .toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/libLLVMDemangle.a -lpthread -ldl -lrt -lz -lzstd -lm -o /tmp/void-review-ir/ownership_probe
+/tmp/void-review-ir/ownership_probe > /tmp/void-review-ir/baseline.txt
+
+Modified host source syntax:
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++ -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic -Iinclude -fsyntax-only tests/random/host.cpp
+
+The baseline probe build was first attempted without LLVM Support/Demangle and without lld. Those failed at link configuration only. The successful invocation above ran all eight proofs and accepted all eight operations, demonstrating both missing owner guards.

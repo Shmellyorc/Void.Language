@@ -1,0 +1,8 @@
+{
+  "baseline": "a4fd7fb0b79c1fb2ac17073bde492118a50516b3",
+  "binary": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls",
+  "binary_sha256": "8c1f27049b547fffa344711e1c07072231adbc4a6bc9c0b5ec6f11add56dda2f",
+  "regression_source_sha256": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b",
+  "instrumented_source_sha256": "bb0d98a3d45b2a31949ffb4fc7a6a876217e803f824c7bf14595ea7edd976eae",
+  "lifecycle": "On expected assertion failure, instrumented baseline regression captures fixture sources and stdin, then gracefully shuts down LSP server before raising."
+}

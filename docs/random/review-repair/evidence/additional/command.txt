@@ -1,0 +1,4 @@
+cwd: /home/shmellyorc/Documents/Void.Language
+PYTHONPATH=tests/random VOID_CRASH_EVIDENCE=/tmp/void-review-lsp/crashes python3 /tmp/void-review-lsp/baseline-regression.py build/ci-official-debug/voidls > /tmp/void-review-lsp/baseline-graceful.log 2>&1
+
+After the passing run, the original instrumented script, log and receipt were renamed. Retained here as debug-regression.py, debug-pass.log and debug-pass-receipt.json. The earlier genuine baseline failure is retained separately under baseline/lsp/.

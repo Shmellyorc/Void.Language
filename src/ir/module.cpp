@@ -1203,11 +1203,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result=Type::none; break;
                 }
                 case Op::random_xor:
-                    if (operand(i.a)!=Type::u64 || operand(i.b)!=Type::u64 || i.type!=Type::u64 || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) fail("invalid random XOR");
+                    if (f.module_identity!="/@stdlib/random.void" || operand(i.a)!=Type::u64 || operand(i.b)!=Type::u64 || i.type!=Type::u64 || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat) fail("invalid random XOR");
                     result=Type::u64; break;
                 case Op::random_seed:
                     valid_type(i.type);
-                    if (!m.coordinated || i.a || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition->result_type || field_type(i.type,1)!=Type::u64 || field_type(i.type,2)!=Type::i32) fail("invalid random entropy result");
+                    if (!m.coordinated || f.module_identity!="/@stdlib/random.void" || i.a || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition->result_type || field_type(i.type,1)!=Type::u64 || field_type(i.type,2)!=Type::i32) fail("invalid random entropy result");
                     result=i.type; break;
                 case Op::bitcast:
                     valid_type(i.type);

@@ -1892,7 +1892,7 @@ class Semantics {
         Documentation docs;
         if(selected_docs)docs=*selected_docs;
         else {
-            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target || (target.symbol.starts_with("/@stdlib/random.void::") && f.token.text==random_public_name(target) && bool(f.receiver)==bool(target.receiver)))docs=source_documentation(u->source,f.token.offset);
+            for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target || (id=="/@stdlib/random.void" && target.symbol.starts_with("/@stdlib/random.void::") && f.token.text==random_public_name(target) && bool(f.receiver)==bool(target.receiver)))docs=source_documentation(u->source,f.token.offset);
             if(auto builtin=unit.builtins.find(target.symbol);builtin!=unit.builtins.end())docs=builtin->second.documentation;
         }
         if(target.symbol.starts_with("$numeric::"))docs=numeric_documentation(*numeric::member(target.token.text));

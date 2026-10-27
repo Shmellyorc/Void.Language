@@ -1,0 +1,19 @@
+{
+  "baseline": "a4fd7fb0b79c1fb2ac17073bde492118a50516b3",
+  "files": {
+    "ir/baseline.txt": "58be3e810e68545933463ec3cc4141c6c0e09ea7f0dfb30f7e377122e57b610a",
+    "ir/command.txt": "924c478882c5262081b909c3351e8fd1a30c7217214fd555df5b4b0860f4186b",
+    "ir/ownership_probe.cpp": "0e08689050cef63d60004f4124b0aeda1e1956c23d8264e53a9526e644fa93f4",
+    "ir/probe-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ir/syntax.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lsp/baseline-conflict.void": "91e310160e0cda1d330a21423cca339183289da273e9e398d9a24b298470af1c",
+    "lsp/baseline-graceful.log": "9be77e9839d364f310fd014a0e67da96120f0c1ed28fc46eb474ec9dc8aa85ae",
+    "lsp/baseline-main.void": "2f0cb858b8017fa70ce3c371fe8d8fbe97c5890efd417941437c2d8807fd659b",
+    "lsp/baseline-overlay.void": "ebe41a125354466e73b981ad336617be319534667ae2a47089f78658565d44f6",
+    "lsp/baseline-receipt.json": "32255fe1df90f5098f756d624ccb12422cf7bc6ddfc584300d3f3d850a43400f",
+    "lsp/baseline-regression.py": "252b8bded7c15a39a21950f7756c93dcd348877fe21d7642294c9f92e17c0bf3",
+    "lsp/baseline-stdin.bin": "2aa678473818258ba9ea0cbbd70284dafdc9833feb03311987846ad58edd8ea1",
+    "lsp/baseline.log": "c89b8708fb4fd743417c70097460d94fcaacb067473b8f1b06259a29b081d9a8"
+  },
+  "ir_probe_binary_sha256": "2af15d1ea28296411f3b13c1fa9af041e93e4bb74789b7d1efa78f4674dd76a1"
+}

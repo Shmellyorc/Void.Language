@@ -1,0 +1,20 @@
+## CONFLICT module documentation.
+## @param maximum CONFLICT maximum documentation.
+## @param lower CONFLICT lower documentation.
+## @param upper CONFLICT upper documentation.
+func rand_i32(maximum: i32, lower: i32, upper: i32) -> i32:
+    return maximum
+value struct generator:
+    value: i32
+## CONFLICT receiver documentation.
+## @param maximum CONFLICT maximum documentation.
+## @param lower CONFLICT lower documentation.
+## @param upper CONFLICT upper documentation.
+func (self generator) rand_f32(maximum: f32, lower: f32, upper: f32) -> f32:
+    return maximum
+## CONFLICT checked receiver documentation.
+## @param maximum CONFLICT maximum documentation.
+## @param lower CONFLICT lower documentation.
+## @param upper CONFLICT upper documentation.
+func (self generator) try_rand_f32(maximum: f32, lower: f32, upper: f32) -> f32:
+    return maximum

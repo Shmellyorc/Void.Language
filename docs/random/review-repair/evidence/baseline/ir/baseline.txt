@@ -1,0 +1,8 @@
+xor owner='/@stdlib/random.void' accepted
+xor owner='' accepted
+xor owner='/random.void' accepted
+xor owner='/@stdlib/random.void.fake' accepted
+seed owner='/@stdlib/random.void' accepted
+seed owner='' accepted
+seed owner='/random.void' accepted
+seed owner='/@stdlib/random.void.fake' accepted

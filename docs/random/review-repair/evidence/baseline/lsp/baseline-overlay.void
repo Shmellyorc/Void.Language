@@ -1,0 +1,5 @@
+use random as rng
+use "./conflict.void" as conflict
+func main():
+    var engine = rng.generator(seed = 42)
+    var x = rng.rand_i32(
