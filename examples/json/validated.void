@@ -1,0 +1,37 @@
+use json as json
+
+struct validated_score:
+    private const stored: i32
+
+private func (self validated_score) init(score: i32):
+    self.stored = score
+
+property (self validated_score) score: i32:
+    get:
+        return self.stored
+
+func make_score(score: i32) -> result<validated_score, string>:
+    if score < 0:
+        return Err("Score must be nonnegative")
+    return Ok(validated_score(score))
+
+struct score_data:
+    score: i32
+
+func load(text: string) -> result<validated_score, string>:
+    var outcome = json.parse_as<score_data>(text)
+    if outcome is Ok(var data):
+        return make_score(data.score)
+    if outcome is Err(var failure):
+        return Err(failure.message)
+    return Err("Unreachable result")
+
+func save(const input: validated_score) -> result<string, json.error>:
+    return json.stringify(score_data(score = input.score))
+
+func main():
+    if load("{{\"score\":7}}") is Ok(var score):
+        if save(score) is Ok(var text):
+            print(text)
+    if load("{{\"score\":-1}}") is Err(var failure):
+        print(failure)

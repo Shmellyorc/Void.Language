@@ -1,0 +1,9 @@
+## Common managed base for recoverable standard-library errors.
+## Omitted fields use ordinary empty-string and zero defaults.
+struct error:
+    ## Human-readable explanation supplied by the producing API.
+    message: string
+    ## Relevant resource or location; empty when no location applies.
+    path: string
+    ## API-specific signed identifier; zero means unspecified.
+    code: i32

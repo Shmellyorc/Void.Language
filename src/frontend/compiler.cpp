@@ -406,6 +406,7 @@ struct GenericParameter { Token token; std::optional<Type> constraint; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
     bool collection_adapter=false;
+    bool json_adapter=false;
     bool global_initializer=false;
     bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
     Type task=Type::none;
@@ -650,7 +651,7 @@ struct Unit {
     std::list<ArraySyntax> arrays;
     std::list<GenericApplication> applications;
     std::vector<std::pair<Token,Type>> type_uses;
-    std::map<std::string,Function*> specialized_functions, display_adapters;
+    std::map<std::string,Function*> specialized_functions, display_adapters, json_adapters;
     std::map<std::string,Structure*> specialized_structures;
     std::map<std::string, Structure*> structure_names;
     std::map<std::string, Constant*> constant_names;
@@ -2255,6 +2256,11 @@ class Semantics {
         return type;
     }
     Type expression(Expr& e, std::optional<Type> expected = {}) {
+        struct RestoreBindings {
+            bool& flag;
+            bool saved;
+            ~RestoreBindings() { flag=saved; }
+        } restore{pattern_bindings,pattern_bindings};
         try {
             Depth guard(diagnostics.semantic_depth(), source, e.token, 256);
             auto outer_bindings=pattern_bindings;if(e.kind!=Expr::Kind::test)pattern_bindings=false;
@@ -2472,6 +2478,11 @@ class Semantics {
         case Expr::Kind::construction: return e.type; // An inferred literal may revisit its already checked constructor.
         case Expr::Kind::dictionary_literal: return dictionary_expression(e,expected);
         case Expr::Kind::array_literal: return array_expression(e,expected);
+        case Expr::Kind::array_default:
+            if(e.type.kind!=Type::fixed_array || e.parts.size()!=1)
+                error(source,e.token,Code::unsupported_type,"Invalid generated fixed-array recipe.");
+            expect(expression(*e.parts[0],ir::array_element(e.type)),ir::array_element(e.type),e.token);
+            return e.type;
         case Expr::Kind::array_index: return index_expression(e);
         case Expr::Kind::array_slice: return slice_expression(e);
         case Expr::Kind::literal: return literal_expression(e, expected);
@@ -2842,6 +2853,7 @@ class Semantics {
     }
 #include "collection_display.inc"
 #include "display_semantics.inc"
+#include "json.inc"
     VOID_SEMANTIC_HANDLER void editor_format(const Expr& spec,Type type) {
         if(!diagnostics.editor || diagnostics.editor->module!=unit.identity || spec.kind!=Expr::Kind::literal || spec.aggregate_value.text!="_void_editor_cursor_")return;
         auto& out=diagnostics.editor->result;
@@ -3003,6 +3015,9 @@ class Semantics {
     }
 
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if(unit.identity=="/@stdlib/json.void" &&
+           (e.token.text=="_json_to_value" || e.token.text=="_json_from_value") && math_private_selected(e))
+            return json_call(e);
         if (e.target.starts_with("$math.")) return e.type;
         if (unit.identity == math::source_module && e.qualifier.empty()) {
             if (const auto* operation = math::operation(e.token.text); operation && math_private_selected(e))
@@ -3021,6 +3036,16 @@ class Semantics {
         if (unit.identity == "/@stdlib/convert.void" && e.qualifier.empty() &&
             (e.token.text == "_convert_parse" || e.token.text == "_convert_unwrap")) {
             return conversion_call(e);
+        }
+
+        if (unit.identity == "/@stdlib/json.void" && e.token.text == "_json_integer" && math_private_selected(e)) {
+            if (!current || e.type_arguments.size() != 1 || !e.parts.empty())
+                error(source,e.token,Code::argument_count,"Private JSON numeric selection requires one concrete type and no value arguments.");
+            const auto type=resolve_type(e.type_arguments[0],unit,root,units,e.token);
+            if (!numeric::number(type))
+                error(source,e.token,Code::unsupported_type,"json.as_number requires one of the ten numeric primitive types.");
+            e.kind=Expr::Kind::literal;e.type=Type::boolean;e.value=e.aggregate_value.bits=numeric::integer(type);
+            return e.type;
         }
 
         if (e.target == "$text.case") {
@@ -4011,7 +4036,10 @@ class Lowering {
     }
     struct Selection {Type type;std::function<unsigned()> read;std::function<void(unsigned)> write;bool dependent=false;bool read_before_write=true;};
     unsigned capture(unsigned value,Type type,const Token& token) {
-        if(!ir::array_type(type))return snapshot(value,type,token);
+        // A growable handle is an ordinary local alias. The raw array capture
+        // operation requires mutable storage authority and is needed only for
+        // fixed arrays, where an ordinary store would copy the selected value.
+        if(type.kind!=Type::fixed_array)return snapshot(value,type,token);
         auto slot=static_cast<unsigned>(output.locals.size());output.locals.push_back(type);ir::Instruction i{ir::Op::array_capture,value};i.immediate=slot;emit(i,token);return slot;
     }
     unsigned dictionary_pair(unsigned key,unsigned value,Type type,const Token& token) {ir::Instruction pair{ir::Op::aggregate};pair.type=ir::array_element(type);pair.arguments={key,value,constant(Type::u64,{0,{}},token)};return emit(pair,token);}
@@ -4694,7 +4722,7 @@ class Lowering {
                     // Root the selected handle without invoking fixed value-copy storage.
                     owner=static_cast<unsigned>(output.locals.size());output.locals.push_back(array);
                     if(array.kind==Type::fixed_array)fixed_view=select_expression(*s.expression);
-                    if(array.kind==Type::dictionary)store(*owner,expression(*s.expression));else {ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);}
+                    if(array.kind!=Type::fixed_array)store(*owner,expression(*s.expression));else {ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);}
                     auto count=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_count:ir::Op::array_count,load(*owner)},s.token),Type::i64,s.token);
                     if(array.kind==Type::growable_array || array.kind==Type::dictionary)version=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_version:ir::Op::list_version,load(*owner)},s.token),Type::u64,s.token);
                     cursor=snapshot(s.reverse ? emit({ir::Op::subtract,load(count),scalar(Type::i64,1)},s.token) : scalar(Type::i64,0),Type::i64,s.token);
@@ -5905,6 +5933,7 @@ struct AnalysisAccess {
             return {};
         };
         auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true) {
+            implicit |= from.find("::$json$")!=std::string::npos;
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
             auto origin=source_identity(from),target=source_identity(to);
@@ -6119,12 +6148,12 @@ struct AnalysisAccess {
                 if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;
                     if(f.accessor)for(const auto& other:unit->functions)if(other.accessor && other.token.offset==f.token.offset)r.end=std::max(r.end,other.source_end);
                     method_record.extent=r;}
-                declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && !f.global_initializer && f.token.text!="$application");
+                declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && !f.json_adapter && !f.global_initializer && f.token.text!="$application");
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
                 for(const auto& binding:f.editor_bindings) {
-                    if(!f.generic_origin.empty() || f.display_adapter || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
+                    if(!f.generic_origin.empty() || f.display_adapter || f.json_adapter || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
                     if(binding.readonly && std::none_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;})) continue;
                     auto key=source_identity(f.symbol)+"::local::"+std::to_string(binding.slot);
                     auto kind=std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;}) ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;

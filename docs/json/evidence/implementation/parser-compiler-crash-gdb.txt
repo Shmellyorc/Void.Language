@@ -1,0 +1,24 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGABRT, Aborted.
+0x00007ffff78988ec in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#0  0x00007ffff78988ec in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007ffff78410a6 in raise () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007ffff78288d7 in abort () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007ffff7aacb14 in std::__glibcxx_assert_fail(char const*, int, char const*, char const*) () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#4  0x00005555561a6b36 in std::vector<std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, vd::(anonymous namespace)::Semantics::Variable, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::(anonymous namespace)::Semantics::Variable> > >, std::allocator<std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, vd::(anonymous namespace)::Semantics::Variable, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::(anonymous namespace)::Semantics::Variable> > > > >::back (this=0x7fffffff6bd0) at /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:1360
+#5  0x00005555561a1bae in vd::(anonymous namespace)::Semantics::declare (this=0x7fffffff6b10, token=..., type=..., readonly=false) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2093
+#6  0x00005555561b71df in vd::(anonymous namespace)::Semantics::variable_statement (this=0x7fffffff6b10, s=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:3356
+#7  0x00005555561af48b in vd::(anonymous namespace)::Semantics::statement (this=0x7fffffff6b10, s=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:3381
+#8  0x00005555561a4a86 in vd::(anonymous namespace)::Semantics::sequence (this=0x7fffffff6b10, body=std::vector of length 7, capacity 8 = {...}, nested=false) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:3365
+#9  0x000055555619fdcc in vd::(anonymous namespace)::Semantics::analyze_one (this=0x7fffffff6b10, f=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:3716
+#10 0x0000555556159dbb in vd::(anonymous namespace)::Semantics::analyze (this=0x7fffffff6b10) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:3721
+#11 0x00005555560ffd11 in vd::(anonymous namespace)::validate_graph (units=std::map with 3 elements = {...}, entry="/json.void", diagnostics=...) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:5634
+#12 0x00005555560e7c0b in vd::validated_project (entry=filesystem::path "stdlib/json.void", overrides=std::map with 0 elements, verify_disk=false, bindings=0x0, editor=0x0) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:6284
+#13 0x00005555560e85be in vd::analyze_project (entry=filesystem::path "stdlib/json.void") at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:6230
+#14 0x0000555555ff31fb in run_cli (argc=3, argv=0x7fffffffdc38) at /home/shmellyorc/Documents/Void.Language/src/main.cpp:59
+#15 0x0000555555ff1c52 in main (argc=3, argv=0x7fffffffdc38) at /home/shmellyorc/Documents/Void.Language/src/main.cpp:119
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:1360: reference std::vector<std::map<std::basic_string<char>, vd::(anonymous namespace)::Semantics::Variable>>::back() [_Tp = std::map<std::basic_string<char>, vd::(anonymous namespace)::Semantics::Variable>, _Alloc = std::allocator<std::map<std::basic_string<char>, vd::(anonymous namespace)::Semantics::Variable>>]: Assertion '!this->empty()' failed.
+Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.

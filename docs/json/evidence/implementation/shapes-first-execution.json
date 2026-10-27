@@ -1,0 +1,11 @@
+{
+  "command": [
+    "build/ci-official-debug/voidc",
+    "run",
+    "tests/json/shapes.void",
+    "--no-opt"
+  ],
+  "status": 0,
+  "stdout": "{\"item\":[{\"item\":9}]}\n{\"label\":\"head\",\"next\":{\"label\":\"tail\",\"next\":null}}\n{\"id\":9223372036854775807,\"position\":{\"x\":1,\"y\":2}}\n{\"data\":{\"x\":4,\"y\":5},\"tags\":[\"a\",\"b\"]}\n[{\"label\":\"a\",\"next\":null},{\"label\":\"b\",\"next\":null}]\nnull\n{}\n{\"a\":[-0,1e400],\"x\":\"\\u0000\"}\n{\"a\":[-0,1e400],\"x\":\"\\u0000\"}\n",
+  "stderr": ""
+}

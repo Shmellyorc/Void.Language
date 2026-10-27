@@ -1,0 +1,163 @@
+{
+  "profile": "debug",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+  "compiler_sha256": "c461e59b99c5cbcadea780b93339fcad6cab925b9f20126031cbc1047820491b",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-schema-53b3sya3/schema.void",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a3440303a2f69640a313040313a2f65787472610a3440303a2f69640a3640363a2f69640a364032323a2f69640a394031343a2f7461670a364032343a2f6368696c642f6974656d0a6f6b0a313140303a0a3740303a0a3640303a0a3640303a0a313040313a2f620a",
+      "stderr": "",
+      "source": "/tmp/void-json-schema-53b3sya3/schema.void",
+      "source_sha256": "e87b821f8ad16822fa526c406a933ef0c9131b539107203d6fad6cd89eebce85",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-schema-53b3sya3/schema.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a3440303a2f69640a313040313a2f65787472610a3440303a2f69640a3640363a2f69640a364032323a2f69640a394031343a2f7461670a364032343a2f6368696c642f6974656d0a6f6b0a313140303a0a3740303a0a3640303a0a3640303a0a313040313a2f620a",
+      "stderr": "",
+      "source": "/tmp/void-json-schema-53b3sya3/schema.void",
+      "source_sha256": "e87b821f8ad16822fa526c406a933ef0c9131b539107203d6fad6cd89eebce85",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/private.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root (/private.void::secret): inaccessible or event field 'stored'. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Requested data type declared here. at /tmp/void-json-schema-53b3sya3/private.void:2:8\n\n 2 | struct secret:\n   |        ^^^^^^\n    Module: /private.void\n    Offending stored field. at /tmp/void-json-schema-53b3sya3/private.void:3:13\n\n 3 |     private stored: i32\n   |             ^^^^^^\n    Module: /private.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/private.void:5:21\n\n 5 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /private.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/private.void",
+      "source_sha256": "6b6605e716acb45fe048a878a617c2f497beb4382f3dc72bc1ae19f4a5d8be3a",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/internal.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root (/internal.void::secret): inaccessible or event field 'stored'. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Requested data type declared here. at /tmp/void-json-schema-53b3sya3/internal.void:2:8\n\n 2 | struct secret:\n   |        ^^^^^^\n    Module: /internal.void\n    Offending stored field. at /tmp/void-json-schema-53b3sya3/internal.void:3:14\n\n 3 |     internal stored: i32\n   |              ^^^^^^\n    Module: /internal.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/internal.void:5:21\n\n 5 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /internal.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/internal.void",
+      "source_sha256": "d635e56717001a0edadfe8b65eb09b4cbfb1f2c653e5be8ea252631bc8a7db87",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/init.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root (/init.void::secret): custom initializers are excluded. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Requested data type declared here. at /tmp/void-json-schema-53b3sya3/init.void:2:8\n\n 2 | struct secret:\n   |        ^^^^^^\n    Module: /init.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/init.void:7:21\n\n 7 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /init.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/init.void",
+      "source_sha256": "f1cf2975f3a8918e8adcca0d7e0d1d705f59475c427deae4d72d6540e605af2a",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/deinit.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root (/deinit.void::secret): custom deinitializers are excluded. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Requested data type declared here. at /tmp/void-json-schema-53b3sya3/deinit.void:2:8\n\n 2 | struct secret:\n   |        ^^^^^^\n    Module: /deinit.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/deinit.void:7:21\n\n 7 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /deinit.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/deinit.void",
+      "source_sha256": "befa8f9a10e4cbab22c9aededbb58c6795795825a37e884bfdecc682c5f1b4bb",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/property.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root (/property.void::secret): property-only types have no public stored-data schema. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Requested data type declared here. at /tmp/void-json-schema-53b3sya3/property.void:2:8\n\n 2 | struct secret:\n   |        ^^^^^^\n    Module: /property.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/property.void:7:21\n\n 7 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /property.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/property.void",
+      "source_sha256": "21fe73f5e2df5a61baccb8e3f5dd16d2b8f6fa57185b13e98a617615b78025f1",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/payload.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root (/payload.void::secret): enum payloads have no automatic wire schema. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Requested data type declared here. at /tmp/void-json-schema-53b3sya3/payload.void:2:6\n\n 2 | enum secret:\n   |      ^^^^^^\n    Module: /payload.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/payload.void:5:21\n\n 5 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /payload.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/payload.void",
+      "source_sha256": "05e134409f0e1d49843d498d2fca5af11d7a68ab4450bc342cc5e6bf6cc698b8",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/result.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root.stored (result<i32, string>): result, callable, task and resource storage is excluded. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/result.void:5:21\n\n 5 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /result.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/result.void",
+      "source_sha256": "f7908f903ccb8edaba74e15f0f8448b110742a085b2379f1c1ad7b688b02479d",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/map.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root.stored ({i32: string}): dictionary keys must be strings. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/map.void:5:21\n\n 5 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /map.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/map.void",
+      "source_sha256": "ca44c712b9c9c1d551d48c0b1de83b372d9fed0db64f91fb3a1e93e9ceadbc8a",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "check",
+        "/tmp/void-json-schema-53b3sya3/callable.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1096:12: error: JSON does not support root.stored (func(i32) -> i32): result, callable, task and resource storage is excluded. Use an explicit public-data DTO.\n    code: VOID1103\n\n 1096 |     return _json_from_value<t>(node, context, unknown)\n      |            ^^^^^^^^^^^^^^^^\n    Module: /@stdlib/json.void\n    Generic specialization requested here. at /tmp/void-json-schema-53b3sya3/callable.void:5:21\n\n 5 |     var data = json.parse_as<secret>(\"{{}}\")\n   |                     ^^^^^^^^\n    Module: /callable.void\n    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1093:6\n\n 1093 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:\n      |      ^^^^^^^^\n    Module: /@stdlib/json.void\n\n",
+      "source": "/tmp/void-json-schema-53b3sya3/callable.void",
+      "source_sha256": "d5821fbd1e8cba385c3c8a2b6416e96c847ebc4d7137950ce691b61378674609",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    }
+  ],
+  "environment": {}
+}

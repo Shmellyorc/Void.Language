@@ -1,0 +1,94 @@
+{
+  "profile": "debug",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+  "compiler_sha256": "c461e59b99c5cbcadea780b93339fcad6cab925b9f20126031cbc1047820491b",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "build",
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+        "-o",
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar-O0",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d6a736f6e2d64796e616d69632d6d67346e62666f362f6772616d6d61722d4f300a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar-O0"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "build",
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+        "-o",
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar-O2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d6a736f6e2d64796e616d69632d6d67346e62666f362f6772616d6d61722d4f320a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-dynamic-mg4nbfo6/grammar-O2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-mg4nbfo6/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    }
+  ],
+  "environment": {}
+}

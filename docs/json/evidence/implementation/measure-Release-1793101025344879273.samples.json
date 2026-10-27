@@ -1,0 +1,38 @@
+{
+  "profile": "Release",
+  "note": "Warmed native O2, compilation excluded. Stringify includes fresh DOM conversion. Informational only; GC/fault/root observations are in json_host.",
+  "samples": [
+    {
+      "case": "save",
+      "bytes": 125,
+      "nodes": 12,
+      "iterations": 20,
+      "parse_ns": 71108877,
+      "stringify_ns": 46157106
+    },
+    {
+      "case": "config",
+      "bytes": 90,
+      "nodes": 9,
+      "iterations": 20,
+      "parse_ns": 48543741,
+      "stringify_ns": 34620715
+    },
+    {
+      "case": "deep64",
+      "bytes": 129,
+      "nodes": 65,
+      "iterations": 20,
+      "parse_ns": 258762762,
+      "stringify_ns": 271173348
+    },
+    {
+      "case": "wide128",
+      "bytes": 1445,
+      "nodes": 129,
+      "iterations": 20,
+      "parse_ns": 2736005087,
+      "stringify_ns": 526673180
+    }
+  ]
+}

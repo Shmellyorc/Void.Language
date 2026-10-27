@@ -1,0 +1,39 @@
+{
+  "source_freeze": "source-freeze-10.json",
+  "source_files_verified_stable": 177,
+  "protected_root_readme": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "preserved_research_archive": "577b441f9a3e451913eae6fb3c9b5ee8391b62567a35e1682eeaa81c92c5c9b0",
+  "builds": {
+    "debug": {
+      "voidc": "2554bf76c07ec04b165845c51ae2886e129f9c8ae6162c40346a89e12c6e096a",
+      "voidls": "a92e0692c3a01e19650ece04728bda47cd6332ca243026abe647c2b6e1266523",
+      "void_json_host": "5da1a641a531c07bfc1a333d42b8147fa590a83bd6ed9eff8006c03f4d1c2b46",
+      "libvoid_core.a": "81d1180fe8ba7e94420a592388e9fc30aafe1aa37996acf39ad79f316633dadb",
+      "libvoid_runtime.a": "09e396e5f4d7ea55831d4e3ad8de6a15f013e15957fb765e0ff92c98b51af756",
+      "libvoid_llvm.a": "5ebce222071aba68774e678cd58be217ae3a68d5670597911cc2de5445332473",
+      "libvoid_native_fixture.a": "cc778e3c1823c2a9073332eba3f735bb6bc0026d90ddfcd842837fa429ae6915",
+      "libvoid_cache_identity.a": "c7a875efdc628410b34c0679cb950cc65ba8f006dda14c64208ff029f086276d"
+    },
+    "release": {
+      "voidc": "3342a2153fc909a98111207db82a8c7b2736983a5311e33a4f68369ec391a952",
+      "voidls": "82475f9a7f6f2c1b1ebbab1dcfefcefef5e5170c5cacc0d61e7c517fffe4d67f",
+      "void_json_host": "30784e189a18a795a30caa3c67650f7a233082ba6146857e2007baf2e4d61ccb",
+      "libvoid_core.a": "0db148d2cf20724ace88bd7c120e322a9ebe8778aaaddd39b750cb53c6fbf3fd",
+      "libvoid_runtime.a": "1f538b16affe1df955c4d374f592b878e1128d409ef86b3eb1b7afa885b9a655",
+      "libvoid_llvm.a": "2e91b92064cb6b0a9a50af7aa545d553f88aa9bdee4558677ab7265cc03d9076",
+      "libvoid_native_fixture.a": "844c40a92f207ca41b2f2ce9c362f9b59c590b1a40d52deab2143928e52ee772",
+      "libvoid_cache_identity.a": "57e99cff4750d650dc3fb163813b10fdb6aaf8daf45b11b7184f2ac158819695"
+    },
+    "san": {
+      "voidc": "a089eee193cbf97aa5000524c522206a910f093aa735ef69a886a08f3d100da9",
+      "voidls": "ae86b1923f9fef8b130142d7012fc765cca089dbcf2bec4356dd73826d70ef40",
+      "void_json_host": "cc24802838210d152553a120fffb968a156b40734bbf80c14a13c32d47aec75f",
+      "libvoid_core.a": "c4cc3088d15c03a2fbe6c5f77c047c4bdffdcef1ad3610300764fa339a93179a",
+      "libvoid_runtime.a": "5d60cb4716e8045e0ca4124f79d40d390f877f0a98144f65b961f77c50fe8e46",
+      "libvoid_llvm.a": "fde1a7f231733d0e2e8f943053d867856b18b6a68b9a851f980b92682e211b0c",
+      "libvoid_native_fixture.a": "251d6ac36a7fd94b5d7d1c4c4c8026fbad29024eca2f0a5e4541690ec51823c2",
+      "libvoid_cache_identity.a": "641f59082a9094df33bfa4bf601ba5925170be4b82d0496b5f982c6f07b19213"
+    }
+  },
+  "note": "Audit during final verification. All production/library/test sources match the latest recorded freeze. Source/header library binaries remain stable; final results follow separately."
+}

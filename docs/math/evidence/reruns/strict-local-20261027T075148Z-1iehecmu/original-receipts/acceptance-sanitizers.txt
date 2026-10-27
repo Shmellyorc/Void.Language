@@ -1,0 +1,488 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start  44: debug_cache_processes
+      Start 245: frontend
+ 1/30 Test  #44: debug_cache_processes ..............***Failed    0.19 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-4pkpyx2o
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py", line 24, in <module>
+    first = run()
+            ^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py", line 19, in run
+    assert result.returncode == 0 and result.stdout.strip() == str(expected), result
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: CompletedProcess(args=['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'run', '/tmp/void-cache-_b3io2ct/main.void', '7', '--cache'], returncode=86, stdout='', stderr='Debug cache: miss\n==7==LeakSanitizer has encountered a fatal error.\n==7==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==7==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 244: numeric
+ 2/30 Test #244: numeric ............................***Failed    6.35 sec
+==9==LeakSanitizer has encountered a fatal error.
+==9==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==9==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start 265: lsp_stage10_display
+ 3/30 Test #265: lsp_stage10_display ................***Failed    0.89 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-0m8j3j5b
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py", line 117, in <module>
+    client.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, '==28==LeakSanitizer has encountered a fatal error.\n==28==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==28==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 247: numeric_sprint2
+ 4/30 Test #247: numeric_sprint2 ....................***Failed    0.18 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-fkzjqqmk
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/numeric/sprint2.py", line 77, in <module>
+    run([compiler,'check',path])
+  File "/home/shmellyorc/Documents/Void.Language/tests/numeric/sprint2.py", line 12, in run
+    assert result.returncode==(0 if ok else 1),(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc'), 'check', PosixPath('/tmp/VOID sprint2 vug6sjn2/binding.void')], 86, '', '==33==LeakSanitizer has encountered a fatal error.\n==33==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==33==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  43: debug_cache
+ 5/30 Test  #43: debug_cache ........................***Failed    2.77 sec
+==35==LeakSanitizer has encountered a fatal error.
+==35==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==35==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start  91: lsp_stage8
+ 6/30 Test  #91: lsp_stage8 .........................***Failed    0.12 sec
+==38==LeakSanitizer has encountered a fatal error.
+==38==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==38==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-dolt_pll
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py", line 55, in <module>
+    selected=discover(project,active)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py", line 7, in discover
+    return json.loads(subprocess.check_output([server,'--discover',str(workspace),str(active),str(override)]))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 209, in run
+    result.check_returncode()
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 502, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '[PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls'), '--discover', '/tmp/VOID discovery é😀 # % lh09x7a2/project', '/tmp/VOID discovery é😀 # % lh09x7a2/project/app/systems/player.void', '']' returned non-zero exit status 86.
+
+      Start 246: modules
+ 7/30 Test #245: frontend ...........................***Failed   12.05 sec
+Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: bounded receiver-chain semantics
+Receiver methods: actual storage, copies, imports, source order, effects, cycles, diagnostics, tooling and reload passed
+Frontend passed: receiver methods
+Frontend begin: initialization
+Initialization project main optimized=0
+Initialization project main optimized=1
+Initialization project order optimized=0
+Initialization project order optimized=1
+Initialization project required optimized=0
+Initialization project required optimized=1
+Initialization project numeric optimized=0
+Initialization project numeric optimized=1
+Initialization project failure optimized=0
+Initialization project failure optimized=1
+Initialization project copies optimized=0
+Initialization project copies optimized=1
+Initialization begin: layout retirement
+Initialization layout generation 0 fields=1
+Initialization layout generation 1 fields=8
+Initialization layout generation 2 fields=15
+Initialization layout generation 3 fields=5
+Initialization layout generation 4 fields=12
+Initialization layout generation 5 fields=2
+Initialization layout generation 6 fields=9
+Initialization layout generation 7 fields=16
+Initialization layout generation 8 fields=6
+Initialization layout generation 9 fields=13
+Initialization layout generation 10 fields=3
+Initialization layout generation 11 fields=10
+Initialization layout generation 12 fields=17
+Initialization layout generation 13 fields=7
+Initialization layout generation 14 fields=14
+Initialization layout generation 15 fields=4
+Initialization layout generation 16 fields=11
+Initialization layout generation 17 fields=1
+Initialization layout generation 18 fields=8
+Initialization layout generation 19 fields=15
+Initialization layout generation 20 fields=5
+Initialization layout generation 21 fields=12
+Initialization layout generation 22 fields=2
+Initialization layout generation 23 fields=9
+Initialization layout generation 24 fields=16
+Initialization layout generation 25 fields=6
+Initialization layout generation 26 fields=13
+Initialization layout generation 27 fields=3
+Initialization layout generation 28 fields=10
+Initialization layout generation 29 fields=17
+Initialization layout generation 30 fields=7
+Initialization layout generation 31 fields=14
+Initialization layout generation 32 fields=4
+Initialization layout generation 33 fields=11
+Initialization layout generation 34 fields=1
+Initialization layout generation 35 fields=8
+Initialization layout generation 36 fields=15
+Initialization layout generation 37 fields=5
+Initialization layout generation 38 fields=12
+Initialization layout generation 39 fields=2
+Initialization layout generation 40 fields=9
+Initialization layout generation 41 fields=16
+Initialization layout generation 42 fields=6
+Initialization layout generation 43 fields=13
+Initialization layout generation 44 fields=3
+Initialization layout generation 45 fields=10
+Initialization layout generation 46 fields=17
+Initialization layout generation 47 fields=7
+Initialization layout generation 48 fields=14
+Initialization layout generation 49 fields=4
+Initialization layout generation 50 fields=11
+Initialization layout generation 51 fields=1
+Initialization layout generation 52 fields=8
+Initialization layout generation 53 fields=15
+Initialization layout generation 54 fields=5
+Initialization layout generation 55 fields=12
+Initialization layout generation 56 fields=2
+Initialization layout generation 57 fields=9
+Initialization layout generation 58 fields=16
+Initialization layout generation 59 fields=6
+Initialization layout generation 60 fields=13
+Initialization layout generation 61 fields=3
+Initialization layout generation 62 fields=10
+Initialization layout generation 63 fields=17
+Initialization nested layout generation 0 padding=i8
+Initialization nested layout generation 1 padding=i64
+Initialization nested layout generation 2 padding=i8
+Initialization nested layout generation 3 padding=i64
+Initialization nested layout generation 4 padding=i8
+Initialization nested layout generation 5 padding=i64
+Initialization nested layout generation 6 padding=i8
+Initialization nested layout generation 7 padding=i64
+Initialization nested layout generation 8 padding=i8
+Initialization nested layout generation 9 padding=i64
+Initialization nested layout generation 10 padding=i8
+Initialization nested layout generation 11 padding=i64
+Initialization nested layout generation 12 padding=i8
+Initialization nested layout generation 13 padding=i64
+Initialization nested layout generation 14 padding=i8
+Initialization nested layout generation 15 padding=i64
+80 aggregate layout generations retired through normal/O2 JIT
+Initialization: parameters/defaults, recursive values, order, copies, lifecycle diagnostics, visibility, tooling, failure and reload passed
+Frontend passed: initialization
+==6==LeakSanitizer has encountered a fatal error.
+==6==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==6==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start 266: lsp_stage10_intelligence
+ 8/30 Test #246: modules ............................***Failed    1.75 sec
+==40==LeakSanitizer has encountered a fatal error.
+==40==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==40==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start  19: gc_buffers
+ 9/30 Test #266: lsp_stage10_intelligence ...........***Failed    0.59 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-m9ypv48p
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 209, in <module>
+    client.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, '==43==LeakSanitizer has encountered a fatal error.\n==43==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==43==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 197: async_ir
+10/30 Test #197: async_ir ...........................***Failed    0.10 sec
+==50==LeakSanitizer has encountered a fatal error.
+==50==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==50==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start 234: core
+11/30 Test #234: core ...............................***Failed    0.03 sec
+==52==LeakSanitizer has encountered a fatal error.
+==52==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==52==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start  20: gc_schemas
+12/30 Test  #20: gc_schemas .........................***Failed    0.21 sec
+==54==LeakSanitizer has encountered a fatal error.
+==54==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==54==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start  92: documentation_execution
+13/30 Test  #92: documentation_execution ............***Failed    0.17 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-tkg39chs
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py", line 22, in <module>
+    run([compiler,'check',source],warning=warned)
+  File "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py", line 10, in run
+    assert result.returncode==0,(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc'), 'check', PosixPath('/tmp/VOID nonfatal docs é😀 3x9cbc_6/main.void')], 86, b'', b'==63==LeakSanitizer has encountered a fatal error.\n==63==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==63==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  93: lsp_documentation
+14/30 Test  #93: lsp_documentation ..................***Failed    0.41 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-_3x6iao1
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py", line 196, in <module>
+    c.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, 'textDocument/didChange: Stale or duplicate document version\ntextDocument/didChange: Stale or duplicate document version\n==66==LeakSanitizer has encountered a fatal error.\n==66==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==66==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  94: math_host
+15/30 Test  #19: gc_buffers .........................***Failed    3.14 sec
+reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=3 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=4 sites=4 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=4 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=5 sites=5 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=5 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=6 sites=6 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=6 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=7 sites=7 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=7 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=8 sites=8 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=8 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=9 sites=9 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=9 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=10 sites=10 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=10 native_count=0 native_bytes=0
+==48==LeakSanitizer has encountered a fatal error.
+==48==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==48==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-f82zmimj
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py", line 4, in <module>
+    subprocess.run([sys.argv[1]], check=True, timeout=150)
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 209, in run
+    result.check_returncode()
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 502, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_buffers']' returned non-zero exit status 86.
+
+      Start  95: math_ir
+16/30 Test  #95: math_ir ............................***Failed    0.39 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-bqbg12vn
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/host.py", line 7, in <module>
+    result=h.run([exe,work],work,timeout=600)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_ir', '/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math ir fixtures'], 86, b'', b'==84==LeakSanitizer has encountered a fatal error.\n==84==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==84==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  96: math_execution
+17/30 Test  #94: math_host ..........................***Failed    2.23 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wikqozrx
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/host.py", line 7, in <module>
+    result=h.run([exe,work],work,timeout=600)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_host', '/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math host fixtures'], 86, b'', b'==72==LeakSanitizer has encountered a fatal error.\n==72==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==72==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  97: math_frontend
+18/30 Test  #97: math_frontend ......................***Failed    0.31 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-ww8oorhr
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/frontend.py", line 29, in <module>
+    check('\n'.join(declarations))
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/frontend.py", line 18, in check
+    result=h.run([compiler,'check',source],work,status=0 if valid else 1,small=small,sources=(source,))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'check', '/tmp/VOID math frontend 4r7sszn1/case1.void'], 86, b'', b'==89==LeakSanitizer has encountered a fatal error.\n==89==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==89==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  98: math_errors
+19/30 Test  #98: math_errors ........................***Failed    0.37 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-7nujbsps
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/errors.py", line 18, in <module>
+    result=h.run([compiler,'run',source,*flags],work,b'cleanup\n',status=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'run', '/tmp/VOID math checked errors 5tybigrl/checked0.void', '--no-opt'], 86, b'cleanup\n', b'/home/shmellyorc/Documents/Void.Language/stdlib/math.void:49:14: runtime error: Signed minimum abs is out of range\nIn function $numeric::i8::abs\nCalled from /@stdlib/math.void::abs\n/home/shmellyorc/Documents/Void.Language/stdlib/math.void:49:14: source call\n    return t.abs(value)\n             ^\nCalled from /checked0.void::main\n/tmp/VOID math checked errors 5tybigrl/checked0.void:6:22: source call\n    var value = math.abs<i8>(i8.min_value)\n                     ^\nCalled from /checked0.void::$app_adapter\n/tmp/VOID math checked errors 5tybigrl/checked0.void:4:6: source call\n\n==93==LeakSanitizer has encountered a fatal error.\n==93==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==93==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start  99: math_worker
+20/30 Test  #96: math_execution .....................***Failed    1.01 sec
+Math check: 1372 vectors, 59675 source bytes
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-dzg7obfe
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/execution.py", line 235, in <module>
+    h.run([compiler,'check',fixture],work,small=small)
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'check', '/tmp/VOID math execution pmhbbpl6/math_test.void'], 86, b'', b'==90==LeakSanitizer has encountered a fatal error.\n==90==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==90==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 100: lsp_math
+21/30 Test  #99: math_worker ........................***Failed    0.38 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-4551yu5i
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/worker.py", line 16, in <module>
+    h.run([compiler,'check',source],work,sources=(source,))
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'check', '/tmp/VOID math worker d7i5_1ta/worker.void'], 86, b'', b'==96==LeakSanitizer has encountered a fatal error.\n==96==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==96==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 102: math_preservation
+22/30 Test #100: lsp_math ...........................***Failed    1.10 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-ick3gr_3
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/lsp.py", line 76, in <module>
+    client.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, '==101==LeakSanitizer has encountered a fatal error.\n==101==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==101==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 103: math_stack
+23/30 Test #102: math_preservation ..................   Passed    1.04 sec
+      Start 104: math_frontend_stack
+24/30 Test #104: math_frontend_stack ................***Failed    0.32 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-1q_uqfti
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/frontend.py", line 29, in <module>
+    check('\n'.join(declarations))
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/frontend.py", line 18, in check
+    result=h.run([compiler,'check',source],work,status=0 if valid else 1,small=small,sources=(source,))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'check', '/tmp/VOID math frontend gu8s6t3b/case1.void'], 86, b'', b'==111==LeakSanitizer has encountered a fatal error.\n==111==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==111==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 116: binary_execution
+25/30 Test #116: binary_execution ...................***Failed    0.54 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-wvj0eu4t
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py", line 191, in <module>
+    run([COMPILER, "check", path])
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py", line 19, in run
+    assert (result.returncode == 0) == success, (arguments, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc'), 'check', PosixPath('/tmp/VOID binary é😀 in3vbqbn/main.void')], 86, b'', b'==115==LeakSanitizer has encountered a fatal error.\n==115==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==115==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 117: lsp_binary
+26/30 Test #103: math_stack .........................***Failed    1.00 sec
+Math check: 1372 vectors, 59675 source bytes
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-juh_od4i
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/execution.py", line 235, in <module>
+    h.run([compiler,'check',fixture],work,small=small)
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'check', '/tmp/VOID math execution 0m4utsa4/math_test.void'], 86, b'', b'==112==LeakSanitizer has encountered a fatal error.\n==112==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==112==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 118: binary_ownership
+27/30 Test #117: lsp_binary .........................***Failed    0.31 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-1vfle4ci
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 108, in <module>
+    client.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, '==119==LeakSanitizer has encountered a fatal error.\n==119==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==119==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+      Start 135: text_encoding_crash_preservation
+28/30 Test #135: text_encoding_crash_preservation ...   Passed    0.70 sec
+29/30 Test #118: binary_ownership ...................***Failed    1.04 sec
+==122==LeakSanitizer has encountered a fatal error.
+==122==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==122==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+      Start 101: math_install
+30/30 Test #101: math_install .......................***Failed    0.75 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes/incident-4c7uejry
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/install.py", line 29, in <module>
+    h.run([installed,'run',fixture,'2',*flags],work,expected,env=env)
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/tmp/VOID math relocated j8j7dlsy/relocated install/bin/voidc', 'run', '/tmp/VOID math relocated j8j7dlsy/installed_math.void', '2', '--no-opt'], 86, b'2\n2\ntrue\n-8\ntrue\n', b'==136==LeakSanitizer has encountered a fatal error.\n==136==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==136==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+
+7% tests passed, 28 tests failed out of 30
+
+Total Test time (real) =  20.68 sec
+
+The following tests FAILED:
+	 19 - gc_buffers (Failed)
+	 20 - gc_schemas (Failed)
+	 43 - debug_cache (Failed)
+	 44 - debug_cache_processes (Failed)
+	 91 - lsp_stage8 (Failed)
+	 92 - documentation_execution (Failed)
+	 93 - lsp_documentation (Failed)
+	 94 - math_host (Failed)
+	 95 - math_ir (Failed)
+	 96 - math_execution (Failed)
+	 97 - math_frontend (Failed)
+	 98 - math_errors (Failed)
+	 99 - math_worker (Failed)
+	100 - lsp_math (Failed)
+	101 - math_install (Failed)
+	103 - math_stack (Failed)
+	104 - math_frontend_stack (Failed)
+	116 - binary_execution (Failed)
+	117 - lsp_binary (Failed)
+	118 - binary_ownership (Failed)
+	197 - async_ir (Failed)
+	234 - core (Failed)
+	244 - numeric (Failed)
+	245 - frontend (Failed)
+	246 - modules (Failed)
+	247 - numeric_sprint2 (Failed)
+	265 - lsp_stage10_display (Failed)
+	266 - lsp_stage10_intelligence (Failed)
+Errors while running CTest

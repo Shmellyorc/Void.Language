@@ -1,0 +1,85 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start 116: binary_execution
+      Start  44: debug_cache_processes
+ 1/30 Test  #44: debug_cache_processes ..............   Passed   21.73 sec
+      Start 274: lsp_stage10_display
+ 2/30 Test #274: lsp_stage10_display ................   Passed   15.06 sec
+      Start 256: numeric_sprint2
+ 3/30 Test #256: numeric_sprint2 ....................   Passed    3.07 sec
+      Start  43: debug_cache
+ 4/30 Test #116: binary_execution ...................   Passed   40.77 sec
+      Start 118: binary_ownership
+ 5/30 Test #118: binary_ownership ...................   Passed    1.02 sec
+      Start  92: documentation_execution
+ 6/30 Test  #43: debug_cache ........................   Passed    2.81 sec
+      Start 253: numeric
+ 7/30 Test  #92: documentation_execution ............   Passed    0.88 sec
+      Start  19: gc_buffers
+ 8/30 Test #253: numeric ............................   Passed    5.54 sec
+      Start 254: frontend
+ 9/30 Test  #19: gc_buffers .........................   Passed    9.98 sec
+      Start  93: lsp_documentation
+10/30 Test  #93: lsp_documentation ..................   Passed    0.39 sec
+      Start 255: modules
+11/30 Test #255: modules ............................   Passed    1.39 sec
+      Start 138: text_encoding_crash_preservation
+12/30 Test #138: text_encoding_crash_preservation ...   Passed    0.77 sec
+      Start 117: lsp_binary
+13/30 Test #117: lsp_binary .........................***Failed    0.12 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 96, in <module>
+    signature = query("signatureHelp", call, len(call), **context)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 59, in query
+    check("error" not in response, response)
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 16, in check
+    assert value, message
+           ^^^^^
+AssertionError: {'error': {'code': -32602, 'message': 'VOID IR: missing array element'}, 'id': 13, 'jsonrpc': '2.0'}
+
+      Start 275: lsp_stage10_intelligence
+14/30 Test #275: lsp_stage10_intelligence ...........   Passed    0.68 sec
+      Start  91: lsp_stage8
+15/30 Test  #91: lsp_stage8 .........................   Passed    0.46 sec
+      Start  20: gc_schemas
+16/30 Test  #20: gc_schemas .........................   Passed    0.84 sec
+      Start 206: async_ir
+17/30 Test #206: async_ir ...........................   Passed    0.06 sec
+      Start 243: core
+18/30 Test #243: core ...............................   Passed    0.02 sec
+      Start  94: math_host
+19/30 Test #254: frontend ...........................   Passed   10.90 sec
+      Start  95: math_ir
+20/30 Test  #95: math_ir ............................   Passed    0.24 sec
+      Start  96: math_execution
+21/30 Test  #94: math_host ..........................   Passed    2.11 sec
+      Start  97: math_frontend
+22/30 Test  #97: math_frontend ......................   Passed   13.35 sec
+      Start  98: math_errors
+23/30 Test  #98: math_errors ........................   Passed    7.43 sec
+      Start  99: math_worker
+24/30 Test  #99: math_worker ........................   Passed    3.53 sec
+      Start 100: lsp_math
+25/30 Test #100: lsp_math ...........................   Passed    1.39 sec
+      Start 102: math_preservation
+26/30 Test #102: math_preservation ..................   Passed    1.09 sec
+      Start 103: math_stack
+27/30 Test  #96: math_execution .....................   Passed  113.35 sec
+      Start 104: math_frontend_stack
+28/30 Test #104: math_frontend_stack ................   Passed   13.24 sec
+29/30 Test #103: math_stack .........................   Passed  104.05 sec
+      Start 101: math_install
+30/30 Test #101: math_install .......................   Passed    1.58 sec
+
+97% tests passed, 1 tests failed out of 30
+
+Total Test time (real) = 191.93 sec
+
+The following tests FAILED:
+	117 - lsp_binary (Failed)
+Errors while running CTest
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/acceptance.py", line 46, in <module>
+    assert result.returncode==0,record
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'profile': 'debug', 'failed_only': False, 'command': ['ctest', '--test-dir', '/home/shmellyorc/Documents/Void.Language/build/ci-official-debug', '-R', '^(math_.*|lsp_math|core|numeric|frontend|modules|numeric_sprint2|binary_execution|binary_ownership|lsp_binary|debug_cache|debug_cache_processes|gc_schemas|gc_buffers|async_ir|documentation_execution|lsp_documentation|lsp_stage8|lsp_stage10_intelligence|lsp_stage10_display|text_encoding_crash_preservation)$', '-j', '2', '--output-on-failure', '--output-junit', '/home/shmellyorc/Documents/Void.Language/docs/math/evidence/acceptance-debug.xml'], 'cwd': '/home/shmellyorc/Documents/Void.Language', 'status': 8, 'seconds': 191.94675016403198, 'tests': [{'name': 'gc_buffers', 'seconds': 9.98052, 'failed': False, 'skipped': False}, {'name': 'gc_schemas', 'seconds': 0.839999, 'failed': False, 'skipped': False}, {'name': 'debug_cache', 'seconds': 2.80509, 'failed': False, 'skipped': False}, {'name': 'debug_cache_processes', 'seconds': 21.7339, 'failed': False, 'skipped': False}, {'name': 'lsp_stage8', 'seconds': 0.455664, 'failed': False, 'skipped': False}, {'name': 'documentation_execution', 'seconds': 0.883726, 'failed': False, 'skipped': False}, {'name': 'lsp_documentation', 'seconds': 0.386202, 'failed': False, 'skipped': False}, {'name': 'math_host', 'seconds': 2.10777, 'failed': False, 'skipped': False}, {'name': 'math_ir', 'seconds': 0.238031, 'failed': False, 'skipped': False}, {'name': 'math_execution', 'seconds': 113.348, 'failed': False, 'skipped': False}, {'name': 'math_frontend', 'seconds': 13.3473, 'failed': False, 'skipped': False}, {'name': 'math_errors', 'seconds': 7.43365, 'failed': False, 'skipped': False}, {'name': 'math_worker', 'seconds': 3.52837, 'failed': False, 'skipped': False}, {'name': 'lsp_math', 'seconds': 1.39252, 'failed': False, 'skipped': False}, {'name': 'math_install', 'seconds': 1.58108, 'failed': False, 'skipped': False}, {'name': 'math_preservation', 'seconds': 1.09192, 'failed': False, 'skipped': False}, {'name': 'math_stack', 'seconds': 104.05, 'failed': False, 'skipped': False}, {'name': 'math_frontend_stack', 'seconds': 13.2354, 'failed': False, 'skipped': False}, {'name': 'binary_execution', 'seconds': 40.7742, 'failed': False, 'skipped': False}, {'name': 'lsp_binary', 'seconds': 0.121861, 'failed': True, 'skipped': False}, {'name': 'binary_ownership', 'seconds': 1.02272, 'failed': False, 'skipped': False}, {'name': 'text_encoding_crash_preservation', 'seconds': 0.770234, 'failed': False, 'skipped': False}, {'name': 'async_ir', 'seconds': 0.0571105, 'failed': False, 'skipped': False}, {'name': 'core', 'seconds': 0.0192904, 'failed': False, 'skipped': False}, {'name': 'numeric', 'seconds': 5.54111, 'failed': False, 'skipped': False}, {'name': 'frontend', 'seconds': 10.9002, 'failed': False, 'skipped': False}, {'name': 'modules', 'seconds': 1.38949, 'failed': False, 'skipped': False}, {'name': 'numeric_sprint2', 'seconds': 3.06642, 'failed': False, 'skipped': False}, {'name': 'lsp_stage10_display', 'seconds': 15.0619, 'failed': False, 'skipped': False}, {'name': 'lsp_stage10_intelligence', 'seconds': 0.676308, 'failed': False, 'skipped': False}], 'passed': 29, 'failed': 1, 'environment': {'VOID_CRASH_EVIDENCE': '/home/shmellyorc/Documents/Void.Language/docs/math/evidence/crashes', 'PYTHONPATH': '/home/shmellyorc/Documents/Void.Language/tests/text_encoding:'}, 'compiler_sha256': 'ae34bc6b1760385975cb34a709ca07e3ed114cdf50920b9579e243954a984c5d', 'build_config': {'sha256': '4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940', 'flags': ['CMAKE_BUILD_TYPE:STRING=Debug', 'CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++', 'CMAKE_CXX_FLAGS:STRING=', 'CMAKE_CXX_FLAGS_DEBUG:STRING=-g', 'CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG', 'CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG', 'CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG', 'LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm', 'VOID_SANITIZERS:BOOL=OFF', 'CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1', 'CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1', 'CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1', 'CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1', 'CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1']}, 'native_manifest': 'VOID native 19.1.7 v1\n/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang\n/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\n/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_runtime.a\n/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/libvoid_native_fixture.a\n-pthread\n', 'source_hashes': {'CMakeLists.txt': 'db4769146a00191086d32b367b2c7b3275d943022ecca4252fbff056dbeb3ef7', 'include/void/math_ops.hpp': 'da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb', 'include/void/ir.hpp': '04394e5c85d2ecd56fecf65511aee5d36224aae6c935d04f211461cd5a47a869', 'src/frontend/compiler.cpp': '6a0d1d1412fd515616acc73e69ec5bfe4447cd90ad94aa08618f956a8f006203', 'src/frontend/math.inc': 'e316847a1bde10702da9b72f1af0f075f04071cbfb3b07c78052f7a6107ae239', 'src/frontend/generics.inc': 'd114e5816315fef153430a4268a22d96fbc5108463818b692105d840ce511267', 'src/frontend/generic_inference.inc': '6b629f2436dfd6128e27339a2fb1e44263090c96c297d6ae4e6615657581b448', 'src/frontend/capabilities.inc': '716c748ee5caac17ff4b4a21f2f5a75188ddab833a8264712cfb8a3ef5f5d6e5', 'src/ir/module.cpp': '7e0b74d982661bb5c7acad56c087b6eb1ad92ac8998c3b40934126f930402693', 'src/backend/llvm/backend.cpp': 'a5ec78a9e82e652f57fd214001660d5402ae100e9ed02476f87093bad2eb8008', 'stdlib/math.void': 'd960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4', 'tests/random/harness.py': 'a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950', 'tests/text_encoding/crash.py': '31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec', 'tests/math/bootstrap.py': '02eff9d62b39a308b7c5da6b68dcef475dc149b412f3c0063abfabce331e56da', 'tests/math/reference.py': '0d512150a38c4402cb276a0948575702573db2cd186138f7506fc5ede4f4fd52', 'tests/math/generate_vectors.py': '10751e37ee3605768744b65ef3fff435dda01fe7e4140f2e50b2e9477c176818', 'tests/math/vectors.json': '697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0', 'tests/math/host.cpp': '59acb15c35eb3334c8a804a24ac4e6f63bc0ad682d6c6ea14ee032e3d92bd74f', 'tests/math/host.py': '04245824aae98855f894f229b5791fd471eca54d4c7ad1ad76361cebbd0bc0a6', 'tests/math/worker.void': 'ad6a0770159315641596ce34ee143721ac46514436257707712e46e0928e3850', 'tests/math/worker.py': 'd49e3c61a62cf6ae29579093c9f2c5ca75f8799c465db681e3ebbd2e779e8b15', 'tests/math/ir.cpp': '7310dcefd1a41661ac1deb49f4c592ad37dbc1bd515d74fa4f64594599c9523a', 'tests/math/execution.py': '0fe77f596af95a451b83e9ae3cd01a5cb7f58be79846ca0f0e2cf0aa2cb0ff96', 'tests/math/frontend.py': '1e1b34e416eae0efd5a7380cc7ba38f6c3ab434a890fa3bf8fefac76156f5cae', 'tests/math/errors.py': '83634c9dd318b80632ce18ce6542425337a58e1ea19612720a38b2b5a5af54e2', 'tests/math/lsp.py': 'e2aacaa8746de5d695905cc423ec9c3d8ea5f2384bdcb85c2b213c2ece03751f', 'tests/math/install.py': 'fd7437bbea8936d8fae2754e91dfc0ac4beb137dbb9dc1fb64074324b88e4ffe', 'tests/math/acceptance.py': 'c3840d31687888f6abd466d494d6495600fb0802aedd52f8cd0c0b91603e3dc4', 'tests/math/preservation.py': '9876fb60bdc5fd10dba50a8a795c8118970032efe72226e7c2ed3f743f624ec8'}, 'limits': ['Linux host evidence only; native Windows/macOS checks remain pending authorization.', 'Host sanitizers do not instrument every generated JIT instruction.']}

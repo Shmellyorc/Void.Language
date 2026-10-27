@@ -1,0 +1,9 @@
+struct node:
+    count: i32
+func main():
+    var writable = node(count = 42)
+    const view = writable
+    if writable is view:
+        print("same identity")
+    writable.count = 43
+    print(view.count)

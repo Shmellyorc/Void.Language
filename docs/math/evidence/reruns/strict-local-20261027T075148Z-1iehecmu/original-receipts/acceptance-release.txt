@@ -1,0 +1,78 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+      Start 116: binary_execution
+      Start  44: debug_cache_processes
+ 1/30 Test  #44: debug_cache_processes ..............   Passed    6.14 sec
+      Start 253: numeric
+ 2/30 Test #253: numeric ............................   Passed    2.21 sec
+      Start 256: numeric_sprint2
+ 3/30 Test #256: numeric_sprint2 ....................   Passed    1.43 sec
+      Start  43: debug_cache
+ 4/30 Test  #43: debug_cache ........................   Passed    1.41 sec
+      Start 254: frontend
+ 5/30 Test #254: frontend ...........................   Passed    4.98 sec
+      Start 274: lsp_stage10_display
+ 6/30 Test #274: lsp_stage10_display ................   Passed    1.85 sec
+      Start  92: documentation_execution
+ 7/30 Test  #92: documentation_execution ............   Passed    0.59 sec
+      Start  91: lsp_stage8
+ 8/30 Test  #91: lsp_stage8 .........................   Passed    0.38 sec
+      Start 118: binary_ownership
+ 9/30 Test #118: binary_ownership ...................   Passed    0.42 sec
+      Start 138: text_encoding_crash_preservation
+10/30 Test #138: text_encoding_crash_preservation ...   Passed    0.73 sec
+      Start 255: modules
+11/30 Test #116: binary_execution ...................   Passed   20.34 sec
+      Start 275: lsp_stage10_intelligence
+12/30 Test #275: lsp_stage10_intelligence ...........   Passed    0.15 sec
+      Start  93: lsp_documentation
+13/30 Test  #93: lsp_documentation ..................   Passed    0.12 sec
+      Start 117: lsp_binary
+14/30 Test #117: lsp_binary .........................   Passed    0.10 sec
+      Start  19: gc_buffers
+15/30 Test #255: modules ............................   Passed    0.92 sec
+      Start 206: async_ir
+16/30 Test #206: async_ir ...........................   Passed    0.05 sec
+      Start 243: core
+17/30 Test #243: core ...............................   Passed    0.01 sec
+      Start  20: gc_schemas
+18/30 Test  #20: gc_schemas .........................   Passed    0.04 sec
+      Start  94: math_host
+19/30 Test  #19: gc_buffers .........................   Passed    0.96 sec
+      Start  95: math_ir
+20/30 Test  #95: math_ir ............................   Passed    0.25 sec
+      Start  96: math_execution
+21/30 Test  #94: math_host ..........................   Passed    0.81 sec
+      Start  97: math_frontend
+22/30 Test  #97: math_frontend ......................   Passed    4.10 sec
+      Start  98: math_errors
+23/30 Test  #98: math_errors ........................   Passed    4.07 sec
+      Start  99: math_worker
+24/30 Test  #99: math_worker ........................   Passed    1.84 sec
+      Start 100: lsp_math
+25/30 Test #100: lsp_math ...........................***Failed    0.15 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/lsp.py", line 57, in <module>
+    result=query('signatureHelp',call,len(call),context={'triggerKind':1,'isRetrigger':False});check(bool(result),(call,result));shown=result['signatures'][0]
+                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/lsp.py", line 16, in check
+    assert value,message
+           ^^^^^
+AssertionError: ('m.sin(', None)
+
+      Start 102: math_preservation
+26/30 Test #102: math_preservation ..................   Passed    0.98 sec
+      Start 103: math_stack
+27/30 Test  #96: math_execution .....................   Passed   90.68 sec
+      Start 104: math_frontend_stack
+28/30 Test #104: math_frontend_stack ................   Passed    5.63 sec
+29/30 Test #103: math_stack .........................   Passed   88.65 sec
+      Start 101: math_install
+30/30 Test #101: math_install .......................   Passed    1.07 sec
+
+97% tests passed, 1 tests failed out of 30
+
+Total Test time (real) = 122.84 sec
+
+The following tests FAILED:
+	100 - lsp_math (Failed)
+Errors while running CTest

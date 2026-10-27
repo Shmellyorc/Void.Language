@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="31"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="2785"
+	timestamp="2026-10-27T05:09:01"
+	>
+	<testcase name="json_readonly" classname="json_readonly" time="17.1303" status="run">
+		<properties/>
+		<system-out>readonly RelWithDebInfo: 47/47 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_dynamic" classname="json_dynamic" time="185.556" status="run">
+		<properties/>
+		<system-out>grammar RelWithDebInfo: 100 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_numbers" classname="json_numbers" time="232.602" status="run">
+		<properties/>
+		<system-out>numbers RelWithDebInfo: 125 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_schema" classname="json_schema" time="178.365" status="run">
+		<properties/>
+		<system-out>schema RelWithDebInfo: 14 error/order vectors in four modes and 21 admission/authority negatives passed
+</system-out>
+	</testcase>
+	<testcase name="json_bounds" classname="json_bounds" time="261.679" status="run">
+		<properties/>
+		<system-out>bounds RelWithDebInfo: 56 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_install" classname="json_install" time="322.329" status="run">
+		<properties/>
+		<system-out>JSON relocated install: 7 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_adversarial" classname="json_adversarial" time="223.568" status="run">
+		<properties/>
+		<system-out>JSON adversarial: 22 vectors in all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_validated" classname="json_execution_validated" time="98.5389" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_accessors" classname="json_execution_accessors" time="80.9348" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_dynamic_smoke" classname="json_execution_dynamic_smoke" time="72.6624" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_typed_smoke" classname="json_execution_typed_smoke" time="160.416" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_shapes" classname="json_execution_shapes" time="304.202" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_ownership" classname="json_execution_ownership" time="98.5342" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_stress_fixed" classname="json_stress_fixed" time="233.773" status="run">
+		<properties/>
+		<system-out>JSON stack stress fixed: all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_stress_wide" classname="json_stress_wide" time="909.038" status="run">
+		<properties/>
+		<system-out>JSON stack stress wide: all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_host" classname="json_host" time="1205.04" status="run">
+		<properties/>
+		<system-out>JSON wide const GC O0: 223824205 root observations, 266 managed constructions, 50564 polls
+JSON forced GC O0: 12087416 root observations, 85 managed constructions, 11005 polls
+JSON allocation sweep O0: 2050 injected failures
+JSON wide const GC O2: 223824205 root observations, 266 managed constructions, 50564 polls
+JSON forced GC O2: 12087416 root observations, 85 managed constructions, 11005 polls
+JSON allocation sweep O2: 2050 injected failures
+JSON host: 12343 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_preservation" classname="json_preservation" time="0.374358" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID random synthetic preservation c7acneco/evidence/incident-b_rghqs6
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation c7acneco/evidence/incident-l44dji7s
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation c7acneco/evidence/incident-iq6q2bg0
+Random preservation: 3 synthetic reserved-status/timeout incidents verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="json_lsp" classname="json_lsp" time="8.11325" status="run">
+		<properties/>
+		<system-out>JSON LSP: 43 checks passed
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="10.7378" status="run">
+		<properties/>
+		<system-out>list transaction 0: 14 failing allocation budgets passed
+list transaction 1: 1 failing allocation budgets passed
+list transaction 2: 1 failing allocation budgets passed
+list transaction 3: 12 failing allocation budgets passed
+cold list construction: 48 failing allocation budgets passed
+growable source normal: 42 failing allocation budgets, recovery and cleanup passed
+growable source O2: 42 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="generics_source" classname="generics_source" time="7.28946" status="run">
+		<properties/>
+		<system-out>failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="collections_source" classname="collections_source" time="62.2516" status="run">
+		<properties/>
+		<system-out>native operation 0: 19 allocation failures; rollback passed
+native operation 1: 4 allocation failures; rollback passed
+native operation 2: 36 allocation failures; rollback passed
+main normal: 276 allocation failures, roots/publication/cleanup/retry passed
+nested normal: 2170 allocation failures, roots/publication/cleanup/retry passed
+main O2: 276 allocation failures, roots/publication/cleanup/retry passed
+nested O2: 2170 allocation failures, roots/publication/cleanup/retry passed
+Collections: source/GC/rollback/readonly/iteration/reload passed
+</system-out>
+	</testcase>
+	<testcase name="patterns_source" classname="patterns_source" time="16.3456" status="run">
+		<properties/>
+		<system-out>normal values allocation failures: 418
+normal large allocation failures: 232
+normal combined allocation failures: 169
+O2 values allocation failures: 418
+O2 large allocation failures: 232
+O2 combined allocation failures: 169
+</system-out>
+	</testcase>
+	<testcase name="reference_values_source" classname="reference_values_source" time="6.52712" status="run">
+		<properties/>
+		<system-out>reference values: copies, capabilities, construction, sole aggregate roots, failure, tooling and reload passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.52029" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.905399" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-a4o7g9m4
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-2ja1vy79
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-45mkq11a
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-ejocnbj9
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-qggour_7
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-3xur1j3j
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-dm3vqrro
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest t4gnk26c/evidence/incident-qc8_jq28
+{"intentional_incidents_verified": 8, "checked_crash_preserved": true, "sanitizer_exits_verified": [87, 86], "run_and_popen_verified": true, "signed_windows_receipt_simulation_verified": true, "windows_native_branch_executed": false, "colliding_filenames_verified": true, "editor_snapshot_verified": true...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.0537929" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="8.32993" status="run">
+		<properties/>
+		<system-out>192 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="16.9952" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="2.40947" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="5.67469" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_collections_sprint3" classname="text_collections_sprint3" time="91.0404" status="run">
+		<properties/>
+		<system-out>Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -18,7 +18,10 @@
             if(p.values[0]->kind==Expr::Kind::sum && p.values[0]->parts.empty()){
                 pattern_branch(emit({ir::Op::equal,extract(load(source),0,token),constant(Type::i32,{p.values[0]->slot,{}},token)},token),yes,no);return;
             }
-            auto rhs=snapshot(expression(*p.values[0]),p.type,token);ir::Instruction compare{ir::Op::pattern_equal,load(source),load(rhs)};
+            // Equality observes the RHS in its own authority profile. A mutable
+            // subject may be compared with a readonly alias without thawing the
+            // alias into a temporary having the subject's mutable type.
+            auto rhs=snapshot(expression(*p.values[0]),p.values[0]->type,token);ir::Instruction compare{ir::Op::pattern_equal,load(source),load(rhs)};
             pattern_branch(emit(compare,token),yes,no);return;
         }
         case K::range: {

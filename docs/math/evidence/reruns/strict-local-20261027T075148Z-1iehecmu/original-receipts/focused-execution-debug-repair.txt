@@ -1,0 +1,1 @@
+Math execution: 1294 vectors x four real modes; 7 processes passed; 1 MiB=False

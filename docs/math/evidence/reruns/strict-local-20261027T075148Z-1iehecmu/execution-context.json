@@ -1,0 +1,195 @@
+{
+  "runner": {
+    "pid": 894672,
+    "ppid": 894670,
+    "name": "python3",
+    "executable": "/usr/bin/python3.14",
+    "TracerPid": "0",
+    "NSpid": "894672",
+    "NoNewPrivs": "0",
+    "Seccomp": "0",
+    "Seccomp_filters": "0"
+  },
+  "ancestry": [
+    {
+      "pid": 894672,
+      "ppid": 894670,
+      "name": "python3",
+      "executable": "/usr/bin/python3.14",
+      "TracerPid": "0",
+      "NSpid": "894672",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 894670,
+      "ppid": 34523,
+      "name": "bash",
+      "executable": "/usr/bin/bash",
+      "TracerPid": "0",
+      "NSpid": "894670",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 34523,
+      "ppid": 34029,
+      "name": "codex",
+      "executable": "/usr/lib/chatgpt/resources/codex",
+      "TracerPid": "0",
+      "NSpid": "34523",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 34029,
+      "ppid": 4389,
+      "name": "ChatGPT",
+      "executable": "/usr/lib/chatgpt/ChatGPT",
+      "TracerPid": "0",
+      "NSpid": "34029",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 4389,
+      "ppid": 1,
+      "name": "systemd",
+      "executable": "/proc/4389/exe",
+      "TracerPid": "0",
+      "NSpid": "4389",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 1,
+      "ppid": 0,
+      "name": "systemd",
+      "executable": "/proc/1/exe",
+      "TracerPid": "0",
+      "NSpid": "1",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    }
+  ],
+  "ctest_process": {
+    "pid": 894721,
+    "ppid": 894672,
+    "name": "ctest",
+    "executable": "/usr/bin/ctest",
+    "TracerPid": "0",
+    "NSpid": "894721",
+    "NoNewPrivs": "0",
+    "Seccomp": "0",
+    "Seccomp_filters": "0"
+  },
+  "observed_test_processes": [
+    {
+      "pid": 894721,
+      "ppid": 894672,
+      "name": "ctest",
+      "executable": "/usr/bin/ctest",
+      "TracerPid": "0",
+      "NSpid": "894721",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 894724,
+      "ppid": 894722,
+      "name": "voidc",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+      "TracerPid": "0",
+      "NSpid": "894724",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 897129,
+      "ppid": 894721,
+      "name": "void_tests",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests",
+      "TracerPid": "0",
+      "NSpid": "897129",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 897461,
+      "ppid": 897460,
+      "name": "voidls",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+      "TracerPid": "0",
+      "NSpid": "897461",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 897704,
+      "ppid": 897685,
+      "name": "void_io_runner",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_io_runner",
+      "TracerPid": "0",
+      "NSpid": "897704",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 897886,
+      "ppid": 894721,
+      "name": "void_cache_test",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_cache_tests",
+      "TracerPid": "0",
+      "NSpid": "897886",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 897970,
+      "ppid": 897969,
+      "name": "void_math_host",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_host",
+      "TracerPid": "0",
+      "NSpid": "897970",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 898114,
+      "ppid": 894721,
+      "name": "void_binary_own",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_binary_ownership",
+      "TracerPid": "0",
+      "NSpid": "898114",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    },
+    {
+      "pid": 898443,
+      "ppid": 898441,
+      "name": "void_gc_buffers",
+      "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_buffers",
+      "TracerPid": "0",
+      "NSpid": "898443",
+      "NoNewPrivs": "0",
+      "Seccomp": "0",
+      "Seccomp_filters": "0"
+    }
+  ],
+  "outside_sandbox": true,
+  "policy": "danger-full-access; no Codex process sandbox, no tracing, no seccomp filter in observed runner/CTest/test processes"
+}

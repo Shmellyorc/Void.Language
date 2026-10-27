@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="5"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="27"
+	timestamp="2026-10-27T03:37:50"
+	>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="3.17935" status="run">
+		<properties/>
+		<system-out>list transaction 0: 14 failing allocation budgets passed
+list transaction 1: 1 failing allocation budgets passed
+list transaction 2: 1 failing allocation budgets passed
+list transaction 3: 12 failing allocation budgets passed
+cold list construction: 48 failing allocation budgets passed
+growable source normal: 42 failing allocation budgets, recovery and cleanup passed
+growable source O2: 42 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="generics_source" classname="generics_source" time="2.82263" status="run">
+		<properties/>
+		<system-out>failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="collections_source" classname="collections_source" time="13.4469" status="run">
+		<properties/>
+		<system-out>native operation 0: 19 allocation failures; rollback passed
+native operation 1: 4 allocation failures; rollback passed
+native operation 2: 36 allocation failures; rollback passed
+main normal: 276 allocation failures, roots/publication/cleanup/retry passed
+nested normal: 2170 allocation failures, roots/publication/cleanup/retry passed
+main O2: 276 allocation failures, roots/publication/cleanup/retry passed
+nested O2: 2170 allocation failures, roots/publication/cleanup/retry passed
+Collections: source/GC/rollback/readonly/iteration/reload passed
+</system-out>
+	</testcase>
+	<testcase name="patterns_source" classname="patterns_source" time="5.63455" status="run">
+		<properties/>
+		<system-out>normal values allocation failures: 418
+normal large allocation failures: 232
+normal combined allocation failures: 169
+O2 values allocation failures: 418
+O2 large allocation failures: 232
+O2 combined allocation failures: 169
+</system-out>
+	</testcase>
+	<testcase name="reference_values_source" classname="reference_values_source" time="1.91466" status="run">
+		<properties/>
+		<system-out>reference values: copies, capabilities, construction, sole aggregate roots, failure, tooling and reload passed
+</system-out>
+	</testcase>
+</testsuite>

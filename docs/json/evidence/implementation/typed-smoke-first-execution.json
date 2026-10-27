@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "build/ci-official-debug/voidc",
+      "check",
+      "tests/json/typed_smoke.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "build/ci-official-debug/voidc",
+      "run",
+      "tests/json/typed_smoke.void",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": ""
+  }
+]

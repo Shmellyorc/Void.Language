@@ -1,0 +1,42 @@
+use json as json
+value struct point:
+    x: i32
+    y: i32
+struct box<t>:
+    item: t
+struct link:
+    const label: string
+    next: link?
+struct base:
+    id: i64
+struct derived extends base:
+    const position: point
+struct composed:
+    using data: point
+    tags: [string]
+struct empty:
+func exercise() -> result<i32, json.error>:
+    var nested = json.parse_as<box<[box<i32>]>>("{{\"item\":[{{\"item\":9}}]}}")?
+    print(json.stringify(nested)?)
+    var chain = json.parse_as<link>("{{\"label\":\"head\",\"next\":{{\"label\":\"tail\",\"next\":null}}}}")?
+    print(json.stringify(chain)?)
+    var inherited = json.parse_as<derived>("{{\"id\":9223372036854775807,\"position\":{{\"x\":1,\"y\":2}}}}")?
+    print(json.stringify(inherited)?)
+    var combined = json.parse_as<composed>("{{\"data\":{{\"x\":4,\"y\":5}},\"tags\":[\"a\",\"b\"]}}")?
+    print(json.stringify(combined)?)
+    var nodes = json.parse_as<[link, 2]>("[{{\"label\":\"a\"}},{{\"label\":\"b\",\"next\":null}}]")?
+    print(json.stringify(nodes)?)
+    var absent = json.parse_as<link?>("null")?
+    print(json.stringify(absent)?)
+    var nothing = json.parse_as<empty>("{{}}")?
+    print(json.stringify(nothing)?)
+    var dom = json.parse("{{\"a\":[-0,1e400],\"x\":\"\\u0000\"}}")?
+    const readonly = dom
+    var fresh = json.to_value(readonly)?
+    var decoded = json.from_value<json.value>(readonly)?
+    print(json.stringify(fresh)?)
+    print(json.stringify(decoded)?)
+    return Ok(0)
+func main():
+    if exercise() is Err(var failure):
+        print("error {failure.code} {failure.offset} {failure.path} {failure.message}")

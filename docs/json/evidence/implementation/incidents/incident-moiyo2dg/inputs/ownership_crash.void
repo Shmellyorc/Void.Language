@@ -1,0 +1,42 @@
+use json as json
+use convert
+func run() -> result<i32, json.error>:
+    const root = json.parse("[{{\"x\":1e400}}]")?
+    var first = root.at(0)?
+    var again = root.at(0)?
+    if first is again:
+        print("same child")
+    var copied = json.to_value(root)?
+    if copied is root:
+        print("bad clone")
+    else:
+        print("new root")
+    var copied_child = copied.at(0)?
+    if copied_child is first:
+        print("bad child clone")
+    else:
+        print("new child")
+    var items = root.as_array()?
+    items.push(json.null_value())
+    print("outer {items.count} original {root.length()?}")
+    print(json.stringify(root)?)
+    var bytes: [u8] = []
+    for code in 0..<32:
+        bytes.push(code as u8)
+    bytes.push(34)
+    bytes.push(92)
+    bytes.push(47)
+    bytes.push(127)
+    var controls = convert.unwrap(string.from_utf8(bytes))
+    print(json.stringify(controls)?)
+    var zero: f64 = 0
+    if json.stringify(zero / zero) is Err(var failure):
+        print(failure.code)
+    if json.stringify(1.0d / zero) is Err(var failure):
+        print(failure.code)
+    if json.stringify(-1.0d / zero) is Err(var failure):
+        print(failure.code)
+    return Ok(0)
+func main():
+    if run() is Err(var failure):
+        print("error {failure.code} {failure.offset} {failure.path}")

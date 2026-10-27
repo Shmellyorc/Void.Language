@@ -1,0 +1,17 @@
+use json
+func inspect(const root: json.value) -> result<string, json.error>:
+    var name = root.get("name")?
+    return name.as_string()
+func main():
+    if json.parse("{{\"name\":\"a\\u0000\\ud83d\\ude00\",\"nums\":[10,20,30],\"nil\":null}}") is Ok(var root):
+        if inspect(root) is Ok(var name):
+            print("bytes {name.byte_length}")
+        if root.get("nums") is Ok(var numbers):
+            if numbers.as_array() is Ok(var items):
+                for item, index in items:
+                    if item.number_text() is Ok(var token):
+                        print("{index}: {token}")
+        if root.get("nil") is Ok(var child):
+            print("{child.kind}")
+    else:
+        print("parse failed")

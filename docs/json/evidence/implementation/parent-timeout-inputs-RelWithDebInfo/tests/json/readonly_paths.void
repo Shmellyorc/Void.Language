@@ -1,0 +1,26 @@
+use error as core
+struct node:
+    children: [node]
+    count: i32
+func (self node) child() -> result<node, core.error>:
+    return Ok(self.children[0])
+func forward(const root: node) -> result<node, core.error>:
+    return root.child()
+func propagate(const root: node) -> result<node, core.error>:
+    return Ok(forward(root)?)
+func (self node) snapshot() -> [node]:
+    return self.children[0..<self.children.count]
+func main():
+    var leaf = node(children = [], count = 42)
+    const root = node(children = [leaf])
+    if propagate(root) is Ok(var child):
+        print("child {child.count}")
+    for child, index in root.children:
+        print("list {index}: {child.count}")
+    for child in root.snapshot():
+        print("snapshot {child.count}")
+    const map: {string: node} = {"leaf": leaf}
+    for child, key in map:
+        print("dict {key}: {child.count}")
+    if map.get("leaf") is Ok(var child):
+        print("get {child.count}")

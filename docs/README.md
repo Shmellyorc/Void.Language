@@ -1,15 +1,26 @@
 # VOID documentation
 
-## Math module — research proposal, 26 October 2026
+## JSON module — research proposal, 27 October 2026
 
-Boss authorized research from `9eaefbd3`, following reported local Random Sprint 4
-acceptance. The [proposed API and numerical contract](math/DESIGN.md),
-[source findings and owner decisions](math/RESEARCH.md) and
-[one-sprint implementation roadmap](math/ROADMAP.md) cover one typed scalar Math
-module, reuse of numeric abs/clamp, source algorithms, a narrow LLVM/native
-boundary and focused verification. Math remains unimplemented. Stop for Golden
-Wrench architecture review and Boss contract approval; no production, root README,
-Git or hosted CI change is authorized by this research.
+The [source audit and feasibility report](json/RESEARCH.md),
+[proposed API/data contract](json/DESIGN.md) and
+[ordered engineering roadmap](json/ROADMAP.md) cover one source JSON parser/writer,
+dynamic lookup, exact numeric tokens, bounded untrusted input and proposed
+compile-time public-data adapters. A readonly result source/IR discrepancy is
+reproduced and preserved as a focused dependency. JSON is not implemented or
+approved. Stop for Golden Wrench architecture review and Boss contract approval.
+
+## Math module — implemented, local verification, 27 October 2026
+
+Math is implemented at `194603ea`. The [committed handoff](math/HANDOFF.md),
+[API audit](math/API.md) and [contract](math/DESIGN.md) record all 29 functions and
+six constants, with effective local **93/93** outcomes after retained repairs and
+targeted reruns. The handoff preserves the original sanitizer sandbox failures
+and identical strict binaries/flags passing outside it. Boss additionally reports
+independent Golden Wrench local source review. Hosted acceptance/release lock and
+native Windows/macOS execution are not claimed. The earlier
+[research](math/RESEARCH.md) and [roadmap](math/ROADMAP.md) remain design history;
+their original research-only status does not describe current implementation.
 
 ## Standard-library Sprint 4 — random, 26 October 2026
 

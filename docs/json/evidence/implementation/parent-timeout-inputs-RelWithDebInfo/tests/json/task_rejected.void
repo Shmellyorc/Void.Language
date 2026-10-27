@@ -1,0 +1,5 @@
+use json as json
+async func leaf() -> i32:
+    return 1
+func main():
+    var data = json.to_value(leaf())

@@ -1,0 +1,2 @@
+struct value:
+    number: i32

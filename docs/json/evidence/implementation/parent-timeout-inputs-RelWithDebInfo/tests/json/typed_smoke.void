@@ -1,0 +1,31 @@
+use json as json
+struct player:
+    name: string
+    hp: i32
+    levels: [i32]
+enum color:
+    red
+    blue
+func demo() -> result<i32, json.error>:
+    var levels = json.parse_as<[i32]>("[10,20,30]")?
+    for value, index in levels:
+        print("{index}: {value}")
+    var stats: {string: i32} = {"hp": 100}
+    var saved = json.stringify(stats)?
+    print(saved)
+    var loaded = json.parse_as<{string: i32}>(saved)?
+    var hp = loaded["hp"]
+    print("hp {hp}")
+    var data = json.parse_as<player>("{{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}}")?
+    print(json.stringify(data)?)
+    var fixed = json.parse_as<[i32, 3]>("[1,2,3]")?
+    print(json.stringify(fixed)?)
+    var shade = json.parse_as<color>("\"blue\"")?
+    print(json.stringify(shade)?)
+    var exact = json.parse("18446744073709551615")?
+    print(exact.as_number<u64>()?)
+    print(json.stringify(exact)?)
+    return Ok(0)
+func main():
+    if demo() is Err(var failure):
+        print("error {failure.kind} {failure.offset} {failure.path} {failure.message}")

@@ -1,0 +1,9 @@
+{
+  "note": "Deterministically regenerated reproduction, not the original captured input. Bytes match the two loaded-source hashes. The failure is a source diagnostic, not a native crash.",
+  "reproduction": "tests/json/reductions/adversarial_nested_propagation.reproduction.void",
+  "sha256": "29708dbbe4bab9c1e516933a2a5bbadbcdf06f67e37da2fb3cd7b32ac4393e8d",
+  "matching_receipts": [
+    "docs/json/evidence/implementation/adversarial-Debug-1793103413068912610.json",
+    "docs/json/evidence/implementation/adversarial-Release-1793103102256567818.json"
+  ]
+}

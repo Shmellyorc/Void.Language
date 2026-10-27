@@ -1,0 +1,23 @@
+{
+  "profile": "debug",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+  "compiler_sha256": "c461e59b99c5cbcadea780b93339fcad6cab925b9f20126031cbc1047820491b",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-dynamic-lhgir77k/grammar.void",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/tmp/void-json-dynamic-lhgir77k/grammar.void:30:20: error: Raw control characters and line breaks are not allowed in strings; use an escape.\n    code: VOID1101\n\n 30 |     print(probe(\"\\\"\u007f\\\"\"))\n    |                    ^\n    Module: /grammar.void\n\n",
+      "source": "/tmp/void-json-dynamic-lhgir77k/grammar.void",
+      "source_sha256": "199686da394e2975a8b6181800ec7c69220ec04804553a3271c2b22c58af0eb7",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    }
+  ],
+  "environment": {}
+}

@@ -1,0 +1,4 @@
+Outside sandbox verified: TracerPid=0 Seccomp=0 NoNewPrivs=0; no codex-linux-sandbox ancestor.
+Frozen binaries verified; unchanged ASan/UBSan settings; LeakSanitizer enabled; LSAN_OPTIONS unset.
+Running exactly 28 previously failed tests.
+PASS: 28/28; no skipped tests; outside sandbox; frozen files and all 20 original incident archives unchanged.

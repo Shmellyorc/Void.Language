@@ -1,0 +1,208 @@
+{
+  "profile": "release",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+  "compiler_sha256": "f7f9e1e785f4e6242a981e52fb03446b2fb0ccf4778b20c6d543dd02add85d4b",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "input_hashes": {
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "9b8b13b26e6914f635a711dbfb495e5c1573c438da1f9fcfd04edf7b287cd63f",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+        "-o",
+        "/tmp/void-json-dynamic-bd86gzo3/grammar-O0",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d6a736f6e2d64796e616d69632d62643836677a6f332f6772616d6d61722d4f300a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "input_hashes": {
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "9b8b13b26e6914f635a711dbfb495e5c1573c438da1f9fcfd04edf7b287cd63f",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-dynamic-bd86gzo3/grammar-O0"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "input_hashes": {
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "9b8b13b26e6914f635a711dbfb495e5c1573c438da1f9fcfd04edf7b287cd63f",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "input_hashes": {
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "9b8b13b26e6914f635a711dbfb495e5c1573c438da1f9fcfd04edf7b287cd63f",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+        "-o",
+        "/tmp/void-json-dynamic-bd86gzo3/grammar-O2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d6a736f6e2d64796e616d69632d62643836677a6f332f6772616d6d61722d4f320a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "input_hashes": {
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "9b8b13b26e6914f635a711dbfb495e5c1573c438da1f9fcfd04edf7b287cd63f",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-dynamic-bd86gzo3/grammar-O2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a6f6b0a3140303a0a3140313a0a3140303a0a3140313a0a3140303a0a3140323a0a3140323a0a3140333a0a3140313a0a3140353a0a3140333a2f310a3140353a2f610a3140313a0a3140303a0a3140303a0a3140313a0a3140313a0a3240313a0a3240313a0a3240313a0a3240333a0a3340373a2f610a3340383a2f7e307e310a",
+      "stderr": "",
+      "source": "/tmp/void-json-dynamic-bd86gzo3/grammar.void",
+      "source_sha256": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+      "input_hashes": {
+        "/tmp/void-json-dynamic-bd86gzo3/grammar.void": "96f934363046be54ecda8a91f06c8472443c3d9dbd746fe4ae0340ccdc987cb5",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "9b8b13b26e6914f635a711dbfb495e5c1573c438da1f9fcfd04edf7b287cd63f",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    }
+  ],
+  "environment": {}
+}

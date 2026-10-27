@@ -1,0 +1,174 @@
+[
+  {
+    "profile": "debug",
+    "source": "direct_const_get.void",
+    "mode": "check",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": "",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "debug",
+    "source": "direct_const_get.void",
+    "mode": "run",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: call requires mutable reference authority in /direct_const_get.void::main\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "debug",
+    "source": "direct_const_get.void",
+    "mode": "o2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void",
+      "--opt"
+    ],
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Unknown option: --opt\nUsage: voidc check <file-or-directory>\n       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]\n       voidc build [file-or-directory] [-o executable] [--no-opt]\n       voidc emit <file-or-directory> -o <object> [--no-opt]\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "debug",
+    "source": "readonly_result_corrected.void",
+    "mode": "check",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": "",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "debug",
+    "source": "readonly_result_corrected.void",
+    "mode": "run",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: call requires mutable reference authority in /readonly_result_corrected.void::read\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "debug",
+    "source": "readonly_result_corrected.void",
+    "mode": "o2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void",
+      "--opt"
+    ],
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Unknown option: --opt\nUsage: voidc check <file-or-directory>\n       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]\n       voidc build [file-or-directory] [-o executable] [--no-opt]\n       voidc emit <file-or-directory> -o <object> [--no-opt]\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "release",
+    "source": "direct_const_get.void",
+    "mode": "check",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": "",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "release",
+    "source": "direct_const_get.void",
+    "mode": "run",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-release",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: call requires mutable reference authority in /direct_const_get.void::main\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "release",
+    "source": "direct_const_get.void",
+    "mode": "o2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-release",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/direct_const_get.void",
+      "--opt"
+    ],
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Unknown option: --opt\nUsage: voidc check <file-or-directory>\n       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]\n       voidc build [file-or-directory] [-o executable] [--no-opt]\n       voidc emit <file-or-directory> -o <object> [--no-opt]\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "release",
+    "source": "readonly_result_corrected.void",
+    "mode": "check",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-release",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": "",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "release",
+    "source": "readonly_result_corrected.void",
+    "mode": "run",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-release",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: call requires mutable reference authority in /readonly_result_corrected.void::read\n",
+    "stack_bytes": 1048576
+  },
+  {
+    "profile": "release",
+    "source": "readonly_result_corrected.void",
+    "mode": "o2",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-release",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/readonly_result_corrected.void",
+      "--opt"
+    ],
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Unknown option: --opt\nUsage: voidc check <file-or-directory>\n       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]\n       voidc build [file-or-directory] [-o executable] [--no-opt]\n       voidc emit <file-or-directory> -o <object> [--no-opt]\n",
+    "stack_bytes": 1048576
+  }
+]

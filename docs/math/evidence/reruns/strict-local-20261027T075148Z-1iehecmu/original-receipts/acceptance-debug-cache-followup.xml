@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1"
+	timestamp="2026-10-27T00:03:42"
+	>
+	<testcase name="math_host" classname="math_host" time="1.71648" status="run">
+		<properties/>
+		<system-out>Math native cache: first=miss repeated=hit
+Math native cache: first=miss repeated=hit
+Math host: 28 checks passed
+</system-out>
+	</testcase>
+</testsuite>

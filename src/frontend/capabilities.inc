@@ -182,6 +182,11 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         std::function<void(Pattern&,const ReferenceFacts&)> pattern;
         pattern=[&](Pattern& p,const ReferenceFacts& facts) {
             using K=Pattern::Kind;
+            // Lowering roots each pattern operand in its annotated type. Keep
+            // those temporary types in step with the subject's inferred view,
+            // as well as updating the eventual user binding below.
+            p.type=ir::fact_type(p.type,facts);
+            if(p.narrowed!=Type::none)p.narrowed=ir::fact_type(p.narrowed,facts);
             for(auto& value:p.values)expression(*value);
             if(p.kind==K::capture){local_changed|=ir::join_facts(locals[p.slot],facts);return;}
             for(unsigned n=0;n<p.children.size();++n) {

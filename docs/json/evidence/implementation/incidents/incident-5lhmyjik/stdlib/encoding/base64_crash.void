@@ -1,0 +1,240 @@
+use error as core
+use convert
+
+
+## Explicit RFC 4648 alphabet; no decoder autodetection occurs.
+enum alphabet:
+    ## Standard Base64 uses plus and slash as digits 62 and 63.
+    standard
+
+    ## URL-safe Base64 uses hyphen and underscore as digits 62 and 63.
+    url_safe
+
+
+## Explicit padding policy shared by encoding and strict decoding.
+enum padding:
+    ## Emit and require exactly the equals signs needed for a final partial quartet.
+    required
+
+    ## Never emit or accept equals signs; remainder one is still impossible.
+    omitted
+
+
+## Recoverable strict Base64 failures.
+enum error_kind:
+    ## Encoded length cannot represent complete bytes under the selected policy.
+    invalid_length
+
+    ## Input contains a character outside the selected ASCII alphabet.
+    invalid_character
+
+    ## Padding is missing, excessive, misplaced or forbidden.
+    invalid_padding
+
+    ## Unused bits in a final partial quartet are nonzero.
+    noncanonical_bits
+
+    ## Encoded text or decoded bytes would exceed 64 MiB.
+    limit_exceeded
+
+
+## Managed Base64 failure; input bytes and text are never modified or retained.
+struct error extends core.error:
+    ## Portable failure category.
+    kind: error_kind
+
+    ## Zero-based UTF-8 byte offset of the failure, or -1 for length/output-limit failures.
+    offset: i64
+
+
+private const _limit: i64 = 67108864
+
+
+private func _error(kind: error_kind, offset: i64 = -1) -> error:
+    var code: i32 = 1
+    var message = "Invalid Base64 length"
+
+    if kind is error_kind.invalid_character:
+        code = 2
+        message = "Invalid Base64 alphabet character at byte {offset}"
+    else if kind is error_kind.invalid_padding:
+        code = 3
+        message = "Invalid Base64 padding at byte {offset}"
+    else if kind is error_kind.noncanonical_bits:
+        code = 4
+        message = "Nonzero Base64 trailing bits at byte {offset}"
+    else if kind is error_kind.limit_exceeded:
+        code = 5
+        message = "Base64 output exceeds 64 MiB"
+
+    return error(message = message, code = code, kind = kind, offset = offset)
+
+
+private func _alphabet(selected: alphabet) -> [u8]:
+    if selected is alphabet.url_safe:
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".to_utf8()
+
+    return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".to_utf8()
+
+
+private func _digit(byte: u8, selected: alphabet, offset: i64) -> result<i64, error>:
+    if byte >= 65 and byte <= 90:
+        return Ok((byte as i64) - 65)
+
+    if byte >= 97 and byte <= 122:
+        return Ok((byte as i64) - 71)
+
+    if byte >= 48 and byte <= 57:
+        return Ok((byte as i64) + 4)
+
+    if selected is alphabet.standard:
+        if byte == 43:
+            return Ok(62)
+
+        if byte == 47:
+            return Ok(63)
+    else:
+        if byte == 45:
+            return Ok(62)
+
+        if byte == 95:
+            return Ok(63)
+
+    if byte == 61:
+        return Err(_error(error_kind.invalid_padding, offset))
+
+    return Err(_error(error_kind.invalid_character, offset))
+
+
+## Encode arbitrary bytes as independent RFC 4648 ASCII text.
+## @param bytes Readonly or mutable input, preserving every byte value.
+## @param selected Alphabet, default standard (+/); URL-safe selects -_.
+## @param pad Padding policy, default required; omitted never emits equals signs.
+## @return Independent text; output above 64 MiB or allocation exhaustion uses checked Runtime failure. Use try_encode for recoverable limits.
+func encode(const bytes: [u8], selected: alphabet = alphabet.standard, pad: padding = padding.required) -> string:
+    return convert.unwrap(try_encode(bytes, selected, pad))
+
+
+## Encode arbitrary bytes with an explicit RFC 4648 alphabet and padding policy.
+## @param bytes Readonly or mutable input; output is independent and preserves every byte value.
+## @param selected Alphabet, default standard (+/); URL-safe selects -_.
+## @param pad Padding policy, default required; omitted never emits equals signs.
+## @return Ok with ASCII text bounded to 64 MiB, or limit_exceeded; allocation uses checked Runtime failure.
+func try_encode(const bytes: [u8], selected: alphabet = alphabet.standard, pad: padding = padding.required) -> result<string, error>:
+    var groups = bytes.count / 3
+    var remainder = bytes.count % 3
+    var tail: i64 = 0
+
+    if remainder != 0:
+        tail = 4
+
+        if pad is padding.omitted:
+            tail = remainder + 1
+
+    if groups > (_limit - tail) / 4:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var digits = _alphabet(selected)
+    var output: [u8] = []
+    var cursor: i64 = 0
+
+    for cursor < bytes.count:
+        var first = bytes[cursor] as i64
+        var second: i64 = 0
+        var third: i64 = 0
+        var count = bytes.count - cursor
+
+        if count > 1:
+            second = bytes[cursor + 1] as i64
+
+        if count > 2:
+            third = bytes[cursor + 2] as i64
+
+        output.push(digits[first / 4])
+        output.push(digits[(first % 4) * 16 + second / 16])
+
+        if count > 1:
+            output.push(digits[(second % 16) * 4 + third / 64])
+        else if pad is padding.required:
+            output.push(61)
+
+        if count > 2:
+            output.push(digits[third % 64])
+        else if pad is padding.required:
+            output.push(61)
+
+        cursor += 3
+
+    return Ok(convert.unwrap(string.from_utf8(output)))
+
+
+## Decode canonical RFC 4648 text without skipping whitespace or detecting alphabets.
+## @param value ASCII encoding; NUL, non-ASCII, mixed alphabets and nonzero unused bits reject.
+## @param selected Exact alphabet, default standard (+/); URL-safe accepts -_ instead.
+## @param pad Exact padding policy, default required; omitted rejects every equals sign.
+## @return Ok with independent writable bytes, or a structured length/character/padding/bits/limit error.
+func decode(value: string, selected: alphabet = alphabet.standard, pad: padding = padding.required) -> result<[u8], error>:
+    var length = value.byte_length
+
+    if pad is padding.required:
+        if length % 4 != 0:
+            return Err(_error(error_kind.invalid_padding))
+    else if length % 4 == 1:
+        return Err(_error(error_kind.invalid_length))
+
+    if length > (_limit / 3) * 4 + 4:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var bytes = value.to_utf8()
+    var significant = length
+
+    if pad is padding.required:
+        if significant > 0 and bytes[significant - 1] == 61:
+            significant -= 1
+
+        if significant > 0 and bytes[significant - 1] == 61:
+            significant -= 1
+
+    if significant % 4 == 1:
+        return Err(_error(error_kind.invalid_padding, significant))
+
+    var count = (significant / 4) * 3
+    var remainder = significant % 4
+
+    if remainder != 0:
+        count += remainder - 1
+
+    if count > _limit:
+        return Err(_error(error_kind.limit_exceeded))
+
+    var output: [u8] = []
+    var cursor: i64 = 0
+
+    for cursor < significant:
+        var first = _digit(bytes[cursor], selected, cursor)?
+        var second = _digit(bytes[cursor + 1], selected, cursor + 1)?
+        var third: i64 = 0
+        var fourth: i64 = 0
+        var available = significant - cursor
+
+        if available > 2:
+            third = _digit(bytes[cursor + 2], selected, cursor + 2)?
+        else if second % 16 != 0:
+            return Err(_error(error_kind.noncanonical_bits, cursor + 1))
+
+        if available > 3:
+            fourth = _digit(bytes[cursor + 3], selected, cursor + 3)?
+        else if available == 3 and third % 4 != 0:
+            return Err(_error(error_kind.noncanonical_bits, cursor + 2))
+
+        output.push((first * 4 + second / 16) as u8)
+
+        if available > 2:
+            output.push(((second % 16) * 16 + third / 4) as u8)
+
+        if available > 3:
+            output.push(((third % 4) * 64 + fourth) as u8)
+
+        cursor += 4
+
+    return Ok(output)

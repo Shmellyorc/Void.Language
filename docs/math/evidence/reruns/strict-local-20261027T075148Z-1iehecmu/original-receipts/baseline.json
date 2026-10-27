@@ -1,0 +1,15 @@
+{
+  "baseline": "9eaefbd339e2456295911cdecb2460d4143f34b0",
+  "status": " M docs/README.md\n?? docs/math/\n",
+  "authorization": "Full approved math module, API/numerical/interpolation bundles, numeric-primitive specialization correction. No Git mutation or hosted CI.",
+  "sources": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "docs/README.md": "84fb309ef14732bfc6d3ba1253dee65afe4d2c7b15a00cc346c4f8f3b56210ce",
+    "docs/math/RESEARCH.md": "facdb1399bb743bfe0aad602e10ad5d82c905235ce839a4f8ac1578256b7abda",
+    "docs/math/DESIGN.md": "fb25fcbed4ea84593ef6b585dd3e738f2c37c50870a15ff573f81b3995d8f468",
+    "docs/math/ROADMAP.md": "8870bd951549dfe51c464211f21aa5591c8a74f821349140c6292fdaa180737e",
+    "tests/text_encoding/crash.py": "31f875c93608e337f62289457179def00a4138b7391ba409fd49f62147c020ec",
+    "tests/random/harness.py": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950"
+  },
+  "crash_preservation": "tests/text_encoding/crash.py via existing Random harness pattern; VOID_CRASH_EVIDENCE=docs/math/evidence/crashes; source/provenance supplied before fixture execution."
+}

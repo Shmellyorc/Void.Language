@@ -1,0 +1,22 @@
+[
+  {
+    "command": [
+      "build/json-baseline/voidc-debug",
+      "run",
+      "tests/json/import_binding/main.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/tests/json/import_binding/main.void:4:9: error: Duplicate declaration or shadowing of 'value'.\n    code: VOID2005\n\n 4 |     for value, index in levels:\n   |         ^^^^^\n    Module: /main.void\n    Hint: Assign to the existing variable, or choose a distinct name.\n\n"
+  },
+  {
+    "command": [
+      "build/json-baseline/voidc-debug",
+      "run",
+      "tests/json/import_binding/aliased.void"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n",
+    "stderr": ""
+  }
+]

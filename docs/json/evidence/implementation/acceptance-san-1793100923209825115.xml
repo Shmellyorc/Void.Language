@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="24"
+	failures="3"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1725"
+	timestamp="2026-10-27T04:35:23"
+	>
+	<testcase name="json_readonly" classname="json_readonly" time="15.0883" status="run">
+		<properties/>
+		<system-out>readonly RelWithDebInfo: 47/47 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_dynamic" classname="json_dynamic" time="167.563" status="run">
+		<properties/>
+		<system-out>grammar RelWithDebInfo: 100 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_numbers" classname="json_numbers" time="225.072" status="run">
+		<properties/>
+		<system-out>numbers RelWithDebInfo: 125 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_schema" classname="json_schema" time="213.67" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/schema.py", line 65, in &lt;module&gt;
+    assert b'JSON does not support' in r.stderr,r.stderr
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'/tmp/void-json-schema-s772ka_2/task.void:5:30: error: Type mismatch: expected readonly i32, received $task:0::.\n    code: VOID2001\n\n 5 |     var data = json.to_value(leaf())\n   |                              ^^^^\n    Module: /task.void\n    Expected: readonly i32\n    Received: $task:0::\n\n'
+</system-out>
+	</testcase>
+	<testcase name="json_bounds" classname="json_bounds" time="287.235" status="run">
+		<properties/>
+		<system-out>bounds RelWithDebInfo: 56 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution" classname="json_execution" time="900.128" status="fail">
+		<failure message="Timeout"/>
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="json_install" classname="json_install" time="272.813" status="run">
+		<properties/>
+		<system-out>JSON relocated install: 7 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_stress" classname="json_stress" time="300.652" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/json/evidence/implementation/incidents/incident-1wxwa3c8
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 191, in run
+    stdout, stderr = process.communicate(supplied, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 289, in communicate
+    result = super().communicate(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'run', '/tmp/void-json-stress-pq66fdgs/stress.void', '--no-opt']' timed out after 300 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/stress.py", line 28, in &lt;module&gt;
+    h.run([h.compiler,'run',src,*flags],src,b'6144\n8193\n127\ntrue\n',timeout=300)
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 198, in run
+    raise subprocess.TimeoutExpired(command, timeout, output=stdout, stderr=stderr)
+subprocess.TimeoutExpired: Command '['/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc', 'run', '/tmp/void-json-stress-pq66fdgs/stress.void', '--no-opt']' timed out after 300 seconds
+</system-out>
+	</testcase>
+	<testcase name="json_host" classname="json_host" time="499.506" status="run">
+		<properties/>
+		<system-out>JSON allocation sweep O0: 2050 injected failures
+JSON allocation sweep O2: 2050 injected failures
+JSON host: 12335 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_preservation" classname="json_preservation" time="0.48181" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID random synthetic preservation 40z982w0/evidence/incident-ay37ypat
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation 40z982w0/evidence/incident-8_062kfp
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation 40z982w0/evidence/incident-dp8zmync
+Random preservation: 3 synthetic reserved-status/timeout incidents verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="json_lsp" classname="json_lsp" time="10.2944" status="run">
+		<properties/>
+		<system-out>JSON LSP: 43 checks passed
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="14.047" status="run">
+		<properties/>
+		<system-out>list transaction 0: 14 failing allocation budgets passed
+list transaction 1: 1 failing allocation budgets passed
+list transaction 2: 1 failing allocation budgets passed
+list transaction 3: 12 failing allocation budgets passed
+cold list construction: 48 failing allocation budgets passed
+growable source normal: 42 failing allocation budgets, recovery and cleanup passed
+growable source O2: 42 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="generics_source" classname="generics_source" time="8.13249" status="run">
+		<properties/>
+		<system-out>failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 231 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 231 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="collections_source" classname="collections_source" time="65.6997" status="run">
+		<properties/>
+		<system-out>native operation 0: 19 allocation failures; rollback passed
+native operation 1: 4 allocation failures; rollback passed
+native operation 2: 36 allocation failures; rollback passed
+main normal: 276 allocation failures, roots/publication/cleanup/retry passed
+nested normal: 2170 allocation failures, roots/publication/cleanup/retry passed
+main O2: 276 allocation failures, roots/publication/cleanup/retry passed
+nested O2: 2170 allocation failures, roots/publication/cleanup/retry passed
+Collections: source/GC/rollback/readonly/iteration/reload passed
+</system-out>
+	</testcase>
+	<testcase name="patterns_source" classname="patterns_source" time="15.2881" status="run">
+		<properties/>
+		<system-out>normal values allocation failures: 418
+normal large allocation failures: 232
+normal combined allocation failures: 169
+O2 values allocation failures: 418
+O2 large allocation failures: 232
+O2 combined allocation failures: 169
+</system-out>
+	</testcase>
+	<testcase name="reference_values_source" classname="reference_values_source" time="7.03383" status="run">
+		<properties/>
+		<system-out>reference values: copies, capabilities, construction, sole aggregate roots, failure, tooling and reload passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.432117" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.808696" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-72e0tjka
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-_xp_qnsp
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-stub3sc2
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-3ql30_q6
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-yfm35z18
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-jmost35g
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-6f2h8b3e
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest pnri20yo/evidence/incident-_0dk4v3d
+{"intentional_incidents_verified": 8, "checked_crash_preserved": true, "sanitizer_exits_verified": [87, 86], "run_and_popen_verified": true, "signed_windows_receipt_simulation_verified": true, "windows_native_branch_executed": false, "colliding_filenames_verified": true, "editor_snapshot_verified": true...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.0510345" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="9.32894" status="run">
+		<properties/>
+		<system-out>192 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="18.5524" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="2.06" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="5.95605" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_collections_sprint3" classname="text_collections_sprint3" time="102.275" status="run">
+		<properties/>
+		<system-out>Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed
+</system-out>
+	</testcase>
+</testsuite>

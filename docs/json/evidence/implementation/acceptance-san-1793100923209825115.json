@@ -1,0 +1,246 @@
+{
+  "profile": "san",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+    "-R",
+    "^(json_.*|core|numeric|frontend|modules|growable_arrays_source|patterns_source|reference_values_source|generics_source|collections_source|lsp_documentation|text_collections_sprint3|numeric_sprint2|text_encoding_crash_preservation)$",
+    "-j",
+    "2",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/json/evidence/implementation/acceptance-san-1793100923209825115.xml"
+  ],
+  "seconds": 1725.1990141868591,
+  "status": 8,
+  "passed": 21,
+  "failed": 3,
+  "tests": [
+    {
+      "name": "json_readonly",
+      "seconds": 15.0883,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_dynamic",
+      "seconds": 167.563,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_numbers",
+      "seconds": 225.072,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_schema",
+      "seconds": 213.67,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "json_bounds",
+      "seconds": 287.235,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_execution",
+      "seconds": 900.128,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "json_install",
+      "seconds": 272.813,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_stress",
+      "seconds": 300.652,
+      "failed": true,
+      "skipped": false
+    },
+    {
+      "name": "json_host",
+      "seconds": 499.506,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_preservation",
+      "seconds": 0.48181,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "json_lsp",
+      "seconds": 10.2944,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "growable_arrays_source",
+      "seconds": 14.047,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "generics_source",
+      "seconds": 8.13249,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "collections_source",
+      "seconds": 65.6997,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "patterns_source",
+      "seconds": 15.2881,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "reference_values_source",
+      "seconds": 7.03383,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_documentation",
+      "seconds": 0.432117,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "text_encoding_crash_preservation",
+      "seconds": 0.808696,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "core",
+      "seconds": 0.0510345,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric",
+      "seconds": 9.32894,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "frontend",
+      "seconds": 18.5524,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "modules",
+      "seconds": 2.06,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric_sprint2",
+      "seconds": 5.95605,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "text_collections_sprint3",
+      "seconds": 102.275,
+      "failed": false,
+      "skipped": false
+    }
+  ],
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "VOID_CRASH_EVIDENCE": "/home/shmellyorc/Documents/Void.Language/docs/json/evidence/implementation/incidents",
+    "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+  },
+  "build_hashes": {
+    "voidc": "36257e23c5d441d7c75e178f4ff9caba68604a31947c64f259791418016ed661",
+    "voidls": "a438a0577f7ff03cfb96a0513d499fed79f4ce859f98c98bf5d56419810b7579",
+    "void_json_host": "ad8c58cc5f1237949da41d20a7ce6129d7f14480c61493eff72b88138631415b"
+  },
+  "source_hashes": {
+    "CMakeLists.txt": "b610000cb3e6d52c20b80f9e166e1d32570859122b6e7026cd081c306eb85ead",
+    "src/frontend/source.cpp": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+    "src/frontend/compiler.cpp": "e57d1c393ad09b7c9ff2fbe026a6fd99e79c7873bec122a634ba152805a2ed19",
+    "src/frontend/tooling.cpp": "7bae9162ea7aab48d88447e978f8d309e3779f6149c276de3f42ac3906d8fdbb",
+    "src/frontend/capabilities.inc": "829039de0efe1d294e4c63aaa70226ffc0ddd5c4993b6be8b21d864ca62b10f2",
+    "src/frontend/construction.inc": "11dd4ab49feff3c1b428cb8cd5d957ba41d56351fb7154f3b62ae318392935d0",
+    "src/frontend/inheritance.inc": "fddcd9b411bd8c2716c700faf388f0433db8e2813f3757f2952ffc18272d0f4a",
+    "src/frontend/strings.inc": "1ca4225da42b4bb14ce1a4579fa70be84463b71f1ba8811f1c5d4f257ccc71bc",
+    "src/frontend/generics.inc": "d114e5816315fef153430a4268a22d96fbc5108463818b692105d840ce511267",
+    "src/frontend/generic_inference.inc": "6b629f2436dfd6128e27339a2fb1e44263090c96c297d6ae4e6615657581b448",
+    "src/frontend/generic_declarations.inc": "38c18207bb3f60883165451e47e9db21ab5c42ad397dc919442c4fef58d78b12",
+    "src/frontend/generic_tooling.inc": "8e1cc9c63abd20869ae79c90069c1f4aed6e6c4e738fec2f11d76df5e3f55cc2",
+    "src/frontend/pattern_parser.inc": "5b9a0af017b9702e82fbebc0bd0799c620174d23a7cf6296141f96d67c0f8951",
+    "src/frontend/pattern_semantics.inc": "fda278c4fdcf77713473c262922075921d8c44365720d070b99189822c9c57b3",
+    "src/frontend/pattern_lowering.inc": "a411efc0316296a995f8ca00a5e73e243a0ffc5491b98468e909b22f5bf51fcf",
+    "src/frontend/display_semantics.inc": "ab2614138c5a0c39f4f964cefab88a023ffc3d92025bf27d5ba186a636e83915",
+    "src/frontend/collection_display.inc": "bc118b9767343dd3f05abe650e4118624c8b724886f4a867af722e9e97fa1697",
+    "src/frontend/binary_codec.inc": "16fe0bcde0c7aacf6c2536f17a118498dbcef3f880f33efe42b299fb95b094ca",
+    "src/frontend/stdlib_conversion.inc": "39b6a3b02a2e4f657b68069e68f28e7c73cd53c2f9e66d4fbc8fcbf82570721c",
+    "src/frontend/filesystem.inc": "a509841949985bfe5038ff28908cc5aefa84531762b12b72ca3b877577b90ed0",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/math.inc": "e316847a1bde10702da9b72f1af0f075f04071cbfb3b07c78052f7a6107ae239",
+    "src/frontend/json.inc": "8c1de0c650d23d0039c3768958c8e7f57560ab9209cb7138796959674e8dde16",
+    "stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+    "stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+    "stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+    "stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+    "stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+    "stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+    "stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+    "stdlib/json.void": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+    "stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+    "stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+    "stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+    "stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+    "stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+    "tests/json/readonly_result_corrected.void": "6f37596054943f31c66e122856f6b74dddfbdd69bc862a8c174d345e2d9269e4",
+    "tests/json/direct_const_get.void": "35e3b77fab4faa11b4e5a2b0840c8c9a3ad048bf1c41df13d804c1e32441dd22",
+    "tests/json/probe_readonly.py": "7cae626f2df9234cd107e5e1b1276d9ca74d016f7a5d55b8a0d302f6631efd33",
+    "tests/json/readonly_reduced.void": "7d0399801121c5cf44bf88595453e9786a050dbc85a29f24d884de63a72623d2",
+    "tests/json/readonly_safe_route.void": "1305def5e212eb6e3186bd56e9607b822eb497ad841ffa3691d1f09cea7b3ea0",
+    "tests/json/readonly_paths.void": "2ed0129a445e152bad3b532c839cc4c72162e5ccea263302e2b9c0a819e6b109",
+    "tests/json/readonly.py": "72e6f6bd2fbd9ad67576227c274bdfc4407cf2a382f43e5fba8b2892b9ce3443",
+    "tests/json/dynamic_smoke.void": "fd710500902431ffa3d3775e851f61e1e01a51b479f46dd6d1c6e1f88bc7167b",
+    "tests/json/pattern_recovery_invalid.void": "42f7002a0a22c57cc9b3bc504b002c115d85e094805d25359704bbff9292369f",
+    "tests/json/typed_smoke.void": "a3ad0514648f3c5a94bd96c3f35007c01746568ed508ac26ab5052a7f36546dc",
+    "tests/json/harness.py": "dd6fdf0ecffc3064fb9decffd52794855293c42af4ab2077250a94e4aa6a99f0",
+    "tests/json/dynamic.py": "601f99fe05739a193550ca87240681b10708f5b0fa9b18a4911c4d72bc14e343",
+    "tests/json/shapes.void": "febe371732dcf53a23d3288a3e247a7f4ed83a0e39cb03b62ae5126ff2a7db1e",
+    "tests/json/numbers.py": "d20dfa8167dd126dd1a3723adaf7c799a17b30eaec6975ff4aeabb65921c56e6",
+    "tests/json/schema.py": "17b084634f8c8b67e4ddb05eb5ad9881033e90bf63f99f05d02d00082c89050d",
+    "tests/json/bounds.py": "da7217b23dc3a86ab23717b2ca0306ce39fd27f8c41542d90ffea57667b2ba62",
+    "tests/json/ownership.void": "922104f64675c66b67da7b50f87ef6bfa702ca142a36b73558da56b4ffbc9979",
+    "tests/json/execution.py": "533d676a42588da826224b8882dd9af424135d8bdbd29676fe1a17b40adc32a4",
+    "tests/json/host.cpp": "cc84275f46539d7fc3deee0566d00f1fae0d3f8e3ab9195b49d37292015c94da",
+    "tests/json/host.py": "848d4bd2d6ea201b31ba895206dbd4209f80915c4e8a82b7957271a01e3f7f5c",
+    "tests/json/accessors.void": "428a722021f112b3f991aa91cdb9573394768710c3748dc8884a04720c904419",
+    "tests/json/lsp.py": "3afd6faa29ea8f52ad2e379b30ab29ce2e70603876d98a651692a20c2fef1684",
+    "tests/json/readonly_identity.void": "78602a5682efddf9d4cd6a335a783b05fd1cd6d0924bc280ca8369587a7d07e0",
+    "tests/json/install.py": "ec76790ab2c843ea706632103b72951b855e09c485f7dcd5e834a2f266ec1c9e",
+    "tests/json/stress.py": "144b0541a17861d715e0365d78e66038bafacc485f46273dcc6b0d1d8878e9f3",
+    "tests/json/acceptance.py": "9cfb941be7f69a6fac6374fbbf8fc02f300d2f386f46802abbb670aa11e05bf7",
+    "tests/json/measure.py": "23bf2fe65d2e00f11cc9c72a12041c0b0513d9c38be100a9306434ee60e6b3cf",
+    "tests/json/adversarial.py": "1184ef8a5d936d036e44c57855a9ca226f3c422cae1c4f19a2c78aefc7bee160",
+    "tests/json/task_rejected.void": "49d749c0bd40fd8de997de7178f7e993e61044de6f757db8c2aeb4d94b2caa9a"
+  },
+  "cmake_configuration": "# This is the CMakeCache file.\n# For build in directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-san\n# It was generated by CMake: /usr/bin/cmake\n# You can edit this file to change values found and used by cmake.\n# If you do not want to change any of the values, simply exit the editor.\n# If you do want to change a value, simply edit, save, and exit the editor.\n# The syntax for the file is as follows:\n# KEY:TYPE=VALUE\n# KEY is the name of a variable in the cache.\n# TYPE is a hint to GUIs for the type of VALUE, DO NOT EDIT TYPE!.\n# VALUE is the current value for the KEY.\n\n########################\n# EXTERNAL cache entries\n########################\n\n//Build the testing tree.\nBUILD_TESTING:BOOL=ON\n\n//Path to a program.\nCMAKE_ADDR2LINE:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-addr2line\n\n//Path to a program.\nCMAKE_AR:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-ar\n\n//Choose the type of build, options are: None Debug Release RelWithDebInfo\n// MinSizeRel ...\nCMAKE_BUILD_TYPE:STRING=RelWithDebInfo\n\n//Enable/Disable color output during build.\nCMAKE_COLOR_MAKEFILE:BOOL=ON\n\n//No help, variable specified on the command line.\nCMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++\n\n//LLVM archiver\nCMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/llvm-ar-19\n\n//`clang-scan-deps` dependency scanner\nCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS:FILEPATH=/usr/bin/clang-scan-deps-19\n\n//Generate index for LLVM archive\nCMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/llvm-ranlib-19\n\n//Flags used by the CXX compiler during all build types.\nCMAKE_CXX_FLAGS:STRING=\n\n//Flags used by the CXX compiler during DEBUG builds.\nCMAKE_CXX_FLAGS_DEBUG:STRING=-g\n\n//Flags used by the CXX compiler during MINSIZEREL builds.\nCMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG\n\n//Flags used by the CXX compiler during RELEASE builds.\nCMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG\n\n//Flags used by the CXX compiler during RELWITHDEBINFO builds.\nCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG\n\n//No help, variable specified on the command line.\nCMAKE_C_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang\n\n//LLVM archiver\nCMAKE_C_COMPILER_AR:FILEPATH=/usr/bin/llvm-ar-19\n\n//`clang-scan-deps` dependency scanner\nCMAKE_C_COMPILER_CLANG_SCAN_DEPS:FILEPATH=/usr/bin/clang-scan-deps-19\n\n//Generate index for LLVM archive\nCMAKE_C_COMPILER_RANLIB:FILEPATH=/usr/bin/llvm-ranlib-19\n\n//Flags used by the C compiler during all build types.\nCMAKE_C_FLAGS:STRING=\n\n//Flags used by the C compiler during DEBUG builds.\nCMAKE_C_FLAGS_DEBUG:STRING=-g\n\n//Flags used by the C compiler during MINSIZEREL builds.\nCMAKE_C_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG\n\n//Flags used by the C compiler during RELEASE builds.\nCMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG\n\n//Flags used by the C compiler during RELWITHDEBINFO builds.\nCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG\n\n//Path to a program.\nCMAKE_DLLTOOL:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-dlltool\n\n//Flags used by the linker during all build types.\nCMAKE_EXE_LINKER_FLAGS:STRING=-Wl,--thinlto-cache-dir=/home/shmellyorc/Documents/Void.Language/build/phase6-verification/lto-cache\n\n//Flags used by the linker during DEBUG builds.\nCMAKE_EXE_LINKER_FLAGS_DEBUG:STRING=\n\n//Flags used by the linker during MINSIZEREL builds.\nCMAKE_EXE_LINKER_FLAGS_MINSIZEREL:STRING=\n\n//Flags used by the linker during RELEASE builds.\nCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=\n\n//Flags used by the linker during RELWITHDEBINFO builds.\nCMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=\n\n//Enable/Disable output of compile commands during generation.\nCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=\n\n//Value Computed by CMake.\nCMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=/home/shmellyorc/Documents/Void.Language/build/ci-official-san/CMakeFiles/pkgRedirects\n\n//Install path prefix, prepended onto install directories.\nCMAKE_INSTALL_PREFIX:PATH=/usr/local\n\n//Path to a program.\nCMAKE_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\n\n//Path to a program.\nCMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/gmake\n\n//Flags used by the linker during the creation of modules during\n// all build types.\nCMAKE_MODULE_LINKER_FLAGS:STRING=\n\n//Flags used by the linker during the creation of modules during\n// DEBUG builds.\nCMAKE_MODULE_LINKER_FLAGS_DEBUG:STRING=\n\n//Flags used by the linker during the creation of modules during\n// MINSIZEREL builds.\nCMAKE_MODULE_LINKER_FLAGS_MINSIZEREL:STRING=\n\n//Flags used by the linker during the creation of modules during\n// RELEASE builds.\nCMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=\n\n//Flags used by the linker during the creation of modules during\n// RELWITHDEBINFO builds.\nCMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=\n\n//Path to a program.\nCMAKE_NM:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-nm\n\n//Path to a program.\nCMAKE_OBJCOPY:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-objcopy\n\n//Path to a program.\nCMAKE_OBJDUMP:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-objdump\n\n//Value Computed by CMake\nCMAKE_PROJECT_COMPAT_VERSION:STATIC=\n\n//Value Computed by CMake\nCMAKE_PROJECT_DESCRIPTION:STATIC=\n\n//Value Computed by CMake\nCMAKE_PROJECT_HOMEPAGE_URL:STATIC=\n\n//Value Computed by CMake\nCMAKE_PROJECT_NAME:STATIC=VoidLanguage\n\n//Value Computed by CMake\nCMAKE_PROJECT_SPDX_LICENSE:STATIC=\n\n//Value Computed by CMake\nCMAKE_PROJECT_VERSION:STATIC=0.1.0\n\n//Value Computed by CMake\nCMAKE_PROJECT_VERSION_MAJOR:STATIC=0\n\n//Value Computed by CMake\nCMAKE_PROJECT_VERSION_MINOR:STATIC=1\n\n//Value Computed by CMake\nCMAKE_PROJECT_VERSION_PATCH:STATIC=0\n\n//Value Computed by CMake\nCMAKE_PROJECT_VERSION_TWEAK:STATIC=\n\n//Path to a program.\nCMAKE_RANLIB:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-ranlib\n\n//Path to a program.\nCMAKE_READELF:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-readelf\n\n//Flags used by the linker during the creation of shared libraries\n// during all build types.\nCMAKE_SHARED_LINKER_FLAGS:STRING=\n\n//Flags used by the linker during the creation of shared libraries\n// during DEBUG builds.\nCMAKE_SHARED_LINKER_FLAGS_DEBUG:STRING=\n\n//Flags used by the linker during the creation of shared libraries\n// during MINSIZEREL builds.\nCMAKE_SHARED_LINKER_FLAGS_MINSIZEREL:STRING=\n\n//Flags used by the linker during the creation of shared libraries\n// during RELEASE builds.\nCMAKE_SHARED_LINKER_FLAGS_RELEASE:STRING=\n\n//Flags used by the linker during the creation of shared libraries\n// during RELWITHDEBINFO builds.\nCMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO:STRING=\n\n//If set, runtime paths are not added when installing shared libraries,\n// but are added when building.\nCMAKE_SKIP_INSTALL_RPATH:BOOL=NO\n\n//If set, runtime paths are not added when using shared libraries.\nCMAKE_SKIP_RPATH:BOOL=NO\n\n//Flags used by the archiver during the creation of static libraries\n// during all build types.\nCMAKE_STATIC_LINKER_FLAGS:STRING=\n\n//Flags used by the archiver during the creation of static libraries\n// during DEBUG builds.\nCMAKE_STATIC_LINKER_FLAGS_DEBUG:STRING=\n\n//Flags used by the archiver during the creation of static libraries\n// during MINSIZEREL builds.\nCMAKE_STATIC_LINKER_FLAGS_MINSIZEREL:STRING=\n\n//Flags used by the archiver during the creation of static libraries\n// during RELEASE builds.\nCMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=\n\n//Flags used by the archiver during the creation of static libraries\n// during RELWITHDEBINFO builds.\nCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=\n\n//Path to a program.\nCMAKE_STRIP:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-strip\n\n//Path to a program.\nCMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND\n\n//If this value is on, makefiles will be generated without the\n// .SILENT directive, and all commands will be echoed to the console\n// during the make.  This is useful for debugging only. With Visual\n// Studio IDE projects all commands are done without /nologo.\nCMAKE_VERBOSE_MAKEFILE:BOOL=FALSE\n\n//Path to the coverage program that CTest uses for performing coverage\n// inspection\nCOVERAGE_COMMAND:FILEPATH=/usr/bin/gcov\n\n//Extra command line flags to pass to the coverage tool\nCOVERAGE_EXTRA_FLAGS:STRING=-l\n\n//How many times to retry timed-out CTest submissions.\nCTEST_SUBMIT_RETRY_COUNT:STRING=3\n\n//How long to wait between timed-out CTest submissions.\nCTEST_SUBMIT_RETRY_DELAY:STRING=5\n\n//Maximum time allowed before CTest will kill the test.\nDART_TESTING_TIMEOUT:STRING=1500\n\n//Path to a program.\nGITCOMMAND:FILEPATH=/usr/bin/git\n\n//Path to a file.\nLIBXML2_INCLUDE_DIR:PATH=/usr/include/libxml2\n\n//Path to a library.\nLIBXML2_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libxml2.so\n\n//Path to a program.\nLIBXML2_XMLLINT_EXECUTABLE:FILEPATH=/usr/bin/xmllint\n\n//No help, variable specified on the command line.\nLLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm\n\n//Command to build the project\nMAKECOMMAND:STRING=/usr/bin/cmake --build . --config \"${CTEST_CONFIGURATION_TYPE}\"\n\n//Path to the memory checking command, used for memory error detection.\nMEMORYCHECK_COMMAND:FILEPATH=MEMORYCHECK_COMMAND-NOTFOUND\n\n//File that contains suppressions for the memory checker\nMEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=\n\n//Arguments to supply to pkg-config\nPKG_CONFIG_ARGN:STRING=\n\n//pkg-config executable\nPKG_CONFIG_EXECUTABLE:FILEPATH=PKG_CONFIG_EXECUTABLE-NOTFOUND\n\n//No help, variable specified on the command line.\nPython3_EXECUTABLE:UNINITIALIZED=/home/shmellyorc/.local/bin/python3.11\n\n//Name of the computer/site where compile is being run\nSITE:STRING=gamedev\n\n//Path to a program.\nVOID_CLANG:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang\n\n//Path to a program.\nVOID_DWARFDUMP:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llvm-dwarfdump\n\n//Matching LLVM 19.1.7 LLD executable for ELF links\nVOID_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld\n\n//Build optional LLVM machine-code certification experiments\nVOID_LLVM_RESEARCH:BOOL=OFF\n\n//Build optional Sprint 5 historical measurement control\nVOID_RETENTION_BASELINE:BOOL=OFF\n\n//Instrument compiler/runtime with ASan and UBSan\nVOID_SANITIZERS:BOOL=ON\n\n//Matching standard-library sources\nVOID_STDLIB_ROOT:PATH=/home/shmellyorc/Documents/Void.Language/stdlib\n\n//Value Computed by CMake\nVoidLanguage_BINARY_DIR:STATIC=/home/shmellyorc/Documents/Void.Language/build/ci-official-san\n\n//Value Computed by CMake\nVoidLanguage_IS_TOP_LEVEL:STATIC=ON\n\n//Value Computed by CMake\nVoidLanguage_SOURCE_DIR:STATIC=/home/shmellyorc/Documents/Void.Language\n\n//Path to a file.\nZLIB_INCLUDE_DIR:PATH=/usr/include\n\n//Path to a library.\nZLIB_LIBRARY_DEBUG:FILEPATH=ZLIB_LIBRARY_DEBUG-NOTFOUND\n\n//Path to a library.\nZLIB_LIBRARY_RELEASE:FILEPATH=/usr/lib/x86_64-linux-gnu/libz.so\n\n//Path to a file.\nzstd_INCLUDE_DIR:PATH=/usr/include\n\n//Path to a library.\nzstd_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libzstd.so\n\n//Path to a library.\nzstd_STATIC_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libzstd.a\n\n\n########################\n# INTERNAL cache entries\n########################\n\n//ADVANCED property for variable: CMAKE_ADDR2LINE\nCMAKE_ADDR2LINE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_AR\nCMAKE_AR-ADVANCED:INTERNAL=1\n//This is the directory where this CMakeCache.txt was created\nCMAKE_CACHEFILE_DIR:INTERNAL=/home/shmellyorc/Documents/Void.Language/build/ci-official-san\n//Major version of cmake used to create the current loaded cache\nCMAKE_CACHE_MAJOR_VERSION:INTERNAL=4\n//Minor version of cmake used to create the current loaded cache\nCMAKE_CACHE_MINOR_VERSION:INTERNAL=3\n//Patch version of cmake used to create the current loaded cache\nCMAKE_CACHE_PATCH_VERSION:INTERNAL=4\n//ADVANCED property for variable: CMAKE_COLOR_MAKEFILE\nCMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1\n//Path to CMake executable.\nCMAKE_COMMAND:INTERNAL=/usr/bin/cmake\n//Path to cpack program executable.\nCMAKE_CPACK_COMMAND:INTERNAL=/usr/bin/cpack\n//ADVANCED property for variable: CMAKE_CTEST_COMMAND\nCMAKE_CTEST_COMMAND-ADVANCED:INTERNAL=1\n//Path to ctest program executable.\nCMAKE_CTEST_COMMAND:INTERNAL=/usr/bin/ctest\n//ADVANCED property for variable: CMAKE_CXX_COMPILER\nCMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_COMPILER_AR\nCMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS\nCMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_COMPILER_RANLIB\nCMAKE_CXX_COMPILER_RANLIB-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_FLAGS\nCMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_FLAGS_DEBUG\nCMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_FLAGS_MINSIZEREL\nCMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_FLAGS_RELEASE\nCMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_CXX_FLAGS_RELWITHDEBINFO\nCMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_COMPILER\nCMAKE_C_COMPILER-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_COMPILER_AR\nCMAKE_C_COMPILER_AR-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_COMPILER_CLANG_SCAN_DEPS\nCMAKE_C_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_COMPILER_RANLIB\nCMAKE_C_COMPILER_RANLIB-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_FLAGS\nCMAKE_C_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_FLAGS_DEBUG\nCMAKE_C_FLAGS_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_FLAGS_MINSIZEREL\nCMAKE_C_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_FLAGS_RELEASE\nCMAKE_C_FLAGS_RELEASE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_C_FLAGS_RELWITHDEBINFO\nCMAKE_C_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_DLLTOOL\nCMAKE_DLLTOOL-ADVANCED:INTERNAL=1\n//Executable file format\nCMAKE_EXECUTABLE_FORMAT:INTERNAL=ELF\n//ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS\nCMAKE_EXE_LINKER_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_DEBUG\nCMAKE_EXE_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_MINSIZEREL\nCMAKE_EXE_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_RELEASE\nCMAKE_EXE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO\nCMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_EXPORT_COMPILE_COMMANDS\nCMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1\n//Name of external makefile project generator.\nCMAKE_EXTRA_GENERATOR:INTERNAL=\n//Name of generator.\nCMAKE_GENERATOR:INTERNAL=Unix Makefiles\n//Generator instance identifier.\nCMAKE_GENERATOR_INSTANCE:INTERNAL=\n//Name of generator platform.\nCMAKE_GENERATOR_PLATFORM:INTERNAL=\n//Name of generator toolset.\nCMAKE_GENERATOR_TOOLSET:INTERNAL=\n//Test CMAKE_HAVE_LIBC_PTHREAD\nCMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1\n//Source directory with the top level CMakeLists.txt file for this\n// project\nCMAKE_HOME_DIRECTORY:INTERNAL=/home/shmellyorc/Documents/Void.Language\n//Install .so files without execute permission.\nCMAKE_INSTALL_SO_NO_EXE:INTERNAL=1\n//ADVANCED property for variable: CMAKE_LINKER\nCMAKE_LINKER-ADVANCED:INTERNAL=1\n//Name of CMakeLists files to read\nCMAKE_LIST_FILE_NAME:INTERNAL=CMakeLists.txt\n//ADVANCED property for variable: CMAKE_MAKE_PROGRAM\nCMAKE_MAKE_PROGRAM-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS\nCMAKE_MODULE_LINKER_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_DEBUG\nCMAKE_MODULE_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL\nCMAKE_MODULE_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_RELEASE\nCMAKE_MODULE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO\nCMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_NM\nCMAKE_NM-ADVANCED:INTERNAL=1\n//number of local generators\nCMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1\n//ADVANCED property for variable: CMAKE_OBJCOPY\nCMAKE_OBJCOPY-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_OBJDUMP\nCMAKE_OBJDUMP-ADVANCED:INTERNAL=1\n//Platform information initialized\nCMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_RANLIB\nCMAKE_RANLIB-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_READELF\nCMAKE_READELF-ADVANCED:INTERNAL=1\n//Path to CMake installation.\nCMAKE_ROOT:INTERNAL=/usr/share/cmake-4.3\n//ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS\nCMAKE_SHARED_LINKER_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS_DEBUG\nCMAKE_SHARED_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL\nCMAKE_SHARED_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS_RELEASE\nCMAKE_SHARED_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO\nCMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_SKIP_INSTALL_RPATH\nCMAKE_SKIP_INSTALL_RPATH-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_SKIP_RPATH\nCMAKE_SKIP_RPATH-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_STATIC_LINKER_FLAGS\nCMAKE_STATIC_LINKER_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_STATIC_LINKER_FLAGS_DEBUG\nCMAKE_STATIC_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL\nCMAKE_STATIC_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_STATIC_LINKER_FLAGS_RELEASE\nCMAKE_STATIC_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO\nCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_STRIP\nCMAKE_STRIP-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CMAKE_TAPI\nCMAKE_TAPI-ADVANCED:INTERNAL=1\n//uname command\nCMAKE_UNAME:INTERNAL=/usr/bin/uname\n//ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE\nCMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: COVERAGE_COMMAND\nCOVERAGE_COMMAND-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: COVERAGE_EXTRA_FLAGS\nCOVERAGE_EXTRA_FLAGS-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CTEST_SUBMIT_RETRY_COUNT\nCTEST_SUBMIT_RETRY_COUNT-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: CTEST_SUBMIT_RETRY_DELAY\nCTEST_SUBMIT_RETRY_DELAY-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: DART_TESTING_TIMEOUT\nDART_TESTING_TIMEOUT-ADVANCED:INTERNAL=1\n//Details about finding LibXml2\nFIND_PACKAGE_MESSAGE_DETAILS_LibXml2:INTERNAL=[/usr/lib/x86_64-linux-gnu/libxml2.so][/usr/include/libxml2][v2.15.4()]\n//Details about finding Python3\nFIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/home/shmellyorc/.local/bin/python3.11][found components: Interpreter ][v3.11.16()]\n//Details about finding Threads\nFIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]\n//Details about finding ZLIB\nFIND_PACKAGE_MESSAGE_DETAILS_ZLIB:INTERNAL=[/usr/lib/x86_64-linux-gnu/libz.so][/usr/include][ ][v1.3.2()]\n//Details about finding zstd\nFIND_PACKAGE_MESSAGE_DETAILS_zstd:INTERNAL=[/usr/lib/x86_64-linux-gnu/libzstd.so][/usr/include][v()]\n//ADVANCED property for variable: GITCOMMAND\nGITCOMMAND-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: LIBXML2_INCLUDE_DIR\nLIBXML2_INCLUDE_DIR-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: LIBXML2_LIBRARY\nLIBXML2_LIBRARY-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: LIBXML2_XMLLINT_EXECUTABLE\nLIBXML2_XMLLINT_EXECUTABLE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: MAKECOMMAND\nMAKECOMMAND-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: MEMORYCHECK_COMMAND\nMEMORYCHECK_COMMAND-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: MEMORYCHECK_SUPPRESSIONS_FILE\nMEMORYCHECK_SUPPRESSIONS_FILE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: PKG_CONFIG_ARGN\nPKG_CONFIG_ARGN-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE\nPKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: SITE\nSITE-ADVANCED:INTERNAL=1\n//Test VOID_LLVM_ORC_RUNS\nVOID_LLVM_ORC_RUNS:INTERNAL=1\n//Result of TRY_COMPILE\nVOID_LLVM_ORC_RUNS_COMPILED:INTERNAL=TRUE\n//Result of try_run()\nVOID_LLVM_ORC_RUNS_EXITCODE:INTERNAL=0\n//ADVANCED property for variable: ZLIB_INCLUDE_DIR\nZLIB_INCLUDE_DIR-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: ZLIB_LIBRARY_DEBUG\nZLIB_LIBRARY_DEBUG-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: ZLIB_LIBRARY_RELEASE\nZLIB_LIBRARY_RELEASE-ADVANCED:INTERNAL=1\n//Compiler reason failure\n_Python3_Compiler_REASON_FAILURE:INTERNAL=\n//Development reason failure\n_Python3_Development_REASON_FAILURE:INTERNAL=\n_Python3_EXECUTABLE:INTERNAL=/home/shmellyorc/.local/bin/python3.11\n//Python3 Properties\n_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;11;16;64;32;<none>;cpython-311-x86_64-linux-gnu;abi3;/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11;/home/shmellyorc/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu/lib/python3.11;/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/site-packages;/home/shmellyorc/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu/lib/python3.11/site-packages\n_Python3_INTERPRETER_SIGNATURE:INTERNAL=53c0d9a0976eed4976c6501670ef4b1b\n//NumPy reason failure\n_Python3_NumPy_REASON_FAILURE:INTERNAL=\n//ADVANCED property for variable: zstd_INCLUDE_DIR\nzstd_INCLUDE_DIR-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: zstd_LIBRARY\nzstd_LIBRARY-ADVANCED:INTERNAL=1\n//ADVANCED property for variable: zstd_STATIC_LIBRARY\nzstd_STATIC_LIBRARY-ADVANCED:INTERNAL=1\n\n"
+}

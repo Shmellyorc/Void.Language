@@ -1,0 +1,36 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1070:12: error: Unknown identifier 'jt0'.
+    code: VOID2002
+
+ 1070 |     return _json_from_value<t>(node, context, unknown)
+      |            ^
+    Module: /@stdlib/json.void
+    Generic specialization requested here. at /home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void:23:22
+
+ 23 |     var shade = json.parse_as<color>("\"blue\"")?
+    |                      ^^^^^^^^
+    Module: /typed_smoke.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1067:6
+
+ 1067 | func parse_as<t>(text: string, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:
+      |      ^^^^^^^^
+    Module: /@stdlib/json.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1078:16: error: Unknown identifier 'jt0'.
+    code: VOID2002
+
+ 1078 |     var node = _json_to_value<t>(input, context)?
+      |                ^
+    Module: /@stdlib/json.void
+    Generic specialization requested here. at /home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void:24:16
+
+ 24 |     print(json.stringify(shade)?)
+    |                ^^^^^^^^^
+    Module: /typed_smoke.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1076:6
+
+ 1076 | func stringify<t>(const input: t, budget: limits = limits()) -> result<string, error>:
+      |      ^^^^^^^^^
+    Module: /@stdlib/json.void
+    Hint: Declare it with var before use.
+

@@ -1,0 +1,772 @@
+{
+  "status": "locally_verified_for_independent_review",
+  "profiles": {
+    "debug": {
+      "cohort_receipt": "acceptance-debug-1793102605031232081.json",
+      "cohort_passed": 30,
+      "cohort_failed": 1,
+      "cohort_seconds": 2574.079880475998,
+      "effective_passed": 31,
+      "effective_failed": 0,
+      "overrides": {
+        "json_host": {
+          "receipt": "host-final-host-debug-1793103169178617199.json",
+          "sha256": "1126113c640d3f5c99f9f5447bc13aa1971c1cb27932be905076063267dce756"
+        },
+        "json_adversarial": {
+          "receipt": "adversarial-final-adversarial-debug-1793103893710929467.json",
+          "sha256": "e044d7ee74fef17ce3366e3d5ae21650c101b1e37dffd3ba02eef94b4870d8e4"
+        }
+      },
+      "groups": [
+        {
+          "name": "json_readonly",
+          "seconds": 11.3989,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_dynamic",
+          "seconds": 156.419,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_numbers",
+          "seconds": 195.065,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_schema",
+          "seconds": 197.806,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_bounds",
+          "seconds": 156.691,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_install",
+          "seconds": 171.436,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_adversarial",
+          "failed": false,
+          "skipped": false,
+          "receipt": "adversarial-final-adversarial-debug-1793103893710929467.json",
+          "note": "Verified targeted replacement; original cohort row retained."
+        },
+        {
+          "name": "json_execution_validated",
+          "seconds": 135.633,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_execution_accessors",
+          "seconds": 111.244,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_execution_dynamic_smoke",
+          "seconds": 106.943,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_execution_typed_smoke",
+          "seconds": 276.042,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_execution_shapes",
+          "seconds": 496.664,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_execution_ownership",
+          "seconds": 129.368,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_stress_fixed",
+          "seconds": 445.566,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_stress_wide",
+          "seconds": 1049.03,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_host",
+          "failed": false,
+          "skipped": false,
+          "receipt": "host-final-host-debug-1793103169178617199.json",
+          "note": "Verified targeted replacement; original cohort row retained."
+        },
+        {
+          "name": "json_preservation",
+          "seconds": 0.386899,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "json_lsp",
+          "seconds": 7.48111,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "growable_arrays_source",
+          "seconds": 12.1879,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "generics_source",
+          "seconds": 6.79572,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "collections_source",
+          "seconds": 80.6898,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "patterns_source",
+          "seconds": 13.7832,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "reference_values_source",
+          "seconds": 5.75348,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "lsp_documentation",
+          "seconds": 0.458125,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 1.09139,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "core",
+          "seconds": 0.0240177,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "numeric",
+          "seconds": 5.9205,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "frontend",
+          "seconds": 16.197,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "modules",
+          "seconds": 1.87282,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": 4.09886,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        },
+        {
+          "name": "text_collections_sprint3",
+          "seconds": 122.446,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-debug-1793102605031232081.json"
+        }
+      ],
+      "build_hashes": {
+        "voidc": "2554bf76c07ec04b165845c51ae2886e129f9c8ae6162c40346a89e12c6e096a",
+        "voidls": "a92e0692c3a01e19650ece04728bda47cd6332ca243026abe647c2b6e1266523",
+        "void_json_host": "5da1a641a531c07bfc1a333d42b8147fa590a83bd6ed9eff8006c03f4d1c2b46"
+      }
+    },
+    "release": {
+      "cohort_receipt": "acceptance-release-1793102605031232611.json",
+      "cohort_passed": 30,
+      "cohort_failed": 1,
+      "cohort_seconds": 2204.9431767463684,
+      "effective_passed": 31,
+      "effective_failed": 0,
+      "overrides": {
+        "json_host": {
+          "receipt": "host-final-host-release-1793103169194211098.json",
+          "sha256": "91a3d33df63eefbf04c79c8c860af3027e7db2250d2374bb9111db4a3a425158"
+        },
+        "json_adversarial": {
+          "receipt": "adversarial-final-adversarial-release-1793103893698300147.json",
+          "sha256": "4427eb57aec512e44bef589dd34f042b9ad96dc028d1805556dfd0ff37c5c987"
+        }
+      },
+      "groups": [
+        {
+          "name": "json_readonly",
+          "seconds": 8.44226,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_dynamic",
+          "seconds": 98.3031,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_numbers",
+          "seconds": 123.549,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_schema",
+          "seconds": 136.139,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_bounds",
+          "seconds": 119.359,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_install",
+          "seconds": 130.053,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_adversarial",
+          "failed": false,
+          "skipped": false,
+          "receipt": "adversarial-final-adversarial-release-1793103893698300147.json",
+          "note": "Verified targeted replacement; original cohort row retained."
+        },
+        {
+          "name": "json_execution_validated",
+          "seconds": 95.6615,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_execution_accessors",
+          "seconds": 79.5377,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_execution_dynamic_smoke",
+          "seconds": 76.8337,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_execution_typed_smoke",
+          "seconds": 218.299,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_execution_shapes",
+          "seconds": 412.226,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_execution_ownership",
+          "seconds": 110.405,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_stress_fixed",
+          "seconds": 153.02,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_stress_wide",
+          "seconds": 1137.53,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_host",
+          "failed": false,
+          "skipped": false,
+          "receipt": "host-final-host-release-1793103169194211098.json",
+          "note": "Verified targeted replacement; original cohort row retained."
+        },
+        {
+          "name": "json_preservation",
+          "seconds": 0.373969,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "json_lsp",
+          "seconds": 1.00025,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "growable_arrays_source",
+          "seconds": 4.12443,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "generics_source",
+          "seconds": 3.37381,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "collections_source",
+          "seconds": 19.5314,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "patterns_source",
+          "seconds": 7.78546,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "reference_values_source",
+          "seconds": 2.23193,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "lsp_documentation",
+          "seconds": 0.179451,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.864993,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "core",
+          "seconds": 0.0115916,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "numeric",
+          "seconds": 2.68001,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "frontend",
+          "seconds": 5.50376,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "modules",
+          "seconds": 0.98478,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": 1.6593,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        },
+        {
+          "name": "text_collections_sprint3",
+          "seconds": 85.9633,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-release-1793102605031232611.json"
+        }
+      ],
+      "build_hashes": {
+        "voidc": "3342a2153fc909a98111207db82a8c7b2736983a5311e33a4f68369ec391a952",
+        "voidls": "82475f9a7f6f2c1b1ebbab1dcfefcefef5e5170c5cacc0d61e7c517fffe4d67f",
+        "void_json_host": "30784e189a18a795a30caa3c67650f7a233082ba6146857e2007baf2e4d61ccb"
+      }
+    },
+    "san": {
+      "cohort_receipt": "acceptance-san-1793102941276648795.json",
+      "cohort_passed": 31,
+      "cohort_failed": 0,
+      "cohort_seconds": 2785.7469696998596,
+      "effective_passed": 31,
+      "effective_failed": 0,
+      "overrides": {},
+      "groups": [
+        {
+          "name": "json_readonly",
+          "seconds": 17.1303,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_dynamic",
+          "seconds": 185.556,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_numbers",
+          "seconds": 232.602,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_schema",
+          "seconds": 178.365,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_bounds",
+          "seconds": 261.679,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_install",
+          "seconds": 322.329,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_adversarial",
+          "seconds": 223.568,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_execution_validated",
+          "seconds": 98.5389,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_execution_accessors",
+          "seconds": 80.9348,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_execution_dynamic_smoke",
+          "seconds": 72.6624,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_execution_typed_smoke",
+          "seconds": 160.416,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_execution_shapes",
+          "seconds": 304.202,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_execution_ownership",
+          "seconds": 98.5342,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_stress_fixed",
+          "seconds": 233.773,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_stress_wide",
+          "seconds": 909.038,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_host",
+          "seconds": 1205.04,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_preservation",
+          "seconds": 0.374358,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "json_lsp",
+          "seconds": 8.11325,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "growable_arrays_source",
+          "seconds": 10.7378,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "generics_source",
+          "seconds": 7.28946,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "collections_source",
+          "seconds": 62.2516,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "patterns_source",
+          "seconds": 16.3456,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "reference_values_source",
+          "seconds": 6.52712,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "lsp_documentation",
+          "seconds": 0.52029,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "text_encoding_crash_preservation",
+          "seconds": 0.905399,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "core",
+          "seconds": 0.0537929,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "numeric",
+          "seconds": 8.32993,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "frontend",
+          "seconds": 16.9952,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "modules",
+          "seconds": 2.40947,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": 5.67469,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        },
+        {
+          "name": "text_collections_sprint3",
+          "seconds": 91.0404,
+          "failed": false,
+          "skipped": false,
+          "receipt": "acceptance-san-1793102941276648795.json"
+        }
+      ],
+      "build_hashes": {
+        "voidc": "a089eee193cbf97aa5000524c522206a910f093aa735ef69a886a08f3d100da9",
+        "voidls": "ae86b1923f9fef8b130142d7012fc765cca089dbcf2bec4356dd73826d70ef40",
+        "void_json_host": "cc24802838210d152553a120fffb968a156b40734bbf80c14a13c32d47aec75f"
+      }
+    }
+  },
+  "effective_groups": 93,
+  "effective_failed": 0,
+  "consolidated_ctest_attempts": 165,
+  "consolidated_ctest_passes": 156,
+  "consolidated_ctest_failures": 9,
+  "additional_targeted_replacement_groups": 4,
+  "replacement_group_passes": 4,
+  "native_host_checks_per_profile": 12343,
+  "native_host_checks_total": 37029,
+  "injected_allocation_failures_per_mode": 2050,
+  "injected_allocation_failures_per_profile": 4100,
+  "attempts": [
+    {
+      "receipt": "acceptance-debug-1793100770043646771.json",
+      "passed": 22,
+      "failed": 2,
+      "tests": 24
+    },
+    {
+      "receipt": "acceptance-debug-1793102605031232081.json",
+      "passed": 30,
+      "failed": 1,
+      "tests": 31
+    },
+    {
+      "receipt": "acceptance-release-1793100771205151370.json",
+      "passed": 22,
+      "failed": 2,
+      "tests": 24
+    },
+    {
+      "receipt": "acceptance-release-1793102605031232611.json",
+      "passed": 30,
+      "failed": 1,
+      "tests": 31
+    },
+    {
+      "receipt": "acceptance-san-1793100923209825115.json",
+      "passed": 21,
+      "failed": 3,
+      "tests": 24
+    },
+    {
+      "receipt": "acceptance-san-1793102941276648795.json",
+      "passed": 31,
+      "failed": 0,
+      "tests": 31
+    }
+  ],
+  "note": "Counts cover the six retained consolidated selections and four final replacement groups, not every exploratory shell/process attempt. Readonly/crash reductions, earlier developing tests, benchmark, and final save-example execution have their own receipts. Native Windows/macOS and independent review remain unverified."
+}

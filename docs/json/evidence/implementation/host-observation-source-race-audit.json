@@ -1,0 +1,18 @@
+{
+  "note": "Debug/Release first final host children started before observation-only and wide-GC test additions. Exclude their host rows for final coverage and repeat with stable binaries in separate fixture directories. Production compiler/library unchanged. San final started after all builds.",
+  "items": {
+    "debug": {
+      "pid": 944533,
+      "unavailable": "[Errno 2] No such file or directory: '/proc/944533/exe'",
+      "current_executable_sha256": "5da1a641a531c07bfc1a333d42b8147fa590a83bd6ed9eff8006c03f4d1c2b46"
+    },
+    "release": {
+      "pid": 944532,
+      "unavailable": "[Errno 2] No such file or directory: '/proc/944532/exe'",
+      "current_executable_sha256": "30784e189a18a795a30caa3c67650f7a233082ba6146857e2007baf2e4d61ccb"
+    },
+    "san": {
+      "current_executable_sha256": "cc24802838210d152553a120fffb968a156b40734bbf80c14a13c32d47aec75f"
+    }
+  }
+}

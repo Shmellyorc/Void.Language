@@ -1,0 +1,28 @@
+Diagnostic interruption under an owning debugger; not a crash test.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x00005555573e5074 in llvm::SUnit::addPred(llvm::SDep const&, bool) ()
+
+Thread 1 (Thread 0x7ffff7d5cfc0 (LWP 939556) "voidc"):
+#0  0x00005555573e5074 in llvm::SUnit::addPred(llvm::SDep const&, bool) ()
+#1  0x00005555573e89e3 in llvm::ScheduleDAGInstrs::addChainDependencies(llvm::SUnit*, llvm::ScheduleDAGInstrs::Value2SUsMap&, llvm::PointerUnion<llvm::Value const*, llvm::PseudoSourceValue const*>) ()
+#2  0x00005555573ec188 in llvm::ScheduleDAGInstrs::buildSchedGraph(llvm::AAResults*, llvm::RegPressureTracker*, llvm::PressureDiffs*, llvm::LiveIntervals*, bool) ()
+#3  0x00005555572e33c9 in llvm::ScheduleDAGMILive::schedule() ()
+#4  0x00005555572ecf49 in (anonymous namespace)::MachineSchedulerBase::scheduleRegions(llvm::ScheduleDAGInstrs&, bool) ()
+#5  0x00005555572ec7e6 in (anonymous namespace)::MachineScheduler::runOnMachineFunction(llvm::MachineFunction&) ()
+#6  0x00005555572af3cc in llvm::MachineFunctionPass::runOnFunction(llvm::Function&) ()
+#7  0x0000555557f90019 in llvm::FPPassManager::runOnFunction(llvm::Function&) ()
+#8  0x0000555557f990b3 in llvm::FPPassManager::runOnModule(llvm::Module&) ()
+#9  0x0000555557f90cf9 in llvm::legacy::PassManagerImpl::run(llvm::Module&) ()
+#10 0x000055555647babd in llvm::orc::SimpleCompiler::operator()(llvm::Module&) ()
+#11 0x000055555647c1d7 in llvm::orc::IRCompileLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#12 0x000055555647c5f4 in llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#13 0x000055555647c5f4 in llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule) ()
+#14 0x00005555564774e1 in llvm::orc::BasicIRLayerMaterializationUnit::materialize(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >) ()
+#15 0x0000555556448c51 in llvm::orc::MaterializationTask::run() ()
+#16 0x000055555644abec in llvm::orc::ExecutionSession::dispatchOutstandingMUs() ()
+#17 0x0000555556460421 in llvm::orc::InProgressFullLookupState::complete(std::unique_ptr<llvm::orc::InProgressLookupState, std::default_delete<llvm::orc::InProgressLookupState> >) ()
+
+Debugger status 0

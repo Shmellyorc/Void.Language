@@ -1,0 +1,30 @@
+use json as json
+func number(const node: json.value, index: i64) -> result<i32, json.error>:
+    return Ok(node.at(index)?.as_number<i32>()?)
+func demo() -> result<i32, json.error>:
+    var root = json.parse("{{\"null\":null,\"array\":[10,20,30],\"A\\u0000\":true}}")?
+    var missing = root.get("missing")
+    if missing is Err(var failure):
+        print("missing {failure.code} {failure.offset} {failure.path}")
+    var nil = root.get("null")?
+    print(nil.kind)
+    if nil.as_string() is Err(var failure):
+        print("wrong {failure.code}")
+    const array = root.get("array")?
+    print(number(array, -1)?)
+    print(number(array, -3)?)
+    if number(array, -4) is Err(var failure):
+        print("range {failure.code} {failure.path}")
+    if number(array, -9223372036854775808) is Err(var failure):
+        print("range {failure.code} {failure.path}")
+    var names = root.keys()?
+    for name, index in names:
+        print("key {index} {name.byte_length}")
+    names.clear()
+    print(root.length()?)
+    var nul = root.get("A\u{0}")?
+    print(nul.as_bool()?)
+    return Ok(0)
+func main():
+    if demo() is Err(var failure):
+        print("error {failure.code} {failure.offset} {failure.path}")

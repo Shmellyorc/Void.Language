@@ -1,0 +1,19 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+    Start 265: lsp_stage10_display
+    Start  38: generics_source
+1/7 Test  #38: generics_source ..................   Passed    5.89 sec
+    Start 100: lsp_math
+2/7 Test #100: lsp_math .........................   Passed    1.05 sec
+    Start  91: lsp_stage8
+3/7 Test  #91: lsp_stage8 .......................   Passed    1.85 sec
+    Start 266: lsp_stage10_intelligence
+4/7 Test #266: lsp_stage10_intelligence .........   Passed    0.56 sec
+    Start  93: lsp_documentation
+5/7 Test  #93: lsp_documentation ................   Passed    0.35 sec
+    Start 117: lsp_binary
+6/7 Test #117: lsp_binary .......................   Passed    0.26 sec
+7/7 Test #265: lsp_stage10_display ..............   Passed   11.48 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  11.49 sec

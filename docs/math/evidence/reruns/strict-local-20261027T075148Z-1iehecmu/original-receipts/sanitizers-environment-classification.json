@@ -1,0 +1,463 @@
+{
+  "classification": "LeakSanitizer fatal process-inspection failure in restricted sandbox; not a leak report or numerical result failure. Original LSAN diagnostic retained verbatim in receipts. The ptrace message is a runtime hint; the precise denied kernel operation was not traced. The math_errors output also contains the expected language checked abs failure, which is not a UBSan report.",
+  "experiment_stopped": true,
+  "strict_flags_unchanged": true,
+  "failed_tests": [
+    {
+      "test": "gc_buffers",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "gc_schemas",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "debug_cache",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "debug_cache_processes",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "lsp_stage8",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "documentation_execution",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "lsp_documentation",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_host",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_ir",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_execution",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_frontend",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_errors",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "expected_language_failure": true,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_worker",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "lsp_math",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_install",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_stack",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "math_frontend_stack",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "binary_execution",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "lsp_binary",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "binary_ownership",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "async_ir",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "core",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "numeric",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "frontend",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "modules",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "numeric_sprint2",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "lsp_stage10_display",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    },
+    {
+      "test": "lsp_stage10_intelligence",
+      "lsan_fatal": true,
+      "ptrace_hint": true,
+      "reported_asan_error": false,
+      "reported_runtime_error": false,
+      "expected_language_failure": false,
+      "reported_ubsan_error": false
+    }
+  ],
+  "matching_incidents": [
+    {
+      "receipt": "docs/math/evidence/crashes/incident-4pkpyx2o/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/tmp/void-cache-_b3io2ct/main.void",
+        "7",
+        "--cache"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-0m8j3j5b/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID Stage10 display editor ztr3r0b6/main.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-fkzjqqmk/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID sprint2 vug6sjn2/binding.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-m9ypv48p/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID Step38 \u00e9\ud83d\ude00 y01iobmb/main.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-tkg39chs/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID nonfatal docs \u00e9\ud83d\ude00 3x9cbc_6/main.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-_3x6iao1/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID documentation \u00e9\ud83d\ude00 5chxfxvw/main.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-wikqozrx/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "feee2fe925760397c3fa6323dbee38883bc0c1445d71ed006334e354be9104bf",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_host",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math host fixtures"
+      ],
+      "sources": 53
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-bqbg12vn/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "2985d14ce44dbefc174afb45b0c26126d1370c06ed425bae7d81ab11075e65d4",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_ir",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math ir fixtures"
+      ],
+      "sources": 14
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-ww8oorhr/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math frontend 4r7sszn1/case1.void"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-7nujbsps/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "run",
+        "/tmp/VOID math checked errors 5tybigrl/checked0.void",
+        "--no-opt"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-dzg7obfe/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math execution pmhbbpl6/math_test.void"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-4551yu5i/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math worker d7i5_1ta/worker.void"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-ick3gr_3/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID math LSP do5gph9o/main.void"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-1q_uqfti/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math frontend gu8s6t3b/case1.void"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-wvj0eu4t/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID binary \u00e9\ud83d\ude00 in3vbqbn/main.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-juh_od4i/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "check",
+        "/tmp/VOID math execution 0m4utsa4/math_test.void"
+      ],
+      "sources": 15
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-1vfle4ci/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "--entry",
+        "/tmp/VOID binary LSP e4sfm53i/main.void"
+      ],
+      "sources": 16
+    },
+    {
+      "receipt": "docs/math/evidence/crashes/incident-4c7uejry/receipt.json",
+      "returncode": 86,
+      "executable_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+      "command": [
+        "/tmp/VOID math relocated j8j7dlsy/relocated install/bin/voidc",
+        "run",
+        "/tmp/VOID math relocated j8j7dlsy/installed_math.void",
+        "2",
+        "--no-opt"
+      ],
+      "sources": 29
+    }
+  ],
+  "compiler_sha256": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+  "lsp_sha256": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394"
+}

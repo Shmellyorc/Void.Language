@@ -1,0 +1,10 @@
+use json as json
+func test(const root: json.value) -> result<i32, json.error>:
+    var first = root.at(0)?
+    var again = root.at(0)?
+    if first is again:
+        print("same")
+    return Ok(0)
+func main():
+    if json.parse("[null]") is Ok(var root):
+        var result = test(root)

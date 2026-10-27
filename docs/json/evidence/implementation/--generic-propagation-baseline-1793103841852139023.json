@@ -1,0 +1,49 @@
+{
+  "profile": "generic-propagation-baseline",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+  "compiler_sha256": "fe184f4ee004af17db8a086653d6d3b06c1d7097945c7fb82ebdecdef108d656",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/json-baseline/voidc-debug",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/generic_nested_propagation.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 1,
+      "stdout_hex": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/generic_nested_propagation.void:6:33: error: Type mismatch: expected result<i32, string>, received i32.\n    code: VOID2001\n\n 6 |     var output = identity(read()?)\n   |                                 ^\n    Module: /generic_nested_propagation.void\n    Expected: result<i32, string>\n    Received: i32\n\n",
+      "source": "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/generic_nested_propagation.void",
+      "source_sha256": "db5177e7440b0d6ab9a74b0cd5aa2daf13365e90cd55d583878fb1aea01c9a00",
+      "input_hashes": {
+        "/home/shmellyorc/Documents/Void.Language/stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io.void": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/adversarial_nested_propagation.reproduction.void": "29708dbbe4bab9c1e516933a2a5bbadbcdf06f67e37da2fb3cd7b32ac4393e8d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/json.void": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/generic_nested_propagation.void": "db5177e7440b0d6ab9a74b0cd5aa2daf13365e90cd55d583878fb1aea01c9a00",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/snapshot.void": "08b9c23233634532e4665e656e67fc9b345f0aa670f970bbd74967626b3f3169",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/stress_wide.void": "bd400d031c81beb1b619a090136924a44228f1585ef3bed7045b129211620332",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/identity.void": "d8f01536fbe3cdbf2edd5e4c2642cd451838226d11d841e4fd26ef3d422a326d",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/stress_fixed.void": "a976aec07822764261f91b23b16fdd6363f67841c5c991aa6d648a5a186e359d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/writer.void": "8895d272e6aa48d2c1c6cdfa04c017ae25ba0a4b3b7892cb02975a4779035429",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/clone.void": "ea43820d35aee7785f756b7172ca4ed2f16124289f915a78d3129e6830fed780",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+        "/home/shmellyorc/Documents/Void.Language/tests/json/reductions/snapshot_only.void": "85a1db02226a9a5cf7369598ff65e65c1a5ec70020effaf05d2d4da0c7613cf4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+        "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0"
+      },
+      "inputs_stable": true,
+      "stack_bytes_verified_in_child_preexec": 1048576
+    }
+  ],
+  "environment": {}
+}

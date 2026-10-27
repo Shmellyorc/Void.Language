@@ -1,0 +1,12 @@
+use error as core
+struct node:
+    private children: [node]
+private func (self node) init(children: [node] = []):
+    self.children = children
+func (self node) get() -> result<node, core.error>:
+    return Ok(self.children[0])
+func main():
+    var leaf = node()
+    const root = node([leaf])
+    if root.get() is Ok(var child):
+        print("direct readonly result")

@@ -1,0 +1,12 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Program received signal SIGABRT, Aborted.
+0x00007ffff78988ec in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#5  0x00005555561a1bae in vd::(anonymous namespace)::Semantics::declare (this=0x7fffffff6b10, token=..., type=..., readonly=false) at /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2093
+2093	        scopes.back().emplace(token.text, Variable{type, slot, readonly, token,current}); return slot;
+$1 = "item"
+$2 = "_read_text"
+$3 = "/json.void::_read_text"
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:1360: reference std::vector<std::map<std::basic_string<char>, vd::(anonymous namespace)::Semantics::Variable>>::back() [_Tp = std::map<std::basic_string<char>, vd::(anonymous namespace)::Semantics::Variable>, _Alloc = std::allocator<std::map<std::basic_string<char>, vd::(anonymous namespace)::Semantics::Variable>>]: Assertion '!this->empty()' failed.
+No symbol "f" in current context.

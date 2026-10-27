@@ -1,5 +1,13 @@
 # Standard library
 
+`use json as json` provides strict dynamic parsing, immutable JSON observations,
+automatic public-data conversion and compact serialization. `parse_as<[i32]>`
+returns an ordinary list for enumeration; `stringify` and `parse_as` round-trip
+string-key dictionaries and eligible DTOs. Exact numeric tokens, Unicode checks,
+decoded duplicate rejection and shared resource limits apply. The explicit module
+alias permits a loop binder named `value` under the existing no-shadowing rule.
+See the [JSON API](../docs/json/API.md) and [working save example](../examples/json/save.void).
+
 `use io` provides owned file handles, bounded whole-file bytes/UTF-8 reads,
 write/append, metadata, file and directory copy/move/removal, symbolic links and
 filtered recursive directory lookup. `get_files(directory, "*.bin", true)` and

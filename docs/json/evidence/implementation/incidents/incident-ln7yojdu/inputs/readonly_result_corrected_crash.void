@@ -1,0 +1,14 @@
+use error as core
+struct node:
+    private children: [node]
+private func (self node) init(children: [node] = []):
+    self.children = children
+func (self node) get() -> result<node, core.error>:
+    return Ok(self.children[0])
+func read(const value: node) -> result<node, core.error>:
+    return value.get()
+func main():
+    var leaf = node()
+    const root = node([leaf])
+    if read(root) is Ok(var child):
+        print("readonly result accepted")

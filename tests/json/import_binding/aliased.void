@@ -1,0 +1,5 @@
+use "./data.void" as data
+func main():
+    var levels: [i32] = [10, 20, 30]
+    for value, index in levels:
+        print("{index}: {value}")

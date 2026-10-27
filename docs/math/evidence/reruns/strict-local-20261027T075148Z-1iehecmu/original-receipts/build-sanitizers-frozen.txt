@@ -1,0 +1,69 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[100%] Built target void_runtime
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_math_host
+[100%] Built target void_math_host
+Built target void_zone_objects
+Built target void_format_objects
+Built target void_core
+Linking CXX executable void_math_ir
+Built target void_math_ir
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_io_runner
+[100%] Built target void_io_runner
+[  0%] Built target void_format_objects
+[  0%] Built target native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/initialization.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/examples/proof.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/tests/analysis/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/methods.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/structs.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/tests.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/values.cpp.o

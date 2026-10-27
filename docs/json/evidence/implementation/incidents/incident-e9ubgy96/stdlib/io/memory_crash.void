@@ -1,0 +1,275 @@
+use encoding/binary
+use error as core
+
+
+## Recoverable memory stream errors; every error preserves contents and position.
+enum error_kind:
+    ## A count or absolute position is negative, outside the data, or cannot fit its wire width.
+    invalid_range
+
+    ## An exact read or Pascal frame requires more bytes than remain.
+    unexpected_eof
+
+    ## The selected complete byte sequence is not strict UTF-8.
+    invalid_utf8
+
+    ## A Pascal payload length exceeds the caller's maximum byte count.
+    limit_exceeded
+
+
+## Recoverable memory-stream failure with common diagnostic fields.
+struct error extends core.error:
+    ## Exact range, EOF, encoding or caller-limit failure category.
+    kind: error_kind
+
+private func _error(kind: error_kind) -> error:
+    match kind:
+        error_kind.invalid_range:
+            return error(message = "Memory stream range is invalid", code = 1, kind = kind)
+        error_kind.unexpected_eof:
+            return error(message = "Memory stream ended before the exact read completed", code = 2, kind = kind)
+        error_kind.invalid_utf8:
+            return error(message = "Memory stream contains invalid UTF-8", code = 3, kind = kind)
+        error_kind.limit_exceeded:
+            return error(message = "Pascal string exceeds the caller's byte limit", code = 4, kind = kind)
+    return error(message = "Unknown memory stream error", kind = kind)
+
+private struct _state:
+    bytes: [u8]
+    const position: i64
+    const order: binary.byte_order
+
+
+## An owned memory buffer with one shared cursor; aliases observe the same stream state.
+## Writes retain spare capacity and grow geometrically, with atomic contents and cursor publication.
+struct stream:
+    private _state: _state
+
+
+## Create a stream at position zero with an independent copy of the input bytes.
+## @param bytes Initial data; defaults to empty and accepts readonly arrays without retaining them.
+## @param order Numeric and Pascal-prefix byte order; defaults to portable little endian.
+func (self stream) init(const bytes: [u8] = [], order: binary.byte_order = binary.byte_order.little):
+    var owned = bytes[0..<bytes.count]
+    self._state = _state(bytes = owned, position = 0, order = order)
+
+
+## Absolute byte position of the shared cursor, between zero and length inclusive.
+## @return Current absolute position in bytes, shared by aliases.
+property (self stream) position: i64:
+    get:
+        return self._state.position
+
+
+## Total byte count of the buffer, including data before and after the cursor.
+## @return Number of stored bytes, independent of the cursor.
+property (self stream) length: i64:
+    get:
+        return self._state.bytes.count
+
+
+## Number of bytes available from the shared cursor through the end.
+## @return Nonnegative length minus the current position.
+property (self stream) remaining: i64:
+    get:
+        return self.length - self.position
+
+
+## True when the shared cursor is at the end, even after a zero-count read.
+## @return Whether position equals length; a zero-count request does not change this value.
+property (self stream) eof: bool:
+    get:
+        return self.position == self.length
+
+
+## Byte order selected at construction for numeric values and Pascal prefixes.
+## @return The canonical encoding/binary byte_order used by this stream.
+property (self stream) order: binary.byte_order:
+    get:
+        return self._state.order
+
+
+private func (self stream) _advance(count: i64):
+    self._state = _state(bytes = self._state.bytes, position = self.position + count, order = self.order)
+
+
+## Seek to an existing absolute byte boundary; no sparse gaps or negative indexes are allowed.
+## @param position New absolute byte position, from zero through length inclusive.
+## @return Ok with the new position, or Err(invalid_range) without changing the stream.
+func (self stream) seek(position: i64) -> result<i64, error>:
+    if position < 0 or position > self.length:
+        return Err(_error(error_kind.invalid_range))
+
+    self._state = _state(bytes = self._state.bytes, position = position, order = self.order)
+    return Ok(position)
+
+
+## Copy the entire buffer without moving its shared cursor.
+## @return Independent writable bytes unaffected by later stream changes or other snapshots.
+func (self stream) to_bytes() -> [u8]:
+    return self._state.bytes[0..<self.length]
+
+
+private func (self stream) _peek(count: i64, offset: i64 = 0) -> result<[u8], error>:
+    if count < 0 or offset < 0:
+        return Err(_error(error_kind.invalid_range))
+
+    if offset > self.remaining:
+        return Err(_error(error_kind.unexpected_eof))
+
+    if count > self.remaining - offset:
+        return Err(_error(error_kind.unexpected_eof))
+
+    var first = self.position + offset
+    return Ok(self._state.bytes[first..<first + count])
+
+
+## Read up to the requested byte count; a short successful result reaches EOF.
+## Zero-count reads succeed without moving, and reads at EOF return an empty Ok.
+## @param max_count Maximum bytes to copy; negative counts return invalid_range.
+## @return Ok with independent bytes and matching cursor progress, or Err(invalid_range).
+func (self stream) read_bytes(max_count: i64) -> result<[u8], error>:
+    if max_count < 0:
+        return Err(_error(error_kind.invalid_range))
+
+    var count = max_count
+
+    if count > self.remaining:
+        count = self.remaining
+
+    var bytes = self._peek(count)?
+
+    if count != 0:
+        self._advance(count)
+
+    return Ok(bytes)
+
+
+## Read exactly count bytes; a short buffer leaves the shared cursor unchanged.
+## @param count Required byte count; zero succeeds and negative counts return invalid_range.
+## @return Ok with independent bytes, or Err(invalid_range/unexpected_eof) without progress.
+func (self stream) read_exact(count: i64) -> result<[u8], error>:
+    var bytes = self._peek(count)?
+
+    if count != 0:
+        self._advance(count)
+
+    return Ok(bytes)
+
+
+## Overwrite bytes at the cursor and extend the buffer when needed, preserving any existing tail.
+## Growth stages new storage; writes within capacity copy only input bytes.
+## Allocation failures preserve the old contents and cursor.
+## @param bytes Readonly or mutable input bytes, copied without retaining caller storage.
+## @return Ok with bytes written, or Err(invalid_range) if the resulting position cannot fit i64.
+func (self stream) write_bytes(const bytes: [u8]) -> result<i64, error>:
+    var count = bytes.count
+
+    if count > i64.max_value - self.position:
+        return Err(_error(error_kind.invalid_range))
+
+    if count == 0:
+        return Ok(0)
+
+    var next = _state(bytes = self._state.bytes, position = self.position + count, order = self.order)
+    _memory_write(self._state.bytes, bytes, self.position)
+    self._state = next
+    return Ok(count)
+
+
+## Read one fixed-width number through encoding/binary in this stream's byte order.
+## Supports all ten numeric primitives and preserves signed and IEEE representation bits.
+## @return Ok with the decoded value, or Err(unexpected_eof) without cursor progress.
+func (self stream) read<t>() -> result<t, error>:
+    var width = binary.encode<t>(0).count
+    var bytes = self._peek(width)?
+
+    if binary.decode<t>(bytes, self.order) is Ok(var value):
+        self._advance(width)
+        return Ok(value)
+
+    return Err(_error(error_kind.unexpected_eof))
+
+
+## Write one fixed-width number through encoding/binary in this stream's byte order.
+## Supports all ten numeric primitives and preserves signed zero, infinities and NaN payloads.
+## @param value Numeric value, inferred or explicitly selected, with no implicit narrowing.
+## @return Ok with the numeric width in bytes, or Err(invalid_range) for position overflow.
+func (self stream) write<t>(value: t) -> result<i64, error>:
+    return self.write_bytes(binary.encode(value, self.order))
+
+
+private func (self stream) _text(count: i64, offset: i64 = 0) -> result<string, error>:
+    var bytes = self._peek(count, offset)?
+
+    if string.from_utf8(bytes) is Ok(var value):
+        return Ok(value)
+
+    return Err(_error(error_kind.invalid_utf8))
+
+
+## Read an exact byte count as strict UTF-8; invalid or incomplete input does not move the cursor.
+## @param count UTF-8 bytes to consume, including embedded NUL; negative counts return invalid_range.
+## @return Ok with owned text, or Err(invalid_range/unexpected_eof/invalid_utf8) without progress.
+func (self stream) read_string(count: i64) -> result<string, error>:
+    var value = self._text(count)?
+
+    if count != 0:
+        self._advance(count)
+
+    return Ok(value)
+
+
+## Write raw UTF-8 bytes with no prefix, newline, terminator or normalization.
+## @param value Strict Unicode text to encode, including embedded NUL characters.
+## @return Ok with UTF-8 bytes written, or Err(invalid_range) for position overflow.
+func (self stream) write_string(value: string) -> result<i64, error>:
+    if value.byte_length > i64.max_value - self.position:
+        return Err(_error(error_kind.invalid_range))
+
+    return self.write_bytes(value.to_utf8())
+
+
+## Read a u32-byte-length-prefixed strict UTF-8 string in this stream's byte order.
+## Length limits and availability are checked before payload allocation; errors never move the cursor.
+## @param max_bytes Maximum payload bytes; a negative maximum returns invalid_range.
+## @return Ok with text, or Err(invalid_range/limit_exceeded/unexpected_eof/invalid_utf8) without progress.
+func (self stream) read_pascal_string(max_bytes: i64 = i64.max_value) -> result<string, error>:
+    if max_bytes < 0:
+        return Err(_error(error_kind.invalid_range))
+
+    var prefix = self._peek(4)?
+
+    if binary.decode<u32>(prefix, self.order) is Ok(var length):
+        var count = length as i64
+
+        if count > max_bytes:
+            return Err(_error(error_kind.limit_exceeded))
+
+        var value = self._text(count, 4)?
+        self._advance(4 + count)
+        return Ok(value)
+
+    return Err(_error(error_kind.unexpected_eof))
+
+
+## Write a u32 UTF-8 byte-length prefix followed by raw payload in this stream's byte order.
+## Publishes the entire frame together; embedded NUL is data and no terminator is added.
+## @param value Text whose UTF-8 byte length must fit u32; no scalar-count prefix is used.
+## @return Ok with total bytes including the four-byte prefix, or Err(invalid_range) on width/position overflow.
+func (self stream) write_pascal_string(value: string) -> result<i64, error>:
+    if value.byte_length > (u32.max_value as i64):
+        return Err(_error(error_kind.invalid_range))
+
+    var wire_count = value.byte_length + 4
+
+    if wire_count > i64.max_value - self.position:
+        return Err(_error(error_kind.invalid_range))
+
+    var payload = value.to_utf8()
+    var framed = binary.encode(value.byte_length as u32, self.order)
+
+    for byte in payload:
+        framed.push(byte)
+
+    return self.write_bytes(framed)

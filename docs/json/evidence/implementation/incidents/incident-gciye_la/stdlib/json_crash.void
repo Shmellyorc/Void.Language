@@ -1,0 +1,1040 @@
+use error as core
+use convert
+
+## The six kinds of an immutable JSON value.
+enum value_kind:
+    ## Genuine JSON null, distinct from a missing property.
+    null_value
+    ## A JSON true or false literal.
+    boolean
+    ## An exact validated decimal number token.
+    number
+    ## Decoded Unicode-scalar text, including NUL.
+    text
+    ## An ordered sequence of values.
+    array
+    ## An ordered sequence of unique decoded names and values.
+    object
+
+## Stable categories of recoverable JSON failures, in code order starting at 1.
+enum error_kind:
+    ## Input does not follow the complete JSON grammar.
+    syntax
+    ## A Unicode escape contains an invalid scalar or surrogate pair.
+    invalid_unicode
+    ## Two object names decode to the same string.
+    duplicate_key
+    ## A required property is absent, distinct from explicit null.
+    missing_property
+    ## An array index has no corresponding element.
+    index_out_of_range
+    ## The value kind does not match the requested operation or type.
+    wrong_type
+    ## A number cannot be represented exactly or within the target range.
+    out_of_range
+    ## A typed floating value is NaN or infinity.
+    non_finite
+    ## Text is not an exact payload-free enum case name.
+    invalid_enum
+    ## An object contains a name absent from the requested schema.
+    unknown_property
+    ## An array has the wrong fixed extent.
+    length_mismatch
+    ## An operation would exceed its configured resource budget.
+    limit_exceeded
+    ## A supplied limit is nonpositive or depth exceeds 128.
+    invalid_limits
+
+## Whether typed decoding admits extra object properties.
+enum unknown_fields:
+    ## Reject the first unknown name in input order.
+    reject
+    ## Ignore schema membership after complete parsing and budget checks.
+    ignore
+
+## Recoverable JSON failure. Inherited path is a JSON Pointer relative to this operation.
+struct error extends core.error:
+    ## Stable module category; inherited code is its one-based declaration index.
+    kind: error_kind
+    ## Original zero-based UTF-8 byte position, or -1 for converted values.
+    offset: i64
+
+## Per-operation logical resource limits, shared by compound conversions.
+## These counters bound admitted work, not allocator overhead or resident memory.
+value struct limits:
+    ## Maximum original parse bytes, checked before copying UTF-8 input.
+    max_input_bytes: i64 = 16777216
+    ## Maximum emitted JSON bytes, checked before growth.
+    max_output_bytes: i64 = 16777216
+    ## Maximum container nesting; scalar root is 0. Must be at most 128.
+    max_depth: i64 = 64
+    ## Maximum logical values materialized across the operation.
+    max_nodes: i64 = 262144
+    ## Maximum decoded bytes in each key or string.
+    max_string_bytes: i64 = 8388608
+    ## Maximum bytes in each exact number token.
+    max_number_bytes: i64 = 1024
+    ## Maximum members in any object, dictionary or data struct.
+    max_object_members: i64 = 4096
+    ## Maximum conservative byte, comparison and traversal work units.
+    max_work: i64 = 67108864
+
+private value struct _member:
+    name: string
+    child: value
+    offset: i64
+
+private enum _payload:
+    nil
+    boolean(item: bool)
+    number(token: string)
+    text(item: string)
+    array(items: [value])
+    object(members: [_member])
+
+## Immutable managed JSON node. Observation through a const root preserves readonly authority.
+## Nodes own decoded strings and exact number tokens without retaining the input document.
+struct value:
+    private payload: _payload
+    private start: i64
+
+private func (self value) init(payload: _payload, offset: i64 = -1):
+    self.payload = payload
+    self.start = offset
+
+private func _decode(const bytes: [u8]) -> string:
+    return convert.unwrap(string.from_utf8(bytes))
+
+private func _code(kind: error_kind) -> i32:
+    match kind:
+        error_kind.syntax:
+            return 1
+        error_kind.invalid_unicode:
+            return 2
+        error_kind.duplicate_key:
+            return 3
+        error_kind.missing_property:
+            return 4
+        error_kind.index_out_of_range:
+            return 5
+        error_kind.wrong_type:
+            return 6
+        error_kind.out_of_range:
+            return 7
+        error_kind.non_finite:
+            return 8
+        error_kind.invalid_enum:
+            return 9
+        error_kind.unknown_property:
+            return 10
+        error_kind.length_mismatch:
+            return 11
+        error_kind.limit_exceeded:
+            return 12
+        error_kind.invalid_limits:
+            return 13
+    return 0
+
+private func _segment(name: string) -> string:
+    var bytes: [u8] = []
+    for byte in name.to_utf8():
+        if byte == 126:
+            bytes.push(126)
+            bytes.push(48)
+        else if byte == 47:
+            bytes.push(126)
+            bytes.push(49)
+        else:
+            bytes.push(byte)
+    return _decode(bytes)
+
+private func _error(kind: error_kind, offset: i64, path: string = "", detail: string = "JSON operation failed") -> error:
+    return error(message = detail, code = _code(kind), path = path, kind = kind, offset = offset)
+
+private struct _context:
+    budget: limits
+    nodes_left: i64
+    work_left: i64
+    location: i64 = -1
+    path: [string]
+
+private func (self _context) fail(kind: error_kind, detail: string, offset: i64 = -2, suffix: string = "") -> error:
+    var bytes: [u8] = []
+    for part in self.path:
+        bytes.push(47)
+        for byte in _segment(part).to_utf8():
+            bytes.push(byte)
+    for byte in suffix.to_utf8():
+        bytes.push(byte)
+    var at = offset
+    if at == -2:
+        at = self.location
+    return _error(kind, at, _decode(bytes), detail)
+
+private func _context_for(budget: limits) -> result<_context, error>:
+    if budget.max_input_bytes <= 0 or budget.max_output_bytes <= 0 or budget.max_depth <= 0 or budget.max_depth > 128 or budget.max_nodes <= 0 or budget.max_string_bytes <= 0 or budget.max_number_bytes <= 0 or budget.max_object_members <= 0 or budget.max_work <= 0:
+        return Err(_error(error_kind.invalid_limits, -1, detail = "JSON limits must be positive and max_depth at most 128"))
+    return Ok(_context(budget = budget, nodes_left = budget.max_nodes, work_left = budget.max_work, path = []))
+
+private func (self _context) charge(units: i64) -> result<i64, error>:
+    if units < 0 or units > self.work_left:
+        return Err(self.fail(error_kind.limit_exceeded, "max_work"))
+    self.work_left -= units
+    return Ok(units)
+
+private func (self _context) node(depth: i64) -> result<i64, error>:
+    if depth > self.budget.max_depth:
+        return Err(self.fail(error_kind.limit_exceeded, "max_depth"))
+    if self.nodes_left == 0:
+        return Err(self.fail(error_kind.limit_exceeded, "max_nodes"))
+    self.nodes_left -= 1
+    return self.charge(1)
+
+## Construct a genuine JSON null node with no source byte offset.
+## @return A fresh immutable node whose kind is null_value.
+func null_value() -> value:
+    return value(_payload.nil)
+
+## Observe the node's exact JSON category without conversion.
+property (self value) kind: value_kind:
+    get:
+        match self.payload:
+            _payload.nil:
+                return value_kind.null_value
+            _payload.boolean(_):
+                return value_kind.boolean
+            _payload.number(_):
+                return value_kind.number
+            _payload.text(_):
+                return value_kind.text
+            _payload.array(_):
+                return value_kind.array
+            _payload.object(_):
+                return value_kind.object
+        return value_kind.null_value
+
+## Find an exact decoded object name; missing is an error, while null is a value.
+## @param name Case-sensitive UTF-8 name without normalization.
+## @return The existing child identity, or wrong_type/missing_property.
+func (self value) get(name: string) -> result<value, error>:
+    if self.payload is _payload.object(var members):
+        for member in members:
+            if member.name == name:
+                return Ok(member.child)
+        return Err(_error(error_kind.missing_property, self.start, "/" + _segment(name)))
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Find an array element using ordinary VOID negative indexing.
+## @param index Zero-based position, or negative distance from the end.
+## @return The existing child identity, or wrong_type/index_out_of_range.
+func (self value) at(index: i64) -> result<value, error>:
+    if self.payload is _payload.array(var items):
+        var position = index
+        if position < 0:
+            if position < -items.count:
+                return Err(_error(error_kind.index_out_of_range, self.start, "/" + string(index)))
+            position += items.count
+        if position >= items.count:
+            return Err(_error(error_kind.index_out_of_range, self.start, "/" + string(index)))
+        return Ok(items[position])
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Require a JSON string without coercion.
+## @return Decoded immutable Unicode text, including embedded NUL, or wrong_type.
+func (self value) as_string() -> result<string, error>:
+    if self.payload is _payload.text(var item):
+        return Ok(item)
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Require a JSON Boolean without truthiness or coercion.
+## @return True or false, or wrong_type.
+func (self value) as_bool() -> result<bool, error>:
+    if self.payload is _payload.boolean(var item):
+        return Ok(item)
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Require a JSON number and retain its exact original decimal spelling.
+## @return Validated token, including exponent spelling and trailing zeros, or wrong_type.
+func (self value) number_text() -> result<string, error>:
+    if self.payload is _payload.number(var token):
+        return Ok(token)
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Snapshot an array's outer list, retaining child identities and readonly authority.
+## @return Independent growable list suitable for normal VOID enumeration, or wrong_type.
+func (self value) as_array() -> result<[value], error>:
+    if self.payload is _payload.array(var items):
+        return Ok(items[0..<items.count])
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Snapshot an object's decoded names in document/construction order.
+## @return Independent growable string list, or wrong_type.
+func (self value) keys() -> result<[string], error>:
+    if self.payload is _payload.object(var members):
+        var names: [string] = []
+        for member in members:
+            names.push(member.name)
+        return Ok(names)
+    return Err(_error(error_kind.wrong_type, self.start))
+
+## Count array elements or object members without treating text as a collection.
+## @return Element/member count, or wrong_type for all other kinds.
+func (self value) length() -> result<i64, error>:
+    if self.payload is _payload.array(var items):
+        return Ok(items.count)
+    if self.payload is _payload.object(var members):
+        return Ok(members.count)
+    return Err(_error(error_kind.wrong_type, self.start))
+
+private struct _scanner:
+    bytes: [u8]
+    cursor: i64
+    context: _context
+
+private func _space(byte: u8) -> bool:
+    return byte == 32 or byte == 9 or byte == 10 or byte == 13
+
+private func _digit(byte: u8) -> bool:
+    return byte >= 48 and byte <= 57
+
+private func (self _scanner) take() -> result<u8, error>:
+    self.context.location = self.cursor
+    if self.cursor >= self.bytes.count:
+        return Err(self.context.fail(error_kind.syntax, "Unexpected end of JSON input"))
+    var charged = self.context.charge(1)?
+    var byte = self.bytes[self.cursor]
+    self.cursor += 1
+    return Ok(byte)
+
+private func (self _scanner) whitespace() -> result<i64, error>:
+    for self.cursor < self.bytes.count and _space(self.bytes[self.cursor]):
+        var byte = self.take()?
+    self.context.location = self.cursor
+    return Ok(self.cursor)
+
+private func (self _scanner) expect(byte: u8) -> result<i64, error>:
+    var found = self.take()?
+    if found != byte:
+        return Err(self.context.fail(error_kind.syntax, "Unexpected JSON token"))
+    return Ok(self.cursor)
+
+private func _string_byte(context: _context, output: [u8], byte: u8) -> result<i64, error>:
+    if output.count >= context.budget.max_string_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var charged = context.charge(1)?
+    output.push(byte)
+    return Ok(output.count)
+
+private func _scalar(context: _context, output: [u8], scalar: i64) -> result<i64, error>:
+    var width: i64 = 1
+    if scalar >= 65536:
+        width = 4
+    else if scalar >= 2048:
+        width = 3
+    else if scalar >= 128:
+        width = 2
+    if width > context.budget.max_string_bytes - output.count:
+        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var charged = context.charge(width)?
+    if width == 1:
+        output.push(scalar as u8)
+    else if width == 2:
+        output.push((192 + scalar / 64) as u8)
+        output.push((128 + scalar % 64) as u8)
+    else if width == 3:
+        output.push((224 + scalar / 4096) as u8)
+        output.push((128 + scalar / 64 % 64) as u8)
+        output.push((128 + scalar % 64) as u8)
+    else:
+        output.push((240 + scalar / 262144) as u8)
+        output.push((128 + scalar / 4096 % 64) as u8)
+        output.push((128 + scalar / 64 % 64) as u8)
+        output.push((128 + scalar % 64) as u8)
+    return Ok(width)
+
+private func (self _scanner) hex4() -> result<i64, error>:
+    var scalar: i64 = 0
+    for index in 0..<4:
+        var byte = self.take()?
+        var digit: i64 = -1
+        if byte >= 48 and byte <= 57:
+            digit = (byte - 48) as i64
+        else if byte >= 65 and byte <= 70:
+            digit = (byte - 55) as i64
+        else if byte >= 97 and byte <= 102:
+            digit = (byte - 87) as i64
+        if digit < 0:
+            return Err(self.context.fail(error_kind.invalid_unicode, "Expected four hexadecimal Unicode digits"))
+        scalar = scalar * 16 + digit
+    return Ok(scalar)
+
+private func (self _scanner) quoted() -> result<string, error>:
+    var quote = self.expect(34)?
+    var output: [u8] = []
+    for true:
+        var at = self.cursor
+        var byte = self.take()?
+        if byte == 34:
+            var charged = self.context.charge(output.count)?
+            return Ok(_decode(output))
+        if byte < 32:
+            return Err(self.context.fail(error_kind.syntax, "Unescaped control byte in JSON string"))
+        if byte != 92:
+            var added = _string_byte(self.context, output, byte)?
+            continue
+        byte = self.take()?
+        if byte == 34 or byte == 92 or byte == 47:
+            var added = _string_byte(self.context, output, byte)?
+        else if byte == 98:
+            var added = _string_byte(self.context, output, 8)?
+        else if byte == 102:
+            var added = _string_byte(self.context, output, 12)?
+        else if byte == 110:
+            var added = _string_byte(self.context, output, 10)?
+        else if byte == 114:
+            var added = _string_byte(self.context, output, 13)?
+        else if byte == 116:
+            var added = _string_byte(self.context, output, 9)?
+        else if byte == 117:
+            var scalar = self.hex4()?
+            if scalar >= 55296 and scalar <= 56319:
+                if self.cursor > self.bytes.count - 2:
+                    return Err(self.context.fail(error_kind.invalid_unicode, "High surrogate requires a low-surrogate escape", at))
+                if self.bytes[self.cursor] != 92 or self.bytes[self.cursor + 1] != 117:
+                    return Err(self.context.fail(error_kind.invalid_unicode, "High surrogate requires a low-surrogate escape", at))
+                var slash = self.take()?
+                var marker = self.take()?
+                var low = self.hex4()?
+                if low < 56320 or low > 57343:
+                    return Err(self.context.fail(error_kind.invalid_unicode, "Invalid low surrogate", at))
+                scalar = 65536 + (scalar - 55296) * 1024 + low - 56320
+            else if scalar >= 56320 and scalar <= 57343:
+                return Err(self.context.fail(error_kind.invalid_unicode, "Lone low surrogate", at))
+            var added = _scalar(self.context, output, scalar)?
+        else:
+            return Err(self.context.fail(error_kind.syntax, "Unknown JSON escape", at))
+    return Err(self.context.fail(error_kind.syntax, "Unterminated JSON string"))
+
+private func (self _scanner) literal(token: string) -> result<i64, error>:
+    for byte in token.to_utf8():
+        var matched = self.expect(byte)?
+    return Ok(self.cursor)
+
+private func (self _scanner) number_byte(start: i64) -> result<u8, error>:
+    if self.cursor - start >= self.context.budget.max_number_bytes:
+        return Err(self.context.fail(error_kind.limit_exceeded, "max_number_bytes", self.cursor))
+    return self.take()
+
+private func (self _scanner) number() -> result<string, error>:
+    var start = self.cursor
+    if self.bytes[self.cursor] == 45:
+        var minus = self.number_byte(start)?
+    if self.cursor >= self.bytes.count:
+        return Err(self.context.fail(error_kind.syntax, "Number requires integer digits", self.cursor))
+    var first = self.bytes[self.cursor]
+    if first == 48:
+        var zero = self.number_byte(start)?
+    else if first >= 49 and first <= 57:
+        for self.cursor < self.bytes.count and _digit(self.bytes[self.cursor]):
+            var digit = self.number_byte(start)?
+    else:
+        return Err(self.context.fail(error_kind.syntax, "Number requires integer digits", self.cursor))
+    if self.cursor < self.bytes.count and self.bytes[self.cursor] == 46:
+        var dot = self.number_byte(start)?
+        var beginning = self.cursor
+        for self.cursor < self.bytes.count and _digit(self.bytes[self.cursor]):
+            var digit = self.number_byte(start)?
+        if self.cursor == beginning:
+            return Err(self.context.fail(error_kind.syntax, "Fraction requires digits", self.cursor))
+    if self.cursor < self.bytes.count and (self.bytes[self.cursor] == 101 or self.bytes[self.cursor] == 69):
+        var marker = self.number_byte(start)?
+        if self.cursor < self.bytes.count and (self.bytes[self.cursor] == 43 or self.bytes[self.cursor] == 45):
+            var sign = self.number_byte(start)?
+        var beginning = self.cursor
+        for self.cursor < self.bytes.count and _digit(self.bytes[self.cursor]):
+            var digit = self.number_byte(start)?
+        if self.cursor == beginning:
+            return Err(self.context.fail(error_kind.syntax, "Exponent requires digits", self.cursor))
+    var size = self.cursor - start
+    var charged = self.context.charge(size)?
+    var token = _decode(self.bytes[start..<self.cursor])
+    return Ok(token)
+
+private struct _parse_frame:
+    object: bool
+    phase: i32
+    start: i64
+    items: [value]
+    members: [_member]
+    key: string
+    key_offset: i64
+    nested: bool
+
+private func (self _parse_frame) finish() -> value:
+    if self.object:
+        var members = self.members
+        self.members = []
+        return value(_payload.object(members), self.start)
+    var items = self.items
+    self.items = []
+    return value(_payload.array(items), self.start)
+
+private func (self _parse_frame) attach(child: value):
+    if self.object:
+        self.members.push(_member(name = self.key, child = child, offset = self.key_offset))
+        self.key = ""
+    else:
+        self.items.push(child)
+    self.phase = 1
+
+private func _parse(text: string, context: _context) -> result<value, error>:
+    context.location = 0
+    if text.byte_length > context.budget.max_input_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_input_bytes"))
+    var copied = context.charge(text.byte_length)?
+    var scanner = _scanner(bytes = text.to_utf8(), context = context)
+    var frames: [_parse_frame] = []
+    for true:
+        var skipped = scanner.whitespace()?
+        var completed: value? = null
+        var close = false
+        if frames.count > 0:
+            var frame = frames[-1]
+            var closing: u8 = 93
+            if frame.object:
+                closing = 125
+            if scanner.cursor >= scanner.bytes.count:
+                return Err(context.fail(error_kind.syntax, "Unterminated JSON container", scanner.cursor))
+            if frame.phase == 1:
+                if scanner.bytes[scanner.cursor] == closing:
+                    close = true
+                else:
+                    var comma = scanner.expect(44)?
+                    frame.phase = 2
+                    continue
+            else if frame.phase == 0 and scanner.bytes[scanner.cursor] == closing:
+                close = true
+            if close:
+                var end = scanner.take()?
+                var popped = frames.remove_at(frames.count - 1)
+                completed = popped.finish()
+                if popped.nested:
+                    var segment = context.path.remove_at(context.path.count - 1)
+            else if frame.object and frame.phase != 3:
+                if frame.members.count >= context.budget.max_object_members:
+                    return Err(context.fail(error_kind.limit_exceeded, "max_object_members", scanner.cursor))
+                var key_offset = scanner.cursor
+                var key = scanner.quoted()?
+                for previous in frame.members:
+                    var a = context.charge(previous.name.byte_length)?
+                    var b = context.charge(key.byte_length)?
+                    var comparison = context.charge(1)?
+                    if previous.name == key:
+                        return Err(context.fail(error_kind.duplicate_key, "Duplicate decoded object name", key_offset, "/" + _segment(key)))
+                frame.key = key
+                frame.key_offset = key_offset
+                var space = scanner.whitespace()?
+                var colon = scanner.expect(58)?
+                frame.phase = 3
+                continue
+        if completed == null:
+            if frames.count > 0:
+                var parent = frames[-1]
+                if parent.object:
+                    context.path.push(parent.key)
+                else:
+                    context.path.push(string(parent.items.count))
+            var start = scanner.cursor
+            context.location = start
+            if start >= scanner.bytes.count:
+                return Err(context.fail(error_kind.syntax, "Expected JSON value", start))
+            var first = scanner.bytes[start]
+            var container = first == 91 or first == 123
+            var depth = frames.count
+            if container:
+                depth += 1
+            var admitted = context.node(depth)?
+            if container:
+                var opening = scanner.take()?
+                frames.push(_parse_frame(object = first == 123, start = start, items = [], members = [], nested = frames.count > 0))
+                continue
+            if first == 34:
+                completed = value(_payload.text(scanner.quoted()?), start)
+            else if first == 110:
+                var matched = scanner.literal("null")?
+                completed = value(_payload.nil, start)
+            else if first == 116:
+                var matched = scanner.literal("true")?
+                completed = value(_payload.boolean(true), start)
+            else if first == 102:
+                var matched = scanner.literal("false")?
+                completed = value(_payload.boolean(false), start)
+            else if first == 45 or _digit(first):
+                completed = value(_payload.number(scanner.number()?), start)
+            else:
+                return Err(context.fail(error_kind.syntax, "Expected JSON value", start))
+            if frames.count > 0:
+                var segment = context.path.remove_at(context.path.count - 1)
+        if frames.count == 0:
+            var tail = scanner.whitespace()?
+            if scanner.cursor != scanner.bytes.count:
+                return Err(context.fail(error_kind.syntax, "Trailing JSON input", scanner.cursor))
+            return Ok(completed as value)
+        frames[-1].attach(completed as value)
+    return Err(context.fail(error_kind.syntax, "Expected JSON value"))
+
+## Parse one strict JSON value, retaining exact number tokens and decoded name order.
+## Reject comments, BOM, trailing input, malformed escapes and decoded duplicate names.
+## @param text Valid VOID Unicode text containing exactly one JSON value.
+## @param budget Positive per-operation limits, checked before copying or allocating.
+## @return Complete immutable tree, or a located JSON error without partial publication.
+func parse(text: string, budget: limits = limits()) -> result<value, error>:
+    var context = _context_for(budget)?
+    return _parse(text, context)
+
+private func _number_text(token: string, integral: bool, offset: i64) -> result<string, error>:
+    var bytes = token.to_utf8()
+    var negative = bytes[0] == 45
+    var digits: [u8] = []
+    var fractional: i64 = 0
+    var dot = false
+    var cursor: i64 = 0
+    if negative:
+        cursor = 1
+    for cursor < bytes.count and bytes[cursor] != 101 and bytes[cursor] != 69:
+        if bytes[cursor] == 46:
+            dot = true
+        else:
+            digits.push(bytes[cursor])
+            if dot:
+                fractional += 1
+        cursor += 1
+    var first: i64 = 0
+    for first < digits.count and digits[first] == 48:
+        first += 1
+    if first == digits.count:
+        if negative and not integral:
+            return Ok("-0")
+        return Ok("0")
+    if not integral:
+        return Ok(token)
+    var exponent: i64 = 0
+    var exponent_negative = false
+    if cursor < bytes.count:
+        cursor += 1
+        if bytes[cursor] == 45 or bytes[cursor] == 43:
+            exponent_negative = bytes[cursor] == 45
+            cursor += 1
+        var cap = bytes.count + 21
+        for cursor < bytes.count:
+            var digit = (bytes[cursor] - 48) as i64
+            if exponent > (cap - digit) / 10:
+                exponent = cap
+            else:
+                exponent = exponent * 10 + digit
+            cursor += 1
+    if exponent_negative:
+        exponent = -exponent
+    var scale = exponent - fractional
+    var stop = digits.count
+    if scale < 0:
+        if scale < -(digits.count - first):
+            return Err(_error(error_kind.out_of_range, offset))
+        stop += scale
+        for index in stop..<digits.count:
+            if digits[index] != 48:
+                return Err(_error(error_kind.out_of_range, offset))
+    var count = digits.count - first + scale
+    if count <= 0 or count > 20:
+        return Err(_error(error_kind.out_of_range, offset))
+    var output: [u8] = []
+    if negative:
+        output.push(45)
+    for index in first..<stop:
+        output.push(digits[index])
+    for scale > 0:
+        output.push(48)
+        scale -= 1
+    return Ok(_decode(output))
+
+## Extract a JSON number at its declared primitive precision, without coercion.
+## Integer targets require an exact integral mathematical value, including decimal exponents.
+## @return Representable number, wrong_type, or out_of_range; bad type arguments diagnose.
+func (self value) as_number<t>() -> result<t, error>:
+    var integral = _json_integer<t>()
+    var token = self.number_text()?
+    var normalized = _number_text(token, integral, self.start)?
+    if convert.parse<t>(normalized) is Ok(var item):
+        return Ok(item)
+    return Err(_error(error_kind.out_of_range, self.start))
+
+private func (self value) source_offset() -> i64:
+    return self.start
+
+private func (self value) member_name(index: i64) -> string:
+    if self.payload is _payload.object(var members):
+        return members[index].name
+    return ""
+
+private func (self value) member_child(index: i64) -> result<value, error>:
+    if self.payload is _payload.object(var members):
+        return Ok(members[index].child)
+    return Err(_error(error_kind.wrong_type, self.start))
+
+private struct _writer:
+    context: _context
+    bytes: [u8]
+
+private func (self _writer) append(const bytes: [u8]) -> result<i64, error>:
+    if bytes.count > self.context.budget.max_output_bytes - self.bytes.count:
+        return Err(self.context.fail(error_kind.limit_exceeded, "max_output_bytes"))
+    var charged = self.context.charge(bytes.count)?
+    for byte in bytes:
+        self.bytes.push(byte)
+    return Ok(bytes.count)
+
+private func (self _writer) text(text: string) -> result<i64, error>:
+    var charged = self.context.charge(text.byte_length)?
+    if text.byte_length > self.context.budget.max_output_bytes - self.bytes.count:
+        return Err(self.context.fail(error_kind.limit_exceeded, "max_output_bytes"))
+    return self.append(text.to_utf8())
+
+private func (self _writer) quoted(text: string) -> result<i64, error>:
+    if text.byte_length > self.context.budget.max_string_bytes:
+        return Err(self.context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var charged = self.context.charge(text.byte_length)?
+    var bytes = text.to_utf8()
+    var quote = self.append([34 as u8])?
+    var hex = "0123456789abcdef".to_utf8()
+    for byte in bytes:
+        if byte == 34 or byte == 92:
+            var added = self.append([92 as u8, byte])?
+        else if byte == 8:
+            var added = self.append([92 as u8, 98 as u8])?
+        else if byte == 12:
+            var added = self.append([92 as u8, 102 as u8])?
+        else if byte == 10:
+            var added = self.append([92 as u8, 110 as u8])?
+        else if byte == 13:
+            var added = self.append([92 as u8, 114 as u8])?
+        else if byte == 9:
+            var added = self.append([92 as u8, 116 as u8])?
+        else if byte < 32:
+            var added = self.append([92 as u8, 117 as u8, 48 as u8, 48 as u8, hex[byte / 16], hex[byte % 16]])?
+        else:
+            var added = self.append([byte])?
+    return self.append([34 as u8])
+
+private struct _write_frame:
+    const node: value
+    cursor: i64
+    depth: i64
+    entered: bool
+    nested: bool
+
+private func _write(const node: value, context: _context) -> result<string, error>:
+    var writer = _writer(context = context, bytes = [])
+    var frames: [_write_frame] = [_write_frame(node = node)]
+    for frames.count > 0:
+        var frame = frames[-1]
+        context.location = frame.node.source_offset()
+        var charged = context.charge(1)?
+        var kind = frame.node.kind
+        var container = kind is value_kind.array or kind is value_kind.object
+        if not frame.entered:
+            var depth = frame.depth
+            if container:
+                depth += 1
+            if depth > context.budget.max_depth:
+                return Err(context.fail(error_kind.limit_exceeded, "max_depth"))
+            frame.depth = depth
+            frame.entered = true
+            if kind is value_kind.null_value:
+                var added = writer.text("null")?
+            else if kind is value_kind.boolean:
+                if frame.node.as_bool()?:
+                    var added = writer.text("true")?
+                else:
+                    var added = writer.text("false")?
+            else if kind is value_kind.number:
+                var token = frame.node.number_text()?
+                if token.byte_length > context.budget.max_number_bytes:
+                    return Err(context.fail(error_kind.limit_exceeded, "max_number_bytes"))
+                var added = writer.text(token)?
+            else if kind is value_kind.text:
+                var added = writer.quoted(frame.node.as_string()?)?
+            else if kind is value_kind.array:
+                var added = writer.text("[")?
+            else:
+                if frame.node.length()? > context.budget.max_object_members:
+                    return Err(context.fail(error_kind.limit_exceeded, "max_object_members"))
+                var added = writer.text("{{")?
+            if container:
+                continue
+        if container:
+            var size = frame.node.length()?
+            if frame.cursor < size:
+                if frame.cursor > 0:
+                    var comma = writer.text(",")?
+                var position = frame.cursor
+                frame.cursor += 1
+                if kind is value_kind.object:
+                    var key = frame.node.member_name(position)
+                    var name = writer.quoted(key)?
+                    var colon = writer.text(":")?
+                    context.path.push(key)
+                    frames.push(_write_frame(node = frame.node.member_child(position)?, depth = frame.depth, nested = true))
+                else:
+                    context.path.push(string(position))
+                    frames.push(_write_frame(node = frame.node.at(position)?, depth = frame.depth, nested = true))
+                continue
+            if kind is value_kind.array:
+                var added = writer.text("]")?
+            else:
+                var added = writer.text("}}")?
+        var popped = frames.remove_at(frames.count - 1)
+        if popped.nested:
+            var segment = context.path.remove_at(context.path.count - 1)
+    var copied = context.charge(writer.bytes.count)?
+    return Ok(_decode(writer.bytes))
+
+private struct _encode_frame:
+    object: bool
+    depth: i64
+    cursor: i64
+    count: i64
+    awaiting: bool
+    key: string
+    key_offset: i64 = -1
+    start: i64 = -1
+    items: [value]
+    members: [_member]
+    names: [string]
+
+private func (self _encode_frame) attach(child: value):
+    if self.object:
+        self.members.push(_member(name = self.key, child = child, offset = self.key_offset))
+        self.key = ""
+    else:
+        self.items.push(child)
+    self.awaiting = false
+
+private func (self _encode_frame) finish() -> value:
+    if self.object:
+        var members = self.members
+        self.members = []
+        return value(_payload.object(members), self.start)
+    var items = self.items
+    self.items = []
+    return value(_payload.array(items), self.start)
+
+private func _begin(context: _context, depth: i64, count: i64, object: bool) -> result<_encode_frame, error>:
+    var admitted = context.node(depth + 1)?
+    if object and count > context.budget.max_object_members:
+        return Err(context.fail(error_kind.limit_exceeded, "max_object_members"))
+    if count > context.nodes_left:
+        return Err(context.fail(error_kind.limit_exceeded, "max_nodes"))
+    var charged = context.charge(count)?
+    return Ok(_encode_frame(object = object, depth = depth + 1, count = count, items = [], members = [], names = []))
+
+private func _new_null(context: _context, depth: i64) -> result<value, error>:
+    var admitted = context.node(depth)?
+    return Ok(null_value())
+
+private func _new_bool(item: bool, context: _context, depth: i64) -> result<value, error>:
+    var admitted = context.node(depth)?
+    return Ok(value(_payload.boolean(item)))
+
+private func _new_text(item: string, context: _context, depth: i64) -> result<value, error>:
+    var admitted = context.node(depth)?
+    if item.byte_length > context.budget.max_string_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var charged = context.charge(item.byte_length)?
+    return Ok(value(_payload.text(item)))
+
+private func _new_number<t>(const item: t, context: _context, depth: i64) -> result<value, error>:
+    var integral = _json_integer<t>()
+    var admitted = context.node(depth)?
+    var token = string(item)
+    if token == "nan" or token == "inf" or token == "-inf":
+        return Err(context.fail(error_kind.non_finite, "JSON cannot represent NaN or infinity"))
+    if token.byte_length > context.budget.max_number_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_number_bytes"))
+    var charged = context.charge(token.byte_length)?
+    return Ok(value(_payload.number(token)))
+
+private func (self value) member_offset(index: i64) -> i64:
+    if self.payload is _payload.object(var members):
+        return members[index].offset
+    return self.start
+
+private struct _copy_frame:
+    const node: value
+    builder: _encode_frame
+
+private func _clone(const node: value, context: _context, depth: i64 = 0) -> result<value, error>:
+    var sources: [_copy_frame] = []
+    var results: [value] = []
+    var pending: value? = node
+    var level = depth
+    for true:
+        if pending != null:
+            var input = pending as value
+            pending = null
+            context.location = input.source_offset()
+            var kind = input.kind
+            if kind is value_kind.array or kind is value_kind.object:
+                var builder = _begin(context, level, input.length()?, kind is value_kind.object)?
+                builder.start = input.source_offset()
+                sources.push(_copy_frame(node = input, builder = builder))
+                continue
+            var admitted = context.node(level)?
+            if kind is value_kind.null_value:
+                results.push(value(_payload.nil, input.source_offset()))
+            else if kind is value_kind.boolean:
+                results.push(value(_payload.boolean(input.as_bool()?), input.source_offset()))
+            else:
+                var token = ""
+                if kind is value_kind.text:
+                    token = input.as_string()?
+                    if token.byte_length > context.budget.max_string_bytes:
+                        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+                else:
+                    token = input.number_text()?
+                    if token.byte_length > context.budget.max_number_bytes:
+                        return Err(context.fail(error_kind.limit_exceeded, "max_number_bytes"))
+                var charged = context.charge(token.byte_length)?
+                if kind is value_kind.text:
+                    results.push(value(_payload.text(token), input.source_offset()))
+                else:
+                    results.push(value(_payload.number(token), input.source_offset()))
+        if sources.count == 0:
+            return Ok(results.remove_at(results.count - 1))
+        var frame = sources[-1]
+        var builder = frame.builder
+        context.location = frame.node.source_offset()
+        if builder.awaiting:
+            builder.attach(results.remove_at(results.count - 1))
+            var segment = context.path.remove_at(context.path.count - 1)
+        if builder.cursor >= builder.count:
+            var popped = sources.remove_at(sources.count - 1)
+            results.push(builder.finish())
+            continue
+        var cursor = builder.cursor
+        builder.cursor += 1
+        builder.awaiting = true
+        level = builder.depth
+        if builder.object:
+            builder.key = frame.node.member_name(cursor)
+            builder.key_offset = frame.node.member_offset(cursor)
+            if builder.key.byte_length > context.budget.max_string_bytes:
+                return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+            var charged = context.charge(builder.key.byte_length)?
+            context.path.push(builder.key)
+            pending = frame.node.member_child(cursor)?
+        else:
+            context.path.push(string(cursor))
+            pending = frame.node.at(cursor)?
+    return Err(context.fail(error_kind.limit_exceeded, "Unfinished clone"))
+
+private func _read_text(const node: value, context: _context, depth: i64) -> result<string, error>:
+    context.location = node.source_offset()
+    var admitted = context.node(depth)?
+    if node.kind is not value_kind.text:
+        return Err(context.fail(error_kind.wrong_type, "Expected JSON string"))
+    var item = node.as_string()?
+    if item.byte_length > context.budget.max_string_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var charged = context.charge(item.byte_length)?
+    return Ok(item)
+
+private func _read_bool(const node: value, context: _context, depth: i64) -> result<bool, error>:
+    context.location = node.source_offset()
+    var admitted = context.node(depth)?
+    if node.kind is not value_kind.boolean:
+        return Err(context.fail(error_kind.wrong_type, "Expected JSON Boolean"))
+    return node.as_bool()
+
+private func _read_number<t>(const node: value, context: _context, depth: i64) -> result<t, error>:
+    context.location = node.source_offset()
+    var integral = _json_integer<t>()
+    var admitted = context.node(depth)?
+    if node.kind is not value_kind.number:
+        return Err(context.fail(error_kind.wrong_type, "Expected JSON number"))
+    var token = node.number_text()?
+    if token.byte_length > context.budget.max_number_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_number_bytes"))
+    var charged = context.charge(token.byte_length)?
+    if node.as_number<t>() is Ok(var item):
+        return Ok(item)
+    return Err(context.fail(error_kind.out_of_range, "Number is outside the target range"))
+
+private func _same(context: _context, left: string, right: string) -> result<bool, error>:
+    var a = context.charge(left.byte_length)?
+    var b = context.charge(right.byte_length)?
+    var comparison = context.charge(1)?
+    return Ok(left == right)
+
+private func _find(const node: value, name: string, context: _context) -> result<value?, error>:
+    var count = node.length()?
+    for index in 0..<count:
+        if _same(context, node.member_name(index), name)?:
+            return Ok(node.member_child(index)?)
+    return Ok(null)
+
+private struct _decode_frame:
+    const node: value
+    depth: i64
+    cursor: i64
+    count: i64
+    awaiting: bool
+    capacity: i64 = 4
+    key_max: i64
+
+private func _read_container(const node: value, context: _context, depth: i64, object: bool, extent: i64 = -1) -> result<_decode_frame, error>:
+    context.location = node.source_offset()
+    var admitted = context.node(depth + 1)?
+    if object:
+        if node.kind is not value_kind.object:
+            return Err(context.fail(error_kind.wrong_type, "Expected JSON object"))
+    else if node.kind is not value_kind.array:
+        return Err(context.fail(error_kind.wrong_type, "Expected JSON array"))
+    var count = node.length()?
+    if object and count > context.budget.max_object_members:
+        return Err(context.fail(error_kind.limit_exceeded, "max_object_members"))
+    if extent >= 0 and extent != count:
+        return Err(context.fail(error_kind.length_mismatch, "Incorrect fixed array extent"))
+    if count > context.nodes_left:
+        return Err(context.fail(error_kind.limit_exceeded, "max_nodes"))
+    var charged = context.charge(count)?
+    return Ok(_decode_frame(node = node, depth = depth + 1, count = count))
+
+private func (self _context) product(a: i64, b: i64) -> result<i64, error>:
+    if a < 0 or b < 0:
+        return Err(self.fail(error_kind.limit_exceeded, "max_work"))
+    if b > 0 and a > self.work_left / b:
+        return Err(self.fail(error_kind.limit_exceeded, "max_work"))
+    return self.charge(a * b)
+
+private func (self _decode_frame) dictionary_charge(context: _context, key: string) -> result<i64, error>:
+    if key.byte_length > context.budget.max_string_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var hash = context.charge(key.byte_length)?
+    var word = context.charge(8)?
+    var maximum = self.key_max
+    if key.byte_length > maximum:
+        maximum = key.byte_length
+    if self.capacity > 9223372036854775807 / 4 or maximum > 9223372036854775807 / 2 - 1:
+        return Err(context.fail(error_kind.limit_exceeded, "max_work"))
+    if self.cursor > 0:
+        var search = context.product(2 * self.capacity, 2 * maximum + 1)?
+    if self.cursor == self.capacity:
+        var grown = self.capacity * 2
+        var reindex = context.product(2 * grown, self.cursor + 1)?
+        var clearing = context.charge(2 * grown)?
+        var copying = context.charge(self.cursor)?
+        self.capacity = grown
+    else:
+        var insert = context.charge(2 * self.capacity)?
+    self.key_max = maximum
+    return Ok(self.capacity)

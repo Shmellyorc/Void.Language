@@ -1,0 +1,7 @@
+enum kind:
+    a
+func main():
+    var input = kind.a
+    if input is not kind.a:
+        print("no")
+    var item = 0

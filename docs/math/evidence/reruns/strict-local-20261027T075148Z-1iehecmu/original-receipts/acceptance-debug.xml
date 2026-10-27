@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="30"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="191"
+	timestamp="2026-10-26T23:36:12"
+	>
+	<testcase name="gc_buffers" classname="gc_buffers" time="9.98052" status="run">
+		<properties/>
+		<system-out>reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_cou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gc_schemas" classname="gc_schemas" time="0.839999" status="run">
+		<properties/>
+		<system-out>schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache" classname="debug_cache" time="2.80509" status="run">
+		<properties/>
+		<system-out>cache generations, source/build invalidation, revisions, roots, failures and fallback passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="21.7339" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="0.455664" status="run">
+		<properties/>
+		<system-out>Debug cache: miss
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="documentation_execution" classname="documentation_execution" time="0.883726" status="run">
+		<properties/>
+		<system-out>Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.386202" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="math_host" classname="math_host" time="2.10777" status="run">
+		<properties/>
+		<system-out>Math host: 26 checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_ir" classname="math_ir" time="0.238031" status="run">
+		<properties/>
+		<system-out>799 independent scalar Math IR checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_execution" classname="math_execution" time="113.348" status="run">
+		<properties/>
+		<system-out>Math check: 1372 vectors, 59675 source bytes
+Math JIT O0
+Math linked AOT O0
+Math JIT O2
+Math linked AOT O2
+Math execution: 1372 vectors x four real modes; 7 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="math_frontend" classname="math_frontend" time="13.3473" status="run">
+		<properties/>
+		<system-out>Math frontend: 356 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="math_errors" classname="math_errors" time="7.43365" status="run">
+		<properties/>
+		<system-out>Math inherited checked failures: 11 cases x four modes; 66 processes passed
+</system-out>
+	</testcase>
+	<testcase name="math_worker" classname="math_worker" time="3.52837" status="run">
+		<properties/>
+		<system-out>Math worker: 8 preserved processes passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_math" classname="lsp_math" time="1.39252" status="run">
+		<properties/>
+		<system-out>Math LSP: 65 checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_install" classname="math_install" time="1.58108" status="run">
+		<properties/>
+		<system-out>Math relocated install: 7 processes passed
+</system-out>
+	</testcase>
+	<testcase name="math_preservation" classname="math_preservation" time="1.09192" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID math synthetic preservation u_t6kium/synthetic-evidence/incident-9bdp2s3g
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation u_t6kium/synthetic-evidence/incident-jpf9n76t
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation u_t6kium/synthetic-evidence/incident-lwwqrrbx
+Math preservation: 3 synthetic reserved-87/timeout incidents, edited nested sources, compiler identity and original output verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="math_stack" classname="math_stack" time="104.05" status="run">
+		<properties/>
+		<system-out>Math check: 1372 vectors, 59675 source bytes
+Math JIT O0
+Math linked AOT O0
+Math JIT O2
+Math linked AOT O2
+Math execution: 1372 vectors x four real modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="math_frontend_stack" classname="math_frontend_stack" time="13.2354" status="run">
+		<properties/>
+		<system-out>Math frontend: 356 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="binary_execution" classname="binary_execution" time="40.7742" status="run">
+		<properties/>
+		<system-out>Binary execution: 356 independent vectors; 19 processes passed (check, JIT/O2, linked AOT/O2, rejection checks)
+</system-out>
+	</testcase>
+	<testcase name="lsp_binary" classname="lsp_binary" time="0.121861" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 96, in &lt;module&gt;
+    signature = query("signatureHelp", call, len(call), **context)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 59, in query
+    check("error" not in response, response)
+  File "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py", line 16, in check
+    assert value, message
+           ^^^^^
+AssertionError: {'error': {'code': -32602, 'message': 'VOID IR: missing array element'}, 'id': 13, 'jsonrpc': '2.0'}
+</system-out>
+	</testcase>
+	<testcase name="binary_ownership" classname="binary_ownership" time="1.02272" status="run">
+		<properties/>
+		<system-out>normal: 183 allocation failure budgets, collection and retry passed
+O2: 183 allocation failure budgets, collection and retry passed
+Binary ownership: 2253 checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="0.770234" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-fv8zgb3o
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-yh9rq6_1
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-bizz45he
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-jvqbdcwr
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-eakra25c
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-7bh6cwo_
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-jsfusohj
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest fqc93x2m/evidence/incident-z__fyghm
+{"intentional_incidents_verified": 8, "checked_crash_preserved": true, "sanitizer_exits_verified": [87, 86], "run_and_popen_verified": true, "signed_windows_receipt_simulation_verified": true, "windows_native_branch_executed": false, "colliding_filenames_verified": true, "editor_snapshot_verified": true...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.0571105" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.0192904" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="5.54111" status="run">
+		<properties/>
+		<system-out>192 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="10.9002" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="1.38949" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="3.06642" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_display" classname="lsp_stage10_display" time="15.0619" status="run">
+		<properties/>
+		<system-out>Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+237 console/composite LSP checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_intelligence" classname="lsp_stage10_intelligence" time="0.676308" status="run">
+		<properties/>
+		<system-out>170 Stage 10 LSP intelligence checks passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,62 @@
+[
+  {
+    "file": "tests/json/reductions/identity.void",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "run",
+      "tests/json/reductions/identity.void",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "same\n",
+    "stderr": ""
+  },
+  {
+    "file": "tests/json/reductions/clone.void",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "run",
+      "tests/json/reductions/clone.void",
+      "--no-opt"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: store discards readonly reference or construction-place capability in /clone.void::test\n"
+  },
+  {
+    "file": "tests/json/reductions/snapshot.void",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "run",
+      "tests/json/reductions/snapshot.void",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "file": "tests/json/reductions/snapshot_only.void",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "run",
+      "tests/json/reductions/snapshot_only.void",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "file": "tests/json/reductions/writer.void",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "run",
+      "tests/json/reductions/writer.void",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

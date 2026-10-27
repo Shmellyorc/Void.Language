@@ -1,0 +1,853 @@
+{
+  "backtraceGraph" : 
+  {
+    "commands" : 
+    [
+      "add_test"
+    ],
+    "files" : 
+    [
+      "/home/shmellyorc/Documents/Void.Language/CMakeLists.txt"
+    ],
+    "nodes" : 
+    [
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 366,
+        "parent" : 0
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 370,
+        "parent" : 2
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 485,
+        "parent" : 4
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 487,
+        "parent" : 6
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 656,
+        "parent" : 8
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 657,
+        "parent" : 10
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 659,
+        "parent" : 12
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 664,
+        "parent" : 14
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 665,
+        "parent" : 16
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 667,
+        "parent" : 18
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 667,
+        "parent" : 20
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 667,
+        "parent" : 22
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 669,
+        "parent" : 24
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 670,
+        "parent" : 26
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 671,
+        "parent" : 28
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 676,
+        "parent" : 30
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 677,
+        "parent" : 32
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 704,
+        "parent" : 34
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 706,
+        "parent" : 36
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 711,
+        "parent" : 38
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1027,
+        "parent" : 40
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1083,
+        "parent" : 42
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1105,
+        "parent" : 44
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1107,
+        "parent" : 46
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1109,
+        "parent" : 48
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1117,
+        "parent" : 50
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1194,
+        "parent" : 52
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1195,
+        "parent" : 54
+      }
+    ]
+  },
+  "kind" : "ctestInfo",
+  "tests" : 
+  [
+    {
+      "backtrace" : 1,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_buffers"
+      ],
+      "name" : "gc_buffers",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 3,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_gc_schemas"
+      ],
+      "name" : "gc_schemas",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 90.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 5,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_cache_tests",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/cache fixtures",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name" : "debug_cache",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 7,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name" : "debug_cache_processes",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 9,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "lsp_stage8",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 11,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/documentation/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "documentation_execution",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 13,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+      ],
+      "name" : "lsp_documentation",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 15,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/host.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_host",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math host fixtures"
+      ],
+      "name" : "math_host",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 17,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/host.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_math_ir",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/math ir fixtures"
+      ],
+      "name" : "math_ir",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 19,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "math_execution",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 21,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/frontend.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "math_frontend",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 23,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/errors.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "math_errors",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 25,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/worker.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_io_runner"
+      ],
+      "name" : "math_worker",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 27,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+      ],
+      "name" : "lsp_math",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 29,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/install.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "math_install",
+      "properties" : 
+      [
+        {
+          "name" : "RUN_SERIAL",
+          "value" : true
+        },
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 31,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "--small-stack"
+      ],
+      "name" : "math_stack",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 33,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/math/frontend.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "--small-stack"
+      ],
+      "name" : "math_frontend_stack",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 35,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/binary/execution.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc"
+      ],
+      "name" : "binary_execution",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 900.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 37,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/binary/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+      ],
+      "name" : "lsp_binary",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 39,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_binary_ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/binary/ownership.void"
+      ],
+      "name" : "binary_ownership",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 41,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_async_tests",
+        "--ir"
+      ],
+      "name" : "async_ir",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 43,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests",
+        "core"
+      ],
+      "name" : "core",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 90.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 45,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests",
+        "numeric",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name" : "numeric",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 47,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests",
+        "frontend",
+        "/home/shmellyorc/Documents/Void.Language"
+      ],
+      "name" : "frontend",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 90.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 49,
+      "command" : 
+      [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/void_tests",
+        "modules",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/module fixtures with spaces"
+      ],
+      "name" : "modules",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 90.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 51,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/numeric/sprint2.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidc",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld"
+      ],
+      "name" : "numeric_sprint2",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 53,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_display.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+      ],
+      "name" : "lsp_stage10_display",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    },
+    {
+      "backtrace" : 55,
+      "command" : 
+      [
+        "/home/shmellyorc/.local/bin/python3.11",
+        "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/voidls"
+      ],
+      "name" : "lsp_stage10_intelligence",
+      "properties" : 
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/home/shmellyorc/Documents/Void.Language/build/ci-official-san"
+        }
+      ]
+    }
+  ],
+  "version" : 
+  {
+    "major" : 1,
+    "minor" : 0
+  }
+}

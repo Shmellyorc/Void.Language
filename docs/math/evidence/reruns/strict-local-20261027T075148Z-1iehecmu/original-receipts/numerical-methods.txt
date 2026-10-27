@@ -1,0 +1,84 @@
+Math numerical evidence methodology (Linux host, 26 October 2026)
+
+The development oracle is tests/math/generate_vectors.py, using the independent
+system MPFR 4.2.2 library through ctypes. No VOID compiler or host transcendental
+libm produces the expected numerical values. The checked-in tests/math/vectors.json
+contains 224 native-function/sqrt reference rows and 44 interpolation mathematical
+reference rows. MPFR is needed only to regenerate this bank, not to run it or use
+Math. Each input is recorded as its exact unsigned IEEE binary32/binary64 bits.
+MPFR imports binary64 exactly (every binary32 is exactly representable in it),
+evaluates at 256 bits, converts directly to the target precision with MPFR_RNDN,
+and independently repeats at 512 bits to check reference-bit stability. Decimal
+reference digits are retained with their base-10 exponent for review.
+
+Reproduce the reference bank:
+  python3 tests/math/generate_vectors.py
+
+Run the source fixture through four actual execution modes:
+  python3 tests/math/execution.py build/ci-official-debug/voidc
+  python3 tests/math/execution.py build/ci-official-debug/voidc --small-stack
+
+The final generated source contains 1,372 checks, grouped into small concern
+functions. Homogeneous banks are runtime data-table loops. Imported binary.decode
+constructs exact stored inputs; a parameter-dependent sin(input as f64) call also
+exercises a dynamic caller. Normal/O2 JIT execution and separately built O0/O2
+native executable launches each compare their own output with the oracle.
+The successfully exercised initial 1,294-check source and expectations remain as
+math_test-initial.void and expectations-initial.json. Final source and full
+expectation tables use profile/stack-specific math_test-<profile>.void and
+expectations-<profile>.json filenames. Exact loaded reference bytes are retained
+in immutable vectors-<sha256>.json files.
+
+Exact policies compare output bits: constants, zero signs, selectors, rounding,
+angle conversion operation order, endpoint returns, and correctly rounded sqrt.
+NaNs compare classification, without a payload or sign promise. Full Cartesian
+atan2 origins/axes/infinities and pow identity/NaN/zero/infinity/huge-parity policies
+are tested separately from normal native calls. Float finite native rows use
+ordered-bit ULP distance, at most 4 ULP for binary32 and 8 ULP for binary64 as the
+approved engineering gates. These are measured quality gates, not a universal
+public error theorem. A wrong sign, nonfinite class, or flushed subnormal cannot
+pass through the ULP budget. Dedicated rows around stored pi/pi/2 additionally
+check near-zero absolute magnitude/error and tangent-pole magnitude ranges.
+Huge trig vectors refer to the exact stored input.
+
+Interpolation has two distinct comparisons. Its required per-operation, target-
+precision source algorithm is checked exactly. The mathematical interpolation or
+ratio is also computed independently by MPFR and its one-round target result is
+recorded with the observed ULP error, without a universal interpolation tolerance.
+The final Debug Linux run matched the source algorithm exactly in all four modes.
+Across the 44 mathematical interpolation rows the largest observed discrepancy was
+5 binary64 ULP for lerp of the stored representations of (-0.1, 0.2, 0.3). This
+reflects cancellation and the specified separate operations; exact interpolation
+invertibility and a universally rounded mathematical value are not the contract.
+The largest observed native/sqrt error across the final 224 rows was 1 ULP
+on that measured run, within the retained 4/8 ULP engineering gates.
+Consult the per-mode execution-*.json receipts for actual profile observations.
+
+Crash handling is installed before fixture execution by tests/math/bootstrap.py.
+It reuses tests/random/harness.py and tests/text_encoding/crash.py unchanged,
+retains canonical and controlled recursively imported source bytes, unsaved LSP
+snapshots, generators, native executable hashes, and an immutable compiler-identity
+JSON as incident provenance before temporary cleanup. No unexpected signal,
+sanitizer failure, or timeout occurred in the completed numerical experiments.
+The initial bootstrap Python import-precedence failure happened before a compiler
+fixture executed and is retained in focused-execution-debug.txt; it is not a native
+crash. A frontend retry encountered a transient missing voidc during concurrent
+relinking before a subprocess could start; final stable-binary checks passed.
+
+Consolidated acceptance commands:
+  python3 tests/math/acceptance.py debug
+  python3 tests/math/acceptance.py release
+  python3 tests/math/acceptance.py sanitizers
+
+Sanitizers uses build/ci-official-san and strict ASan/UBSan/leak settings. Host
+sanitizer flags do not instrument every generated JIT instruction. Native Windows
+Debug/Release and macOS ARM64 execution remain separately authorized follow-up;
+Linux links and executions do not establish results for those native platforms.
+
+During concurrent final-suite expansion, two Release receipts from the older
+1,354-case run reread the expanded bank hash at exit. Their numerical comparisons
+passed against their originally loaded references, but that hash cannot identify
+the loaded bytes. Exact originals are retained with before-freeze names and the
+limitation is recorded in bank-freeze-provenance.json. The corrected harness hashes
+bank_raw at startup and retains it immutably. Only affected execution/stack tests
+need supplementary reruns; a provenance correction does not imply a native crash.

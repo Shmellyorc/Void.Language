@@ -1,0 +1,94 @@
+{
+  "profile": "debug",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+  "compiler_sha256": "c461e59b99c5cbcadea780b93339fcad6cab925b9f20126031cbc1047820491b",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "31330a31330a31330a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a300a300a31320a300a300a31320a31320a31320a31320a31320a31310a",
+      "stderr": "",
+      "source": "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+      "source_sha256": "e24994789f689fb6cc23e0ec7a0d583f7cc024e52d9ebdab905c9b80e6b24154",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "build",
+        "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+        "-o",
+        "/tmp/void-json-bounds-aqqvhp1q/bounds-O0",
+        "--no-opt"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d6a736f6e2d626f756e64732d61717176687031712f626f756e64732d4f300a",
+      "stderr": "",
+      "source": "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+      "source_sha256": "e24994789f689fb6cc23e0ec7a0d583f7cc024e52d9ebdab905c9b80e6b24154",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-bounds-aqqvhp1q/bounds-O0"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "31330a31330a31330a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a300a300a31320a300a300a31320a31320a31320a31320a31320a31310a",
+      "stderr": "",
+      "source": "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+      "source_sha256": "e24994789f689fb6cc23e0ec7a0d583f7cc024e52d9ebdab905c9b80e6b24154",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "run",
+        "/tmp/void-json-bounds-aqqvhp1q/bounds.void"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "31330a31330a31330a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a300a300a31320a300a300a31320a31320a31320a31320a31320a31310a",
+      "stderr": "",
+      "source": "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+      "source_sha256": "e24994789f689fb6cc23e0ec7a0d583f7cc024e52d9ebdab905c9b80e6b24154",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+        "build",
+        "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+        "-o",
+        "/tmp/void-json-bounds-aqqvhp1q/bounds-O2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "4275696c74206e61746976652065786563757461626c653a202f746d702f766f69642d6a736f6e2d626f756e64732d61717176687031712f626f756e64732d4f320a",
+      "stderr": "",
+      "source": "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+      "source_sha256": "e24994789f689fb6cc23e0ec7a0d583f7cc024e52d9ebdab905c9b80e6b24154",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    },
+    {
+      "command": [
+        "/tmp/void-json-bounds-aqqvhp1q/bounds-O2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "status": 0,
+      "stdout_hex": "31330a31330a31330a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a31320a300a300a300a300a31320a300a300a31320a31320a31320a31320a31320a31310a",
+      "stderr": "",
+      "source": "/tmp/void-json-bounds-aqqvhp1q/bounds.void",
+      "source_sha256": "e24994789f689fb6cc23e0ec7a0d583f7cc024e52d9ebdab905c9b80e6b24154",
+      "stack_bytes_verified_in_child_preexec": 1048576
+    }
+  ],
+  "environment": {}
+}

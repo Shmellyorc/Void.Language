@@ -1,0 +1,7 @@
+use json as json
+func test(const root: json.value) -> result<i32, json.error>:
+    var text = json.stringify(root)?
+    return Ok(0)
+func main():
+    if json.parse("[null]") is Ok(var root):
+        var result = test(root)

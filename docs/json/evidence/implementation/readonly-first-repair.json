@@ -1,0 +1,42 @@
+[
+  {
+    "file": "direct_const_get.void",
+    "O2": false,
+    "stdout": "direct readonly result\n"
+  },
+  {
+    "file": "direct_const_get.void",
+    "O2": true,
+    "stdout": "direct readonly result\n"
+  },
+  {
+    "file": "readonly_reduced.void",
+    "O2": false,
+    "stdout": "readonly child\n"
+  },
+  {
+    "file": "readonly_reduced.void",
+    "O2": true,
+    "stdout": "readonly child\n"
+  },
+  {
+    "file": "readonly_result_corrected.void",
+    "O2": false,
+    "stdout": "readonly result accepted\n"
+  },
+  {
+    "file": "readonly_result_corrected.void",
+    "O2": true,
+    "stdout": "readonly result accepted\n"
+  },
+  {
+    "file": "readonly_safe_route.void",
+    "O2": false,
+    "stdout": "readonly child\n"
+  },
+  {
+    "file": "readonly_safe_route.void",
+    "O2": true,
+    "stdout": "readonly child\n"
+  }
+]

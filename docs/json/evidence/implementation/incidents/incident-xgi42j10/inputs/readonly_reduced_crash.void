@@ -1,0 +1,9 @@
+struct node:
+    children: [node]
+func (self node) first() -> node:
+    return self.children[0]
+func main():
+    var leaf = node(children = [])
+    const root = node(children = [leaf])
+    var child = root.first()
+    print("readonly child")

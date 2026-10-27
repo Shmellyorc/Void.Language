@@ -1,0 +1,255 @@
+{
+  "started_at_utc": "2026-10-27T07:53:57.844949+00:00",
+  "completed_at_utc": "2026-10-27T07:56:56.062364+00:00",
+  "duration_seconds": 178.21743298499496,
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-san",
+    "-R",
+    "^(gc_buffers|gc_schemas|debug_cache|debug_cache_processes|lsp_stage8|documentation_execution|lsp_documentation|math_host|math_ir|math_execution|math_frontend|math_errors|math_worker|lsp_math|math_install|math_stack|math_frontend_stack|binary_execution|lsp_binary|binary_ownership|async_ir|core|numeric|frontend|modules|numeric_sprint2|lsp_stage10_display|lsp_stage10_intelligence)$",
+    "-j",
+    "2",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/math/evidence/reruns/strict-local-20261027T075148Z-1iehecmu/results.xml"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "exit_status": 0,
+  "timed_out": false,
+  "passed": 28,
+  "failed": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "name": "gc_buffers",
+      "seconds": 3.35459,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "gc_schemas",
+      "seconds": 0.218391,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "debug_cache",
+      "seconds": 2.85182,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "debug_cache_processes",
+      "seconds": 11.2189,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage8",
+      "seconds": 1.86973,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "documentation_execution",
+      "seconds": 1.33318,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_documentation",
+      "seconds": 0.360657,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_host",
+      "seconds": 1.75486,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_ir",
+      "seconds": 0.369668,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_execution",
+      "seconds": 97.4457,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_frontend",
+      "seconds": 16.7304,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_errors",
+      "seconds": 8.68435,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_worker",
+      "seconds": 3.75497,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_math",
+      "seconds": 1.16304,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_install",
+      "seconds": 2.16709,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_stack",
+      "seconds": 97.1812,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "math_frontend_stack",
+      "seconds": 17.9358,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "binary_execution",
+      "seconds": 41.8561,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_binary",
+      "seconds": 0.266664,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "binary_ownership",
+      "seconds": 1.08013,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "async_ir",
+      "seconds": 0.105525,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "core",
+      "seconds": 0.046079,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric",
+      "seconds": 6.54339,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "frontend",
+      "seconds": 12.273,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "modules",
+      "seconds": 1.8468,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "numeric_sprint2",
+      "seconds": 4.42825,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage10_display",
+      "seconds": 11.3517,
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "name": "lsp_stage10_intelligence",
+      "seconds": 0.587827,
+      "failed": false,
+      "skipped": false
+    }
+  ],
+  "outside_sandbox": true,
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "LSAN_OPTIONS": null
+  },
+  "frozen_files_before": {
+    "build/ci-official-san/voidc": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+    "build/ci-official-san/voidls": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+    "build/ci-official-san/void_math_host": "c34acd9ac824afbbb227f80b3f255821923b4c263e0058290b06999bb1773c34",
+    "build/ci-official-san/void_math_ir": "2985d14ce44dbefc174afb45b0c26126d1370c06ed425bae7d81ab11075e65d4",
+    "build/ci-official-san/void_io_runner": "128de44ae462dab60ffe43ab02e14b5a423d32aec2ddc48abf1bfce367f76174",
+    "build/ci-official-san/void_gc_buffers": "6118744a4c5e43a2835808911966ee289aade4c1dd22aaf2f3de1381c5982b47",
+    "build/ci-official-san/void_gc_schemas": "c13a53e25f958cbb75796ebe0e7cb05dae9cc7340aee63cebecd0a75da4b4ba6",
+    "build/ci-official-san/void_cache_tests": "437a446c9ee1d5735f8cd0f45e1b0964150733a1e0baae638820bb1a7f8ca906",
+    "build/ci-official-san/void_binary_ownership": "93c40b56b42bf7b9a760a9436f5da87b74ac0cd47a6d704a027158cf4ba41e04",
+    "build/ci-official-san/void_async_tests": "e5e48cc95d04240886dbb3ece6683b45515b0fc7c2228af60d68cb03461c9939",
+    "build/ci-official-san/void_tests": "9186d12dda9003d31a5923d76cf194d2572c219b7f596c6c0bed445d186b5c4e",
+    "build/ci-official-san/CMakeCache.txt": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+    "build/ci-official-san/CTestTestfile.cmake": "62b97e42d0cf166ac9153a352df8ef5d6a0cb87a87f45ba01960509459d9826d",
+    "build/ci-official-san/void-native.txt": "6bba6ca752fb81bfd39bc9c8b5464d791910cfdc1fd1f3a0ff2ae9668f8992ca",
+    "build/ci-official-san/libvoid_runtime.a": "5d60cb4716e8045e0ca4124f79d40d390f877f0a98144f65b961f77c50fe8e46",
+    "build/ci-official-san/libvoid_native_fixture.a": "251d6ac36a7fd94b5d7d1c4c4c8026fbad29024eca2f0a5e4541690ec51823c2"
+  },
+  "frozen_files_after": {
+    "build/ci-official-san/voidc": "9157df32200bca776123293d2ab986d7888c75b4f869c0166c39a3ffa1bad1e6",
+    "build/ci-official-san/voidls": "d0aa9d369e21ade419d065ad16598eec3d8e76e95846db80ad70561f58cd9394",
+    "build/ci-official-san/void_math_host": "c34acd9ac824afbbb227f80b3f255821923b4c263e0058290b06999bb1773c34",
+    "build/ci-official-san/void_math_ir": "2985d14ce44dbefc174afb45b0c26126d1370c06ed425bae7d81ab11075e65d4",
+    "build/ci-official-san/void_io_runner": "128de44ae462dab60ffe43ab02e14b5a423d32aec2ddc48abf1bfce367f76174",
+    "build/ci-official-san/void_gc_buffers": "6118744a4c5e43a2835808911966ee289aade4c1dd22aaf2f3de1381c5982b47",
+    "build/ci-official-san/void_gc_schemas": "c13a53e25f958cbb75796ebe0e7cb05dae9cc7340aee63cebecd0a75da4b4ba6",
+    "build/ci-official-san/void_cache_tests": "437a446c9ee1d5735f8cd0f45e1b0964150733a1e0baae638820bb1a7f8ca906",
+    "build/ci-official-san/void_binary_ownership": "93c40b56b42bf7b9a760a9436f5da87b74ac0cd47a6d704a027158cf4ba41e04",
+    "build/ci-official-san/void_async_tests": "e5e48cc95d04240886dbb3ece6683b45515b0fc7c2228af60d68cb03461c9939",
+    "build/ci-official-san/void_tests": "9186d12dda9003d31a5923d76cf194d2572c219b7f596c6c0bed445d186b5c4e",
+    "build/ci-official-san/CMakeCache.txt": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+    "build/ci-official-san/CTestTestfile.cmake": "62b97e42d0cf166ac9153a352df8ef5d6a0cb87a87f45ba01960509459d9826d",
+    "build/ci-official-san/void-native.txt": "6bba6ca752fb81bfd39bc9c8b5464d791910cfdc1fd1f3a0ff2ae9668f8992ca",
+    "build/ci-official-san/libvoid_runtime.a": "5d60cb4716e8045e0ca4124f79d40d390f877f0a98144f65b961f77c50fe8e46",
+    "build/ci-official-san/libvoid_native_fixture.a": "251d6ac36a7fd94b5d7d1c4c4c8026fbad29024eca2f0a5e4541690ec51823c2"
+  },
+  "frozen_files_changed": [],
+  "original_incident_count": 20,
+  "original_incident_files": 967,
+  "original_incident_files_changed": [],
+  "new_canonical_incidents": [],
+  "original_receipts_restored_if_child_rewrote": [],
+  "tracked_files_changed": [],
+  "git_head_after": "194603ea00eb38aff72b7d6e950865b3a23df92a",
+  "git_status_after": "?? docs/math/evidence/reruns/\n",
+  "remaining_failures": [],
+  "notes": [
+    "No frozen compiler/Runtime binary rebuild, CMake reconfiguration, production-source change, Git mutation, or hosted CI occurred. Existing tests generate/link AOT fixtures and relocate existing installs.",
+    "Child-generated AOT executables and relocated installs use existing frozen compiler/runtime files.",
+    "All prior canonical incident files were compared byte-for-byte by SHA-256; original failure receipts were not replaced."
+  ],
+  "raw_receipt": {
+    "path": "verification-raw.json",
+    "sha256": "60bc74821cbe0b69c80b459ff4c9fe0bfa334d248657c3c8349231ed0411fcf6",
+    "finalization": "Clarified that the no-build statement concerns frozen production binaries; test-defined AOT fixture builds did run. Measured results and integrity checks are unchanged."
+  }
+}
