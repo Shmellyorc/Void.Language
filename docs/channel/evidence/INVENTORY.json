@@ -1,0 +1,196 @@
+{
+  "baseline": "72ee05db7e417645d434b3932bfc1e00ffd4ecb6",
+  "initial_worktree": {
+    "modified": [
+      "docs/README.md"
+    ],
+    "untracked": [
+      "docs/channel/"
+    ]
+  },
+  "implementation_changed_files": [
+    {
+      "path": "CMakeLists.txt",
+      "change": "modified"
+    },
+    {
+      "path": "docs/README.md",
+      "change": "preexisting_index_updated"
+    },
+    {
+      "path": "docs/WRENCH_CLANKER.md",
+      "change": "modified"
+    },
+    {
+      "path": "docs/channel/API.md",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/DESIGN.md",
+      "change": "provided_research_updated"
+    },
+    {
+      "path": "docs/channel/FAILURES.md",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/HANDOFF.md",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/PERFORMANCE.md",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/ROADMAP.md",
+      "change": "provided_research_updated"
+    },
+    {
+      "path": "docs/channel/evidence/IMPLEMENTATION_ARCHIVE.json",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/evidence/IMPLEMENTATION_RECEIPT.json",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/evidence/INVENTORY.json",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/evidence/SOURCES.sha256",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/evidence/implementation-evidence.tar.gz",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/evidence/performance.json",
+      "change": "new"
+    },
+    {
+      "path": "docs/channel/evidence/typed-ir.txt",
+      "change": "new"
+    },
+    {
+      "path": "examples/channel/global.void",
+      "change": "new"
+    },
+    {
+      "path": "examples/channel/local.void",
+      "change": "new"
+    },
+    {
+      "path": "examples/channel/state.void",
+      "change": "new"
+    },
+    {
+      "path": "stdlib/README.md",
+      "change": "modified"
+    },
+    {
+      "path": "stdlib/channel.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/acceptance.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/async.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/benchmark.cpp",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/execution.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/frontend.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/host.cpp",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/host.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/lifetime.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/lsp.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/native_lifetime.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/nested.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/payloads.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/performance.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/persistent.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/receiver.py",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/receiver.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/reload.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/semantics.void",
+      "change": "new"
+    },
+    {
+      "path": "tests/channel/support.py",
+      "change": "new"
+    }
+  ],
+  "preexisting_research_preserved": [
+    {
+      "path": "docs/channel/RESEARCH.md",
+      "sha256": "fe77a5892da7b5a0d4166ae22cd85567e7c9b1de47d74cd679213908955464e7"
+    },
+    {
+      "path": "docs/channel/evidence/README.md",
+      "sha256": "29f1aee2ffd8104b98d846687bb683bdfc84a8d00818d48d80aa7b2444c8e37b"
+    },
+    {
+      "path": "docs/channel/evidence/RECEIPT.json",
+      "sha256": "e649ab2c8b447beccdb488a35e73a7c06c6adc6e06295e1f16e843134cda7258"
+    },
+    {
+      "path": "docs/channel/evidence/capability-probes.tar.gz",
+      "sha256": "b438fa0baa57ec1130956d331deb7802899aa61adb5dd995a702e366374f1cc7"
+    }
+  ],
+  "excluded_generated_state": [
+    "build/ outputs and raw originals",
+    "Python bytecode caches"
+  ],
+  "protected_root_README_unchanged": true
+}

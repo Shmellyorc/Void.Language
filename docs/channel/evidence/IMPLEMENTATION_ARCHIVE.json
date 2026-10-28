@@ -1,0 +1,14 @@
+{
+  "archive": "implementation-evidence.tar.gz",
+  "sha256": "d14b5d9c51794459b3a05f23637af4e4df97b107e6a1d5d9ecff803bbc50c26e",
+  "bytes": 13087398,
+  "members": 16023,
+  "uncompressed_file_bytes": 48450830,
+  "every_member_reread_and_hash_verified": true,
+  "member_manifest": "implementation/FILE_MANIFEST.json",
+  "member_manifest_sha256": "38a9957bdc83bc6baa29c9cdf5c869f772ffc8db1214732ec619041b5e4206a4",
+  "exclusions": [
+    "Generated executables, native libraries and cache objects are represented by hashes, not embedded."
+  ],
+  "raw_originals_retained_at": "/home/shmellyorc/Documents/Void.Language/build/channel/evidence-raw"
+}

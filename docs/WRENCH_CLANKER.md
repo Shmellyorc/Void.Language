@@ -1,5 +1,17 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Channel router implementation handoff — 27 October 2026
+
+Boss authorized the complete typed router with readonly payloads and reusable
+clear. `stdlib/channel.void`, public docs, examples and focused tests are complete.
+The [Golden Wrench handoff](channel/HANDOFF.md) records **59/59** selected local
+Debug/Release/strict sanitizer outcomes, persistent allocation/GC/reload/cache
+tests, compiler-owned LSP, independent AOT, hard 1 MiB stacks and measured event
+comparisons. Original failures and corrections are preserved. Independent source
+review and native Windows/macOS acceptance remain unclaimed. **Engineering stops
+for Golden Wrench review.** No Git mutation, hosted CI or root README change;
+H1–H7 remain historical unresolved incidents.
+
 ## Current async syntax delivery and Boss status decision — 27 October 2026
 
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**

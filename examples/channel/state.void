@@ -1,0 +1,2 @@
+use channel
+var combat = channel.router<i32>()

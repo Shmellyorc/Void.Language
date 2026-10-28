@@ -17,6 +17,16 @@ record. Historical freeze records are preserved there. H1–H7 remain unresolved
 historical incidents; this decision does not claim their repair. Earlier dated
 sections below remain historical.
 
+## Channel router implementation, 27 October 2026
+
+Boss approved readonly payloads, reusable clear and one exact payload type per
+router. `stdlib/channel.void` implements the [public API](channel/API.md) with
+existing events and opaque identity handles. The [handoff](channel/HANDOFF.md)
+records engineering evidence and the independent Golden Wrench review gate.
+The [source audit](channel/RESEARCH.md), [approved design history](channel/DESIGN.md),
+[roadmap](channel/ROADMAP.md) and [capability probes](channel/evidence/README.md)
+remain preserved separately from implementation verification.
+
 ## Historical JSON module research proposal, 27 October 2026
 
 The [source audit and feasibility report](json/RESEARCH.md),

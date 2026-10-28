@@ -1,0 +1,10 @@
+{
+  "archive_sha256": "b438fa0baa57ec1130956d331deb7802899aa61adb5dd995a702e366374f1cc7",
+  "archive_bytes": 19611,
+  "members": 88,
+  "planned_operations": 31,
+  "initial_fixture_authoring_error": 1,
+  "production_input_count": 135,
+  "compiler_sha256": "6ef159e55e285f89cd92403db724018f29f5d3cdc0c502da799d88df38f65eb1",
+  "baseline": "72ee05db7e417645d434b3932bfc1e00ffd4ecb6"
+}

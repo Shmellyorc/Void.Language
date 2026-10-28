@@ -1,5 +1,15 @@
 # Standard library
 
+`use channel` provides `channel.router<t>()` for synchronous typed string-topic
+routing. `subscribe(topic, handler)` returns an opaque `subscription` for exact
+`unsubscribe(token)`; duplicate callbacks remain separate. `emit(topic, payload)`
+gives callbacks readonly payload authority and ordered event snapshots. `clear()`
+removes registrations and keeps the router reusable. Handles do not retain the
+router or callback graph and dropping them does not disconnect. Use on the owning
+application thread. See the [complete API](../docs/channel/API.md),
+[global example](../examples/channel/global.void) and
+[local example](../examples/channel/local.void).
+
 `use json as json` provides strict dynamic parsing, immutable JSON observations,
 automatic public-data conversion and compact serialization. `parse_as<[i32]>`
 returns an ordinary list for enumeration; `stringify` and `parse_as` round-trip
