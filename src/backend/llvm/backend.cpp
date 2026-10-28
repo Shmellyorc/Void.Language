@@ -14,7 +14,9 @@
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
+#include "void/os.hpp"
 #include "void/filesystem_abi.hpp"
+#include "void/os_abi.hpp"
 #include "void/format.hpp"
 #include "void/temporal.hpp"
 #include "void/runtime_abi.hpp"
@@ -1297,6 +1299,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     selected_failure();v=llvm::UndefValue::get(b.getInt8Ty());break;
                 }
 #include "filesystem.inc"
+#include "os.inc"
                 case Op::console_native: {
                     auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());auto* words_type=llvm::ArrayType::get(b.getInt64Ty(),8);
@@ -1868,6 +1871,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("powf",static_cast<float(*)(float,float)>(std::pow));
     bind("vd_random_seed", vd_random_seed);
     bind("vd_filesystem_call", vd_filesystem_call);
+    bind("vd_os_call", vd_os_call);
     bind("vd_file_control", vd_file_control);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);

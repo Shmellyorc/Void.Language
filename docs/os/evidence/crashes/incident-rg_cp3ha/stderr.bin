@@ -1,0 +1,8 @@
+/tmp/VOID OS owner x0uhz_sn/main.void:1:1: error: No entry function found.
+    code: VOID4001
+
+ 1 | use os
+   | ^
+    Module: /main.void
+    Hint: Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.
+

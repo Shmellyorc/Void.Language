@@ -1,0 +1,454 @@
+{
+  "timed_out": false,
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/build/debug/voidc",
+    "build",
+    "/tmp/VOID OS execution 17nh7qa6/main.void",
+    "-o",
+    "/tmp/VOID OS execution 17nh7qa6/native-True",
+    "--no-opt",
+    "--no-cache"
+  ],
+  "cwd": "/tmp/VOID OS execution 17nh7qa6",
+  "returncode": 2,
+  "signal": null,
+  "executable": "/home/shmellyorc/Documents/Void.Language/build/debug/voidc",
+  "executable_sha256": "e70a0a955c921e2db3c2d69e525e4d1f3479eed8635944f220b22bb019994ea9",
+  "sources": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/channel.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/channel_crash.void",
+      "sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "original_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "preserved_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/console.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/console_crash.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "original_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "preserved_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/convert_crash.void",
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "original_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "preserved_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/encoding/ascii_crash.void",
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "original_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "preserved_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/encoding/base64_crash.void",
+      "sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "original_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "preserved_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/encoding/binary_crash.void",
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "original_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "preserved_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/encoding/hex_crash.void",
+      "sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "original_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "preserved_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/error.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/error_crash.void",
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "original_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "preserved_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/io/memory_crash.void",
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "original_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "preserved_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/io_crash.void",
+      "sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+      "original_sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7",
+      "preserved_sha256": "e7688ea2f84476a4d8e9bf2c79de3f0e6288079005e9ed1ff72ece2b49bc68a7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/json_crash.void",
+      "sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "original_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "preserved_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/math.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/math_crash.void",
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "original_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "preserved_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/os.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/os_crash.void",
+      "sha256": "9eeedaaac4833c14c1ec1706e1a1cf881790f76551efc274fd56289b093dfbb6",
+      "original_sha256": "9eeedaaac4833c14c1ec1706e1a1cf881790f76551efc274fd56289b093dfbb6",
+      "preserved_sha256": "9eeedaaac4833c14c1ec1706e1a1cf881790f76551efc274fd56289b093dfbb6"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/path.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/path_crash.void",
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "original_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "preserved_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/random.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/random_crash.void",
+      "sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "original_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "preserved_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/text.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/text_crash.void",
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "original_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "preserved_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/time.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/stdlib/time_crash.void",
+      "sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "original_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "preserved_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b"
+    },
+    {
+      "original": "/tmp/VOID OS execution 17nh7qa6/main.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/inputs/main_crash.void",
+      "sha256": "aaa44a7c04b7a4a4750ef1b62b2bd4ced6c165ebbc0261a7b52fc108c8b41ba5",
+      "original_sha256": "aaa44a7c04b7a4a4750ef1b62b2bd4ced6c165ebbc0261a7b52fc108c8b41ba5",
+      "preserved_sha256": "aaa44a7c04b7a4a4750ef1b62b2bd4ced6c165ebbc0261a7b52fc108c8b41ba5"
+    }
+  ],
+  "build_inputs": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-gnu/CMakeCache.txt",
+      "sha256": "30fcf758fc2b547032431899ad55a0c555b2f09cfe174ed02118f228ee2327fc",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/CMakeCache.txt",
+      "sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/CMakeCache.txt",
+      "sha256": "05bad7ad190fbdbea3afdc7a700542adc7e7e147c8df85fd1aeace72158fdedb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/CMakeCache.txt",
+      "sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/CMakeCache.txt",
+      "sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/CMakeCache.txt",
+      "sha256": "bdb7b3bc0484036366e9ffbd79fc86e0e09658f1eefb17b7a52f4e532faf727b",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    }
+  ],
+  "provenance_inputs": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/acceptance.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/acceptance.py",
+      "sha256": "d8712aba2ad61c4d2b3cf8c44f09eb3401463633d13b9f01117bb1586813ea2a",
+      "original_sha256": "d8712aba2ad61c4d2b3cf8c44f09eb3401463633d13b9f01117bb1586813ea2a",
+      "preserved_sha256": "d8712aba2ad61c4d2b3cf8c44f09eb3401463633d13b9f01117bb1586813ea2a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/entropy.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/entropy.void",
+      "sha256": "551f38d9d7603577bfc0c6d171e8674963c796b31ea91a1947d2289e3241065b",
+      "original_sha256": "551f38d9d7603577bfc0c6d171e8674963c796b31ea91a1947d2289e3241065b",
+      "preserved_sha256": "551f38d9d7603577bfc0c6d171e8674963c796b31ea91a1947d2289e3241065b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/errors.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/errors.py",
+      "sha256": "2116dc1717990c685ee07be50750781a7092ed85c98753b461c9562bf8639f8e",
+      "original_sha256": "2116dc1717990c685ee07be50750781a7092ed85c98753b461c9562bf8639f8e",
+      "preserved_sha256": "2116dc1717990c685ee07be50750781a7092ed85c98753b461c9562bf8639f8e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/execution.py",
+      "sha256": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c",
+      "original_sha256": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c",
+      "preserved_sha256": "88b0f26f5d01e209de3bfa2ad676e0daff9fad5bd5d9496fb3aae252bbad9a3c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/frontend.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/frontend.py",
+      "sha256": "cd6c517531ce4a0bd157f71c3de3d94a4a94de16ac795f7aac87db6d30cd24fc",
+      "original_sha256": "cd6c517531ce4a0bd157f71c3de3d94a4a94de16ac795f7aac87db6d30cd24fc",
+      "preserved_sha256": "cd6c517531ce4a0bd157f71c3de3d94a4a94de16ac795f7aac87db6d30cd24fc"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/harness.py",
+      "sha256": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950",
+      "original_sha256": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950",
+      "preserved_sha256": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/host.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/host.cpp",
+      "sha256": "b709544f3a1513d42bae9544054d78db9b94753831984c52269c7bdee85a1caa",
+      "original_sha256": "b709544f3a1513d42bae9544054d78db9b94753831984c52269c7bdee85a1caa",
+      "preserved_sha256": "b709544f3a1513d42bae9544054d78db9b94753831984c52269c7bdee85a1caa"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/host.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/host.py",
+      "sha256": "d30ae41d663bd4701e56d8329afbf55fb865ef7690d5267e2cfce1b6c5dfa971",
+      "original_sha256": "d30ae41d663bd4701e56d8329afbf55fb865ef7690d5267e2cfce1b6c5dfa971",
+      "preserved_sha256": "d30ae41d663bd4701e56d8329afbf55fb865ef7690d5267e2cfce1b6c5dfa971"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/install.py",
+      "sha256": "319fec06e59841d3e39359a00957ad622b76f0f08a708c402a6fffb4eaea4097",
+      "original_sha256": "319fec06e59841d3e39359a00957ad622b76f0f08a708c402a6fffb4eaea4097",
+      "preserved_sha256": "319fec06e59841d3e39359a00957ad622b76f0f08a708c402a6fffb4eaea4097"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/lsp.py",
+      "sha256": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b",
+      "original_sha256": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b",
+      "preserved_sha256": "75eb37f7f9c0dc574655096e510ed083ab9c4b0a51bafd8876b3ee7649e4273b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/preservation.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/preservation.py",
+      "sha256": "6c409a3da3f7788f2b6fb3217709852b60f619d44400b09358b3ecfc5d4b41a7",
+      "original_sha256": "6c409a3da3f7788f2b6fb3217709852b60f619d44400b09358b3ecfc5d4b41a7",
+      "preserved_sha256": "6c409a3da3f7788f2b6fb3217709852b60f619d44400b09358b3ecfc5d4b41a7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/reference.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/reference.py",
+      "sha256": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+      "original_sha256": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a",
+      "preserved_sha256": "58f0274de427565ee81c61789a952f9e305a45e4eca6b755e06d7345c45e6a1a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/worker.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/worker.py",
+      "sha256": "72d130bb265c56c0a350d0f1ea95795fa95db71cb2a26a65f0bb2298cdb15a61",
+      "original_sha256": "72d130bb265c56c0a350d0f1ea95795fa95db71cb2a26a65f0bb2298cdb15a61",
+      "preserved_sha256": "72d130bb265c56c0a350d0f1ea95795fa95db71cb2a26a65f0bb2298cdb15a61"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/random/worker.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/worker.void",
+      "sha256": "b80850327b56b06cdb5b125eca67ffd459b5e055800025b038aa8e19486831d8",
+      "original_sha256": "b80850327b56b06cdb5b125eca67ffd459b5e055800025b038aa8e19486831d8",
+      "preserved_sha256": "b80850327b56b06cdb5b125eca67ffd459b5e055800025b038aa8e19486831d8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/acceptance.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/acceptance_2.py",
+      "sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "original_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "preserved_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/crash.py",
+      "sha256": "e329329aeeaf7bf182c28dcf4c0593d0e74b468c586767c4aa8a08f34ab5cf77",
+      "original_sha256": "e329329aeeaf7bf182c28dcf4c0593d0e74b468c586767c4aa8a08f34ab5cf77",
+      "preserved_sha256": "e329329aeeaf7bf182c28dcf4c0593d0e74b468c586767c4aa8a08f34ab5cf77"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/crash_test.py",
+      "sha256": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625",
+      "original_sha256": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625",
+      "preserved_sha256": "c755e4de24530007ba6a3a3880e13197ac1a5b5d7d94f70e192afee7cba0d625"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/depth.py",
+      "sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "original_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "preserved_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/execution_2.py",
+      "sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "original_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "preserved_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/final_checks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/final_checks.py",
+      "sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "original_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "preserved_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/focused.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/focused.py",
+      "sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "original_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "preserved_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/install_2.py",
+      "sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "original_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "preserved_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/lsp_2.py",
+      "sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "original_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "preserved_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/oracles.py",
+      "sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "original_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "preserved_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/process.py",
+      "sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "original_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "preserved_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/sitecustomize.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-z8cj64i3/provenance/sitecustomize.py",
+      "sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "original_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "preserved_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc"
+    }
+  ],
+  "trigger": "Sources come from argv and explicit source_inputs; working-directory companions and canonical stdlib are retained conservatively. The exact causal subset is not inferred.",
+  "build": "/home/shmellyorc/Documents/Void.Language/build",
+  "environment": {}
+}

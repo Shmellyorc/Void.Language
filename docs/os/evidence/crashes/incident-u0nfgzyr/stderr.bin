@@ -1,0 +1,12 @@
+/tmp/void-os-error-completion.void:3:20: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 3 |     var issue = os.error()
+   |                    ^^^^^
+    Module: /void-os-error-completion.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/os.void:39:5
+
+ 39 |     kind: error_kind
+    |     ^^^^
+    Module: /@stdlib/os.void
+

@@ -1,0 +1,9 @@
+use os
+use path
+func main():
+    if os.env("VOID_OS_LONG") is Ok(var value):
+        print(value.byte_length)
+    if path.absolute("") is Ok(var first):
+        if path.absolute("", "") is Ok(var second):
+            if os.env("VOID_OS_EXPECT_CWD") is Ok(var expected):
+                print(first == second and first == expected)

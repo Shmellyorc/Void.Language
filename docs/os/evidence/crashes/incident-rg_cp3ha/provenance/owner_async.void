@@ -1,0 +1,7 @@
+use os
+async func main():
+    print(os.process_id() > 0)
+    if os.home_dir() is Ok(var home):
+        print(home.byte_length > 0)
+    else:
+        print(false)

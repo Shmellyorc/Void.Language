@@ -1,0 +1,5 @@
+Invalid invocation: --no-cache is available only for JIT runs.
+Usage: voidc check <file-or-directory>
+       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]
+       voidc build [file-or-directory] [-o executable] [--no-opt]
+       voidc emit <file-or-directory> -o <object> [--no-opt]

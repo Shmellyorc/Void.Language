@@ -17,6 +17,16 @@ record. Historical freeze records are preserved there. H1–H7 remain unresolved
 historical incidents; this decision does not claim their repair. Earlier dated
 sections below remain historical.
 
+## OS module implementation, 27 October 2026
+
+Boss approved the complete 13-function [contract](os/DESIGN.md) and
+[roadmap](os/ROADMAP.md). The native kernel, all three platform adapters,
+source facade, guarded compiler/Runtime bridge and both native build routes
+are implemented. [API/examples](os/API.md), [engineering record](os/IMPLEMENTATION.md)
+and [Golden Wrench handoff](os/HANDOFF.md) record behavior and local evidence.
+Native Windows/macOS execution and independent acceptance remain unclaimed.
+The original [source/platform research](os/RESEARCH.md) remains historical evidence.
+
 ## Channel router implementation, 27 October 2026
 
 Boss approved readonly payloads, reusable clear and one exact payload type per

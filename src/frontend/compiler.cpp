@@ -5,6 +5,7 @@
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
+#include "void/os.hpp"
 #include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
 #include <algorithm>
@@ -3047,6 +3048,7 @@ class Semantics {
         return e.type=call_arguments(e,target,0);
     }
 #include "filesystem.inc"
+#include "os.inc"
 #include "binary_codec.inc"
 #include "stdlib_conversion.inc"
 #include "math.inc"
@@ -3070,6 +3072,10 @@ class Semantics {
         if (unit.identity == math::source_module && e.qualifier.empty()) {
             if (const auto* operation = math::operation(e.token.text); operation && math_private_selected(e))
                 return math_private_call(e, *operation);
+        }
+        if (unit.identity == os::source_module && e.qualifier.empty()) {
+            for (unsigned n = 0; n < os::operations.size(); ++n)
+                if (e.token.text == os::operations[n].name) return os_call(e, n);
         }
         if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
             for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
@@ -3897,6 +3903,7 @@ class Lowering {
             i.op == ir::Op::collection_leave ||
             i.op == ir::Op::collection_append ||
             i.op == ir::Op::collection_finish ||
+            i.op == ir::Op::os_query ||
             i.op == ir::Op::filesystem_native ||
             i.op == ir::Op::filesystem_async ||
             i.op == ir::Op::filesystem_control ||
@@ -4359,6 +4366,13 @@ class Lowering {
                 for(unsigned n=0;n<rendered.size();++n){if(n)join.arguments.push_back(emit({ir::Op::load,*sep},e.token));join.arguments.push_back(emit({ir::Op::load,rendered[n]},e.token));}join.arguments.push_back(emit({ir::Op::load,*end},e.token));
                 ir::Instruction print{ir::Op::console_print,emit(join,e.token),flush?emit({ir::Op::load,*flush},e.token):constant(Type::boolean,{0,{}},e.token)};print.type=Type::none;if(file)print.arguments.push_back(emit({ir::Op::load,*file},e.token));return emit(print,e.token);
             });
+            if (e.target.starts_with("$os.")) {
+                ir::Instruction operation{ir::Op::os_query};
+                operation.type = e.type;
+                operation.immediate = std::stoul(e.target.substr(4));
+                for (auto& part : e.parts) operation.arguments.push_back(expression(*part));
+                return emit(operation, e.token);
+            }
             if (e.target.starts_with("$io.")) {
                 bool asynchronous = e.target.starts_with("$io.async.");
                 std::vector<unsigned> slots(e.parts.size());

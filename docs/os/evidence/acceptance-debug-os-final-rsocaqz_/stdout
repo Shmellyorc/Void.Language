@@ -1,0 +1,33 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/debug
+      Start 129: os_stack
+      Start 128: os_execution
+ 1/14 Test #129: os_stack .........................   Passed   71.87 sec
+      Start 140: os_frontend_stack
+ 2/14 Test #128: os_execution .....................   Passed   72.06 sec
+      Start 134: os_frontend
+ 3/14 Test #134: os_frontend ......................   Passed   32.79 sec
+      Start 137: os_owner
+ 4/14 Test #140: os_frontend_stack ................   Passed   33.00 sec
+      Start 141: os_host_stack
+ 5/14 Test #141: os_host_stack ....................   Passed   31.75 sec
+      Start 132: os_host
+ 6/14 Test #137: os_owner .........................   Passed   32.51 sec
+      Start 133: os_errors
+ 7/14 Test #133: os_errors ........................   Passed   20.03 sec
+      Start 130: os_edges
+ 8/14 Test #132: os_host ..........................   Passed   32.13 sec
+      Start 131: os_edges_stack
+ 9/14 Test #130: os_edges .........................   Passed   15.89 sec
+      Start 138: os_examples
+10/14 Test #131: os_edges_stack ...................   Passed   15.87 sec
+      Start 136: os_cache
+11/14 Test #138: os_examples ......................   Passed   15.27 sec
+      Start 135: lsp_os
+12/14 Test #135: lsp_os ...........................   Passed    7.07 sec
+13/14 Test #136: os_cache .........................   Passed   12.65 sec
+      Start 139: os_install
+14/14 Test #139: os_install .......................   Passed   25.25 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) = 222.53 sec

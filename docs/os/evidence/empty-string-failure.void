@@ -1,0 +1,9 @@
+use os
+use convert
+func main():
+    var zero = convert.unwrap(string.from_utf8([0]))
+    for name in ["", "a=b", zero, "a" + zero + "b"]:
+        if os.env(name) is Err(var reason):
+            print(reason.code, reason.operation, reason.os_code, reason.native_domain)
+    if os.data_dir("a" + zero + "b") is Err(var reason):
+        print(reason.code, reason.operation, reason.os_code, reason.native_domain)

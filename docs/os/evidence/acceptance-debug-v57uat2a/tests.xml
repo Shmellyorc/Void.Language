@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++-19"
+	tests="25"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="255"
+	timestamp="2026-10-27T22:18:50"
+	>
+	<testcase name="gc_buffers" classname="gc_buffers" time="10.3753" status="run">
+		<properties/>
+		<system-out>reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_cou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gc_schemas" classname="gc_schemas" time="0.796758" status="run">
+		<properties/>
+		<system-out>schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache" classname="debug_cache" time="2.75351" status="run">
+		<properties/>
+		<system-out>cache generations, source/build invalidation, revisions, roots, failures and fallback passed
+</system-out>
+	</testcase>
+	<testcase name="automatic_cache_processes" classname="automatic_cache_processes" time="0.720954" status="run">
+		<properties/>
+		<system-out>Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="0.115551" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="documentation_execution" classname="documentation_execution" time="1.98051" status="run">
+		<properties/>
+		<system-out>Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.334877" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="os_execution" classname="os_execution" time="72.6363" status="run">
+		<properties/>
+		<system-out>OS location/identity: 80 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_stack" classname="os_stack" time="73.2249" status="run">
+		<properties/>
+		<system-out>OS location/identity: 80 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_edges" classname="os_edges" time="15.7716" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_edges_stack" classname="os_edges_stack" time="15.7553" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host" classname="os_host" time="32.1307" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 113 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="19.6461" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="33.217" status="run">
+		<properties/>
+		<system-out>OS frontend: 62 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="7.29469" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_cache" classname="os_cache" time="10.9785" status="run">
+		<properties/>
+		<system-out>OS cache: 6 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_owner" classname="os_owner" time="33.0759" status="run">
+		<properties/>
+		<system-out>OS owner async JIT/O2/AOT: 8 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_examples" classname="os_examples" time="15.3499" status="run">
+		<properties/>
+		<system-out>OS examples: 9 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_install" classname="os_install" time="25.6127" status="run">
+		<properties/>
+		<system-out>OS compiler/tooling install and independent AOT: 14 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_frontend_stack" classname="os_frontend_stack" time="33.6207" status="run">
+		<properties/>
+		<system-out>OS frontend: 62 processes passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host_stack" classname="os_host_stack" time="32.276" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 113 checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="1.61116" status="run">
+		<properties/>
+		<system-out>107 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_source" classname="io_errors_source" time="17.0288" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_async" classname="io_errors_async" time="19.3297" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_kernel" classname="io_kernel" time="0.128212" status="run">
+		<properties/>
+		<system-out>native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+</system-out>
+	</testcase>
+</testsuite>

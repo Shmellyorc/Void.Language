@@ -1,0 +1,268 @@
+[
+  {
+    "profile": "debug",
+    "kind": "independent IR geometry and full host",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/host.py",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/void_os_host",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/os final IR geometry corrected"
+    ],
+    "status": 0,
+    "stdout": "debug-ir-geometry-corrected.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/debug/void_os_host": "0a50431b0fdea21cd3419ebb0d69f90725f05e065570aaf18973819b75415545"
+    }
+  },
+  {
+    "profile": "debug",
+    "kind": "owner async and immutable worker snapshot",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/owner.py",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/void_io_runner"
+    ],
+    "status": 0,
+    "stdout": "debug-owner-snapshot.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc": "d0775568b844bf4a40bfa665aaee973743869c157f4001e8cecd76a3cd18cf6d",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/void_io_runner": "52cbd18ecded291e9f1ea4e27ea475d8d300af9e5446b6e8bec145ce00dd0fae"
+    }
+  },
+  {
+    "profile": "debug",
+    "kind": "launcher conventions and hard stack",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc",
+      "--small-stack"
+    ],
+    "status": 0,
+    "stdout": "debug-launcher-stack.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc": "d0775568b844bf4a40bfa665aaee973743869c157f4001e8cecd76a3cd18cf6d"
+    }
+  },
+  {
+    "profile": "release",
+    "kind": "independent IR geometry and full host",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/host.py",
+      "/home/shmellyorc/Documents/Void.Language/build/release/void_os_host",
+      "/home/shmellyorc/Documents/Void.Language/build/release/os final IR geometry corrected"
+    ],
+    "status": 0,
+    "stdout": "release-ir-geometry-corrected.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/release/void_os_host": "d3a2768b7d60fffa7f5432ac2045ac2697ab7b4f091fa10389abc0bcc4a73819"
+    }
+  },
+  {
+    "profile": "release",
+    "kind": "owner async and immutable worker snapshot",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/owner.py",
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/release/void_io_runner"
+    ],
+    "status": 0,
+    "stdout": "release-owner-snapshot.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc": "49fc1e5f622dae034428f0152edaa895b4afe68756bbf82cd0152b2a2ab1df44",
+      "/home/shmellyorc/Documents/Void.Language/build/release/void_io_runner": "171f0417386c37917bb707827db2051e2a26578cec86788f351d1edccc82c3f5"
+    }
+  },
+  {
+    "profile": "release",
+    "kind": "launcher conventions and hard stack",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+      "--small-stack"
+    ],
+    "status": 0,
+    "stdout": "release-launcher-stack.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc": "49fc1e5f622dae034428f0152edaa895b4afe68756bbf82cd0152b2a2ab1df44"
+    }
+  },
+  {
+    "profile": "sanitizers",
+    "kind": "independent IR geometry and full host",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/host.py",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/void_os_host",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/os final IR geometry"
+    ],
+    "status": 0,
+    "stdout": "sanitizers-ir-geometry.log",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/void_os_host": "2204b8930987d3c3fd68c7a9677cc32e3cfb5a4639544137672c5750d6e1a356"
+    }
+  },
+  {
+    "profile": "sanitizers",
+    "kind": "owner async and immutable worker snapshot",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/owner.py",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/void_io_runner"
+    ],
+    "status": 0,
+    "stdout": "sanitizers-owner-snapshot.log",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc": "8e7aa405567171c216a48879134915e3c4476675f0e6c665a89aaad60bd38601",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/void_io_runner": "d9a206a7ba37f91cd76f1e795911b801de4d50b236e98c027fe0c5f35dc42198"
+    }
+  },
+  {
+    "profile": "sanitizers",
+    "kind": "launcher conventions and hard stack",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/execution.py",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc",
+      "--small-stack"
+    ],
+    "status": 0,
+    "stdout": "sanitizers-launcher-stack.log",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc": "8e7aa405567171c216a48879134915e3c4476675f0e6c665a89aaad60bd38601"
+    }
+  },
+  {
+    "profile": "release",
+    "kind": "simultaneously live process/cache identity",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/cache.py",
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc"
+    ],
+    "status": 0,
+    "stdout": "release-concurrent-cache.log",
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc": "49fc1e5f622dae034428f0152edaa895b4afe68756bbf82cd0152b2a2ab1df44"
+    }
+  },
+  {
+    "profile": "debug",
+    "kind": "portable process fixture cache",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/cache.py",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc"
+    ],
+    "status": 0,
+    "stdout": "debug-portable-process-cache.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc": "d0775568b844bf4a40bfa665aaee973743869c157f4001e8cecd76a3cd18cf6d"
+    }
+  },
+  {
+    "profile": "debug",
+    "kind": "portable process fixture install",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc"
+    ],
+    "status": 0,
+    "stdout": "debug-portable-process-install.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/debug/voidc": "d0775568b844bf4a40bfa665aaee973743869c157f4001e8cecd76a3cd18cf6d"
+    }
+  },
+  {
+    "profile": "release",
+    "kind": "portable process fixture cache",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/cache.py",
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc"
+    ],
+    "status": 0,
+    "stdout": "release-portable-process-cache.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc": "49fc1e5f622dae034428f0152edaa895b4afe68756bbf82cd0152b2a2ab1df44"
+    }
+  },
+  {
+    "profile": "release",
+    "kind": "portable process fixture install",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc"
+    ],
+    "status": 0,
+    "stdout": "release-portable-process-install.log",
+    "environment": {},
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/release/voidc": "49fc1e5f622dae034428f0152edaa895b4afe68756bbf82cd0152b2a2ab1df44"
+    }
+  },
+  {
+    "profile": "sanitizers",
+    "kind": "portable process fixture cache",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/cache.py",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc"
+    ],
+    "status": 0,
+    "stdout": "sanitizers-portable-process-cache.log",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc": "8e7aa405567171c216a48879134915e3c4476675f0e6c665a89aaad60bd38601"
+    }
+  },
+  {
+    "profile": "sanitizers",
+    "kind": "portable process fixture install",
+    "command": [
+      "python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/os/install.py",
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc"
+    ],
+    "status": 0,
+    "stdout": "sanitizers-portable-process-install.log",
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/sanitizers/voidc": "8e7aa405567171c216a48879134915e3c4476675f0e6c665a89aaad60bd38601"
+    }
+  }
+]

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++-19"
+	tests="14"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="222"
+	timestamp="2026-10-27T22:24:17"
+	>
+	<testcase name="os_execution" classname="os_execution" time="72.057" status="run">
+		<properties/>
+		<system-out>OS location/identity: 80 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_stack" classname="os_stack" time="71.8696" status="run">
+		<properties/>
+		<system-out>OS location/identity: 80 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_edges" classname="os_edges" time="15.8919" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_edges_stack" classname="os_edges_stack" time="15.8718" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host" classname="os_host" time="32.1303" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 115 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="20.0274" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="32.7869" status="run">
+		<properties/>
+		<system-out>OS frontend: 62 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="7.06564" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_cache" classname="os_cache" time="12.6521" status="run">
+		<properties/>
+		<system-out>OS cache/fresh and simultaneously live process identity: 10 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_owner" classname="os_owner" time="32.511" status="run">
+		<properties/>
+		<system-out>OS owner async JIT/O2/AOT: 8 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_examples" classname="os_examples" time="15.2737" status="run">
+		<properties/>
+		<system-out>OS examples: 9 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_install" classname="os_install" time="25.2505" status="run">
+		<properties/>
+		<system-out>OS compiler/tooling install and independent AOT: 14 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_frontend_stack" classname="os_frontend_stack" time="33.0035" status="run">
+		<properties/>
+		<system-out>OS frontend: 62 processes passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host_stack" classname="os_host_stack" time="31.7459" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 115 checks passed
+</system-out>
+	</testcase>
+</testsuite>

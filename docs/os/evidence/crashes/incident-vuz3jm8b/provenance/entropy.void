@@ -1,0 +1,11 @@
+use random
+
+func main():
+    if random.from_entropy() is Ok(var engine):
+        var sample = engine.rand_u64()
+        if random.try_initialize() is Ok(var ready):
+            var value = random.try_rand_f64()
+            if value is Ok(var unit):
+                print(unit >= 0.0 and unit < 1.0)
+                return
+    print(false)

@@ -210,7 +210,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.kind==K::awaited || e.kind==K::task_cancel || e.kind==K::function_call || e.asynchronous_call || e.interface_call || !e.virtual_slot.empty())edges.unsafe=true;
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
             if(e.target.starts_with("$time.") && temporal::operations.at(std::stoul(e.target.substr(6))).clock)edges.unsafe=true;
-            if(e.target == "$random.seed") edges.unsafe=true;
+            if(e.target == "$random.seed" || e.target.starts_with("$os.")) edges.unsafe=true;
             const bool intrinsic = scalar_numeric_call(e) || e.target.starts_with("$math.") || e.target == "$random.xor" || e.target == "$random.domain" || e.target == "$random.seed" || e.target.starts_with("$collection.") ||
                 e.target.starts_with("$array.") || e.target.starts_with("$dict.") ||
                 e.target.starts_with("$convert.") || e.target == "$temporal.result" ||

@@ -5,6 +5,7 @@
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
+#include "void/os.hpp"
 #include "void/reference_capabilities.hpp"
 #include <map>
 #include <algorithm>
@@ -1066,6 +1067,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if(!i.arguments.empty()){auto endpoint=operand(i.arguments[0]);if(!console::endpoint_type(endpoint) || endpoint.definition->name!="output")fail("print requires output endpoint");}
                     result=Type::none;break;
 #include "filesystem.inc"
+#include "os.inc"
                 case Op::console_native: {
                     if(!m.coordinated || f.module_identity!=console::source_module || i.a || i.b || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=console::source_operations.size() || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid console operation");
                     const auto& contract=console::source_operations.at(i.immediate);
@@ -1428,6 +1430,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
                 case Op::random_seed:fail("worker cannot acquire OS entropy");break;
                 case Op::global_cell:fail("worker cannot access runtime globals");break;
+                case Op::os_query:fail("worker cannot perform OS queries");break;
                 case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;

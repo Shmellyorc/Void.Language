@@ -1,5 +1,17 @@
 # Standard library
 
+`use os` provides 13 synchronous owner-side queries for data/config/cache/state,
+home/temp, executable/resources, environment, platform/architecture, process ID
+and macOS bundle classification. Discovery returns owned UTF-8 paths and creates
+nothing. `env` distinguishes missing from empty. `os.error` preserves the public
+operation and native diagnostic domain/code, separately from `io.error`.
+JIT identifies the compiler/embedding host; linked AOT identifies the application.
+Use `path.absolute("")` for cwd and `io` for explicit creation/read/write.
+See the [OS API and boundaries](../docs/os/API.md),
+[startup](../examples/os/startup.void), [save](../examples/os/save.void) and
+[resource](../examples/os/resources.void) examples.
+
+
 `use channel` provides `channel.router<t>()` for synchronous typed string-topic
 routing. `subscribe(topic, handler)` returns an opaque `subscription` for exact
 `unsubscribe(token)`; duplicate callbacks remain separate. `emit(topic, payload)`

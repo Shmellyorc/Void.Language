@@ -1,0 +1,25 @@
+use os
+use path
+
+func show(label: string, location: result<string, os.error>):
+    if location is Ok(var folder):
+        print(label, folder)
+    else if location is Err(var reason):
+        print(reason.operation, reason.message, reason.native_domain, reason.os_code)
+
+func main():
+    print(os.platform(), os.architecture(), os.process_id())
+    show("Data:", os.data_dir("com.studio.game"))
+    show("Config:", os.config_dir("com.studio.game"))
+    show("Cache:", os.cache_dir("com.studio.game"))
+    show("State:", os.state_dir("com.studio.game"))
+    show("Home:", os.home_dir())
+    show("Temp base:", os.temp_dir())
+    show("Native image:", os.executable_path())
+    show("Native host resources:", os.resource_dir())
+    if os.env("VOID_GAME_ASSETS") is Ok(var assets):
+        print("Application-selected assets:", assets)
+    if os.is_bundle() is Ok(var bundled):
+        print("macOS application bundle:", bundled)
+    if path.absolute("") is Ok(var current):
+        print("Existing cwd snapshot:", current)

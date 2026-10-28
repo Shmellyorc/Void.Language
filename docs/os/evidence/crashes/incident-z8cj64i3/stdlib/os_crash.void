@@ -1,0 +1,280 @@
+use error as core
+use path
+use io
+
+
+## Portable categories of recoverable environment and location failures.
+enum error_kind:
+    ## The requested environment variable is absent.
+    not_found
+
+    ## The application ID or environment name violates the portable contract.
+    invalid_argument
+
+    ## A configured directory is relative or violates host path rules.
+    invalid_path
+
+    ## Native text cannot be represented losslessly as UTF-8.
+    invalid_utf8
+
+    ## The native discovery service denied access.
+    permission_denied
+
+    ## The current location, image or bundle classification is unavailable.
+    unavailable
+
+    ## This host explicitly does not support the requested facility.
+    unsupported
+
+    ## Another native discovery failure occurred.
+    system_failure
+
+
+## Managed OS discovery failure, distinct from io.error despite their shared base.
+## Native values retain their original diagnostic domain; environment contents are never included.
+struct error extends core.error:
+    ## Public operation, such as os.env or os.state_dir, including helper failures.
+    operation: string
+    ## Stable portable failure category; inherited code is its one-based ordinal.
+    kind: error_kind
+    ## Original signed errno/NSError or unsigned Win32/HRESULT bits widened to i64; otherwise zero.
+    os_code: i64
+    ## Original errno, win32, hresult or NSError domain; empty for non-native failures.
+    native_domain: string
+
+
+private value struct _reply:
+    kind: i64
+    os_code: i64
+    number: i64
+    flag: bool
+    text: string
+    native_domain: string
+
+
+private func _kind(code: i64) -> error_kind:
+    if code == 1:
+        return error_kind.not_found
+    if code == 2:
+        return error_kind.invalid_argument
+    if code == 3:
+        return error_kind.invalid_path
+    if code == 4:
+        return error_kind.invalid_utf8
+    if code == 5:
+        return error_kind.permission_denied
+    if code == 6:
+        return error_kind.unavailable
+    if code == 7:
+        return error_kind.unsupported
+    if code == 8:
+        return error_kind.system_failure
+    return error_kind.system_failure
+
+
+private func _error(operation: string, reply: _reply) -> error:
+    return error(message = "{operation} discovery failed; native code {reply.os_code}",
+        code = reply.kind as i32, operation = operation, kind = _kind(reply.kind),
+        os_code = reply.os_code, native_domain = reply.native_domain)
+
+
+private func _invalid(operation: string) -> error:
+    return _error(operation, _reply(kind = 2))
+
+
+private func _text(operation: string, reply: _reply) -> result<string, error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(reply.text)
+
+
+private func _adapt(operation: string, value: result<string, io.error>) -> result<string, error>:
+    if value is Ok(var text):
+        return Ok(text)
+    if value is Err(var reason):
+        var code: i64 = 8
+        match reason.kind:
+            io.error_kind.invalid_path:
+                code = 3
+            io.error_kind.invalid_utf8:
+                code = 4
+            io.error_kind.permission_denied:
+                code = 5
+            io.error_kind.unsupported:
+                code = 7
+            _:
+                code = 8
+        var domain = ""
+        if reason.os_code != 0:
+            domain = "errno"
+            if platform() == "windows":
+                domain = "win32"
+        return Err(error(message = "{operation} path composition failed", path = reason.path,
+            code = code as i32, operation = operation, kind = _kind(code),
+            os_code = reason.os_code, native_domain = domain))
+    return Err(_error(operation, _reply(kind = 8)))
+
+
+private func _alnum(byte: u8) -> bool:
+    return (byte >= 97 and byte <= 122) or (byte >= 48 and byte <= 57)
+
+
+private func _valid_id(value: string) -> bool:
+    if value.byte_length < 1 or value.byte_length > 255:
+        return false
+    var bytes = value.to_utf8()
+    if not _alnum(bytes[0]) or not _alnum(bytes[bytes.count - 1]):
+        return false
+    var device_length: i64 = 0
+    var before_dot = true
+    var previous_dot = false
+    for byte in bytes:
+        if not _alnum(byte) and byte != 46 and byte != 95 and byte != 45:
+            return false
+        if byte == 46:
+            if previous_dot:
+                return false
+            before_dot = false
+        else if before_dot:
+            device_length += 1
+        previous_dot = byte == 46
+    if device_length == 3:
+        if (bytes[0] == 99 and bytes[1] == 111 and bytes[2] == 110) or (bytes[0] == 112 and bytes[1] == 114 and bytes[2] == 110) or (bytes[0] == 97 and bytes[1] == 117 and bytes[2] == 120) or (bytes[0] == 110 and bytes[1] == 117 and bytes[2] == 108):
+            return false
+    if device_length == 4:
+        if bytes[3] >= 49 and bytes[3] <= 57:
+            if (bytes[0] == 99 and bytes[1] == 111 and bytes[2] == 109) or (bytes[0] == 108 and bytes[1] == 112 and bytes[2] == 116):
+                return false
+    return true
+
+
+private func _directory(operation: string, app_id: string, reply: _reply, leaf: string) -> result<string, error>:
+    var native_root = _text(operation, reply)?
+    if leaf == "":
+        return _adapt(operation, path.join([native_root, app_id]))
+    return _adapt(operation, path.join([native_root, app_id, leaf]))
+
+
+## Discover XDG data, Windows LocalAppData or macOS Application Support, with one validated application component.
+## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.data_dir and native diagnostics.
+func data_dir(app_id: string) -> result<string, error>:
+    if not _valid_id(app_id):
+        return Err(_invalid("os.data_dir"))
+    var leaf = ""
+    return _directory("os.data_dir", app_id, _os_data_root(), leaf)
+
+
+## Discover XDG config, Windows RoamingAppData or macOS Application Support/id/config, with one validated application component.
+## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.config_dir and native diagnostics.
+func config_dir(app_id: string) -> result<string, error>:
+    if not _valid_id(app_id):
+        return Err(_invalid("os.config_dir"))
+    var leaf = ""
+    if platform() == "macos":
+        leaf = "config"
+    return _directory("os.config_dir", app_id, _os_config_root(), leaf)
+
+
+## Discover XDG cache, Windows LocalAppData/id/cache or macOS Caches, with one validated application component.
+## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.cache_dir and native diagnostics.
+func cache_dir(app_id: string) -> result<string, error>:
+    if not _valid_id(app_id):
+        return Err(_invalid("os.cache_dir"))
+    var leaf = ""
+    if platform() == "windows":
+        leaf = "cache"
+    return _directory("os.cache_dir", app_id, _os_cache_root(), leaf)
+
+
+## Discover XDG state, Windows LocalAppData/id/state or macOS Application Support/id/state, with one validated application component.
+## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+## Persistent operational history/restart data; no log rotation, retention or session IPC guarantees.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.state_dir and native diagnostics.
+func state_dir(app_id: string) -> result<string, error>:
+    if not _valid_id(app_id):
+        return Err(_invalid("os.state_dir"))
+    var leaf = ""
+    if platform() == "windows" or platform() == "macos":
+        leaf = "state"
+    return _directory("os.state_dir", app_id, _os_state_root(), leaf)
+
+
+## Discover the current application home; Linux honors absolute HOME then real-user passwd fallback.
+## Returns an owned absolute UTF-8 snapshot without resolving symlinks or testing existence/access.
+## @return Ok with the native location, or Err with original diagnostics; no guessed location on failure.
+func home_dir() -> result<string, error>:
+    return _text("os.home_dir", _os_home())
+
+
+## Discover a temporary-directory base; this reserves no name and creates no secure temporary object.
+## Returns an owned absolute UTF-8 snapshot without resolving symlinks or testing existence/access.
+## @return Ok with the native location, or Err with original diagnostics; no guessed location on failure.
+func temp_dir() -> result<string, error>:
+    return _text("os.temp_dir", _os_temp())
+
+
+## Discover the executing native image, the compiler/embedding host under JIT and the application under linked AOT.
+## Returns an owned absolute UTF-8 snapshot without resolving symlinks or testing existence/access.
+## @return Ok with the native location, or Err with original diagnostics; no guessed location on failure.
+func executable_path() -> result<string, error>:
+    return _text("os.executable_path", _os_executable())
+
+
+## Discover actual resources for a recognized macOS APPL .app, otherwise the executable parent.
+## JIT describes the compiler/embedding host; linked AOT describes the running application.
+## This portable layout convention creates nothing and never falls back to cwd or source paths.
+## @return Ok with an owned absolute resource directory, or Err; bundle lookup failures prohibit parent fallback.
+func resource_dir() -> result<string, error>:
+    var reply = _os_resources()
+    if reply.kind != 0:
+        return Err(_error("os.resource_dir", reply))
+    if reply.flag:
+        return Ok(reply.text)
+    var image = _text("os.resource_dir", _os_executable())?
+    return _adapt("os.resource_dir", path.parent(image))
+
+
+## Read one environment value at execution time; native environment mutation must be quiescent.
+## Contents preserve valid UTF-8 exactly, including whitespace/newlines/equals, and never appear in diagnostics.
+## POSIX names are case-sensitive; Windows uses its native case-insensitive lookup.
+## @param name Nonempty strict UTF-8 name without NUL or equals; Windows hidden drive entries are rejected.
+## @return Ok with an owned value, including empty; Err(not_found) for absence or another precise lookup failure.
+func env(name: string) -> result<string, error>:
+    return _text("os.env", _os_env(name))
+
+
+## Identify the operating-system family of the executing process, without version or feature probing.
+## @return Exactly linux, windows or macos on supported targets.
+func platform() -> string:
+    return _os_platform().text
+
+
+## Identify the running binary target, including when executed through emulation.
+## @return x86_64, aarch64, x86, arm or unknown; never physical hardware or CPU features.
+func architecture() -> string:
+    return _os_architecture().text
+
+
+## Read the current native process ID at execution time with no managed string allocation.
+## JIT returns the compiler/embedding host PID; linked AOT returns the application's PID.
+## Shared across Runtimes/threads and reusable after exit; this is no security identity or filename reservation.
+## @return Native getpid or unsigned GetCurrentProcessId widened directly to i64.
+func process_id() -> i64:
+    return _os_process_id()
+
+
+## Observe whether the current process is in a recognized macOS APPL .app with a file executable URL.
+## JIT observes its host; this does not validate signatures, entitlements, sandboxing or access.
+## @return Ok(true) for recognized applications, Ok(false) for confirmed plain hosts/other platforms, or Err(unavailable).
+func is_bundle() -> result<bool, error>:
+    var reply = _os_bundle()
+    if reply.kind != 0:
+        return Err(_error("os.is_bundle", reply))
+    return Ok(reply.flag)

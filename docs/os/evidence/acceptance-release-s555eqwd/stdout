@@ -1,0 +1,71 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/release
+      Start  39: gc_buffers
+      Start  40: gc_schemas
+ 1/25 Test  #40: gc_schemas .......................   Passed    0.04 sec
+      Start  65: debug_cache
+ 2/25 Test  #39: gc_buffers .......................   Passed    0.85 sec
+      Start  67: automatic_cache_processes
+ 3/25 Test  #65: debug_cache ......................   Passed    1.28 sec
+      Start 113: lsp_stage11_globals
+ 4/25 Test #113: lsp_stage11_globals ..............   Passed    0.12 sec
+      Start 115: documentation_execution
+ 5/25 Test  #67: automatic_cache_processes ........   Passed    0.63 sec
+      Start 116: lsp_documentation
+ 6/25 Test #116: lsp_documentation ................   Passed    0.15 sec
+      Start 128: os_execution
+ 7/25 Test #115: documentation_execution ..........   Passed    0.97 sec
+      Start 129: os_stack
+ 8/25 Test #128: os_execution .....................   Passed   23.54 sec
+      Start 130: os_edges
+ 9/25 Test #129: os_stack .........................   Passed   23.82 sec
+      Start 131: os_edges_stack
+10/25 Test #130: os_edges .........................   Passed    3.60 sec
+      Start 132: os_host
+11/25 Test #131: os_edges_stack ...................   Passed    3.64 sec
+      Start 133: os_errors
+12/25 Test #132: os_host ..........................   Passed    4.66 sec
+      Start 134: os_frontend
+13/25 Test #133: os_errors ........................   Passed    5.80 sec
+      Start 135: lsp_os
+14/25 Test #135: lsp_os ...........................   Passed    0.98 sec
+      Start 136: os_cache
+15/25 Test #134: os_frontend ......................   Passed    4.56 sec
+      Start 137: os_owner
+16/25 Test #137: os_owner .........................***Failed    0.24 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/os/evidence/crashes/incident-rg_cp3ha
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/os/owner.py", line 11, in <module>
+    h.run([compiler,'run',source,*flags,'--no-cache'],work,b'true\ntrue\n')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/os/support.py", line 11, in run
+    return harness.run(command, cwd, *args, **kwargs)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 26, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/release/voidc', 'run', '/tmp/VOID OS owner x0uhz_sn/main.void', '--no-opt', '--no-cache'], 1, b'', b'/tmp/VOID OS owner x0uhz_sn/main.void:1:1: error: No entry function found.\n    code: VOID4001\n\n 1 | use os\n   | ^\n    Module: /main.void\n    Hint: Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.\n\n')
+
+      Start 138: os_examples
+17/25 Test #136: os_cache .........................   Passed    2.06 sec
+      Start 140: os_frontend_stack
+18/25 Test #138: os_examples ......................   Passed    4.03 sec
+      Start 141: os_host_stack
+19/25 Test #140: os_frontend_stack ................   Passed    4.69 sec
+      Start 190: stage11_globals
+20/25 Test #190: stage11_globals ..................   Passed    0.87 sec
+      Start 238: io_errors_source
+21/25 Test #141: os_host_stack ....................   Passed    4.67 sec
+      Start 239: io_errors_async
+22/25 Test #238: io_errors_source .................   Passed    7.85 sec
+      Start 245: io_kernel
+23/25 Test #245: io_kernel ........................   Passed    0.04 sec
+24/25 Test #239: io_errors_async ..................   Passed    9.41 sec
+      Start 139: os_install
+25/25 Test #139: os_install .......................   Passed   10.12 sec
+
+96% tests passed, 1 tests failed out of 25
+
+Total Test time (real) =  66.48 sec
+
+The following tests FAILED:
+	137 - os_owner (Failed)

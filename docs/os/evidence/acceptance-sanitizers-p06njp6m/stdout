@@ -1,0 +1,55 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/sanitizers
+      Start  39: gc_buffers
+      Start  40: gc_schemas
+ 1/25 Test  #40: gc_schemas .......................   Passed    0.22 sec
+      Start  65: debug_cache
+ 2/25 Test  #65: debug_cache ......................   Passed    3.01 sec
+      Start  67: automatic_cache_processes
+ 3/25 Test  #39: gc_buffers .......................   Passed    3.41 sec
+      Start 113: lsp_stage11_globals
+ 4/25 Test #113: lsp_stage11_globals ..............   Passed    0.18 sec
+      Start 115: documentation_execution
+ 5/25 Test  #67: automatic_cache_processes ........   Passed    1.42 sec
+      Start 116: lsp_documentation
+ 6/25 Test #116: lsp_documentation ................   Passed    0.45 sec
+      Start 128: os_execution
+ 7/25 Test #115: documentation_execution ..........   Passed    2.64 sec
+      Start 129: os_stack
+ 8/25 Test #128: os_execution .....................   Passed   79.50 sec
+      Start 130: os_edges
+ 9/25 Test #129: os_stack .........................   Passed   79.88 sec
+      Start 131: os_edges_stack
+10/25 Test #130: os_edges .........................   Passed   16.41 sec
+      Start 132: os_host
+11/25 Test #131: os_edges_stack ...................   Passed   16.38 sec
+      Start 133: os_errors
+12/25 Test #133: os_errors ........................   Passed   21.84 sec
+      Start 134: os_frontend
+13/25 Test #132: os_host ..........................   Passed   29.35 sec
+      Start 135: lsp_os
+14/25 Test #135: lsp_os ...........................   Passed    5.40 sec
+      Start 136: os_cache
+15/25 Test #136: os_cache .........................   Passed   10.54 sec
+      Start 137: os_owner
+16/25 Test #134: os_frontend ......................   Passed   30.28 sec
+      Start 138: os_examples
+17/25 Test #138: os_examples ......................   Passed   15.51 sec
+      Start 140: os_frontend_stack
+18/25 Test #137: os_owner .........................   Passed   36.84 sec
+      Start 141: os_host_stack
+19/25 Test #140: os_frontend_stack ................   Passed   31.64 sec
+      Start 184: stage11_globals
+20/25 Test #184: stage11_globals ..................   Passed    2.35 sec
+      Start 228: io_errors_source
+21/25 Test #141: os_host_stack ....................   Passed   30.42 sec
+      Start 229: io_errors_async
+22/25 Test #228: io_errors_source .................   Passed   19.36 sec
+      Start 235: io_kernel
+23/25 Test #235: io_kernel ........................   Passed    0.09 sec
+24/25 Test #229: io_errors_async ..................   Passed   22.53 sec
+      Start 139: os_install
+25/25 Test #139: os_install .......................   Passed   26.47 sec
+
+100% tests passed, 0 tests failed out of 25
+
+Total Test time (real) = 262.55 sec

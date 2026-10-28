@@ -1,0 +1,21 @@
+use os
+use path
+func show(value: result<string, os.error>):
+    if value is Ok(var text):
+        print(text)
+    else if value is Err(var reason):
+        print(reason.operation, reason.code, reason.native_domain, reason.os_code)
+func main():
+    show(os.data_dir("com.studio.game"))
+    show(os.config_dir("com.studio.game"))
+    show(os.cache_dir("com.studio.game"))
+    show(os.state_dir("com.studio.game"))
+    show(os.home_dir())
+    show(os.temp_dir())
+    show(os.executable_path())
+    show(os.resource_dir())
+    show(os.env("VOID_OS_VALUE"))
+    print(os.platform(), os.architecture())
+    print(os.process_id())
+    if os.is_bundle() is Ok(var bundled):
+        print(bundled)

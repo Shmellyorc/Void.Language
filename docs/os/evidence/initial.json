@@ -1,0 +1,11 @@
+{
+  "head": "0d014e851851203e30d3b376ca99606a67d36a7a",
+  "status": " M docs/README.md\n?? docs/VOID_STDLIB_BACKLOG_2026-10-27.md\n?? docs/os/\n",
+  "sha256": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "docs/README.md": "aafe0b77a8ed636c8b32dd4dfbd211a63ca8a06c49f94de37412b494699bd0b7",
+    "docs/os/RESEARCH.md": "5e7f8011ae715f75a93827edc8e33815b0339398ec994efcb447d0e21b1f15e7",
+    "docs/os/DESIGN.md": "feb337eef639b98dc6e437543d666acc355694534c6f840a81f2d77fdd9bb844",
+    "docs/os/ROADMAP.md": "18a21b166feac86134e37033b9d4825c2cce4079ad479ade94e48548a54e488c"
+  }
+}

@@ -1,0 +1,1405 @@
+use os
+func main():
+    var accepted = 0
+    var rejected = 0
+    if os.data_dir("a") is Err(var reason0data):
+        if reason0data.code == 3 and reason0data.operation == "os.data_dir" and reason0data.os_code == 0 and reason0data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a") is Err(var reason0config):
+        if reason0config.code == 3 and reason0config.operation == "os.config_dir" and reason0config.os_code == 0 and reason0config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a") is Err(var reason0cache):
+        if reason0cache.code == 3 and reason0cache.operation == "os.cache_dir" and reason0cache.os_code == 0 and reason0cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a") is Err(var reason0state):
+        if reason0state.code == 3 and reason0state.operation == "os.state_dir" and reason0state.os_code == 0 and reason0state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("0") is Err(var reason1data):
+        if reason1data.code == 3 and reason1data.operation == "os.data_dir" and reason1data.os_code == 0 and reason1data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("0") is Err(var reason1config):
+        if reason1config.code == 3 and reason1config.operation == "os.config_dir" and reason1config.os_code == 0 and reason1config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("0") is Err(var reason1cache):
+        if reason1cache.code == 3 and reason1cache.operation == "os.cache_dir" and reason1cache.os_code == 0 and reason1cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("0") is Err(var reason1state):
+        if reason1state.code == 3 and reason1state.operation == "os.state_dir" and reason1state.os_code == 0 and reason1state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com.studio.game") is Err(var reason2data):
+        if reason2data.code == 3 and reason2data.operation == "os.data_dir" and reason2data.os_code == 0 and reason2data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com.studio.game") is Err(var reason2config):
+        if reason2config.code == 3 and reason2config.operation == "os.config_dir" and reason2config.os_code == 0 and reason2config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com.studio.game") is Err(var reason2cache):
+        if reason2cache.code == 3 and reason2cache.operation == "os.cache_dir" and reason2cache.os_code == 0 and reason2cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com.studio.game") is Err(var reason2state):
+        if reason2state.code == 3 and reason2state.operation == "os.state_dir" and reason2state.os_code == 0 and reason2state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a_b-c.d") is Err(var reason3data):
+        if reason3data.code == 3 and reason3data.operation == "os.data_dir" and reason3data.os_code == 0 and reason3data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a_b-c.d") is Err(var reason3config):
+        if reason3config.code == 3 and reason3config.operation == "os.config_dir" and reason3config.os_code == 0 and reason3config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a_b-c.d") is Err(var reason3cache):
+        if reason3cache.code == 3 and reason3cache.operation == "os.cache_dir" and reason3cache.os_code == 0 and reason3cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a_b-c.d") is Err(var reason3state):
+        if reason3state.code == 3 and reason3state.operation == "os.state_dir" and reason3state.os_code == 0 and reason3state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com0") is Err(var reason4data):
+        if reason4data.code == 3 and reason4data.operation == "os.data_dir" and reason4data.os_code == 0 and reason4data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com0") is Err(var reason4config):
+        if reason4config.code == 3 and reason4config.operation == "os.config_dir" and reason4config.os_code == 0 and reason4config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com0") is Err(var reason4cache):
+        if reason4cache.code == 3 and reason4cache.operation == "os.cache_dir" and reason4cache.os_code == 0 and reason4cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com0") is Err(var reason4state):
+        if reason4state.code == 3 and reason4state.operation == "os.state_dir" and reason4state.os_code == 0 and reason4state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com10") is Err(var reason5data):
+        if reason5data.code == 3 and reason5data.operation == "os.data_dir" and reason5data.os_code == 0 and reason5data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com10") is Err(var reason5config):
+        if reason5config.code == 3 and reason5config.operation == "os.config_dir" and reason5config.os_code == 0 and reason5config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com10") is Err(var reason5cache):
+        if reason5cache.code == 3 and reason5cache.operation == "os.cache_dir" and reason5cache.os_code == 0 and reason5cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com10") is Err(var reason5state):
+        if reason5state.code == 3 and reason5state.operation == "os.state_dir" and reason5state.os_code == 0 and reason5state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt0") is Err(var reason6data):
+        if reason6data.code == 3 and reason6data.operation == "os.data_dir" and reason6data.os_code == 0 and reason6data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt0") is Err(var reason6config):
+        if reason6config.code == 3 and reason6config.operation == "os.config_dir" and reason6config.os_code == 0 and reason6config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt0") is Err(var reason6cache):
+        if reason6cache.code == 3 and reason6cache.operation == "os.cache_dir" and reason6cache.os_code == 0 and reason6cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt0") is Err(var reason6state):
+        if reason6state.code == 3 and reason6state.operation == "os.state_dir" and reason6state.os_code == 0 and reason6state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("auxiliary") is Err(var reason7data):
+        if reason7data.code == 3 and reason7data.operation == "os.data_dir" and reason7data.os_code == 0 and reason7data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("auxiliary") is Err(var reason7config):
+        if reason7config.code == 3 and reason7config.operation == "os.config_dir" and reason7config.os_code == 0 and reason7config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("auxiliary") is Err(var reason7cache):
+        if reason7cache.code == 3 and reason7cache.operation == "os.cache_dir" and reason7cache.os_code == 0 and reason7cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("auxiliary") is Err(var reason7state):
+        if reason7state.code == 3 and reason7state.operation == "os.state_dir" and reason7state.os_code == 0 and reason7state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason8data):
+        if reason8data.code == 3 and reason8data.operation == "os.data_dir" and reason8data.os_code == 0 and reason8data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason8config):
+        if reason8config.code == 3 and reason8config.operation == "os.config_dir" and reason8config.os_code == 0 and reason8config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason8cache):
+        if reason8cache.code == 3 and reason8cache.operation == "os.cache_dir" and reason8cache.os_code == 0 and reason8cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason8state):
+        if reason8state.code == 3 and reason8state.operation == "os.state_dir" and reason8state.os_code == 0 and reason8state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("") is Err(var reason9data):
+        if reason9data.code == 2 and reason9data.operation == "os.data_dir" and reason9data.os_code == 0 and reason9data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("") is Err(var reason9config):
+        if reason9config.code == 2 and reason9config.operation == "os.config_dir" and reason9config.os_code == 0 and reason9config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("") is Err(var reason9cache):
+        if reason9cache.code == 2 and reason9cache.operation == "os.cache_dir" and reason9cache.os_code == 0 and reason9cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("") is Err(var reason9state):
+        if reason9state.code == 2 and reason9state.operation == "os.state_dir" and reason9state.os_code == 0 and reason9state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason10data):
+        if reason10data.code == 2 and reason10data.operation == "os.data_dir" and reason10data.os_code == 0 and reason10data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason10config):
+        if reason10config.code == 2 and reason10config.operation == "os.config_dir" and reason10config.os_code == 0 and reason10config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason10cache):
+        if reason10cache.code == 2 and reason10cache.operation == "os.cache_dir" and reason10cache.os_code == 0 and reason10cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") is Err(var reason10state):
+        if reason10state.code == 2 and reason10state.operation == "os.state_dir" and reason10state.os_code == 0 and reason10state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("A") is Err(var reason11data):
+        if reason11data.code == 2 and reason11data.operation == "os.data_dir" and reason11data.os_code == 0 and reason11data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("A") is Err(var reason11config):
+        if reason11config.code == 2 and reason11config.operation == "os.config_dir" and reason11config.os_code == 0 and reason11config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("A") is Err(var reason11cache):
+        if reason11cache.code == 2 and reason11cache.operation == "os.cache_dir" and reason11cache.os_code == 0 and reason11cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("A") is Err(var reason11state):
+        if reason11state.code == 2 and reason11state.operation == "os.state_dir" and reason11state.os_code == 0 and reason11state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("aB") is Err(var reason12data):
+        if reason12data.code == 2 and reason12data.operation == "os.data_dir" and reason12data.os_code == 0 and reason12data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("aB") is Err(var reason12config):
+        if reason12config.code == 2 and reason12config.operation == "os.config_dir" and reason12config.os_code == 0 and reason12config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("aB") is Err(var reason12cache):
+        if reason12cache.code == 2 and reason12cache.operation == "os.cache_dir" and reason12cache.os_code == 0 and reason12cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("aB") is Err(var reason12state):
+        if reason12state.code == 2 and reason12state.operation == "os.state_dir" and reason12state.os_code == 0 and reason12state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a b") is Err(var reason13data):
+        if reason13data.code == 2 and reason13data.operation == "os.data_dir" and reason13data.os_code == 0 and reason13data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a b") is Err(var reason13config):
+        if reason13config.code == 2 and reason13config.operation == "os.config_dir" and reason13config.os_code == 0 and reason13config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a b") is Err(var reason13cache):
+        if reason13cache.code == 2 and reason13cache.operation == "os.cache_dir" and reason13cache.os_code == 0 and reason13cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a b") is Err(var reason13state):
+        if reason13state.code == 2 and reason13state.operation == "os.state_dir" and reason13state.os_code == 0 and reason13state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("雪") is Err(var reason14data):
+        if reason14data.code == 2 and reason14data.operation == "os.data_dir" and reason14data.os_code == 0 and reason14data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("雪") is Err(var reason14config):
+        if reason14config.code == 2 and reason14config.operation == "os.config_dir" and reason14config.os_code == 0 and reason14config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("雪") is Err(var reason14cache):
+        if reason14cache.code == 2 and reason14cache.operation == "os.cache_dir" and reason14cache.os_code == 0 and reason14cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("雪") is Err(var reason14state):
+        if reason14state.code == 2 and reason14state.operation == "os.state_dir" and reason14state.os_code == 0 and reason14state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("../a") is Err(var reason15data):
+        if reason15data.code == 2 and reason15data.operation == "os.data_dir" and reason15data.os_code == 0 and reason15data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("../a") is Err(var reason15config):
+        if reason15config.code == 2 and reason15config.operation == "os.config_dir" and reason15config.os_code == 0 and reason15config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("../a") is Err(var reason15cache):
+        if reason15cache.code == 2 and reason15cache.operation == "os.cache_dir" and reason15cache.os_code == 0 and reason15cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("../a") is Err(var reason15state):
+        if reason15state.code == 2 and reason15state.operation == "os.state_dir" and reason15state.os_code == 0 and reason15state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir(".") is Err(var reason16data):
+        if reason16data.code == 2 and reason16data.operation == "os.data_dir" and reason16data.os_code == 0 and reason16data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir(".") is Err(var reason16config):
+        if reason16config.code == 2 and reason16config.operation == "os.config_dir" and reason16config.os_code == 0 and reason16config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir(".") is Err(var reason16cache):
+        if reason16cache.code == 2 and reason16cache.operation == "os.cache_dir" and reason16cache.os_code == 0 and reason16cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir(".") is Err(var reason16state):
+        if reason16state.code == 2 and reason16state.operation == "os.state_dir" and reason16state.os_code == 0 and reason16state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("..") is Err(var reason17data):
+        if reason17data.code == 2 and reason17data.operation == "os.data_dir" and reason17data.os_code == 0 and reason17data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("..") is Err(var reason17config):
+        if reason17config.code == 2 and reason17config.operation == "os.config_dir" and reason17config.os_code == 0 and reason17config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("..") is Err(var reason17cache):
+        if reason17cache.code == 2 and reason17cache.operation == "os.cache_dir" and reason17cache.os_code == 0 and reason17cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("..") is Err(var reason17state):
+        if reason17state.code == 2 and reason17state.operation == "os.state_dir" and reason17state.os_code == 0 and reason17state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a/../b") is Err(var reason18data):
+        if reason18data.code == 2 and reason18data.operation == "os.data_dir" and reason18data.os_code == 0 and reason18data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a/../b") is Err(var reason18config):
+        if reason18config.code == 2 and reason18config.operation == "os.config_dir" and reason18config.os_code == 0 and reason18config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a/../b") is Err(var reason18cache):
+        if reason18cache.code == 2 and reason18cache.operation == "os.cache_dir" and reason18cache.os_code == 0 and reason18cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a/../b") is Err(var reason18state):
+        if reason18state.code == 2 and reason18state.operation == "os.state_dir" and reason18state.os_code == 0 and reason18state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a/b") is Err(var reason19data):
+        if reason19data.code == 2 and reason19data.operation == "os.data_dir" and reason19data.os_code == 0 and reason19data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a/b") is Err(var reason19config):
+        if reason19config.code == 2 and reason19config.operation == "os.config_dir" and reason19config.os_code == 0 and reason19config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a/b") is Err(var reason19cache):
+        if reason19cache.code == 2 and reason19cache.operation == "os.cache_dir" and reason19cache.os_code == 0 and reason19cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a/b") is Err(var reason19state):
+        if reason19state.code == 2 and reason19state.operation == "os.state_dir" and reason19state.os_code == 0 and reason19state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a\\b") is Err(var reason20data):
+        if reason20data.code == 2 and reason20data.operation == "os.data_dir" and reason20data.os_code == 0 and reason20data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a\\b") is Err(var reason20config):
+        if reason20config.code == 2 and reason20config.operation == "os.config_dir" and reason20config.os_code == 0 and reason20config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a\\b") is Err(var reason20cache):
+        if reason20cache.code == 2 and reason20cache.operation == "os.cache_dir" and reason20cache.os_code == 0 and reason20cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a\\b") is Err(var reason20state):
+        if reason20state.code == 2 and reason20state.operation == "os.state_dir" and reason20state.os_code == 0 and reason20state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a:b") is Err(var reason21data):
+        if reason21data.code == 2 and reason21data.operation == "os.data_dir" and reason21data.os_code == 0 and reason21data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a:b") is Err(var reason21config):
+        if reason21config.code == 2 and reason21config.operation == "os.config_dir" and reason21config.os_code == 0 and reason21config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a:b") is Err(var reason21cache):
+        if reason21cache.code == 2 and reason21cache.operation == "os.cache_dir" and reason21cache.os_code == 0 and reason21cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a:b") is Err(var reason21state):
+        if reason21state.code == 2 and reason21state.operation == "os.state_dir" and reason21state.os_code == 0 and reason21state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a..b") is Err(var reason22data):
+        if reason22data.code == 2 and reason22data.operation == "os.data_dir" and reason22data.os_code == 0 and reason22data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a..b") is Err(var reason22config):
+        if reason22config.code == 2 and reason22config.operation == "os.config_dir" and reason22config.os_code == 0 and reason22config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a..b") is Err(var reason22cache):
+        if reason22cache.code == 2 and reason22cache.operation == "os.cache_dir" and reason22cache.os_code == 0 and reason22cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a..b") is Err(var reason22state):
+        if reason22state.code == 2 and reason22state.operation == "os.state_dir" and reason22state.os_code == 0 and reason22state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir(".a") is Err(var reason23data):
+        if reason23data.code == 2 and reason23data.operation == "os.data_dir" and reason23data.os_code == 0 and reason23data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir(".a") is Err(var reason23config):
+        if reason23config.code == 2 and reason23config.operation == "os.config_dir" and reason23config.os_code == 0 and reason23config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir(".a") is Err(var reason23cache):
+        if reason23cache.code == 2 and reason23cache.operation == "os.cache_dir" and reason23cache.os_code == 0 and reason23cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir(".a") is Err(var reason23state):
+        if reason23state.code == 2 and reason23state.operation == "os.state_dir" and reason23state.os_code == 0 and reason23state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a.") is Err(var reason24data):
+        if reason24data.code == 2 and reason24data.operation == "os.data_dir" and reason24data.os_code == 0 and reason24data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a.") is Err(var reason24config):
+        if reason24config.code == 2 and reason24config.operation == "os.config_dir" and reason24config.os_code == 0 and reason24config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a.") is Err(var reason24cache):
+        if reason24cache.code == 2 and reason24cache.operation == "os.cache_dir" and reason24cache.os_code == 0 and reason24cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a.") is Err(var reason24state):
+        if reason24state.code == 2 and reason24state.operation == "os.state_dir" and reason24state.os_code == 0 and reason24state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("-a") is Err(var reason25data):
+        if reason25data.code == 2 and reason25data.operation == "os.data_dir" and reason25data.os_code == 0 and reason25data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("-a") is Err(var reason25config):
+        if reason25config.code == 2 and reason25config.operation == "os.config_dir" and reason25config.os_code == 0 and reason25config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("-a") is Err(var reason25cache):
+        if reason25cache.code == 2 and reason25cache.operation == "os.cache_dir" and reason25cache.os_code == 0 and reason25cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("-a") is Err(var reason25state):
+        if reason25state.code == 2 and reason25state.operation == "os.state_dir" and reason25state.os_code == 0 and reason25state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a-") is Err(var reason26data):
+        if reason26data.code == 2 and reason26data.operation == "os.data_dir" and reason26data.os_code == 0 and reason26data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a-") is Err(var reason26config):
+        if reason26config.code == 2 and reason26config.operation == "os.config_dir" and reason26config.os_code == 0 and reason26config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a-") is Err(var reason26cache):
+        if reason26cache.code == 2 and reason26cache.operation == "os.cache_dir" and reason26cache.os_code == 0 and reason26cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a-") is Err(var reason26state):
+        if reason26state.code == 2 and reason26state.operation == "os.state_dir" and reason26state.os_code == 0 and reason26state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("_a") is Err(var reason27data):
+        if reason27data.code == 2 and reason27data.operation == "os.data_dir" and reason27data.os_code == 0 and reason27data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("_a") is Err(var reason27config):
+        if reason27config.code == 2 and reason27config.operation == "os.config_dir" and reason27config.os_code == 0 and reason27config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("_a") is Err(var reason27cache):
+        if reason27cache.code == 2 and reason27cache.operation == "os.cache_dir" and reason27cache.os_code == 0 and reason27cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("_a") is Err(var reason27state):
+        if reason27state.code == 2 and reason27state.operation == "os.state_dir" and reason27state.os_code == 0 and reason27state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("a_") is Err(var reason28data):
+        if reason28data.code == 2 and reason28data.operation == "os.data_dir" and reason28data.os_code == 0 and reason28data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("a_") is Err(var reason28config):
+        if reason28config.code == 2 and reason28config.operation == "os.config_dir" and reason28config.os_code == 0 and reason28config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("a_") is Err(var reason28cache):
+        if reason28cache.code == 2 and reason28cache.operation == "os.cache_dir" and reason28cache.os_code == 0 and reason28cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("a_") is Err(var reason28state):
+        if reason28state.code == 2 and reason28state.operation == "os.state_dir" and reason28state.os_code == 0 and reason28state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("con") is Err(var reason29data):
+        if reason29data.code == 2 and reason29data.operation == "os.data_dir" and reason29data.os_code == 0 and reason29data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("con") is Err(var reason29config):
+        if reason29config.code == 2 and reason29config.operation == "os.config_dir" and reason29config.os_code == 0 and reason29config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("con") is Err(var reason29cache):
+        if reason29cache.code == 2 and reason29cache.operation == "os.cache_dir" and reason29cache.os_code == 0 and reason29cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("con") is Err(var reason29state):
+        if reason29state.code == 2 and reason29state.operation == "os.state_dir" and reason29state.os_code == 0 and reason29state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("con.game") is Err(var reason30data):
+        if reason30data.code == 2 and reason30data.operation == "os.data_dir" and reason30data.os_code == 0 and reason30data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("con.game") is Err(var reason30config):
+        if reason30config.code == 2 and reason30config.operation == "os.config_dir" and reason30config.os_code == 0 and reason30config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("con.game") is Err(var reason30cache):
+        if reason30cache.code == 2 and reason30cache.operation == "os.cache_dir" and reason30cache.os_code == 0 and reason30cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("con.game") is Err(var reason30state):
+        if reason30state.code == 2 and reason30state.operation == "os.state_dir" and reason30state.os_code == 0 and reason30state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("prn") is Err(var reason31data):
+        if reason31data.code == 2 and reason31data.operation == "os.data_dir" and reason31data.os_code == 0 and reason31data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("prn") is Err(var reason31config):
+        if reason31config.code == 2 and reason31config.operation == "os.config_dir" and reason31config.os_code == 0 and reason31config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("prn") is Err(var reason31cache):
+        if reason31cache.code == 2 and reason31cache.operation == "os.cache_dir" and reason31cache.os_code == 0 and reason31cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("prn") is Err(var reason31state):
+        if reason31state.code == 2 and reason31state.operation == "os.state_dir" and reason31state.os_code == 0 and reason31state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("aux") is Err(var reason32data):
+        if reason32data.code == 2 and reason32data.operation == "os.data_dir" and reason32data.os_code == 0 and reason32data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("aux") is Err(var reason32config):
+        if reason32config.code == 2 and reason32config.operation == "os.config_dir" and reason32config.os_code == 0 and reason32config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("aux") is Err(var reason32cache):
+        if reason32cache.code == 2 and reason32cache.operation == "os.cache_dir" and reason32cache.os_code == 0 and reason32cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("aux") is Err(var reason32state):
+        if reason32state.code == 2 and reason32state.operation == "os.state_dir" and reason32state.os_code == 0 and reason32state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("nul") is Err(var reason33data):
+        if reason33data.code == 2 and reason33data.operation == "os.data_dir" and reason33data.os_code == 0 and reason33data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("nul") is Err(var reason33config):
+        if reason33config.code == 2 and reason33config.operation == "os.config_dir" and reason33config.os_code == 0 and reason33config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("nul") is Err(var reason33cache):
+        if reason33cache.code == 2 and reason33cache.operation == "os.cache_dir" and reason33cache.os_code == 0 and reason33cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("nul") is Err(var reason33state):
+        if reason33state.code == 2 and reason33state.operation == "os.state_dir" and reason33state.os_code == 0 and reason33state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com1") is Err(var reason34data):
+        if reason34data.code == 2 and reason34data.operation == "os.data_dir" and reason34data.os_code == 0 and reason34data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com1") is Err(var reason34config):
+        if reason34config.code == 2 and reason34config.operation == "os.config_dir" and reason34config.os_code == 0 and reason34config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com1") is Err(var reason34cache):
+        if reason34cache.code == 2 and reason34cache.operation == "os.cache_dir" and reason34cache.os_code == 0 and reason34cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com1") is Err(var reason34state):
+        if reason34state.code == 2 and reason34state.operation == "os.state_dir" and reason34state.os_code == 0 and reason34state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com1.game") is Err(var reason35data):
+        if reason35data.code == 2 and reason35data.operation == "os.data_dir" and reason35data.os_code == 0 and reason35data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com1.game") is Err(var reason35config):
+        if reason35config.code == 2 and reason35config.operation == "os.config_dir" and reason35config.os_code == 0 and reason35config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com1.game") is Err(var reason35cache):
+        if reason35cache.code == 2 and reason35cache.operation == "os.cache_dir" and reason35cache.os_code == 0 and reason35cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com1.game") is Err(var reason35state):
+        if reason35state.code == 2 and reason35state.operation == "os.state_dir" and reason35state.os_code == 0 and reason35state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com2") is Err(var reason36data):
+        if reason36data.code == 2 and reason36data.operation == "os.data_dir" and reason36data.os_code == 0 and reason36data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com2") is Err(var reason36config):
+        if reason36config.code == 2 and reason36config.operation == "os.config_dir" and reason36config.os_code == 0 and reason36config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com2") is Err(var reason36cache):
+        if reason36cache.code == 2 and reason36cache.operation == "os.cache_dir" and reason36cache.os_code == 0 and reason36cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com2") is Err(var reason36state):
+        if reason36state.code == 2 and reason36state.operation == "os.state_dir" and reason36state.os_code == 0 and reason36state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com2.game") is Err(var reason37data):
+        if reason37data.code == 2 and reason37data.operation == "os.data_dir" and reason37data.os_code == 0 and reason37data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com2.game") is Err(var reason37config):
+        if reason37config.code == 2 and reason37config.operation == "os.config_dir" and reason37config.os_code == 0 and reason37config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com2.game") is Err(var reason37cache):
+        if reason37cache.code == 2 and reason37cache.operation == "os.cache_dir" and reason37cache.os_code == 0 and reason37cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com2.game") is Err(var reason37state):
+        if reason37state.code == 2 and reason37state.operation == "os.state_dir" and reason37state.os_code == 0 and reason37state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com3") is Err(var reason38data):
+        if reason38data.code == 2 and reason38data.operation == "os.data_dir" and reason38data.os_code == 0 and reason38data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com3") is Err(var reason38config):
+        if reason38config.code == 2 and reason38config.operation == "os.config_dir" and reason38config.os_code == 0 and reason38config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com3") is Err(var reason38cache):
+        if reason38cache.code == 2 and reason38cache.operation == "os.cache_dir" and reason38cache.os_code == 0 and reason38cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com3") is Err(var reason38state):
+        if reason38state.code == 2 and reason38state.operation == "os.state_dir" and reason38state.os_code == 0 and reason38state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com3.game") is Err(var reason39data):
+        if reason39data.code == 2 and reason39data.operation == "os.data_dir" and reason39data.os_code == 0 and reason39data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com3.game") is Err(var reason39config):
+        if reason39config.code == 2 and reason39config.operation == "os.config_dir" and reason39config.os_code == 0 and reason39config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com3.game") is Err(var reason39cache):
+        if reason39cache.code == 2 and reason39cache.operation == "os.cache_dir" and reason39cache.os_code == 0 and reason39cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com3.game") is Err(var reason39state):
+        if reason39state.code == 2 and reason39state.operation == "os.state_dir" and reason39state.os_code == 0 and reason39state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com4") is Err(var reason40data):
+        if reason40data.code == 2 and reason40data.operation == "os.data_dir" and reason40data.os_code == 0 and reason40data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com4") is Err(var reason40config):
+        if reason40config.code == 2 and reason40config.operation == "os.config_dir" and reason40config.os_code == 0 and reason40config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com4") is Err(var reason40cache):
+        if reason40cache.code == 2 and reason40cache.operation == "os.cache_dir" and reason40cache.os_code == 0 and reason40cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com4") is Err(var reason40state):
+        if reason40state.code == 2 and reason40state.operation == "os.state_dir" and reason40state.os_code == 0 and reason40state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com4.game") is Err(var reason41data):
+        if reason41data.code == 2 and reason41data.operation == "os.data_dir" and reason41data.os_code == 0 and reason41data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com4.game") is Err(var reason41config):
+        if reason41config.code == 2 and reason41config.operation == "os.config_dir" and reason41config.os_code == 0 and reason41config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com4.game") is Err(var reason41cache):
+        if reason41cache.code == 2 and reason41cache.operation == "os.cache_dir" and reason41cache.os_code == 0 and reason41cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com4.game") is Err(var reason41state):
+        if reason41state.code == 2 and reason41state.operation == "os.state_dir" and reason41state.os_code == 0 and reason41state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com5") is Err(var reason42data):
+        if reason42data.code == 2 and reason42data.operation == "os.data_dir" and reason42data.os_code == 0 and reason42data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com5") is Err(var reason42config):
+        if reason42config.code == 2 and reason42config.operation == "os.config_dir" and reason42config.os_code == 0 and reason42config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com5") is Err(var reason42cache):
+        if reason42cache.code == 2 and reason42cache.operation == "os.cache_dir" and reason42cache.os_code == 0 and reason42cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com5") is Err(var reason42state):
+        if reason42state.code == 2 and reason42state.operation == "os.state_dir" and reason42state.os_code == 0 and reason42state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com5.game") is Err(var reason43data):
+        if reason43data.code == 2 and reason43data.operation == "os.data_dir" and reason43data.os_code == 0 and reason43data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com5.game") is Err(var reason43config):
+        if reason43config.code == 2 and reason43config.operation == "os.config_dir" and reason43config.os_code == 0 and reason43config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com5.game") is Err(var reason43cache):
+        if reason43cache.code == 2 and reason43cache.operation == "os.cache_dir" and reason43cache.os_code == 0 and reason43cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com5.game") is Err(var reason43state):
+        if reason43state.code == 2 and reason43state.operation == "os.state_dir" and reason43state.os_code == 0 and reason43state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com6") is Err(var reason44data):
+        if reason44data.code == 2 and reason44data.operation == "os.data_dir" and reason44data.os_code == 0 and reason44data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com6") is Err(var reason44config):
+        if reason44config.code == 2 and reason44config.operation == "os.config_dir" and reason44config.os_code == 0 and reason44config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com6") is Err(var reason44cache):
+        if reason44cache.code == 2 and reason44cache.operation == "os.cache_dir" and reason44cache.os_code == 0 and reason44cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com6") is Err(var reason44state):
+        if reason44state.code == 2 and reason44state.operation == "os.state_dir" and reason44state.os_code == 0 and reason44state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com6.game") is Err(var reason45data):
+        if reason45data.code == 2 and reason45data.operation == "os.data_dir" and reason45data.os_code == 0 and reason45data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com6.game") is Err(var reason45config):
+        if reason45config.code == 2 and reason45config.operation == "os.config_dir" and reason45config.os_code == 0 and reason45config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com6.game") is Err(var reason45cache):
+        if reason45cache.code == 2 and reason45cache.operation == "os.cache_dir" and reason45cache.os_code == 0 and reason45cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com6.game") is Err(var reason45state):
+        if reason45state.code == 2 and reason45state.operation == "os.state_dir" and reason45state.os_code == 0 and reason45state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com7") is Err(var reason46data):
+        if reason46data.code == 2 and reason46data.operation == "os.data_dir" and reason46data.os_code == 0 and reason46data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com7") is Err(var reason46config):
+        if reason46config.code == 2 and reason46config.operation == "os.config_dir" and reason46config.os_code == 0 and reason46config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com7") is Err(var reason46cache):
+        if reason46cache.code == 2 and reason46cache.operation == "os.cache_dir" and reason46cache.os_code == 0 and reason46cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com7") is Err(var reason46state):
+        if reason46state.code == 2 and reason46state.operation == "os.state_dir" and reason46state.os_code == 0 and reason46state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com7.game") is Err(var reason47data):
+        if reason47data.code == 2 and reason47data.operation == "os.data_dir" and reason47data.os_code == 0 and reason47data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com7.game") is Err(var reason47config):
+        if reason47config.code == 2 and reason47config.operation == "os.config_dir" and reason47config.os_code == 0 and reason47config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com7.game") is Err(var reason47cache):
+        if reason47cache.code == 2 and reason47cache.operation == "os.cache_dir" and reason47cache.os_code == 0 and reason47cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com7.game") is Err(var reason47state):
+        if reason47state.code == 2 and reason47state.operation == "os.state_dir" and reason47state.os_code == 0 and reason47state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com8") is Err(var reason48data):
+        if reason48data.code == 2 and reason48data.operation == "os.data_dir" and reason48data.os_code == 0 and reason48data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com8") is Err(var reason48config):
+        if reason48config.code == 2 and reason48config.operation == "os.config_dir" and reason48config.os_code == 0 and reason48config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com8") is Err(var reason48cache):
+        if reason48cache.code == 2 and reason48cache.operation == "os.cache_dir" and reason48cache.os_code == 0 and reason48cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com8") is Err(var reason48state):
+        if reason48state.code == 2 and reason48state.operation == "os.state_dir" and reason48state.os_code == 0 and reason48state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com8.game") is Err(var reason49data):
+        if reason49data.code == 2 and reason49data.operation == "os.data_dir" and reason49data.os_code == 0 and reason49data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com8.game") is Err(var reason49config):
+        if reason49config.code == 2 and reason49config.operation == "os.config_dir" and reason49config.os_code == 0 and reason49config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com8.game") is Err(var reason49cache):
+        if reason49cache.code == 2 and reason49cache.operation == "os.cache_dir" and reason49cache.os_code == 0 and reason49cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com8.game") is Err(var reason49state):
+        if reason49state.code == 2 and reason49state.operation == "os.state_dir" and reason49state.os_code == 0 and reason49state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com9") is Err(var reason50data):
+        if reason50data.code == 2 and reason50data.operation == "os.data_dir" and reason50data.os_code == 0 and reason50data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com9") is Err(var reason50config):
+        if reason50config.code == 2 and reason50config.operation == "os.config_dir" and reason50config.os_code == 0 and reason50config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com9") is Err(var reason50cache):
+        if reason50cache.code == 2 and reason50cache.operation == "os.cache_dir" and reason50cache.os_code == 0 and reason50cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com9") is Err(var reason50state):
+        if reason50state.code == 2 and reason50state.operation == "os.state_dir" and reason50state.os_code == 0 and reason50state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("com9.game") is Err(var reason51data):
+        if reason51data.code == 2 and reason51data.operation == "os.data_dir" and reason51data.os_code == 0 and reason51data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("com9.game") is Err(var reason51config):
+        if reason51config.code == 2 and reason51config.operation == "os.config_dir" and reason51config.os_code == 0 and reason51config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("com9.game") is Err(var reason51cache):
+        if reason51cache.code == 2 and reason51cache.operation == "os.cache_dir" and reason51cache.os_code == 0 and reason51cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("com9.game") is Err(var reason51state):
+        if reason51state.code == 2 and reason51state.operation == "os.state_dir" and reason51state.os_code == 0 and reason51state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt1") is Err(var reason52data):
+        if reason52data.code == 2 and reason52data.operation == "os.data_dir" and reason52data.os_code == 0 and reason52data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt1") is Err(var reason52config):
+        if reason52config.code == 2 and reason52config.operation == "os.config_dir" and reason52config.os_code == 0 and reason52config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt1") is Err(var reason52cache):
+        if reason52cache.code == 2 and reason52cache.operation == "os.cache_dir" and reason52cache.os_code == 0 and reason52cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt1") is Err(var reason52state):
+        if reason52state.code == 2 and reason52state.operation == "os.state_dir" and reason52state.os_code == 0 and reason52state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt1.game") is Err(var reason53data):
+        if reason53data.code == 2 and reason53data.operation == "os.data_dir" and reason53data.os_code == 0 and reason53data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt1.game") is Err(var reason53config):
+        if reason53config.code == 2 and reason53config.operation == "os.config_dir" and reason53config.os_code == 0 and reason53config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt1.game") is Err(var reason53cache):
+        if reason53cache.code == 2 and reason53cache.operation == "os.cache_dir" and reason53cache.os_code == 0 and reason53cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt1.game") is Err(var reason53state):
+        if reason53state.code == 2 and reason53state.operation == "os.state_dir" and reason53state.os_code == 0 and reason53state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt2") is Err(var reason54data):
+        if reason54data.code == 2 and reason54data.operation == "os.data_dir" and reason54data.os_code == 0 and reason54data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt2") is Err(var reason54config):
+        if reason54config.code == 2 and reason54config.operation == "os.config_dir" and reason54config.os_code == 0 and reason54config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt2") is Err(var reason54cache):
+        if reason54cache.code == 2 and reason54cache.operation == "os.cache_dir" and reason54cache.os_code == 0 and reason54cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt2") is Err(var reason54state):
+        if reason54state.code == 2 and reason54state.operation == "os.state_dir" and reason54state.os_code == 0 and reason54state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt2.game") is Err(var reason55data):
+        if reason55data.code == 2 and reason55data.operation == "os.data_dir" and reason55data.os_code == 0 and reason55data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt2.game") is Err(var reason55config):
+        if reason55config.code == 2 and reason55config.operation == "os.config_dir" and reason55config.os_code == 0 and reason55config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt2.game") is Err(var reason55cache):
+        if reason55cache.code == 2 and reason55cache.operation == "os.cache_dir" and reason55cache.os_code == 0 and reason55cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt2.game") is Err(var reason55state):
+        if reason55state.code == 2 and reason55state.operation == "os.state_dir" and reason55state.os_code == 0 and reason55state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt3") is Err(var reason56data):
+        if reason56data.code == 2 and reason56data.operation == "os.data_dir" and reason56data.os_code == 0 and reason56data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt3") is Err(var reason56config):
+        if reason56config.code == 2 and reason56config.operation == "os.config_dir" and reason56config.os_code == 0 and reason56config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt3") is Err(var reason56cache):
+        if reason56cache.code == 2 and reason56cache.operation == "os.cache_dir" and reason56cache.os_code == 0 and reason56cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt3") is Err(var reason56state):
+        if reason56state.code == 2 and reason56state.operation == "os.state_dir" and reason56state.os_code == 0 and reason56state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt3.game") is Err(var reason57data):
+        if reason57data.code == 2 and reason57data.operation == "os.data_dir" and reason57data.os_code == 0 and reason57data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt3.game") is Err(var reason57config):
+        if reason57config.code == 2 and reason57config.operation == "os.config_dir" and reason57config.os_code == 0 and reason57config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt3.game") is Err(var reason57cache):
+        if reason57cache.code == 2 and reason57cache.operation == "os.cache_dir" and reason57cache.os_code == 0 and reason57cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt3.game") is Err(var reason57state):
+        if reason57state.code == 2 and reason57state.operation == "os.state_dir" and reason57state.os_code == 0 and reason57state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt4") is Err(var reason58data):
+        if reason58data.code == 2 and reason58data.operation == "os.data_dir" and reason58data.os_code == 0 and reason58data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt4") is Err(var reason58config):
+        if reason58config.code == 2 and reason58config.operation == "os.config_dir" and reason58config.os_code == 0 and reason58config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt4") is Err(var reason58cache):
+        if reason58cache.code == 2 and reason58cache.operation == "os.cache_dir" and reason58cache.os_code == 0 and reason58cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt4") is Err(var reason58state):
+        if reason58state.code == 2 and reason58state.operation == "os.state_dir" and reason58state.os_code == 0 and reason58state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt4.game") is Err(var reason59data):
+        if reason59data.code == 2 and reason59data.operation == "os.data_dir" and reason59data.os_code == 0 and reason59data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt4.game") is Err(var reason59config):
+        if reason59config.code == 2 and reason59config.operation == "os.config_dir" and reason59config.os_code == 0 and reason59config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt4.game") is Err(var reason59cache):
+        if reason59cache.code == 2 and reason59cache.operation == "os.cache_dir" and reason59cache.os_code == 0 and reason59cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt4.game") is Err(var reason59state):
+        if reason59state.code == 2 and reason59state.operation == "os.state_dir" and reason59state.os_code == 0 and reason59state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt5") is Err(var reason60data):
+        if reason60data.code == 2 and reason60data.operation == "os.data_dir" and reason60data.os_code == 0 and reason60data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt5") is Err(var reason60config):
+        if reason60config.code == 2 and reason60config.operation == "os.config_dir" and reason60config.os_code == 0 and reason60config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt5") is Err(var reason60cache):
+        if reason60cache.code == 2 and reason60cache.operation == "os.cache_dir" and reason60cache.os_code == 0 and reason60cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt5") is Err(var reason60state):
+        if reason60state.code == 2 and reason60state.operation == "os.state_dir" and reason60state.os_code == 0 and reason60state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt5.game") is Err(var reason61data):
+        if reason61data.code == 2 and reason61data.operation == "os.data_dir" and reason61data.os_code == 0 and reason61data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt5.game") is Err(var reason61config):
+        if reason61config.code == 2 and reason61config.operation == "os.config_dir" and reason61config.os_code == 0 and reason61config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt5.game") is Err(var reason61cache):
+        if reason61cache.code == 2 and reason61cache.operation == "os.cache_dir" and reason61cache.os_code == 0 and reason61cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt5.game") is Err(var reason61state):
+        if reason61state.code == 2 and reason61state.operation == "os.state_dir" and reason61state.os_code == 0 and reason61state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt6") is Err(var reason62data):
+        if reason62data.code == 2 and reason62data.operation == "os.data_dir" and reason62data.os_code == 0 and reason62data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt6") is Err(var reason62config):
+        if reason62config.code == 2 and reason62config.operation == "os.config_dir" and reason62config.os_code == 0 and reason62config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt6") is Err(var reason62cache):
+        if reason62cache.code == 2 and reason62cache.operation == "os.cache_dir" and reason62cache.os_code == 0 and reason62cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt6") is Err(var reason62state):
+        if reason62state.code == 2 and reason62state.operation == "os.state_dir" and reason62state.os_code == 0 and reason62state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt6.game") is Err(var reason63data):
+        if reason63data.code == 2 and reason63data.operation == "os.data_dir" and reason63data.os_code == 0 and reason63data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt6.game") is Err(var reason63config):
+        if reason63config.code == 2 and reason63config.operation == "os.config_dir" and reason63config.os_code == 0 and reason63config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt6.game") is Err(var reason63cache):
+        if reason63cache.code == 2 and reason63cache.operation == "os.cache_dir" and reason63cache.os_code == 0 and reason63cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt6.game") is Err(var reason63state):
+        if reason63state.code == 2 and reason63state.operation == "os.state_dir" and reason63state.os_code == 0 and reason63state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt7") is Err(var reason64data):
+        if reason64data.code == 2 and reason64data.operation == "os.data_dir" and reason64data.os_code == 0 and reason64data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt7") is Err(var reason64config):
+        if reason64config.code == 2 and reason64config.operation == "os.config_dir" and reason64config.os_code == 0 and reason64config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt7") is Err(var reason64cache):
+        if reason64cache.code == 2 and reason64cache.operation == "os.cache_dir" and reason64cache.os_code == 0 and reason64cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt7") is Err(var reason64state):
+        if reason64state.code == 2 and reason64state.operation == "os.state_dir" and reason64state.os_code == 0 and reason64state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt7.game") is Err(var reason65data):
+        if reason65data.code == 2 and reason65data.operation == "os.data_dir" and reason65data.os_code == 0 and reason65data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt7.game") is Err(var reason65config):
+        if reason65config.code == 2 and reason65config.operation == "os.config_dir" and reason65config.os_code == 0 and reason65config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt7.game") is Err(var reason65cache):
+        if reason65cache.code == 2 and reason65cache.operation == "os.cache_dir" and reason65cache.os_code == 0 and reason65cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt7.game") is Err(var reason65state):
+        if reason65state.code == 2 and reason65state.operation == "os.state_dir" and reason65state.os_code == 0 and reason65state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt8") is Err(var reason66data):
+        if reason66data.code == 2 and reason66data.operation == "os.data_dir" and reason66data.os_code == 0 and reason66data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt8") is Err(var reason66config):
+        if reason66config.code == 2 and reason66config.operation == "os.config_dir" and reason66config.os_code == 0 and reason66config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt8") is Err(var reason66cache):
+        if reason66cache.code == 2 and reason66cache.operation == "os.cache_dir" and reason66cache.os_code == 0 and reason66cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt8") is Err(var reason66state):
+        if reason66state.code == 2 and reason66state.operation == "os.state_dir" and reason66state.os_code == 0 and reason66state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt8.game") is Err(var reason67data):
+        if reason67data.code == 2 and reason67data.operation == "os.data_dir" and reason67data.os_code == 0 and reason67data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt8.game") is Err(var reason67config):
+        if reason67config.code == 2 and reason67config.operation == "os.config_dir" and reason67config.os_code == 0 and reason67config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt8.game") is Err(var reason67cache):
+        if reason67cache.code == 2 and reason67cache.operation == "os.cache_dir" and reason67cache.os_code == 0 and reason67cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt8.game") is Err(var reason67state):
+        if reason67state.code == 2 and reason67state.operation == "os.state_dir" and reason67state.os_code == 0 and reason67state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt9") is Err(var reason68data):
+        if reason68data.code == 2 and reason68data.operation == "os.data_dir" and reason68data.os_code == 0 and reason68data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt9") is Err(var reason68config):
+        if reason68config.code == 2 and reason68config.operation == "os.config_dir" and reason68config.os_code == 0 and reason68config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt9") is Err(var reason68cache):
+        if reason68cache.code == 2 and reason68cache.operation == "os.cache_dir" and reason68cache.os_code == 0 and reason68cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt9") is Err(var reason68state):
+        if reason68state.code == 2 and reason68state.operation == "os.state_dir" and reason68state.os_code == 0 and reason68state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.data_dir("lpt9.game") is Err(var reason69data):
+        if reason69data.code == 2 and reason69data.operation == "os.data_dir" and reason69data.os_code == 0 and reason69data.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.config_dir("lpt9.game") is Err(var reason69config):
+        if reason69config.code == 2 and reason69config.operation == "os.config_dir" and reason69config.os_code == 0 and reason69config.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.cache_dir("lpt9.game") is Err(var reason69cache):
+        if reason69cache.code == 2 and reason69cache.operation == "os.cache_dir" and reason69cache.os_code == 0 and reason69cache.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    if os.state_dir("lpt9.game") is Err(var reason69state):
+        if reason69state.code == 2 and reason69state.operation == "os.state_dir" and reason69state.os_code == 0 and reason69state.native_domain == "":
+            rejected += 1
+    else:
+        accepted += 1
+    print(accepted, rejected)

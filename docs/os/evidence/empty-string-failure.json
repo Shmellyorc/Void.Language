@@ -1,0 +1,13 @@
+{
+  "cause": "Runtime empty strings use nullptr. OS ABI incorrectly used pointer nullness as text-argument arity. Empty env names must return invalid_argument.",
+  "command": [
+    "python3",
+    "tests/os/errors.py",
+    "build/debug/voidc"
+  ],
+  "status": 1,
+  "sha256": {
+    "build/debug/voidc": "332efd7557ec7f5870ca6d301f6900171672d99ae2abb3b109035f09b3e8925c",
+    "build/debug/libvoid_runtime.a": "6762f9556794d253ad27907153f7779f7206b70d0a9cdcffb7810b3d412eb206"
+  }
+}
