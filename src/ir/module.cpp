@@ -40,6 +40,10 @@ void retain_entry(Module& module) {
         // identities. Indirect calls consume those compiler-owned function IDs.
     }
     std::erase_if(module.functions,[&](const auto& function){return !retained.contains(function.name);});
+    std::erase_if(module.generic_instances,[&](const auto& entry) {
+        auto declaration=module.generic_declarations.find(entry.second.declaration);
+        return declaration!=module.generic_declarations.end() && !declaration->second.nominal && !retained.contains(entry.first);
+    });
 }
 bool operator_arity(std::string_view glyph,std::size_t arity) {
     if(arity==1)return glyph=="+" || glyph=="-";
@@ -693,6 +697,36 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         functions.emplace(f.name,&f);
         if(f.initializer && !initializer_types.insert(Type::key(f.parameters[0])).second) fail("duplicate nominal initializer");
     }
+    for(const auto& [identity,declaration]:m.generic_declarations) {
+        if(!declaration.arity || declaration.module_identity.empty() ||
+           !m.source_imports.contains(declaration.module_identity) ||
+           !identity.starts_with(declaration.module_identity+"::") ||
+           identity.size()==declaration.module_identity.size()+2 || functions.contains(identity))
+            fail("invalid generic declaration provenance");
+    }
+    for(const auto& [identity,instance]:m.generic_instances) {
+        auto declaration=m.generic_declarations.find(instance.declaration);
+        auto concrete=functions.find(identity);
+        if(declaration==m.generic_declarations.end() || instance.arguments.size()!=declaration->second.arity ||
+           identity!=generic_instance_identity(m,instance,concrete==functions.end()?nullptr:concrete->second))
+            fail("invalid generic specialization provenance for " + identity + " from " + instance.declaration +
+                 " (canonical " + generic_identity(instance.declaration,instance.arguments) + ")");
+        for(auto argument:instance.arguments) {
+            valid_type(argument);
+            if(argument==Type::none || argument.construction || argument.kind==Type::prepared_receiver)
+                fail("invalid generic specialization argument");
+        }
+        if(declaration->second.nominal) {
+            auto nominal=std::find_if(m.nominal_types.begin(),m.nominal_types.end(),[&](auto type){return Type::key(type)==identity;});
+            if(nominal==m.nominal_types.end() || nominal->definition->module_identity!=declaration->second.module_identity)
+                fail("generic nominal specialization has no declared owner");
+        } else {
+            auto function=functions.find(identity);
+            if(function==functions.end() || function->second->module_identity!=declaration->second.module_identity ||
+               function->second->closure || !function->second->operator_glyph.empty())
+                fail("generic function specialization has no declared owner");
+        }
+    }
     for(const auto& f:m.functions) {
         if(!f.method_name.empty()) {
             if(f.visibility!="public" && f.visibility!="private" && f.visibility!="internal") fail("invalid method visibility");
@@ -1311,7 +1345,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if(declaration!=functions.end() && !declaration->second->operator_glyph.empty()) {
                         if(i.operator_glyph!=declaration->second->operator_glyph || i.receiver || i.initialization)fail("missing or invalid exact operator call proof");
                         std::vector<Type> operands;for(auto arg:args)operands.push_back(operand(arg));
-                        auto selected=select_operator(m,i.operator_glyph,operands,f.module_identity,f.lexical_owner);
+                        auto selected=select_operator(m,i.operator_glyph,operands,f.module_identity,f.lexical_owner,generic_operator_arguments(m,f));
                         if(selected.status!=MemberSelection::found || selected.method!=i.callee)fail("operator call bypasses exact direct-owner selection/access");
                     }else if(!i.operator_glyph.empty())fail("operator target is not an operator declaration");
                     result = i.op==Op::async_call ? declaration->second->task : target->second.result; break;

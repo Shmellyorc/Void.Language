@@ -1,0 +1,26 @@
+func identity<t>(value: t) -> t:
+    return value
+func pick<t>(left: t, right: t) -> t:
+    return left
+func first<t>(items: [t, 3]) -> t:
+    return items[0]
+func relay<a, b>(value: a, other: b) -> a:
+    return identity(value)
+func repeat<t>(value: t, count: i32) -> t:
+    if count == 0:
+        return value
+    return repeat<t>(value, count - 1)
+func twice<t>(value: t) -> t:
+    return value + value
+func entry(value: i32) -> i32:
+    if identity<i8>(-128) != -128 or identity<i16>(-32768) != -32768 or identity<i64>(-9223372036854775808) != -9223372036854775808:
+        return -100
+    if identity<u8>(255) != 255 or identity<u16>(65535) != 65535 or identity<u32>(4294967295) != 4294967295 or identity<u64>(18446744073709551615) != 18446744073709551615:
+        return -200
+    if identity<f32>(0.5) != 0.5f or identity<f64>(0.5) != 0.5d or not identity<bool>(true):
+        return -300
+    if twice("ab") != "abab":
+        return -400
+    var width: i64 = value as i64
+    var chosen = pick(1, width)
+    return first([relay(value, "text"), 2, 3]) + chosen as i32 + repeat<i32>(2, 4)

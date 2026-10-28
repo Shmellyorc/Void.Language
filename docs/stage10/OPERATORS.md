@@ -1,5 +1,14 @@
 # Stage 10 operator overloading
 
+## Approved generic access amendment, 28 October 2026
+
+Boss approved [public exact substituted-owner operator access](../collections/GENERIC_OPERATORS.md)
+for concrete generic specializations, including inferred and explicit arguments.
+Ordinary non-generic code retains direct-import restrictions. Private/internal
+operators and nonpublic owners gain no access. Exact matching, ambiguity, readonly
+authority and independent typed IR validation remain mandatory. The dated
+definition-import statements below are superseded only for this narrow case.
+
 ## Current acceptance checkpoint — 24 October 2026
 
 Implementation, examples and executed coverage are reconciled in

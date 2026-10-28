@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -33,22 +34,46 @@ def _signal_name(status):
         return None
 
 
-def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
-    target = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes'))
-    target.mkdir(parents=True, exist_ok=True)
-    incident = Path(tempfile.mkdtemp(prefix='incident-', dir=target))
+def _sources(command, cwd, source_inputs, environment):
     working = Path(cwd or Path.cwd()).resolve()
     arguments = list(map(str, command)) if not isinstance(command, str) else [command]
     sources = {p for p in working.glob('*.void') if p.is_file()}
-    sources.update((working / item).resolve() for item in source_inputs)
+    explicit = set()
+    for item in source_inputs:
+        candidate = (working / item).resolve()
+        sources.update(candidate.rglob('*.void') if candidate.is_dir() else (candidate,))
+        if candidate.is_file():
+            explicit.add(candidate)
     for argument in arguments:
         candidate = Path(argument)
         if not candidate.is_absolute():
             candidate = working / candidate
         if candidate.suffix == '.void' and candidate.is_file():
             sources.add(candidate.resolve())
+            explicit.add(candidate.resolve())
+            sources.update(candidate.parent.rglob('*.void'))
     # Import resolution can involve several modules; retain the canonical input set.
     sources.update(p for p in (ROOT / 'stdlib').rglob('*.void') if p.is_file())
+    configured = environment.get('VOID_STDLIB_ROOT')
+    if configured:
+        sources.update(Path(configured).rglob('*.void'))
+    evidence = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes')).resolve()
+    return {path for path in sources if path.is_file() and
+            (path in explicit or not path.resolve().is_relative_to(evidence))}
+
+
+def preserve(command, cwd, result, source_inputs=(), provenance_inputs=(), *,
+             failure_kind=None, evidence_context=None, environment=None, source_snapshots=None):
+    if source_snapshots is None:
+        source_snapshots = getattr(result, 'source_snapshots', None)
+    environment = os.environ if environment is None else environment
+    target = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes'))
+    target.mkdir(parents=True, exist_ok=True)
+    incident = Path(tempfile.mkdtemp(prefix='incident-', dir=target))
+    working = Path(cwd or Path.cwd()).resolve()
+    arguments = list(map(str, command)) if not isinstance(command, str) else [command]
+    sources = _sources(command, cwd, source_inputs, environment)
+    sources.update(source_snapshots or {})
     records = []
     for original in sorted(sources):
         if original.is_dir():
@@ -63,7 +88,7 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
         while copy.exists():
             copy = destination / f'{stem}_{serial}{original.suffix}'
             serial += 1
-        raw = original.read_bytes()
+        raw = source_snapshots[original] if source_snapshots and original in source_snapshots else original.read_bytes()
         with copy.open('xb') as stream:
             stream.write(raw)
         original_hash = hashlib.sha256(raw).hexdigest()
@@ -71,11 +96,19 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
         assert preserved_hash == original_hash
         copy.chmod(0o444)
         records.append({'original': str(original), 'copy': str(copy), 'sha256': original_hash,
-                        'original_sha256': original_hash, 'preserved_sha256': preserved_hash})
+                        'original_sha256': original_hash, 'preserved_sha256': preserved_hash,
+                        'captured_at': 'subprocess_launch' if source_snapshots and original in source_snapshots else 'failure',
+                        'current_sha256': digest(original) if original.is_file() else None})
     provenance = incident / 'provenance'
     provenance.mkdir()
     generators = set((ROOT / 'tests/text_encoding').glob('*.py'))
-    generators.update((working / item).resolve() for item in provenance_inputs)
+    for item in provenance_inputs:
+        candidate = (working / item).resolve()
+        if candidate.is_dir():
+            generators.update(path for path in candidate.rglob('*') if path.is_file() and
+                              path.suffix in ('.py', '.cpp', '.cc', '.c', '.h', '.hpp', '.txt', '.json', '.cmake'))
+        else:
+            generators.add(candidate)
     for argument in arguments:
         original = Path(argument)
         if not original.is_absolute():
@@ -112,7 +145,11 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
                              'flags': [line for line in cache.read_text().splitlines()
                                        if line.startswith(('CMAKE_BUILD_TYPE:', 'CMAKE_CXX_COMPILER:',
                                                            'CMAKE_CXX_FLAGS', 'VOID_SANITIZERS:', 'LLVM_DIR:'))]})
-    record = {'timed_out': getattr(result, 'timed_out', False), 'command': arguments, 'cwd': str(working), 'returncode': result.returncode,
+    record = {'failure_kind': failure_kind or ('timeout' if getattr(result, 'timed_out', False)
+                                              else 'abnormal_exit' if crashed(result.returncode)
+                                              else 'test_assertion'),
+              'context': evidence_context or {},
+              'timed_out': getattr(result, 'timed_out', False), 'command': arguments, 'cwd': str(working), 'returncode': result.returncode,
               'signal': _signal_name(result.returncode),
               'executable': executable,
               'executable_sha256': digest(Path(executable)) if executable else None,
@@ -122,8 +159,21 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
                          'companions and canonical stdlib are retained conservatively. '
                          'The exact causal subset is not inferred.',
               'build': str(ROOT / 'build'),
-              'environment': {key: os.environ[key] for key in
-                              ('ASAN_OPTIONS', 'UBSAN_OPTIONS', 'VOID_STDLIB_ROOT') if key in os.environ}}
+              'environment': {key: environment[key] for key in
+                              ('ASAN_OPTIONS', 'UBSAN_OPTIONS', 'LSAN_OPTIONS', 'VOID_STDLIB_ROOT')
+                              if key in environment}}
+    record['compiler_source_hashes'] = {
+        str(path.relative_to(ROOT)): digest(path)
+        for directory in ('src', 'include') for path in sorted((ROOT / directory).rglob('*'))
+        if path.is_file()
+    }
+    record['tool_input_hashes'] = {}
+    for argument in arguments:
+        candidate = Path(argument.removeprefix('--ld-path='))
+        if not candidate.is_absolute():
+            candidate = working / candidate
+        if candidate.is_file() and candidate.suffix != '.void':
+            record['tool_input_hashes'][str(candidate.resolve())] = digest(candidate)
     for name in ('stdout', 'stderr'):
         output = getattr(result, name, None)
         if isinstance(output, str):
@@ -173,6 +223,12 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
 def run(command, *args, **kwargs):
     source_inputs = kwargs.pop('source_inputs', ())
     provenance_inputs = kwargs.pop('provenance_inputs', ())
+    evidence_context = kwargs.pop('evidence_context', None)
+    expected_returncode = kwargs.pop('expected_returncode', None)
+    expected_stdout = kwargs.pop('expected_stdout', None)
+    environment = kwargs.get('env', os.environ)
+    source_snapshots = {path: path.read_bytes() for path in
+                        _sources(command, kwargs.get('cwd'), source_inputs, environment)}
     checked = kwargs.pop('check', False)
     previous = getattr(_RUN_CONTEXT, 'active', False)
     _RUN_CONTEXT.active = True
@@ -198,17 +254,35 @@ def run(command, *args, **kwargs):
                 stdout, stderr = process.communicate()
                 result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
                 result.timed_out = True
-                preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs)
+                preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs,
+                         failure_kind='timeout', evidence_context=evidence_context,
+                         environment=kwargs.get('env'), source_snapshots=source_snapshots)
                 raise subprocess.TimeoutExpired(command, timeout, output=stdout, stderr=stderr)
             except BaseException:
                 process.kill()
                 process.wait()
                 raise
             result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+            result.source_snapshots = source_snapshots
     finally:
         _RUN_CONTEXT.active = previous
-    if crashed(result.returncode):
-        preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs)
+    stderr_bytes = result.stderr or b''
+    if isinstance(stderr_bytes, str):
+        stderr_bytes = stderr_bytes.encode()
+    sanitizer = re.search(rb'(?:ERROR: (?:AddressSanitizer|LeakSanitizer)|'
+                          rb'UndefinedBehaviorSanitizer:|'
+                          rb'\.(?:cpp|cc|c|h|hpp):\d+(?::\d+)?: runtime error:)', stderr_bytes)
+    mismatch = (expected_returncode is not None and result.returncode != expected_returncode or
+                expected_stdout is not None and result.stdout != expected_stdout)
+    if crashed(result.returncode) or sanitizer or mismatch:
+        kind = ('sanitizer_finding' if sanitizer or result.returncode in (86, 87) else
+                'abnormal_exit' if crashed(result.returncode) else
+                'unexpected_exit' if expected_returncode is not None and result.returncode != expected_returncode
+                else 'test_assertion')
+        preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs,
+                 failure_kind=kind, evidence_context=evidence_context, environment=kwargs.get('env'),
+                 source_snapshots=source_snapshots)
+    result.expectation_failed = bool(mismatch or sanitizer)
     if checked:
         result.check_returncode()
     return result
@@ -259,6 +333,8 @@ class _PreservingPopen(_REAL_POPEN):
         self._incident_preserved = False
         self._communicating = False
         self._managed_by_run = getattr(_RUN_CONTEXT, 'active', False)
+        self._source_snapshots = {} if self._managed_by_run else {
+            path: path.read_bytes() for path in _sources(command, self._source_cwd, (), kwargs.get('env', os.environ))}
         self._intentional_stop = False
         self._communicated_output = None
         super().__init__(command, *args, **kwargs)
@@ -279,7 +355,7 @@ class _PreservingPopen(_REAL_POPEN):
                 returncode=status,
                 stdout=self._communicated_output[0] if self._communicated_output else (self.stdout.captured() if self.stdout else b''),
                 stderr=self._communicated_output[1] if self._communicated_output else (self.stderr.captured() if self.stderr else b''),
-                stdin=self.stdin.captured() if self.stdin else b''))
+                stdin=self.stdin.captured() if self.stdin else b''), source_snapshots=self._source_snapshots)
         return status
 
     def communicate(self, *args, **kwargs):

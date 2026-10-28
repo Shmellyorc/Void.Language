@@ -1,0 +1,8 @@
+normal captures allocation failures: 226
+normal with allocation failures: 230
+normal events allocation failures: 388
+normal fixed_capture allocation failures: 133
+O2 captures allocation failures: 226
+O2 with allocation failures: 230
+O2 events allocation failures: 388
+O2 fixed_capture allocation failures: 133

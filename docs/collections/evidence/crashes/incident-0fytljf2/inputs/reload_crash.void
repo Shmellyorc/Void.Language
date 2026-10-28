@@ -1,0 +1,6 @@
+private func identity<t>(value: t) -> t:
+    return value
+func alternate(value: i32) -> i32:
+    return identity(value) + 1
+func entry(value: i32) -> i32:
+    return identity(value)

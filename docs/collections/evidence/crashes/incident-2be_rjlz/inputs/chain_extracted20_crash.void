@@ -1,0 +1,25 @@
+func identity<t>(input:t) -> t:
+    return input
+func entry(input:i32) -> i32:
+    var total = input
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    total += 1
+    return identity(total)

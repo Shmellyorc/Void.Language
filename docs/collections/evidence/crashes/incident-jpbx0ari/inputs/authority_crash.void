@@ -1,0 +1,43 @@
+use collections as c
+
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+
+struct node:
+    number: i32
+
+func positive(const item: node) -> bool:
+    return item.number > 0
+
+func ordered(const left: node, const right: node) -> bool:
+    return left.number < right.number
+
+func fresh(const item: node) -> node:
+    return node(number = item.number + 1)
+
+func main():
+    var first = node(number = 2)
+    var second = node(number = 1)
+    const input = [first, second]
+    var selected = c.filter(input, positive)
+    var backward = c.reversed(input)
+    var sorted = c.sorted(input, ordered)
+    selected.push(first)
+    require(selected[0] == first and backward[1] == first and sorted[0] == second)
+    if c.find(input, positive) is Ok(var found):
+        require(found == first)
+    else:
+        require(false)
+    var transformed = c.map<node, node>(input, fresh)
+    transformed[0].number = 30
+    require(first.number == 2 and transformed[0].number == 30)
+    const dictionary = {"first": first, "second": second}
+    var copy = c.copy_dictionary(dictionary)
+    var keys = c.keys(dictionary)
+    var values = c.values(dictionary)
+    require(copy != dictionary and copy["first"] == first)
+    require(keys[0] == "first" and values[1] == second)
+    require(c.lower_bound(sorted, second, ordered) == 0)
+    print(7)

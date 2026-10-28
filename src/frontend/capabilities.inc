@@ -213,6 +213,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.target == "$random.seed" || e.target.starts_with("$os.")) edges.unsafe=true;
             const bool intrinsic = scalar_numeric_call(e) || e.target.starts_with("$math.") || e.target == "$random.xor" || e.target == "$random.domain" || e.target == "$random.seed" || e.target.starts_with("$collection.") ||
                 e.target.starts_with("$array.") || e.target.starts_with("$dict.") ||
+                e.target == "$collections.version" || e.target == "$collections.check" ||
                 e.target.starts_with("$convert.") || e.target == "$temporal.result" ||
                 e.target.starts_with("$time.") || e.target.starts_with("$layout.") ||
                 e.target.starts_with("$display.") || e.target == "$interpolation" ||
@@ -419,6 +420,19 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if(!s.compound_target.empty()) {
                     if(s.selection)old=evaluated.at(s.selection.get());
                     else {auto type=ir::fact_type(f.locals.at(s.slot),locals.at(s.slot));old=locals.at(s.slot);for(auto field:s.field_indexes){old=ir::field_facts(type,old,field);type=ir::field_type(type,field);}if(s.index)old=ir::field_facts(type,old,ir::array_element_path);}
+                }
+                if (s.kind == K::returned && s.expression && s.expression->parts.empty() &&
+                    (s.expression->kind == Expr::Kind::array_literal ||
+                     s.expression->kind == Expr::Kind::dictionary_literal)) {
+                    // Fresh empty storage has no aliases or elements whose
+                    // authority could be widened. Contextualize it with the
+                    // inferred return profile, just as with the declared
+                    // return type during nominal checking. Existing storage
+                    // and nonempty literals keep the ordinary invariant rules.
+                    auto profile = ir::fact_type(s.expression->type, f.reference_effects.returned);
+                    if (ir::capability_key(profile) != ir::capability_key(s.expression->type)) {
+                        s.expression->type = profile; changed = true;
+                    }
                 }
                 if (s.expression && !s.task_group) rhs=expression(*s.expression);
                 else if (s.kind==K::variable) rhs=ir::reference_facts(f.locals.at(s.slot));

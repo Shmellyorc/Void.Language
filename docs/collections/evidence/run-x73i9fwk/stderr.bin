@@ -1,0 +1,87 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:343:41: error: Dictionary key contains a type defining custom operator ==.
+    code: VOID1103
+
+ 343 | func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+     |                                         ^
+    Module: /@stdlib/collections.void
+    Custom equality declared by /custom-key.void::custom. at /tmp/VOID-collections-negative-3drdzqjb/custom-key.void:12:14
+
+ 12 |     operator ==(const left: custom, const right: custom) -> bool:
+    |              ^^
+    Module: /custom-key.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-3drdzqjb/custom-key.void:31:20
+
+ 31 |     var output = c.copy_dictionary({custom(number = 1): 1})
+    |                    ^^^^^^^^^^^^^^^
+    Module: /custom-key.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:343:6
+
+ 343 | func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+     |      ^^^^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+    Hint: Use an explicit scalar, string or eligible value key projection; custom equality has no authorized hash contract.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:343:52: error: Dictionary key contains a type defining custom operator ==.
+    code: VOID1103
+
+ 343 | func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+     |                                                    ^
+    Module: /@stdlib/collections.void
+    Custom equality declared by /custom-key.void::custom. at /tmp/VOID-collections-negative-3drdzqjb/custom-key.void:12:14
+
+ 12 |     operator ==(const left: custom, const right: custom) -> bool:
+    |              ^^
+    Module: /custom-key.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-3drdzqjb/custom-key.void:31:20
+
+ 31 |     var output = c.copy_dictionary({custom(number = 1): 1})
+    |                    ^^^^^^^^^^^^^^^
+    Module: /custom-key.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:343:6
+
+ 343 | func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+     |      ^^^^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+    Hint: Use an explicit scalar, string or eligible value key projection; custom equality has no authorized hash contract.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:344:5: error: Iteration requires an array, dictionary or integer range.
+    code: VOID1105
+
+ 344 |     for first_value, first_key in items:
+     |     ^^^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-3drdzqjb/custom-key.void:31:20
+
+ 31 |     var output = c.copy_dictionary({custom(number = 1): 1})
+    |                    ^^^^^^^^^^^^^^^
+    Module: /custom-key.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:343:6
+
+ 343 | func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+     |      ^^^^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:349:12: error: Dictionary literal requires dictionary context.
+    code: VOID2001
+
+ 349 |     return {}
+     |            ^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-3drdzqjb/custom-key.void:31:20
+
+ 31 |     var output = c.copy_dictionary({custom(number = 1): 1})
+    |                    ^^^^^^^^^^^^^^^
+    Module: /custom-key.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:343:6
+
+ 343 | func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+     |      ^^^^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+
+/tmp/VOID-collections-negative-3drdzqjb/custom-key.void:31:36: error: Dictionary literal requires dictionary context.
+    code: VOID2001
+
+ 31 |     var output = c.copy_dictionary({custom(number = 1): 1})
+    |                                    ^
+    Module: /custom-key.void
+

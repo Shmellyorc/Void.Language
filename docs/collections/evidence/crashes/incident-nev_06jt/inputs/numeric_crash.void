@@ -1,0 +1,65 @@
+use collections as c
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+func numeric<t>():
+    var items: [t] = [3, 1, 2, 1]
+    var ascending = c.sorted(items, c.numeric_less<t>)
+    var descending = c.sorted(items, c.numeric_less<t>, true)
+    require(ascending[0] == 1 and ascending[3] == 3 and descending[0] == 3 and descending[3] == 1)
+    require(c.sum(items) == 7 and c.lower_bound(ascending, 1, c.numeric_less<t>) == 0 and c.upper_bound(ascending, 1, c.numeric_less<t>) == 2)
+    var empty: [t] = []
+    require(c.sum(empty) == 0)
+    var extremes: [t] = [t.max_value, t.min_value, 0]
+    var ordered = c.sorted(extremes, c.numeric_less<t>)
+    require(ordered[0] == t.min_value and ordered[2] == t.max_value)
+func wrapping<t>():
+    var items: [t] = [t.max_value, 1]
+    var expected: t = t.max_value
+    expected += 1
+    require(c.sum(items) == expected)
+func floating<t>():
+    var zero: t = 0
+    var nan: t = zero / zero
+    var infinity: t = 1 / zero
+    var items: [t] = [nan, 0, -zero, infinity, -infinity, 2, nan]
+    var ordered = c.sorted(items, c.numeric_less<t>)
+    var descending = c.sorted(items, c.numeric_less<t>, true)
+    require(ordered[0] == -infinity and ordered[3] == 2 and ordered[4] == infinity)
+    require(ordered[5] != ordered[5] and ordered[6] != ordered[6])
+    require(descending[0] != descending[0] and descending[1] != descending[1] and descending[2] == infinity)
+    require(1 / ordered[1] == infinity and 1 / ordered[2] == -infinity)
+    require(c.lower_bound(ordered, nan, c.numeric_less<t>) == 5 and c.upper_bound(ordered, nan, c.numeric_less<t>) == 7)
+    require(c.lower_bound(ordered, zero, c.numeric_less<t>) == 1 and c.upper_bound(ordered, -zero, c.numeric_less<t>) == 3)
+    if c.binary_search(ordered, nan, c.numeric_less<t>) is Ok(var index):
+        require(index == 5)
+    else:
+        require(false)
+    require(not c.contains(items, nan))
+    require(not c.numeric_less(nan, nan) and not c.numeric_less(zero, -zero))
+func entry(input: i32) -> i32:
+    numeric<i8>()
+    numeric<u8>()
+    numeric<i16>()
+    numeric<u16>()
+    numeric<i32>()
+    numeric<u32>()
+    numeric<i64>()
+    numeric<u64>()
+    numeric<f32>()
+    numeric<f64>()
+    wrapping<i8>()
+    wrapping<u8>()
+    wrapping<i16>()
+    wrapping<u16>()
+    wrapping<i32>()
+    wrapping<u32>()
+    wrapping<i64>()
+    wrapping<u64>()
+    floating<f32>()
+    floating<f64>()
+    var single: [f32] = [16777216, 1, -16777216]
+    var double: [f64] = [9007199254740992, 1, -9007199254740992]
+    require(c.sum(single) == 0 and c.sum(double) == 0)
+    return 7

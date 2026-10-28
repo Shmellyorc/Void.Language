@@ -1,0 +1,3 @@
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:32:9: runtime error: List structurally modified during iteration
+In function /mutation.void::entry
+

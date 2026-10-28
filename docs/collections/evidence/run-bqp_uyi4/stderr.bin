@@ -1,0 +1,21 @@
+/tmp/VOID-collections-negative-5h6obzcf/untyped-lambda.void:23:40: error: A parameter requires an explicit type or a concrete compile-time default; generic parameter types must be explicit.
+    code: VOID2001
+
+ 23 |     var output = c.sorted([1, 2], func(a, b) -> bool:
+    |                                        ^
+    Module: /untyped-lambda.void
+
+/tmp/VOID-collections-negative-5h6obzcf/untyped-lambda.void:24:9: error: Expected an expression, found '<indent>'.
+    code: VOID1101
+
+ 24 |         return a < b
+    |         ^
+    Module: /untyped-lambda.void
+
+/tmp/VOID-collections-negative-5h6obzcf/untyped-lambda.void:25:5: error: Expected an expression, found ')'.
+    code: VOID1101
+
+ 25 |     )
+    |     ^
+    Module: /untyped-lambda.void
+

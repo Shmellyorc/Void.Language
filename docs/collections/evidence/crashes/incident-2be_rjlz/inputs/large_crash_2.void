@@ -1,0 +1,45 @@
+use collections as c
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+func large_less(const left: [i32, 524288], const right: [i32, 524288]) -> bool:
+    return left[524287] < right[524287]
+func entry(input: i32) -> i32:
+    var first: [i32, 524288]
+    var second: [i32, 524288]
+    first[524287] = 2
+    second[524287] = 1
+    var items = [first, second]
+    var ordered = c.sorted(items, large_less)
+    var backward = c.reversed(items)
+    var filtered = c.filter(items, func(const item: [i32, 524288]) -> bool:
+        return true
+    )
+    var mapped = c.map<[i32, 524288], [i32, 524288]>(items, func(const item: [i32, 524288]) -> [i32, 524288]:
+        return item
+    )
+    items[0][524287] = 99
+    require(ordered[0][524287] == 1 and ordered[1][524287] == 2)
+    require(backward[1][524287] == 2 and filtered[0][524287] == 2)
+    var original = {"first": first}
+    var copied = c.copy_dictionary(original)
+    original["first"][524287] = 88
+    require(copied["first"][524287] == 2)
+    require(mapped[0][524287] == 2)
+    if input == 0:
+        return 7
+    var numbers: [i32] = []
+    for index in 0..<16384:
+        numbers.push((16383 - index) as i32)
+    var sorted = c.sorted(numbers, c.numeric_less<i32>)
+    for item, index in sorted:
+        require(item == index as i32)
+    var calls = 0
+    var compare = func(const left: i32, const right: i32) -> bool:
+        calls += 1
+        return left < right
+    for query in 0..<100:
+        require(c.lower_bound(sorted, query, compare) == (query as i64))
+    require(calls <= 1500)
+    return 7

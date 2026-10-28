@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/semantics.void:123:86: error: Unknown string escape.
+    code: VOID1101
+
+ 123 |     require(c.text_less("", "a") and c.text_less("a", "aa") and c.text_less("a\0", "a\1"))
+     |                                                                                      ^
+    Module: /semantics.void
+

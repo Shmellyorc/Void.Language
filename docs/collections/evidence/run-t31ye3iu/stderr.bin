@@ -1,0 +1,8 @@
+/tmp/VOID-collections-negative-bnvj52tx/private-helper.void:23:20: error: Function '_bound' is private to /@stdlib/collections.void.
+    code: VOID3003
+
+ 23 |     var output = c._bound([1], 0, 1, c.numeric_less<i32>, false, false)
+    |                    ^^^^^^
+    Module: /private-helper.void
+    Hint: Call a public function from that file instead.
+

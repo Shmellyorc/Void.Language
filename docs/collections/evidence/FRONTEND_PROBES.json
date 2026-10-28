@@ -1,0 +1,286 @@
+{
+  "baseline": "bb7244ea029623ddc83acfc163f888a261379051",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+  "compiler_sha256": "49fc1e5f622dae034428f0152edaa895b4afe68756bbf82cd0152b2a2ab1df44",
+  "scope": "Source checking with an existing identified Release binary; no fresh build or JIT/O2/AOT workload execution. Source audit independently targets the baseline. Historical expected-status mismatch is preserved, not rewritten.",
+  "records": [
+    {
+      "case": "find_read",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/find_read.void"
+      ],
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "f2c8f4c49f9759b9515c7b6846e02b567d75c813213d4806034bd06a63ef0b5e",
+      "stderr": "",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var data = [node(value = 7)]\n    if finding(data, node_positive) is Ok(var found):\n        print(found.value)\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "find_mutate",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/find_mutate.void"
+      ],
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "0810ea22f83c8dd16b2539aeccc0f96f0994fbf19a1f287b063857cf7f06336c",
+      "stderr": "/tmp/void-collections-authority-2kswimib/find_mutate.void:57:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 57 |         found.value = 9\n    |         ^^^^^\n    Module: /find_mutate.void\n    Reference type declared here. at /tmp/void-collections-authority-2kswimib/find_mutate.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /find_mutate.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var data = [node(value = 7)]\n    if finding(data, node_positive) is Ok(var found):\n        found.value = 9\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "dict_copy_read",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/dict_copy_read.void"
+      ],
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "f77b23e36e187659f0557f586d5075263ea5640a908004fb853bdc0474adfc62",
+      "stderr": "",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var key = node(value = 1)\n    var leaf = node(value = 7)\n    const dictionary: {node:node} = {key:leaf}\n    var output = copied(dictionary)\n    for value, held_key in output:\n        print(value.value, held_key.value)\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "dict_copy_value_mutate",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/dict_copy_value_mutate.void"
+      ],
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "daf882d492a00953b0ce1729d80511b7ed6059317aa36ba7ab9718420d1bc396",
+      "stderr": "/tmp/void-collections-authority-2kswimib/dict_copy_value_mutate.void:60:9: error: Cannot write through readonly reference leaf 'node'.\n    code: VOID2007\n\n 60 |         value.value = 9\n    |         ^^^^^\n    Module: /dict_copy_value_mutate.void\n    Reference type declared here. at /tmp/void-collections-authority-2kswimib/dict_copy_value_mutate.void:2:8\n\n 2 | struct node:\n   |        ^^^^\n    Module: /dict_copy_value_mutate.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var key = node(value = 1)\n    var leaf = node(value = 7)\n    const dictionary: {node:node} = {key:leaf}\n    var output = copied(dictionary)\n    for value in output:\n        value.value = 9\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "dict_keys_read",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/dict_keys_read.void"
+      ],
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "65e59af2483ea2efbd7c05aeb089d6418401fd80359325318a0185440447cef0",
+      "stderr": "",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var key = node(value = 1)\n    var leaf = node(value = 7)\n    const dictionary: {node:node} = {key:leaf}\n    var output = keys_of(dictionary)\n    print(output[0].value)\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "dict_keys_mutate",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/dict_keys_mutate.void"
+      ],
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "835625bb136f132673bfae6f89aebebb5f039ade35e3185932f72a1f739cffb2",
+      "stderr": "/tmp/void-collections-authority-2kswimib/dict_keys_mutate.void:59:15: error: Cannot mutate storage through readonly array/reference authority.\n    code: VOID2007\n\n 59 |     output[0].value = 9\n    |               ^^^^^\n    Module: /dict_keys_mutate.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var key = node(value = 1)\n    var leaf = node(value = 7)\n    const dictionary: {node:node} = {key:leaf}\n    var output = keys_of(dictionary)\n    output[0].value = 9\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "dict_values_read",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/dict_values_read.void"
+      ],
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "8dd1c9e9350b8505ca0eec5cf136ec7471f0ce4678163cabd307d48ea765fc86",
+      "stderr": "",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var key = node(value = 1)\n    var leaf = node(value = 7)\n    const dictionary: {node:node} = {key:leaf}\n    var output = values_of(dictionary)\n    print(output[0].value)\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "dict_values_mutate",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/dict_values_mutate.void"
+      ],
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "925ea902587f357d7e86330b5540fd5b1dc2450a7e3ae4ae8bfcd740d8603734",
+      "stderr": "/tmp/void-collections-authority-2kswimib/dict_values_mutate.void:59:15: error: Cannot mutate storage through readonly array/reference authority.\n    code: VOID2007\n\n 59 |     output[0].value = 9\n    |               ^^^^^\n    Module: /dict_values_mutate.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var key = node(value = 1)\n    var leaf = node(value = 7)\n    const dictionary: {node:node} = {key:leaf}\n    var output = values_of(dictionary)\n    output[0].value = 9\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "map_nullable_fresh",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/map_nullable_fresh.void"
+      ],
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "e262fa6ffe12355c6c4bad231de8c768bd754296f95753a7a0adc0710fcaa97f",
+      "stderr": "",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var data = [node(value = 7)]\n    var output = mapping<node,node?>(data, fresh_nullable)\n    if output[0] is Ok(var item):\n        item.value = 9\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "map_composite_results",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-authority-2kswimib/map_composite_results.void"
+      ],
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "0b4e6c423aa4542ffd5f08ab44c9cb58c02bac7f21c53ab533678072f1e0333f",
+      "stderr": "",
+      "source": "use error as core\nstruct node:\n    value: i32\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc finding<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, core.error>:\n    for item in items:\n        if predicate(item):\n            return Ok(item)\n    return Err(core.error(message = \"not found\"))\nfunc copied<k,v>(const items: {k:v}) -> {k:v}:\n    for first_value, first_key in items:\n        var output = {first_key: first_value}\n        for value, key in items:\n            output[key] = value\n        return output\n    var empty: {k:v} = {}\n    return empty\nfunc keys_of<k,v>(const items: {k:v}) -> [k]:\n    for first_value, first_key in items:\n        var output = [first_key]\n        output.clear()\n        for value, key in items:\n            output.push(key)\n        return output\n    var empty: [k] = []\n    return empty\nfunc values_of<k,v>(const items: {k:v}) -> [v]:\n    for first_value, first_key in items:\n        var output = [first_value]\n        output.clear()\n        for value, key in items:\n            output.push(value)\n        return output\n    var empty: [v] = []\n    return empty\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc fresh_nullable(const value: node) -> node?:\n    if value.value > 0:\n        return node(value = value.value)\n    return null\nfunc pair(const value: node) -> [i32,2]:\n    return [value.value, value.value]\nfunc make_result(const value: node) -> result<node, string>:\n    return Ok(node(value = value.value))\nfunc make_callback(const value: node) -> func() -> i32:\n    var held = value.value\n    return func() -> i32:\n        return held\nfunc main():\n    var data = [node(value = 7)]\n    var pairs = mapping<node,[i32,2]>(data, pair)\n    var results = mapping<node,result<node,string>>(data, make_result)\n    var callbacks = mapping<node,func() -> i32>(data, make_callback)\n    print(pairs[0][0], callbacks[0]())\n    if results[0] is Ok(var result_node):\n        result_node.value = 9\n",
+      "origin_report": "/tmp/void-collections-authority-2kswimib/report.json"
+    },
+    {
+      "case": "numeric_ten_types",
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "406a6fee522b057b187a2ca68bd243ad9f9bd1c5740377e521ec4062beede618",
+      "stderr": "",
+      "source": "func numeric_less<t>(const left: t, const right: t) -> bool:\n    var zero: t = 0\n    if left != left:\n        return false\n    if right != right:\n        return true\n    return left < right\nfunc order_probe<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:\n    if items.count < 2:\n        return false\n    if descending:\n        return less(items[1], items[0])\n    return less(items[0], items[1])\nfunc main():\n    var left_i8: i8 = 1\n    var right_i8: i8 = 2\n    print(numeric_less(left_i8, right_i8))\n    var left_u8: u8 = 1\n    var right_u8: u8 = 2\n    print(numeric_less(left_u8, right_u8))\n    var left_i16: i16 = 1\n    var right_i16: i16 = 2\n    print(numeric_less(left_i16, right_i16))\n    var left_u16: u16 = 1\n    var right_u16: u16 = 2\n    print(numeric_less(left_u16, right_u16))\n    var left_i32: i32 = 1\n    var right_i32: i32 = 2\n    print(numeric_less(left_i32, right_i32))\n    var left_u32: u32 = 1\n    var right_u32: u32 = 2\n    print(numeric_less(left_u32, right_u32))\n    var left_i64: i64 = 1\n    var right_i64: i64 = 2\n    print(numeric_less(left_i64, right_i64))\n    var left_u64: u64 = 1\n    var right_u64: u64 = 2\n    print(numeric_less(left_u64, right_u64))\n    var left_f32: f32 = 1\n    var right_f32: f32 = 2\n    print(numeric_less(left_f32, right_f32))\n    var left_f64: f64 = 1\n    var right_f64: f64 = 2\n    print(numeric_less(left_f64, right_f64))\n",
+      "origin_report": "/tmp/void-collections-comparator-xs39sk6p/report.json"
+    },
+    {
+      "case": "numeric_bool_reject",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "74927cf0393ec4a490355825eda88d533a71b0ec68a96a835d4cdabc661d4a0e",
+      "stderr": "/tmp/void-collections-comparator-xs39sk6p/numeric_bool_reject.void:2:19: error: Type mismatch: expected bool, received i32.\n    code: VOID2001\n\n 2 |     var zero: t = 0\n   |                   ^\n    Module: /numeric_bool_reject.void\n    Generic specialization requested here. at /tmp/void-collections-comparator-xs39sk6p/numeric_bool_reject.void:15:11\n\n 15 |     print(numeric_less(false, true))\n    |           ^^^^^^^^^^^^\n    Module: /numeric_bool_reject.void\n    Generic declaration. at /tmp/void-collections-comparator-xs39sk6p/numeric_bool_reject.void:1:6\n\n 1 | func numeric_less<t>(const left: t, const right: t) -> bool:\n   |      ^^^^^^^^^^^^\n    Module: /numeric_bool_reject.void\n    Expected: bool\n    Received: i32\n\n/tmp/void-collections-comparator-xs39sk6p/numeric_bool_reject.void:7:12: error: Type mismatch: expected i32, received readonly bool.\n    code: VOID2001\n\n 7 |     return left < right\n   |            ^^^^\n    Module: /numeric_bool_reject.void\n    Generic specialization requested here. at /tmp/void-collections-comparator-xs39sk6p/numeric_bool_reject.void:15:11\n\n 15 |     print(numeric_less(false, true))\n    |           ^^^^^^^^^^^^\n    Module: /numeric_bool_reject.void\n    Generic declaration. at /tmp/void-collections-comparator-xs39sk6p/numeric_bool_reject.void:1:6\n\n 1 | func numeric_less<t>(const left: t, const right: t) -> bool:\n   |      ^^^^^^^^^^^^\n    Module: /numeric_bool_reject.void\n    Expected: i32\n    Received: readonly bool\n\n",
+      "source": "func numeric_less<t>(const left: t, const right: t) -> bool:\n    var zero: t = 0\n    if left != left:\n        return false\n    if right != right:\n        return true\n    return left < right\nfunc order_probe<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:\n    if items.count < 2:\n        return false\n    if descending:\n        return less(items[1], items[0])\n    return less(items[0], items[1])\nfunc main():\n    print(numeric_less(false, true))\n",
+      "origin_report": "/tmp/void-collections-comparator-xs39sk6p/report.json"
+    },
+    {
+      "case": "numeric_string_reject",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "caec058a74eb0f4ed3ba47dcb29a3526e6ccca1765da2749e475629967dde62a",
+      "stderr": "/tmp/void-collections-comparator-xs39sk6p/numeric_string_reject.void:2:19: error: Type mismatch: expected string, received i32.\n    code: VOID2001\n\n 2 |     var zero: t = 0\n   |                   ^\n    Module: /numeric_string_reject.void\n    Generic specialization requested here. at /tmp/void-collections-comparator-xs39sk6p/numeric_string_reject.void:15:11\n\n 15 |     print(numeric_less(\"a\", \"b\"))\n    |           ^^^^^^^^^^^^\n    Module: /numeric_string_reject.void\n    Generic declaration. at /tmp/void-collections-comparator-xs39sk6p/numeric_string_reject.void:1:6\n\n 1 | func numeric_less<t>(const left: t, const right: t) -> bool:\n   |      ^^^^^^^^^^^^\n    Module: /numeric_string_reject.void\n    Expected: string\n    Received: i32\n\n/tmp/void-collections-comparator-xs39sk6p/numeric_string_reject.void:7:17: error: Strings support only +, == and !=.\n    code: VOID2016\n\n 7 |     return left < right\n   |                 ^\n    Module: /numeric_string_reject.void\n    Generic specialization requested here. at /tmp/void-collections-comparator-xs39sk6p/numeric_string_reject.void:15:11\n\n 15 |     print(numeric_less(\"a\", \"b\"))\n    |           ^^^^^^^^^^^^\n    Module: /numeric_string_reject.void\n    Generic declaration. at /tmp/void-collections-comparator-xs39sk6p/numeric_string_reject.void:1:6\n\n 1 | func numeric_less<t>(const left: t, const right: t) -> bool:\n   |      ^^^^^^^^^^^^\n    Module: /numeric_string_reject.void\n\n",
+      "source": "func numeric_less<t>(const left: t, const right: t) -> bool:\n    var zero: t = 0\n    if left != left:\n        return false\n    if right != right:\n        return true\n    return left < right\nfunc order_probe<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:\n    if items.count < 2:\n        return false\n    if descending:\n        return less(items[1], items[0])\n    return less(items[0], items[1])\nfunc main():\n    print(numeric_less(\"a\", \"b\"))\n",
+      "origin_report": "/tmp/void-collections-comparator-xs39sk6p/report.json"
+    },
+    {
+      "case": "bare_generic_comparator_context",
+      "expected_status": 0,
+      "status": 1,
+      "source_sha256": "d99cf8a46b47f2692cec990a6ad53a9f6b5e15c9b257255105b737f442c2ab13",
+      "stderr": "/tmp/void-collections-comparator-xs39sk6p/bare_generic_comparator_context.void:16:30: error: A generic function value requires explicit concrete type arguments.\n    code: VOID1103\n\n 16 |     print(order_probe(items, numeric_less))\n    |                              ^^^^^^^^^^^^\n    Module: /bare_generic_comparator_context.void\n\n",
+      "source": "func numeric_less<t>(const left: t, const right: t) -> bool:\n    var zero: t = 0\n    if left != left:\n        return false\n    if right != right:\n        return true\n    return left < right\nfunc order_probe<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:\n    if items.count < 2:\n        return false\n    if descending:\n        return less(items[1], items[0])\n    return less(items[0], items[1])\nfunc main():\n    var items = [1, 2]\n    print(order_probe(items, numeric_less))\n    print(order_probe(items, numeric_less<i32>, true))\n",
+      "origin_report": "/tmp/void-collections-comparator-xs39sk6p/report.json"
+    },
+    {
+      "case": "inline_untyped_comparator",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "0851de5209096b4b2c65803ad0db7301b5afc432ab799c9f35f23a506caf33ac",
+      "stderr": "/tmp/void-collections-comparator-xs39sk6p/inline_untyped_comparator.void:16:35: error: A parameter requires an explicit type or a concrete compile-time default; generic parameter types must be explicit.\n    code: VOID2001\n\n 16 |     print(order_probe(items, func(a, b):\n    |                                   ^\n    Module: /inline_untyped_comparator.void\n\n/tmp/void-collections-comparator-xs39sk6p/inline_untyped_comparator.void:17:9: error: Expected an expression, found '<indent>'.\n    code: VOID1101\n\n 17 |         return a < b\n    |         ^\n    Module: /inline_untyped_comparator.void\n\n/tmp/void-collections-comparator-xs39sk6p/inline_untyped_comparator.void:18:5: error: Expected an expression, found ')'.\n    code: VOID1101\n\n 18 |     ))\n    |     ^\n    Module: /inline_untyped_comparator.void\n\n",
+      "source": "func numeric_less<t>(const left: t, const right: t) -> bool:\n    var zero: t = 0\n    if left != left:\n        return false\n    if right != right:\n        return true\n    return left < right\nfunc order_probe<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:\n    if items.count < 2:\n        return false\n    if descending:\n        return less(items[1], items[0])\n    return less(items[0], items[1])\nfunc main():\n    var items = [1, 2]\n    print(order_probe(items, func(a, b):\n        return a < b\n    ))\n",
+      "origin_report": "/tmp/void-collections-comparator-xs39sk6p/report.json"
+    },
+    {
+      "case": "inline_typed_comparator",
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "c1ba93310b163af763eddbcd15a941a99307d5a5166e0acb8588c5d6a04767b7",
+      "stderr": "",
+      "source": "func numeric_less<t>(const left: t, const right: t) -> bool:\n    var zero: t = 0\n    if left != left:\n        return false\n    if right != right:\n        return true\n    return left < right\nfunc order_probe<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:\n    if items.count < 2:\n        return false\n    if descending:\n        return less(items[1], items[0])\n    return less(items[0], items[1])\nfunc main():\n    var items = [1, 2]\n    print(order_probe(items, func(const a: i32, const b: i32) -> bool:\n        return a < b\n    ))\n",
+      "origin_report": "/tmp/void-collections-comparator-xs39sk6p/report.json"
+    },
+    {
+      "case": "filter_zero_slice",
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "b5e12df5d3e9ad08ceab43a82ec0376031444b445205598ac4fd2803a22e0735",
+      "source": "struct node:\n    value: i32\nfunc identity(const value: node) -> node:\n    return value\nfunc fresh(const value: node) -> node:\n    return node(value = value.value)\nfunc number(const value: node) -> i32:\n    return value.value\nfunc positive(const value: i32) -> bool:\n    return value > 0\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc copying<t>(const items: [t]) -> [t]:\n    var output: [t] = []\n    for item in items:\n        output.push(item)\n    return output\nfunc index_of<c,t>(const items: c, predicate: func(const t) -> bool) -> i64:\n    for item, index in items:\n        if predicate(item):\n            return index\n    return -1\nfunc filtered<t>(const items: [t], predicate: func(const t) -> bool) -> [t]:\n    var output = items[0..<0]\n    for item in items:\n        if predicate(item):\n            output.push(item)\n    return output\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc folded<t,u>(const items: [t], initial: u, combine: func(u, const t) -> u) -> u:\n    var total = initial\n    for item in items:\n        total = combine(total, item)\n    return total\nfunc total(initial: i32, const value: node) -> i32:\n    return initial + value.value\nfunc has_positive<c>(const items: c) -> bool:\n    for item in items:\n        if item > 0:\n            return true\n    return false\nfunc main():\n    var data = [node(value = 7)]\n    var output = filtered(data, node_positive)\n    print(output[0].value)\n",
+      "stdout": "Source checked successfully\n",
+      "stderr": "",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-frontend-d5en5uwt/filter_zero_slice.void"
+      ]
+    },
+    {
+      "case": "filter_zero_slice_mutate",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "07747e3c5b80459180742c3ee18b4709cbdd1fab68a44932a74dc1a65419d9ec",
+      "source": "struct node:\n    value: i32\nfunc identity(const value: node) -> node:\n    return value\nfunc fresh(const value: node) -> node:\n    return node(value = value.value)\nfunc number(const value: node) -> i32:\n    return value.value\nfunc positive(const value: i32) -> bool:\n    return value > 0\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc copying<t>(const items: [t]) -> [t]:\n    var output: [t] = []\n    for item in items:\n        output.push(item)\n    return output\nfunc index_of<c,t>(const items: c, predicate: func(const t) -> bool) -> i64:\n    for item, index in items:\n        if predicate(item):\n            return index\n    return -1\nfunc filtered<t>(const items: [t], predicate: func(const t) -> bool) -> [t]:\n    var output = items[0..<0]\n    for item in items:\n        if predicate(item):\n            output.push(item)\n    return output\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc folded<t,u>(const items: [t], initial: u, combine: func(u, const t) -> u) -> u:\n    var total = initial\n    for item in items:\n        total = combine(total, item)\n    return total\nfunc total(initial: i32, const value: node) -> i32:\n    return initial + value.value\nfunc has_positive<c>(const items: c) -> bool:\n    for item in items:\n        if item > 0:\n            return true\n    return false\nfunc main():\n    var data = [node(value = 7)]\n    var output = filtered(data, node_positive)\n    output[0].value = 8\n",
+      "stdout": "",
+      "stderr": "/tmp/void-collections-frontend-d5en5uwt/filter_zero_slice_mutate.void:49:15: error: Cannot mutate storage through readonly array/reference authority.\n    code: VOID2007\n\n 49 |     output[0].value = 8\n    |               ^^^^^\n    Module: /filter_zero_slice_mutate.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-frontend-d5en5uwt/filter_zero_slice_mutate.void"
+      ]
+    },
+    {
+      "case": "copy_fixed",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "29b0c32a26ae28677f393b40516e7e7a62e16d64eaeb047a0c09902947a99b62",
+      "source": "struct node:\n    value: i32\nfunc identity(const value: node) -> node:\n    return value\nfunc fresh(const value: node) -> node:\n    return node(value = value.value)\nfunc number(const value: node) -> i32:\n    return value.value\nfunc positive(const value: i32) -> bool:\n    return value > 0\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc copying<t>(const items: [t]) -> [t]:\n    var output: [t] = []\n    for item in items:\n        output.push(item)\n    return output\nfunc index_of<c,t>(const items: c, predicate: func(const t) -> bool) -> i64:\n    for item, index in items:\n        if predicate(item):\n            return index\n    return -1\nfunc main():\n    var data: [i32, 2] = [1, 2]\n    var output = copying(data)\n    print(output[0])\n",
+      "stdout": "",
+      "stderr": "/tmp/void-collections-frontend-d5en5uwt/copy_fixed.void:28:18: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 28 |     var output = copying(data)\n    |                  ^^^^^^^\n    Module: /copy_fixed.void\n\n",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-frontend-d5en5uwt/copy_fixed.void"
+      ]
+    },
+    {
+      "case": "map_typed_callback",
+      "expected_status": 0,
+      "status": 0,
+      "source_sha256": "aeb8644d497ba1eaade5811866af12b0f0f9b02708b4334fe0c550a87bdee047",
+      "source": "struct node:\n    value: i32\nfunc identity(const value: node) -> node:\n    return value\nfunc fresh(const value: node) -> node:\n    return node(value = value.value)\nfunc number(const value: node) -> i32:\n    return value.value\nfunc positive(const value: i32) -> bool:\n    return value > 0\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc copying<t>(const items: [t]) -> [t]:\n    var output: [t] = []\n    for item in items:\n        output.push(item)\n    return output\nfunc index_of<c,t>(const items: c, predicate: func(const t) -> bool) -> i64:\n    for item, index in items:\n        if predicate(item):\n            return index\n    return -1\nfunc main():\n    var data = [node(value = 7)]\n    var transform: func(const node) -> i32 = number\n    var output = mapping(data, transform)\n    print(output[0])\n",
+      "stdout": "Source checked successfully\n",
+      "stderr": "",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-frontend-d5en5uwt/map_typed_callback.void"
+      ]
+    },
+    {
+      "case": "map_explicit_identity",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "5985492710cc94d3b9c21196638a8ba47fb1f1c614faef095042b57c2425d3b1",
+      "source": "struct node:\n    value: i32\nfunc identity(const value: node) -> node:\n    return value\nfunc fresh(const value: node) -> node:\n    return node(value = value.value)\nfunc number(const value: node) -> i32:\n    return value.value\nfunc positive(const value: i32) -> bool:\n    return value > 0\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc copying<t>(const items: [t]) -> [t]:\n    var output: [t] = []\n    for item in items:\n        output.push(item)\n    return output\nfunc index_of<c,t>(const items: c, predicate: func(const t) -> bool) -> i64:\n    for item, index in items:\n        if predicate(item):\n            return index\n    return -1\nfunc main():\n    var data = [node(value = 7)]\n    var output = mapping<node,node>(data, identity)\n    print(output[0].value)\n",
+      "stdout": "",
+      "stderr": "/tmp/void-collections-frontend-d5en5uwt/map_explicit_identity.void:28:43: error: Function value would discard returned readonly authority.\n    code: VOID2007\n\n 28 |     var output = mapping<node,node>(data, identity)\n    |                                           ^^^^^^^^\n    Module: /map_explicit_identity.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-frontend-d5en5uwt/map_explicit_identity.void"
+      ]
+    },
+    {
+      "case": "map_annotation_no_infer",
+      "expected_status": 1,
+      "status": 1,
+      "source_sha256": "e1f665178080ec6e78d6442476ef8b39ee8054510b373e63a5b88affe6675fa1",
+      "source": "struct node:\n    value: i32\nfunc identity(const value: node) -> node:\n    return value\nfunc fresh(const value: node) -> node:\n    return node(value = value.value)\nfunc number(const value: node) -> i32:\n    return value.value\nfunc positive(const value: i32) -> bool:\n    return value > 0\nfunc mapping<t,u>(const items: [t], transform: func(const t) -> u) -> [u]:\n    var output: [u] = []\n    for item in items:\n        output.push(transform(item))\n    return output\nfunc copying<t>(const items: [t]) -> [t]:\n    var output: [t] = []\n    for item in items:\n        output.push(item)\n    return output\nfunc index_of<c,t>(const items: c, predicate: func(const t) -> bool) -> i64:\n    for item, index in items:\n        if predicate(item):\n            return index\n    return -1\nfunc filtered<t>(const items: [t], predicate: func(const t) -> bool) -> [t]:\n    var output = items[0..<0]\n    for item in items:\n        if predicate(item):\n            output.push(item)\n    return output\nfunc node_positive(const value: node) -> bool:\n    return value.value > 0\nfunc folded<t,u>(const items: [t], initial: u, combine: func(u, const t) -> u) -> u:\n    var accumulator = initial\n    for item in items:\n        accumulator = combine(accumulator, item)\n    return accumulator\nfunc add_value(initial: i32, const value: node) -> i32:\n    return initial + value.value\nfunc main():\n    var data = [node(value = 7)]\n    var output: [i32] = mapping(data, number)\n    print(output[0])\n",
+      "stdout": "",
+      "stderr": "/tmp/void-collections-frontend-d5en5uwt/map_annotation_no_infer.void:43:25: error: Cannot infer generic parameter 'u'; supply explicit type arguments.\n    code: VOID2001\n\n 43 |     var output: [i32] = mapping(data, number)\n    |                         ^^^^^^^\n    Module: /map_annotation_no_infer.void\n\n",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/release/voidc",
+        "check",
+        "/tmp/void-collections-frontend-d5en5uwt/map_annotation_no_infer.void"
+      ]
+    }
+  ]
+}

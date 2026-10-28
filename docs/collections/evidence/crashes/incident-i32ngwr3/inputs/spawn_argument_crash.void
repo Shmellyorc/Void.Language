@@ -1,0 +1,7 @@
+func identity<t>(input: t) -> t:
+    return input
+func worker() -> i32:
+    return 7
+async func entry(input: i32) -> i32:
+    var job = identity(spawn worker())
+    return identity(await job)

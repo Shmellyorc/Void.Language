@@ -1,0 +1,44 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:204:17: error: Exact operator '==' is not accessible; import its direct declaring owner and respect its visibility.
+    code: VOID3003
+
+ 204 |         if item == value:
+     |                 ^^
+    Module: /@stdlib/collections.void
+    Operator declared by /mutation.void::marker. at /home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:10:14
+
+ 10 |     operator ==(const left: marker, const right: marker) -> bool:
+    |              ^^
+    Module: /mutation.void
+    Generic specialization requested here. at /home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:29:11
+
+ 29 |         c.index_of(equality_items, marker(number = 99))
+    |           ^^^^^^^^
+    Module: /mutation.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:202:6
+
+ 202 | func index_of<t>(const items: [t], const value: t) -> result<i64, error>:
+     |      ^^^^^^^^
+    Module: /@stdlib/collections.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:214:17: error: Exact operator '==' is not accessible; import its direct declaring owner and respect its visibility.
+    code: VOID3003
+
+ 214 |         if item == value:
+     |                 ^^
+    Module: /@stdlib/collections.void
+    Operator declared by /mutation.void::marker. at /home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:10:14
+
+ 10 |     operator ==(const left: marker, const right: marker) -> bool:
+    |              ^^
+    Module: /mutation.void
+    Generic specialization requested here. at /home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:26:11
+
+ 26 |         c.contains(equality_items, marker(number = 99))
+    |           ^^^^^^^^
+    Module: /mutation.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:212:6
+
+ 212 | func contains<t>(const items: [t], const value: t) -> bool:
+     |      ^^^^^^^^
+    Module: /@stdlib/collections.void
+

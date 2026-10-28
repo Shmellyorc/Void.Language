@@ -209,7 +209,16 @@ struct Module {
     std::vector<Binding> interface_bindings = {};
     std::vector<std::string> strings = {}; // Owned unique UTF-8 byte templates.
     std::vector<Global> globals = {};
+    // Non-executable generic declarations and their canonical concrete instances.
+    // Access is rederived from these typed records, never a permission bit.
+    struct GenericDeclaration { std::string module_identity; unsigned arity; bool nominal; };
+    struct GenericInstance { std::string declaration; std::vector<Type> arguments; };
+    std::map<std::string,GenericDeclaration> generic_declarations = {};
+    std::map<std::string,GenericInstance> generic_instances = {};
 };
+std::string generic_identity(std::string_view,const std::vector<Type>&);
+std::string generic_instance_identity(const Module&,const Module::GenericInstance&,const Function* = nullptr);
+std::vector<Type> generic_operator_arguments(const Module&,const Function&);
 inline constexpr std::size_t string_constant_limit = 16 * 1024 * 1024;
 // CLI execution may emit only the closed entry graph. Embedders retain all
 // source exports unless they explicitly choose this policy.
@@ -229,7 +238,7 @@ struct MemberSelection {
 bool field_accessible(const Module&,Type,unsigned,std::string_view scope,std::string_view lexical_owner = {});
 MemberSelection select_member(const Module&,Type,std::string_view,std::string_view scope,std::size_t* work=nullptr,std::string_view lexical_owner = {});
 bool method_accessible(const Module&,const Function&,std::string_view scope);
-MemberSelection select_operator(const Module&,std::string_view,const std::vector<Type>&,std::string_view scope,std::string_view lexical_owner = {});
+MemberSelection select_operator(const Module&,std::string_view,const std::vector<Type>&,std::string_view scope,std::string_view lexical_owner = {},const std::vector<Type>& generic_arguments = {});
 void satisfy_constraint(const Module&,Type,Type,std::string_view scope);
 Module::Binding structural_binding(const Module&,Type,Type,std::string_view scope,std::size_t* work=nullptr);
 std::vector<Module::Binding> interface_universe(const Module&);

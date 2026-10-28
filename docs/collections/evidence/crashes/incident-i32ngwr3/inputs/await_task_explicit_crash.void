@@ -1,0 +1,9 @@
+func identity<t>(input: t) -> t:
+    return input
+func read() -> result<i32, string>:
+    return Ok(7)
+async func ready() -> i32:
+    return 7
+async func entry(input:i32) -> i32:
+    var task = ready()
+    return identity<i32>(await task)

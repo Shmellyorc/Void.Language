@@ -423,6 +423,7 @@ struct Function {
     std::map<std::string,Type> substitutions;
     std::map<std::string,std::string> substitution_sources;
     std::string generic_origin, concrete_name, concrete_method_name, display_name;
+    std::vector<Type> generic_arguments;
     std::vector<RelatedLocation> instantiation_context;
     unsigned specialization_depth=0;
     std::string native_symbol;
@@ -2117,7 +2118,7 @@ class Semantics {
                 if(!type && part.kind==K::literal && !part.literal_text.empty()){auto opposite=hints.size()==2?hints[1-n]:std::optional<Type>{};type=opposite && numeric::number(*opposite)?*opposite:decimal(part)?Type::f32:Type::i32;}
                 if(!type){known=false;break;}operands.push_back(*type);
             }
-            if(known){auto selected=ir::select_operator(*root.member_catalog,e.op,operands,unit.identity,lexical_owner());if(selected.status==ir::MemberSelection::found)for(const auto& f:root.member_catalog->functions)if(f.name==selected.method)return f.result;}
+            if(known){auto selected=ir::select_operator(*root.member_catalog,e.op,operands,unit.identity,lexical_owner(),operator_generic_arguments());if(selected.status==ir::MemberSelection::found)for(const auto& f:root.member_catalog->functions)if(f.name==selected.method)return f.result;}
         // Builtin arithmetic uses the original child anchors. Do not walk the
         // same children again after failing to select a custom operator.
         for(const auto& hint:hints)if(hint)return hint;
@@ -3065,6 +3066,24 @@ class Semantics {
     }
 
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (e.target == "$collections.version" || e.target == "$collections.check") return e.type;
+        if (unit.identity == "/@stdlib/collections.void" && e.qualifier.empty() &&
+            (e.token.text == "_collections_version" || e.token.text == "_collections_check")) {
+            const bool check = e.token.text == "_collections_check";
+            if (!current || !e.type_arguments.empty() || e.parts.size() != (check ? 2u : 1u))
+                error(source, e.token, Code::argument_count, "Private collection guard has invalid arguments.");
+            const auto owner = expression(*e.parts[0]);
+            if (owner.kind != Type::growable_array)
+                error(source, e.token, Code::type_mismatch, "Private collection guard requires a growable list.");
+            Function target;
+            target.token = e.token;
+            target.symbol = check ? "$collections.check" : "$collections.version";
+            target.result = check ? Type::none : Type::u64;
+            target.parameters.push_back({Token{TokenKind::name, "items", e.token.offset}, ir::readonly_view(owner)});
+            if (check) target.parameters.push_back({Token{TokenKind::name, "version", e.token.offset}, Type::u64});
+            e.target = target.symbol;
+            return e.type = call_arguments(e, target, 0);
+        }
         if(unit.identity=="/@stdlib/json.void" &&
            (e.token.text=="_json_to_value" || e.token.text=="_json_from_value") && math_private_selected(e))
             return json_call(e);
@@ -3274,6 +3293,11 @@ class Semantics {
         if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
         return target;
     }
+    std::vector<Type> operator_generic_arguments() const {
+        std::vector<Type> arguments;
+        if(current)for(const auto& [name,type]:current->substitutions)arguments.push_back(type);
+        return arguments;
+    }
     bool operator_expression(Expr& e,const std::vector<Type>& operands) {
         if(e.implicit)return false; // Compiler-generated identity guards are not source operators.
         const auto glyph=e.op=="!="?std::string("=="):e.op;
@@ -3281,14 +3305,14 @@ class Semantics {
         if(diagnostics.editor && diagnostics.editor->operator_context && diagnostics.editor->module==unit.identity && diagnostics.editor->offset==e.token.offset) {
             auto& out=diagnostics.editor->result;++diagnostics.editor->operator_occurrences;
             if(!invalid_function && !unit.failed_import)for(const auto& name:{"+","-","*","/","%","==","!=","<",">","<=",">="}) {
-                auto match=ir::select_operator(*root.member_catalog,name==std::string("!=")?"==":name,operands,unit.identity,lexical_owner());
+                auto match=ir::select_operator(*root.member_catalog,name==std::string("!=")?"==":name,operands,unit.identity,lexical_owner(),operator_generic_arguments());
                 if(match.status!=ir::MemberSelection::found)continue;
                 for(const auto& [id,u]:units)for(const auto& f:u->functions)if(f.symbol==match.method){auto spelling=std::string(name);if(e.token.text.size()==2 && e.token.text[1]=='=' && e.token.text!="==" && e.token.text!="!=" && e.token.text!="<=" && e.token.text!=">="){if(spelling.size()!=1 || spelling=="<" || spelling==">")continue;spelling+="=";}out.candidates.push_back({spelling,editor_signature(f),24,{},source_documentation(u->source,f.token.offset).text(f.result!=Type::none)});diagnostics.editor->candidate_targets[spelling].insert(f.symbol);++diagnostics.editor->candidate_occurrences[spelling];}
             }
             // Continue the ordinary checker so effects and capability contracts
             // are finalized before presenting these candidates.
         }
-        try{selected=ir::select_operator(*root.member_catalog,glyph,operands,unit.identity,lexical_owner());}
+        try{selected=ir::select_operator(*root.member_catalog,glyph,operands,unit.identity,lexical_owner(),operator_generic_arguments());}
         catch(const std::invalid_argument& failure){error(source,e.token,Code::readonly,failure.what());}
         if(selected.status==ir::MemberSelection::missing)return false;
         std::vector<RelatedLocation> related;
@@ -3383,6 +3407,7 @@ class Semantics {
         } else if(!(left.definition && right.definition && left.definition->callable && right.definition->callable && Type::key(left)==Type::key(right)))expect(right,left,e.token);
         if (e.op == "==" || e.op == "!=") {
             if(left.definition && right.definition && left.definition->callable && right.definition->callable && Type::key(left)==Type::key(right))return e.type=Type::boolean;
+            if(ir::collection_type(left))error(source,e.token,Code::numeric_operator,"Collection equality is not implemented; use an element predicate.");
             if (left.kind == Type::aggregate) error(source,e.token,Code::numeric_operator,"Value struct equality is not implemented.");
             if (left == Type::none) error(source,e.token,Code::invalid_value,"Cannot compare a no-result call.");
             return e.type = Type::boolean;
@@ -4484,6 +4509,16 @@ class Lowering {
                 ir::Instruction operation{ir::Op::temporal_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(6));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
             }
             if(e.target=="$layout.unwrap"){ir::Instruction unwrap{ir::Op::format_unwrap,expression(*e.parts[0])};unwrap.type=Type::string;return emit(unwrap,e.token);}
+            if (e.target == "$collections.version" || e.target == "$collections.check") {
+                // Capture arguments once in source order, as for ordinary calls.
+                std::vector<unsigned> slots(e.parts.size());
+                for (unsigned n = 0; n < e.parts.size(); ++n)
+                    slots[e.argument_indexes.at(n)] = snapshot(expression(*e.parts[n]), expression_type(*e.parts[n]), e.parts[n]->token);
+                ir::Instruction operation{e.target == "$collections.check" ? ir::Op::list_check : ir::Op::list_version,
+                                          emit({ir::Op::load, slots[0]}, e.token)};
+                if (slots.size() == 2) operation.b = emit({ir::Op::load, slots[1]}, e.token);
+                return emit(operation, e.token);
+            }
             if(e.target.starts_with("$collection.")) {
                 const auto operation=e.target.substr(12);unsigned owner=0;if(!e.parts.empty())owner=expression(*e.parts[0]);
                 if(operation=="invalid"){ir::Instruction fail{ir::Op::panic};fail.callee="Invalid enum/result variant tag during display";return emit(fail,e.token);}
@@ -5211,6 +5246,22 @@ ir::Module member_catalog(const std::map<std::string,std::unique_ptr<Unit>>& uni
     }
     return m;
 }
+void generic_provenance(ir::Module& module,const std::map<std::string,std::unique_ptr<Unit>>& units) {
+    for(const auto& [id,unit]:units) {
+        for(const auto& generic:unit->generic_functions)if(!generic.generics.empty() && !generic.symbol.empty())
+            module.generic_declarations.emplace(generic.symbol,ir::Module::GenericDeclaration{id,static_cast<unsigned>(generic.generics.size()),false});
+        for(const auto& generic:unit->generic_structures)
+            module.generic_declarations.emplace(generic.definition->identity,ir::Module::GenericDeclaration{id,static_cast<unsigned>(generic.generics.size()),true});
+        for(const auto& function:unit->functions)if(!function.generic_arguments.empty()) {
+            module.generic_instances.emplace(function.symbol,ir::Module::GenericInstance{function.generic_origin,function.generic_arguments});
+            for(const auto& [mask,context]:function.construction_contexts)
+                module.generic_instances.emplace(ir::construction_name(function.symbol,{mask.begin(),mask.end()}),
+                    ir::Module::GenericInstance{function.generic_origin,function.generic_arguments});
+        }
+        for(const auto& structure:unit->structures)if(structure.generic_origin)
+            module.generic_instances.emplace(structure.definition->identity,ir::Module::GenericInstance{structure.generic_origin->definition->identity,structure.type_arguments});
+    }
+}
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     for(auto& [id,u]:units)if(u->application_body) {
         try {
@@ -5833,6 +5884,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     module.identity = entry; module.entry_symbol = entry + "::entry";module.root_identity=entry;
     for(const auto& [id,u]:units) {auto& imports=module.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);}
     module.source_path = units.at(entry)->source.path();
+    generic_provenance(module,units);
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source,module,strings);
         for (const auto& f : unit->functions) {

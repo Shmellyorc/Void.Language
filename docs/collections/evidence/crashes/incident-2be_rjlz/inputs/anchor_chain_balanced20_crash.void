@@ -1,0 +1,4 @@
+func identity<t>(input: t) -> t:
+    return input
+func entry(input: i32) -> i32:
+    return identity(((((input + 1) + (1 + (1 + 1))) + ((1 + 1) + (1 + (1 + 1)))) + (((1 + 1) + (1 + (1 + 1))) + ((1 + (1 + 1)) + (1 + (1 + 1))))))

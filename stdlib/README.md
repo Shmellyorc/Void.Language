@@ -1,5 +1,17 @@
 # Standard library
 
+`use collections as c` provides 24 synchronous helpers for copied stable sorting
+and reversal, ordered and live searches, predicates, mapping/filtering, seeded
+folds, numeric sums, extrema and ordered dictionary extraction/copying. Transforms
+create new outer identities and preserve readonly referenced children. Fixed
+arrays use explicit slices. `numeric_less<t>` orders NaNs last ascending;
+`text_less` compares unsigned UTF-8 bytes. Use explicitly typed callbacks such as
+`c.numeric_less<i32>` and explicit map type arguments when inference needs them.
+See the [API and mutation contract](../docs/collections/API.md),
+[runnable example](../examples/collections_stdlib/main.void) and
+[engineering handoff](../docs/collections/HANDOFF.md). Native platform acceptance
+and independent Golden Wrench review remain separate gates.
+
 `use os` provides 13 synchronous owner-side queries for data/config/cache/state,
 home/temp, executable/resources, environment, platform/architecture, process ID
 and macOS bundle classification. Discovery returns owned UTF-8 paths and creates

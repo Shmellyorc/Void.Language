@@ -1,0 +1,14 @@
+struct node:
+    value: i32
+func identity<t>(const input: t) -> t:
+    return input
+func read(const input: node) -> result<node, string>:
+    return Ok(input)
+func work(const input: node) -> result<i32, string>:
+    const forwarded = identity(read(input)?)
+    return Ok(forwarded.value)
+func entry(input: i32) -> i32:
+    const item = node(value = 7)
+    if work(item) is Ok(var payload):
+        return payload
+    return -1

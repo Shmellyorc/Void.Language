@@ -140,7 +140,74 @@ std::vector<Module::Binding> interface_universe(const Module& m) {
 
 // Operators share ordinary nominal declarations and access scopes. Selection
 // examines only the static operand owners, with no ancestry/promotion or ranking.
-MemberSelection select_operator(const Module& m,std::string_view glyph,const std::vector<Type>& operands,std::string_view scope,std::string_view lexical_owner) {
+std::string generic_identity(std::string_view declaration,const std::vector<Type>& arguments) {
+    std::string result=std::string(declaration)+"<";
+    for(auto type:arguments) {
+        auto key=std::to_string(static_cast<unsigned>(type.kind))+":"+Type::key(type)+(type.nullable?"?":"");
+        result+=std::to_string(key.size())+":"+key;
+    }
+    return result+">";
+}
+std::string generic_instance_identity(const Module& m,const Module::GenericInstance& proof,const Function* function) {
+    auto declaration=m.generic_declarations.find(proof.declaration);
+    if(declaration==m.generic_declarations.end() || proof.arguments.size()!=declaration->second.arity)
+        throw std::invalid_argument("Invalid generic declaration/argument provenance.");
+    auto base=proof.declaration;
+    if(function && function->receiver) {
+        const auto separator=base.rfind("::method::");
+        if(separator==std::string::npos || function->parameters.empty())
+            throw std::invalid_argument("Generic method has no declaring receiver.");
+        const auto owner=base.substr(0,separator), receiver=Type::key(function->parameters[0]);
+        if(owner!=receiver) {
+            auto bound=m.generic_instances.find(receiver);
+            auto nominal=m.generic_declarations.find(owner);
+            if(bound==m.generic_instances.end() || nominal==m.generic_declarations.end() ||
+               !nominal->second.nominal || bound->second.declaration!=owner ||
+               bound->second.arguments.size()!=nominal->second.arity ||
+               generic_identity(owner,bound->second.arguments)!=receiver ||
+               nominal->second.module_identity!=declaration->second.module_identity)
+                throw std::invalid_argument("Generic method has no matching nominal specialization.");
+        }
+        base=receiver+base.substr(separator);
+    }
+    auto identity=generic_identity(base,proof.arguments);
+    if(function && !function->initializer) {
+        std::vector<unsigned> context;
+        for(unsigned n=0;n<function->parameters.size();++n)if(function->parameters[n].construction)context.push_back(n);
+        identity=construction_name(identity,context);
+    }
+    return identity;
+}
+std::vector<Type> generic_operator_arguments(const Module& m,const Function& function) {
+    std::vector<Type> result;
+    auto instance=[&](const std::string& identity) {
+        auto found=m.generic_instances.find(identity);
+        if(found==m.generic_instances.end())return;
+        const auto& proof=found->second;
+        auto concrete=std::find_if(m.functions.begin(),m.functions.end(),[&](const auto& f){return f.name==identity;});
+        if(generic_instance_identity(m,proof,concrete==m.functions.end()?nullptr:&*concrete)!=identity)
+            throw std::invalid_argument("Invalid generic operator specialization provenance.");
+        result.insert(result.end(),proof.arguments.begin(),proof.arguments.end());
+    };
+    const auto* current=&function;std::set<std::string> seen;
+    for(;;) {
+        if(!seen.insert(current->name).second)throw std::invalid_argument("Cyclic generic operator lexical provenance.");
+        instance(current->name);
+        if(current->receiver && !current->parameters.empty())instance(Type::key(current->parameters[0]));
+        if(current->lexical_parent.empty())break;
+        auto parent=std::find_if(m.functions.begin(),m.functions.end(),[&](const auto& f){return f.name==current->lexical_parent;});
+        if(!current->closure || parent==m.functions.end() || current->module_identity!=parent->module_identity ||
+           !current->name.starts_with(parent->name+"::$lambda$"))
+            throw std::invalid_argument("Invalid generic operator lexical provenance.");
+        bool created=false;
+        for(const auto& block:parent->blocks)for(const auto& instruction:block.instructions)
+            created|=instruction.op==Op::function_reference && instruction.callee==current->name;
+        if(!created)throw std::invalid_argument("Generic operator closure has no lexical creation.");
+        current=&*parent;
+    }
+    return result;
+}
+MemberSelection select_operator(const Module& m,std::string_view glyph,const std::vector<Type>& operands,std::string_view scope,std::string_view lexical_owner,const std::vector<Type>& generic_arguments) {
     MemberSelection result;std::set<std::string> seen;std::vector<std::pair<std::vector<unsigned>,std::string>> hidden;
     if(std::none_of(operands.begin(),operands.end(),[](auto t){return t.definition && (t.kind==Type::aggregate || t.kind==Type::managed_ref);}))return result;
     for(const auto& f:m.functions) {
@@ -153,6 +220,11 @@ MemberSelection select_operator(const Module& m,std::string_view glyph,const std
         bool accessible=owner.visibility=="public" || (owner.visibility=="internal" && same_domain) || (owner.visibility=="private" && scope==owner.module_identity);
         Function visibility;visibility.module_identity=f.module_identity;visibility.visibility="public"; // Private operators use lexical owner, not file-method policy.
         accessible &= method_accessible(m,visibility,scope) && (f.visibility=="public" || (f.visibility=="internal" && same_domain) || (f.visibility=="private" && lexical_owner==Type::key(f.operator_owner)));
+        if(!accessible && owner.visibility=="public" && f.visibility=="public")
+            accessible=std::any_of(generic_arguments.begin(),generic_arguments.end(),[&](auto type) {
+                return type.definition && (type.kind==Type::aggregate || type.kind==Type::managed_ref) &&
+                       Type::key(type)==Type::key(f.operator_owner);
+            });
         if(!accessible){hidden.push_back({{},f.name});continue;}
         for(unsigned n=0;n<operands.size();++n)if(!capability_assignable(operands[n],f.parameters[n]))throw std::invalid_argument("Operator operands cannot discard readonly capabilities.");
         result.candidates.push_back({{},f.name});

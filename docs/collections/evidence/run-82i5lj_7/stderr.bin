@@ -1,0 +1,13 @@
+/tmp/VOID-collections-negative-5h6obzcf/readonly-find.void:24:9: error: Cannot write through readonly reference leaf 'node'.
+    code: VOID2007
+
+ 24 |         found.number = 9
+    |         ^^^^^
+    Module: /readonly-find.void
+    Reference type declared here. at /tmp/VOID-collections-negative-5h6obzcf/readonly-find.void:2:8
+
+ 2 | struct node:
+   |        ^^^^
+    Module: /readonly-find.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

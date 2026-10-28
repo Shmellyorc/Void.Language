@@ -1,0 +1,118 @@
+use collections as c
+
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+
+func entry(command: i32) -> i32:
+    var items = [1, 2]
+    var calls = 0
+    if command >= 10 and command <= 12:
+        var answer = c.is_sorted(items, func(const left: i32, const right: i32) -> bool:
+            calls += 1
+            items.push(3)
+            return command == 10
+        )
+        require(command == 10 and not answer and calls == 1 and items.count == 3)
+        return 7
+    if command >= 20 and command <= 23:
+        var singleton = [1]
+        c.binary_search(singleton, 1, func(const left: i32, const right: i32) -> bool:
+            calls += 1
+            if calls == command - 20:
+                singleton.remove_at(0)
+                singleton.push(1)
+            return left < right
+        )
+        require(command == 20)
+        return 7
+    if command >= 30 and command <= 37:
+        var mutate = func(const value: i32) -> bool:
+            calls += 1
+            if calls == 2:
+                items.push(3)
+            return true
+        if command == 30:
+            c.count_if(items, mutate)
+        if command == 31:
+            c.filter(items, mutate)
+        if command == 32:
+            c.map<i32, i32>(items, func(const value: i32) -> i32:
+                mutate(value)
+                return value
+            )
+        if command == 33:
+            c.fold(items, 0, func(total: i32, const value: i32) -> i32:
+                mutate(value)
+                return total + value
+            )
+        if command == 34 or command == 35:
+            var compare = func(const left: i32, const right: i32) -> bool:
+                items.push(3)
+                return left < right
+            if command == 34:
+                c.min(items, compare)
+            else:
+                c.max(items, compare)
+        if command == 36:
+            c.lower_bound(items, 1, func(const left: i32, const right: i32) -> bool:
+                items.clear()
+                return false
+            )
+        if command == 37:
+            c.upper_bound(items, 1, func(const left: i32, const right: i32) -> bool:
+                items.insert(0, 0)
+                return false
+            )
+        require(false)
+    items = [1, 2]
+    require(c.any(items, func(const value: i32) -> bool:
+        items.push(3)
+        return true
+    ))
+    items = [1, 2]
+    require(not c.all(items, func(const value: i32) -> bool:
+        items.push(3)
+        return false
+    ))
+    items = [1, 2]
+    if c.find(items, func(const value: i32) -> bool:
+        items[0] = 99
+        items.push(3)
+        return true
+    ) is Ok(var captured):
+        require(captured == 1 and items[0] == 99)
+    else:
+        require(false)
+    items = [1, 2]
+    var kept = c.filter(items, func(const value: i32) -> bool:
+        items[0] = 99
+        items[1] = 5
+        return true
+    )
+    require(kept[0] == 1 and kept[1] == 5)
+    items = [1, 2]
+    var ordered = c.sorted(items, func(const left: i32, const right: i32) -> bool:
+        items.push(9)
+        return left < right
+    )
+    require(ordered.count == 2 and ordered[0] == 1 and ordered[1] == 2 and items.count > 2)
+    items = [1, 2]
+    var inversions = 0
+    require(not c.is_sorted(items, func(const left: i32, const right: i32) -> bool:
+        inversions += 1
+        items.push(9)
+        return true
+    ))
+    require(inversions == 1 and items.count == 3)
+    var count = 0
+    items = [1, 2, 3]
+    var visited = c.count_if(items, func(const value: i32) -> bool:
+        count += value
+        if value == 1:
+            items[2] = 9
+        return true
+    )
+    require(count == 12 and visited == 3)
+    return 7

@@ -1,0 +1,38 @@
+use collections as c
+
+struct player:
+    name: string
+    score: i32
+
+func score_less(const left: player, const right: player) -> bool:
+    return left.score < right.score
+
+func active(const item: player) -> bool:
+    return item.score > 0
+
+func main():
+    var numbers = [3, 1, 2, 1]
+    var ordered = c.sorted(numbers, c.numeric_less<i32>)
+    print(ordered[0], ordered[1], ordered[2], ordered[3])
+    # Copy-returning sorting leaves numbers and its other aliases unchanged.
+    var hero = player(name = "hero", score = 20)
+    var enemy = player(name = "enemy", score = 10)
+    var ranking = c.sorted([hero, enemy], score_less)
+    print(ranking[0].name, ranking[1].name)
+    var names = c.sorted(["雪", "a", "é"], c.text_less)
+    print(names[0], names[1], names[2])
+    var scores = {"hero": 10}
+    var copied = c.copy_dictionary(scores)
+    copied["hero"] = 20
+    print(scores["hero"], copied["hero"])
+    const players = [hero, enemy]
+    var selected = c.filter(players, active)
+    # The result outer list is independent; its input-derived children stay readonly.
+    # selected[0].score = 30 would reject. An independently held mutable alias works.
+    hero.score = 30
+    print(selected[0] == hero)
+    var twice: func(const i32) -> i32 = func(const item: i32) -> i32:
+        return item * 2
+    var transformed = c.map(numbers, twice)
+    var fixed: [i32, 3] = [1, 2, 3]
+    print(c.sum(transformed), c.sum(fixed[0..<fixed.count]))

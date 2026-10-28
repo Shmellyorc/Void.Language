@@ -1,0 +1,1 @@
+{"compile_wall":0.702858,"compile_cpu":0.698192,"cache":"disabled","iterations":3,"samples":[{"wall":0.0112712,"cpu":0.011199,"process_peak_rss_kib":74244,"checksum":21},{"wall":0.0102703,"cpu":0.010219,"process_peak_rss_kib":74244,"checksum":21},{"wall":0.0100406,"cpu":0.00999,"process_peak_rss_kib":74244,"checksum":21}]}

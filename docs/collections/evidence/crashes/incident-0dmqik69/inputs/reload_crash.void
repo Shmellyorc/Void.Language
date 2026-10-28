@@ -1,0 +1,20 @@
+use collections as c
+struct callback_frame:
+    number: i32
+var calls = 0
+var items = [3, 1, 2]
+func make() -> func(const i32, const i32) -> bool:
+    var step = 1
+    return func(const left: i32, const right: i32) -> bool:
+        var frame = callback_frame(number = 1)
+        calls += step
+        return left < right
+var saved = make()
+func entry(command: i32) -> i32:
+    if command == 0:
+        calls = 0
+        return 0
+    if command == 3:
+        return calls
+    var ordered = c.sorted(items, saved)
+    return ordered[0] + calls * 100

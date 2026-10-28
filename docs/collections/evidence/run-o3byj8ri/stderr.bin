@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-nujhzgfi/fixed.void:24:20: error: Cannot infer generic parameter 't'; supply explicit type arguments.
+    code: VOID2001
+
+ 24 |     var output = c.sum(input)
+    |                    ^^^
+    Module: /fixed.void
+

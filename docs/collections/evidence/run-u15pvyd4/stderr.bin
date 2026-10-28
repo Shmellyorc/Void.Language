@@ -1,0 +1,9 @@
+/tmp/VOID-collections-negative-3drdzqjb/wrong-callback.void:31:32: error: Type mismatch: expected func(readonly i32, readonly i32) -> bool, received func(readonly i64, readonly i64) -> bool.
+    code: VOID2001
+
+ 31 |     var output = c.sorted([1], func(const a: i64, const b: i64) -> bool:
+    |                                ^^^^
+    Module: /wrong-callback.void
+    Expected: func(readonly i32, readonly i32) -> bool
+    Received: func(readonly i64, readonly i64) -> bool
+

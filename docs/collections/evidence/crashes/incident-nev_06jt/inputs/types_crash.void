@@ -1,0 +1,101 @@
+use collections as c
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+struct node:
+    number: i32
+interface reader:
+    func read() -> i32
+func (self node) read() -> i32:
+    return self.number
+value struct record:
+    fixed: [i32, 2]
+    child: node
+value struct checker:
+    threshold: i32
+func (self checker) call(const item: i32) -> bool:
+    return item > self.threshold
+func (self node) less(const left: i32, const right: i32) -> bool:
+    return left < right
+func keep<t>(const item: t) -> bool:
+    return true
+func double(const item: i32) -> i32:
+    return item * 2
+func entry(input: i32) -> i32:
+    var original = node(number = 4)
+    var nullable: [node?] = [null, original]
+    var optional = c.reversed(nullable)
+    if optional[0] is Ok(var found):
+        require(found == original)
+    else:
+        require(false)
+    var interfaces: [reader] = [original]
+    require(c.filter(interfaces, keep<reader>)[0].read() == 4)
+    var nested = [[original]]
+    var outer = c.reversed(nested)
+    original.number = 5
+    require(outer[0][0].number == 5)
+    var dictionary = {"a": [original]}
+    require(c.values(dictionary)[0][0].number == 5)
+    var copies = c.copy_dictionary(dictionary)
+    require(copies["a"][0] == original)
+    var fixed: [i32, 2] = [1, 2]
+    var fixed_items = [fixed]
+    var reversed = c.reversed(fixed_items)
+    fixed_items[0][0] = 99
+    require(reversed[0][0] == 1)
+    var packet = record(fixed = fixed, child = original)
+    var packets = c.filter([packet], keep<record>)
+    packet.fixed[0] = 77
+    require(packets[0].fixed[0] == 1 and packets[0].child == original)
+    var booleans = c.filter([true, false], keep<bool>)
+    require(booleans.count == 2 and c.contains(booleans, false))
+    var mapped = c.map<i32, [i32, 2]>([3], func(const value: i32) -> [i32, 2]:
+        return [value, value + 1]
+    )
+    require(mapped[0][0] == 3 and mapped[0][1] == 4)
+    var results = c.map<i32, result<i32, string>>([1], func(const value: i32) -> result<i32, string>:
+        return Err("data")
+    )
+    if results[0] is Err(var text):
+        require(text == "data")
+    else:
+        require(false)
+    var functions = c.map<i32, func(const i32) -> i32>([1], func(const value: i32) -> func(const i32) -> i32:
+        return double
+    )
+    require(functions[0](3) == 6)
+    var maybe = c.map<i32, node?>([1, 2], func(const value: i32) -> node?:
+        if value == 1:
+            return null
+        return node(number = value)
+    )
+    require(maybe[0] is null)
+    var checker_value = checker(threshold = 1)
+    require(c.count_if([1, 2, 3], checker_value) == 2)
+    require(c.sorted([3, 2, 1], original.less)[0] == 1)
+    var seed = node(number = 0)
+    var final = c.fold([1, 2, 3], seed, func(total: node, const value: i32) -> node:
+        total.number += value
+        return total
+    )
+    require(final == seed and seed.number == 6)
+    var captured_functions = c.map<i32, func(const i32) -> i32>([1, 2], func(const value: i32) -> func(const i32) -> i32:
+        return func(const later: i32) -> i32:
+            return value + later
+    )
+    require(captured_functions[0](5) == 6 and captured_functions[1](5) == 7)
+    var empty_nodes: {node: node} = {}
+    var empty_copy = c.copy_dictionary(empty_nodes)
+    var empty_keys = c.keys(empty_nodes)
+    var empty_values = c.values(empty_nodes)
+    empty_copy[original] = original
+    empty_keys.push(original)
+    empty_values.push(original)
+    require(empty_nodes.count == 0 and empty_copy[original] == original and empty_keys[0] == original and empty_values[0] == original)
+    var managed_keys = {original: packet}
+    var key_list = c.keys(managed_keys)
+    var value_list = c.values(managed_keys)
+    require(key_list[0] == original and value_list[0].child == original)
+    return 7

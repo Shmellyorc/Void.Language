@@ -1,0 +1,17 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:214:17: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 214 |         if item == value:
+     |                 ^^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-bnvj52tx/value-equality.void:23:20
+
+ 23 |     var output = c.contains([packet(number = 1)], packet(number = 1))
+    |                    ^^^^^^^^
+    Module: /value-equality.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:212:6
+
+ 212 | func contains<t>(const items: [t], const value: t) -> bool:
+     |      ^^^^^^^^
+    Module: /@stdlib/collections.void
+

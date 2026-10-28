@@ -1,0 +1,27 @@
+use collections as c
+use console as con
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+var callbacks = 0
+var items: [[i32, 65536]] = []
+func less(const left: [i32, 65536], const right: [i32, 65536]) -> bool:
+    callbacks += 1
+    return left[65535] < right[65535]
+
+func entry(iterations: i32) -> i32:
+    if iterations == 0:
+        for index in 0..<4:
+            var item: [i32, 65536]
+            item[65535] = 3 - index
+            items.push(item)
+        return 0
+    callbacks = 0
+    var checksum = 0
+    for repetition in 0..<iterations:
+        var output = c.sorted(items, less)
+        require(output[0][65535] == 0 and output[-1][65535] == 3)
+        checksum += 7
+    print(callbacks, file = con.stderr)
+    return checksum

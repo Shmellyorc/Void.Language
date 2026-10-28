@@ -3,13 +3,12 @@
 // the same Parser; all layout, initialization, effects and lowering stay shared.
 std::size_t generic_key_work=0;
 auto specialization_name=[&](const SourceFile& source,const Token& token,const std::string& name,const std::vector<Type>& arguments) {
-    std::string result=name+"<";
     for(const auto& t:arguments) {
         const auto key=std::to_string(static_cast<unsigned>(t.kind))+":"+Type::key(t)+(t.nullable?"?":"");
         if(key.size()>8388608-generic_key_work)error(source,token,Code::limit,"Generic specialization identity work budget exceeded.");
-        generic_key_work+=key.size();result+=std::to_string(key.size())+":"+key;
+        generic_key_work+=key.size();
     }
-    return result+">";
+    return ir::generic_identity(name,arguments);
 };
 auto transfer_syntax=[](Unit& owner,Unit& parsed) {
     owner.function_types.splice(owner.function_types.end(),parsed.function_types);owner.results.splice(owner.results.end(),parsed.results);owner.arrays.splice(owner.arrays.end(),parsed.arrays);owner.applications.splice(owner.applications.end(),parsed.applications);
@@ -54,6 +53,7 @@ for(auto& [id,u]:units) {
         if(parsed.parse_failed || parsed.functions.size()!=1)throw Poison{};
         transfer_syntax(owner,parsed);owner.functions.splice(owner.functions.end(),parsed.functions);
         auto& concrete=owner.functions.back();concrete.accessor=generic.accessor;
+        concrete.generic_arguments=arguments;
         for(const auto& p:generic.generics)concrete.substitution_sources.emplace(p.token.text,generic.symbol+"::type::"+p.token.text);
         if(generic.receiver)for(const auto& s:owner.structures)if(s.definition==receiver.definition && s.generic_origin)
             for(const auto& p:s.generic_origin->generics)concrete.substitution_sources.emplace(p.token.text,s.generic_origin->definition->identity+"::type::"+p.token.text);

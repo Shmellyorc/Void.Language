@@ -1,0 +1,15 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:124:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::_checked_less
+Called from /@stdlib/collections.void::_bound
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:136:22: source call
+            before = _checked_less(items, version, items[middle], value, less, descending)
+                     ^
+Called from /@stdlib/collections.void::binary_search
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:171:20: source call
+    var position = _bound(items, version, value, less, descending, false)
+                   ^
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:51:11: source call
+        c.binary_search(singleton, 1, func(const left: i32, const right: i32) -> bool:
+          ^
+

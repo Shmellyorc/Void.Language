@@ -1,0 +1,659 @@
+{
+  "completed_utc": "2026-10-28T08:18:15.448501+00:00",
+  "baseline": "bb7244ea029623ddc83acfc163f888a261379051",
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "focused_suites_passed": 30,
+  "adjacent_suites_passed": 12,
+  "public_signatures_verified": 24,
+  "profiles": {
+    "debug": {
+      "receipt": "docs/collections/evidence/acceptance-debug-p5d5zp84/receipt.json",
+      "passed": 10,
+      "skipped": 0,
+      "seconds": 477.5153385119629,
+      "verified_source_hashes": 169,
+      "executables": {
+        "voidc": "bce5c5647622d8a2db0a18c3bbe12dcbb01b79638ae80d303bf9eb55b5f6d977",
+        "voidls": "a50e1546c575fe789a84ac8129c4228d6a2612509b345aeca7ca7ba41a1de8ae",
+        "void_collections_stdlib_host": "fd1d4dd919e729e3d202d60dec1b3ca5c2eca83c3138efd28994b331081a0f94",
+        "void_operator_resolution": "120fcacabe89c6bd81e9a28fbb20adb82e7dfe20aa2ec247c1a6e2f3be8f9392"
+      },
+      "build_configuration_sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "environment": {
+        "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+      }
+    },
+    "release": {
+      "receipt": "docs/collections/evidence/acceptance-release-q24zvwya/receipt.json",
+      "passed": 10,
+      "skipped": 0,
+      "seconds": 83.08217264397535,
+      "verified_source_hashes": 169,
+      "executables": {
+        "voidc": "f9e7bcf55374c13e4e3c2213b72c207aa31ba00774ba3b6be2dcffc655b58994",
+        "voidls": "fe725093095e75fac948cfb1bf2beb2aad827c887ccb0a152a0d674ad202c83b",
+        "void_collections_stdlib_host": "874443d6da58df43dcbccae37630e8f89c6e66638369d0be0d4e5da7a3846759",
+        "void_operator_resolution": "9010b6ca0b3155f90593202bc4b885f0c996ebcc583b20315a57ccedc5fb590b"
+      },
+      "build_configuration_sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "environment": {
+        "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+      }
+    },
+    "san": {
+      "receipt": "docs/collections/evidence/acceptance-san-9khqxhvs/receipt.json",
+      "passed": 10,
+      "skipped": 0,
+      "seconds": 270.3803993490292,
+      "verified_source_hashes": 169,
+      "executables": {
+        "voidc": "dbd8c08762e56982b6ef1109b399651652745dc730268abae5a62f81e244ab7c",
+        "voidls": "60f39c4f47e17f84c5fb0a5f7cf1f4510743691500287d383fbdb5e3214f78b0",
+        "void_collections_stdlib_host": "dddfb6c34f38a1dc76f25389f087f400bfac74416eb04fe436a21c08d8cb890c",
+        "void_operator_resolution": "202971e53f965c07a97aa12cb58182fb2f4e0099c0342a50bf3b8d8ed4af79fa"
+      },
+      "build_configuration_sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+        "PYTHONPATH": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding:"
+      }
+    }
+  },
+  "adjacent": {
+    "debug": {
+      "generics": {
+        "receipt": "docs/collections/evidence/run-ub9k0m_b/receipt.json",
+        "seconds": 6.369903480983339,
+        "executable_sha256": "84d32f0090e8542ccffd57cf71473274a2e542fbb233157fa6c29e47383412cb"
+      },
+      "advanced": {
+        "receipt": "docs/collections/evidence/run-gfim31jc/receipt.json",
+        "seconds": 20.467696847044863,
+        "executable_sha256": "fd2937483ef606cac364104a7cf234be4163698df6838170b9b096977d480141"
+      },
+      "collections": {
+        "receipt": "docs/collections/evidence/run-h3m_ff21/receipt.json",
+        "seconds": 56.17971304699313,
+        "executable_sha256": "5f113bfba5f8b9393e8cf200260b36902aec3c40ea5f87ecec1e8a1b22f252d8"
+      },
+      "reference_values": {
+        "receipt": "docs/collections/evidence/run-dbeq0c3k/receipt.json",
+        "seconds": 3.931586633028928,
+        "executable_sha256": "6fe6179a921b66cd4e9e9621dc3984be20e46344b36e70cba42953fe87c59ecf"
+      }
+    },
+    "release": {
+      "generics": {
+        "receipt": "docs/collections/evidence/run-mgjfnsjs/receipt.json",
+        "seconds": 2.6821708580246195,
+        "executable_sha256": "26ded5b32fcdff7a38abf2ed9779f3cf6c2a2332bf36ed9559840ac9faae0401"
+      },
+      "advanced": {
+        "receipt": "docs/collections/evidence/run-i2yqrmdo/receipt.json",
+        "seconds": 3.267156784015242,
+        "executable_sha256": "9523a435fbf08221d4f548c38f5c78a24f86dd6e4a498f08c529989e33c62f3c"
+      },
+      "collections": {
+        "receipt": "docs/collections/evidence/run-dgdz5gxb/receipt.json",
+        "seconds": 7.4685654859640636,
+        "executable_sha256": "79f040760420e3e5875473894098d318728080ba6358fdd0852cd83761593b32"
+      },
+      "reference_values": {
+        "receipt": "docs/collections/evidence/run-6x2hnll_/receipt.json",
+        "seconds": 1.2311281319707632,
+        "executable_sha256": "85a3d6e781cc2ba1266b58b8099673a0e15005dec4d8309a5fe3c5359337678e"
+      }
+    },
+    "san": {
+      "generics": {
+        "receipt": "docs/collections/evidence/run-c2a3q7c2/receipt.json",
+        "seconds": 7.011328188003972,
+        "executable_sha256": "f5df1ddabf23ddf374d4049924d7056cdc60b1fa4a34429be88c73adc6657a1b"
+      },
+      "advanced": {
+        "receipt": "docs/collections/evidence/run-zhfxrtqq/receipt.json",
+        "seconds": 10.377784450014587,
+        "executable_sha256": "d98943c6c706d90adaac80ed02acd29f069b8669211c1c14ef2501e01dba2b58"
+      },
+      "collections": {
+        "receipt": "docs/collections/evidence/run-42khvf9w/receipt.json",
+        "seconds": 37.7258578009787,
+        "executable_sha256": "2a7b90cd9eb81653ff49895295102d01cb2c6eb28f556e9019f904b4078473f2"
+      },
+      "reference_values": {
+        "receipt": "docs/collections/evidence/run-6qnjja3q/receipt.json",
+        "seconds": 4.035975629987661,
+        "executable_sha256": "6a60cca6d59469fd707d191cc16fbe68e3bb1f612a688e2378f3170c2a47f534"
+      }
+    }
+  },
+  "targeted_guard_ir": {
+    "debug": "docs/collections/evidence/run-49irqfvs/receipt.json",
+    "release": "docs/collections/evidence/run-txr3wbe2/receipt.json",
+    "san": "docs/collections/evidence/run-yo7uk3_a/receipt.json"
+  },
+  "archive_audit": {
+    "incidents": [
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-0dmqik69/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 30,
+          "provenance_inputs": 25
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-0fytljf2/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 75,
+          "provenance_inputs": 30
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-2_fxzre7/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 20,
+          "provenance_inputs": 16
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-2be_rjlz/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 75,
+          "provenance_inputs": 30
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-4_be_qbt/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 19,
+          "provenance_inputs": 15
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-gnaun5p7/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 30,
+          "provenance_inputs": 27
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-i32ngwr3/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 75,
+          "provenance_inputs": 30
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-jpbx0ari/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 20,
+          "provenance_inputs": 15
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-kbiww20w/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 29,
+          "provenance_inputs": 25
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-mf7fg8wc/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 21,
+          "provenance_inputs": 17
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-nev_06jt/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 30,
+          "provenance_inputs": 23
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-peado_o2/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 75,
+          "provenance_inputs": 30
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-sme98iu7/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 24,
+          "provenance_inputs": 17
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-vu6mics2/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 19,
+          "provenance_inputs": 15
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-woklfvtc/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 30,
+          "provenance_inputs": 24
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-x_8b433c/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 20,
+          "provenance_inputs": 15
+        }
+      },
+      {
+        "receipt": "docs/collections/evidence/crashes/incident-y85t0wuv/receipt.json",
+        "failure_kind": "unexpected_exit",
+        "returncode": 1,
+        "verified_copies": {
+          "sources": 20,
+          "provenance_inputs": 15
+        }
+      }
+    ],
+    "source_copies": 612,
+    "provenance_copies": 369
+  },
+  "build_logs": [
+    {
+      "original": "build/collections-benchmark-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-benchmark-build.log",
+      "sha256": "80bb11e85503299648a03e6ee9febb8a388a139e7d8e6e8e56bafdb9a1ec3428"
+    },
+    {
+      "original": "build/collections-benchmark-corrected.log",
+      "copy": "docs/collections/evidence/build-logs/collections-benchmark-corrected.log",
+      "sha256": "95ac31e3145a375b624c2c38a78a476230394d0575457f0d7ed15dddbce2c8bf"
+    },
+    {
+      "original": "build/collections-benchmark.log",
+      "copy": "docs/collections/evidence/build-logs/collections-benchmark.log",
+      "sha256": "498460486ce5d04ba82bbd420ba088db47070c6781d2dd9b8481655ddea03f99"
+    },
+    {
+      "original": "build/collections-debug-acceptance-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-acceptance-build.log",
+      "sha256": "8f99397278ed719bb5eb42a1603bb28b01707d429205840d7ecca62ea5e99667"
+    },
+    {
+      "original": "build/collections-debug-acceptance.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-acceptance.log",
+      "sha256": "6afb08ada1bcc66189f93939c682187030e87bd6d2dd0a29c58e5ca577897e6a"
+    },
+    {
+      "original": "build/collections-debug-adjacent-diagnostic.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-adjacent-diagnostic.log",
+      "sha256": "996de38124baa8b0bcb3dfbb78b477eed80c308ab949471304d9cae8f0743a01"
+    },
+    {
+      "original": "build/collections-debug-adjacent-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-adjacent-final.log",
+      "sha256": "3daed45dfcd89abcef868abec96ebfa10e2e23bf058827f9ba749766c9fa4d5a"
+    },
+    {
+      "original": "build/collections-debug-adjacent.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-adjacent.log",
+      "sha256": "b9627138b4bddc7b3cae79347f81d4816f438277cab886924140241b5b30214e"
+    },
+    {
+      "original": "build/collections-debug-authority-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-authority-build.log",
+      "sha256": "a3d3f7b1e589248b838979e1765024cfdae60a0a13a35a5dc927eaf8c2dffa63"
+    },
+    {
+      "original": "build/collections-debug-bound-method-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-bound-method-final-build.log",
+      "sha256": "089825dde0ebccc8e007094205e528544d169c4bc60bd51a7d58372dbd51b8dd"
+    },
+    {
+      "original": "build/collections-debug-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-build.log",
+      "sha256": "52a09e1d45e0cabd3c6957377b2a15b77cb8fc92c9636029700b2a8ca01ff805"
+    },
+    {
+      "original": "build/collections-debug-cache.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-cache.log",
+      "sha256": "d36d2faaf84f0fb5cf33ddc10e69ee3430a6a453d3e479897ea0b77f46e8c5ad"
+    },
+    {
+      "original": "build/collections-debug-configure.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-configure.log",
+      "sha256": "b7e100b59ec0fa52b4a1f0f4d879c670a29130c21231436d78d0074640444a95"
+    },
+    {
+      "original": "build/collections-debug-contract-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-contract-build.log",
+      "sha256": "fed82ccbe96b6cef6faf92ef9ba570c49071666fecd552104b04a5d4e4af61e6"
+    },
+    {
+      "original": "build/collections-debug-empty-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-empty-build.log",
+      "sha256": "da171d9f24d5ca1c4e2935fe595490ef2d5798dcb80f6cc03f6e54d202d5849d"
+    },
+    {
+      "original": "build/collections-debug-example.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-example.log",
+      "sha256": "65383e48e15157d0e951714cdbe27867c1e37aa1dd84c7d0e3d53ecfee3c4fc8"
+    },
+    {
+      "original": "build/collections-debug-failures-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-failures-final.log",
+      "sha256": "2ebec6ee24f2d39e2c4edcd31b4ed0d093e62293da4d6f7fb9b7d11064d2258b"
+    },
+    {
+      "original": "build/collections-debug-failures.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-failures.log",
+      "sha256": "688876a73e18ad21ccf32d60f2754cb8adee50d9cbd79a1bbaabf51794c21ea5"
+    },
+    {
+      "original": "build/collections-debug-final-acceptance.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-final-acceptance.log",
+      "sha256": "e7d3def194469f7fc9687007982ada662ae9296bf153061f5692c24ba62f72b9"
+    },
+    {
+      "original": "build/collections-debug-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-final-build.log",
+      "sha256": "5f39676b31f2d3fffead38da0b87e1b502798155b5c529dd6f9a10d038b98239"
+    },
+    {
+      "original": "build/collections-debug-final-scope-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-final-scope-build.log",
+      "sha256": "f0ce74845a93b14f06ef481f14793a2458fadaaae97c7a2a3c343368df8aa9df"
+    },
+    {
+      "original": "build/collections-debug-frontend.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-frontend.log",
+      "sha256": "5de4dd711ca41d24925fca07479f2533f5a50ac228bf8546389694ff43e746cc"
+    },
+    {
+      "original": "build/collections-debug-frozen-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-frozen-build.log",
+      "sha256": "d10e165af49a36478b771f518c17ec6a67d90a6fdfc9779afc5478215a63e73f"
+    },
+    {
+      "original": "build/collections-debug-guard-ir.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-guard-ir.log",
+      "sha256": "1a97d6bdb5f6353f329d3165398e298c79f67246d2e4a913fdb3f2bbfce13037"
+    },
+    {
+      "original": "build/collections-debug-host-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-host-build.log",
+      "sha256": "0515bea11bd3bcb178e33953d0bed55de37c6ed67dd54f5f28008801db9c4efc"
+    },
+    {
+      "original": "build/collections-debug-host-contract.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-host-contract.log",
+      "sha256": "28854b3c8d05656a5b53a7afe868059483b98138454627e988bf44e4060ac5dc"
+    },
+    {
+      "original": "build/collections-debug-host-corrected.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-host-corrected.log",
+      "sha256": "ae1ba611ef6f4f3497db43fd68fa2abe126a71c8e0a6f556cfda752742e14e10"
+    },
+    {
+      "original": "build/collections-debug-host-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-host-final.log",
+      "sha256": "488947ae372fe83540cee3300ae7087e1bd48f13348cfc30f5b81e92d08041dc"
+    },
+    {
+      "original": "build/collections-debug-install.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-install.log",
+      "sha256": "832e13d474990a0b390668cd2bfc13e6e8230706b11c3b1d10f8412a76294ad5"
+    },
+    {
+      "original": "build/collections-debug-ir-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-ir-build.log",
+      "sha256": "c80919699960d3c15dccab199209ef5c1957e327531d5f714269950dc2f69143"
+    },
+    {
+      "original": "build/collections-debug-local-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-local-final-build.log",
+      "sha256": "98c35fb5a70ea52b18e90d6d9af593f27869c2b6e85aa74ccf8616d0d37efacb"
+    },
+    {
+      "original": "build/collections-debug-lsp-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-lsp-final.log",
+      "sha256": "4140d58b8afd0d1df414c458f3df75899fc6b21582bf89754dd094ea190f9b23"
+    },
+    {
+      "original": "build/collections-debug-lsp.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-lsp.log",
+      "sha256": "f215c935f7e45a0e826389c5c0f3df7da45e1b07a3edfe9e3e85298578c4dcfa"
+    },
+    {
+      "original": "build/collections-debug-method-proof-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-method-proof-build.log",
+      "sha256": "290d95b1c1bd5a0672944878ce4420e61001138ba952fc65e701b0cf7509aa5f"
+    },
+    {
+      "original": "build/collections-debug-operators-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-operators-final.log",
+      "sha256": "be8b7a4c27f609ab676f0993a83962d91f4a9fad76006a6b111876c6916041f8"
+    },
+    {
+      "original": "build/collections-debug-oracles.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-oracles.log",
+      "sha256": "c4ae81f1d7529c88725832fb55b5115010e2ed1b69471f0827f1af5101b9270c"
+    },
+    {
+      "original": "build/collections-debug-provenance-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-provenance-build.log",
+      "sha256": "a5739c0aa27e4fa78ab20cc16a19ee95d43269a153f29d9c92d8e8a4acb1122b"
+    },
+    {
+      "original": "build/collections-debug-provenance-diagnostic-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-provenance-diagnostic-build.log",
+      "sha256": "c17e45dced4bfb30a60c74850a379ae558a386d17ea501e6c746a24bf24a7bdd"
+    },
+    {
+      "original": "build/collections-debug-regression-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-regression-build.log",
+      "sha256": "a762347be6a793f865b188b43beeb543066eaddbcb723279fc898bbf8125f4cb"
+    },
+    {
+      "original": "build/collections-debug-regression-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-regression-final-build.log",
+      "sha256": "4d7d5728d908e7720cb139f66cefbfbbd4f2bb167a7ee35ebfc03a32a6c91a09"
+    },
+    {
+      "original": "build/collections-debug-reload-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-reload-build.log",
+      "sha256": "b6d5d4640dd021431324f6921d221352a54af77f7d69b8c185ccdbf577fc10cd"
+    },
+    {
+      "original": "build/collections-debug-reload-corrected-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-reload-corrected-build.log",
+      "sha256": "edee6fd9cfbfa01fa8967afd87ee09dc4a926cc0c1206851cd2e8b426cf6817d"
+    },
+    {
+      "original": "build/collections-debug-reload-only-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-reload-only-build.log",
+      "sha256": "40ca424143c3df5c35cfbe9e16726f19a88d0a9eca08a1681526e8debe50f4a8"
+    },
+    {
+      "original": "build/collections-debug-reload-only.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-reload-only.log",
+      "sha256": "81b2052f0d2e6f01394f31d0dad02b86af65d88cfa722040d6819e5946d38687"
+    },
+    {
+      "original": "build/collections-debug-reload-runtime-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-reload-runtime-build.log",
+      "sha256": "40ca424143c3df5c35cfbe9e16726f19a88d0a9eca08a1681526e8debe50f4a8"
+    },
+    {
+      "original": "build/collections-debug-reload-runtime.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-reload-runtime.log",
+      "sha256": "7234ce5f979644340148339865185df9579ea5d1e58ac1b68c3ec96e0cececea"
+    },
+    {
+      "original": "build/collections-debug-stack-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-debug-stack-final.log",
+      "sha256": "ad290a7012d4d3b6b6ae8da4393739f70624e548608723d45cd15c91e4bc20ae"
+    },
+    {
+      "original": "build/collections-recorder-final-selftest.log",
+      "copy": "docs/collections/evidence/build-logs/collections-recorder-final-selftest.log",
+      "sha256": "1ac31a5faac94b5afa3bd706928382390942ffa855afbd564c3d3d57b598a727"
+    },
+    {
+      "original": "build/collections-recorder-selftest.log",
+      "copy": "docs/collections/evidence/build-logs/collections-recorder-selftest.log",
+      "sha256": "d9b00d2ba0cb006dfe7cd2e668657ca6b4e51caa186628d34fda5789d3c28f67"
+    },
+    {
+      "original": "build/collections-release-acceptance.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-acceptance.log",
+      "sha256": "77619d6016c01a6f8bb9d0ca99e07b4f4c66d4720179b5dcd8fcccf8b36cb057"
+    },
+    {
+      "original": "build/collections-release-adjacent-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-adjacent-build.log",
+      "sha256": "b63a3b390c3410e86f408bceec78b014b739b0850089699c5e4f2f711ec8d306"
+    },
+    {
+      "original": "build/collections-release-adjacent-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-adjacent-final.log",
+      "sha256": "3daed45dfcd89abcef868abec96ebfa10e2e23bf058827f9ba749766c9fa4d5a"
+    },
+    {
+      "original": "build/collections-release-adjacent.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-adjacent.log",
+      "sha256": "df73e77a5fd7ad39f15555781c3c83382a6e8465ac49b42582340e7badd7cad3"
+    },
+    {
+      "original": "build/collections-release-bound-method-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-bound-method-build.log",
+      "sha256": "d88acd7e0f8a2f71eeb42881056adf93e96b37d695827da528b133333ad81821"
+    },
+    {
+      "original": "build/collections-release-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-build.log",
+      "sha256": "5b9b27c1d089db208dae326b648f535948370d3dbe4fe207977db3d742a4e042"
+    },
+    {
+      "original": "build/collections-release-final-acceptance.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-final-acceptance.log",
+      "sha256": "27a2e33bf88ece92e7e8ed62d5a3b35e3fd8ddfec1ad4a91341ad0e7a37305c1"
+    },
+    {
+      "original": "build/collections-release-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-final-build.log",
+      "sha256": "b632cf3ae60bc4985875cc71c23e787709ba170a07250e102377963a3b7fa68f"
+    },
+    {
+      "original": "build/collections-release-frozen-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-frozen-build.log",
+      "sha256": "b9f94a6559f2dcc16d8a3d0ab087367e399477d63bb7538a928e7cb37a67e2ab"
+    },
+    {
+      "original": "build/collections-release-guard-ir.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-guard-ir.log",
+      "sha256": "1a97d6bdb5f6353f329d3165398e298c79f67246d2e4a913fdb3f2bbfce13037"
+    },
+    {
+      "original": "build/collections-release-local-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-release-local-final-build.log",
+      "sha256": "fb590b964b1c73b845c21b7869b39cde8a39761ca16b44cc36d45352b460c9d4"
+    },
+    {
+      "original": "build/collections-san-acceptance.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-acceptance.log",
+      "sha256": "d182f3f550d43afecdaeae1b1abc57c2dbff1b68477e16dc73b25ef20dbc309d"
+    },
+    {
+      "original": "build/collections-san-adjacent-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-adjacent-build.log",
+      "sha256": "e6be3dbe52e1e9b2e871eef20b1d114b06772ce5c8b0de6fd8bf087b81dc8473"
+    },
+    {
+      "original": "build/collections-san-adjacent-final.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-adjacent-final.log",
+      "sha256": "3daed45dfcd89abcef868abec96ebfa10e2e23bf058827f9ba749766c9fa4d5a"
+    },
+    {
+      "original": "build/collections-san-adjacent.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-adjacent.log",
+      "sha256": "8ad0dda206dca12381f21d95c9d5c0ec7caed8fad8f4cfd2ef345687efdd6f70"
+    },
+    {
+      "original": "build/collections-san-bound-method-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-bound-method-build.log",
+      "sha256": "6cf7cf1733809c624c9c9ef4e7b004f32ecb44986ec0ab151088d619b1e4f335"
+    },
+    {
+      "original": "build/collections-san-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-build.log",
+      "sha256": "614d6e9bb4df89e168839a7b34458797e906e91bfe74ad0812735c2d81566da4"
+    },
+    {
+      "original": "build/collections-san-final-acceptance.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-final-acceptance.log",
+      "sha256": "e9d92aaa06f739845430ad5db39fc215b8ecad1135c4b642d49ecfe5899f274d"
+    },
+    {
+      "original": "build/collections-san-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-final-build.log",
+      "sha256": "1238232f0026756808f40f533732b281c99ab91305c14b01e594e7e74d5c5cfa"
+    },
+    {
+      "original": "build/collections-san-frozen-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-frozen-build.log",
+      "sha256": "0c5f1887828a0096f6493738ccf5307b06d3e40548618c4dbf6d046a15d68464"
+    },
+    {
+      "original": "build/collections-san-guard-ir.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-guard-ir.log",
+      "sha256": "1a97d6bdb5f6353f329d3165398e298c79f67246d2e4a913fdb3f2bbfce13037"
+    },
+    {
+      "original": "build/collections-san-local-final-build.log",
+      "copy": "docs/collections/evidence/build-logs/collections-san-local-final-build.log",
+      "sha256": "a4ca954bc7c4bab49f17eeaebe86e82f61357a65fc99a7b78011ac3eef6738df"
+    }
+  ],
+  "protected_root_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "git_index_changed": false,
+  "native_windows_macOS_executed": false,
+  "hosted_ci_triggered": false,
+  "ptrace_used": false,
+  "independent_review_complete": false,
+  "benchmark": "docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/measurements.json"
+}

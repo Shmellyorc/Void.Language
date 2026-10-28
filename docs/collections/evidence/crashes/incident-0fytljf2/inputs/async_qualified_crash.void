@@ -1,0 +1,6 @@
+use "./async_library.void" as library
+func identity<t>(input: t) -> t:
+    return input
+async func entry(input: i32) -> i32:
+    var job = identity(library.ready(7))
+    return identity(await job)

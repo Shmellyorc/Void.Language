@@ -1,0 +1,42 @@
+use collections as c
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+func entry(command: i32) -> i32:
+    var items = [3, 1, 2, 1, 4]
+    if command == 1:
+        var result = c.sorted(items, c.numeric_less<i32>)
+        require(result[0] == 1 and result[4] == 4)
+    if command == 2:
+        var result = c.reversed(items)
+        require(result[0] == 4 and result[4] == 3)
+    if command == 3:
+        var result = c.filter(items, func(const item: i32) -> bool:
+            return item > 1
+        )
+        require(result.count == 3)
+    if command == 4:
+        var result = c.map<i32, string>(items, func(const item: i32) -> string:
+            return "value"
+        )
+        require(result.count == 5 and result[4] == "value")
+    if command == 5:
+        var result = c.keys({"first": 1, "second": 2})
+        require(result.count == 2 and result[0] == "first")
+    if command == 6:
+        var result = c.values({"first": 1, "second": 2})
+        require(result.count == 2 and result[1] == 2)
+    if command == 7:
+        var original = {"first": 1, "second": 2}
+        var result = c.copy_dictionary(original)
+        result["first"] = 99
+        require(original["first"] == 1)
+    if command == 8:
+        var empty: [i32] = []
+        if c.min(empty, c.numeric_less<i32>) is Err(var failure):
+            require(failure.code == 2)
+        else:
+            require(false)
+    require(items.count == 5 and items[0] == 3 and items[1] == 1)
+    return 7

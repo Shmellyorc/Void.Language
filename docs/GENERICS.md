@@ -1,5 +1,10 @@
 # Native generics (Phase 24)
 
+The [28 October generic operator amendment](collections/GENERIC_OPERATORS.md)
+allows public operators on exact substituted public nominal owners, with verified
+IR specialization provenance. Ordinary code keeps the direct-import restriction;
+private/internal visibility and exact matching remain unchanged.
+
 **Stage 8 Sprint 2 update (20 October 2026):**
 [The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
 ordinary named/default-call exclusions below. Existing constructor, readonly,

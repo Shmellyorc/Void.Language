@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-z7lr0t1i/stdlib/collections.void:352:5: error: Private collection guard has invalid arguments.
+    code: VOID2004
+
+ 352 |     _collections_version([1], 2)
+     |     ^^^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+

@@ -1,0 +1,1163 @@
+{
+  "host": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_channel_benchmark",
+  "host_sha256": "53c16b2753a5cc47322a4c385b7c952bf29744ee3e1b606e1f7f962d6ff7ea39",
+  "cache": "disabled",
+  "note": "Execution includes result checks and one callback-count stderr write per invocation; setup and compilation are separate. RSS is process-wide high water, not algorithm allocation.",
+  "measurements": [
+    {
+      "compile_wall": 0.859481,
+      "compile_cpu": 0.852945,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000245569,
+          "cpu": 0.000245,
+          "process_peak_rss_kib": 62384,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000246888,
+          "cpu": 0.000239,
+          "process_peak_rss_kib": 62384,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000259259,
+          "cpu": 0.00026,
+          "process_peak_rss_kib": 62384,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-0-ordered",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-0-ordered.void",
+      "source_sha256": "503ff528e61a539a85cfa4343890bcc6a1d31f933d6728bfe0f1e7a732807b67",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.850334,
+      "compile_cpu": 0.843491,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000247669,
+          "cpu": 0.000247,
+          "process_peak_rss_kib": 72764,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000240448,
+          "cpu": 0.00024,
+          "process_peak_rss_kib": 72764,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000259729,
+          "cpu": 0.000259,
+          "process_peak_rss_kib": 72764,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-0-reverse",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-0-reverse.void",
+      "source_sha256": "49d8de3b06c410b779ff6e7f6217fc5c0466fc5a53a86c9a5725ac09e83f8403",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.925798,
+      "compile_cpu": 0.916848,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000255099,
+          "cpu": 0.000255,
+          "process_peak_rss_kib": 72784,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000236228,
+          "cpu": 0.000237,
+          "process_peak_rss_kib": 72784,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000261969,
+          "cpu": 0.000262,
+          "process_peak_rss_kib": 72784,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-0-duplicates",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-0-duplicates.void",
+      "source_sha256": "8b08e003c27d6c0e8e6c073823495ed506f562f00822581d28d6f9594b428917",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.930588,
+      "compile_cpu": 0.919796,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000260999,
+          "cpu": 0.000261,
+          "process_peak_rss_kib": 72788,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000276408,
+          "cpu": 0.000268,
+          "process_peak_rss_kib": 72788,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000273428,
+          "cpu": 0.000273,
+          "process_peak_rss_kib": 72788,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-0-mixed",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-0-mixed.void",
+      "source_sha256": "95099065ad1b90aece187f8d89e29f9daca5f6164425afaa8d11742f957e0e30",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.841135,
+      "compile_cpu": 0.834716,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000584897,
+          "cpu": 0.000575,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000599516,
+          "cpu": 0.0006,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000636837,
+          "cpu": 0.000629,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-1-ordered",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1-ordered.void",
+      "source_sha256": "1ebf84ecce14305370a4e09fdebf1544ebee9922b0ea16d28b52dcca0c92a729",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.82374,
+      "compile_cpu": 0.81866,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000574116,
+          "cpu": 0.000575,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000592947,
+          "cpu": 0.000589,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000590466,
+          "cpu": 0.000591,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-1-reverse",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1-reverse.void",
+      "source_sha256": "ba9ca115e5d465720dc0d444eaace46072f40135ac0a9ae9c3d67960bbe93a16",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.844445,
+      "compile_cpu": 0.838343,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000612496,
+          "cpu": 0.000606,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000623106,
+          "cpu": 0.000623,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000609857,
+          "cpu": 0.00061,
+          "process_peak_rss_kib": 72792,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-1-duplicates",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1-duplicates.void",
+      "source_sha256": "301c68843a4695f9994ee0daecaf79bbadec03af75753ed274e1590a7c13e70b",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.841272,
+      "compile_cpu": 0.835909,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.000580007,
+          "cpu": 0.00058,
+          "process_peak_rss_kib": 72800,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000607666,
+          "cpu": 0.000603,
+          "process_peak_rss_kib": 72800,
+          "checksum": 140
+        },
+        {
+          "wall": 0.000615727,
+          "cpu": 0.000612,
+          "process_peak_rss_kib": 72800,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-1-mixed",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1-mixed.void",
+      "source_sha256": "8c1a3f661c064d938c7a5af9f3922d524dc5f70f3e490c304a9e0f6b24cb4965",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.868086,
+      "compile_cpu": 0.859179,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.0348874,
+          "cpu": 0.034681,
+          "process_peak_rss_kib": 72800,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0348186,
+          "cpu": 0.03469,
+          "process_peak_rss_kib": 72800,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0347669,
+          "cpu": 0.034643,
+          "process_peak_rss_kib": 72800,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-32-ordered",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-32-ordered.void",
+      "source_sha256": "4eef3066277dabf084ce0a0454138c16c95230f7b09fa9a0d9b7286ea7bbcb24",
+      "callback_totals": [
+        160,
+        1600,
+        1600,
+        1600
+      ]
+    },
+    {
+      "compile_wall": 0.859805,
+      "compile_cpu": 0.853789,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.0366895,
+          "cpu": 0.03655,
+          "process_peak_rss_kib": 72804,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0358927,
+          "cpu": 0.035761,
+          "process_peak_rss_kib": 72804,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0359536,
+          "cpu": 0.035781,
+          "process_peak_rss_kib": 72804,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-32-reverse",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-32-reverse.void",
+      "source_sha256": "aab1e47357fd590affd952919f47ca7af1b6afa40aa70c58b96a645c7f3ed847",
+      "callback_totals": [
+        160,
+        1600,
+        1600,
+        1600
+      ]
+    },
+    {
+      "compile_wall": 0.851192,
+      "compile_cpu": 0.845137,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.0442957,
+          "cpu": 0.044045,
+          "process_peak_rss_kib": 72804,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0442668,
+          "cpu": 0.044094,
+          "process_peak_rss_kib": 72804,
+          "checksum": 140
+        },
+        {
+          "wall": 0.044304,
+          "cpu": 0.044132,
+          "process_peak_rss_kib": 72804,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-32-duplicates",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-32-duplicates.void",
+      "source_sha256": "e2c5f284279f2b7120d4adad4850034cf96fa7d23e1174be608b3008d3e1e9df",
+      "callback_totals": [
+        240,
+        2400,
+        2400,
+        2400
+      ]
+    },
+    {
+      "compile_wall": 0.824806,
+      "compile_cpu": 0.818957,
+      "cache": "disabled",
+      "iterations": 20,
+      "samples": [
+        {
+          "wall": 0.0344858,
+          "cpu": 0.034356,
+          "process_peak_rss_kib": 72812,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0343671,
+          "cpu": 0.034232,
+          "process_peak_rss_kib": 72812,
+          "checksum": 140
+        },
+        {
+          "wall": 0.0342761,
+          "cpu": 0.034137,
+          "process_peak_rss_kib": 72812,
+          "checksum": 140
+        }
+      ],
+      "scenario": "sort-32-mixed",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-32-mixed.void",
+      "source_sha256": "eaddc85fa393684af11b11661d6078bf18b49f2f24c1a9eb4ce13cb81d6982bc",
+      "callback_totals": [
+        160,
+        1600,
+        1600,
+        1600
+      ]
+    },
+    {
+      "compile_wall": 0.854469,
+      "compile_cpu": 0.848149,
+      "cache": "disabled",
+      "iterations": 2,
+      "samples": [
+        {
+          "wall": 0.210799,
+          "cpu": 0.209654,
+          "process_peak_rss_kib": 72820,
+          "checksum": 14
+        },
+        {
+          "wall": 0.215037,
+          "cpu": 0.213864,
+          "process_peak_rss_kib": 72820,
+          "checksum": 14
+        },
+        {
+          "wall": 0.208753,
+          "cpu": 0.207924,
+          "process_peak_rss_kib": 72820,
+          "checksum": 14
+        }
+      ],
+      "scenario": "sort-1024-ordered",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1024-ordered.void",
+      "source_sha256": "7436e2009b9c9a9229362276de41d0ea6951466332e61ffb75b0b89911e9ab74",
+      "callback_totals": [
+        10240,
+        10240,
+        10240,
+        10240
+      ]
+    },
+    {
+      "compile_wall": 0.816132,
+      "compile_cpu": 0.811313,
+      "cache": "disabled",
+      "iterations": 2,
+      "samples": [
+        {
+          "wall": 0.20768,
+          "cpu": 0.206738,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        },
+        {
+          "wall": 0.202224,
+          "cpu": 0.201398,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        },
+        {
+          "wall": 0.203045,
+          "cpu": 0.202201,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        }
+      ],
+      "scenario": "sort-1024-reverse",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1024-reverse.void",
+      "source_sha256": "7e1ba72e5d111b8a7399e56294bc9ba400266f447f9914d82b14e8148a0eabdd",
+      "callback_totals": [
+        10240,
+        10240,
+        10240,
+        10240
+      ]
+    },
+    {
+      "compile_wall": 0.911101,
+      "compile_cpu": 0.900887,
+      "cache": "disabled",
+      "iterations": 2,
+      "samples": [
+        {
+          "wall": 0.284981,
+          "cpu": 0.283743,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        },
+        {
+          "wall": 0.289773,
+          "cpu": 0.28806,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        },
+        {
+          "wall": 0.285602,
+          "cpu": 0.283636,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        }
+      ],
+      "scenario": "sort-1024-duplicates",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1024-duplicates.void",
+      "source_sha256": "50601d531af5ca139f7d384c9ad6e292b154914bf8d7ea10b9ef4f8a488c55e4",
+      "callback_totals": [
+        16952,
+        16952,
+        16952,
+        16952
+      ]
+    },
+    {
+      "compile_wall": 0.830923,
+      "compile_cpu": 0.821114,
+      "cache": "disabled",
+      "iterations": 2,
+      "samples": [
+        {
+          "wall": 0.265206,
+          "cpu": 0.262546,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        },
+        {
+          "wall": 0.249422,
+          "cpu": 0.247382,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        },
+        {
+          "wall": 0.25152,
+          "cpu": 0.249596,
+          "process_peak_rss_kib": 73000,
+          "checksum": 14
+        }
+      ],
+      "scenario": "sort-1024-mixed",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-1024-mixed.void",
+      "source_sha256": "9ecf6b937be5515d215eae5fda481e76c108a4efe5049ebdf4de6a3d7432f249",
+      "callback_totals": [
+        15182,
+        15182,
+        15182,
+        15182
+      ]
+    },
+    {
+      "compile_wall": 0.868618,
+      "compile_cpu": 0.861725,
+      "cache": "disabled",
+      "iterations": 1,
+      "samples": [
+        {
+          "wall": 2.33594,
+          "cpu": 2.32417,
+          "process_peak_rss_kib": 73000,
+          "checksum": 7
+        },
+        {
+          "wall": 2.26434,
+          "cpu": 2.25491,
+          "process_peak_rss_kib": 73000,
+          "checksum": 7
+        },
+        {
+          "wall": 2.31336,
+          "cpu": 2.3021,
+          "process_peak_rss_kib": 73000,
+          "checksum": 7
+        }
+      ],
+      "scenario": "sort-16384-ordered",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-16384-ordered.void",
+      "source_sha256": "8262ec38f8f3f55b36a4f7c1529b915de63a2f3f92cf343462df9c32faeec912",
+      "callback_totals": [
+        229376,
+        114688,
+        114688,
+        114688
+      ]
+    },
+    {
+      "compile_wall": 0.805596,
+      "compile_cpu": 0.799775,
+      "cache": "disabled",
+      "iterations": 1,
+      "samples": [
+        {
+          "wall": 2.2654,
+          "cpu": 2.24652,
+          "process_peak_rss_kib": 73576,
+          "checksum": 7
+        },
+        {
+          "wall": 2.29809,
+          "cpu": 2.28595,
+          "process_peak_rss_kib": 73576,
+          "checksum": 7
+        },
+        {
+          "wall": 2.18944,
+          "cpu": 2.1767,
+          "process_peak_rss_kib": 73576,
+          "checksum": 7
+        }
+      ],
+      "scenario": "sort-16384-reverse",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-16384-reverse.void",
+      "source_sha256": "0ea1effb9ae5b2c3dbaa8b40c08bcfd68a49cad77573cceb5abf949c9f1985bb",
+      "callback_totals": [
+        229376,
+        114688,
+        114688,
+        114688
+      ]
+    },
+    {
+      "compile_wall": 0.834175,
+      "compile_cpu": 0.827352,
+      "cache": "disabled",
+      "iterations": 1,
+      "samples": [
+        {
+          "wall": 3.05223,
+          "cpu": 3.03983,
+          "process_peak_rss_kib": 74096,
+          "checksum": 7
+        },
+        {
+          "wall": 3.12547,
+          "cpu": 3.11047,
+          "process_peak_rss_kib": 74096,
+          "checksum": 7
+        },
+        {
+          "wall": 3.13531,
+          "cpu": 3.12121,
+          "process_peak_rss_kib": 74096,
+          "checksum": 7
+        }
+      ],
+      "scenario": "sort-16384-duplicates",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-16384-duplicates.void",
+      "source_sha256": "ab744ffad643257862f5f15a5324875db0cec58eacb555a783a5bebd5faf233a",
+      "callback_totals": [
+        389128,
+        194564,
+        194564,
+        194564
+      ]
+    },
+    {
+      "compile_wall": 1.10182,
+      "compile_cpu": 1.09239,
+      "cache": "disabled",
+      "iterations": 1,
+      "samples": [
+        {
+          "wall": 3.00341,
+          "cpu": 2.99125,
+          "process_peak_rss_kib": 74096,
+          "checksum": 7
+        },
+        {
+          "wall": 3.0399,
+          "cpu": 3.02868,
+          "process_peak_rss_kib": 74096,
+          "checksum": 7
+        },
+        {
+          "wall": 3.07179,
+          "cpu": 3.05548,
+          "process_peak_rss_kib": 74096,
+          "checksum": 7
+        }
+      ],
+      "scenario": "sort-16384-mixed",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-16384-mixed.void",
+      "source_sha256": "182d62a8b90feed39bcc1bc4c4d6789519d546042e8a1fd02bcc0a393d76c37b",
+      "callback_totals": [
+        376774,
+        188387,
+        188387,
+        188387
+      ]
+    },
+    {
+      "compile_wall": 0.787711,
+      "compile_cpu": 0.781832,
+      "cache": "disabled",
+      "iterations": 10,
+      "samples": [
+        {
+          "wall": 0.0495776,
+          "cpu": 0.048672,
+          "process_peak_rss_kib": 74224,
+          "checksum": 70
+        },
+        {
+          "wall": 0.0303331,
+          "cpu": 0.030157,
+          "process_peak_rss_kib": 74224,
+          "checksum": 70
+        },
+        {
+          "wall": 0.0307896,
+          "cpu": 0.030615,
+          "process_peak_rss_kib": 74224,
+          "checksum": 70
+        }
+      ],
+      "scenario": "bounds-1024",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/bounds-1024.void",
+      "source_sha256": "ab5c891b6d783b40c4eaaa0466f2bfa14e665e20e4fa06f2e7f45ea79079285d",
+      "callback_totals": [
+        2004,
+        10020,
+        10020,
+        10020
+      ]
+    },
+    {
+      "compile_wall": 0.728333,
+      "compile_cpu": 0.721194,
+      "cache": "disabled",
+      "iterations": 5,
+      "samples": [
+        {
+          "wall": 0.00906226,
+          "cpu": 0.00903,
+          "process_peak_rss_kib": 74228,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00899243,
+          "cpu": 0.008957,
+          "process_peak_rss_kib": 74228,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00887262,
+          "cpu": 0.008804,
+          "process_peak_rss_kib": 74228,
+          "checksum": 35
+        }
+      ],
+      "scenario": "filter",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/filter.void",
+      "source_sha256": "66bd414cfef238c87e37198f22b9905287c153d882f903185c71501a334d54b8",
+      "callback_totals": [
+        2048,
+        5120,
+        5120,
+        5120
+      ]
+    },
+    {
+      "compile_wall": 0.735424,
+      "compile_cpu": 0.72912,
+      "cache": "disabled",
+      "iterations": 5,
+      "samples": [
+        {
+          "wall": 0.0102332,
+          "cpu": 0.010185,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.0100688,
+          "cpu": 0.01003,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.0102599,
+          "cpu": 0.010219,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        }
+      ],
+      "scenario": "map",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/map.void",
+      "source_sha256": "c4cf43893d48fc51da8e479f1595c200dab7e914943a01c99a7ea3dda348679c",
+      "callback_totals": [
+        2048,
+        5120,
+        5120,
+        5120
+      ]
+    },
+    {
+      "compile_wall": 0.724287,
+      "compile_cpu": 0.716626,
+      "cache": "disabled",
+      "iterations": 5,
+      "samples": [
+        {
+          "wall": 0.00682801,
+          "cpu": 0.006796,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00666297,
+          "cpu": 0.006638,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00648041,
+          "cpu": 0.006451,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        }
+      ],
+      "scenario": "fold",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/fold.void",
+      "source_sha256": "7a22601fb1451ae5b28e88b30c98e37af772f368e463f78d99349635fa1a2f18",
+      "callback_totals": [
+        2048,
+        5120,
+        5120,
+        5120
+      ]
+    },
+    {
+      "compile_wall": 0.732563,
+      "compile_cpu": 0.725563,
+      "cache": "disabled",
+      "iterations": 5,
+      "samples": [
+        {
+          "wall": 0.00856718,
+          "cpu": 0.008536,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00921193,
+          "cpu": 0.009175,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.0082825,
+          "cpu": 0.008248,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        }
+      ],
+      "scenario": "filter-loop",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/filter-loop.void",
+      "source_sha256": "fdfd5b5695fbc4cde57aaf76798eb0d140189119c0da80e155d0be7a876ef15a",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.704227,
+      "compile_cpu": 0.698819,
+      "cache": "disabled",
+      "iterations": 5,
+      "samples": [
+        {
+          "wall": 0.00994221,
+          "cpu": 0.009903,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.0099217,
+          "cpu": 0.009888,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        },
+        {
+          "wall": 0.0101289,
+          "cpu": 0.01009,
+          "process_peak_rss_kib": 74240,
+          "checksum": 35
+        }
+      ],
+      "scenario": "map-loop",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/map-loop.void",
+      "source_sha256": "519fb5d729b04b9ed3f89e7fed098220be7b90df142543be64f93aa7426adffa",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.71818,
+      "compile_cpu": 0.712626,
+      "cache": "disabled",
+      "iterations": 5,
+      "samples": [
+        {
+          "wall": 0.00586367,
+          "cpu": 0.005839,
+          "process_peak_rss_kib": 74244,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00580874,
+          "cpu": 0.005793,
+          "process_peak_rss_kib": 74244,
+          "checksum": 35
+        },
+        {
+          "wall": 0.00604426,
+          "cpu": 0.006021,
+          "process_peak_rss_kib": 74244,
+          "checksum": 35
+        }
+      ],
+      "scenario": "fold-loop",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/fold-loop.void",
+      "source_sha256": "a9469adca29ef28ca5776749659f75c42d678bf70844eef38f8fa8746548202c",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.702858,
+      "compile_cpu": 0.698192,
+      "cache": "disabled",
+      "iterations": 3,
+      "samples": [
+        {
+          "wall": 0.0112712,
+          "cpu": 0.011199,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0102703,
+          "cpu": 0.010219,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0100406,
+          "cpu": 0.00999,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        }
+      ],
+      "scenario": "dictionary-keys",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/dictionary-keys.void",
+      "source_sha256": "49edbaaf259565395d7aad55a2505d7a881e8f505460a5c4b94cc7aee894d87c",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.77373,
+      "compile_cpu": 0.765658,
+      "cache": "disabled",
+      "iterations": 3,
+      "samples": [
+        {
+          "wall": 0.0212257,
+          "cpu": 0.020767,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0188282,
+          "cpu": 0.018686,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0205597,
+          "cpu": 0.020374,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        }
+      ],
+      "scenario": "dictionary-values",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/dictionary-values.void",
+      "source_sha256": "98762e57f0f0336e5f9ca7229fcafb48f5d34b5a66cfbfa13c19e6c6177815bc",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.759222,
+      "compile_cpu": 0.74732,
+      "cache": "disabled",
+      "iterations": 3,
+      "samples": [
+        {
+          "wall": 0.017246,
+          "cpu": 0.017181,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0169566,
+          "cpu": 0.016896,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0182288,
+          "cpu": 0.01805,
+          "process_peak_rss_kib": 74244,
+          "checksum": 21
+        }
+      ],
+      "scenario": "dictionary-copy_dictionary",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/dictionary-copy_dictionary.void",
+      "source_sha256": "54c77818ed4986a1ef8a393b46eef232bb1e525c039d71141b368803269ab6f1",
+      "callback_totals": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "compile_wall": 0.83066,
+      "compile_cpu": 0.825199,
+      "cache": "disabled",
+      "iterations": 3,
+      "samples": [
+        {
+          "wall": 0.0245915,
+          "cpu": 0.024491,
+          "process_peak_rss_kib": 74264,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0245607,
+          "cpu": 0.024469,
+          "process_peak_rss_kib": 74264,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0244887,
+          "cpu": 0.024398,
+          "process_peak_rss_kib": 74264,
+          "checksum": 21
+        }
+      ],
+      "scenario": "sort-text",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-text.void",
+      "source_sha256": "11b2b02985cc8a8321570f2ca2e2835db2a911f8ae899b64f55deda1c6736f01",
+      "callback_totals": [
+        160,
+        240,
+        240,
+        240
+      ]
+    },
+    {
+      "compile_wall": 0.877325,
+      "compile_cpu": 0.868961,
+      "cache": "disabled",
+      "iterations": 3,
+      "samples": [
+        {
+          "wall": 0.0327211,
+          "cpu": 0.032588,
+          "process_peak_rss_kib": 74264,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0319732,
+          "cpu": 0.031863,
+          "process_peak_rss_kib": 74264,
+          "checksum": 21
+        },
+        {
+          "wall": 0.0333413,
+          "cpu": 0.033148,
+          "process_peak_rss_kib": 74264,
+          "checksum": 21
+        }
+      ],
+      "scenario": "sort-references",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-references.void",
+      "source_sha256": "637d605db2b45ad3dfe56a15786dad9c48ece5dcbb84786ce3cbc0863099c68b",
+      "callback_totals": [
+        896,
+        1344,
+        1344,
+        1344
+      ]
+    },
+    {
+      "compile_wall": 0.882716,
+      "compile_cpu": 0.876215,
+      "cache": "disabled",
+      "iterations": 1,
+      "samples": [
+        {
+          "wall": 0.453759,
+          "cpu": 0.451818,
+          "process_peak_rss_kib": 96872,
+          "checksum": 7
+        },
+        {
+          "wall": 0.453439,
+          "cpu": 0.451638,
+          "process_peak_rss_kib": 107112,
+          "checksum": 7
+        },
+        {
+          "wall": 0.45225,
+          "cpu": 0.450459,
+          "process_peak_rss_kib": 112744,
+          "checksum": 7
+        }
+      ],
+      "scenario": "sort-fixed-256KiB",
+      "source": "/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/sort-fixed-256KiB.void",
+      "source_sha256": "d99f088ea9fc2bd4d421122622e30868cb5118ac64851c738589cb1c8532ac61",
+      "callback_totals": [
+        8,
+        4,
+        4,
+        4
+      ]
+    }
+  ]
+}

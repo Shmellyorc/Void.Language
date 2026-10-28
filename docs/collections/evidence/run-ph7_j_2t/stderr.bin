@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:116:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::is_sorted
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:42:24: source call
+        var answer = c.is_sorted(items, func(const left: i32, const right: i32) -> bool:
+                       ^
+

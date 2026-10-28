@@ -1,0 +1,12 @@
+func identity<t>(input: t) -> t:
+    return input
+func read() -> result<i32, string>:
+    return Ok(7)
+func size<t>(items: {string:t}) -> i32:
+    return items.count as i32
+func demo() -> result<i32, string>:
+    return Ok(size({"x":read()?}))
+func entry(input: i32) -> i32:
+    if demo() is Ok(var output):
+        return output
+    return -999

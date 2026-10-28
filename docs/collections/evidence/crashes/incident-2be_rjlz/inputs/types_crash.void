@@ -1,0 +1,28 @@
+struct box<t>:
+    value: t
+func (b box<t>) get() -> t:
+    return b.value
+func (b box<t>) put(value: t):
+    b.value = value
+value struct pair<a, b>:
+    first: a
+    second: b
+func (p pair<a, b>) left() -> a:
+    return p.first
+func identity<t>(value: t) -> t:
+    return value
+struct chain<t>:
+    value: t
+    next: chain<t>?
+func entry(value: i32) -> i32:
+    var link = chain(value = value, next = null)
+    link.next = chain<i32>(value = value, next = link)
+    var follow = link.next as chain<i32>
+    if follow.value != value:
+        return -500
+    var b = box(value = value)
+    b.put(b.get() + 2)
+    var p = pair(first = b, second = "text")
+    var nested: box<box<i32>> = box(value = b)
+    var arrays: [pair<i32, string>, 2] = [pair(first = 1, second = "a"), pair(first = 2, second = "b")]
+    return p.left().get() + nested.value.value + identity(arrays)[1].first

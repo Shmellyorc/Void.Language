@@ -1,0 +1,6 @@
+func identity<t>(input:t) -> t:
+    return input
+async func ready() -> i32:
+    return 7
+async func entry(input:i32) -> i32:
+    return identity(await ready())

@@ -1,0 +1,17 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:214:17: error: Collection equality is not implemented; use an element predicate.
+    code: VOID2016
+
+ 214 |         if item == value:
+     |                 ^^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-3drdzqjb/fixed-equality.void:33:20
+
+ 33 |     var output = c.contains(input, needle)
+    |                    ^^^^^^^^
+    Module: /fixed-equality.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:212:6
+
+ 212 | func contains<t>(const items: [t], const value: t) -> bool:
+     |      ^^^^^^^^
+    Module: /@stdlib/collections.void
+

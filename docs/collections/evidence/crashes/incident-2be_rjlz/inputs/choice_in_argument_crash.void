@@ -1,0 +1,10 @@
+func identity<t>(input: t) -> t:
+    return input
+func read() -> result<i32, string>:
+    return Ok(7)
+func entry(input:i32) -> i32:
+    return identity(if true:
+        7
+    else:
+        8
+    )

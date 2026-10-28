@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:244:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::count_if
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:65:15: source call
+            c.count_if(items, mutate)
+              ^
+

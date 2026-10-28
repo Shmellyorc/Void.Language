@@ -1,0 +1,144 @@
+use collections as c
+
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+
+func positive(const item: i32) -> bool:
+    return item > 0
+func doubled(const item: i32) -> i32:
+    return item * 2
+func subtract(total: i32, const item: i32) -> i32:
+    return total - item
+
+value struct tagged:
+    key: i32
+    serial: i32
+func order(const left: tagged, const right: tagged) -> bool:
+    return left.key < right.key
+
+func entry(input: i32) -> i32:
+    var items = [3, -1, 2, 3, 0]
+    var alias = items
+    var ordered = c.sorted(items, c.numeric_less<i32>)
+    var descending = c.sorted(items, c.numeric_less<i32>, true)
+    var backward = c.reversed(items)
+    alias[1] = -1
+    require(items[1] == -1)
+    require(items[0] == 3 and ordered[0] == -1 and ordered[4] == 3 and backward[4] == 3)
+    require(descending[0] == 3 and descending[4] == -1)
+    require(c.is_sorted(ordered, c.numeric_less<i32>) and c.is_sorted(descending, c.numeric_less<i32>, true))
+    require(not c.is_sorted(items, c.numeric_less<i32>))
+    require(c.lower_bound(ordered, 3, c.numeric_less<i32>) == 3)
+    require(c.upper_bound(ordered, 3, c.numeric_less<i32>) == 5)
+    require(c.lower_bound(descending, 3, c.numeric_less<i32>, true) == 0)
+    require(c.upper_bound(descending, 3, c.numeric_less<i32>, true) == 2)
+    require(c.lower_bound(ordered, -10, c.numeric_less<i32>) == 0)
+    require(c.upper_bound(ordered, 10, c.numeric_less<i32>) == 5)
+    if c.binary_search(ordered, 3, c.numeric_less<i32>) is Ok(var index):
+        require(index == 3)
+    else:
+        require(false)
+    if c.binary_search(ordered, 1, c.numeric_less<i32>) is Err(var absent):
+        require(absent.code == 1 and absent.path == "" and absent.operation == "binary_search")
+        require(absent.kind is c.error_kind.not_found)
+    else:
+        require(false)
+    if c.find(items, positive) is Ok(var found):
+        require(found == 3)
+    else:
+        require(false)
+    if c.find_index(items, positive) is Ok(var index):
+        require(index == 0)
+    else:
+        require(false)
+    if c.index_of(items, 3) is Ok(var index):
+        require(index == 0)
+    else:
+        require(false)
+    require(c.contains(items, -1) and not c.contains(items, 20))
+    require(c.any(items, positive) and not c.all(items, positive) and c.count_if(items, positive) == 3)
+    var selected = c.filter(items, positive)
+    require(selected.count == 3 and selected[0] == 3 and selected[1] == 2 and selected[2] == 3)
+    var mapped = c.map<i32, i32>(items, doubled)
+    require(mapped[0] == 6 and mapped[1] == -2 and mapped.count == 5)
+    require(c.fold(items, 10, subtract) == 3 and c.sum(items) == 7)
+    if c.min(items, c.numeric_less<i32>) is Ok(var minimum):
+        require(minimum == -1)
+    else:
+        require(false)
+    if c.max(items, c.numeric_less<i32>) is Ok(var maximum):
+        require(maximum == 3)
+    else:
+        require(false)
+    var empty: [i32] = []
+    require(not c.any(empty, positive) and c.all(empty, positive) and c.count_if(empty, positive) == 0)
+    require(c.sum(empty) == 0 and c.fold(empty, 20, subtract) == 20)
+    var empty_sorted = c.sorted(empty, c.numeric_less<i32>)
+    var empty_reversed = c.reversed(empty)
+    empty_sorted.push(1)
+    empty_reversed.push(2)
+    require(empty.count == 0 and empty_sorted[0] == 1 and empty_reversed[0] == 2)
+    var empty_filtered = c.filter(empty, positive)
+    empty_filtered.push(3)
+    require(empty.count == 0 and c.map<i32, i32>(empty, doubled).count == 0)
+    require(c.is_sorted(empty, c.numeric_less<i32>) and c.lower_bound(empty, 0, c.numeric_less<i32>) == 0)
+    require(c.upper_bound(empty, 0, c.numeric_less<i32>) == 0)
+    if c.find(empty, positive) is Err(var missing):
+        require(missing.code == 1 and missing.operation == "find")
+    else:
+        require(false)
+    if c.find_index(empty, positive) is Err(var missing):
+        require(missing.code == 1 and missing.operation == "find_index")
+    else:
+        require(false)
+    if c.index_of(empty, 0) is Err(var missing):
+        require(missing.code == 1 and missing.operation == "index_of")
+    else:
+        require(false)
+    if c.min(empty, c.numeric_less<i32>) is Err(var missing):
+        require(missing.code == 2 and missing.operation == "min" and missing.kind is c.error_kind.empty_collection)
+    else:
+        require(false)
+    if c.max(empty, c.numeric_less<i32>) is Err(var missing):
+        require(missing.code == 2 and missing.operation == "max")
+    else:
+        require(false)
+    var singleton = [5]
+    require(c.sorted(singleton, c.numeric_less<i32>)[0] == 5 and c.is_sorted(singleton, c.numeric_less<i32>))
+    var tagged_items = [tagged(key = 2, serial = 0), tagged(key = 1, serial = 1), tagged(key = 2, serial = 2), tagged(key = 1, serial = 3)]
+    var tagged_up = c.sorted(tagged_items, order)
+    var tagged_down = c.sorted(tagged_items, order, true)
+    require(tagged_up[0].serial == 1 and tagged_up[1].serial == 3 and tagged_up[2].serial == 0 and tagged_up[3].serial == 2)
+    require(tagged_down[0].serial == 0 and tagged_down[1].serial == 2 and tagged_down[2].serial == 1 and tagged_down[3].serial == 3)
+    if c.min(tagged_items, order) is Ok(var first_min):
+        require(first_min.serial == 1)
+    else:
+        require(false)
+    if c.max(tagged_items, order) is Ok(var first_max):
+        require(first_max.serial == 0)
+    else:
+        require(false)
+    require(c.text_less("", "a") and c.text_less("a", "aa") and c.text_less("a\0", "aA"))
+    require(c.text_less("é", "雪") and c.text_less("雪", "🔥") and not c.text_less("same", "same"))
+    var text_order = c.sorted(["雪", "a\0b", "a", "é", "🔥"], c.text_less)
+    require(text_order[0] == "a" and text_order[1] == "a\0b" and text_order[2] == "é" and text_order[4] == "🔥")
+    var dictionary = {"a": 1, "b": 2, "c": 3}
+    dictionary["a"] = 4
+    dictionary.remove("b")
+    dictionary["b"] = 5
+    var names = c.keys(dictionary)
+    var amounts = c.values(dictionary)
+    var copied = c.copy_dictionary(dictionary)
+    require(names[0] == "a" and names[1] == "c" and names[2] == "b")
+    require(amounts[0] == 4 and amounts[1] == 3 and amounts[2] == 5)
+    copied["a"] = 99
+    require(copied["a"] == 99 and dictionary["a"] == 4)
+    var no_entries: {string: i32} = {}
+    var empty_copy = c.copy_dictionary(no_entries)
+    empty_copy["x"] = 1
+    require(no_entries.count == 0 and c.keys(no_entries).count == 0 and c.values(no_entries).count == 0)
+    var fixed: [i32, 3] = [2, 1, 3]
+    require(c.sum(fixed[0..<fixed.count]) == 6)
+    return 7

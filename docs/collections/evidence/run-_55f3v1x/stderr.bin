@@ -1,0 +1,9 @@
+/tmp/VOID-collections-negative-z7lr0t1i/stdlib/collections.void:352:29: error: Type mismatch: expected u64, received bool.
+    code: VOID2001
+
+ 352 |     _collections_check([1], true)
+     |                             ^^^^
+    Module: /@stdlib/collections.void
+    Expected: u64
+    Received: bool
+

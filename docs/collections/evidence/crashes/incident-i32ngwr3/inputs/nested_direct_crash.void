@@ -1,0 +1,11 @@
+func identity<t>(input: t) -> t:
+    return input
+func read() -> result<i32, string>:
+    return Ok(7)
+func demo() -> result<i32, string>:
+    var output = identity(read()?)
+    return Ok(output)
+func entry(input: i32) -> i32:
+    if demo() is Ok(var output):
+        return output
+    return -999

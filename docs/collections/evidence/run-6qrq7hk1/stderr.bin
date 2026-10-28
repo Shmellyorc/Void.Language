@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:277:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::fold
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:76:15: source call
+            c.fold(items, 0, func(total: i32, const value: i32) -> i32:
+              ^
+

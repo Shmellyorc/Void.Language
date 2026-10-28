@@ -1,0 +1,13 @@
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:33:25: error: A call requires mutable authority for reference leaf 'readonly [/authority.void::node][]'.
+    code: VOID2007
+
+ 33 |     var transformed = c.map<node, node>(input, fresh)
+    |                         ^^^
+    Module: /authority.void
+    Reference authority enters this declaration here. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:264:22
+
+ 264 | func map<t, u>(const items: [t], transform: func(const t) -> u) -> [u]:
+     |                      ^^^^^
+    Module: /@stdlib/collections.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

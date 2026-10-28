@@ -1,5 +1,12 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+The [Boss-approved generic operator amendment, 28 October 2026](collections/GENERIC_OPERATORS.md)
+permits public operators on exact substituted public nominal owners in concrete
+generic bodies. Ordinary imports, private/internal visibility, readonly authority
+and exact operand matching retain their existing rules. Independent typed IR must
+verify specialization provenance. This supersedes older definition-import wording
+only for the approved generic case; acceptance is tracked with collections.
+
 ## Stage 11 runtime globals — Boss authorization, 25 October 2026
 
 Outermost `var` now has the approved shared Runtime-storage semantics described in

@@ -1,0 +1,3 @@
+collections cache/reload/captures/active leases optimized=0 passed
+collections cache/reload/captures/active leases optimized=1 passed
+Collections forced-GC and allocation sweeps passed

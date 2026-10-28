@@ -1,0 +1,16 @@
+/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-o3bcx88c/sort-0-ordered.void:21:13: error: Duplicate declaration or shadowing of 'output'.
+    code: VOID2005
+
+ 21 |         var output = c.sorted(items, less)
+    |             ^^^^^^
+    Module: /sort-0-ordered.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/docs/collections/evidence/benchmark-ci-official-release-o3bcx88c/sort-0-ordered.void:22:17: error: Unknown identifier 'output'.
+    code: VOID2002
+
+ 22 |         require(output.count == 0)
+    |                 ^^^^^^
+    Module: /sort-0-ordered.void
+    Hint: Declare it with var before use.
+

@@ -1,0 +1,14 @@
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-i682gcq2
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-_jjejxce
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-sbp_jiv1
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-7zi6j40q
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-kj1ukzbl
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-ponyc2cd
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-xq5wy6r5
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-xokvqzi3
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-27eliid0
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-9okut8zf
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-cz0zx324
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-1x8n21na
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest kewgtt5l/evidence/incident-38oxi_y0
+{"intentional_incidents_verified": 13, "checked_crash_preserved": true, "sanitizer_exits_verified": [87, 86], "run_and_popen_verified": true, "signed_windows_receipt_simulation_verified": true, "windows_native_branch_executed": false, "colliding_filenames_verified": true, "editor_snapshot_verified": true, "ordinary_rejection_ignored": true, "assertion_and_timeout_preserved": true, "passing_retry_keeps_original": true, "temporary_outputs_removed": true, "launch_bytes_survive_source_changes": true, "repository_artifacts_added": 0}

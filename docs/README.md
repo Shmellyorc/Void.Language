@@ -17,6 +17,20 @@ record. Historical freeze records are preserved there. H1–H7 remain unresolved
 historical incidents; this decision does not claim their repair. Earlier dated
 sections below remain historical.
 
+## Collections implementation, 28 October 2026
+
+Boss approved the complete [24-function contract](collections/DESIGN.md),
+copy-returning transforms, NaNs-last ordering and both mutation refinements.
+`stdlib/collections.void` implements the [API](collections/API.md) using ordinary
+source and two private adapters to existing version-check IR. The
+[engineering record](collections/IMPLEMENTATION.md), [measurements](collections/BENCHMARKS.md)
+and [Golden Wrench handoff](collections/HANDOFF.md) record actual local evidence
+and remaining acceptance boundaries. The separately approved
+[generic operator amendment](collections/GENERIC_OPERATORS.md) preserves ordinary
+direct-import restrictions. The original [research](collections/RESEARCH.md) and
+[roadmap](collections/ROADMAP.md) remain preserved. Independent review, hosted CI
+and native Windows/macOS verification are not claimed.
+
 ## OS module implementation, 27 October 2026
 
 Boss approved the complete 13-function [contract](os/DESIGN.md) and

@@ -1,0 +1,25 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-san
+      Start 194: collections_stdlib_stack
+      Start 187: collections_stdlib_failures
+ 1/10 Test #187: collections_stdlib_failures ........   Passed  114.15 sec
+      Start 185: collections_stdlib_host
+ 2/10 Test #185: collections_stdlib_host ............   Passed   99.05 sec
+      Start 190: collections_stdlib_oracles
+ 3/10 Test #190: collections_stdlib_oracles .........   Passed   37.70 sec
+      Start 191: collections_stdlib_install
+ 4/10 Test #194: collections_stdlib_stack ...........   Passed  261.31 sec
+      Start 188: collections_stdlib_frontend
+ 5/10 Test #191: collections_stdlib_install .........   Passed   12.76 sec
+      Start 192: collections_stdlib_cache
+ 6/10 Test #192: collections_stdlib_cache ...........   Passed    3.25 sec
+      Start 193: collections_stdlib_operators
+ 7/10 Test #188: collections_stdlib_frontend ........   Passed    6.52 sec
+      Start 172: text_encoding_crash_preservation
+ 8/10 Test #172: text_encoding_crash_preservation ...   Passed    1.81 sec
+      Start 189: lsp_collections_stdlib
+ 9/10 Test #193: collections_stdlib_operators .......   Passed    2.78 sec
+10/10 Test #189: lsp_collections_stdlib .............   Passed    0.71 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) = 270.36 sec

@@ -1,0 +1,12 @@
+func identity<t>(input: t) -> t:
+    return input
+func read() -> result<i32, string>:
+    return Ok(7)
+func first<t>(items: [t]) -> t:
+    return items[0]
+func demo() -> result<i32, string>:
+    return Ok(first<i32>([read()?]))
+func entry(input: i32) -> i32:
+    if demo() is Ok(var output):
+        return output
+    return -999

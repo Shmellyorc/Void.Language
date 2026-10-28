@@ -1,0 +1,8 @@
+operation=1 optimized=0 injected_allocation_failures=631
+operation=2 optimized=0 injected_allocation_failures=80
+operation=3 optimized=0 injected_allocation_failures=106
+operation=4 optimized=0 injected_allocation_failures=280
+operation=5 optimized=0 injected_allocation_failures=328
+operation=6 optimized=0 injected_allocation_failures=284
+operation=7 optimized=0 injected_allocation_failures=398
+operation=8 optimized=0 injected_allocation_failures=102

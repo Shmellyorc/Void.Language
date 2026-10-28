@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:255:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::filter
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:67:15: source call
+            c.filter(items, mutate)
+              ^
+

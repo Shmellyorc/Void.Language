@@ -112,9 +112,65 @@ def exercise(root):
             snapshot = record['editor_snapshots'][0]
             assert Path(snapshot['copy']).read_bytes() == edited.encode()
             assert snapshot['sha256'] == hashlib.sha256(edited.encode()).hexdigest()
-    assert collisions == 1
+    # Recursive project companions are now retained on every argv-source run.
+    assert collisions == 8
     assert fatal_counts == {87: 2, 86: 2, windows_status: 1}
     assert sum(bool(json.loads(p.read_text()).get('editor_snapshots')) for p in receipts) == 1
+
+    # Ordinary diagnostics stay ordinary; only an unmet execution expectation
+    # records an incident. Preserve before the temporary source scope is removed.
+    baseline = set(receipts)
+    context = {'profile': 'synthetic', 'mode': 'runner', 'hard_stack_bytes': 1048576}
+    rejected = run([sys.executable, '-c', 'raise SystemExit(1)', original],
+                   cwd=root, capture_output=True, expected_returncode=1,
+                   evidence_context={'mode': 'expected_diagnostic'})
+    assert not rejected.expectation_failed
+    diagnostic = run([sys.executable, '-c',
+                      'import sys; sys.stderr.write("case.void:1:2: runtime error: expected\\n"); sys.exit(1)', original],
+                     cwd=root, capture_output=True, expected_returncode=1)
+    assert not diagnostic.expectation_failed
+    assert set(kept.glob('*/receipt.json')) == baseline
+    cases = [
+        ('unexpected_exit', 'raise SystemExit(1)', 0, None),
+        ('test_assertion', 'print("wrong")', 0, b'correct\n'),
+        ('sanitizer_finding', 'import sys; sys.stderr.write("ERROR: LeakSanitizer: synthetic\\n")', 0, None),
+    ]
+    for kind, script_text, status, output in cases:
+        before_case = set(kept.glob('*/receipt.json'))
+        result = run([sys.executable, '-c', script_text, original], cwd=root,
+                     capture_output=True, expected_returncode=status, expected_stdout=output,
+                     source_inputs=(companion.parent,), evidence_context=context)
+        added = set(kept.glob('*/receipt.json')) - before_case
+        assert len(added) == 1
+        data = json.loads(added.pop().read_text())
+        assert data['failure_kind'] == kind and data['context'] == context
+        assert result.expectation_failed
+        assert any(s['original'] == str(companion) for s in data['sources'])
+    before_case = set(kept.glob('*/receipt.json'))
+    try:
+        run([sys.executable, '-c', 'import time; time.sleep(60)', original], cwd=root,
+            capture_output=True, timeout=0.1, evidence_context=context)
+        raise AssertionError('timeout did not raise')
+    except subprocess.TimeoutExpired:
+        added = set(kept.glob('*/receipt.json')) - before_case
+        assert len(added) == 1
+        data = json.loads(added.pop().read_text())
+        assert data['failure_kind'] == 'timeout' and data['timed_out']
+        assert data['context'] == context
+    run([sys.executable, '-c', 'print("correct")', original], cwd=root, capture_output=True,
+        expected_returncode=0, expected_stdout=b'correct\n')
+    assert len(list(kept.glob('*/receipt.json'))) == len(baseline) + 4
+    before_case = set(kept.glob('*/receipt.json'))
+    raw = original.read_bytes()
+    run([sys.executable, '-c', 'import pathlib,sys; pathlib.Path(sys.argv[1]).write_text("changed"); sys.exit(1)', original],
+        cwd=root, capture_output=True, expected_returncode=0)
+    added = set(kept.glob('*/receipt.json')) - before_case
+    assert len(added) == 1
+    data = json.loads(added.pop().read_text())
+    entry = next(item for item in data['sources'] if item['original'] == str(original))
+    assert Path(entry['copy']).read_bytes() == raw and entry['captured_at'] == 'subprocess_launch'
+    assert entry['current_sha256'] != entry['original_sha256']
+    original.write_bytes(raw)
 
 
 install()
@@ -132,10 +188,12 @@ finally:
         os.environ['VOID_CRASH_EVIDENCE'] = previous
 assert not disposable.exists()
 assert snapshot(legacy) == before
-print(json.dumps({'intentional_incidents_verified': 8, 'checked_crash_preserved': True,
+print(json.dumps({'intentional_incidents_verified': 13, 'checked_crash_preserved': True,
                   'sanitizer_exits_verified': [87, 86], 'run_and_popen_verified': True,
                   'signed_windows_receipt_simulation_verified': True,
                   'windows_native_branch_executed': os.name == 'nt',
                   'colliding_filenames_verified': True, 'editor_snapshot_verified': True,
-                  'ordinary_rejection_ignored': True, 'temporary_outputs_removed': True,
+                  'ordinary_rejection_ignored': True, 'assertion_and_timeout_preserved': True,
+                  'passing_retry_keeps_original': True, 'temporary_outputs_removed': True,
+                  'launch_bytes_survive_source_changes': True,
                   'repository_artifacts_added': 0}))

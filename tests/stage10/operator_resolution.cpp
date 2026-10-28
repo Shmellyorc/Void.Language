@@ -3,15 +3,24 @@
 #include <algorithm>
 #include <iostream>
 #include <stdexcept>
+#include <cstdlib>
+#include <fstream>
 namespace {
 unsigned checks=0;
+void snapshot(const std::string& source,const std::map<std::string,std::string>& files={}) {
+    const auto* directory=std::getenv("VOID_TEST_SOURCE_SNAPSHOTS");if(!directory)return;
+    static unsigned serial=0;auto selected=std::filesystem::path(directory)/("case-"+std::to_string(++serial));
+    std::filesystem::create_directories(selected);
+    std::ofstream(selected/"resolution.void",std::ios::binary)<<source;
+    for(const auto& [name,text]:files){auto destination=selected/name;std::filesystem::create_directories(destination.parent_path());std::ofstream(destination,std::ios::binary)<<text;}
+}
 const std::string entry="func entry(input: i32) -> i32:\n";
 const std::string point="value struct point:\n    x: i32\n    operator +(const left: point, const right: point) -> point:\n        return point(x = left.x + right.x)\n    operator +(const left: point, const right: i32) -> i32:\n        return left.x + right\n    operator -(const left: point) -> i32:\n        return -left.x\n    operator ==(const left: point, const right: point) -> bool:\n        return left.x == right.x\n";
 void check(bool value,const std::string& reason){if(!value)throw std::runtime_error(reason);++checks;}
-auto analyze(const std::string& source){auto a=vd::analyze_source({"/resolution.void",source});if(!a.succeeded())throw vd::CompilationError(a.diagnostics);++checks;return a.program;}
+auto analyze(const std::string& source){snapshot(source);auto a=vd::analyze_source({"/resolution.void",source});if(!a.succeeded())throw vd::CompilationError(a.diagnostics);++checks;return a.program;}
 void run(const std::string& source,int expected){auto a=analyze(source);auto module=a->lower();vd::ir::validate(module);++checks;for(bool optimized:{false,true}){vd::Jit jit;check(jit.compile(*a,optimized)->invoke(4)==expected,"wrong operator result: "+source);}}
-void reject(const std::string& source,const std::string& diagnostic=""){auto a=vd::analyze_source({"/resolution.void",source});check(!a.succeeded(),"invalid operator use accepted: "+source);if(!diagnostic.empty()){bool found=false;for(const auto& d:a.diagnostics)found|=d.description.find(diagnostic)!=std::string::npos;check(found,"wrong operator diagnostic for "+diagnostic+": "+source);}}
-auto project(const std::filesystem::path& root,const std::string& source,const std::map<std::string,std::string>& files){vd::SourceOverrides changes;auto path=root/"tests"/"stage10"/"operator_project.void";changes.emplace("/operator_project.void",vd::SourceFile(path.string(),source));for(const auto& [name,text]:files)changes.emplace("/"+name,vd::SourceFile(name,text));return vd::analyze_project(path,changes);}
+void reject(const std::string& source,const std::string& diagnostic=""){snapshot(source);auto a=vd::analyze_source({"/resolution.void",source});check(!a.succeeded(),"invalid operator use accepted: "+source);if(!diagnostic.empty()){bool found=false;for(const auto& d:a.diagnostics)found|=d.description.find(diagnostic)!=std::string::npos;check(found,"wrong operator diagnostic for "+diagnostic+": "+source);}}
+auto project(const std::filesystem::path& root,const std::string& source,const std::map<std::string,std::string>& files){snapshot(source,files);vd::SourceOverrides changes;auto path=root/"tests"/"stage10"/"operator_project.void";changes.emplace("/operator_project.void",vd::SourceFile(path.string(),source));for(const auto& [name,text]:files)changes.emplace("/"+name,vd::SourceFile(name,text));return vd::analyze_project(path,changes);}
 }
 int main(int argc,char** argv){try{
     if(argc!=2)throw std::invalid_argument("expected repository root");const std::filesystem::path root=argv[1];
@@ -60,7 +69,56 @@ int main(int argc,char** argv){try{
     auto unique=project(root,"use \"left.void\" as l\nuse \"right.void\" as r\n"+entry+"    return l.first(value = input) + r.second(value = 2)\n",{{"left.void",left},{"right.void",unique_right}});if(!unique.succeeded())throw vd::CompilationError(unique.diagnostics);++checks;{vd::Jit jit;check(jit.compile(*unique.program)->invoke(4)==6,"inaccessible candidate incorrectly ranked/suppressed unique accessible declaration");}
     const std::string utility="func sum<t>(const left: t, const right: t) -> i32:\n    return left + right\n";
     const std::string generic_use="use \"a.void\" as a\nuse \"utility.void\" as utility\n"+entry+"    return utility.sum(a.make(input), a.make(2))\n";
-    auto generic_hidden=project(root,generic_use,{{"a.void",foreign},{"utility.void",utility}});check(!generic_hidden.succeeded(),"caller imports leaked into specialized generic definition scope");
+    auto generic_hidden=project(root,generic_use,{{"a.void",foreign},{"utility.void",utility}});
+    if(!generic_hidden.succeeded())throw vd::CompilationError(generic_hidden.diagnostics);
+    for(bool optimized:{false,true}){vd::Jit jit;check(jit.compile(*generic_hidden.program,optimized)->invoke(4)==6,"public substituted-owner operator access");}
+    auto explicit_use=generic_use;explicit_use.replace(explicit_use.find("utility.sum("),12,"utility.sum<a.token>(");
+    auto explicit_generic=project(root,explicit_use,{{"a.void",foreign},{"utility.void",utility}});
+    if(!explicit_generic.succeeded())throw vd::CompilationError(explicit_generic.diagnostics);
+    for(bool optimized:{false,true}){vd::Jit jit;check(jit.compile(*explicit_generic.program,optimized)->invoke(4)==6,"explicit substituted-owner operator access");}
+    for(const auto* access:{"private ","internal "}){
+        auto restricted=foreign;restricted.insert(restricted.find("operator"),access);
+        auto denied=project(root,generic_use,{{"a.void",restricted},{"utility.void",utility}});
+        check(!denied.succeeded(),"generic operator access admitted private/internal operator without ordinary import access");
+    }
+    auto unrelated=project(root,"use \"utility.void\" as utility\n"+entry+"    return utility.other(input)\n",
+        {{"a.void",foreign},{"bridge.void","use \"a.void\" as a\nfunc make(value: i32) -> a.token:\n    return a.make(value)\n"},
+         {"utility.void","use \"bridge.void\" as bridge\nfunc other<t>(value: t) -> i32:\n    return bridge.make(1) + bridge.make(2)\n"}});
+    check(!unrelated.succeeded(),"unrelated substituted type granted transitive foreign operator access");
+    auto generic_ir=generic_hidden.program->lower();vd::ir::validate(generic_ir);
+    for(unsigned variant=0;variant<4;++variant){
+        auto forged=generic_ir;
+        auto instance=std::find_if(forged.generic_instances.begin(),forged.generic_instances.end(),[](const auto& entry){return entry.first.find("::sum<")!=std::string::npos;});
+        check(instance!=forged.generic_instances.end(),"generic operator provenance missing");
+        if(variant==0)forged.generic_instances.erase(instance);
+        else if(variant==1)instance->second.arguments[0]=vd::ir::Type::i32;
+        else if(variant==2)instance->second.declaration="/utility.void::invented";
+        else ++forged.generic_declarations.at(instance->second.declaration).arity;
+        bool rejected=false;try{vd::ir::validate(forged);}catch(const std::invalid_argument&){rejected=true;}
+        check(rejected,"forged generic operator provenance was accepted");
+    }
+    const std::string method_utility="value struct carrier<t>:\n    value: t\nfunc (self carrier<t>) sum<u>(const left: u, const right: u) -> i32:\n    var apply = func() -> i32:\n        return left + right\n    return apply()\n";
+    auto method_generic=project(root,"use \"a.void\" as a\nuse \"utility.void\" as utility\n"+entry+
+        "    var holder = utility.carrier<i32>()\n    return holder.sum(a.make(input), a.make(2)) + holder.sum<a.token>(a.make(input), a.make(2))\n",
+        {{"a.void",foreign},{"utility.void",method_utility}});
+    if(!method_generic.succeeded())throw vd::CompilationError(method_generic.diagnostics);
+    for(bool optimized:{false,true}){vd::Jit jit;check(jit.compile(*method_generic.program,optimized)->invoke(4)==12,"bound generic method/closure operator access");}
+    auto method_ir=method_generic.program->lower();vd::ir::validate(method_ir);
+    for(unsigned variant=0;variant<3;++variant){
+        auto forged=method_ir;
+        auto owner=std::find_if(forged.generic_instances.begin(),forged.generic_instances.end(),[](const auto& entry){return entry.second.declaration=="/utility.void::carrier";});
+        check(owner!=forged.generic_instances.end(),"bound generic receiver provenance missing");
+        if(variant==0)forged.generic_instances.erase(owner);
+        else if(variant==1)owner->second.arguments[0]=vd::ir::Type::i64;
+        else {
+            auto method=std::find_if(forged.generic_instances.begin(),forged.generic_instances.end(),[](const auto& entry){return entry.second.declaration=="/utility.void::carrier::method::sum";});
+            check(method!=forged.generic_instances.end(),"bound generic method provenance missing");
+            method->second.declaration="/utility.void::other::method::sum";
+            forged.generic_declarations.emplace(method->second.declaration,vd::ir::Module::GenericDeclaration{"/utility.void",1,false});
+        }
+        bool rejected=false;try{vd::ir::validate(forged);}catch(const std::invalid_argument&){rejected=true;}
+        check(rejected,"forged bound generic receiver provenance was accepted");
+    }
     auto generic_visible=project(root,generic_use,{{"a.void",foreign},{"utility.void","use \"a.void\" as a\n"+utility}});if(!generic_visible.succeeded())throw vd::CompilationError(generic_visible.diagnostics);++checks;{vd::Jit jit;check(jit.compile(*generic_visible.program)->invoke(4)==6,"generic direct owner import");}
     run("value struct box<t>:\n    value: t\n    private operator +(const left: box<t>, const right: box<t>) -> t:\n        return left.value + right.value\nfunc (self box<t>) total(other: box<t>) -> t:\n    return self + other\n"+entry+"    return box<i32>(value = input).total(box<i32>(value = 2))\n",6);
     run("interface view:\n    func read() -> i32\nstruct object:\n    value: i32\n    operator +(const left: object, const right: view) -> i32:\n        return left.value + right.read()\nfunc (self object) read() -> i32:\n    return self.value\n"+entry+"    var value = object(value = input)\n    var erased: view = value\n    return value + erased\n",8);

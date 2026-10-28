@@ -1,0 +1,5 @@
+failures normal: 354 allocation failures; roots/cleanup/retry passed
+initialization normal: 219 allocation failures; roots/cleanup/retry passed
+failures O2: 354 allocation failures; roots/cleanup/retry passed
+initialization O2: 219 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed

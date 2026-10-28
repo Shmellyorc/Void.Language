@@ -1,0 +1,25 @@
+use collections as c
+use console
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+var callbacks = 0
+var items: [i32] = []
+func less(const left: i32, const right: i32) -> bool:
+    callbacks += 1
+    return left < right
+
+func entry(iterations: i32) -> i32:
+    if iterations == 0:
+        for index in 0..<0:
+            items.push(index)
+        return 0
+    callbacks = 0
+    var checksum = 0
+    for repetition in 0..<iterations:
+        var output = c.sorted(items, less)
+        require(output.count == 0)
+        checksum += 7
+    print(callbacks, file = console.stderr)
+    return checksum

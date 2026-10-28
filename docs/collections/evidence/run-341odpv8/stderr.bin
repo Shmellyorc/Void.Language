@@ -1,0 +1,19 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:311:20: error: Type mismatch: expected string, received i32.
+    code: VOID2001
+
+ 311 |     var total: t = 0
+     |                    ^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-5h6obzcf/string-sum.void:23:20
+
+ 23 |     var output = c.sum(["x"])
+    |                    ^^^
+    Module: /string-sum.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:310:6
+
+ 310 | func sum<t>(const items: [t]) -> t:
+     |      ^^^
+    Module: /@stdlib/collections.void
+    Expected: string
+    Received: i32
+

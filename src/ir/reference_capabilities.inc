@@ -86,7 +86,9 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
             if (report) throw std::invalid_argument("VOID IR: "+message+" in "+f.name);
         };
         auto check=[&](const ReferenceFacts& actual,Type expected,bool require_mutable=false,const ReferenceFacts* capacity=nullptr) {
-            if (!capability_assignable(fact_type(expected,actual),expected)) fail("readonly reference capability would be discarded");
+            if (!capability_assignable(fact_type(expected,actual),expected))
+                fail("readonly reference capability would be discarded (expected " + capability_key(expected) +
+                     ", actual " + capability_key(fact_type(expected,actual)) + ")");
             if(requirements && require_mutable) for(const auto& origin:mutable_requirements(actual,expected,capacity))
                 changed|=summary.required_mutable.insert(origin).second;
         };

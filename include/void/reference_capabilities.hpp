@@ -125,7 +125,17 @@ inline ReferenceFacts callable_result(Type function,const std::vector<ReferenceF
     auto result=reference_facts(*function.definition->call_result);
     // A checked callable signature promises its result authority. Provenance
     // remains conservative, without treating readonly arguments as result aliases.
-    for(auto& [path,fact]:result)for(const auto& argument:arguments)for(const auto& [leaf,input]:argument)fact.origins.insert(input.origins.begin(),input.origins.end());
+    for (auto& [path, fact] : result) for (unsigned n = 0; n < arguments.size(); ++n) {
+        const auto readonly = readonly_paths(function.definition->call_parameters.at(n));
+        for (const auto& [leaf, input] : arguments[n]) {
+            // An exact mutable result cannot derive its authority from a
+            // readonly formal leaf: function-reference validation rejects that
+            // conversion. Attributing it to such a leaf invents a mutable
+            // requirement on callers of otherwise valid map/build functions.
+            if (fact.readonly || !readonly.contains(leaf))
+                fact.origins.insert(input.origins.begin(), input.origins.end());
+        }
+    }
     return result;
 }
 inline ReferenceFacts instantiate_result(const ReferenceFacts& summary,const std::vector<ReferenceFacts>& arguments) {

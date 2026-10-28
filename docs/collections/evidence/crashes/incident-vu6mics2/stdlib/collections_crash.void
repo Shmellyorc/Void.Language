@@ -1,0 +1,352 @@
+use error as core
+
+## Recoverable missing-value and empty-reduction outcomes.
+enum error_kind:
+    ## No matching element exists.
+    not_found
+    ## A minimum or maximum needs at least one element.
+    empty_collection
+
+## Collection failure; inherited path is empty and code is 1 or 2.
+struct error extends core.error:
+    ## Public function that produced this error.
+    operation: string
+    ## Missing-value or empty-collection category.
+    kind: error_kind
+
+private func _error(operation: string, kind: error_kind) -> error:
+    if kind == error_kind.not_found:
+        return error(message = operation + ": no matching element", code = 1, operation = operation, kind = kind)
+    return error(message = operation + ": empty collection", code = 2, operation = operation, kind = kind)
+
+## Return a fresh outer list in reverse order; referenced children remain readonly.
+## @param items Growable input; fixed callers use an explicit slice.
+## @return Reversed copy, including fresh empty storage.
+func reversed<t>(const items: [t]) -> [t]:
+    if items.count == 0:
+        return items[0..<0]
+    return items[-1..0]
+
+## Natural numeric ordering: NaNs last, signed zeros equivalent, no endpoint subtraction.
+## @param left First of two values of the same numeric primitive.
+## @param right Second numeric value.
+## @return Whether left precedes right in ascending order.
+func numeric_less<t>(const left: t, const right: t) -> bool:
+    var zero: t = 0
+    if left != left:
+        return false
+    if right != right:
+        return true
+    return left < right
+
+## Compare unsigned UTF-8 bytes lexicographically; NUL is ordinary data.
+## @param left First text; no normalization or locale processing occurs.
+## @param right Second text; a proper prefix sorts first.
+## @return Whether left precedes right; UTF-8 conversions allocate owned lists.
+func text_less(const left: string, const right: string) -> bool:
+    var a = left.to_utf8()
+    var b = right.to_utf8()
+    var index: i64 = 0
+    for index < a.count and index < b.count:
+        if a[index] != b[index]:
+            return a[index] < b[index]
+        index += 1
+    return a.count < b.count
+
+private func _precedes<t>(const left: t, const right: t, less: func(const t, const t) -> bool, descending: bool) -> bool:
+    if descending:
+        return less(right, left)
+    return less(left, right)
+
+## Stable sorted copy using a complete outer snapshot before the first callback.
+## @param items Growable input; its original outer sequence is never overwritten.
+## @param less Consistent strict weak ordering with exact const element parameters.
+## @param descending Swap comparator arguments while retaining equivalent-element order.
+## @return Fresh outer list with ordinary value copies and readonly shared children.
+func sorted<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> [t]:
+    var snapshot = items[0..<items.count]
+    var size = snapshot.count
+    var order: [i64] = []
+    var workspace: [i64] = []
+    for index in 0..<size:
+        order.push(index)
+        workspace.push(0)
+    var width: i64 = 1
+    for width < size:
+        var start: i64 = 0
+        for start < size:
+            var middle = size
+            if width < size - start:
+                middle = start + width
+            var finish = size
+            if width < size - middle:
+                finish = middle + width
+            var left = start
+            var right = middle
+            var destination = start
+            for destination < finish:
+                if right < finish and (left == middle or _precedes(snapshot[order[right]], snapshot[order[left]], less, descending)):
+                    workspace[destination] = order[right]
+                    right += 1
+                else:
+                    workspace[destination] = order[left]
+                    left += 1
+                destination += 1
+            start = finish
+        var saved = order
+        order = workspace
+        workspace = saved
+        if width >= size - width:
+            break
+        width += width
+    var output = snapshot[0..<0]
+    for position in order:
+        output.push(snapshot[position])
+    return output
+
+## Check adjacent live elements, stopping at the first inversion.
+## @param items Live growable input with ordinary next-access/completion invalidation.
+## @param less Consistent strict weak ordering.
+## @param descending Check the swapped comparator direction.
+## @return True for empty/singleton input; early return performs no extra version check.
+func is_sorted<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> bool:
+    if items.count == 0:
+        return true
+    var previous = items[0]
+    for item, index in items:
+        if index > 0 and _precedes(item, previous, less, descending):
+            return false
+        previous = item
+    return true
+
+private func _checked_less<t>(const items: [t], version: u64, const left: t, const right: t, less: func(const t, const t) -> bool, descending: bool) -> bool:
+    var answer = _precedes(left, right, less, descending)
+    _collections_check(items, version)
+    return answer
+
+private func _bound<t>(const items: [t], version: u64, const value: t, less: func(const t, const t) -> bool, descending: bool, upper: bool) -> i64:
+    var low: i64 = 0
+    var high = items.count
+    for low < high:
+        var middle = low + (high - low) / 2
+        var before = false
+        if upper:
+            before = not _checked_less(items, version, value, items[middle], less, descending)
+        else:
+            before = _checked_less(items, version, items[middle], value, less, descending)
+        if before:
+            low = middle + 1
+        else:
+            high = middle
+    return low
+
+## First position where an element does not precede value; logarithmic probes.
+## @param items Already sorted list whose ordering-relevant values remain stable.
+## @param value Search value under the same ordering.
+## @param less Required strict weak ordering; structural mutation fails after every call.
+## @param descending Use the swapped comparator direction.
+## @return Insertion position from zero through count, including zero for empty input.
+func lower_bound<t>(const items: [t], const value: t, less: func(const t, const t) -> bool, descending: bool = false) -> i64:
+    var version = _collections_version(items)
+    return _bound(items, version, value, less, descending, false)
+
+## First position where value precedes an element; logarithmic probes.
+## @param items Already sorted list with stable ordering-relevant values.
+## @param value Search value.
+## @param less Required strict weak ordering, checked for structural mutation after each call.
+## @param descending Use the swapped comparator direction.
+## @return Insertion position after every equivalent element, from zero through count.
+func upper_bound<t>(const items: [t], const value: t, less: func(const t, const t) -> bool, descending: bool = false) -> i64:
+    var version = _collections_version(items)
+    return _bound(items, version, value, less, descending, true)
+
+## Find the first comparator-equivalent element with logarithmic probes.
+## @param items Already sorted list; no snapshot or sortedness prepass is made.
+## @param value Search value; comparator equivalence is used instead of equality.
+## @param less Strict weak ordering; every invocation, including final probes, is guarded.
+## @param descending Use the swapped comparator direction.
+## @return First equivalent i64 index or Err(not_found).
+func binary_search<t>(const items: [t], const value: t, less: func(const t, const t) -> bool, descending: bool = false) -> result<i64, error>:
+    var version = _collections_version(items)
+    var position = _bound(items, version, value, less, descending, false)
+    if position < items.count:
+        var candidate = items[position]
+        if not _checked_less(items, version, candidate, value, less, descending) and not _checked_less(items, version, value, candidate, less, descending):
+            return Ok(position)
+    return Err(_error("binary_search", error_kind.not_found))
+
+## First predicate match under ordinary live iteration.
+## @param items Live list; the current candidate is captured before its callback.
+## @param predicate Exact readonly element predicate, called in input order.
+## @return Captured element with preserved authority or Err(not_found).
+func find<t>(const items: [t], predicate: func(const t) -> bool) -> result<t, error>:
+    for item in items:
+        if predicate(item):
+            return Ok(item)
+    return Err(_error("find", error_kind.not_found))
+
+## First matching position under ordinary live iteration.
+## @param items Live input.
+## @param predicate Readonly predicate, short-circuited at the first match.
+## @return First i64 index or Err(not_found).
+func find_index<t>(const items: [t], predicate: func(const t) -> bool) -> result<i64, error>:
+    for item, index in items:
+        if predicate(item):
+            return Ok(index)
+    return Err(_error("find_index", error_kind.not_found))
+
+## Find the first existing-language equality match, including custom operator effects.
+## @param items Live list whose element type supports readonly equality.
+## @param value Value compared to each captured current element.
+## @return First i64 index or Err(not_found), never a negative sentinel.
+func index_of<t>(const items: [t], const value: t) -> result<i64, error>:
+    for item, index in items:
+        if item == value:
+            return Ok(index)
+    return Err(_error("index_of", error_kind.not_found))
+
+## Test existing-language equality, short-circuiting on the first match.
+## @param items Live input whose element type supports readonly equality.
+## @param value Value compared with each current element.
+## @return Whether any equality comparison matched; NaN retains ordinary equality.
+func contains<t>(const items: [t], const value: t) -> bool:
+    for item in items:
+        if item == value:
+            return true
+    return false
+
+## Test whether any live element matches.
+## @param items Live input traversed left to right.
+## @param predicate Exact readonly predicate with ordinary callback effects.
+## @return False for empty input; stop at the first true result.
+func any<t>(const items: [t], predicate: func(const t) -> bool) -> bool:
+    for item in items:
+        if predicate(item):
+            return true
+    return false
+
+## Test whether all live elements match.
+## @param items Live input traversed left to right.
+## @param predicate Exact readonly predicate with ordinary callback effects.
+## @return True for empty input; stop at the first false result.
+func all<t>(const items: [t], predicate: func(const t) -> bool) -> bool:
+    for item in items:
+        if not predicate(item):
+            return false
+    return true
+
+## Count predicate matches without snapshotting the input.
+## @param items Live input with next-access/completion invalidation.
+## @param predicate Called exactly once per visited element.
+## @return i64 count, zero for empty input.
+func count_if<t>(const items: [t], predicate: func(const t) -> bool) -> i64:
+    var count: i64 = 0
+    for item in items:
+        if predicate(item):
+            count += 1
+    return count
+
+## Select captured matching elements in input order into fresh outer storage.
+## @param items Live input; referenced children remain readonly in the result.
+## @param predicate Called once per visited element before appending that candidate.
+## @return Fresh list, including an independently allocated empty result.
+func filter<t>(const items: [t], predicate: func(const t) -> bool) -> [t]:
+    var output = items[0..<0]
+    for item in items:
+        if predicate(item):
+            output.push(item)
+    return output
+
+## Transform live elements in order; callback results are ordinary data.
+## @param items Live input, with no extra callback for empty/type initialization.
+## @param transform Exact callback; use explicit T/U or a previously typed callback.
+## @return Fresh list obeying the callback's existing result-authority contract.
+func map<t, u>(const items: [t], transform: func(const t) -> u) -> [u]:
+    var output: [u] = []
+    for item in items:
+        output.push(transform(item))
+    return output
+
+## Left-to-right seeded fold with ordinary mutable accumulator authority.
+## @param items Live input, whose callback effects persist on failure.
+## @param initial Explicit accumulator; reference identities remain shared.
+## @param combine Called as combine(accumulator, captured item).
+## @return Final accumulator, or initial for empty input.
+func fold<t, a>(const items: [t], initial: a, combine: func(a, const t) -> a) -> a:
+    var accumulator = initial
+    for item in items:
+        accumulator = combine(accumulator, item)
+    return accumulator
+
+## Select the first comparator-equivalent minimum under live iteration.
+## @param items Live input with captured current candidates.
+## @param less Required strict weak ordering.
+## @return Selected element with preserved authority or Err(empty_collection).
+func min<t>(const items: [t], less: func(const t, const t) -> bool) -> result<t, error>:
+    if items.count == 0:
+        return Err(_error("min", error_kind.empty_collection))
+    var best = items[0]
+    for item, index in items:
+        if index > 0 and less(item, best):
+            best = item
+    return Ok(best)
+
+## Select the first comparator-equivalent maximum under live iteration.
+## @param items Live input with captured current candidates.
+## @param less Required strict weak ordering.
+## @return Selected element with preserved authority or Err(empty_collection).
+func max<t>(const items: [t], less: func(const t, const t) -> bool) -> result<t, error>:
+    if items.count == 0:
+        return Err(_error("max", error_kind.empty_collection))
+    var best = items[0]
+    for item, index in items:
+        if index > 0 and less(best, item):
+            best = item
+    return Ok(best)
+
+## Same-type numeric sum using existing wrapping/IEEE left-to-right addition.
+## @param items List of one of the ten numeric primitives.
+## @return Same-type accumulator; empty input returns typed zero.
+func sum<t>(const items: [t]) -> t:
+    var total: t = 0
+    for item in items:
+        total += item
+    return total
+
+## Extract dictionary keys in insertion order with preserved child authority.
+## @param items Existing ordered dictionary; supported key rules are unchanged.
+## @return Fresh key list, including for empty input.
+func keys<k, v>(const items: {k: v}) -> [k]:
+    for first_value, first_key in items:
+        var output = [first_key]
+        output.clear()
+        for item, key in items:
+            output.push(key)
+        return output
+    var empty: [k] = []
+    return empty
+
+## Extract dictionary values in insertion order with ordinary copy/reference rules.
+## @param items Existing ordered dictionary.
+## @return Fresh value list; referenced children remain readonly.
+func values<k, v>(const items: {k: v}) -> [v]:
+    for first_value, first_key in items:
+        var output = [first_value]
+        output.clear()
+        for item, key in items:
+            output.push(item)
+        return output
+    var empty: [v] = []
+    return empty
+
+## Copy a dictionary's outer identity and insertion order without deep cloning.
+## @param items Existing dictionary; child authority and key admissibility are preserved.
+## @return Fresh dictionary; nested references retain their shared readonly identities.
+func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}:
+    for first_value, first_key in items:
+        var output = {first_key: first_value}
+        for item, key in items:
+            output[key] = item
+        return output
+    var empty: {k: v} = {}
+    return empty

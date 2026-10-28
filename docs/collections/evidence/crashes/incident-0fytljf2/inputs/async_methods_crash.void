@@ -1,0 +1,13 @@
+func identity<t>(input: t) -> t:
+    return input
+struct worker:
+    score: i32
+async func (self worker) ready() -> i32:
+    return self.score
+async func (self worker) forward<t>(value: t) -> t:
+    return value
+async func entry(input: i32) -> i32:
+    var owner = worker(score = 7)
+    var first = identity(owner.ready())
+    var second = identity(owner.forward(7))
+    return identity(await first) + identity(await second) - 7

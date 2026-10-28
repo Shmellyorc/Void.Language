@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="10"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="628"
+	timestamp="2026-10-28T00:42:05"
+	>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="1.89596" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-m8kp4tvf
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-788w2ujq
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-o03he7e2
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-pe9gn4el
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-ehtaqnz4
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-cgm6yfji
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-qlli1q36
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-yga4fj7i
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-tu708t1f
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-g67h2tt6
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest 682j9dpl/evidence/incident-r_v8c95g
+CRASH EVIDENCE: /tmp/VOID crash pr...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_host" classname="collections_stdlib_host" time="215.357" status="run">
+		<properties/>
+		<system-out>operation=1 optimized=0 injected_allocation_failures=631
+operation=2 optimized=0 injected_allocation_failures=80
+operation=3 optimized=0 injected_allocation_failures=106
+operation=4 optimized=0 injected_allocation_failures=280
+operation=5 optimized=0 injected_allocation_failures=328
+operation=6 optimized=0 injected_allocation_failures=284
+operation=7 optimized=0 injected_allocation_failures=398
+operation=8 optimized=0 injected_allocation_failures=102
+map publication optimized=0 partial_effect_failures=72 passed
+collections cache/reload/captures/active leases optimized=0 passed
+operation=1 optimized=1 injected_allocation_failures=631
+operation=2 optimized=1 injected_allocation_failures=80
+operation=3 optimized=1 injected_allocation_failures=106
+operation=4 optimized=1 injected_allocation_failures=280
+operation=5 optimized=1 injected_allocation_failures=328
+operation=6 optimized=1 injected_allocation_failures=284
+operation=7 optimized=1 injected_allocation_failures=398
+operation=8 optimized=1 injected_allocatio...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_failures" classname="collections_stdlib_failures" time="99.1761" status="run">
+		<properties/>
+		<system-out>Collections expected invalidation and early-return execution passed in JIT/O2/linked AOT/O2
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_frontend" classname="collections_stdlib_frontend" time="4.24657" status="run">
+		<properties/>
+		<system-out>Collections: 37 source-located negative cases and ordinary same-name function passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_collections_stdlib" classname="lsp_collections_stdlib" time="1.03774" status="run">
+		<properties/>
+		<system-out>Collections LSP: 40 checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_oracles" classname="collections_stdlib_oracles" time="38.2215" status="run">
+		<properties/>
+		<system-out>Collections independent oracles: 48 numeric distributions, 240 bounds and stable tagged duplicates; invalid comparators bounded
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_install" classname="collections_stdlib_install" time="10.5064" status="run">
+		<properties/>
+		<system-out>Collections installed/relocated check, JIT/O2, build, independent AOT and LSP passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_cache" classname="collections_stdlib_cache" time="2.49867" status="run">
+		<properties/>
+		<system-out>Collections automatic cache miss/hit/bypass and fresh captured-callback/equality state passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_operators" classname="collections_stdlib_operators" time="2.0212" status="run">
+		<properties/>
+		<system-out>175 operator resolution/call checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_stack" classname="collections_stdlib_stack" time="468.792" status="run">
+		<properties/>
+		<system-out>Collections: 56 JIT/emit/link/native checks; hard stack=1048576
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,25 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+      Start 175: text_encoding_crash_preservation
+      Start 191: collections_stdlib_host
+ 1/10 Test #175: text_encoding_crash_preservation ...   Passed    1.97 sec
+      Start 193: collections_stdlib_failures
+ 2/10 Test #191: collections_stdlib_host ............   Passed   29.88 sec
+      Start 194: collections_stdlib_frontend
+ 3/10 Test #194: collections_stdlib_frontend ........   Passed    2.72 sec
+      Start 195: lsp_collections_stdlib
+ 4/10 Test #195: lsp_collections_stdlib .............   Passed    0.19 sec
+      Start 196: collections_stdlib_oracles
+ 5/10 Test #193: collections_stdlib_failures ........   Passed   47.74 sec
+      Start 197: collections_stdlib_install
+ 6/10 Test #196: collections_stdlib_oracles .........   Passed   17.09 sec
+      Start 198: collections_stdlib_cache
+ 7/10 Test #198: collections_stdlib_cache ...........   Passed    1.37 sec
+      Start 199: collections_stdlib_operators
+ 8/10 Test #199: collections_stdlib_operators .......   Passed    1.13 sec
+      Start 200: collections_stdlib_stack
+ 9/10 Test #197: collections_stdlib_install .........   Passed    5.88 sec
+10/10 Test #200: collections_stdlib_stack ...........   Passed   70.51 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) = 122.91 sec

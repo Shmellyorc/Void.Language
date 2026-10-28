@@ -1,0 +1,21 @@
+struct counter:
+    value: i32
+func mark(c: counter, value: i32) -> i32:
+    c.value = c.value * 10 + value
+    return value
+func choose<t>(first: t, second: t, third: t) -> t:
+    return first
+struct triple<t>:
+    first: t
+    second: t
+    third: t
+func entry(value: i32) -> i32:
+    var c = counter()
+    var selected = choose(mark(c, 1), mark(c, 2), mark(c, 3))
+    if c.value != 123 or selected != 1:
+        return -100
+    c.value = 0
+    var record = triple(third = mark(c, 3), first = mark(c, 1), second = mark(c, 2))
+    if c.value != 312 or record.first != 1:
+        return -200
+    return value + selected + record.third

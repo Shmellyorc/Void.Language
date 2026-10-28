@@ -1,0 +1,9 @@
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/large.void:37:55: error: Type mismatch: expected i64, received i32.
+    code: VOID2001
+
+ 37 |         require(c.lower_bound(sorted, query, compare) == query)
+    |                                                       ^^
+    Module: /large.void
+    Expected: i64
+    Received: i32
+

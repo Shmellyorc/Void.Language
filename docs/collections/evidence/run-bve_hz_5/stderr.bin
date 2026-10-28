@@ -1,0 +1,8 @@
+/tmp/VOID-collections-negative-3drdzqjb/collections.void:2:17: error: Unknown function '_collections_version'.
+    code: VOID2003
+
+ 2 |     var token = _collections_version([1])
+   |                 ^^^^^^^^^^^^^^^^^^^^
+    Module: /collections.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+

@@ -1,0 +1,11 @@
+func identity<t>(input: t) -> t:
+    return input
+func read() -> result<i32, string>:
+    return Ok(7)
+func work() -> result<i32, string>:
+    var nested = identity({"values": [read()?]})
+    return Ok(nested["values"][0])
+func entry(input: i32) -> i32:
+    if work() is Ok(var payload):
+        return payload
+    return -1

@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:302:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::max
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:85:19: source call
+                c.max(items, compare)
+                  ^
+

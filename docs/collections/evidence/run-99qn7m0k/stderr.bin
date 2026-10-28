@@ -1,0 +1,8 @@
+/tmp/VOID-collections-negative-h_oreo98/map-laundering.void:23:46: error: Function value would discard returned readonly authority.
+    code: VOID2007
+
+ 23 |     var output = c.map<node, node>([node()], func(const item: node) -> node:
+    |                                              ^^^^
+    Module: /map-laundering.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

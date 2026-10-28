@@ -1,0 +1,74 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:18:13: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 18 |     if kind == error_kind.not_found:
+    |             ^^
+    Module: /@stdlib/collections.void
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:26:9: error: Duplicate declaration or shadowing of 'sorted'.
+    code: VOID2005
+
+ 26 |     var sorted = collections.sorted(input, ordered)
+    |         ^^^^^^
+    Module: /authority.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:66:6
+
+ 66 | func sorted<t>(const items: [t], less: func(const t, const t) -> bool, descending: bool = false) -> [t]:
+    |      ^^^^^^
+    Module: /@stdlib/collections.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:28:63: error: A generic function value requires explicit concrete type arguments.
+    code: VOID1103
+
+ 28 |     require(selected[0] == first and backward[1] == first and sorted[0] == second)
+    |                                                               ^^^^^^
+    Module: /authority.void
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:38:9: error: Duplicate declaration or shadowing of 'keys'.
+    code: VOID2005
+
+ 38 |     var keys = collections.keys(dictionary)
+    |         ^^^^
+    Module: /authority.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:319:6
+
+ 319 | func keys<k, v>(const items: {k: v}) -> [k]:
+     |      ^^^^
+    Module: /@stdlib/collections.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:39:9: error: Duplicate declaration or shadowing of 'values'.
+    code: VOID2005
+
+ 39 |     var values = collections.values(dictionary)
+    |         ^^^^^^
+    Module: /authority.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:332:6
+
+ 332 | func values<k, v>(const items: {k: v}) -> [v]:
+     |      ^^^^^^
+    Module: /@stdlib/collections.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:41:13: error: A generic function value requires explicit concrete type arguments.
+    code: VOID1103
+
+ 41 |     require(keys[0] == "first" and values[1] == second)
+    |             ^^^^
+    Module: /authority.void
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:41:36: error: A generic function value requires explicit concrete type arguments.
+    code: VOID1103
+
+ 41 |     require(keys[0] == "first" and values[1] == second)
+    |                                    ^^^^^^
+    Module: /authority.void
+
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/authority.void:42:37: error: A generic function value requires explicit concrete type arguments.
+    code: VOID1103
+
+ 42 |     require(collections.lower_bound(sorted, second, ordered) == 0)
+    |                                     ^^^^^^
+    Module: /authority.void
+

@@ -1,0 +1,21 @@
+interface readable:
+    func read() -> i32
+struct node:
+    value: i32
+func (n node) read() -> i32:
+    return n.value
+value struct scalar:
+    value: i32
+func (s scalar) read() -> i32:
+    return s.value
+func read<t: readable>(value: t) -> i32:
+    return value.read()
+func concrete_extra<t: readable>(value: t) -> i32:
+    return value.read() + value.value
+func entry(value: i32) -> i32:
+    var n = node(value = value)
+    var s = scalar(value = 2)
+    if concrete_extra(s) != 4:
+        return -100
+    var view: readable = n
+    return read(n) + read(s) + read(view)
