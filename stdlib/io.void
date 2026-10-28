@@ -448,6 +448,26 @@ async func open_async(value: string, mode: open_mode = open_mode.read, order: bi
     return Ok(resource)
 
 
+# Source factories with outer ownership must publish the unopened managed identity
+# into their own reached cleanup guard before awaiting acquisition. Returning an
+# acquired file from a child task otherwise leaves a cancellation window before
+# the parent can observe that result. These helpers grant no native authority.
+## Prepare an unopened identity for another standard-library acquisition guard.
+## @param value Host path retained in the identity; native validation occurs on acquisition.
+## @return A fresh closed identity with no native resource or filesystem effects.
+internal func _prepare_open(value: string) -> file:
+    return file(value, binary.byte_order.little)
+
+## Acquire a fresh prepared identity already retained by the caller's cleanup guard.
+## @param mode Existing native opening policy; the identity must be fresh and unopened.
+## @return True after acquisition, or the original typed native failure.
+internal async func (self file) _complete_open_async(mode: open_mode) -> result<bool, error>:
+    var reply = await _io_open_async(self, self._path, _mode(mode))
+    if reply.kind != 0:
+        return Err(_error("open", self._path, "", reply))
+    return Ok(true)
+
+
 ## Close this shared native handle when leaving with, including early failure.
 ## Closing is idempotent; an actual native close failure becomes a checked Runtime failure.
 func (self file) deinit():

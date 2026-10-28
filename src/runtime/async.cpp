@@ -10,6 +10,7 @@
 #include <string>
 #include <stdexcept>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 namespace {
 struct Diagnostic {
@@ -38,7 +39,7 @@ struct Diagnostic {
     }
 };
 struct Task;
-struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;};
+struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;std::size_t pending=0,failures=0;};
 struct Task {
     enum State { prepared,ready,running,waiting,joining,working,finishing,finished } state=prepared;
     enum Outcome { success,cancelled,failed } outcome=success;
@@ -47,6 +48,13 @@ struct Task {
     vd_async_resume_entry resume=nullptr;
     Task* dependency=nullptr;
     Task* next_ready=nullptr;
+    Task* next_live=nullptr;
+    Task* previous_live=nullptr;
+    Task* first_child=nullptr;
+    Task* last_child=nullptr;
+    Task* next_sibling=nullptr;
+    std::size_t sequence=0,pending_children=0,failed_children=0;
+    bool live=false,listed_failure=false;
     Group children;
     Group* group=nullptr;
     Group* active_group=&children;
@@ -74,6 +82,9 @@ struct Scope {
     vd::Runtime& runtime;
     std::thread::id owner=std::this_thread::get_id();
     std::vector<std::unique_ptr<Task>> tasks;
+    std::unordered_map<void*,Task*> task_index;
+    Task* live_head=nullptr;
+    Task* live_tail=nullptr;
     std::vector<std::unique_ptr<Group>> groups;
     Task* current=nullptr;
     Task* ready_head=nullptr;
@@ -130,16 +141,17 @@ struct Scope {
         {vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);work_changed.wait(lock,[&]{return admitted==count;});if(startup_failed)throw std::logic_error("Worker Runtime admission failed");}
     }
     void publish(Task& task){
-        ensure_workers();task.state=Task::working;task.next_worker=nullptr;
+        ensure_workers();activate(task);task.state=Task::working;task.next_worker=nullptr;
         {std::lock_guard lock(work_mutex);if(startup_failed)throw std::logic_error("Worker unavailable");if(work_tail)work_tail->next_worker=&task;else work_head=&task;work_tail=&task;}work_changed.notify_one();
     }
-    bool work_pending() const noexcept {for(const auto& task:tasks)if(task->state==Task::working)return true;return false;}
+    bool work_pending() const noexcept {for(auto* task=live_head;task;task=task->next_live)if(task->state==Task::working)return true;return false;}
     void receive() noexcept {
-        for(auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire)){
+        for(auto* task=live_head;task;){
+            auto* following=task->next_live;
+            if(task->state==Task::working && task->work->done.load(std::memory_order_acquire)){
             if (task->work->native) {
                 receive_native(*task);
-                continue;
-            }
+            } else {
             task->state=Task::finished;const auto& failure=task->work->failure.value;
             if(failure.message){task->failure.assign(failure);task->outcome=task->work->cancelled?Task::cancelled:Task::failed;if(task->outcome==Task::cancelled)task->failure.value={};}
             else{std::int32_t complete=1;std::memcpy(task->address,&complete,sizeof(complete));}
@@ -147,9 +159,14 @@ struct Scope {
             // The acquire handoff proves the worker has returned from resume,
             // removed its scratch roots and stopped accessing this frame.
             task->frame.reset(nullptr);
+            retire(*task);
+            }
+            }
+            task=following;
         }
     }
     void abandon(Task& task) noexcept {
+        activate(task);
         task.work->abandoning = true;
         task.work->done.store(false, std::memory_order_relaxed);
         // Workers were admitted before this resource could be acquired. Reuse
@@ -200,11 +217,12 @@ struct Scope {
             std::memcpy(task.address, &complete, sizeof(complete));
         }
         failed_child(task);
+        retire(task);
     }
     void finish_native_children(Task& owner) noexcept {
         bool pending_cleanup = false;
-        for (auto& child : tasks) {
-            if (!owned(*child, owner) || !child->work || !child->work->native) continue;
+        for (auto* child=owner.first_child;child;child=child->next_sibling) {
+            if (!child->work || !child->work->native) continue;
             auto& work = *child->work;
             if (child->state == Task::working) {
                 pending_cleanup = true;
@@ -222,20 +240,76 @@ struct Scope {
             owner.state = Task::finished;
             failed_child(owner);
             owner.frame.reset(nullptr);
+            retire(owner);
         }
     }
     void wait_work(){
         vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);
-        work_changed.wait(lock,[&]{if(startup_failed)return true;for(const auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire))return true;return false;});
+        work_changed.wait(lock,[&]{if(startup_failed)return true;for(auto* task=live_head;task;task=task->next_live)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire))return true;return false;});
         if(startup_failed)throw std::logic_error("Worker execution failed");
     }
 
     Scope(vd::Runtime& owner,const void* identity):runtime(owner),generation(identity){}
+    void register_task(std::unique_ptr<Task> item) {
+        auto* task=item.get();task->sequence=tasks.size();
+        tasks.push_back(std::move(item));
+        try {
+            if(!task_index.emplace(task->address,task).second)throw std::logic_error("duplicate async task address");
+        }catch(...){tasks.pop_back();throw;}
+        if(task->group) {
+            auto& owner=*task->group->owner;
+            if(owner.last_child)owner.last_child->next_sibling=task;else owner.first_child=task;
+            owner.last_child=task;
+        }
+    }
+    // Publication can fail before the job reaches a worker. Remove every scan
+    // index before destroying the just-registered task and its rooted handles.
+    void discard_last_task() noexcept {
+        auto& task=*tasks.back();
+        retire(task);
+        if(task.group) {
+            auto& owner=*task.group->owner;
+            Task* previous=nullptr;
+            for(auto* child=owner.first_child;child!=&task;child=child->next_sibling)previous=child;
+            if(previous)previous->next_sibling=nullptr;else owner.first_child=nullptr;
+            owner.last_child=previous;
+        }
+        task_index.erase(task.address);
+        tasks.pop_back();
+    }
+    // A scan index, not another ready queue. Retain creation order exactly as
+    // the original task-vector scan, including out-of-order starts/abandonment.
+    // Intrusive links permit reactivation during cleanup without allocation.
+    void activate(Task& task) noexcept {
+        if(task.live)return;
+        auto* previous=live_tail;
+        while(previous && previous->sequence>task.sequence)previous=previous->previous_live;
+        task.previous_live=previous;task.next_live=previous?previous->next_live:live_head;
+        if(task.next_live)task.next_live->previous_live=&task;else live_tail=&task;
+        if(previous)previous->next_live=&task;else live_head=&task;
+        task.live=true;
+        if(task.group){++task.group->pending;++task.group->owner->pending_children;}
+    }
+    void retire(Task& task) noexcept {
+        if(!task.live)return;
+        if(task.previous_live)task.previous_live->next_live=task.next_live;else live_head=task.next_live;
+        if(task.next_live)task.next_live->previous_live=task.previous_live;else live_tail=task.previous_live;
+        task.next_live=task.previous_live=nullptr;task.live=false;
+        if(task.group){if(!task.group->pending || !task.group->owner->pending_children)std::terminate();--task.group->pending;--task.group->owner->pending_children;}
+    }
+    void observe(Task& task) noexcept {
+        task.observed=true;
+        if(task.listed_failure) {
+            if(!task.group || !task.group->failures || !task.group->owner->failed_children)std::terminate();
+            --task.group->failures;--task.group->owner->failed_children;task.listed_failure=false;
+        }
+    }
     Task& find(void* address) {
-        for(auto& task:tasks)if(task->address==address)return *task;
+        auto found=task_index.find(address);if(found!=task_index.end())return *found->second;
         throw std::logic_error("Task does not belong to the active root adapter");
     }
     void enqueue(Task& task) noexcept {
+        activate(task);
         task.state=Task::ready;task.next_ready=nullptr;
         if(ready_tail)ready_tail->next_ready=&task;else ready_head=&task;
         ready_tail=&task;
@@ -244,25 +318,30 @@ struct Scope {
     bool member(const Task& task,const Group* group) const noexcept {return task.group==group;}
     bool owned(const Task& task,const Task& owner) const noexcept {return task.group && task.group->owner==&owner;}
     bool pending(const Task& owner,const Group* group=nullptr) const noexcept {
-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::prepared && task->state!=Task::finished)return true;
-        return false;
+        return group?group->pending!=0:owner.pending_children!=0;
     }
     void cancel_children(Task& owner,Group* group=nullptr) noexcept {
-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::finished)task->cancel_requested=true;
+        for(auto* task=owner.first_child;task;task=task->next_sibling)if((!group || member(*task,group)) && task->state!=Task::finished)task->cancel_requested=true;
     }
     Task* child_failure(Task& owner,Group* group=nullptr) noexcept {
-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::prepared && task->outcome==Task::failed && !task->observed)return task.get();
+        if(!(group?group->failures:owner.failed_children))return nullptr;
+        for(auto* task=owner.first_child;task;task=task->next_sibling)if((!group || member(*task,group)) && task->state!=Task::prepared && task->outcome==Task::failed && !task->observed)return task;
         return nullptr;
     }
     void collect(Task& owner,Group* group=nullptr) noexcept {
-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->outcome==Task::failed && !task->observed){
+        if(!(group?group->failures:owner.failed_children))return;
+        for(auto* task=owner.first_child;task;task=task->next_sibling)if((!group || member(*task,group)) && task->outcome==Task::failed && !task->observed){
             if(owner.outcome!=Task::failed){owner.failure.assign(task->failure.value);owner.outcome=Task::failed;}
             else owner.failure.append(task->failure.value);
-            task->observed=true;
+            observe(*task);
         }
     }
     void failed_child(Task& child) noexcept {
-        if(child.group && child.outcome==Task::failed){auto& owner=*child.group->owner;cancel_children(owner,child.group);}
+        if(child.group && child.outcome==Task::failed){
+            auto& owner=*child.group->owner;
+            if(!child.observed && !child.listed_failure){++owner.failed_children;++child.group->failures;child.listed_failure=true;}
+            cancel_children(owner,child.group);
+        }
     }
 };
 thread_local Scope* active=nullptr;
@@ -282,7 +361,7 @@ void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::siz
         task_layout.descriptor=s.runtime.descriptor(task_key);
         s.runtime.allocate_into(task,task_layout);item->task.reset(*task);item->address=*task;
         s.runtime.allocate_into(frame,frame_layout);item->frame.reset(*frame);
-        s.tasks.push_back(std::move(item));
+        s.register_task(std::move(item));
     }catch(const std::bad_alloc&){exception(failure,"Async activation allocation failed");}
      catch(const std::exception&){exception(failure,"Async activation requires a valid owning root adapter");}
 }
@@ -298,7 +377,7 @@ bool vd_async_ready(void* address,vd::RuntimeFailure* failure) noexcept {
         if(&task==s.current){exception(failure,"Task cannot await itself");return true;}
         for(auto* owner=s.current->group? s.current->group->owner:nullptr;owner;owner=owner->group?owner->group->owner:nullptr)if(owner==&task && task.state!=Task::finished){exception(failure,"Async await dependency cycle");return true;}
         if(task.state!=Task::finished)return false;
-        task.observed=true;if(task.outcome==Task::cancelled){s.current->cancel_observed=true;exception(failure,"Async task cancelled");}else if(task.failure.value.message)*failure=task.failure.value;
+        s.observe(task);if(task.outcome==Task::cancelled){s.current->cancel_observed=true;exception(failure,"Async task cancelled");}else if(task.failure.value.message)*failure=task.failure.value;
         return true;
     }catch(...){exception(failure,"Invalid task await");return true;}
 }
@@ -396,20 +475,28 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
         Task* root=nullptr;if(root_address)root=&s.find(root_address);
         for(;;) {
             s.receive();
-            for(auto& task:s.tasks){
+            bool retired=false;
+            for(auto* task=s.live_head;task;){
+                auto* following=task->next_live;
                 if(task->state==Task::waiting && (task->dependency->state==Task::finished || task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
                 else if(task->state==Task::joining && !s.pending(*task,task->joining_group))s.enqueue(*task);
-                else if (task->state == Task::finishing && !s.pending(*task)) s.finish_native_children(*task);
+                else if (task->state == Task::finishing && !s.pending(*task)) {
+                    s.finish_native_children(*task);
+                    retired |= task->state == Task::finished;
+                }
+                task=following;
             }
-            Task* next=s.pop();bool pending=false;
-            for(auto& task:s.tasks){pending|=task->state!=Task::finished && task->state!=Task::prepared;}
+            Task* next=s.pop();bool pending=s.live_head!=nullptr;
             if(!next){
                 if(!pending)break;
+                // A later child may have just retired after an earlier parent's
+                // readiness check. Rescan before diagnosing a dependency cycle.
+                if(retired)continue;
                 if(s.work_pending()){s.wait_work();continue;}
                 // Resume through the checked await failure edge so reached
                 // cleanup runs even for an invalid cyclic dependency graph.
                 vd::RuntimeFailure cycle;cycle.message="Async await dependency cycle";
-                for(auto& task:s.tasks)if(task->state==Task::waiting){task->failure.assign(cycle);task->outcome=Task::failed;s.enqueue(*task);}
+                for(auto* task=s.live_head;task;task=task->next_live)if(task->state==Task::waiting){task->failure.assign(cycle);task->outcome=Task::failed;s.enqueue(*task);}
                 continue;
             }
             s.current=next;next->state=Task::running;vd::RuntimeFailure result;
@@ -463,14 +550,14 @@ void async_submit_native(void** output, const TypeLayout& layout,
     executor.runtime.allocate_into(output, layout);
     item->task.reset(*output);
     item->address = *output;
-    executor.tasks.push_back(std::move(item));
+    executor.register_task(std::move(item));
     try {
         executor.publish(*executor.tasks.back());
     } catch (...) {
         // No native operation has been queued if admission fails. Retire the
         // reserved file-operation count before source cleanup can run.
         executor.tasks.back()->work->native->cancel_queued();
-        executor.tasks.pop_back();
+        executor.discard_last_task();
         *output = nullptr;
         throw;
     }

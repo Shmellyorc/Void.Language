@@ -1,0 +1,121 @@
+use log
+use io
+use console
+use time
+use convert
+
+private func record(timestamps: bool) -> [u8]:
+    if timestamps:
+        var sample = convert.unwrap(time.now_utc())
+        var stamp = convert.unwrap(sample.format("yyyy-MM-dd'T'HH:mm:ss.fff'Z'"))
+        return "{stamp} INFO \"\" \"async record\"\n".to_utf8()
+    return "INFO \"\" \"async record\"\n".to_utf8()
+
+private func direct_file(count: i32, timestamps: bool) -> i32:
+    var bytes = record(false)
+    with convert.unwrap(io.open("async-performance.log", io.open_mode.create_new)) as owner:
+        for index in 0..<count:
+            if timestamps:
+                bytes = record(true)
+            convert.unwrap(owner.write_bytes(bytes))
+        convert.unwrap(owner.flush())
+        convert.unwrap(owner.close())
+    return 7
+
+private async func direct_file_async(count: i32, timestamps: bool) -> i32:
+    var bytes = record(false)
+    var handle = convert.unwrap(await io.open_async("async-performance.log", io.open_mode.create_new))
+    with handle as owner:
+        for index in 0..<count:
+            if timestamps:
+                bytes = record(true)
+            convert.unwrap(await owner.write_bytes_async(bytes))
+        convert.unwrap(await owner.flush_async())
+        convert.unwrap(await owner.close_async())
+    return 7
+
+private func direct_console(count: i32, timestamps: bool) -> i32:
+    var bytes = record(false)
+    for index in 0..<count:
+        if timestamps:
+            bytes = record(true)
+        convert.unwrap(console.stdout.write_bytes(bytes))
+    convert.unwrap(console.stdout.flush())
+    return 7
+
+# console has a synchronous transfer API. This comparator isolates one ordinary
+# async activation around that same transfer; it does not invent async native I/O.
+private async func console_activation(bytes: [u8]) -> i64:
+    return convert.unwrap(console.stdout.write_bytes(bytes))
+
+private async func direct_console_async(count: i32, timestamps: bool) -> i32:
+    var bytes = record(false)
+    for index in 0..<count:
+        if timestamps:
+            bytes = record(true)
+        var transferred = await console_activation(bytes)
+        if transferred != bytes.count:
+            return 1
+    convert.unwrap(console.stdout.flush())
+    return 7
+
+private func settings(file_sink: bool, timestamps: bool) -> log.config:
+    if file_sink:
+        return log.config(timestamps = timestamps, console = log.console_sink.none, file_path = "async-performance.log")
+    return log.config(timestamps = timestamps, console = log.console_sink.stdout)
+
+private func synchronous_log(count: i32, file_sink: bool, timestamps: bool) -> i32:
+    with convert.unwrap(log.open(settings(file_sink, timestamps))) as owner:
+        var accepted: i32 = 0
+        for index in 0..<count:
+            if convert.unwrap(owner.info("async record")):
+                accepted++
+        convert.unwrap(owner.close())
+        if accepted != count:
+            return 2
+    return 7
+
+private async func asynchronous_log(count: i32, file_sink: bool, timestamps: bool) -> i32:
+    var instance = convert.unwrap(await log.open_async(settings(file_sink, timestamps)))
+    with instance as owner:
+        var accepted: i32 = 0
+        for index in 0..<count:
+            if convert.unwrap(await owner.write_async(log.level.info, "async record")):
+                accepted++
+        convert.unwrap(await owner.close_async())
+        if accepted != count:
+            return 3
+    return 7
+
+private async func empty_activation() -> i32:
+    return 1
+
+async func entry(command: i32) -> i32:
+    if command == 0:
+        return 7
+    var mode = command / 10000
+    var count = command % 10000
+    if mode == 16:
+        var total: i32 = 0
+        for index in 0..<count:
+            total += await empty_activation()
+        if total != count:
+            return 4
+        return 7
+    var timestamps = mode >= 8
+    mode = mode % 8
+    if mode == 0:
+        return direct_file(count, timestamps)
+    if mode == 1:
+        return await direct_file_async(count, timestamps)
+    if mode == 2:
+        return synchronous_log(count, true, timestamps)
+    if mode == 3:
+        return await asynchronous_log(count, true, timestamps)
+    if mode == 4:
+        return direct_console(count, timestamps)
+    if mode == 5:
+        return await direct_console_async(count, timestamps)
+    if mode == 6:
+        return synchronous_log(count, false, timestamps)
+    return await asynchronous_log(count, false, timestamps)

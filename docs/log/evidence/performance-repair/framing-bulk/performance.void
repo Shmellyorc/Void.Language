@@ -1,0 +1,5 @@
+use log
+async func entry(command: i32) -> i32:
+    if command >= 1000:
+        return log.perf_setup(command - 1000)
+    return log.perf_stage(command)

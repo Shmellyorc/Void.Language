@@ -1,0 +1,11 @@
+# One independently linked root for the native fault/identity/GC/cancellation host.
+use "./native.void" as transport
+use "./publication.void" as ownership
+use "./cancel.void" as cancellation
+
+async func entry(command: i32) -> i32:
+    if command >= 2000:
+        return await cancellation.entry(command - 2000)
+    if command >= 1000:
+        return ownership.entry(command - 1000)
+    return transport.entry(command)

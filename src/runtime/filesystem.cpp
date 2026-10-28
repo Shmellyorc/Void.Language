@@ -483,6 +483,10 @@ void set_length(File& file, std::int64_t count, Result& result) {
 
 void file_operation(const Request& request, Result& result, const std::atomic<bool>* cancellation) {
     auto& file = *request.file;
+    // Complete the existing test barrier at native operation boundaries. Transfer
+    // chunks and close retain their established per-file hooks below.
+    if (file.hooks && file.hooks->before && request.operation >= Operation::seek &&
+        request.operation < Operation::close) file.hooks->before(request.operation);
     if (request.operation == Operation::close) {
         result = close(file);
         return;
@@ -1226,6 +1230,7 @@ void create_parents(const fs::path& value, Result& result,
 
 void filesystem_operation(const Request& request, Result& result,
                           const std::atomic<bool>* cancellation) {
+    if (request.hooks && request.hooks->before) request.hooks->before(request.operation);
     if (!valid_path(request.path) ||
         (!request.target.empty() && !valid_path(request.target))) {
         fail(result, ErrorKind::invalid_path);

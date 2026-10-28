@@ -1,0 +1,72 @@
+[ 20%] Built target void_native_fixture
+[ 40%] Built target void_format_objects
+[ 40%] Built target void_zone_objects
+[ 40%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[ 40%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 40%] Linking CXX static library libvoid_runtime.a
+[ 80%] Built target void_runtime
+[ 80%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+-- VOID LLVM: 19.1.7 at /home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- ASan/UBSan enabled; vptr checking requires an RTTI-enabled LLVM SDK and is unavailable in this ABI
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (8.3s)
+-- Generating done (1.3s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[  0%] Built target void_lsp
+[  0%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[ 25%] Linking CXX executable voidls
+[ 25%] Built target voidls
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_io_runner.dir/tests/io/runner.cpp.o
+[100%] Linking CXX executable void_io_runner
+[100%] Built target void_io_runner
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_log_host.dir/tests/log/host.cpp.o
+[100%] Building CXX object CMakeFiles/void_log_host.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_log_host
+[100%] Built target void_log_host

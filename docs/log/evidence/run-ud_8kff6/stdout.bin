@@ -1,0 +1,2 @@
+transport optimize=0 partial_boundaries=18 native_closes=24 passed
+rotation optimize=0 boundaries=7 independent_identity_observations passed

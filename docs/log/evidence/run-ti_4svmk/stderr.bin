@@ -1,0 +1,7 @@
+/tmp/VOID-log-frontend-_b855myt/main.void:3:22: error: Initializer is private to /@stdlib/log.void.
+    code: VOID3003
+
+ 3 |     var instance = l.logger(l.config())
+   |                      ^^^^^^
+    Module: /main.void
+

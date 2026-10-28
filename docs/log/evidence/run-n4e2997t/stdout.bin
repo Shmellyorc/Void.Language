@@ -1,0 +1,34 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+    Start  39: gc_buffers
+1/8 Test  #39: gc_buffers .......................   Passed    0.89 sec
+    Start  56: growable_arrays_source
+2/8 Test  #56: growable_arrays_source ...........   Passed    1.43 sec
+    Start 191: log_native
+3/8 Test #191: log_native .......................***Failed   49.60 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-v917yx1_
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/log/host.py", line 8, in <module>
+    result = h.run([exe, h.ROOT, directory, *sys.argv[2:]], sources=[h.ROOT / 'tests/log', Path(directory)], timeout=1800, small=True,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/log/support.py", line 73, in run
+    assert not result.expectation_failed, (receipt, args, result.returncode, result.stdout, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (PosixPath('/home/shmellyorc/Documents/Void.Language/docs/log/evidence/run-ae2rc4wa'), ['/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_host', '/home/shmellyorc/Documents/Void.Language', '/tmp/VOID-log-host-fin0yj6v'], 1, b'native stack soft=1048576 hard=1048576\nstartup optimize=0 close_before_shutdown=1 close_after_shutdown=1 passed\nreload optimize=0 pending_native_write preserved_global_file_identity passed\ntransport optimize=0 partial_boundaries=18 native_closes=43 passed\nrotation optimize=0 native_identity_and_replacement_boundaries passed\n', '/home/shmellyorc/Documents/Void.Language/stdlib/log.void:454:53: runtime error: Display operation failed\n    return Ok("{prefix}{label} \\"{quoted_name}\\" \\"{quoted_message}\\"\\n".to_utf8())\n                                                    ^\nIn function /@stdlib/log.void::_frame\nCalled from /@stdlib/log.void::_prepare\n/home/shmellyorc/Documents/Void.Language/stdlib/log.void:468:12: source call\n    return _frame(options, severity, message, stamp)\n           ^\nCalled from /@stdlib/log.void::logger::method::write\n/home/shmellyorc/Documents/Void.Language/stdlib/log.void:783:21: source call\n        var bytes = _prepare(self._options, severity, message)?\n                    ^\nCalled from /@stdlib/log.void::logger::method::info\n/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1221:17: source call\n    return self.write(level.info, message)\n                ^\nCalled from /publication.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/log/publication.void:27:37: source call\n            convert.unwrap(instance.info("record"))\n                                    ^\n\nnative-observation publication.log identity=195668 bytes=0 hex=\nnative-observation replacement.log identity=195657 bytes=21 hex=7265706c6163656d656e742073656e74696e656c0a\nnative-observation native.log identity=195656 bytes=36 hex=494e464f202222202241f09f94a55c6e220a494e464f202222202241f09f94a55c6e220a\nnative-observation external-sentinel identity=195617 bytes=18 hex=65787465726e616c20636f6e74656e74730a\nnative-observation length.log identity=195616 bytes=0 hex=\nnative-observation reload.log identity=195587 bytes=28 hex=494e464f20222220226f6c64220a494e464f20222220226e6577220a\nnative-observation startup.log identity=195584 bytes=0 hex=\n')
+
+    Start 265: io_native_jobs
+4/8 Test #265: io_native_jobs ...................   Passed    0.00 sec
+    Start 269: async_source
+5/8 Test #269: async_source .....................   Passed    5.11 sec
+    Start 272: async_ir
+6/8 Test #272: async_ir .........................   Passed    0.06 sec
+    Start 273: async_parallel
+7/8 Test #273: async_parallel ...................   Passed    1.36 sec
+    Start 274: async_lifecycle
+8/8 Test #274: async_lifecycle ..................   Passed    2.36 sec
+
+88% tests passed, 1 tests failed out of 8
+
+Total Test time (real) =  60.82 sec
+
+The following tests FAILED:
+	191 - log_native (Failed)

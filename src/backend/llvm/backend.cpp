@@ -949,7 +949,14 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 }
                 case Op::array_get: case Op::array_set: case Op::fixed_snapshot: {
                     auto t=operand_type(instruction.a);auto* source=value_roots[n].at(instruction.a);
-                    llvm::Value* index=instruction.op==Op::fixed_snapshot?nullptr:array_index(instruction.b,t,instruction.a);
+                    const bool scalar_list_read=instruction.op==Op::array_get && t.kind==ir::Type::growable_array && ir::scalar_array(t);
+                    llvm::Value* index=nullptr;
+                    if(scalar_list_read) {
+                        // The Runtime normalizes and bounds-checks against its
+                        // validated header in the same operation as the read.
+                        auto raw=values.at(instruction.b);
+                        index=numeric::signed_integer(operand_type(instruction.b))?b.CreateSExtOrTrunc(raw,b.getInt64Ty()):b.CreateZExtOrTrunc(raw,b.getInt64Ty());
+                    } else if(instruction.op!=Op::fixed_snapshot)index=array_index(instruction.b,t,instruction.a);
                     if(!ir::scalar_array(t)) {
                         auto child=ir::array_element(t);auto* count=b.getInt64(t.definition->extent.value_or(0));
                         if(instruction.op==Op::array_get) {
@@ -961,7 +968,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));auto* count=b.getInt64(t.definition->extent.value_or(0));
                     if(instruction.op==Op::array_get) {
                         auto* value=t.kind==ir::Type::growable_array ?
-                            b.CreateCall(module->getOrInsertFunction("vd_list_read",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,index,failure}) :
+                            b.CreateCall(module->getOrInsertFunction("vd_list_read_index",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,encoding,index,b.getInt32(numeric::signed_integer(operand_type(instruction.b))),failure}) :
                             b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});array_failure();
                         auto element=ir::array_element(t);auto* narrow=b.CreateTruncOrBitCast(value,b.getIntNTy(numeric::width(element)));
                         v=numeric::floating(element)?b.CreateBitCast(narrow,type(element)):narrow;
@@ -1888,7 +1895,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
     bind("vd_convert_parse", vd_convert_parse);
     bind("vd_list_write_bytes", vd_list_write_bytes);
-    bind("vd_list_read",vd_list_read);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
+    bind("vd_list_read",vd_list_read);bind("vd_list_read_index",vd_list_read_index);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
     bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_construct_typed",vd_gc_construct_typed);
     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);

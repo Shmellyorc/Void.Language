@@ -1,0 +1,44 @@
+{
+  "reason": "Controlled stop of pre-repair validation after deterministic native-job regression proved a shared scheduler readiness defect. Preserve abnormal exits; rebuild and rerun the expanded matrix against the repair. Noncompleting hosts are not retrospectively classified from a passing retry.",
+  "processes": [
+    {
+      "pid": 1464477,
+      "kind": "superseded-ctest",
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+        "-R",
+        "^(log_|lsp_log$|io_kernel$|io_ownership$|io_native|stage11_globals$|stage10_console_source$|advanced_source$)",
+        "--output-on-failure",
+        "-j",
+        "1"
+      ]
+    },
+    {
+      "pid": 1465614,
+      "kind": "superseded-ctest",
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+        "-R",
+        "^(log_|lsp_log$|io_kernel$|io_ownership$|io_native|stage11_globals$|stage10_console_source$|advanced_source$)",
+        "--output-on-failure",
+        "-j",
+        "1"
+      ]
+    },
+    {
+      "pid": 1466352,
+      "kind": "noncompleting-pre-repair-native-host",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_log_host",
+        "/home/shmellyorc/Documents/Void.Language",
+        "/tmp/VOID-log-host-alylygg5"
+      ],
+      "proc_stat": "1466352 (void_log_host) R 1466351 1460632 1460632 0 -1 4194304 6255844 0 0 0 40953 1457 0 0 16 -4 1 0 27966904 21990561390592 320525 18446744073709551615 94136334614720 94136379594608 140731432512016 0 0 0 0 0 1216 0 0 0 17 4 0 0 0 0 0 94136380190752 94136382013584 94136673230848 140731432517645 140731432517798 140731432517798 140731432521636 0\n",
+      "preserved_files": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/stopped-native-1466352"
+    }
+  ]
+}

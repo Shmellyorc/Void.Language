@@ -1,0 +1,9 @@
+{
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "logical_cpus": 16,
+  "cpu_model": "AMD Ryzen 7 1700X Eight-Core Processor",
+  "mem_total": "MemTotal:       32771924 kB",
+  "initial_loadavg": "7.12 6.08 4.81 7/3835 1495057",
+  "limits": "soft and hard stack 1048576 bytes; source workloads at most 1000 enabled or 10000 disabled records",
+  "conditions": "Local development machine; Debug and strict acceptance selections ran concurrently. Process CPU and wall times are recorded separately. No isolated-machine throughput claim."
+}

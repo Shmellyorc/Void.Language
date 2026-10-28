@@ -1,0 +1,67 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+      Start  68: advanced_source
+ 1/31 Test  #68: advanced_source ..................   Passed    9.87 sec
+      Start 184: stage11_globals
+ 2/31 Test #184: stage11_globals ..................   Passed    2.00 sec
+      Start 185: log_native
+ 3/31 Test #185: log_native .......................   Passed  449.32 sec
+      Start 186: log_execution
+ 4/31 Test #186: log_execution ....................   Passed  220.11 sec
+      Start 187: log_frontend
+ 5/31 Test #187: log_frontend .....................   Passed   17.72 sec
+      Start 188: log_files
+ 6/31 Test #188: log_files ........................   Passed   68.15 sec
+      Start 189: log_oracles
+ 7/31 Test #189: log_oracles ......................   Passed  143.13 sec
+      Start 190: log_cache
+ 8/31 Test #190: log_cache ........................   Passed   46.51 sec
+      Start 191: log_install
+ 9/31 Test #191: log_install ......................   Passed   94.53 sec
+      Start 192: log_console
+10/31 Test #192: log_console ......................   Passed   77.81 sec
+      Start 193: lsp_log
+11/31 Test #193: lsp_log ..........................   Passed   11.76 sec
+      Start 194: log_probe_normal
+12/31 Test #194: log_probe_normal .................   Passed    1.01 sec
+      Start 195: log_probe_optimized
+13/31 Test #195: log_probe_optimized ..............   Passed    0.99 sec
+      Start 211: stage10_console_source
+14/31 Test #211: stage10_console_source ...........   Passed  142.52 sec
+      Start 232: io_ownership
+15/31 Test #232: io_ownership .....................   Passed   40.01 sec
+      Start 239: io_native_responsiveness
+16/31 Test #239: io_native_responsiveness .........   Passed   16.31 sec
+      Start 240: io_native_close_failure
+17/31 Test #240: io_native_close_failure ..........   Passed   16.60 sec
+      Start 241: io_native_shutdown
+18/31 Test #241: io_native_shutdown ...............   Passed   15.48 sec
+      Start 242: io_native_opening_shutdown
+19/31 Test #242: io_native_opening_shutdown .......   Passed   15.28 sec
+      Start 243: io_native_whole_shutdown
+20/31 Test #243: io_native_whole_shutdown .........   Passed   14.93 sec
+      Start 244: io_native_pending_close
+21/31 Test #244: io_native_pending_close ..........   Passed   15.43 sec
+      Start 245: io_native_cancelled
+22/31 Test #245: io_native_cancelled ..............   Passed   14.85 sec
+      Start 248: io_async_source
+23/31 Test #248: io_async_source ..................   Passed   19.22 sec
+      Start 250: io_errors_async
+24/31 Test #250: io_errors_async ..................   Passed   19.09 sec
+      Start 252: io_async_acquisition
+25/31 Test #252: io_async_acquisition .............   Passed    0.46 sec
+      Start 255: io_native_jobs
+26/31 Test #255: io_native_jobs ...................   Passed    0.02 sec
+      Start 256: io_kernel
+27/31 Test #256: io_kernel ........................   Passed    0.08 sec
+      Start 259: async_source
+28/31 Test #259: async_source .....................   Passed   17.58 sec
+      Start 262: async_ir
+29/31 Test #262: async_ir .........................   Passed    0.11 sec
+      Start 263: async_parallel
+30/31 Test #263: async_parallel ...................   Passed    3.54 sec
+      Start 264: async_lifecycle
+31/31 Test #264: async_lifecycle ..................   Passed    5.63 sec
+
+100% tests passed, 0 tests failed out of 31
+
+Total Test time (real) = 1500.09 sec

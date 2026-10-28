@@ -1,0 +1,18 @@
+use log
+use io
+use os
+use path
+use convert
+
+func main():
+    var state = convert.unwrap(os.state_dir("com.example.game"))
+    var directory = convert.unwrap(path.join([state, "logs"]))
+    convert.unwrap(io.create_directories(directory))
+    var destination = convert.unwrap(path.join([directory, "game.log"]))
+    # The application controls this reserved namespace and excludes unrelated aliases.
+    convert.unwrap(log.configure(log.config(name = "game", file_path = destination,
+        existing = log.existing_files.adopt)))
+    defer {
+        convert.unwrap(log.shutdown())
+    }
+    convert.unwrap(log.info("Released game started"))

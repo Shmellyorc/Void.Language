@@ -1,0 +1,6 @@
+VOID native 19.1.7 v1
+/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang
+/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld
+/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_runtime.a
+/home/shmellyorc/Documents/Void.Language/build/ci-official-release/libvoid_native_fixture.a
+-pthread

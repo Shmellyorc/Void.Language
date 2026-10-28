@@ -1,0 +1,69 @@
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:62:23: error: Duplicate declaration or shadowing of 'file'.
+    code: VOID2005
+
+ 62 | private func settings(file: bool, timestamps: bool) -> log.config:
+    |                       ^^^^
+    Module: /performance.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:63:8: error: Unknown identifier 'file'.
+    code: VOID2002
+
+ 63 |     if file:
+    |        ^^^^
+    Module: /performance.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:67:42: error: Duplicate declaration or shadowing of 'file'.
+    code: VOID2005
+
+ 67 | private func synchronous_log(count: i32, file: bool, timestamps: bool) -> i32:
+    |                                          ^^^^
+    Module: /performance.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:68:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 68 |     with convert.unwrap(log.open(settings(file, timestamps))) as owner:
+    |     ^^^^
+    Module: /performance.void
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:68:43: error: Unknown identifier 'file'.
+    code: VOID2002
+
+ 68 |     with convert.unwrap(log.open(settings(file, timestamps))) as owner:
+    |                                           ^^^^
+    Module: /performance.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:78:49: error: Duplicate declaration or shadowing of 'file'.
+    code: VOID2005
+
+ 78 | private async func asynchronous_log(count: i32, file: bool, timestamps: bool) -> i32:
+    |                                                 ^^^^
+    Module: /performance.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:79:35: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 79 |     var instance = convert.unwrap(await log.open_async(settings(file, timestamps)))
+    |                                   ^^^^^
+    Module: /performance.void
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:79:65: error: Unknown identifier 'file'.
+    code: VOID2002
+
+ 79 |     var instance = convert.unwrap(await log.open_async(settings(file, timestamps)))
+    |                                                                 ^^^^
+    Module: /performance.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void:80:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 80 |     with instance as owner:
+    |     ^^^^
+    Module: /performance.void
+

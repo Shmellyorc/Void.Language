@@ -88,6 +88,34 @@ void timeout_and_recovery() {
         check(r.collect() == vd::Runtime::Collection::completed && r.snapshot().objects == 0, "post-timeout collection failed");
     }
 }
+void persistent_handle_removal() {
+    vd::Runtime r;vd::Runtime::Attachment a(r);vd::Runtime::Managed m(r);
+    void* value=nullptr;vd::Runtime::Slot slot{&value,sizeof(value),&pointer_offset,1};vd::Runtime::Frame frame(r,&slot,1);
+    std::vector<std::unique_ptr<vd::Runtime::Handle>> roots;
+    for(unsigned cycle=0;cycle<3;++cycle) {
+        for(unsigned i=0;i<129;++i) {
+            r.allocate_into(&value,{8,{}});
+            roots.push_back(std::make_unique<vd::Runtime::Handle>(r,value));
+        }
+        value=nullptr;
+        // Relocate the last root into an early/middle slot, then remove that
+        // relocated root as well. Collect after every removal to check rooting.
+        std::size_t alive=roots.size();
+        for(unsigned step=0;step<129;++step) {
+            auto index=(step*64u)%129u;
+            roots[index].reset();--alive;
+            check(r.memory_snapshot().handles==alive,"persistent handle index count");
+            check(r.collect()==vd::Runtime::Collection::completed && r.snapshot().objects==alive,"persistent handle removal lost or retained roots");
+            for(auto& root:roots)if(root)check(r.contains(root->get()),"relocated persistent root lost");
+        }
+        roots.clear();
+        auto empty=std::make_unique<vd::Runtime::Handle>(r);
+        // Destruction remains legal from a native host thread without attachment.
+        auto worker=std::async(std::launch::async,[owned=std::move(empty)]()mutable{owned.reset();});
+        {vd::Runtime::Native native(r);worker.get();}
+        check(!r.memory_snapshot().handles,"native handle removal retained registration");
+    }
+}
 void competing_collectors() {
     vd::Runtime r;
     std::latch ready(1), release(1);
@@ -222,7 +250,7 @@ void repeated_competing_epochs() {
 }
 int main() {
     try {
-        states_and_roots(); timeout_and_recovery(); competing_collectors(); timeout_releases_losing_collector(); native_and_stress(); repeated_competing_epochs();
+        states_and_roots(); persistent_handle_removal(); timeout_and_recovery(); competing_collectors(); timeout_releases_losing_collector(); native_and_stress(); repeated_competing_epochs();
         std::cout << "runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed\n";
     } catch (const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
 }

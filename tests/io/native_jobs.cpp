@@ -125,6 +125,12 @@ void root_resume(void* address, vd::RuntimeFailure* failure) {
         }
         frame.stage = 2;
         if (!failure->message && scenario == 4) failure->message = "injected opening activation failure";
+        if (!failure->message && scenario == 6) {
+            // A published acquisition is abandoned after its owner is cancelled.
+            // The enclosing activation must remain waiting until this drain ends.
+            vd_async_cancel(frame.self, failure);
+            vd_async_checkpoint(failure);
+        }
     }
     if (!vd_async_drain(address, failure)) return;
     if (failure->message) return;
@@ -133,12 +139,38 @@ void root_resume(void* address, vd::RuntimeFailure* failure) {
     vd_async_complete(frame.self);
 }
 
+void parent_resume(void* address, vd::RuntimeFailure* failure) {
+    auto& frame = *static_cast<Activation*>(address);
+    if (frame.stage == 0) {
+        Activation local{};
+        vd::Runtime::Slot slot{&local, sizeof(local), offsets, 3};
+        vd::Runtime::Frame registered(vd::Runtime::current(), &slot, 1);
+        vd_async_new(&local.self, &local.pending, sizeof(Activation), offsets, 3,
+                     8, nullptr, 0, "io-test-task", &generation, root_resume, failure);
+        if (failure->message) return;
+        static_cast<Activation*>(local.pending)->self = local.self;
+        vd::Runtime::current().store(address, offsetof(Activation, pending), local.self);
+        vd_async_start(frame.pending, failure);
+        frame.stage = 1;
+    }
+    if (frame.stage == 1) {
+        if (!vd_async_ready(frame.pending, failure)) {
+            vd_async_suspend(address, frame.pending, failure);
+            return;
+        }
+        frame.stage = 2;
+    }
+    if (!vd_async_drain(address, failure)) return;
+    if (!failure->message) vd_async_complete(frame.self);
+}
+
 void* start(std::int32_t, vd::RuntimeFailure* failure) {
     Activation roots{};
     vd::Runtime::Slot slot{&roots, sizeof(roots), offsets, 3};
     vd::Runtime::Frame registered(vd::Runtime::current(), &slot, 1);
     vd_async_new(&roots.self, &roots.pending, sizeof(Activation), offsets, 3,
-                 8, nullptr, 0, "io-test-task", &generation, root_resume, failure);
+                 8, nullptr, 0, "io-test-task", &generation,
+                 scenario == 6 ? parent_resume : root_resume, failure);
     if (failure->message) return nullptr;
     static_cast<Activation*>(roots.pending)->self = roots.self;
     vd_async_start(roots.self, failure);
@@ -148,7 +180,7 @@ void* start(std::int32_t, vd::RuntimeFailure* failure) {
 
 int main() {
     try {
-        for (scenario = 0; scenario != 6; ++scenario) {
+        for (scenario = 0; scenario != 7; ++scenario) {
             entered = false;
             release_job = false;
             executed = false;
@@ -173,6 +205,10 @@ int main() {
                 require(failure.message, "failure/cancellation disappeared");
                 require(!committed, "failed opening task committed an acquisition");
                 if (scenario != 1) require(abandoned, "native acquisition leaked after failure");
+                if (scenario == 6) {
+                    require(std::string(failure.message).find("cancelled") != std::string::npos,
+                            "completed acquisition drain fabricated an await dependency cycle");
+                }
                 if (scenario == 5) {
                     require(std::string(failure.message).find("allocation") != std::string::npos,
                             "publication failure lost priority");
@@ -188,7 +224,8 @@ int main() {
             require(runtime.snapshot().objects == 0, "native task roots retained");
         }
         std::cout << "native jobs: result, blocked-owner progress, queued/pending cancellation, "
-                     "publication failure, acquisition rollback and cleanup diagnostics passed\n";
+                     "publication failure, acquisition rollback, nested cancellation drain "
+                     "and cleanup diagnostics passed (7 scenarios)\n";
         return 0;
     } catch (const std::exception& failure) {
         std::cerr << failure.what() << '\n';

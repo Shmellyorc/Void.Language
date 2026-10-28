@@ -1,0 +1,8 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start  68: advanced_source
+ 1/24 Test  #68: advanced_source ..................   Passed   20.47 sec
+      Start 190: stage11_globals
+ 2/24 Test #190: stage11_globals ..................   Passed    1.43 sec
+      Start 191: log_native
+ 3/24 Test #191: log_native .......................   Passed  383.63 sec
+      Start 192: log_execution

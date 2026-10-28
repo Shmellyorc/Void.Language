@@ -1,0 +1,14 @@
+use log
+use io
+use convert
+
+func main():
+    convert.unwrap(io.create_directories(".void/logs"))
+    # Adoption is explicit application authority over this exact file set.
+    var instance = convert.unwrap(log.open(log.config(name = "rotating",
+        file_path = ".void/logs/rotation.log", existing = log.existing_files.adopt,
+        rotation_bytes = 4096, max_record_bytes = 1024, backups = 3)))
+    with instance as owner:
+        for index in 0..<100:
+            convert.unwrap(owner.info("Event {index:000}"))
+        convert.unwrap(owner.close())

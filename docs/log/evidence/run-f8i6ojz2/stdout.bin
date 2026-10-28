@@ -1,0 +1,7 @@
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_io_native_jobs.dir/tests/io/native_jobs.cpp.o
+[100%] Linking CXX executable void_io_native_jobs
+[100%] Built target void_io_native_jobs

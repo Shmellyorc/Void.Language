@@ -1,0 +1,7 @@
+use log
+use convert
+
+func main():
+    convert.unwrap(log.info("Application started"))
+    convert.unwrap(log.warn("An optional asset is missing"))
+    convert.unwrap(log.shutdown())

@@ -38,7 +38,17 @@ void Runtime::list_into(void** out,ScalarEncoding encoding,std::uint64_t count) 
 std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).count;}
 std::uint64_t Runtime::list_version(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).version;}
 std::uint64_t Runtime::list_read(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index) const {
+    return list_read_index(source,encoding,index,false);
+}
+std::uint64_t Runtime::list_read_index(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index,bool signed_index) const {
     require_managed();std::lock_guard lock(mutex_);const auto& h=list_header(source,encoding);
+    // Normalize a sign-extended source index against the same checked header
+    // used for the read. Unsigned subtraction handles INT64_MIN without UB.
+    if(signed_index && (index&(std::uint64_t{1}<<63))) {
+        const auto magnitude=~index+1;
+        if(magnitude>h.count)throw std::out_of_range("list index outside extent");
+        index=h.count-magnitude;
+    }
     if(index>=h.count)throw std::out_of_range("list index outside extent");
     const auto& state=heap_.buffer_state(h.backing);return load_bits(static_cast<const char*>(h.backing)+state.layout->element_offset(index),scalar_width(encoding));
 }

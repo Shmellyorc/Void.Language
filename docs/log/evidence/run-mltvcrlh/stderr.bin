@@ -1,0 +1,12 @@
+/tmp/VOID-log-frontend-wbifqekq/main.void:6:17: error: A non-nullable reference field requires an explicit value: selected.
+    code: VOID2004
+
+ 6 |     var value = missing()
+   |                 ^^^^^^^
+    Module: /main.void
+    Required field declared here. at /tmp/VOID-log-frontend-wbifqekq/main.void:4:5
+
+ 4 |     selected: choice
+   |     ^^^^^^^^
+    Module: /main.void
+

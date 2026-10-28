@@ -1,0 +1,3 @@
+reload optimize=0 pending_native_write preserved_global_file_identity passed
+reload optimize=1 pending_native_write preserved_global_file_identity passed
+29 logging native checks passed

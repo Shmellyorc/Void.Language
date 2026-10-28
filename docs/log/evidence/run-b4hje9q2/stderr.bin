@@ -1,0 +1,14 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:398:67: error: Expected an expression, found '<newline>'.
+    code: VOID1101
+
+ 398 |             replacement = [92, 117, _hex_digit(value / 4096 % 16),
+     |                                                                   ^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:399:17: error: Expected an expression, found '<indent>'.
+    code: VOID1101
+
+ 399 |                 _hex_digit(value / 256 % 16), _hex_digit(value / 16 % 16), _hex_digit(value % 16)]
+     |                 ^
+    Module: /@stdlib/log.void
+

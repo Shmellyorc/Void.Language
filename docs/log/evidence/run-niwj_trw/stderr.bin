@@ -1,0 +1,8 @@
+/home/shmellyorc/Documents/Void.Language/tests/log/benchmark.void:68:83: error: Duplicate declaration or shadowing of 'file'.
+    code: VOID2005
+
+ 68 |         with convert.unwrap(io.open("benchmark.log", io.open_mode.create_new)) as file:
+    |                                                                                   ^^^^
+    Module: /benchmark.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+

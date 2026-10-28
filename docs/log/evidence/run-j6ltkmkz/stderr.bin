@@ -1,0 +1,13 @@
+/tmp/VOID-log-frontend-wbifqekq/main.void:5:27: error: Member '_options' is not accessible from this lexical context.
+    code: VOID3003
+
+ 5 |     var hidden = instance._options
+   |                           ^^^^^^^^
+    Module: /main.void
+    Stored field declared by /@stdlib/log.void::logger. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:117:13
+
+ 117 |     private _options: config
+     |             ^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+

@@ -1,0 +1,5 @@
+/home/shmellyorc/Documents/Void.Language/tests/log/publication.void:18:58: runtime error: String operation failed
+            console = log.console_sink.none, file_path = "publication.log")))
+                                                         ^
+In function /publication.void::entry
+

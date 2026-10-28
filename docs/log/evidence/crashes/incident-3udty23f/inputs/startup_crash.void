@@ -1,0 +1,15 @@
+use log
+use convert
+
+private var owned = convert.unwrap(log.open(log.config(timestamps = false,
+    console = log.console_sink.none, file_path = "startup.log")))
+
+private func explode() -> i32:
+    if owned.enabled(log.level.info):
+        var zero: i32 = 0
+        return 1 / zero
+    return 1
+
+private var failed = explode()
+func entry(input: i32) -> i32:
+    return input + failed

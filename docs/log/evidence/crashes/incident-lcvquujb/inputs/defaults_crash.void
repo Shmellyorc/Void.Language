@@ -1,0 +1,18 @@
+# Regression for the shared complete enum-field default construction path.
+enum choice:
+    first
+    second
+value struct options:
+    selected: choice = choice.second
+const defaults = options()
+value struct nested:
+    settings: options
+struct owner:
+    settings: options
+func entry(input: i32) -> i32:
+    var a = options()
+    var b = nested()
+    var c = owner()
+    if (a.selected is choice.second) and (b.settings.selected is choice.second) and (c.settings.selected is choice.second) and (defaults.selected is choice.second):
+        return input
+    return 99

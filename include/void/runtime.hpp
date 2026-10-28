@@ -130,6 +130,7 @@ public:
     std::uint64_t list_count(RegisteredRootWord,ScalarEncoding) const;
     std::uint64_t list_version(RegisteredRootWord,ScalarEncoding) const;
     std::uint64_t list_read(RegisteredRootWord,ScalarEncoding,std::uint64_t index) const;
+    std::uint64_t list_read_index(RegisteredRootWord,ScalarEncoding,std::uint64_t bits,bool signed_index) const;
     void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
     void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
     // Transactional byte overwrite/append using the existing list backing allocator.
@@ -302,6 +303,7 @@ private:
     friend class Runtime;
     Runtime& runtime_;
     void* value_;
+    std::size_t index_=0; // Protected with handles_ by the Runtime mutex.
 };
 // A private root is still an ordinary Frame/Slot. Its separate registration is
 // permission for exactly this word, never permission for another root/heap edge.

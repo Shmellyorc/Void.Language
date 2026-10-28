@@ -1,0 +1,11 @@
+use log
+
+func main() -> i32:
+    var delivered = log.info("Checked delivery")
+    var closed = log.shutdown()
+    if delivered is Err(var problem):
+        # Inspect problem.kind and its original typed causes/progress as needed.
+        return 1
+    if closed is Err(var problem):
+        return 2
+    return 0

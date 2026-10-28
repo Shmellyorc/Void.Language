@@ -1,0 +1,12 @@
+use log
+use convert
+
+func main():
+    var score = 42
+    if log.enabled(log.level.debug):
+        convert.unwrap(log.debug("Guarded score: {score:000}"))
+    convert.unwrap(log.write_lazy(log.level.debug, func() -> string:
+        return "Lazy score: {score:000}"
+    ))
+    convert.unwrap(log.info("Ordinary eager score: {score:000}"))
+    convert.unwrap(log.shutdown())

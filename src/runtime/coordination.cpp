@@ -384,11 +384,17 @@ Runtime::Handle::Handle(Runtime& r, void* value) : runtime_(r), value_(value) {
     std::lock_guard lock(r.mutex_);
     if (r.closing_ || (value && !r.heap_.contains(value))) throw std::invalid_argument("invalid persistent handle");
     r.handles_.push_back(this);
+    index_=r.handles_.size()-1;
 }
 Runtime::Handle::~Handle() {
     std::lock_guard lock(runtime_.mutex_);
     auto& handles = runtime_.handles_;
-    handles.erase(std::find(handles.begin(), handles.end(), this));
+    if(index_>=handles.size() || handles[index_]!=this)std::terminate();
+    // Root enumeration has no ordering contract. Preserve every live handle
+    // while removing this one without shifting the retained task history.
+    handles[index_]=handles.back();
+    handles[index_]->index_=index_;
+    handles.pop_back();
 }
 void Runtime::Handle::reset(void* value) {
     std::lock_guard lock(runtime_.mutex_);

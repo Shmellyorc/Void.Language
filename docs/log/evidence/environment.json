@@ -1,0 +1,14 @@
+{
+  "system": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "machine": "x86_64",
+  "python": "3.14.8",
+  "head": "f9ac49f1558f326129948bc06c829263448b7714",
+  "protected_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "logging_stack_soft_bytes": 1048576,
+  "logging_stack_hard_bytes": 1048576,
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "LSAN_OPTIONS": "exitcode=87"
+  }
+}

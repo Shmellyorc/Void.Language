@@ -1,0 +1,6 @@
+cancel optimize=0 native_operation=14 closes=1 passed
+cancel optimize=0 native_operation=15 closes=1 passed
+cancel optimize=0 native_operation=18 closes=1 passed
+cancel optimize=0 native_operation=30 closes=1 passed
+cancel optimize=0 native_operation=24 closes=1 passed
+51 logging native checks passed

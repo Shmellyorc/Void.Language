@@ -1,5 +1,15 @@
 # Standard library
 
+`use log` provides five checked severity functions, inclusive/off filtering,
+lazy messages, fixed UTC single-line UTF-8 framing, borrowed console destinations,
+persistent files, explicit adoption, bounded rotation, independent managed loggers,
+recovery, flush/close and awaitable file operations. The application default is
+stderr-only and creates no files. File namespaces require trusted exclusive ownership;
+metadata checks do not eliminate aliases or filesystem races. See the
+[complete API](../docs/log/API.md), [examples](../examples/log/main.void) and
+[engineering handoff](../docs/log/HANDOFF.md).
+
+
 `use collections as c` provides 24 synchronous helpers for copied stable sorting
 and reversal, ordered and live searches, predicates, mapping/filtering, seeded
 folds, numeric sums, extrema and ordered dictionary extraction/copying. Transforms

@@ -1,0 +1,13 @@
+use log
+use io
+use convert
+
+func main():
+    # This application reserves .void/logs and excludes other writers/path aliases.
+    convert.unwrap(io.create_directories(".void/logs"))
+    convert.unwrap(log.configure(log.config(name = "development",
+        file_path = ".void/logs/game.log", existing = log.existing_files.adopt)))
+    defer {
+        convert.unwrap(log.shutdown())
+    }
+    convert.unwrap(log.info("Development application started"))

@@ -891,6 +891,38 @@ void output_alias_bounds() {
         check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"alias bounds collection leaked");
     }
 }
+void output_alias_collection_order() {
+    Runtime r(100000);Runtime::Attachment a(r);Runtime::Managed m(r);Output scratch(r);
+    auto layout=r.fixed_scalar_layout(ScalarEncoding::u8,64);
+    std::array<std::unique_ptr<Output>,4> roots;
+    for(auto& root:roots)root=std::make_unique<Output>(r);
+    for(unsigned cycle=0;cycle<3;++cycle) {
+        for(auto& root:roots)r.fixed_default_into(&root->value,layout,quota);
+        // Force object-table rehash while all buffer scan nodes remain live.
+        for(unsigned i=0;i<1024;++i)r.allocate_into(&scratch.value,{16,{}});
+        scratch.value=nullptr;
+        {Runtime::BufferBuilder abandoned(r,layout,64,quota);abandoned.zero_elements(64);}
+        r.collect();
+        auto verify=[&] {
+            for(auto& root:roots)if(root->value)for(bool leased:{false,true}) {
+                std::optional<Runtime::BufferReadLease> lease;
+                if(leased)lease.emplace(r,r.root_word(&root->value),layout);
+                auto** alias=reinterpret_cast<void**>(root->value);
+                constexpr std::size_t zero=0;Runtime::Slot slot{alias,sizeof(void*),&zero,1};Runtime::Frame frame(r,&slot,1);
+                if(leased)busy([&]{r.string_into(alias,{});});
+                else reject([&]{r.string_into(alias,{});});
+            }
+        };
+        verify();
+        // Remove middle, head, tail, and final nodes, checking every survivor.
+        for(auto index:{1,3,0,2}) {
+            roots[index]->value=nullptr;r.collect();verify();
+        }
+        check(!r.snapshot().objects,"buffer alias scan retained collected storage");
+        r.string_into(&scratch.value,{});
+        check(!scratch.value,"empty-buffer alias fast path failed");
+    }
+}
 void source_layout_reuse() {
     Runtime r(1);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
     auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,3);
@@ -1223,7 +1255,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();output_alias_collection_order();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif

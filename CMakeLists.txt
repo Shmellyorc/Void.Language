@@ -920,6 +920,40 @@ if(BUILD_TESTING)
   add_test(NAME stage11_globals COMMAND void_globals "${CMAKE_CURRENT_BINARY_DIR}/stage11 native fixtures")
   set_tests_properties(stage11_globals PROPERTIES TIMEOUT 180)
 
+  add_executable(void_log_host tests/log/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_log_host PRIVATE void_llvm void_cache_identity)
+  add_test(NAME log_native COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/host.py" "$<TARGET_FILE:void_log_host>")
+  set_tests_properties(log_native PROPERTIES TIMEOUT 1900)
+  add_test(NAME log_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/execution.py" "$<TARGET_FILE:voidc>" --small-stack)
+  set_tests_properties(log_execution PROPERTIES TIMEOUT 1900)
+
+  foreach(suite IN ITEMS frontend files oracles cache install console)
+    add_test(NAME log_${suite} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/${suite}.py" "$<TARGET_FILE:voidc>")
+    set_tests_properties(log_${suite} PROPERTIES TIMEOUT 1900)
+  endforeach()
+  add_test(NAME lsp_log COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/lsp.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_log PROPERTIES TIMEOUT 300)
+
+  foreach(mode IN ITEMS normal optimized)
+    set(log_probe_object "${CMAKE_CURRENT_BINARY_DIR}/log-probe-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    set(log_probe_adapter "${log_probe_object}.cpp")
+    add_custom_command(OUTPUT "${log_probe_object}" "${log_probe_adapter}"
+      COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/process.py"
+        "$<TARGET_FILE:void_io_runner>" --emit-probe "${PROJECT_SOURCE_DIR}/tests/log/aot.void" "${log_probe_object}" "${mode}"
+      DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/tests/log/aot.void"
+        "${PROJECT_SOURCE_DIR}/tests/log/native.void" "${PROJECT_SOURCE_DIR}/tests/log/publication.void"
+        "${PROJECT_SOURCE_DIR}/tests/log/cancel.void" "${PROJECT_SOURCE_DIR}/tests/log/benchmark.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/log.void" "${PROJECT_SOURCE_DIR}/stdlib/io.void"
+      VERBATIM)
+    set_source_files_properties("${log_probe_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_log_probe_${mode} tests/log/host.cpp tests/managed/probe.cpp
+      $<TARGET_OBJECTS:void_managed_test_abi> "${log_probe_object}" "${log_probe_adapter}")
+    target_compile_definitions(void_log_probe_${mode} PRIVATE LOG_AOT_PROBE=1 LOG_AOT_OPT=$<STREQUAL:${mode},optimized>)
+    target_link_libraries(void_log_probe_${mode} PRIVATE void_runtime)
+    add_test(NAME log_probe_${mode} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/host.py" "$<TARGET_FILE:void_log_probe_${mode}>")
+    set_tests_properties(log_probe_${mode} PROPERTIES TIMEOUT 1900)
+  endforeach()
+
   add_executable(void_collections_stdlib_host tests/collections_stdlib/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_collections_stdlib_host PRIVATE void_llvm void_cache_identity)
   add_test(NAME collections_stdlib_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/collections_stdlib/host.py" "$<TARGET_FILE:void_collections_stdlib_host>")

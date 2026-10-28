@@ -66,6 +66,7 @@ void vd_list_new(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_count(void**,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_version(void**,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_read(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_list_read_index(void**,unsigned,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_list_write(void**,unsigned,std::uint64_t,std::uint64_t,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_list_write_bytes(void**, void**, std::uint64_t, vd::RuntimeFailure*) noexcept;
 void vd_list_push(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;

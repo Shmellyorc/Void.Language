@@ -1,0 +1,71 @@
+{
+  "utc_start": "2026-10-28T15:49:39Z",
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "gc_allocation_budget": 256,
+  "stack_soft_and_hard": 1048576,
+  "policy": "No concurrent build or validation; desktop active; compilation/admission separate from measured invocation; persistent cache bypassed",
+  "commands": [
+    [
+      [
+        "python3",
+        "tests/log/performance_original.py",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/final-original.json",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/final-original/void_log_host",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/final-original/void_log_probe_normal",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/final-original/void_log_probe_optimized"
+      ],
+      {}
+    ],
+    [
+      [
+        "python3",
+        "tests/log/performance_run.py",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-final",
+        "void_log_host-timing",
+        "void_log_probe_optimized-timing",
+        "void_log_probe_optimized-instrumented"
+      ],
+      {}
+    ],
+    [
+      [
+        "python3",
+        "tests/log/performance_run.py",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-final"
+      ],
+      {}
+    ],
+    [
+      [
+        "python3",
+        "tests/log/performance_run.py",
+        "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-final",
+        "void_log_probe_optimized-timing"
+      ],
+      {
+        "VOID_PERF_STAGES": "0,4,6,7,12,13"
+      }
+    ]
+  ],
+  "source_freeze": "acceptance-release/source-freeze.json",
+  "utc_end": "2026-10-28T15:53:28Z",
+  "source_freeze_verified_after": true
+}

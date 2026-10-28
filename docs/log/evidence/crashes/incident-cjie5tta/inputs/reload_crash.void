@@ -1,0 +1,25 @@
+use log
+use convert
+
+value struct snapshot:
+    version: i32 = 1
+private var frozen = snapshot()
+private var saved: log.logger?
+private func word() -> string:
+    return "old"
+
+async func entry(command: i32) -> i32:
+    if command == 0:
+        saved = convert.unwrap(await log.open_async(log.config(timestamps = false,
+            console = log.console_sink.none, file_path = "reload.log")))
+        return 7
+    if command == 99:
+        return frozen.version
+    if saved is Ok(var instance):
+        if command == 1:
+            convert.unwrap(await instance.write_async(log.level.info, word()))
+            return 7
+        if command == 2:
+            convert.unwrap(await instance.close_async())
+            return 7
+    return 99

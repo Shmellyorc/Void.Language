@@ -1,0 +1,3 @@
+cancelled native ownership not retired: operation=14 descriptors_before=4 after=5 active_exists=1
+native-observation cancel.log identity=175165 bytes=0 hex=
+native-observation cancel-entered identity=175164 bytes=7 hex=656e7465726564

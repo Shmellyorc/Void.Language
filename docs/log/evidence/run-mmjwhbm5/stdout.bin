@@ -1,0 +1,823 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/heap.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[ 50%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[  0%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_zone_objects
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_io_runner
+[100%] Built target void_io_runner
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_managed_test_abi
+[100%] Building CXX object CMakeFiles/void_log_host.dir/tests/log/host.cpp.o
+[100%] Building CXX object CMakeFiles/void_log_host.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_log_host
+[100%] Built target void_log_host
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_io_runner
+[100%] Generating log-probe-normal.o, log-probe-normal.o.cpp
+[100%] Building CXX object CMakeFiles/void_log_probe_normal.dir/tests/log/host.cpp.o
+[100%] Building CXX object CMakeFiles/void_log_probe_normal.dir/log-probe-normal.o.cpp.o
+[100%] Building CXX object CMakeFiles/void_log_probe_normal.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_log_probe_normal
+[100%] Built target void_log_probe_normal
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[ 66%] Built target void_io_runner
+[ 66%] Generating log-probe-optimized.o, log-probe-optimized.o.cpp
+[ 66%] Building CXX object CMakeFiles/void_log_probe_optimized.dir/log-probe-optimized.o.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_log_probe_optimized.dir/tests/log/host.cpp.o
+[100%] Building CXX object CMakeFiles/void_log_probe_optimized.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_log_probe_optimized
+[100%] Built target void_log_probe_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_advanced_tests.dir/tests/advanced/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_advanced_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_advanced_tests
+[100%] Built target void_advanced_tests
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_globals.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_globals.dir/tests/stage11/globals.cpp.o
+[100%] Linking CXX executable void_globals
+[100%] Built target void_globals
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/stage10/console.cpp.o
+[100%] Building CXX object CMakeFiles/void_console_source.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_console_source
+[100%] Built target void_console_source
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_io_ownership.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_io_ownership.dir/tests/io/ownership.cpp.o
+[100%] Linking CXX executable void_io_ownership
+[100%] Built target void_io_ownership
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_io_native.dir/tests/io/native.cpp.o
+[100%] Building CXX object CMakeFiles/void_io_native.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_io_native
+[100%] Built target void_io_native
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_io_native_jobs.dir/tests/io/native_jobs.cpp.o
+[100%] Linking CXX executable void_io_native_jobs
+[100%] Built target void_io_native_jobs
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_io_kernel
+[100%] Built target void_io_kernel
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/ir.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifecycle.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifetime.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/parallel.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/syntax.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_async_tests
+[100%] Built target void_async_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/buffers.cpp.o
+[100%] Building CXX object CMakeFiles/void_gc_buffers.dir/tests/runtime/fixed_call.cpp.o
+[100%] Linking CXX executable void_gc_buffers
+[100%] Built target void_gc_buffers
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_growable_arrays_tests.dir/tests/growable_arrays/tests.cpp.o
+[100%] Linking CXX executable void_growable_arrays_tests
+[100%] Built target void_growable_arrays_tests
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[100%] Linking CXX executable void_fixed_arrays_tests
+[100%] Built target void_fixed_arrays_tests
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/arrays/source.cpp.o
+[100%] Building CXX object CMakeFiles/void_arrays_source.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_arrays_source
+[100%] Built target void_arrays_source
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_retention_current.dir/tests/stage8/sprint5/retention.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_current.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_current.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_retention_current
+[100%] Built target void_retention_current
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[ 66%] Built target void_runtime
+[ 66%] Building CXX object CMakeFiles/void_runtime_tests.dir/tests/runtime/coordination.cpp.o
+[100%] Linking CXX executable void_runtime_tests
+[100%] Built target void_runtime_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Building CXX object CMakeFiles/void_text_audit.dir/tests/text_encoding/audit.cpp.o
+[100%] Linking CXX executable void_text_audit
+[100%] Built target void_text_audit
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_text_ownership.dir/tests/text_encoding/ownership.cpp.o
+[100%] Building CXX object CMakeFiles/void_text_ownership.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_text_ownership
+[100%] Built target void_text_ownership
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-spawn-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_spawn_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_spawn_normal
+[100%] Built target void_async_aot_spawn_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-spawn-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_spawn_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_spawn_optimized
+[100%] Built target void_async_aot_spawn_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-spawn_cancel-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_spawn_cancel_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_spawn_cancel_normal
+[100%] Built target void_async_aot_spawn_cancel_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-spawn_cancel-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_spawn_cancel_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_spawn_cancel_optimized
+[100%] Built target void_async_aot_spawn_cancel_optimized
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-spawn_failure-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_spawn_failure_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_spawn_failure_normal
+[100%] Built target void_async_aot_spawn_failure_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[ 50%] Built target void_cache_identity
+[ 75%] Built target void_async_tests
+[ 75%] Generating async-spawn_failure-optimized.o
+[ 75%] Building CXX object CMakeFiles/void_async_aot_spawn_failure_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_spawn_failure_optimized
+[100%] Built target void_async_aot_spawn_failure_optimized
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-activation-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_activation_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_activation_normal
+[100%] Built target void_async_aot_activation_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-activation-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_activation_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_activation_optimized
+[100%] Built target void_async_aot_activation_optimized
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-managed-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_managed_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_managed_normal
+[100%] Built target void_async_aot_managed_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-managed-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_managed_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_managed_optimized
+[100%] Built target void_async_aot_managed_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-large-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_large_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_large_normal
+[100%] Built target void_async_aot_large_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-large-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_large_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_large_optimized
+[100%] Built target void_async_aot_large_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-closures-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_closures_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_closures_normal
+[100%] Built target void_async_aot_closures_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[ 50%] Built target void_cache_identity
+[ 75%] Built target void_async_tests
+[ 75%] Generating async-closures-optimized.o
+[ 75%] Building CXX object CMakeFiles/void_async_aot_closures_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_closures_optimized
+[100%] Built target void_async_aot_closures_optimized
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-loops-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_loops_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_loops_normal
+[100%] Built target void_async_aot_loops_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-loops-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_loops_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_loops_optimized
+[100%] Built target void_async_aot_loops_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-values-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_values_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_values_normal
+[100%] Built target void_async_aot_values_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-values-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_values_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_values_optimized
+[100%] Built target void_async_aot_values_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[ 50%] Built target void_cache_identity
+[ 75%] Built target void_async_tests
+[ 75%] Generating async-methods-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_methods_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_methods_normal
+[100%] Built target void_async_aot_methods_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-methods-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_methods_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_methods_optimized
+[100%] Built target void_async_aot_methods_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_normal
+[100%] Built target void_async_aot_lifecycle_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_optimized
+[100%] Built target void_async_aot_lifecycle_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[ 50%] Built target void_cache_identity
+[ 75%] Built target void_async_tests
+[ 75%] Generating async-lifecycle_exits-normal.o
+[ 75%] Building CXX object CMakeFiles/void_async_aot_lifecycle_exits_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_exits_normal
+[100%] Built target void_async_aot_lifecycle_exits_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_exits-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_exits_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_exits_optimized
+[100%] Built target void_async_aot_lifecycle_exits_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 33%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_cancelled-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_cancelled_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_cancelled_normal
+[100%] Built target void_async_aot_lifecycle_cancelled_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_cancelled-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_cancelled_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_cancelled_optimized
+[100%] Built target void_async_aot_lifecycle_cancelled_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_failures-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_failures_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_failures_normal
+[100%] Built target void_async_aot_lifecycle_failures_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_failures-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_failures_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_failures_optimized
+[100%] Built target void_async_aot_lifecycle_failures_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[ 50%] Built target void_cache_identity
+[ 75%] Built target void_async_tests
+[100%] Generating async-lifecycle_primary-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_primary_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_primary_normal
+[100%] Built target void_async_aot_lifecycle_primary_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_primary-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_primary_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_primary_optimized
+[100%] Built target void_async_aot_lifecycle_primary_optimized
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_resources-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_resources_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_resources_normal
+[100%] Built target void_async_aot_lifecycle_resources_normal
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_resources-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_resources_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_resources_optimized
+[100%] Built target void_async_aot_lifecycle_resources_optimized
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[100%] Generating async-lifecycle_values-normal.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_values_normal.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_values_normal
+[100%] Built target void_async_aot_lifecycle_values_normal
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 50%] Built target void_runtime
+[ 50%] Built target void_llvm
+[ 50%] Built target voidc_objects
+[ 50%] Built target void_cache_identity
+[ 75%] Built target void_async_tests
+[ 75%] Generating async-lifecycle_values-optimized.o
+[100%] Building CXX object CMakeFiles/void_async_aot_lifecycle_values_optimized.dir/tests/async/aot.cpp.o
+[100%] Linking CXX executable void_async_aot_lifecycle_values_optimized
+[100%] Built target void_async_aot_lifecycle_values_optimized
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[ 66%] Built target void_retention_current
+[100%] Generating retention-growth-normal.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_growth_normal.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_growth_normal.dir/tests/stage8/sprint5/retention.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_growth_normal.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_retention_aot_growth_normal
+[100%] Built target void_retention_aot_growth_normal
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_retention_current
+[100%] Generating retention-growth-optimized.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_growth_optimized.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_growth_optimized.dir/tests/stage8/sprint5/retention.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_growth_optimized.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_retention_aot_growth_optimized
+[100%] Built target void_retention_aot_growth_optimized
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_retention_current
+[100%] Generating retention-workers-normal.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_workers_normal.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_workers_normal.dir/tests/stage8/sprint5/retention.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_workers_normal.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_retention_aot_workers_normal
+[100%] Built target void_retention_aot_workers_normal
+[  0%] Built target void_native_test_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_core
+[ 66%] Built target void_runtime
+[ 66%] Built target void_llvm
+[ 66%] Built target voidc_objects
+[ 66%] Built target void_cache_identity
+[ 66%] Built target void_retention_current
+[ 66%] Generating retention-workers-optimized.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_workers_optimized.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_workers_optimized.dir/tests/stage8/sprint5/retention.cpp.o
+[100%] Building CXX object CMakeFiles/void_retention_aot_workers_optimized.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_retention_aot_workers_optimized
+[100%] Built target void_retention_aot_workers_optimized

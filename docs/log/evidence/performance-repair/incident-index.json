@@ -1,0 +1,485 @@
+[
+  {
+    "directory": "docs/log/evidence/crashes/incident-06ywm3_e",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/usr/bin/python3",
+      "/home/shmellyorc/Documents/Void.Language/tests/log/benchmarks.py",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_host-benchmark-default",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_normal-benchmark-default",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_optimized-benchmark-default"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 38
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-0c6l8m0t",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-18n81gwd"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 26
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-0qchv_td",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_io_runner",
+      "--async",
+      "/home/shmellyorc/Documents/Void.Language/tests/log/async.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 22
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-189q5thv",
+    "failure_kind": "abnormal_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-alylygg5"
+    ],
+    "returncode": -15,
+    "signal": "SIGTERM",
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-2kx9na4j",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/log/smoke.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 20
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-2psi0ciz",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "cmake",
+      "--build",
+      "build/ci-official-release",
+      "--target",
+      "voidc",
+      "void_io_runner",
+      "void_log_host",
+      "void_gc_buffers",
+      "void_growable_arrays",
+      "void_async_tests",
+      "void_io_native_jobs",
+      "-j",
+      "2"
+    ],
+    "returncode": 2,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 41
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-3udty23f",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "build/ci-official-release/voidc",
+      "check",
+      "tests/log/smoke.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 38
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-41ex8kof",
+    "failure_kind": "abnormal_exit",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "-R",
+      "^(log_|lsp_log$|io_kernel$|io_ownership$|io_native|stage11_globals$|stage10_console_source$|advanced_source$)",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": -15,
+    "signal": "SIGTERM",
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-4m33gynx",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/log/smoke.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 20
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-5zapu4ss",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug",
+      "-R",
+      "^(log_|lsp_log$|io_kernel$|io_ownership$|io_native|stage11_globals$|stage10_console_source$|advanced_source$)",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": 8,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 29
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-65bedlo7",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+      "check",
+      "/tmp/VOID-log-files-igjzfk0l/main.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 26
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-67zzofyr",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-idemllso"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-7rh_igd0",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_probe_normal",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-l4h8por2",
+      "--cancel-only"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 27
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-9rgwn6ff",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "check",
+      "tests/log/smoke.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 20
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-9tzv4lmi",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_probe_normal",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-1v_hk_c_"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 27
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-bb5x686j",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-wnrl_1ix",
+      "--cancel-only"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 26
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-cjie5tta",
+    "failure_kind": "abnormal_exit",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers",
+      "-R",
+      "^(log_|lsp_log$|io_kernel$|io_ownership$|io_native|stage11_globals$|stage10_console_source$|advanced_source$)",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": -15,
+    "signal": "SIGTERM",
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-d4b4kyqi",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/async-before/performance.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 61
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-du4yxvhw",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build/ci-official-release",
+      "-R",
+      "^(gc_buffers|growable_arrays_source|async_source|async_ir|async_parallel|async_lifecycle|io_native_jobs|log_native)$",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": 8,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 41
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-ej4p6can",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native_jobs"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 38
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-g4r83x4x",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-cyep9avy",
+      "--cancel-only"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 27
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-gfpyif5z",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/performance.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 58
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-je6m9xz_",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-ke2bg6zf",
+      "--allocation-only"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 26
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-lcvquujb",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-rcjbz_2n"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 26
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-nvvqkc4a",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "check",
+      "tests/log/benchmark.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 28
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-piwcm854",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-obtx3xvp"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 29
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-pno1n6kl",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_normal",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-mmrs_fk8"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-rp2_cl9p",
+    "failure_kind": "abnormal_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_normal-benchmark-default",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-bench-ycpiqc2e",
+      "--benchmark"
+    ],
+    "returncode": -15,
+    "signal": "SIGTERM",
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-rs9b9ass",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-ooate6s8",
+      "--cancel-only"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 37
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-t7g8xkin",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "build/ci-official-debug/voidc",
+      "check",
+      "tests/log/native.void"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 28
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-ur4a6o8g",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-zzbqqret"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 25
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-v917yx1_",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-fin0yj6v"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 41
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-wyrg8ihl",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host",
+      "/home/shmellyorc/Documents/Void.Language",
+      "/tmp/VOID-log-host-wwvwnskp"
+    ],
+    "returncode": 1,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 25
+  },
+  {
+    "directory": "docs/log/evidence/crashes/incident-zg7ztvpg",
+    "failure_kind": "unexpected_exit",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release",
+      "-R",
+      "^(log_|lsp_log$|io_kernel$|io_ownership$|io_native|stage11_globals$|stage10_console_source$|advanced_source$)",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": 8,
+    "signal": null,
+    "timed_out": false,
+    "source_snapshots": 37
+  }
+]

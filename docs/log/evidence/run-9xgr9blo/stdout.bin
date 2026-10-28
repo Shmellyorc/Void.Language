@@ -1,0 +1,3 @@
+allocation optimize=0 acquisition_failures=71 post_effect_faults=1 passed
+allocation optimize=1 acquisition_failures=71 post_effect_faults=1 passed
+665 logging native checks passed

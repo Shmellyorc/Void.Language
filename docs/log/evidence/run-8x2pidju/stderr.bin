@@ -1,0 +1,14 @@
+/tmp/VOID-log-files-igjzfk0l/main.void:41:57: error: format at byte 1: Unknown numeric pattern token
+    code: VOID2009
+
+ 41 |             convert.unwrap(instance.info("record{index:02}"))
+    |                                                         ^
+    Module: /main.void
+
+/tmp/VOID-log-files-igjzfk0l/main.void:47:51: error: format at byte 1: Unknown numeric pattern token
+    code: VOID2009
+
+ 47 |         convert.unwrap(instance.info("item{index:02}"))
+    |                                                   ^
+    Module: /main.void
+

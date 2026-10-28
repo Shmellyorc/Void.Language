@@ -1,0 +1,80 @@
+use log as l
+use convert
+use io
+private func require(ok: bool):
+    if not ok:
+        var failure: result<bool, string> = Err("Logging filesystem assertion failed")
+        convert.unwrap(failure)
+private func rejected(value: string, adopting: bool = false):
+    var policy = l.existing_files.reject
+    if adopting:
+        policy = l.existing_files.adopt
+    if l.open(l.config(console = l.console_sink.none, timestamps = false, file_path = value,
+        rotation_bytes = 64, max_record_bytes = 64, existing = policy)) is Err(var problem):
+        require(problem.file_cause != null)
+    else:
+        require(false)
+func main():
+    rejected("reject-active")
+    rejected("reject-backup")
+    rejected("link", true)
+    rejected("directory", true)
+    rejected("special", true)
+    rejected("torn", true)
+    rejected("too-big", true)
+    rejected("torn-backup", true)
+    var adopted = convert.unwrap(l.open(l.config(console = l.console_sink.none,
+        timestamps = false, file_path = "adopted", existing = l.existing_files.adopt,
+        rotation_bytes = 64, max_record_bytes = 64)))
+    convert.unwrap(adopted.info("append"))
+    convert.unwrap(adopted.close())
+    var holes = convert.unwrap(l.open(l.config(console = l.console_sink.none,
+        timestamps = false, file_path = "holes", existing = l.existing_files.adopt,
+        rotation_bytes = 64, max_record_bytes = 64)))
+    convert.unwrap(holes.close())
+    for retained in [0, 1, 3, 32]:
+        var name = "rotate{retained}"
+        var instance = convert.unwrap(l.open(l.config(console = l.console_sink.none,
+            timestamps = false, file_path = name, rotation_bytes = 32,
+            max_record_bytes = 32, backups = retained)))
+        for index in 0..<45:
+            convert.unwrap(instance.info("record{index:02}"))
+        convert.unwrap(instance.close())
+    var settings = l.config(console = l.console_sink.none, timestamps = false,
+        file_path = "policy", rotation_bytes = 64, max_record_bytes = 64, backups = 3)
+    var instance = convert.unwrap(l.open(settings))
+    for index in 0..<15:
+        convert.unwrap(instance.info("item{index:02}"))
+    settings.backups = 1
+    convert.unwrap(instance.configure(settings))
+    # Unknown historical names are outside the current set and survive.
+    convert.unwrap(io.write_text("policy.7", "unrelated historical sentinel\n"))
+    settings.name = "metadata"
+    convert.unwrap(instance.configure(settings))
+    settings.backups = 3
+    convert.unwrap(instance.configure(settings))
+    settings.rotation_bytes = 32
+    settings.max_record_bytes = 32
+    if instance.configure(settings) is Err(var problem):
+        require(problem.file_cause != null)
+    else:
+        require(false)
+    # Failed preflight leaves the previous ready logger usable.
+    convert.unwrap(instance.info("continues"))
+    settings.rotation_bytes = 64
+    settings.max_record_bytes = 64
+    settings.file_path = "replacement"
+    convert.unwrap(instance.configure(settings))
+    convert.unwrap(instance.warn("new path"))
+    convert.unwrap(instance.close())
+    var growing = l.config(console = l.console_sink.none, timestamps = false,
+        file_path = "grow", rotation_bytes = 64, max_record_bytes = 64, backups = 1)
+    var owner = convert.unwrap(l.open(growing))
+    growing.backups = 3
+    if owner.configure(growing) is Err(var problem):
+        require(problem.file_cause != null)
+    else:
+        require(false)
+    growing.existing = l.existing_files.adopt
+    convert.unwrap(owner.configure(growing))
+    convert.unwrap(owner.close())

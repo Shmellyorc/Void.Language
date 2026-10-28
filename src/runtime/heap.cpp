@@ -118,6 +118,10 @@ void* Heap::adopt_buffer(PendingBuffer& pending,std::shared_ptr<const BufferStat
     auto* data=pending.data_;
     auto [it,added]=objects_.emplace(data,Object{std::move(map),std::move(state),TypeLayout::Kind::buffer});
     (void)it;if(!added) throw std::logic_error("duplicate buffer storage");
+    const auto& adopted=*static_cast<const BufferState*>(it->second.metadata.get());
+    adopted.data=data;adopted.next=buffers_;
+    if(buffers_)buffers_->previous=&adopted;
+    buffers_=&adopted;
     const auto base=reinterpret_cast<std::uintptr_t>(data);
     const auto tail=pending.layout_->bytes()-1;
     const auto high=tail>std::numeric_limits<std::uintptr_t>::max()-base ? std::numeric_limits<std::uintptr_t>::max() : base+tail;
@@ -146,6 +150,9 @@ void Heap::destroy(void* object,const Object& record) noexcept {
     if(record.kind==TypeLayout::Kind::buffer) {
         const auto& b=*static_cast<const BufferState*>(record.metadata.get());
         if(!buffer_objects_)std::terminate();--buffer_objects_;
+        if(b.previous)b.previous->next=b.next;else buffers_=b.next;
+        if(b.next)b.next->previous=b.previous;
+        b.previous=b.next=nullptr;b.data=nullptr;
         if(!b.complete) {if(!private_buffers_)std::terminate();--private_buffers_;}
         release(object,b.layout->alignment());
     } else ::operator delete(object);
@@ -186,9 +193,11 @@ void Heap::validate_output_address(void** slot) const {
     // Pointer-sized writes beginning just below the lowest buffer may overlap.
     // Use subtraction to avoid wrapping address+sizeof(void*) near UINTPTR_MAX.
     if(address>buffer_high_ || (address<buffer_low_ && buffer_low_-address>=sizeof(void*)))return;
-    for(const auto& [payload,object]:objects_)if(object.kind==TypeLayout::Kind::buffer) {
-        const auto& state=*static_cast<const BufferState*>(object.metadata.get());
-        const auto base=reinterpret_cast<std::uintptr_t>(payload);
+    // Include private and published buffers, without revisiting unrelated
+    // ordinary objects retained by a long-lived async root.
+    for(auto* buffer=buffers_;buffer;buffer=buffer->next) {
+        const auto& state=*buffer;
+        const auto base=reinterpret_cast<std::uintptr_t>(state.data);
         if((address>=base && address-base<state.layout->bytes()) || (address<base && base-address<sizeof(void*))) {
             if(state.readers)throw BufferBusy("output aliases leased buffer storage");
             throw std::invalid_argument("untyped output aliases buffer storage");

@@ -1,0 +1,6 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+      Start  68: advanced_source
+ 1/24 Test  #68: advanced_source ..................   Passed   10.29 sec
+      Start 184: stage11_globals
+ 2/24 Test #184: stage11_globals ..................   Passed    1.96 sec
+      Start 185: log_native

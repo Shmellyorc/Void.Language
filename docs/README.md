@@ -17,6 +17,16 @@ record. Historical freeze records are preserved there. H1–H7 remain unresolved
 historical incidents; this decision does not claim their repair. Earlier dated
 sections below remain historical.
 
+## Logging implementation, 28 October 2026
+
+Boss approved the complete logging [contract](log/DESIGN.md) and
+[roadmap](log/ROADMAP.md), including trusted namespace adoption and checked faults.
+The [API](log/API.md), [engineering history](log/IMPLEMENTATION.md),
+[acceptance](log/ACCEPTANCE.md), [measurements](log/BENCHMARKS.md) and
+[Golden Wrench handoff](log/HANDOFF.md) track source and local evidence.
+The original [research](log/RESEARCH.md) remains preserved. Independent review,
+hosted CI and native Windows/macOS verification are separate pending gates.
+
 ## Collections implementation, 28 October 2026
 
 Boss approved the complete [24-function contract](collections/DESIGN.md),

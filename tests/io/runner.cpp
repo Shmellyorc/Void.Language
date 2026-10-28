@@ -16,15 +16,16 @@ int main(int argc, char** argv) {
         if (!analysis.succeeded()) throw vd::CompilationError(analysis.diagnostics);
         if (!analysis.program->warnings().empty()) throw std::runtime_error("Unexpected source documentation warning");
         std::string mode = argv[1];
-        if (mode == "--inventory") {
+        if (mode == "--inventory" || mode == "--inventory-log") {
             std::set<std::string> hidden;
             for (const auto& declaration : analysis.program->declarations()) {
                 if (declaration.visibility != "public") hidden.insert(declaration.identity);
             }
             std::cout << "Identity\tSource\tSignature\tParameters documented\tReturn documented\n";
             for (const auto& declaration : analysis.program->declarations()) {
-                if ((declaration.module != "/@stdlib/io.void" && declaration.module != "/@stdlib/path.void") ||
-                    declaration.visibility != "public" || hidden.contains(declaration.owner)) continue;
+                const bool selected = mode == "--inventory-log" ? declaration.module == "/@stdlib/log.void" :
+                    (declaration.module == "/@stdlib/io.void" || declaration.module == "/@stdlib/path.void");
+                if (!selected || declaration.visibility != "public" || hidden.contains(declaration.owner)) continue;
                 bool parameters = true;
                 for (const auto& parameter : declaration.written_parameters) {
                     parameters &= !declaration.documentation.parameter(parameter.name).empty();

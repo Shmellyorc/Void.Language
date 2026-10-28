@@ -1,0 +1,42 @@
+use log
+use convert
+
+private var current: log.logger?
+
+private func explode() -> string:
+    var zero: i32 = 0
+    return "{1 / zero}"
+
+func entry(command: i32) -> i32:
+    if command == 0:
+        if current is Ok(var instance):
+            convert.unwrap(instance.close())
+        current = null
+        return 7
+    if command == 1:
+        current = convert.unwrap(log.open(log.config(timestamps = false,
+            console = log.console_sink.none, file_path = "publication.log")))
+        return 7
+    if current is Ok(var instance):
+        if command == 2:
+            convert.unwrap(instance.info("record"))
+            return 7
+        if command == 3:
+            var outcome = instance.info("next")
+            if outcome is Err(var problem):
+                if problem.kind is log.failure_kind.faulted:
+                    return 8
+                return 9
+            return 7
+        if command == 4:
+            var outcome = instance.write_lazy(log.level.info, explode)
+            return 1
+        if command == 5:
+            # Builder unwind before transport must release the guard without faulting.
+            convert.unwrap(instance.info("after builder"))
+            return 7
+        if command == 6:
+            convert.unwrap(instance.configure(log.config(timestamps = false,
+                console = log.console_sink.none, file_path = "publication.log")))
+            return 7
+    return 99

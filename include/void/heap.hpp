@@ -69,6 +69,10 @@ private:
         mutable std::shared_ptr<const RuntimeMetadata> catalog;
         std::uint64_t requested_live; // immutable construction boundary, not trace extent
         mutable std::size_t readers=0;
+        // Heap-owned scan links; metadata nodes stay stable across table rehash.
+        mutable const BufferState* previous=nullptr;
+        mutable const BufferState* next=nullptr;
+        mutable void* data=nullptr;
     };
     class PendingBuffer {
     public:
@@ -101,6 +105,7 @@ private:
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
     std::size_t private_buffers_=0,buffer_objects_=0;
+    const BufferState* buffers_=nullptr;
     // Conservative inclusive address bounds, widened on adoption. Stale bounds
     // after collection only cause extra scanning; no per-object index is needed.
     std::uintptr_t buffer_low_=0,buffer_high_=0;

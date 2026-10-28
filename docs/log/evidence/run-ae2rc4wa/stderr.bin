@@ -1,0 +1,28 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:454:53: runtime error: Display operation failed
+    return Ok("{prefix}{label} \"{quoted_name}\" \"{quoted_message}\"\n".to_utf8())
+                                                    ^
+In function /@stdlib/log.void::_frame
+Called from /@stdlib/log.void::_prepare
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:468:12: source call
+    return _frame(options, severity, message, stamp)
+           ^
+Called from /@stdlib/log.void::logger::method::write
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:783:21: source call
+        var bytes = _prepare(self._options, severity, message)?
+                    ^
+Called from /@stdlib/log.void::logger::method::info
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1221:17: source call
+    return self.write(level.info, message)
+                ^
+Called from /publication.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/log/publication.void:27:37: source call
+            convert.unwrap(instance.info("record"))
+                                    ^
+
+native-observation publication.log identity=195668 bytes=0 hex=
+native-observation replacement.log identity=195657 bytes=21 hex=7265706c6163656d656e742073656e74696e656c0a
+native-observation native.log identity=195656 bytes=36 hex=494e464f202222202241f09f94a55c6e220a494e464f202222202241f09f94a55c6e220a
+native-observation external-sentinel identity=195617 bytes=18 hex=65787465726e616c20636f6e74656e74730a
+native-observation length.log identity=195616 bytes=0 hex=
+native-observation reload.log identity=195587 bytes=28 hex=494e464f20222220226f6c64220a494e464f20222220226e6577220a
+native-observation startup.log identity=195584 bytes=0 hex=

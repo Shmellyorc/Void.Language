@@ -1,0 +1,15 @@
+# Execute with the existing explicit async-root runner/embedding adapter.
+use log
+use convert
+
+async func entry(input: i32) -> i32:
+    var instance = convert.unwrap(await log.open_async(log.config(name = "async",
+        file_path = "async-example.log")))
+    with instance as owner:
+        var delivered = await owner.write_async(log.level.info, "Awaited file operation")
+        var closed = await owner.close_async()
+        if delivered is Err(var problem):
+            return 1
+        if closed is Err(var problem):
+            return 2
+    return input

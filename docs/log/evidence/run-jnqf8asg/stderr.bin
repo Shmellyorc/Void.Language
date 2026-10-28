@@ -1,0 +1,36 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:584:21: error: Cannot assign readonly reference leaf 'error' to storage or a parameter promising mutable access.
+    code: VOID2007
+
+ 584 |             receipt.file_error(original, failure_kind.rotation_io)
+     |                     ^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/io.void:62:8
+
+ 62 | struct error extends core.error:
+    |        ^^^^^
+    Module: /@stdlib/io.void
+    Parameter declared here; const accepts readonly reference leaves. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:158:41
+
+ 158 | private func (self _receipt) file_error(cause: io.error, kind: failure_kind, cleanup: bool = false):
+     |                                         ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:856:21: error: Cannot assign readonly reference leaf 'error' to storage or a parameter promising mutable access.
+    code: VOID2007
+
+ 856 |             receipt.file_error(original, failure_kind.rotation_io)
+     |                     ^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/io.void:62:8
+
+ 62 | struct error extends core.error:
+    |        ^^^^^
+    Module: /@stdlib/io.void
+    Parameter declared here; const accepts readonly reference leaves. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:158:41
+
+ 158 | private func (self _receipt) file_error(cause: io.error, kind: failure_kind, cleanup: bool = false):
+     |                                         ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

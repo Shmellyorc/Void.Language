@@ -1,0 +1,4 @@
+native stack soft=1048576 hard=1048576
+allocation optimize=0 acquisition_failures=71 post_effect_faults=2 passed
+allocation optimize=1 acquisition_failures=71 post_effect_faults=2 passed
+748 logging native checks passed

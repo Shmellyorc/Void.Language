@@ -1,0 +1,10 @@
+{
+  "pid": 1530525,
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_normal-benchmark-default",
+    "/home/shmellyorc/Documents/Void.Language",
+    "/tmp/VOID-log-bench-ycpiqc2e",
+    "--benchmark"
+  ],
+  "reason": "Operator stop of accidental unbudgeted Runtime(0) timing variant. Its JIT part completed; stop the next AOT part. Normal JIT/AOT use Runtime(256), established in src/backend/llvm/backend.cpp and src/runtime/abi.cpp. Retain completed/partial samples and source snapshots; rerun correct budget."
+}

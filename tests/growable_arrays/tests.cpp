@@ -37,6 +37,45 @@ void extreme_indexes(bool optimized) {
         require(failed,"extreme list index escaped checking");collect_empty(*runtime);
     }
 }
+void scalar_read_effects(bool optimized) {
+    auto analysis=analyze_source({"scalar-read-effects.void",R"VOID(
+struct holder:
+    data: [i32]
+    calls: i32
+func receiver(value: holder) -> [i32]:
+    value.calls++
+    return value.data
+func change(value: holder, command: i32) -> i32:
+    value.calls++
+    if command == 1:
+        value.data.clear()
+        return 0
+    value.data.push(99)
+    value.data = [7]
+    return -1
+func readonly_read(const values: [i32], index: i32) -> i32:
+    return values[index]
+func entry(command: i32) -> i32:
+    var value = holder(data = [10, 20, 30], calls = 0)
+    var observed = receiver(value)[change(value, command)]
+    if observed != 99 or value.calls != 2 or readonly_read(value.data, -1) != 7:
+        return 1
+    # Selected writes must still reject structural invalidation during the RHS.
+    if command == 2:
+        value.data[0] = change(value, 1)
+    return 27
+)VOID"});
+    require(analysis.succeeded(),"scalar read effect fixture rejected");auto module=analysis.program->lower();ir::validate(module);
+    auto runtime=std::make_shared<Runtime>(1);Jit jit;auto code=jit.compile(module,module.entry_symbol,optimized,{},runtime);
+    managed_test::Probe probe;probe.inspect_roots=true;
+    {managed_test::Observe observation(probe);require(code->invoke(0)==27,"scalar read did not retain pre-index owner or post-index length");}
+    require(probe.roots_valid && probe.roots_checked && probe.frames.empty(),"scalar read root ownership");collect_empty(*runtime);
+    for(int command:{1,2}) {
+        bool failed=false;try{code->invoke(command);}catch(const std::runtime_error& error){failed=std::string(error.what()).find("scalar-read-effects.void:")!=std::string::npos;}
+        require(failed,"scalar read bounds or selected-write invalidation bypassed");collect_empty(*runtime);
+        require(code->invoke(0)==27,"scalar read failure prevented recovery");collect_empty(*runtime);
+    }
+}
 void diagnostics_and_ir() {
     const std::string header="func entry(x: i32) -> i32:\n";
     for(const auto& body:{"    var a = []\n    return x\n", "    var a: [i32] = [1]\n    a.push(true)\n    return x\n", "    var a = [1, true]\n    return x\n", "    const a = [1]\n    var b = a\n    b.push(2)\n    return x\n", "    const a = [1]\n    a[0] = 2\n    return x\n", "    var a: [i32, 1] = [1]\n    a.push(2)\n    return x\n", "    var a = [1]\n    return a[true]\n", "    var a: [unknown]\n    return x\n", "    var a = [1]\n    var b = a.push(2)\n    return x\n", "    var a = [1]\n    return a.remove_at(0.5f)\n"})
@@ -102,8 +141,18 @@ void runtime_transactions() {
     require(invalid && r.list_read(token,encoding,0)==10 && r.list_count(token,encoding)==1,"stale selected write was committed");
     RuntimeFailure mismatch;vd_list_push(&list,static_cast<unsigned>(ScalarEncoding::u32),42,&mismatch);
     require(mismatch.message && r.list_count(token,encoding)==1 && r.list_read(token,encoding,0)==10,"wrong list encoding changed storage");
+    for(auto [bits,sign]:{std::pair{std::uint64_t{0},0u},{~std::uint64_t{0},1u}}) {
+        RuntimeFailure outcome;
+        require(vd_list_read_index(&list,static_cast<unsigned>(encoding),bits,sign,&outcome)==10 && !outcome.message,"checked list read normalization");
+    }
+    for(auto [bits,sign]:{std::pair{std::uint64_t{1},0u},{~std::uint64_t{0},0u},{std::uint64_t{1}<<63,1u},{std::uint64_t{0},2u}}) {
+        RuntimeFailure outcome;vd_list_read_index(&list,static_cast<unsigned>(encoding),bits,sign,&outcome);
+        require(outcome.message && r.list_read(token,encoding,0)==10,"invalid checked list read accepted or changed data");
+    }
     void* unregistered=list;RuntimeFailure root_failure;vd_list_push(&unregistered,static_cast<unsigned>(encoding),42,&root_failure);
     require(root_failure.message && r.list_count(token,encoding)==1,"unregistered list root accepted");
+    RuntimeFailure read_root_failure;vd_list_read_index(&unregistered,static_cast<unsigned>(encoding),0,0,&read_root_failure);
+    require(read_root_failure.message,"checked scalar read accepted an unregistered root");
     RuntimeFailure failed;auto* sentinel=list;vd_list_new(&list,static_cast<unsigned>(encoding),~std::uint64_t{0},&failed);require(failed.message && list==sentinel,"unrepresentable list published");
     list=alias=nullptr;require(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"list transaction roots leaked");
 }
@@ -135,6 +184,6 @@ void concurrent_collection() {
 }
 }
 int main(int argc,char** argv) {
-    try {require(argc==2,"expected repository root");diagnostics_and_ir();runtime_transactions();cold_construction();concurrent_collection();for(bool optimized:{false,true}){sources(argv[1],optimized);extreme_indexes(optimized);source_failures(argv[1],optimized);}std::cout<<"Growable lists: source, aliases, roots, transactions and failures passed\n";}
+    try {require(argc==2,"expected repository root");diagnostics_and_ir();runtime_transactions();cold_construction();concurrent_collection();for(bool optimized:{false,true}){sources(argv[1],optimized);extreme_indexes(optimized);scalar_read_effects(optimized);source_failures(argv[1],optimized);}std::cout<<"Growable lists: source, aliases, roots, transactions and failures passed\n";}
     catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

@@ -1,0 +1,46 @@
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/stdlib/log.void:1307:5: error: Imports must precede constant and function declarations.
+    code: VOID1101
+
+ 1307 | use io/memory
+      |     ^^
+    Module: /@stdlib/log.void
+    Hint: Move use declarations to the start of this file.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/stdlib/log.void:1353:9: error: Duplicate declaration or shadowing of 'instant'.
+    code: VOID2005
+
+ 1353 |     var instant = convert.unwrap(time.make_instant(1609459200, 123000000))
+      |         ^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/stdlib/log.void:1365:30: error: Cannot infer generic parameter 't'; supply explicit type arguments.
+    code: VOID2001
+
+ 1365 |             total += convert.unwrap(instant.format("yyyy-MM-dd'T'HH:mm:ss.fff'Z'")).byte_length
+      |                              ^^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/stdlib/log.void:1365:37: error: Unknown import qualifier 'instant'.
+    code: VOID3003
+
+ 1365 |             total += convert.unwrap(instant.format("yyyy-MM-dd'T'HH:mm:ss.fff'Z'")).byte_length
+      |                                     ^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Import the module with this alias before calling it.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/stdlib/log.void:1387:25: error: Unknown import qualifier 'memory'.
+    code: VOID3003
+
+ 1387 |             var bytes = memory.stream()
+      |                         ^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Import the module with this alias before calling it.
+
+/home/shmellyorc/Documents/Void.Language/docs/log/evidence/performance-repair/framing-before/stdlib/log.void:1388:21: error: Cannot infer generic parameter 't'; supply explicit type arguments.
+    code: VOID2001
+
+ 1388 |             convert.unwrap(bytes.write_bytes(_perf_source))
+      |                     ^^^^^^
+    Module: /@stdlib/log.void
+

@@ -1,0 +1,907 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:117:13: error: A non-nullable reference field requires an explicit value: minimum.
+    code: VOID2004
+
+ 117 |     private _options: config
+     |             ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:42:5
+
+ 42 |     minimum: level = level.info
+    |     ^^^^^^^
+    Module: /@stdlib/log.void
+    Default construction required for this field. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:117:13
+
+ 117 |     private _options: config
+     |             ^^^^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:190:27: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 190 |             if cause.kind != io.error_kind.busy:
+     |                           ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:198:20: error: Member '_busy' is not accessible from this lexical context.
+    code: VOID3003
+
+ 198 |         self.owner._busy = false
+     |                    ^^^^^
+    Module: /@stdlib/log.void
+    Stored field declared by /@stdlib/log.void::logger. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:122:13
+
+ 122 |     private _busy: bool
+     |             ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:200:24: error: Member '_fault' is not accessible from this lexical context.
+    code: VOID3003
+
+ 200 |             self.owner._fault = true
+     |                        ^^^^^^
+    Module: /@stdlib/log.void
+    Stored field declared by /@stdlib/log.void::logger. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:123:13
+
+ 123 |     private _fault: bool
+     |             ^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:254:40: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 254 |     if _rank(severity) < 0 or severity == level.off:
+     |                                        ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:319:9: error: Duplicate declaration or shadowing of 'input'.
+    code: VOID2005
+
+ 319 |     var input = text.to_utf8()
+     |         ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:322:14: error: Unknown identifier 'input'.
+    code: VOID2002
+
+ 322 |     for at < input.count:
+     |              ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:323:28: error: Unknown identifier 'input'.
+    code: VOID2002
+
+ 323 |         var width = _width(input[at])
+     |                            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:324:29: error: Unknown identifier 'input'.
+    code: VOID2002
+
+ 324 |         var value = _scalar(input, at, width)
+     |                             ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:347:28: error: Unknown identifier 'input'.
+    code: VOID2002
+
+ 347 |                 bytes.push(input[at + offset])
+     |                            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:352:41: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 352 |     var valid_console = options.console == console_sink.none or options.console == console_sink.stdout or options.console == console_sink.stderr
+     |                                         ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:352:81: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 352 |     var valid_console = options.console == console_sink.none or options.console == console_sink.stdout or options.console == console_sink.stderr
+     |                                                                                 ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:352:123: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 352 |     var valid_console = options.console == console_sink.none or options.console == console_sink.stdout or options.console == console_sink.stderr
+     |                                                                                                                           ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:353:43: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 353 |     var valid_existing = options.existing == existing_files.reject or options.existing == existing_files.adopt
+     |                                           ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:353:88: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 353 |     var valid_existing = options.existing == existing_files.reject or options.existing == existing_files.adopt
+     |                                                                                        ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:360:24: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 360 |     if options.console == console_sink.none and options.file_path == "" and options.minimum != level.off:
+     |                        ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:360:93: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 360 |     if options.console == console_sink.none and options.file_path == "" and options.minimum != level.off:
+     |                                                                                             ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:389:5: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 389 |     _quote(bytes, options.name, options.max_record_bytes)?
+     |     ^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:393:5: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 393 |     _quote(bytes, message, options.max_record_bytes)?
+     |     ^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:404:29: error: Duplicate declaration or shadowing of 'instant'.
+    code: VOID2005
+
+ 404 |         if sample is Ok(var instant):
+     |                             ^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:405:29: error: Unknown import qualifier 'instant'.
+    code: VOID3003
+
+ 405 |             var formatted = instant.format("yyyy-MM-dd'T'HH:mm:ss.fff'Z'")
+     |                             ^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Import the module with this alias before calling it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:406:29: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 406 |             if formatted is Err(var cause):
+     |                             ^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:407:95: error: Unknown identifier 'cause'.
+    code: VOID2002
+
+ 407 |                 return Err(failure(kind = failure_kind.clock, operation = "format", message = cause.message, code = cause.code, clock_cause = cause))
+     |                                                                                               ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:407:117: error: Unknown identifier 'cause'.
+    code: VOID2002
+
+ 407 |                 return Err(failure(kind = failure_kind.clock, operation = "format", message = cause.message, code = cause.code, clock_cause = cause))
+     |                                                                                                                     ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:407:143: error: Unknown identifier 'cause'.
+    code: VOID2002
+
+ 407 |                 return Err(failure(kind = failure_kind.clock, operation = "format", message = cause.message, code = cause.code, clock_cause = cause))
+     |                                                                                                                                               ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:408:29: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 408 |             if formatted is Ok(var text):
+     |                             ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:409:25: error: Unknown identifier 'text'.
+    code: VOID2002
+
+ 409 |                 stamp = text
+     |                         ^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:428:30: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 428 |     if self._options.console != console_sink.none:
+     |                              ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:431:34: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 431 |         if self._options.console == console_sink.stdout:
+     |                                  ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:442:30: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 442 |     if self._options.console != console_sink.none:
+     |                              ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:444:34: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 444 |         if self._options.console == console_sink.stdout:
+     |                                  ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:449:31: error: A non-nullable reference field requires an explicit value: minimum.
+    code: VOID2004
+
+ 449 | private var _default = logger(config())
+     |                               ^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:42:5
+
+ 42 |     minimum: level = level.info
+    |     ^^^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:456:23: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 456 |         if cause.kind == io.error_kind.not_found:
+     |                       ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:458:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 458 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:462:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 462 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:465:30: error: Duplicate declaration or shadowing of 'entry'.
+    code: VOID2005
+
+ 465 |     if observation is Ok(var entry):
+     |                              ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:466:12: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 466 |         if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+     |            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:466:48: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 466 |         if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+     |                                                ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:466:66: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 466 |         if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+     |                                                                  ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:467:27: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 467 |             var receipt = _receipt()
+     |                           ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:470:12: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 470 |         if entry.size > 0:
+     |            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:474:35: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 474 |                     var receipt = _receipt()
+     |                                   ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:479:35: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 479 |                     var receipt = _receipt()
+     |                                   ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:493:39: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 493 |                         if cause.kind != io.error_kind.busy:
+     |                                       ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:508:55: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 508 |         var authorized = retained or options.existing == existing_files.adopt
+     |                                                       ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:509:89: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 509 |         var found = _member(_slot(namespace, index), options.rotation_bytes, authorized)?
+     |                                                                                         ^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:522:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 522 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:529:27: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 529 |             var receipt = _receipt()
+     |                           ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:543:27: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 543 |             if cause.kind != io.error_kind.busy:
+     |                           ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:564:31: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 564 |                 if cause.kind != io.error_kind.not_found:
+     |                               ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:575:19: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 575 |     var receipt = _receipt()
+     |                   ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:604:29: error: A non-nullable reference field requires an explicit value: minimum.
+    code: VOID2004
+
+ 604 | func open(options: config = config()) -> result<logger, failure>:
+     |                             ^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:42:5
+
+ 42 |     minimum: level = level.info
+    |     ^^^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:605:5: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 605 |     _validate(options)?
+     |     ^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:612:31: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 612 |                 var receipt = _receipt()
+     |                               ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:618:17: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 618 |                 instance._acquire(options, namespace, present)?
+     |                 ^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:628:5: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 628 |     _validate(options)?
+     |     ^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:634:31: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 634 |                 var receipt = _receipt()
+     |                               ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:640:89: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 640 |             options.rotation_bytes == self._options.rotation_bytes and options.existing == self._options.existing)
+     |                                                                                         ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:650:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 650 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:663:13: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 663 |             self._acquire(options, namespace, present)?
+     |             ^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:687:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 687 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:705:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 705 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:723:23: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 723 |         if cause.kind == io.error_kind.not_found:
+     |                       ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:725:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 725 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:729:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 729 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:732:30: error: Duplicate declaration or shadowing of 'entry'.
+    code: VOID2005
+
+ 732 |     if observation is Ok(var entry):
+     |                              ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:733:12: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 733 |         if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+     |            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:733:48: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 733 |         if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+     |                                                ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:733:66: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 733 |         if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+     |                                                                  ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:734:27: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 734 |             var receipt = _receipt()
+     |                           ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:737:12: error: Unknown function 'entry'.
+    code: VOID2003
+
+ 737 |         if entry.size > 0:
+     |            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:741:35: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 741 |                     var receipt = _receipt()
+     |                                   ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:746:35: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 746 |                     var receipt = _receipt()
+     |                                   ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:760:39: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 760 |                         if cause.kind != io.error_kind.busy:
+     |                                       ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:775:55: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 775 |         var authorized = retained or options.existing == existing_files.adopt
+     |                                                       ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:776:21: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 776 |         var found = await _member_async(_slot(namespace, index), options.rotation_bytes, authorized)?
+     |                     ^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:776:101: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 776 |         var found = await _member_async(_slot(namespace, index), options.rotation_bytes, authorized)?
+     |                                                                                                     ^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:789:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 789 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:796:27: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 796 |             var receipt = _receipt()
+     |                           ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:810:27: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 810 |             if cause.kind != io.error_kind.busy:
+     |                           ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:831:31: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 831 |                 if cause.kind != io.error_kind.not_found:
+     |                               ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:842:19: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 842 |     var receipt = _receipt()
+     |                   ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:849:21: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 849 |             ready = await self._rotate_async(receipt)
+     |                     ^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:871:41: error: A non-nullable reference field requires an explicit value: minimum.
+    code: VOID2004
+
+ 871 | async func open_async(options: config = config()) -> result<logger, failure>:
+     |                                         ^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:42:5
+
+ 42 |     minimum: level = level.info
+    |     ^^^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:872:5: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 872 |     _validate(options)?
+     |     ^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:879:31: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 879 |                 var receipt = _receipt()
+     |                               ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:885:17: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 885 |                 await instance._acquire_async(options, namespace, present)?
+     |                 ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:895:5: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 895 |     _validate(options)?
+     |     ^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:901:31: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 901 |                 var receipt = _receipt()
+     |                               ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:907:89: error: Value struct equality is not implemented.
+    code: VOID2016
+
+ 907 |             options.rotation_bytes == self._options.rotation_bytes and options.existing == self._options.existing)
+     |                                                                                         ^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:917:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 917 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:919:9: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 919 |         await self._retire_async(receipt, failure_kind.cleanup_io)
+     |         ^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:930:13: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 930 |             await self._acquire_async(options, namespace, present)?
+     |             ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:954:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 954 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:972:23: error: A non-nullable reference field requires an explicit value: kind.
+    code: VOID2004
+
+ 972 |         var receipt = _receipt()
+     |                       ^^^^^^^^
+    Module: /@stdlib/log.void
+    Required field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:131:5
+
+ 131 |     kind: failure_kind = failure_kind.file_io
+     |     ^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:976:9: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 976 |         await self._retire_async(receipt, failure_kind.cleanup_io)
+     |         ^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1099:9: error: Only function calls can be standalone expressions.
+    code: VOID2009
+
+ 1099 |         _validate(options)?
+      |         ^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Assign this value with var or return it.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1102:25: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 1102 |         _default.close()?
+      |                         ^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1113:12: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 1113 |     return await _default.write_async(severity, message)
+      |            ^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1118:12: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 1118 |     return await _default.flush_async()
+      |            ^^^^^
+    Module: /@stdlib/log.void
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1118:12: error: Diagnostic limit of 100 reached; further diagnostic analysis stopped.
+    code: VOID9001
+
+ 1118 |     return await _default.flush_async()
+      |            ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Fix the reported errors and check again.
+

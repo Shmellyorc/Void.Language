@@ -1,0 +1,969 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6014deb6..c9497855 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -920,6 +920,40 @@ if(BUILD_TESTING)
+   add_test(NAME stage11_globals COMMAND void_globals "${CMAKE_CURRENT_BINARY_DIR}/stage11 native fixtures")
+   set_tests_properties(stage11_globals PROPERTIES TIMEOUT 180)
+ 
++  add_executable(void_log_host tests/log/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
++  target_link_libraries(void_log_host PRIVATE void_llvm void_cache_identity)
++  add_test(NAME log_native COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/host.py" "$<TARGET_FILE:void_log_host>")
++  set_tests_properties(log_native PROPERTIES TIMEOUT 1900)
++  add_test(NAME log_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/execution.py" "$<TARGET_FILE:voidc>" --small-stack)
++  set_tests_properties(log_execution PROPERTIES TIMEOUT 1900)
++
++  foreach(suite IN ITEMS frontend files oracles cache install console)
++    add_test(NAME log_${suite} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/${suite}.py" "$<TARGET_FILE:voidc>")
++    set_tests_properties(log_${suite} PROPERTIES TIMEOUT 1900)
++  endforeach()
++  add_test(NAME lsp_log COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/lsp.py" "$<TARGET_FILE:voidls>")
++  set_tests_properties(lsp_log PROPERTIES TIMEOUT 300)
++
++  foreach(mode IN ITEMS normal optimized)
++    set(log_probe_object "${CMAKE_CURRENT_BINARY_DIR}/log-probe-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
++    set(log_probe_adapter "${log_probe_object}.cpp")
++    add_custom_command(OUTPUT "${log_probe_object}" "${log_probe_adapter}"
++      COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/process.py"
++        "$<TARGET_FILE:void_io_runner>" --emit-probe "${PROJECT_SOURCE_DIR}/tests/log/aot.void" "${log_probe_object}" "${mode}"
++      DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/tests/log/aot.void"
++        "${PROJECT_SOURCE_DIR}/tests/log/native.void" "${PROJECT_SOURCE_DIR}/tests/log/publication.void"
++        "${PROJECT_SOURCE_DIR}/tests/log/cancel.void" "${PROJECT_SOURCE_DIR}/tests/log/benchmark.void"
++        "${PROJECT_SOURCE_DIR}/stdlib/log.void" "${PROJECT_SOURCE_DIR}/stdlib/io.void"
++      VERBATIM)
++    set_source_files_properties("${log_probe_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
++    add_executable(void_log_probe_${mode} tests/log/host.cpp tests/managed/probe.cpp
++      $<TARGET_OBJECTS:void_managed_test_abi> "${log_probe_object}" "${log_probe_adapter}")
++    target_compile_definitions(void_log_probe_${mode} PRIVATE LOG_AOT_PROBE=1 LOG_AOT_OPT=$<STREQUAL:${mode},optimized>)
++    target_link_libraries(void_log_probe_${mode} PRIVATE void_runtime)
++    add_test(NAME log_probe_${mode} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/host.py" "$<TARGET_FILE:void_log_probe_${mode}>")
++    set_tests_properties(log_probe_${mode} PROPERTIES TIMEOUT 1900)
++  endforeach()
++
+   add_executable(void_collections_stdlib_host tests/collections_stdlib/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+   target_link_libraries(void_collections_stdlib_host PRIVATE void_llvm void_cache_identity)
+   add_test(NAME collections_stdlib_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/collections_stdlib/host.py" "$<TARGET_FILE:void_collections_stdlib_host>")
+diff --git a/docs/README.md b/docs/README.md
+index bef3ee06..e55b11aa 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -17,6 +17,16 @@ record. Historical freeze records are preserved there. H1–H7 remain unresolved
+ historical incidents; this decision does not claim their repair. Earlier dated
+ sections below remain historical.
+ 
++## Logging implementation, 28 October 2026
++
++Boss approved the complete logging [contract](log/DESIGN.md) and
++[roadmap](log/ROADMAP.md), including trusted namespace adoption and checked faults.
++The [API](log/API.md), [engineering history](log/IMPLEMENTATION.md),
++[acceptance](log/ACCEPTANCE.md), [measurements](log/BENCHMARKS.md) and
++[Golden Wrench handoff](log/HANDOFF.md) track source and local evidence.
++The original [research](log/RESEARCH.md) remains preserved. Independent review,
++hosted CI and native Windows/macOS verification are separate pending gates.
++
+ ## Collections implementation, 28 October 2026
+ 
+ Boss approved the complete [24-function contract](collections/DESIGN.md),
+diff --git a/include/void/heap.hpp b/include/void/heap.hpp
+index e03cc2a7..4afb024d 100644
+--- a/include/void/heap.hpp
++++ b/include/void/heap.hpp
+@@ -69,6 +69,10 @@ private:
+         mutable std::shared_ptr<const RuntimeMetadata> catalog;
+         std::uint64_t requested_live; // immutable construction boundary, not trace extent
+         mutable std::size_t readers=0;
++        // Heap-owned scan links; metadata nodes stay stable across table rehash.
++        mutable const BufferState* previous=nullptr;
++        mutable const BufferState* next=nullptr;
++        mutable void* data=nullptr;
+     };
+     class PendingBuffer {
+     public:
+@@ -101,6 +105,7 @@ private:
+     std::unordered_map<void*, Object> objects_;
+     std::vector<void**> roots_;
+     std::size_t private_buffers_=0,buffer_objects_=0;
++    const BufferState* buffers_=nullptr;
+     // Conservative inclusive address bounds, widened on adoption. Stale bounds
+     // after collection only cause extra scanning; no per-object index is needed.
+     std::uintptr_t buffer_low_=0,buffer_high_=0;
+diff --git a/include/void/runtime.hpp b/include/void/runtime.hpp
+index 55958099..d0b29068 100644
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -130,6 +130,7 @@ public:
+     std::uint64_t list_count(RegisteredRootWord,ScalarEncoding) const;
+     std::uint64_t list_version(RegisteredRootWord,ScalarEncoding) const;
+     std::uint64_t list_read(RegisteredRootWord,ScalarEncoding,std::uint64_t index) const;
++    std::uint64_t list_read_index(RegisteredRootWord,ScalarEncoding,std::uint64_t bits,bool signed_index) const;
+     void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
+     void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
+     // Transactional byte overwrite/append using the existing list backing allocator.
+@@ -302,6 +303,7 @@ private:
+     friend class Runtime;
+     Runtime& runtime_;
+     void* value_;
++    std::size_t index_=0; // Protected with handles_ by the Runtime mutex.
+ };
+ // A private root is still an ordinary Frame/Slot. Its separate registration is
+ // permission for exactly this word, never permission for another root/heap edge.
+diff --git a/include/void/runtime_abi.hpp b/include/void/runtime_abi.hpp
+index 18a5e2c3..8877af76 100644
+--- a/include/void/runtime_abi.hpp
++++ b/include/void/runtime_abi.hpp
+@@ -66,6 +66,7 @@ void vd_list_new(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+ std::uint64_t vd_list_count(void**,unsigned,vd::RuntimeFailure*) noexcept;
+ std::uint64_t vd_list_version(void**,unsigned,vd::RuntimeFailure*) noexcept;
+ std::uint64_t vd_list_read(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
++std::uint64_t vd_list_read_index(void**,unsigned,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+ void vd_list_write(void**,unsigned,std::uint64_t,std::uint64_t,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+ void vd_list_write_bytes(void**, void**, std::uint64_t, vd::RuntimeFailure*) noexcept;
+ void vd_list_push(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+index 68dba74a..6854ccf4 100644
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -949,7 +949,14 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                 }
+                 case Op::array_get: case Op::array_set: case Op::fixed_snapshot: {
+                     auto t=operand_type(instruction.a);auto* source=value_roots[n].at(instruction.a);
+-                    llvm::Value* index=instruction.op==Op::fixed_snapshot?nullptr:array_index(instruction.b,t,instruction.a);
++                    const bool scalar_list_read=instruction.op==Op::array_get && t.kind==ir::Type::growable_array && ir::scalar_array(t);
++                    llvm::Value* index=nullptr;
++                    if(scalar_list_read) {
++                        // The Runtime normalizes and bounds-checks against its
++                        // validated header in the same operation as the read.
++                        auto raw=values.at(instruction.b);
++                        index=numeric::signed_integer(operand_type(instruction.b))?b.CreateSExtOrTrunc(raw,b.getInt64Ty()):b.CreateZExtOrTrunc(raw,b.getInt64Ty());
++                    } else if(instruction.op!=Op::fixed_snapshot)index=array_index(instruction.b,t,instruction.a);
+                     if(!ir::scalar_array(t)) {
+                         auto child=ir::array_element(t);auto* count=b.getInt64(t.definition->extent.value_or(0));
+                         if(instruction.op==Op::array_get) {
+@@ -961,7 +968,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                     auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));auto* count=b.getInt64(t.definition->extent.value_or(0));
+                     if(instruction.op==Op::array_get) {
+                         auto* value=t.kind==ir::Type::growable_array ?
+-                            b.CreateCall(module->getOrInsertFunction("vd_list_read",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,index,failure}) :
++                            b.CreateCall(module->getOrInsertFunction("vd_list_read_index",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,encoding,index,b.getInt32(numeric::signed_integer(operand_type(instruction.b))),failure}) :
+                             b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});array_failure();
+                         auto element=ir::array_element(t);auto* narrow=b.CreateTruncOrBitCast(value,b.getIntNTy(numeric::width(element)));
+                         v=numeric::floating(element)?b.CreateBitCast(narrow,type(element)):narrow;
+@@ -1888,7 +1895,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
+     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
+     bind("vd_convert_parse", vd_convert_parse);
+     bind("vd_list_write_bytes", vd_list_write_bytes);
+-    bind("vd_list_read",vd_list_read);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
++    bind("vd_list_read",vd_list_read);bind("vd_list_read_index",vd_list_read_index);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
+     bind("vd_gc_construct",vd_gc_construct);
+     bind("vd_gc_construct_typed",vd_gc_construct_typed);
+     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index 84c04026..2154406a 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -2052,7 +2052,9 @@ class Semantics {
+         if (!structure.initializer) for (unsigned n=0;n<structure.effective_fields.size();++n) {
+             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
+             Type t = *field.annotation;
+-            if (ir::requires_initialization(t) && !(console::endpoint_type(t) && field.expression) && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
++            const bool complete_default = field.expression && t.definition &&
++                (t.definition->callable || !t.definition->cases.empty() || console::endpoint_type(t));
++            if (ir::requires_initialization(t) && !complete_default && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
+                 if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),n,access.identity,lexical_owner()))
+                     error(source,e.token,Code::visibility,"An inaccessible required field cannot be supplied by this caller: "+field.name+".","Provide an accessible owner initializer or factory.",{{span(field_owner.source,field.token),"Required field declared here."}});
+                 error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
+@@ -4289,7 +4291,22 @@ class Lowering {
+             for(auto slot:slots) i.arguments.push_back(emit({ir::Op::load,slot},e.token));
+             return emit(i,e.token);
+         });
+-        case K::array_index: return frontend_case([&]() -> unsigned {if(e.target!="$text.index")return select_expression(e).read();auto owner=snapshot(expression(*e.parts[0]),Type::string,e.token);auto index=expression(*e.parts[1]);return emit({ir::Op::string_index,emit({ir::Op::load,owner},e.token),index},e.token);});
++        case K::array_index: return frontend_case([&]() -> unsigned {
++            auto owner_type=e.parts[0]->type;
++            if(owner_type.kind==Type::growable_array && ir::scalar_array(owner_type)) {
++                // A value read has no selected-write lifetime: after evaluating
++                // the index, no source code runs between normalization and read.
++                // Capture the list before index effects (including rebinding or
++                // resizing it), then use the existing checked array_get path.
++                // Assignment and selected receivers still use select_expression.
++                auto owner=snapshot(expression(*e.parts[0]),owner_type,e.token);
++                auto index=expression(*e.parts[1]);
++                return emit({ir::Op::array_get,emit({ir::Op::load,owner},e.token),index},e.token);
++            }
++            if(e.target!="$text.index")return select_expression(e).read();
++            auto owner=snapshot(expression(*e.parts[0]),Type::string,e.token);auto index=expression(*e.parts[1]);
++            return emit({ir::Op::string_index,emit({ir::Op::load,owner},e.token),index},e.token);
++        });
+         case K::array_slice: return frontend_case([&]() -> unsigned {
+             auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
+             auto first=snapshot(expression(*e.parts[1]),e.parts[1]->type,e.token);
+diff --git a/src/runtime/array.cpp b/src/runtime/array.cpp
+index f68a80e3..8aab34da 100644
+--- a/src/runtime/array.cpp
++++ b/src/runtime/array.cpp
+@@ -321,7 +321,13 @@ void Runtime::bytes_into(void** out,std::string_view source) {
+     std::string bytes(source);auto layout=fixed_scalar_layout(ScalarEncoding::u8,bytes.size());
+     void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
+     Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
+-    if(!bytes.empty()){BufferBuilder builder(*this,layout,bytes.size(),quota);for(unsigned char byte:bytes)builder.write_scalar(byte);builder.finish_into(&backing);}
++    if(!bytes.empty()) {
++        BufferBuilder builder(*this,layout,bytes.size(),quota);
++        // bytes already owns the input across safepoints. Reuse the existing
++        // dense-u8 builder path and its bounded polling/publication protocol.
++        builder.write_bytes({reinterpret_cast<const std::byte*>(bytes.data()),bytes.size()});
++        builder.finish_into(&backing);
++    }
+     array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
+     auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
+     auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=bytes.size();*out=result;
+diff --git a/src/runtime/async.cpp b/src/runtime/async.cpp
+index 9f167b0e..36f427c1 100644
+--- a/src/runtime/async.cpp
++++ b/src/runtime/async.cpp
+@@ -10,6 +10,7 @@
+ #include <string>
+ #include <stdexcept>
+ #include <thread>
++#include <unordered_map>
+ #include <vector>
+ namespace {
+ struct Diagnostic {
+@@ -38,7 +39,7 @@ struct Diagnostic {
+     }
+ };
+ struct Task;
+-struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;};
++struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;std::size_t pending=0,failures=0;};
+ struct Task {
+     enum State { prepared,ready,running,waiting,joining,working,finishing,finished } state=prepared;
+     enum Outcome { success,cancelled,failed } outcome=success;
+@@ -47,6 +48,13 @@ struct Task {
+     vd_async_resume_entry resume=nullptr;
+     Task* dependency=nullptr;
+     Task* next_ready=nullptr;
++    Task* next_live=nullptr;
++    Task* previous_live=nullptr;
++    Task* first_child=nullptr;
++    Task* last_child=nullptr;
++    Task* next_sibling=nullptr;
++    std::size_t sequence=0,pending_children=0,failed_children=0;
++    bool live=false,listed_failure=false;
+     Group children;
+     Group* group=nullptr;
+     Group* active_group=&children;
+@@ -74,6 +82,9 @@ struct Scope {
+     vd::Runtime& runtime;
+     std::thread::id owner=std::this_thread::get_id();
+     std::vector<std::unique_ptr<Task>> tasks;
++    std::unordered_map<void*,Task*> task_index;
++    Task* live_head=nullptr;
++    Task* live_tail=nullptr;
+     std::vector<std::unique_ptr<Group>> groups;
+     Task* current=nullptr;
+     Task* ready_head=nullptr;
+@@ -130,16 +141,17 @@ struct Scope {
+         {vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);work_changed.wait(lock,[&]{return admitted==count;});if(startup_failed)throw std::logic_error("Worker Runtime admission failed");}
+     }
+     void publish(Task& task){
+-        ensure_workers();task.state=Task::working;task.next_worker=nullptr;
++        ensure_workers();activate(task);task.state=Task::working;task.next_worker=nullptr;
+         {std::lock_guard lock(work_mutex);if(startup_failed)throw std::logic_error("Worker unavailable");if(work_tail)work_tail->next_worker=&task;else work_head=&task;work_tail=&task;}work_changed.notify_one();
+     }
+-    bool work_pending() const noexcept {for(const auto& task:tasks)if(task->state==Task::working)return true;return false;}
++    bool work_pending() const noexcept {for(auto* task=live_head;task;task=task->next_live)if(task->state==Task::working)return true;return false;}
+     void receive() noexcept {
+-        for(auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire)){
++        for(auto* task=live_head;task;){
++            auto* following=task->next_live;
++            if(task->state==Task::working && task->work->done.load(std::memory_order_acquire)){
+             if (task->work->native) {
+                 receive_native(*task);
+-                continue;
+-            }
++            } else {
+             task->state=Task::finished;const auto& failure=task->work->failure.value;
+             if(failure.message){task->failure.assign(failure);task->outcome=task->work->cancelled?Task::cancelled:Task::failed;if(task->outcome==Task::cancelled)task->failure.value={};}
+             else{std::int32_t complete=1;std::memcpy(task->address,&complete,sizeof(complete));}
+@@ -147,9 +159,14 @@ struct Scope {
+             // The acquire handoff proves the worker has returned from resume,
+             // removed its scratch roots and stopped accessing this frame.
+             task->frame.reset(nullptr);
++            retire(*task);
++            }
++            }
++            task=following;
+         }
+     }
+     void abandon(Task& task) noexcept {
++        activate(task);
+         task.work->abandoning = true;
+         task.work->done.store(false, std::memory_order_relaxed);
+         // Workers were admitted before this resource could be acquired. Reuse
+@@ -200,11 +217,12 @@ struct Scope {
+             std::memcpy(task.address, &complete, sizeof(complete));
+         }
+         failed_child(task);
++        retire(task);
+     }
+     void finish_native_children(Task& owner) noexcept {
+         bool pending_cleanup = false;
+-        for (auto& child : tasks) {
+-            if (!owned(*child, owner) || !child->work || !child->work->native) continue;
++        for (auto* child=owner.first_child;child;child=child->next_sibling) {
++            if (!child->work || !child->work->native) continue;
+             auto& work = *child->work;
+             if (child->state == Task::working) {
+                 pending_cleanup = true;
+@@ -222,20 +240,76 @@ struct Scope {
+             owner.state = Task::finished;
+             failed_child(owner);
+             owner.frame.reset(nullptr);
++            retire(owner);
+         }
+     }
+     void wait_work(){
+         vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);
+-        work_changed.wait(lock,[&]{if(startup_failed)return true;for(const auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire))return true;return false;});
++        work_changed.wait(lock,[&]{if(startup_failed)return true;for(auto* task=live_head;task;task=task->next_live)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire))return true;return false;});
+         if(startup_failed)throw std::logic_error("Worker execution failed");
+     }
+ 
+     Scope(vd::Runtime& owner,const void* identity):runtime(owner),generation(identity){}
++    void register_task(std::unique_ptr<Task> item) {
++        auto* task=item.get();task->sequence=tasks.size();
++        tasks.push_back(std::move(item));
++        try {
++            if(!task_index.emplace(task->address,task).second)throw std::logic_error("duplicate async task address");
++        }catch(...){tasks.pop_back();throw;}
++        if(task->group) {
++            auto& owner=*task->group->owner;
++            if(owner.last_child)owner.last_child->next_sibling=task;else owner.first_child=task;
++            owner.last_child=task;
++        }
++    }
++    // Publication can fail before the job reaches a worker. Remove every scan
++    // index before destroying the just-registered task and its rooted handles.
++    void discard_last_task() noexcept {
++        auto& task=*tasks.back();
++        retire(task);
++        if(task.group) {
++            auto& owner=*task.group->owner;
++            Task* previous=nullptr;
++            for(auto* child=owner.first_child;child!=&task;child=child->next_sibling)previous=child;
++            if(previous)previous->next_sibling=nullptr;else owner.first_child=nullptr;
++            owner.last_child=previous;
++        }
++        task_index.erase(task.address);
++        tasks.pop_back();
++    }
++    // A scan index, not another ready queue. Retain creation order exactly as
++    // the original task-vector scan, including out-of-order starts/abandonment.
++    // Intrusive links permit reactivation during cleanup without allocation.
++    void activate(Task& task) noexcept {
++        if(task.live)return;
++        auto* previous=live_tail;
++        while(previous && previous->sequence>task.sequence)previous=previous->previous_live;
++        task.previous_live=previous;task.next_live=previous?previous->next_live:live_head;
++        if(task.next_live)task.next_live->previous_live=&task;else live_tail=&task;
++        if(previous)previous->next_live=&task;else live_head=&task;
++        task.live=true;
++        if(task.group){++task.group->pending;++task.group->owner->pending_children;}
++    }
++    void retire(Task& task) noexcept {
++        if(!task.live)return;
++        if(task.previous_live)task.previous_live->next_live=task.next_live;else live_head=task.next_live;
++        if(task.next_live)task.next_live->previous_live=task.previous_live;else live_tail=task.previous_live;
++        task.next_live=task.previous_live=nullptr;task.live=false;
++        if(task.group){if(!task.group->pending || !task.group->owner->pending_children)std::terminate();--task.group->pending;--task.group->owner->pending_children;}
++    }
++    void observe(Task& task) noexcept {
++        task.observed=true;
++        if(task.listed_failure) {
++            if(!task.group || !task.group->failures || !task.group->owner->failed_children)std::terminate();
++            --task.group->failures;--task.group->owner->failed_children;task.listed_failure=false;
++        }
++    }
+     Task& find(void* address) {
+-        for(auto& task:tasks)if(task->address==address)return *task;
++        auto found=task_index.find(address);if(found!=task_index.end())return *found->second;
+         throw std::logic_error("Task does not belong to the active root adapter");
+     }
+     void enqueue(Task& task) noexcept {
++        activate(task);
+         task.state=Task::ready;task.next_ready=nullptr;
+         if(ready_tail)ready_tail->next_ready=&task;else ready_head=&task;
+         ready_tail=&task;
+@@ -244,25 +318,30 @@ struct Scope {
+     bool member(const Task& task,const Group* group) const noexcept {return task.group==group;}
+     bool owned(const Task& task,const Task& owner) const noexcept {return task.group && task.group->owner==&owner;}
+     bool pending(const Task& owner,const Group* group=nullptr) const noexcept {
+-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::prepared && task->state!=Task::finished)return true;
+-        return false;
++        return group?group->pending!=0:owner.pending_children!=0;
+     }
+     void cancel_children(Task& owner,Group* group=nullptr) noexcept {
+-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::finished)task->cancel_requested=true;
++        for(auto* task=owner.first_child;task;task=task->next_sibling)if((!group || member(*task,group)) && task->state!=Task::finished)task->cancel_requested=true;
+     }
+     Task* child_failure(Task& owner,Group* group=nullptr) noexcept {
+-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::prepared && task->outcome==Task::failed && !task->observed)return task.get();
++        if(!(group?group->failures:owner.failed_children))return nullptr;
++        for(auto* task=owner.first_child;task;task=task->next_sibling)if((!group || member(*task,group)) && task->state!=Task::prepared && task->outcome==Task::failed && !task->observed)return task;
+         return nullptr;
+     }
+     void collect(Task& owner,Group* group=nullptr) noexcept {
+-        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->outcome==Task::failed && !task->observed){
++        if(!(group?group->failures:owner.failed_children))return;
++        for(auto* task=owner.first_child;task;task=task->next_sibling)if((!group || member(*task,group)) && task->outcome==Task::failed && !task->observed){
+             if(owner.outcome!=Task::failed){owner.failure.assign(task->failure.value);owner.outcome=Task::failed;}
+             else owner.failure.append(task->failure.value);
+-            task->observed=true;
++            observe(*task);
+         }
+     }
+     void failed_child(Task& child) noexcept {
+-        if(child.group && child.outcome==Task::failed){auto& owner=*child.group->owner;cancel_children(owner,child.group);}
++        if(child.group && child.outcome==Task::failed){
++            auto& owner=*child.group->owner;
++            if(!child.observed && !child.listed_failure){++owner.failed_children;++child.group->failures;child.listed_failure=true;}
++            cancel_children(owner,child.group);
++        }
+     }
+ };
+ thread_local Scope* active=nullptr;
+@@ -282,7 +361,7 @@ void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::siz
+         task_layout.descriptor=s.runtime.descriptor(task_key);
+         s.runtime.allocate_into(task,task_layout);item->task.reset(*task);item->address=*task;
+         s.runtime.allocate_into(frame,frame_layout);item->frame.reset(*frame);
+-        s.tasks.push_back(std::move(item));
++        s.register_task(std::move(item));
+     }catch(const std::bad_alloc&){exception(failure,"Async activation allocation failed");}
+      catch(const std::exception&){exception(failure,"Async activation requires a valid owning root adapter");}
+ }
+@@ -298,7 +377,7 @@ bool vd_async_ready(void* address,vd::RuntimeFailure* failure) noexcept {
+         if(&task==s.current){exception(failure,"Task cannot await itself");return true;}
+         for(auto* owner=s.current->group? s.current->group->owner:nullptr;owner;owner=owner->group?owner->group->owner:nullptr)if(owner==&task && task.state!=Task::finished){exception(failure,"Async await dependency cycle");return true;}
+         if(task.state!=Task::finished)return false;
+-        task.observed=true;if(task.outcome==Task::cancelled){s.current->cancel_observed=true;exception(failure,"Async task cancelled");}else if(task.failure.value.message)*failure=task.failure.value;
++        s.observe(task);if(task.outcome==Task::cancelled){s.current->cancel_observed=true;exception(failure,"Async task cancelled");}else if(task.failure.value.message)*failure=task.failure.value;
+         return true;
+     }catch(...){exception(failure,"Invalid task await");return true;}
+ }
+@@ -396,20 +475,28 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
+         Task* root=nullptr;if(root_address)root=&s.find(root_address);
+         for(;;) {
+             s.receive();
+-            for(auto& task:s.tasks){
++            bool retired=false;
++            for(auto* task=s.live_head;task;){
++                auto* following=task->next_live;
+                 if(task->state==Task::waiting && (task->dependency->state==Task::finished || task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
+                 else if(task->state==Task::joining && !s.pending(*task,task->joining_group))s.enqueue(*task);
+-                else if (task->state == Task::finishing && !s.pending(*task)) s.finish_native_children(*task);
++                else if (task->state == Task::finishing && !s.pending(*task)) {
++                    s.finish_native_children(*task);
++                    retired |= task->state == Task::finished;
++                }
++                task=following;
+             }
+-            Task* next=s.pop();bool pending=false;
+-            for(auto& task:s.tasks){pending|=task->state!=Task::finished && task->state!=Task::prepared;}
++            Task* next=s.pop();bool pending=s.live_head!=nullptr;
+             if(!next){
+                 if(!pending)break;
++                // A later child may have just retired after an earlier parent's
++                // readiness check. Rescan before diagnosing a dependency cycle.
++                if(retired)continue;
+                 if(s.work_pending()){s.wait_work();continue;}
+                 // Resume through the checked await failure edge so reached
+                 // cleanup runs even for an invalid cyclic dependency graph.
+                 vd::RuntimeFailure cycle;cycle.message="Async await dependency cycle";
+-                for(auto& task:s.tasks)if(task->state==Task::waiting){task->failure.assign(cycle);task->outcome=Task::failed;s.enqueue(*task);}
++                for(auto* task=s.live_head;task;task=task->next_live)if(task->state==Task::waiting){task->failure.assign(cycle);task->outcome=Task::failed;s.enqueue(*task);}
+                 continue;
+             }
+             s.current=next;next->state=Task::running;vd::RuntimeFailure result;
+@@ -463,14 +550,14 @@ void async_submit_native(void** output, const TypeLayout& layout,
+     executor.runtime.allocate_into(output, layout);
+     item->task.reset(*output);
+     item->address = *output;
+-    executor.tasks.push_back(std::move(item));
++    executor.register_task(std::move(item));
+     try {
+         executor.publish(*executor.tasks.back());
+     } catch (...) {
+         // No native operation has been queued if admission fails. Retire the
+         // reserved file-operation count before source cleanup can run.
+         executor.tasks.back()->work->native->cancel_queued();
+-        executor.tasks.pop_back();
++        executor.discard_last_task();
+         *output = nullptr;
+         throw;
+     }
+diff --git a/src/runtime/coordination.cpp b/src/runtime/coordination.cpp
+index b93c3c73..0cea8719 100644
+--- a/src/runtime/coordination.cpp
++++ b/src/runtime/coordination.cpp
+@@ -384,11 +384,17 @@ Runtime::Handle::Handle(Runtime& r, void* value) : runtime_(r), value_(value) {
+     std::lock_guard lock(r.mutex_);
+     if (r.closing_ || (value && !r.heap_.contains(value))) throw std::invalid_argument("invalid persistent handle");
+     r.handles_.push_back(this);
++    index_=r.handles_.size()-1;
+ }
+ Runtime::Handle::~Handle() {
+     std::lock_guard lock(runtime_.mutex_);
+     auto& handles = runtime_.handles_;
+-    handles.erase(std::find(handles.begin(), handles.end(), this));
++    if(index_>=handles.size() || handles[index_]!=this)std::terminate();
++    // Root enumeration has no ordering contract. Preserve every live handle
++    // while removing this one without shifting the retained task history.
++    handles[index_]=handles.back();
++    handles[index_]->index_=index_;
++    handles.pop_back();
+ }
+ void Runtime::Handle::reset(void* value) {
+     std::lock_guard lock(runtime_.mutex_);
+diff --git a/src/runtime/filesystem.cpp b/src/runtime/filesystem.cpp
+index 36a8deb8..f7ff90f5 100644
+--- a/src/runtime/filesystem.cpp
++++ b/src/runtime/filesystem.cpp
+@@ -483,6 +483,10 @@ void set_length(File& file, std::int64_t count, Result& result) {
+ 
+ void file_operation(const Request& request, Result& result, const std::atomic<bool>* cancellation) {
+     auto& file = *request.file;
++    // Complete the existing test barrier at native operation boundaries. Transfer
++    // chunks and close retain their established per-file hooks below.
++    if (file.hooks && file.hooks->before && request.operation >= Operation::seek &&
++        request.operation < Operation::close) file.hooks->before(request.operation);
+     if (request.operation == Operation::close) {
+         result = close(file);
+         return;
+@@ -1226,6 +1230,7 @@ void create_parents(const fs::path& value, Result& result,
+ 
+ void filesystem_operation(const Request& request, Result& result,
+                           const std::atomic<bool>* cancellation) {
++    if (request.hooks && request.hooks->before) request.hooks->before(request.operation);
+     if (!valid_path(request.path) ||
+         (!request.target.empty() && !valid_path(request.target))) {
+         fail(result, ErrorKind::invalid_path);
+diff --git a/src/runtime/fixed_abi.cpp b/src/runtime/fixed_abi.cpp
+index e29a8863..427041f7 100644
+--- a/src/runtime/fixed_abi.cpp
++++ b/src/runtime/fixed_abi.cpp
+@@ -113,6 +113,16 @@ VD_LIST_QUERY(version)
+ std::uint64_t vd_list_read(void** source,unsigned encoding,std::uint64_t index,vd::RuntimeFailure* failure) noexcept {
+     std::uint64_t result=0;checked(failure,[&]{auto& r=vd::Runtime::current();result=r.list_read(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index);});return result;
+ }
++std::uint64_t vd_list_read_index(void** source,unsigned encoding,std::uint64_t index,unsigned signed_index,vd::RuntimeFailure* failure) noexcept {
++    std::uint64_t result=0;
++    checked(failure,[&]{
++        if(signed_index>1)throw std::invalid_argument("invalid list index signedness");
++        auto& r=vd::Runtime::current();
++        try {result=r.list_read_index(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,signed_index!=0);}
++        catch(const std::out_of_range&) {failure->message="List index outside extent";}
++    });
++    return result;
++}
+ void vd_list_write(void** source,unsigned encoding,std::uint64_t index,std::uint64_t bits,std::uint64_t version,unsigned selected,vd::RuntimeFailure* failure) noexcept {
+     checked(failure,[&]{auto& r=vd::Runtime::current();r.list_write(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,bits,selected ? std::optional(version) : std::nullopt);});
+ }
+diff --git a/src/runtime/heap.cpp b/src/runtime/heap.cpp
+index 149b0a91..c1a32f08 100644
+--- a/src/runtime/heap.cpp
++++ b/src/runtime/heap.cpp
+@@ -118,6 +118,10 @@ void* Heap::adopt_buffer(PendingBuffer& pending,std::shared_ptr<const BufferStat
+     auto* data=pending.data_;
+     auto [it,added]=objects_.emplace(data,Object{std::move(map),std::move(state),TypeLayout::Kind::buffer});
+     (void)it;if(!added) throw std::logic_error("duplicate buffer storage");
++    const auto& adopted=*static_cast<const BufferState*>(it->second.metadata.get());
++    adopted.data=data;adopted.next=buffers_;
++    if(buffers_)buffers_->previous=&adopted;
++    buffers_=&adopted;
+     const auto base=reinterpret_cast<std::uintptr_t>(data);
+     const auto tail=pending.layout_->bytes()-1;
+     const auto high=tail>std::numeric_limits<std::uintptr_t>::max()-base ? std::numeric_limits<std::uintptr_t>::max() : base+tail;
+@@ -146,6 +150,9 @@ void Heap::destroy(void* object,const Object& record) noexcept {
+     if(record.kind==TypeLayout::Kind::buffer) {
+         const auto& b=*static_cast<const BufferState*>(record.metadata.get());
+         if(!buffer_objects_)std::terminate();--buffer_objects_;
++        if(b.previous)b.previous->next=b.next;else buffers_=b.next;
++        if(b.next)b.next->previous=b.previous;
++        b.previous=b.next=nullptr;b.data=nullptr;
+         if(!b.complete) {if(!private_buffers_)std::terminate();--private_buffers_;}
+         release(object,b.layout->alignment());
+     } else ::operator delete(object);
+@@ -186,9 +193,11 @@ void Heap::validate_output_address(void** slot) const {
+     // Pointer-sized writes beginning just below the lowest buffer may overlap.
+     // Use subtraction to avoid wrapping address+sizeof(void*) near UINTPTR_MAX.
+     if(address>buffer_high_ || (address<buffer_low_ && buffer_low_-address>=sizeof(void*)))return;
+-    for(const auto& [payload,object]:objects_)if(object.kind==TypeLayout::Kind::buffer) {
+-        const auto& state=*static_cast<const BufferState*>(object.metadata.get());
+-        const auto base=reinterpret_cast<std::uintptr_t>(payload);
++    // Include private and published buffers, without revisiting unrelated
++    // ordinary objects retained by a long-lived async root.
++    for(auto* buffer=buffers_;buffer;buffer=buffer->next) {
++        const auto& state=*buffer;
++        const auto base=reinterpret_cast<std::uintptr_t>(state.data);
+         if((address>=base && address-base<state.layout->bytes()) || (address<base && base-address<sizeof(void*))) {
+             if(state.readers)throw BufferBusy("output aliases leased buffer storage");
+             throw std::invalid_argument("untyped output aliases buffer storage");
+diff --git a/src/runtime/list.cpp b/src/runtime/list.cpp
+index 572f0172..b04ad6ba 100644
+--- a/src/runtime/list.cpp
++++ b/src/runtime/list.cpp
+@@ -38,7 +38,17 @@ void Runtime::list_into(void** out,ScalarEncoding encoding,std::uint64_t count)
+ std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).count;}
+ std::uint64_t Runtime::list_version(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).version;}
+ std::uint64_t Runtime::list_read(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index) const {
++    return list_read_index(source,encoding,index,false);
++}
++std::uint64_t Runtime::list_read_index(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index,bool signed_index) const {
+     require_managed();std::lock_guard lock(mutex_);const auto& h=list_header(source,encoding);
++    // Normalize a sign-extended source index against the same checked header
++    // used for the read. Unsigned subtraction handles INT64_MIN without UB.
++    if(signed_index && (index&(std::uint64_t{1}<<63))) {
++        const auto magnitude=~index+1;
++        if(magnitude>h.count)throw std::out_of_range("list index outside extent");
++        index=h.count-magnitude;
++    }
+     if(index>=h.count)throw std::out_of_range("list index outside extent");
+     const auto& state=heap_.buffer_state(h.backing);return load_bits(static_cast<const char*>(h.backing)+state.layout->element_offset(index),scalar_width(encoding));
+ }
+diff --git a/stdlib/README.md b/stdlib/README.md
+index 10bd0079..aa5f89fe 100644
+--- a/stdlib/README.md
++++ b/stdlib/README.md
+@@ -1,5 +1,15 @@
+ # Standard library
+ 
++`use log` provides five checked severity functions, inclusive/off filtering,
++lazy messages, fixed UTC single-line UTF-8 framing, borrowed console destinations,
++persistent files, explicit adoption, bounded rotation, independent managed loggers,
++recovery, flush/close and awaitable file operations. The application default is
++stderr-only and creates no files. File namespaces require trusted exclusive ownership;
++metadata checks do not eliminate aliases or filesystem races. See the
++[complete API](../docs/log/API.md), [examples](../examples/log/main.void) and
++[engineering handoff](../docs/log/HANDOFF.md).
++
++
+ `use collections as c` provides 24 synchronous helpers for copied stable sorting
+ and reversal, ordered and live searches, predicates, mapping/filtering, seeded
+ folds, numeric sums, extrema and ordered dictionary extraction/copying. Transforms
+diff --git a/stdlib/io.void b/stdlib/io.void
+index e9e27fed..0245e67b 100644
+--- a/stdlib/io.void
++++ b/stdlib/io.void
+@@ -448,6 +448,26 @@ async func open_async(value: string, mode: open_mode = open_mode.read, order: bi
+     return Ok(resource)
+ 
+ 
++# Source factories with outer ownership must publish the unopened managed identity
++# into their own reached cleanup guard before awaiting acquisition. Returning an
++# acquired file from a child task otherwise leaves a cancellation window before
++# the parent can observe that result. These helpers grant no native authority.
++## Prepare an unopened identity for another standard-library acquisition guard.
++## @param value Host path retained in the identity; native validation occurs on acquisition.
++## @return A fresh closed identity with no native resource or filesystem effects.
++internal func _prepare_open(value: string) -> file:
++    return file(value, binary.byte_order.little)
++
++## Acquire a fresh prepared identity already retained by the caller's cleanup guard.
++## @param mode Existing native opening policy; the identity must be fresh and unopened.
++## @return True after acquisition, or the original typed native failure.
++internal async func (self file) _complete_open_async(mode: open_mode) -> result<bool, error>:
++    var reply = await _io_open_async(self, self._path, _mode(mode))
++    if reply.kind != 0:
++        return Err(_error("open", self._path, "", reply))
++    return Ok(true)
++
++
+ ## Close this shared native handle when leaving with, including early failure.
+ ## Closing is idempotent; an actual native close failure becomes a checked Runtime failure.
+ func (self file) deinit():
+diff --git a/tests/growable_arrays/tests.cpp b/tests/growable_arrays/tests.cpp
+index 6821da5b..72f9bf04 100644
+--- a/tests/growable_arrays/tests.cpp
++++ b/tests/growable_arrays/tests.cpp
+@@ -37,6 +37,45 @@ void extreme_indexes(bool optimized) {
+         require(failed,"extreme list index escaped checking");collect_empty(*runtime);
+     }
+ }
++void scalar_read_effects(bool optimized) {
++    auto analysis=analyze_source({"scalar-read-effects.void",R"VOID(
++struct holder:
++    data: [i32]
++    calls: i32
++func receiver(value: holder) -> [i32]:
++    value.calls++
++    return value.data
++func change(value: holder, command: i32) -> i32:
++    value.calls++
++    if command == 1:
++        value.data.clear()
++        return 0
++    value.data.push(99)
++    value.data = [7]
++    return -1
++func readonly_read(const values: [i32], index: i32) -> i32:
++    return values[index]
++func entry(command: i32) -> i32:
++    var value = holder(data = [10, 20, 30], calls = 0)
++    var observed = receiver(value)[change(value, command)]
++    if observed != 99 or value.calls != 2 or readonly_read(value.data, -1) != 7:
++        return 1
++    # Selected writes must still reject structural invalidation during the RHS.
++    if command == 2:
++        value.data[0] = change(value, 1)
++    return 27
++)VOID"});
++    require(analysis.succeeded(),"scalar read effect fixture rejected");auto module=analysis.program->lower();ir::validate(module);
++    auto runtime=std::make_shared<Runtime>(1);Jit jit;auto code=jit.compile(module,module.entry_symbol,optimized,{},runtime);
++    managed_test::Probe probe;probe.inspect_roots=true;
++    {managed_test::Observe observation(probe);require(code->invoke(0)==27,"scalar read did not retain pre-index owner or post-index length");}
++    require(probe.roots_valid && probe.roots_checked && probe.frames.empty(),"scalar read root ownership");collect_empty(*runtime);
++    for(int command:{1,2}) {
++        bool failed=false;try{code->invoke(command);}catch(const std::runtime_error& error){failed=std::string(error.what()).find("scalar-read-effects.void:")!=std::string::npos;}
++        require(failed,"scalar read bounds or selected-write invalidation bypassed");collect_empty(*runtime);
++        require(code->invoke(0)==27,"scalar read failure prevented recovery");collect_empty(*runtime);
++    }
++}
+ void diagnostics_and_ir() {
+     const std::string header="func entry(x: i32) -> i32:\n";
+     for(const auto& body:{"    var a = []\n    return x\n", "    var a: [i32] = [1]\n    a.push(true)\n    return x\n", "    var a = [1, true]\n    return x\n", "    const a = [1]\n    var b = a\n    b.push(2)\n    return x\n", "    const a = [1]\n    a[0] = 2\n    return x\n", "    var a: [i32, 1] = [1]\n    a.push(2)\n    return x\n", "    var a = [1]\n    return a[true]\n", "    var a: [unknown]\n    return x\n", "    var a = [1]\n    var b = a.push(2)\n    return x\n", "    var a = [1]\n    return a.remove_at(0.5f)\n"})
+@@ -102,8 +141,18 @@ void runtime_transactions() {
+     require(invalid && r.list_read(token,encoding,0)==10 && r.list_count(token,encoding)==1,"stale selected write was committed");
+     RuntimeFailure mismatch;vd_list_push(&list,static_cast<unsigned>(ScalarEncoding::u32),42,&mismatch);
+     require(mismatch.message && r.list_count(token,encoding)==1 && r.list_read(token,encoding,0)==10,"wrong list encoding changed storage");
++    for(auto [bits,sign]:{std::pair{std::uint64_t{0},0u},{~std::uint64_t{0},1u}}) {
++        RuntimeFailure outcome;
++        require(vd_list_read_index(&list,static_cast<unsigned>(encoding),bits,sign,&outcome)==10 && !outcome.message,"checked list read normalization");
++    }
++    for(auto [bits,sign]:{std::pair{std::uint64_t{1},0u},{~std::uint64_t{0},0u},{std::uint64_t{1}<<63,1u},{std::uint64_t{0},2u}}) {
++        RuntimeFailure outcome;vd_list_read_index(&list,static_cast<unsigned>(encoding),bits,sign,&outcome);
++        require(outcome.message && r.list_read(token,encoding,0)==10,"invalid checked list read accepted or changed data");
++    }
+     void* unregistered=list;RuntimeFailure root_failure;vd_list_push(&unregistered,static_cast<unsigned>(encoding),42,&root_failure);
+     require(root_failure.message && r.list_count(token,encoding)==1,"unregistered list root accepted");
++    RuntimeFailure read_root_failure;vd_list_read_index(&unregistered,static_cast<unsigned>(encoding),0,0,&read_root_failure);
++    require(read_root_failure.message,"checked scalar read accepted an unregistered root");
+     RuntimeFailure failed;auto* sentinel=list;vd_list_new(&list,static_cast<unsigned>(encoding),~std::uint64_t{0},&failed);require(failed.message && list==sentinel,"unrepresentable list published");
+     list=alias=nullptr;require(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"list transaction roots leaked");
+ }
+@@ -135,6 +184,6 @@ void concurrent_collection() {
+ }
+ }
+ int main(int argc,char** argv) {
+-    try {require(argc==2,"expected repository root");diagnostics_and_ir();runtime_transactions();cold_construction();concurrent_collection();for(bool optimized:{false,true}){sources(argv[1],optimized);extreme_indexes(optimized);source_failures(argv[1],optimized);}std::cout<<"Growable lists: source, aliases, roots, transactions and failures passed\n";}
++    try {require(argc==2,"expected repository root");diagnostics_and_ir();runtime_transactions();cold_construction();concurrent_collection();for(bool optimized:{false,true}){sources(argv[1],optimized);extreme_indexes(optimized);scalar_read_effects(optimized);source_failures(argv[1],optimized);}std::cout<<"Growable lists: source, aliases, roots, transactions and failures passed\n";}
+     catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
+ }
+diff --git a/tests/io/native_jobs.cpp b/tests/io/native_jobs.cpp
+index 082b7aa0..3c3c523b 100644
+--- a/tests/io/native_jobs.cpp
++++ b/tests/io/native_jobs.cpp
+@@ -125,6 +125,12 @@ void root_resume(void* address, vd::RuntimeFailure* failure) {
+         }
+         frame.stage = 2;
+         if (!failure->message && scenario == 4) failure->message = "injected opening activation failure";
++        if (!failure->message && scenario == 6) {
++            // A published acquisition is abandoned after its owner is cancelled.
++            // The enclosing activation must remain waiting until this drain ends.
++            vd_async_cancel(frame.self, failure);
++            vd_async_checkpoint(failure);
++        }
+     }
+     if (!vd_async_drain(address, failure)) return;
+     if (failure->message) return;
+@@ -133,12 +139,38 @@ void root_resume(void* address, vd::RuntimeFailure* failure) {
+     vd_async_complete(frame.self);
+ }
+ 
++void parent_resume(void* address, vd::RuntimeFailure* failure) {
++    auto& frame = *static_cast<Activation*>(address);
++    if (frame.stage == 0) {
++        Activation local{};
++        vd::Runtime::Slot slot{&local, sizeof(local), offsets, 3};
++        vd::Runtime::Frame registered(vd::Runtime::current(), &slot, 1);
++        vd_async_new(&local.self, &local.pending, sizeof(Activation), offsets, 3,
++                     8, nullptr, 0, "io-test-task", &generation, root_resume, failure);
++        if (failure->message) return;
++        static_cast<Activation*>(local.pending)->self = local.self;
++        vd::Runtime::current().store(address, offsetof(Activation, pending), local.self);
++        vd_async_start(frame.pending, failure);
++        frame.stage = 1;
++    }
++    if (frame.stage == 1) {
++        if (!vd_async_ready(frame.pending, failure)) {
++            vd_async_suspend(address, frame.pending, failure);
++            return;
++        }
++        frame.stage = 2;
++    }
++    if (!vd_async_drain(address, failure)) return;
++    if (!failure->message) vd_async_complete(frame.self);
++}
++
+ void* start(std::int32_t, vd::RuntimeFailure* failure) {
+     Activation roots{};
+     vd::Runtime::Slot slot{&roots, sizeof(roots), offsets, 3};
+     vd::Runtime::Frame registered(vd::Runtime::current(), &slot, 1);
+     vd_async_new(&roots.self, &roots.pending, sizeof(Activation), offsets, 3,
+-                 8, nullptr, 0, "io-test-task", &generation, root_resume, failure);
++                 8, nullptr, 0, "io-test-task", &generation,
++                 scenario == 6 ? parent_resume : root_resume, failure);
+     if (failure->message) return nullptr;
+     static_cast<Activation*>(roots.pending)->self = roots.self;
+     vd_async_start(roots.self, failure);
+@@ -148,7 +180,7 @@ void* start(std::int32_t, vd::RuntimeFailure* failure) {
+ 
+ int main() {
+     try {
+-        for (scenario = 0; scenario != 6; ++scenario) {
++        for (scenario = 0; scenario != 7; ++scenario) {
+             entered = false;
+             release_job = false;
+             executed = false;
+@@ -173,6 +205,10 @@ int main() {
+                 require(failure.message, "failure/cancellation disappeared");
+                 require(!committed, "failed opening task committed an acquisition");
+                 if (scenario != 1) require(abandoned, "native acquisition leaked after failure");
++                if (scenario == 6) {
++                    require(std::string(failure.message).find("cancelled") != std::string::npos,
++                            "completed acquisition drain fabricated an await dependency cycle");
++                }
+                 if (scenario == 5) {
+                     require(std::string(failure.message).find("allocation") != std::string::npos,
+                             "publication failure lost priority");
+@@ -188,7 +224,8 @@ int main() {
+             require(runtime.snapshot().objects == 0, "native task roots retained");
+         }
+         std::cout << "native jobs: result, blocked-owner progress, queued/pending cancellation, "
+-                     "publication failure, acquisition rollback and cleanup diagnostics passed\n";
++                     "publication failure, acquisition rollback, nested cancellation drain "
++                     "and cleanup diagnostics passed (7 scenarios)\n";
+         return 0;
+     } catch (const std::exception& failure) {
+         std::cerr << failure.what() << '\n';
+diff --git a/tests/io/runner.cpp b/tests/io/runner.cpp
+index 2a53e802..5934d8d7 100644
+--- a/tests/io/runner.cpp
++++ b/tests/io/runner.cpp
+@@ -16,15 +16,16 @@ int main(int argc, char** argv) {
+         if (!analysis.succeeded()) throw vd::CompilationError(analysis.diagnostics);
+         if (!analysis.program->warnings().empty()) throw std::runtime_error("Unexpected source documentation warning");
+         std::string mode = argv[1];
+-        if (mode == "--inventory") {
++        if (mode == "--inventory" || mode == "--inventory-log") {
+             std::set<std::string> hidden;
+             for (const auto& declaration : analysis.program->declarations()) {
+                 if (declaration.visibility != "public") hidden.insert(declaration.identity);
+             }
+             std::cout << "Identity\tSource\tSignature\tParameters documented\tReturn documented\n";
+             for (const auto& declaration : analysis.program->declarations()) {
+-                if ((declaration.module != "/@stdlib/io.void" && declaration.module != "/@stdlib/path.void") ||
+-                    declaration.visibility != "public" || hidden.contains(declaration.owner)) continue;
++                const bool selected = mode == "--inventory-log" ? declaration.module == "/@stdlib/log.void" :
++                    (declaration.module == "/@stdlib/io.void" || declaration.module == "/@stdlib/path.void");
++                if (!selected || declaration.visibility != "public" || hidden.contains(declaration.owner)) continue;
+                 bool parameters = true;
+                 for (const auto& parameter : declaration.written_parameters) {
+                     parameters &= !declaration.documentation.parameter(parameter.name).empty();
+diff --git a/tests/runtime/buffers.cpp b/tests/runtime/buffers.cpp
+index db59239e..b98b7f34 100644
+--- a/tests/runtime/buffers.cpp
++++ b/tests/runtime/buffers.cpp
+@@ -891,6 +891,38 @@ void output_alias_bounds() {
+         check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"alias bounds collection leaked");
+     }
+ }
++void output_alias_collection_order() {
++    Runtime r(100000);Runtime::Attachment a(r);Runtime::Managed m(r);Output scratch(r);
++    auto layout=r.fixed_scalar_layout(ScalarEncoding::u8,64);
++    std::array<std::unique_ptr<Output>,4> roots;
++    for(auto& root:roots)root=std::make_unique<Output>(r);
++    for(unsigned cycle=0;cycle<3;++cycle) {
++        for(auto& root:roots)r.fixed_default_into(&root->value,layout,quota);
++        // Force object-table rehash while all buffer scan nodes remain live.
++        for(unsigned i=0;i<1024;++i)r.allocate_into(&scratch.value,{16,{}});
++        scratch.value=nullptr;
++        {Runtime::BufferBuilder abandoned(r,layout,64,quota);abandoned.zero_elements(64);}
++        r.collect();
++        auto verify=[&] {
++            for(auto& root:roots)if(root->value)for(bool leased:{false,true}) {
++                std::optional<Runtime::BufferReadLease> lease;
++                if(leased)lease.emplace(r,r.root_word(&root->value),layout);
++                auto** alias=reinterpret_cast<void**>(root->value);
++                constexpr std::size_t zero=0;Runtime::Slot slot{alias,sizeof(void*),&zero,1};Runtime::Frame frame(r,&slot,1);
++                if(leased)busy([&]{r.string_into(alias,{});});
++                else reject([&]{r.string_into(alias,{});});
++            }
++        };
++        verify();
++        // Remove middle, head, tail, and final nodes, checking every survivor.
++        for(auto index:{1,3,0,2}) {
++            roots[index]->value=nullptr;r.collect();verify();
++        }
++        check(!r.snapshot().objects,"buffer alias scan retained collected storage");
++        r.string_into(&scratch.value,{});
++        check(!scratch.value,"empty-buffer alias fast path failed");
++    }
++}
+ void source_layout_reuse() {
+     Runtime r(1);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+     auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,3);
+@@ -1223,7 +1255,7 @@ void measure() {
+ int main(int argc,char** argv) {
+     try {
+         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
+-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
++        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();output_alias_collection_order();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
+ #ifdef VD_BUFFER_WRAP_COLLECT
+             reference_poll_reacquisition(true);
+ #endif
+diff --git a/tests/runtime/coordination.cpp b/tests/runtime/coordination.cpp
+index 51fcfaf9..95bd6c4a 100644
+--- a/tests/runtime/coordination.cpp
++++ b/tests/runtime/coordination.cpp
+@@ -88,6 +88,34 @@ void timeout_and_recovery() {
+         check(r.collect() == vd::Runtime::Collection::completed && r.snapshot().objects == 0, "post-timeout collection failed");
+     }
+ }
++void persistent_handle_removal() {
++    vd::Runtime r;vd::Runtime::Attachment a(r);vd::Runtime::Managed m(r);
++    void* value=nullptr;vd::Runtime::Slot slot{&value,sizeof(value),&pointer_offset,1};vd::Runtime::Frame frame(r,&slot,1);
++    std::vector<std::unique_ptr<vd::Runtime::Handle>> roots;
++    for(unsigned cycle=0;cycle<3;++cycle) {
++        for(unsigned i=0;i<129;++i) {
++            r.allocate_into(&value,{8,{}});
++            roots.push_back(std::make_unique<vd::Runtime::Handle>(r,value));
++        }
++        value=nullptr;
++        // Relocate the last root into an early/middle slot, then remove that
++        // relocated root as well. Collect after every removal to check rooting.
++        std::size_t alive=roots.size();
++        for(unsigned step=0;step<129;++step) {
++            auto index=(step*64u)%129u;
++            roots[index].reset();--alive;
++            check(r.memory_snapshot().handles==alive,"persistent handle index count");
++            check(r.collect()==vd::Runtime::Collection::completed && r.snapshot().objects==alive,"persistent handle removal lost or retained roots");
++            for(auto& root:roots)if(root)check(r.contains(root->get()),"relocated persistent root lost");
++        }
++        roots.clear();
++        auto empty=std::make_unique<vd::Runtime::Handle>(r);
++        // Destruction remains legal from a native host thread without attachment.
++        auto worker=std::async(std::launch::async,[owned=std::move(empty)]()mutable{owned.reset();});
++        {vd::Runtime::Native native(r);worker.get();}
++        check(!r.memory_snapshot().handles,"native handle removal retained registration");
++    }
++}
+ void competing_collectors() {
+     vd::Runtime r;
+     std::latch ready(1), release(1);
+@@ -222,7 +250,7 @@ void repeated_competing_epochs() {
+ }
+ int main() {
+     try {
+-        states_and_roots(); timeout_and_recovery(); competing_collectors(); timeout_releases_losing_collector(); native_and_stress(); repeated_competing_epochs();
++        states_and_roots(); persistent_handle_removal(); timeout_and_recovery(); competing_collectors(); timeout_releases_losing_collector(); native_and_stress(); repeated_competing_epochs();
+         std::cout << "runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed\n";
+     } catch (const std::exception& e) { std::cerr << e.what() << '\n'; return 1; }
+ }

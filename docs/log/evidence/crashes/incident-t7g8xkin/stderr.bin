@@ -1,0 +1,26 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:648:22: error: Member '_resolved_path' is not accessible from this lexical context.
+    code: VOID3003
+
+ 648 |             instance._resolved_path = instance._namespace
+     |                      ^^^^^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Stored field declared by /@stdlib/log.void::logger. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:120:13
+
+ 120 |     private _resolved_path: string
+     |             ^^^^^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:977:22: error: Member '_resolved_path' is not accessible from this lexical context.
+    code: VOID3003
+
+ 977 |             instance._resolved_path = instance._namespace
+     |                      ^^^^^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Stored field declared by /@stdlib/log.void::logger. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:120:13
+
+ 120 |     private _resolved_path: string
+     |             ^^^^^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+

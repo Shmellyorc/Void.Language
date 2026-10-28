@@ -1,0 +1,17 @@
+reload optimize=0 pending_native_write preserved_global_file_identity passed
+transport optimize=0 partial_boundaries=18 native_closes=25 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=71 post_effect_faults=1 passed
+cancel optimize=0 native_operation=14 closes=1 passed
+cancel optimize=0 native_operation=15 closes=1 passed
+cancel optimize=0 native_operation=18 closes=1 passed
+cancel optimize=0 native_operation=30 closes=1 passed
+cancel optimize=0 native_operation=24 closes=1 passed
+reload optimize=1 pending_native_write preserved_global_file_identity passed
+transport optimize=1 partial_boundaries=18 native_closes=25 passed
+rotation optimize=1 native_identity_and_replacement_boundaries passed
+allocation optimize=1 acquisition_failures=71 post_effect_faults=1 passed
+cancel optimize=1 native_operation=14 closes=1 passed
+cancel optimize=1 native_operation=15 closes=1 passed
+cancel optimize=1 native_operation=18 closes=1 passed
+cancel optimize=1 native_operation=30 closes=1 passed

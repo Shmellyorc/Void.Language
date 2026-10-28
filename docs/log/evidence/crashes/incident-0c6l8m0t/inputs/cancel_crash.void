@@ -1,0 +1,62 @@
+use log
+use convert
+
+struct marker:
+    value: i32
+
+private var current: log.logger?
+
+async func turn(value: i32) -> i32:
+    return value
+
+async func stop<t>(pending: t) -> i32:
+    # Let the selected writer traverse its nested awaitable I/O boundaries.
+    for index in 0..<64:
+        var ignored = await turn(index)
+    var signal = marker(value = 1234567)
+    pending.cancel()
+    return signal.value
+
+async func entry(command: i32) -> i32:
+    var options = log.config(timestamps = false, console = log.console_sink.none,
+        file_path = "cancel.log", rotation_bytes = 40, max_record_bytes = 40, backups = 3)
+    if command == 0:
+        if current is Ok(var instance):
+            convert.unwrap(await instance.close_async())
+        current = null
+        return 7
+    if command == 1:
+        current = convert.unwrap(await log.open_async(options))
+        return 7
+    if command == 2:
+        # Cancellation during an entered open must roll back unpublished ownership.
+        var pending = log.open_async(options)
+        var canceller = stop(pending)
+        var ignored = await canceller
+        var opened = await pending
+        return 1
+    if current is Ok(var instance):
+        if command == 3:
+            var pending = instance.write_async(log.level.info, "A🔥\n")
+            var canceller = stop(pending)
+            var ignored = await canceller
+            var result = await pending
+            return 2
+        if command == 4:
+            if instance.info("must not retry") is Err(var problem):
+                if problem.kind is log.failure_kind.faulted:
+                    return 7
+            return 3
+        if command == 5:
+            convert.unwrap(await instance.close_async())
+            return 7
+        if command == 6:
+            convert.unwrap(await instance.write_async(log.level.info, "A🔥\n"))
+            return 7
+        if command == 7:
+            var pending = instance.close_async()
+            var canceller = stop(pending)
+            var ignored = await canceller
+            var result = await pending
+            return 4
+    return 99

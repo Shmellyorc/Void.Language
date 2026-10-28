@@ -1,0 +1,84 @@
+Identity	Source	Signature	Parameters documented	Return documented
+/@stdlib/log.void::level::variant::trace	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:11	trace	yes	n/a
+/@stdlib/log.void::level::variant::debug	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:13	debug	yes	n/a
+/@stdlib/log.void::level::variant::info	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:15	info	yes	n/a
+/@stdlib/log.void::level::variant::warn	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:17	warn	yes	n/a
+/@stdlib/log.void::level::variant::error	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:19	error	yes	n/a
+/@stdlib/log.void::level::variant::off	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:21	off	yes	n/a
+/@stdlib/log.void::level	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:9	enum level:	yes	n/a
+/@stdlib/log.void::console_sink::variant::none	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:26	none	yes	n/a
+/@stdlib/log.void::console_sink::variant::stdout	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:28	stdout	yes	n/a
+/@stdlib/log.void::console_sink::variant::stderr	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:30	stderr	yes	n/a
+/@stdlib/log.void::console_sink	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:24	enum console_sink:	yes	n/a
+/@stdlib/log.void::existing_files::variant::reject	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:35	reject	yes	n/a
+/@stdlib/log.void::existing_files::variant::adopt	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:37	adopt	yes	n/a
+/@stdlib/log.void::existing_files	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:33	enum existing_files:	yes	n/a
+/@stdlib/log.void::config::field::minimum	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:42	minimum: level = level.info	yes	n/a
+/@stdlib/log.void::config::field::name	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:44	name: string	yes	n/a
+/@stdlib/log.void::config::field::console	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:46	console: console_sink = console_sink.stderr	yes	n/a
+/@stdlib/log.void::config::field::timestamps	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:48	timestamps: bool = true	yes	n/a
+/@stdlib/log.void::config::field::file_path	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:50	file_path: string	yes	n/a
+/@stdlib/log.void::config::field::rotation_bytes	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:52	rotation_bytes: i64 = 8388608	yes	n/a
+/@stdlib/log.void::config::field::backups	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:54	backups: i32 = 3	yes	n/a
+/@stdlib/log.void::config::field::max_record_bytes	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:56	max_record_bytes: i64 = 65536	yes	n/a
+/@stdlib/log.void::config::field::existing	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:58	existing: existing_files = existing_files.reject	yes	n/a
+/@stdlib/log.void::config	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:40	value struct config:	yes	n/a
+/@stdlib/log.void::failure_kind::variant::invalid_config	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:63	invalid_config	yes	n/a
+/@stdlib/log.void::failure_kind::variant::invalid_level	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:65	invalid_level	yes	n/a
+/@stdlib/log.void::failure_kind::variant::record_too_large	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:67	record_too_large	yes	n/a
+/@stdlib/log.void::failure_kind::variant::busy	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:69	busy	yes	n/a
+/@stdlib/log.void::failure_kind::variant::closed	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:71	closed	yes	n/a
+/@stdlib/log.void::failure_kind::variant::faulted	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:73	faulted	yes	n/a
+/@stdlib/log.void::failure_kind::variant::clock	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:75	clock	yes	n/a
+/@stdlib/log.void::failure_kind::variant::console_io	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:77	console_io	yes	n/a
+/@stdlib/log.void::failure_kind::variant::file_io	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:79	file_io	yes	n/a
+/@stdlib/log.void::failure_kind::variant::rotation_io	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:81	rotation_io	yes	n/a
+/@stdlib/log.void::failure_kind::variant::cleanup_io	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:83	cleanup_io	yes	n/a
+/@stdlib/log.void::failure_kind	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:61	enum failure_kind:	yes	n/a
+/@stdlib/log.void::failure::field::kind	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:89	const kind: failure_kind	yes	n/a
+/@stdlib/log.void::failure::field::operation	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:91	const operation: string	yes	n/a
+/@stdlib/log.void::failure::field::console_cause	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:93	const console_cause: console.io_error?	yes	n/a
+/@stdlib/log.void::failure::field::file_cause	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:95	const file_cause: io.error?	yes	n/a
+/@stdlib/log.void::failure::field::clock_cause	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:97	const clock_cause: time.error?	yes	n/a
+/@stdlib/log.void::failure::field::cleanup_cause	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:99	const cleanup_cause: io.error?	yes	n/a
+/@stdlib/log.void::failure::field::console_attempted	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:101	const console_attempted: bool	yes	n/a
+/@stdlib/log.void::failure::field::file_attempted	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:103	const file_attempted: bool	yes	n/a
+/@stdlib/log.void::failure::field::console_complete	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:105	const console_complete: bool	yes	n/a
+/@stdlib/log.void::failure::field::file_complete	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:107	const file_complete: bool	yes	n/a
+/@stdlib/log.void::failure::field::console_bytes	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:109	const console_bytes: i64	yes	n/a
+/@stdlib/log.void::failure::field::file_bytes	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:111	const file_bytes: i64	yes	n/a
+/@stdlib/log.void::failure	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:87	struct failure extends core.error:	yes	n/a
+/@stdlib/log.void::logger	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:116	struct logger:	yes	n/a
+/@stdlib/log.void::logger::method::enabled	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:279	func (self logger) enabled(severity: level) -> bool:	yes	yes
+/@stdlib/log.void::open	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:654	func open(options: config = config()) -> result<logger, failure>:	yes	yes
+/@stdlib/log.void::logger::method::configure	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:682	func (self logger) configure(options: config) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::write	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:765	func (self logger) write(severity: level, message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::flush	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:775	func (self logger) flush() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::close	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:797	func (self logger) close() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::open_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:980	async func open_async(options: config = config()) -> result<logger, failure>:	yes	yes
+/@stdlib/log.void::logger::method::configure_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1008	async func (self logger) configure_async(options: config) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::write_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1091	async func (self logger) write_async(severity: level, message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::flush_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1101	async func (self logger) flush_async() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::close_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1123	async func (self logger) close_async() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::write_lazy	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1152	func (self logger) write_lazy(severity: level, make_message: func() -> string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::deinit	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1163	func (self logger) deinit():	yes	n/a
+/@stdlib/log.void::enabled	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1170	func enabled(severity: level) -> bool:	yes	yes
+/@stdlib/log.void::write_lazy	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1177	func write_lazy(severity: level, make_message: func() -> string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::trace	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1183	func (self logger) trace(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::trace	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1189	func trace(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::debug	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1195	func (self logger) debug(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::debug	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1201	func debug(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::info	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1207	func (self logger) info(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::info	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1213	func info(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::warn	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1219	func (self logger) warn(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::warn	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1225	func warn(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::logger::method::error	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1231	func (self logger) error(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::error	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1237	func error(message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::write	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1244	func write(severity: level, message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::flush	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1249	func flush() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::shutdown	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1254	func shutdown() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::configure	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1260	func configure(options: config) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::write_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1284	async func write_async(severity: level, message: string) -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::flush_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1289	async func flush_async() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::shutdown_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1294	async func shutdown_async() -> result<bool, failure>:	yes	yes
+/@stdlib/log.void::configure_async	/home/shmellyorc/Documents/Void.Language/stdlib/log.void:1300	async func configure_async(options: config) -> result<bool, failure>:	yes	yes

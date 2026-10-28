@@ -1,0 +1,115 @@
+use log
+use convert
+use io
+
+private var current: log.logger?
+private var settings = log.config(timestamps = false, console = log.console_sink.stdout,
+    file_path = "native.log", rotation_bytes = 64, max_record_bytes = 64, backups = 3)
+
+private func require(ok: bool):
+    if not ok:
+        var failed: result<bool, string> = Err("Native logging assertion failed")
+        convert.unwrap(failed)
+
+func entry(command: i32) -> i32:
+    if command == 0:
+        if current is Ok(var instance):
+            convert.unwrap(instance.close())
+        current = null
+        return 7
+    if command == 1:
+        current = convert.unwrap(log.open(settings))
+        return 7
+    if current is Ok(var instance):
+        if command == 2:
+            convert.unwrap(instance.info("A🔥\n"))
+            return 7
+        if command == 3:
+            convert.unwrap(instance.close())
+            return 7
+        if command == 4:
+            if instance.close() is Err(var problem):
+                require(problem.kind is log.failure_kind.cleanup_io)
+                require(problem.cleanup_cause != null)
+                if problem.cleanup_cause is Ok(var original):
+                    require(original.os_code == (5 as i64))
+            else:
+                require(false)
+            convert.unwrap(instance.close())
+            return 7
+        if command == 5:
+            if instance.info("A🔥\n") is Err(var problem):
+                require(problem.kind is log.failure_kind.console_io)
+                require(problem.console_attempted and problem.file_attempted)
+                require(not problem.console_complete and problem.file_complete)
+                require(problem.console_bytes == (2 as i64) and problem.file_bytes == (18 as i64))
+                if problem.console_cause is Ok(var original):
+                    require(original.os_code == (87 as i64) and original.cleanup_code == (19 as i64))
+                    require(original.partial_utf16_units == (1 as i64))
+                else:
+                    require(false)
+            else:
+                require(false)
+            return 7
+        if command == 6:
+            if instance.info("blocked") is Err(var problem):
+                require(problem.kind is log.failure_kind.faulted)
+            else:
+                require(false)
+            require(not convert.unwrap(instance.debug("filtered fault")))
+            return 7
+        if command == 7:
+            # An empty/truncated active file requires application repair before explicit recovery.
+            convert.unwrap(instance.configure(settings))
+            return 7
+        if command == 8:
+            if instance.info("A🔥\n") is Err(var problem):
+                require(problem.kind is log.failure_kind.rotation_io)
+                require(problem.file_attempted and problem.console_complete and not problem.file_complete)
+                require(problem.file_bytes == (0 as i64))
+                require(problem.file_cause != null or problem.cleanup_cause != null)
+            else:
+                require(false)
+            return 7
+        if command == 9:
+            if instance.configure(settings) is Err(var problem):
+                require(problem.kind is log.failure_kind.file_io)
+            else:
+                require(false)
+            return 7
+        if command == 12:
+            if instance.info("A🔥\n") is Err(var problem):
+                require(problem.kind is log.failure_kind.rotation_io)
+                if problem.file_cause is Ok(var original):
+                    require(original.kind is io.error_kind.permission_denied)
+                else:
+                    require(false)
+            else:
+                require(false)
+            return 7
+        if command == 10:
+            var replacement = settings
+            replacement.file_path = "replacement.log"
+            if instance.configure(replacement) is Err(var problem):
+                require(problem.kind is log.failure_kind.file_io)
+            else:
+                require(false)
+            return 7
+        if command == 11:
+            var recovery = settings
+            recovery.existing = log.existing_files.adopt
+            convert.unwrap(instance.configure(recovery))
+            return 7
+        if command >= 100 and command <= 117:
+            if instance.info("A🔥\n") is Err(var problem):
+                require(problem.kind is log.failure_kind.file_io)
+                require(problem.console_complete and problem.file_attempted and not problem.file_complete)
+                require(problem.file_bytes == ((command - 100) as i64))
+                if problem.file_cause is Ok(var original):
+                    require(original.bytes_transferred == problem.file_bytes)
+                else:
+                    require(false)
+            else:
+                require(false)
+            return 7
+    return -99

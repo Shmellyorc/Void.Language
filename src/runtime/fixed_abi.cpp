@@ -113,6 +113,16 @@ VD_LIST_QUERY(version)
 std::uint64_t vd_list_read(void** source,unsigned encoding,std::uint64_t index,vd::RuntimeFailure* failure) noexcept {
     std::uint64_t result=0;checked(failure,[&]{auto& r=vd::Runtime::current();result=r.list_read(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index);});return result;
 }
+std::uint64_t vd_list_read_index(void** source,unsigned encoding,std::uint64_t index,unsigned signed_index,vd::RuntimeFailure* failure) noexcept {
+    std::uint64_t result=0;
+    checked(failure,[&]{
+        if(signed_index>1)throw std::invalid_argument("invalid list index signedness");
+        auto& r=vd::Runtime::current();
+        try {result=r.list_read_index(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,signed_index!=0);}
+        catch(const std::out_of_range&) {failure->message="List index outside extent";}
+    });
+    return result;
+}
 void vd_list_write(void** source,unsigned encoding,std::uint64_t index,std::uint64_t bits,std::uint64_t version,unsigned selected,vd::RuntimeFailure* failure) noexcept {
     checked(failure,[&]{auto& r=vd::Runtime::current();r.list_write(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,bits,selected ? std::optional(version) : std::nullopt);});
 }

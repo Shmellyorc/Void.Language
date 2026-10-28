@@ -1,0 +1,583 @@
+    PID %CPU COMMAND
+      1  0.0 /sbin/init --switched-root --system --deserialize 6
+      2  0.0 [kthreadd]
+      3  0.0 [pool_workqueue_release]
+      4  0.0 [kworker/R-rcu_gp]
+      5  0.0 [kworker/R-sync_wq]
+      6  0.0 [kworker/R-kvfree_rcu_reclaim]
+      7  0.0 [kworker/R-slub_flushwq]
+      8  0.0 [kworker/R-netns]
+     14  0.0 [kworker/R-mm_percpu_wq]
+     15  0.0 [ksoftirqd/0]
+     16  0.1 [rcu_preempt]
+     17  0.0 [rcub/0]
+     18  0.0 [rcu_exp_par_gp_kthread_worker/0]
+     19  0.0 [rcu_exp_gp_kthread_worker]
+     20  0.0 [migration/0]
+     21  0.0 [kprobe-optimizer]
+     22  0.0 [idle_inject/0]
+     23  0.0 [cpuhp/0]
+     24  0.0 [cpuhp/1]
+     25  0.0 [idle_inject/1]
+     26  0.0 [migration/1]
+     27  0.0 [ksoftirqd/1]
+     29  0.0 [kworker/1:0H-kblockd]
+     30  0.0 [cpuhp/2]
+     31  0.0 [idle_inject/2]
+     32  0.0 [migration/2]
+     33  0.0 [ksoftirqd/2]
+     35  0.0 [kworker/2:0H-kblockd]
+     36  0.0 [cpuhp/3]
+     37  0.0 [idle_inject/3]
+     38  0.0 [migration/3]
+     39  0.0 [ksoftirqd/3]
+     41  0.0 [kworker/3:0H-kblockd]
+     42  0.0 [cpuhp/4]
+     43  0.0 [idle_inject/4]
+     44  0.0 [migration/4]
+     45  0.0 [ksoftirqd/4]
+     47  0.0 [kworker/4:0H-kblockd]
+     48  0.0 [cpuhp/5]
+     49  0.0 [idle_inject/5]
+     50  0.0 [migration/5]
+     51  0.0 [ksoftirqd/5]
+     53  0.0 [kworker/5:0H-kblockd]
+     54  0.0 [cpuhp/6]
+     55  0.0 [idle_inject/6]
+     56  0.0 [migration/6]
+     57  0.0 [ksoftirqd/6]
+     59  0.0 [kworker/6:0H-kblockd]
+     60  0.0 [cpuhp/7]
+     61  0.0 [idle_inject/7]
+     62  0.0 [migration/7]
+     63  0.0 [ksoftirqd/7]
+     65  0.0 [kworker/7:0H-kblockd]
+     66  0.0 [cpuhp/8]
+     67  0.0 [idle_inject/8]
+     68  0.0 [migration/8]
+     69  0.0 [ksoftirqd/8]
+     71  0.0 [kworker/8:0H]
+     72  0.0 [cpuhp/9]
+     73  0.0 [idle_inject/9]
+     74  0.0 [migration/9]
+     75  0.0 [ksoftirqd/9]
+     77  0.0 [kworker/9:0H-kblockd]
+     78  0.0 [cpuhp/10]
+     79  0.0 [idle_inject/10]
+     80  0.0 [migration/10]
+     81  0.0 [ksoftirqd/10]
+     83  0.0 [kworker/10:0H]
+     84  0.0 [cpuhp/11]
+     85  0.0 [idle_inject/11]
+     86  0.0 [migration/11]
+     87  0.0 [ksoftirqd/11]
+     89  0.0 [kworker/11:0H]
+     90  0.0 [cpuhp/12]
+     91  0.0 [idle_inject/12]
+     92  0.0 [migration/12]
+     93  0.0 [ksoftirqd/12]
+     95  0.0 [kworker/12:0H-events_highpri]
+     96  0.0 [cpuhp/13]
+     97  0.0 [idle_inject/13]
+     98  0.0 [migration/13]
+     99  0.0 [ksoftirqd/13]
+    101  0.0 [kworker/13:0H-kblockd]
+    102  0.0 [cpuhp/14]
+    103  0.0 [idle_inject/14]
+    104  0.0 [migration/14]
+    105  0.0 [ksoftirqd/14]
+    107  0.0 [kworker/14:0H-kblockd]
+    108  0.0 [cpuhp/15]
+    109  0.0 [idle_inject/15]
+    110  0.0 [migration/15]
+    111  0.0 [ksoftirqd/15]
+    113  0.0 [kworker/15:0H-kblockd]
+    116  0.0 [kdevtmpfs]
+    117  0.0 [kworker/R-inet_frag_wq]
+    118  0.0 [rcu_tasks_kthread]
+    119  0.0 [rcu_tasks_rude_kthread]
+    121  0.0 [kauditd]
+    122  0.0 [khungtaskd]
+    124  0.0 [oom_reaper]
+    126  0.0 [kworker/R-writeback]
+    127  0.0 [kcompactd0]
+    128  0.0 [ksmd]
+    129  0.0 [khugepaged]
+    130  0.0 [kworker/R-kblockd]
+    131  0.0 [kworker/R-blkcg_punt_bio]
+    132  0.0 [kworker/R-kintegrityd]
+    133  0.0 [irq/9-acpi]
+    140  0.0 [kworker/R-tpm_dev_wq]
+    141  0.0 [kworker/R-ata_sff]
+    142  0.0 [kworker/R-edac-poller]
+    143  0.0 [kworker/R-devfreq_wq]
+    144  0.0 [watchdogd]
+    145  0.0 [kworker/R-quota_events_unbound]
+    146  0.0 [kswapd0]
+    147  0.0 [kworker/R-kthrotld]
+    148  0.0 [kworker/u67:0]
+    149  0.0 [irq/27-aerdrv]
+    150  0.0 [irq/28-aerdrv]
+    151  0.0 [irq/29-aerdrv]
+    152  0.0 [irq/30-aerdrv]
+    153  0.0 [kworker/R-acpi_thermal_pm]
+    155  0.0 [scsi_eh_0]
+    156  0.0 [kworker/R-scsi_tmf_0]
+    157  0.0 [scsi_eh_1]
+    158  0.0 [kworker/R-scsi_tmf_1]
+    159  0.0 [scsi_eh_2]
+    160  0.0 [kworker/R-scsi_tmf_2]
+    161  0.0 [scsi_eh_3]
+    162  0.0 [kworker/R-scsi_tmf_3]
+    163  0.0 [scsi_eh_4]
+    164  0.0 [kworker/R-scsi_tmf_4]
+    165  0.0 [scsi_eh_5]
+    166  0.0 [kworker/R-scsi_tmf_5]
+    167  0.0 [scsi_eh_6]
+    168  0.0 [kworker/R-scsi_tmf_6]
+    169  0.0 [scsi_eh_7]
+    170  0.0 [kworker/R-scsi_tmf_7]
+    178  0.0 [scsi_eh_8]
+    179  0.0 [kworker/R-scsi_tmf_8]
+    182  0.0 [kworker/R-mld]
+    183  0.0 [kworker/R-ipv6_addrconf]
+    184  0.0 [kworker/R-kstrp]
+    193  0.0 [kworker/R-zswap-shrink]
+    205  0.0 [kworker/5:1H-kblockd]
+    222  0.0 [kworker/R-xfsalloc]
+    223  0.0 [kworker/R-xfs_mru_cache]
+    224  0.0 [kworker/R-xfs-buf/sda3]
+    225  0.0 [kworker/R-xfs-conv/sda3]
+    226  0.0 [kworker/R-xfs-reclaim/sda3]
+    227  0.0 [kworker/R-xfs-blockgc/sda3]
+    228  0.0 [kworker/R-xfs-inodegc/sda3]
+    229  0.0 [kworker/R-xfs-log/sda3]
+    230  0.0 [kworker/R-xfs-cil/sda3]
+    231  0.0 [xfsaild/sda3]
+    232  0.0 [kworker/2:1H-kblockd]
+    260  0.0 [kworker/4:1H-kblockd]
+    261  0.0 [kworker/12:1H-events_highpri]
+    262  0.0 [psimon]
+    275  0.0 [kworker/0:1H-kblockd]
+    279  0.0 /usr/lib/systemd/systemd-journald
+    305  0.0 [kworker/7:1H-kblockd]
+    307  0.0 [kworker/8:1H-kblockd]
+    308  0.0 [kworker/9:1H-kblockd]
+    312  0.0 /usr/lib/systemd/systemd-timesyncd
+    314  0.0 [ecryptfs-kthread]
+    319  0.0 /usr/lib/systemd/systemd-udevd
+    339  0.0 [kworker/3:1H-kblockd]
+    340  0.0 [kworker/6:1H-kblockd]
+    342  0.0 [psimon]
+    368  0.0 [kworker/1:1H-kblockd]
+    400  0.0 [kworker/11:1H-kblockd]
+    401  0.0 [kworker/10:1H-kblockd]
+   1310  0.0 [kworker/13:1H-kblockd]
+   1522  0.0 [ccp-1-q2]
+   1523  0.0 [ccp-1-q3]
+   1524  0.0 [ccp-1-q4]
+   1525  0.0 [hwrng]
+   2295  0.0 [jbd2/sda2-8]
+   2296  0.0 [kworker/R-ext4-rsv-conversion]
+   2370  0.0 /usr/sbin/rpcbind -f -w
+   2451  0.0 [kworker/15:1H-kblockd]
+   2454  0.0 /usr/bin/dbus-broker-launch --scope system --audit
+   2465  0.0 [kworker/R-amdgpu-reset-dev]
+   2473  0.0 dbus-broker --log 10 --controller 9 --machine-id 734b6c2e91214121b157355fd4c4275b --max-bytes 536870912 --max-fds 4096 --max-matches 131072 --audit
+   2474  0.1 /usr/bin/ananicy-cpp start
+   2475  0.0 /usr/sbin/NetworkManager --no-daemon
+   2476  0.0 /usr/libexec/accounts-daemon
+   2478  0.0 [kworker/R-ttm]
+   2479  0.0 avahi-daemon: running [gamedev.local]
+   2482  0.0 /usr/bin/dmemcg-booster --use-system-bus
+   2483  0.0 [kworker/R-rpciod]
+   2484  0.0 [kworker/R-xprtiod]
+   2502  0.0 avahi-daemon: chroot helper
+   2504  0.0 /usr/sbin/pikd
+   2507  0.0 /usr/sbin/rsyslogd -n -iNONE
+   2515  0.0 /usr/sbin/smartd -n
+   2518  0.0 /usr/bin/supergfxd
+   2519  0.0 /usr/libexec/switcheroo-control
+   2524  0.0 /usr/lib/systemd/systemd-logind
+   2525  0.0 /usr/libexec/udisks2/udisksd
+   2527  0.0 /usr/sbin/wpa_supplicant -u -s -O DIR=/run/wpa_supplicant GROUP=netdev
+   2623  0.0 /usr/sbin/cron -f
+   2626  0.0 [kworker/14:1H-kblockd]
+   2648  0.0 /usr/lib/polkit-1/polkitd --no-debug --log-level=notice
+   2666  0.0 /usr/libexec/xfsprogs/xfs_healer_start
+   2730  0.0 [kworker/R-cfg80211]
+   2823  0.0 /usr/libexec/xfsprogs/xfs_healer /
+   2838  0.0 /usr/sbin/cupsd -l
+   2840  0.0 /usr/bin/python3 /usr/sbin/tuned -l -P
+   2850  0.0 /usr/bin/sddm
+   2851  0.0 /usr/libexec/colord
+   2924  0.0 /usr/bin/python3 /usr/sbin/tuned-ppd -l
+   2954  0.0 /usr/libexec/upowerd
+   3149  0.0 /usr/sbin/cups-browsed
+   3186  0.0 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+   3187  0.0 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+   3188  0.0 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+   3189  0.0 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+   3190  0.0 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+   3191  0.0 [kworker/R-dm_vblank_control_workqueue]
+   3192  0.0 [kworker/R-hdmi_frl_status_polling_workque]
+   3193  0.0 [card1-crtc0]
+   3194  0.0 [card1-crtc1]
+   3195  0.0 [card1-crtc2]
+   3196  0.0 [card1-crtc3]
+   3197  0.0 [card1-crtc4]
+   3198  0.0 [kworker/R-gfx_0.0.0]
+   3199  0.0 [kworker/R-gfx_0.1.0]
+   3200  0.0 [kworker/R-comp_1.0.0]
+   3201  0.0 [kworker/R-comp_1.1.0]
+   3202  0.0 [kworker/R-comp_1.2.0]
+   3203  0.0 [kworker/R-comp_1.3.0]
+   3204  0.0 [kworker/R-comp_1.0.1]
+   3205  0.0 [kworker/R-comp_1.1.1]
+   3206  0.0 [kworker/R-comp_1.2.1]
+   3207  0.0 [kworker/R-comp_1.3.1]
+   3208  0.0 [kworker/R-sdma0]
+   3209  0.0 [kworker/R-sdma1]
+   3210  0.0 [kworker/R-vcn_dec_0]
+   3211  0.0 [kworker/R-vcn_enc_0.0]
+   3212  0.0 [kworker/R-vcn_enc_0.1]
+   3213  0.0 [kworker/R-jpeg_dec]
+   3270  0.0 /usr/lib/cups/notifier/dbus dbus://
+   4379  0.0 /usr/lib/x86_64-linux-gnu/sddm/sddm-helper --socket /tmp/sddm-auth-05a8ccfe-2930-4d7d-a277-a93aca26e6e5 --id 3 --start /usr/lib/x86_64-linux-gnu/libexec/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland --user shmellyorc
+   4380  0.0 [kworker/R-iprt-VBoxWQueue]
+   4389  0.0 /usr/lib/systemd/systemd --user
+   4391  0.0 (sd-pam)
+   4403  0.0 [iprt-VBoxTscThread]
+   4419  0.0 /usr/bin/dbus-broker-launch --scope user
+   4424  0.0 dbus-broker --log 11 --controller 10 --machine-id 734b6c2e91214121b157355fd4c4275b --max-bytes 100000000000000 --max-fds 25000000000000 --max-matches 5000000000
+   4425  0.0 /usr/bin/mpris-proxy
+   4426  0.4 /usr/bin/pipewire
+   4428  0.0 /usr/bin/wireplumber
+   4429  0.0 /usr/bin/pipewire -c filter-chain.conf
+   4430  0.5 /usr/bin/pipewire-pulse
+   4447  0.0 /usr/bin/ksecretd --pam-login 13 14
+   4448  0.0 /usr/bin/startplasma-wayland
+   4575  0.1 /usr/bin/falcond
+   4577  0.0 /usr/bin/scx_loader
+   4597  0.0 /usr/bin/dmemcg-booster
+   4599  0.0 /usr/bin/kwin_wayland_wrapper --xwayland
+   4600  0.0 /usr/bin/ssh-agent -D
+   4611  6.0 /usr/bin/kwin_wayland --wayland-fd 7 --socket wayland-0 --xwayland-fd 8 --xwayland-fd 9 --xwayland-display :0 --xwayland-xauthority /run/user/1000/xauth_NerLIw --xwayland
+   4612  0.0 /usr/libexec/gvfsd
+   4625  0.0 /usr/libexec/gvfsd-fuse /run/user/1000/gvfs -f
+   4696  1.0 /usr/bin/Xwayland :0 -auth /run/user/1000/xauth_NerLIw -listenfd 8 -listenfd 9 -displayfd 102 -wm 110 -rootless
+   4769  0.0 /usr/bin/ksmserver
+   4771  0.0 /usr/bin/kded6
+   4786  0.1 /usr/bin/plasmashell --no-respawn
+   4829  0.0 /usr/libexec/dconf-service
+   4831  0.0 /usr/lib/x86_64-linux-gnu/libexec/kactivitymanagerd
+   4836  0.0 /usr/bin/gmenudbusmenuproxy
+   4837  0.0 /usr/bin/kaccess
+   4838  0.0 /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1
+   4839  0.0 /usr/lib/x86_64-linux-gnu/libexec/org_kde_powerdevil
+   4840  0.0 /usr/bin/xembedsniproxy
+   4905  0.0 /usr/libexec/bluetooth/obexd
+   5022  0.0 /usr/bin/kdeconnectd
+   5123  0.2 /opt/Fluxer Canary/fluxer-canary --autostart
+   5135  0.0 /bin/bash /usr/bin/pikman-update-manager-autostart
+   5141  0.0 /usr/libexec/xdg-desktop-portal
+   5148  0.0 /usr/lib/x86_64-linux-gnu/libexec/DiscoverNotifier --check-delay 20
+   5170  0.0 /usr/libexec/xdg-permission-store
+   5177  0.0 /usr/libexec/xdg-document-portal
+   5184  0.0 fusermount3 -o rw,nosuid,nodev,fsname=portal,auto_unmount,subtype=portal -- /run/user/1000/doc
+   5189  0.0 /usr/libexec/xdg-desktop-portal-gtk
+   5227  0.0 /opt/Fluxer Canary/fluxer-canary --type=zygote --no-zygote-sandbox
+   5228  0.0 /usr/lib/x86_64-linux-gnu/libexec/xdg-desktop-portal-kde
+   5229  0.0 /opt/Fluxer Canary/fluxer-canary --type=zygote
+   5232  0.0 /opt/Fluxer Canary/fluxer-canary --type=zygote
+   5328  0.0 /opt/Fluxer Canary/fluxer-canary --type=gpu-process --ozone-platform=wayland --render-node-override=/dev/dri/renderD128 --enable-crash-reporter=e6ed7e09-fcfb-432d-b482-42daafb3fec7,no_channel --user-data-dir=/home/shmellyorc/.config/fluxercanary --gpu-preferences=YAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAASAAAAAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAMAAAAAQAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --field-trial-handle=3,i,13654738005828907054,1690064854668396989,262144 --enable-features=AcceleratedVideoEncoder,PdfUseShowSaveFilePicker,WebRTCPipeWireCapturer --disable-features=AllowAggressiveThrottlingWithWebSocket,DropInputEventsWhilePaintHolding,HardwareMediaKeyHandling,IntensiveWakeUpThrottling,LocalNetworkAccessChecks,MediaSessionService,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation,UseEcoQoSForBackgroundProcess,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --pseudonymization-salt-handle=7,i,3476733174086255914,14724660837940878370,4 --trace-process-track-uuid=3190708988185955192
+   5333  0.0 /opt/Fluxer Canary/fluxer-canary --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --enable-crash-reporter=e6ed7e09-fcfb-432d-b482-42daafb3fec7,no_channel --user-data-dir=/home/shmellyorc/.config/fluxercanary --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,13654738005828907054,1690064854668396989,262144 --enable-features=AcceleratedVideoEncoder,PdfUseShowSaveFilePicker,WebRTCPipeWireCapturer --disable-features=AllowAggressiveThrottlingWithWebSocket,DropInputEventsWhilePaintHolding,HardwareMediaKeyHandling,IntensiveWakeUpThrottling,LocalNetworkAccessChecks,MediaSessionService,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation,UseEcoQoSForBackgroundProcess,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --pseudonymization-salt-handle=7,i,3476733174086255914,14724660837940878370,4 --trace-process-track-uuid=3190708989122997041
+   5458  0.6 /opt/Fluxer Canary/fluxer-canary --type=renderer --enable-crash-reporter=e6ed7e09-fcfb-432d-b482-42daafb3fec7,no_channel --user-data-dir=/home/shmellyorc/.config/fluxercanary --app-path=/opt/Fluxer Canary/resources/app.asar --no-sandbox --no-zygote --enable-blink-features=EnumerateDevices,AudioOutputDevices --autoplay-policy=no-user-gesture-required --ozone-platform=wayland --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=5 --launch-time-ticks=37177360 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,13654738005828907054,1690064854668396989,262144 --enable-features=AcceleratedVideoEncoder,PdfUseShowSaveFilePicker,WebRTCPipeWireCapturer --disable-features=AllowAggressiveThrottlingWithWebSocket,DropInputEventsWhilePaintHolding,HardwareMediaKeyHandling,IntensiveWakeUpThrottling,LocalNetworkAccessChecks,MediaSessionService,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation,UseEcoQoSForBackgroundProcess,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --pseudonymization-salt-handle=7,i,3476733174086255914,14724660837940878370,4 --trace-process-track-uuid=3190708990997080739
+   5605  0.0 /usr/bin/kwalletd6
+   5689  0.0 /opt/Fluxer Canary/fluxer-canary --type=utility --utility-sub-type=audio.mojom.AudioService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --enable-crash-reporter=e6ed7e09-fcfb-432d-b482-42daafb3fec7,no_channel --user-data-dir=/home/shmellyorc/.config/fluxercanary --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,13654738005828907054,1690064854668396989,262144 --enable-features=AcceleratedVideoEncoder,PdfUseShowSaveFilePicker,WebRTCPipeWireCapturer --disable-features=AllowAggressiveThrottlingWithWebSocket,DropInputEventsWhilePaintHolding,HardwareMediaKeyHandling,IntensiveWakeUpThrottling,LocalNetworkAccessChecks,MediaSessionService,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation,UseEcoQoSForBackgroundProcess,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --pseudonymization-salt-handle=7,i,3476733174086255914,14724660837940878370,4 --trace-process-track-uuid=3190708991934122588
+   5899  0.0 pikman-update-manager --hidden
+   8757  0.0 /usr/lib/virtualbox/VirtualBox
+   8784  0.1 /usr/lib/virtualbox/VBoxSVC --auto-shutdown --inherit-startup-pipe 12
+   8877  0.0 [kworker/R-dio/sda3]
+  18345  0.0 /usr/libexec/gvfsd-metadata
+  34029  1.3 /usr/lib/chatgpt/ChatGPT
+  34039  0.0 /usr/lib/chatgpt/browser_crashpad_handler --monitor-self --monitor-self-annotation=ptype=crashpad-handler --database=/home/shmellyorc/.config/Codex/Crash Reports --annotation=lsb-release=PikaOS 4 --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=155.0.8059.80 --initial-client-fd=5 --shared-client-connection
+  34041  0.0 /usr/lib/chatgpt/browser_crashpad_handler --no-periodic-tasks --monitor-self-annotation=ptype=crashpad-handler --database=/home/shmellyorc/.config/Codex/Crash Reports --annotation=lsb-release=PikaOS 4 --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=155.0.8059.80 --initial-client-fd=4 --shared-client-connection
+  34049  0.0 /usr/lib/chatgpt/ChatGPT --type=zygote --no-zygote-sandbox --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --change-stack-guard-on-fork=enable
+  34050  0.0 /usr/lib/chatgpt/ChatGPT --type=zygote --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --change-stack-guard-on-fork=enable
+  34063  0.0 /usr/lib/chatgpt/ChatGPT --type=zygote --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --change-stack-guard-on-fork=enable
+  34091  7.8 /usr/lib/chatgpt/ChatGPT --type=gpu-process --gpu-recent-crash-count=0 --ozone-platform=x11 --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --change-stack-guard-on-fork=enable --gpu-preferences=YAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAASAAAAAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAAAEAAAAAAAAACAAAAAAAAAAMAAAAAQAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=4,i,10409016356602464326,9479538960329934906,262144 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708988185955192
+  34096  0.0 /usr/lib/chatgpt/ChatGPT --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,9340588285291209650,14596284703234999116,524288 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708989122997041
+  34106  0.0 /usr/lib/chatgpt/ChatGPT --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=utility --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,14605282289940295102,8016525574863359455,524288 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708990060038890
+  34504  0.0 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=6 --launch-time-ticks=30541097375 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,4956691867117443443,17899748621798552013,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708991934122588
+  34505  5.5 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=5 --launch-time-ticks=30541100036 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,7056350476680331883,3447033939112302195,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708990997080739 --force-fieldtrials=WebRTC-Sctp-Snap/Enabled/WebRTC-IceHandshakeDtls/Enabled/WebRTC-ForceDtls13/Enabled/
+  34523  0.5 /usr/lib/chatgpt/resources/codex -c features.code_mode_host=true app-server --analytics-default-enabled -c plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled=true -c plugins.code-review@openai-bundled.mcp_servers.code-review.enabled=true
+  34648  0.0 /usr/lib/chatgpt/ChatGPT --type=utility --utility-sub-type=audio.mojom.AudioService --lang=en-US --service-sandbox-type=none --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,10578884172542211676,14896990621139710215,524288 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708992871164437
+  34753  0.0 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=8 --launch-time-ticks=30549335370 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,307204449034302109,11026462925190185444,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708993808206286 --force-fieldtrials=WebRTC-Sctp-Snap/Enabled/WebRTC-IceHandshakeDtls/Enabled/WebRTC-ForceDtls13/Enabled/
+  35051  0.0 /home/shmellyorc/.config/Codex/artifact-sessions/runtime-generations/generation-BTkQNP/runtime/bin/node /home/shmellyorc/.config/Codex/artifact-sessions/runtime-generations/generation-BTkQNP/runtime/node_modules/@oai/artifact-tool/dist/artifact-session/host-daemon.mjs
+  35159  0.2 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=10 --launch-time-ticks=30556237671 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,16194944579263092076,15540690446313821356,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708995682289984 --force-fieldtrials=WebRTC-Sctp-Snap/Enabled/WebRTC-IceHandshakeDtls/Enabled/WebRTC-ForceDtls13/Enabled/
+  35172  0.0 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=12 --launch-time-ticks=30556568675 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,17456886353871159917,8680180316151428866,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708997556373682
+  35322  0.0 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=14 --launch-time-ticks=30557399505 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,14311970245850531686,6036391398483387731,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190708999430457380
+  35521  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+  35522  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+  35528  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+  35537  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+  35575  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+  36395  0.0 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=34039 --enable-crash-reporter=, --user-data-dir=/home/shmellyorc/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=18 --launch-time-ticks=30561733761 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,6106671468439516556,7218216252243777680,1572864 --field-trial-handle=3,i,17889694108700082060,6157061379232774808,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16233497730986063363,8677654478820511319,4 --trace-process-track-uuid=3190709003178624776
+  36874  0.0 /usr/lib/chatgpt/resources/codex-code-mode-host
+  59176  0.0 /usr/libexec/fwupd/fwupd
+  59192  0.0 [psimon]
+ 407864  0.2 /usr/share/code/code
+ 407871  0.0 /usr/share/code/code --type=zygote --no-zygote-sandbox
+ 407872  0.0 /usr/share/code/code --type=zygote
+ 407874  0.0 /usr/share/code/code --type=zygote
+ 407890  0.0 /usr/share/code/chrome_crashpad_handler --monitor-self-annotation=ptype=crashpad-handler --no-rate-limit --database=/home/shmellyorc/.config/Code/Crashpad --url=appcenter://code?aid=fba07a4d-84bd-4fc8-a125-9640fc8ce171&uid=523cc17e-c68a-42b8-91dd-18709d03c3d1&iid=523cc17e-c68a-42b8-91dd-18709d03c3d1&sid=523cc17e-c68a-42b8-91dd-18709d03c3d1 --annotation=_companyName=Microsoft --annotation=_productName=VSCode --annotation=_version=1.143.0 --annotation=lsb-release=PikaOS 4 --annotation=plat=Linux --annotation=prod=Electron --annotation=ver=43.7.7 --initial-client-fd=36 --shared-client-connection
+ 407911  0.2 /usr/share/code/code --type=gpu-process --ozone-platform=wayland --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --gpu-preferences=WAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAAQAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190708988185955192
+ 407913  0.0 /usr/share/code/code --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190708989122997041
+ 408204  0.1 /usr/share/code/code --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190708990997080739
+ 408239  0.0 /usr/share/code/code --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190708992871164437
+ 440778  0.7 /usr/share/code/code --type=renderer --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --app-path=/usr/share/code/resources/app --enable-sandbox --enable-blink-features=HighlightAPI --max-active-webgl-contexts=32 --ozone-platform=wayland --disable-blink-features=FontMatchingCTMigration,StandardizedBrowserZoom, --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=13 --time-ticks-at-unix-epoch=-1792910949369895 --launch-time-ticks=78079185053 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190708998493415531 --vscode-window-config=vscode:8df93ceb-78e4-4d45-ab7e-6f3572a303e0
+ 440879  0.1 /usr/share/code/code --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --dns-result-order=ipv4first --experimental-network-inspection --inspect-port=0 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190709001304541078
+ 440884  0.2 /usr/share/code/code --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190709002241582927
+ 440924  0.0 /usr/share/code/code /usr/share/code/resources/app/extensions/markdown-language-features/dist/serverWorkerMain --node-ipc --clientProcessId=440879
+ 440934  0.0 /usr/bin/bash --init-file /usr/share/code/resources/app/out/vs/workbench/contrib/terminal/common/scripts/shellIntegration-bash.sh
+ 441980  0.0 /usr/share/code/code /usr/share/code/resources/app/extensions/json-language-features/server/dist/node/jsonServerMain --node-ipc --clientProcessId=440879
+ 442587  0.2 /usr/share/code/code --type=renderer --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --app-path=/usr/share/code/resources/app --enable-sandbox --enable-blink-features=HighlightAPI --max-active-webgl-contexts=32 --ozone-platform=wayland --disable-blink-features=FontMatchingCTMigration,StandardizedBrowserZoom, --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=18 --time-ticks-at-unix-epoch=-1792910949369895 --launch-time-ticks=78219866785 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190709003178624776 --vscode-window-config=vscode:cc60cfb3-0408-4c86-a2b1-210154e4d5c7
+ 442677  0.0 /usr/share/code/code --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --dns-result-order=ipv4first --experimental-network-inspection --inspect-port=0 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190709005989750323
+ 442678  0.0 /usr/share/code/code --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=407890 --enable-crash-reporter=b166a365-7634-4f2f-bb5c-de1daff926e2,no_channel --user-data-dir=/home/shmellyorc/.config/Code --standard-schemes=vscode-webview,vscode-file --enable-sandbox --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,9803613052082552155,17516264721195907288,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,HideCursorWhileTyping,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,12973627225436530117,18335292849646985299,4 --trace-process-track-uuid=3190709006926792172
+ 442724  0.0 /usr/bin/bash --init-file /usr/share/code/resources/app/out/vs/workbench/contrib/terminal/common/scripts/shellIntegration-bash.sh
+ 444988  0.0 /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls --entry /home/shmellyorc/Documents/Void.Language/stdlib/time.void
+ 517205  0.0 /home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidls --entry /home/shmellyorc/Documents/TestGame/main.void
+ 668557  0.0 /usr/bin/konsole
+ 668570  0.0 /bin/bash
+ 669332  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 669333  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 669350  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 669369  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 669394  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 669442  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 777950  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 777951  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 777959  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 777966  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 777972  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 778052  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 796832  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 796833  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 796839  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 796846  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 796863  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 796881  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 796920  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 796975  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 796993  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 797009  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 797032  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 797054  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 797079  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 797113  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 797123  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 797125  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 797157  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 797231  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 797261  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 797294  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 797329  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 797347  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 833636  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 833638  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 833645  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 833653  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 833660  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 833716  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 844334  0.1 /opt/Fluxer Canary/fluxer-canary --type=renderer --enable-crash-reporter=e6ed7e09-fcfb-432d-b482-42daafb3fec7,no_channel --user-data-dir=/home/shmellyorc/.config/fluxercanary --app-path=/opt/Fluxer Canary/resources/app.asar --enable-sandbox --enable-blink-features=EnumerateDevices,AudioOutputDevices --autoplay-policy=no-user-gesture-required --ozone-platform=wayland --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=10 --launch-time-ticks=166233505915 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,13654738005828907054,1690064854668396989,262144 --enable-features=AcceleratedVideoEncoder,PdfUseShowSaveFilePicker,WebRTCPipeWireCapturer --disable-features=AllowAggressiveThrottlingWithWebSocket,DropInputEventsWhilePaintHolding,HardwareMediaKeyHandling,IntensiveWakeUpThrottling,LocalNetworkAccessChecks,MediaSessionService,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation,UseEcoQoSForBackgroundProcess,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --pseudonymization-salt-handle=7,i,3476733174086255914,14724660837940878370,4 --trace-process-track-uuid=3190708995682289984
+ 850932  0.0 [kworker/14:0-events]
+ 876743  0.0 [kworker/0:2H]
+ 881583  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 881586  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 881592  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 881600  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 881619  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 881667  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 894209  0.0 /usr/lib/x86_64-linux-gnu/libexec/kf6/kiod6
+ 970536  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 970537  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 970555  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+ 970580  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+ 970592  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+ 970602  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1175108  0.0 /usr/share/code/code /usr/share/code/resources/app/extensions/markdown-language-features/dist/serverWorkerMain --node-ipc --clientProcessId=442677
+1190518  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1190522  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1190528  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1190546  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1190592  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1190672  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277652  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1277661  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1277669  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1277678  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277681  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277705  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277722  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277777  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277835  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277884  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1277941  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1277977  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278005  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278037  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1278060  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278092  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278101  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278120  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1278143  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278195  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278213  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278228  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278259  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278377  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1278406  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1278462  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278480  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278506  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278507  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278642  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278684  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278713  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1278743  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278776  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278790  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278797  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278818  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1278863  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278913  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278936  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1278943  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1278988  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1279030  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1279072  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1279134  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1279161  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1279197  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1287590  0.0 /usr/lib/chatgpt/resources/codex -c forced_login_method="chatgpt" exec-server --remote https://codex-cloud-environments.chatgpt.com/api --environment-id ccarenv_b64_Y2NhcmVudl82YWJmMjEyMTNmYTg4MTkxODJlNjdlMmJkNWM3Mzk5MQ
+1341162  0.0 /bin/bash /usr/bin/brave-browser-stable
+1341166  0.0 cat
+1341167  0.0 cat
+1341168  4.0 /opt/brave.com/brave/brave
+1341170  0.0 /opt/brave.com/brave/chrome_crashpad_handler --monitor-self --monitor-self-annotation=ptype=crashpad-handler --user-stream-region=4,65568 --database=/home/shmellyorc/.config/BraveSoftware/Brave-Browser/Crash Reports --metrics-dir=/home/shmellyorc/.config/BraveSoftware/Brave-Browser --url=https://cr.brave.com --annotation=lsb-release=PikaOS 4 --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=156.1.98.60 --initial-client-fd=7 --shared-client-connection
+1341172  0.0 /opt/brave.com/brave/chrome_crashpad_handler --no-periodic-tasks --monitor-self-annotation=ptype=crashpad-handler --database=/home/shmellyorc/.config/BraveSoftware/Brave-Browser/Crash Reports --url=https://cr.brave.com --annotation=lsb-release=PikaOS 4 --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=156.1.98.60 --initial-client-fd=4 --shared-client-connection
+1341182  0.0 /opt/brave.com/brave/brave --type=zygote --no-zygote-sandbox --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable
+1341183  0.0 /opt/brave.com/brave/brave --type=zygote --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable
+1341185  0.0 /opt/brave.com/brave/brave --type=zygote --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable
+1341220 42.2 /opt/brave.com/brave/brave --type=gpu-process --gpu-recent-crash-count=0 --ozone-platform=wayland --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable --gpu-preferences=YAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAASAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAACAAAAAAAAAA= --use-gl=disabled --shared-files --metrics-shmem-handle=4,i,9020281254338205066,15734905893501191459,262144 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190708988185955192
+1341222  1.9 /opt/brave.com/brave/brave --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,8148874358401935530,2886087336184995144,524288 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190708989122997041
+1341239  0.0 /opt/brave.com/brave/brave --type=broker
+1341249  0.0 /opt/brave.com/brave/brave --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=utility --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,8118874015813840387,12654228161738261049,524288 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190708990060038890
+1341272  0.2 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --extension-process --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=6 --launch-time-ticks=263222392499 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,3464948762961580085,16112480637571186474,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190708991934122588
+1341350  7.1 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=20 --launch-time-ticks=263222599741 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,1988348513067118131,14396014561819562239,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709005052708474
+1341351 23.2 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=16 --launch-time-ticks=263222601788 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,5738478068389500985,16117046174374091629,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709001304541078
+1341366  0.3 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --extension-process --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=21 --launch-time-ticks=263222610368 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,5991834634528996479,1588919426044072073,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709005989750323
+1341386  0.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=15 --launch-time-ticks=263222684313 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,11226411545306273105,7471281986398877497,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709000367499229
+1341408  0.2 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --extension-process --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=22 --launch-time-ticks=263222743802 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,15223759722565106552,14468128254866539451,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709006926792172
+1341436  0.0 /usr/bin/plasma-browser-integration-host chrome-extension://cimiefiiaegbelhefglklhhakcgmhkai/
+1341535  0.2 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=25 --launch-time-ticks=263225547678 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,16472539882824557793,1918474578975625725,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709009737917719
+1341559  4.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=26 --launch-time-ticks=263225986343 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,10723839641921784806,7492425633166160890,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709010674959568
+1341573  0.6 /opt/brave.com/brave/brave --type=utility --utility-sub-type=audio.mojom.AudioService --lang=en-US --service-sandbox-type=none --render-node-override=/dev/dri/renderD128 --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,18088902675967146886,5682636788743708157,524288 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709011612001417
+1341687  0.5 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=35 --launch-time-ticks=263228489496 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,5523241562740268611,14969263437214824192,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709019108336209
+1341787  0.1 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=37 --launch-time-ticks=263232992661 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,3510984571859573093,10114122100832704422,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709020982419907
+1341812 32.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=38 --launch-time-ticks=263235069788 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,7979672120416381988,13781388232841798001,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709021919461756
+1341838  0.1 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=39 --launch-time-ticks=263235925063 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,5013655629030669477,3918993269360879072,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709022856503605
+1341883  0.4 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=42 --launch-time-ticks=263239906822 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,1026932800155887792,3613067094397029582,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709025667629152
+1341894  0.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=8 --launch-time-ticks=263240008761 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,3183162392331412435,18438292279056126672,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190708993808206286
+1341985  0.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=18 --launch-time-ticks=263246073653 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,8661730325802597459,4484231633677990068,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709003178624776
+1342006  0.1 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=13 --launch-time-ticks=263247003253 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,9675056988617262821,11952150044738493851,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190708998493415531
+1372358  0.0 [kworker/15:0-mm_percpu_wq]
+1372596  0.0 [kworker/13:0-mm_percpu_wq]
+1374436  0.0 [kworker/5:0-events]
+1374524  0.0 [kworker/4:0-events]
+1375155  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1375156  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1375179  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1375182  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1375211  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1375277  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1377478  0.0 [kworker/7:2-mm_percpu_wq]
+1380825  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node /usr/lib/chatgpt/resources/cua_node/lib/node_modules/@oai/cua-repl/bin/cua-repl.mjs
+1380838  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1380852  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+1380859  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1380861  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1380884  0.0 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+1393859  0.0 [kworker/14:1-events]
+1394357  0.0 [kworker/13:1]
+1416886  0.0 [kworker/u69:13-ttm]
+1420040  0.2 [kworker/6:0-events]
+1446883  0.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=74 --launch-time-ticks=278064564534 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,14440993327781106208,14293901282938069394,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709055652968320
+1460309  0.0 [kworker/8:0-xfs-conv/sda3]
+1462830  0.0 [kworker/9:1-xfs-conv/sda3]
+1482840  0.0 [kworker/u68:6-ttm]
+1493049  0.0 [kworker/0:0-events]
+1515028  0.0 [kworker/10:2-xfs-conv/sda3]
+1515568  0.0 [kworker/11:0-mm_percpu_wq]
+1522578  0.0 [kworker/3:2-events]
+1536178  0.0 [kworker/1:4-xfs-conv/sda3]
+1536832  0.0 [kworker/u66:0-events_unbound]
+1538146  0.0 [kworker/2:1-mm_percpu_wq]
+1538285  0.0 [kworker/u64:0-gfx_0.1.0]
+1538533  0.0 [kworker/u68:7-ttm]
+1538665  0.0 [kworker/11:2]
+1538691  0.0 [kworker/12:3-xfs-conv/sda3]
+1538797  0.0 [kworker/9:0-mm_percpu_wq]
+1538869  0.0 [kworker/u66:1-events_power_efficient]
+1538884  0.3 /usr/bin/dolphin
+1539116  0.0 [kworker/4:2]
+1539152  0.0 [kworker/u64:3-sdma0]
+1539268  0.0 [kworker/3:0-events]
+1539405  0.0 [kworker/u69:5-ttm]
+1539408  0.0 [kworker/u69:8-ttm]
+1539532  0.0 [kworker/15:1]
+1539602  0.0 [kworker/5:1-events]
+1539653  0.0 [kworker/u66:2-events_power_efficient]
+1539696  0.0 [kworker/u68:2-ttm]
+1539852  0.0 /opt/brave.com/brave/brave --type=renderer --crashpad-handler-pid=1341170 --enable-crash-reporter=63560875-f2c6-4000-9c5e-958704b41eb5, --enable-distillability-service --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= --change-stack-guard-on-fork=enable --ozone-platform=wayland --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=85 --launch-time-ticks=282980369181 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,4735835711929117026,8700654622880778214,1572864 --field-trial-handle=3,i,8123605512926139879,11839717283534874998,262144 --variations-seed-version=main@ae0ad7cf58a8b1565ad93ac5f9ecb806c2bb843e --pseudonymization-salt-handle=7,i,9135002982538692680,6325657491178860565,4 --trace-process-track-uuid=3190709065960428659
+1539871  0.0 [kworker/12:0-xfs-conv/sda3]
+1539887  0.0 [kworker/1:0]
+1539983  0.0 [kworker/8:2-mm_percpu_wq]
+1540016  0.0 [kworker/6:1-events]
+1540036  0.0 [kworker/2:2-mm_percpu_wq]
+1540046  0.0 [kworker/u69:0-ttm]
+1540047  0.0 [kworker/u69:1-ttm]
+1540048  0.0 [kworker/u68:0-ttm]
+1540049  0.0 [kworker/u68:1-ttm]
+1540050  0.0 [kworker/u68:3-ttm]
+1540051  0.0 [kworker/u68:4-ttm]
+1540052  0.0 [kworker/u68:5-ttm]
+1540053  0.0 [kworker/u68:8-ttm]
+1540209  0.2 [kworker/u65:0-events_unbound]
+1540211  0.0 [kworker/u65:5-writeback]
+1540212  0.0 [kworker/u65:6-flush-8:0]
+1540213  0.1 [kworker/u65:7-flush-8:0]
+1540215  0.0 [kworker/u69:2-ttm]
+1540216  0.0 [kworker/u69:3-ttm]
+1540217  0.0 [kworker/u69:4-ttm]
+1540368  0.0 [kworker/0:2-events]
+1540369  0.0 [kworker/u69:6-ttm]
+1540370  0.0 [kworker/u69:7-ttm]
+1540429  0.0 [kworker/7:1]
+1540443  0.1 [kworker/u64:2-sdma0]
+1540474  0.0 [kworker/10:0-mm_percpu_wq]
+1540567  0.0 [kworker/u68:10-ttm]
+1540578  0.0 [kworker/u68:11-ttm]
+1540589  0.0 [kworker/u69:9-ttm]
+1540611  0.0 [kworker/u69:10-ttm]
+1540652  0.0 [kworker/8:1]
+1540714  0.0 [kworker/2:0]
+1540715  0.0 [kworker/1:1-events]
+1540797  4.5 python3 tests/log/performance_baseline.py
+1541115  0.0 [kworker/0:1-events]
+1541389  0.0 [kworker/12:1]
+1541457  0.0 [kworker/u64:1-gfx_0.1.0]
+1541499  0.0 [kworker/u66:3-events_power_efficient]
+1541812  0.0 [kworker/9:2-mm_percpu_wq]
+1541819  0.0 ps -eo pid,pcpu,args

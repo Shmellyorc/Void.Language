@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+    Start 265: io_native_jobs
+1/5 Test #265: io_native_jobs ...................   Passed    0.00 sec
+    Start 269: async_source
+2/5 Test #269: async_source .....................   Passed    5.16 sec
+    Start 272: async_ir
+3/5 Test #272: async_ir .........................   Passed    0.05 sec
+    Start 273: async_parallel
+4/5 Test #273: async_parallel ...................   Passed    1.42 sec
+    Start 274: async_lifecycle
+5/5 Test #274: async_lifecycle ..................   Passed    2.38 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   9.03 sec

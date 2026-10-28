@@ -1,0 +1,10 @@
+"""Keep compiler/runner assertions inside the shared recorder's scope."""
+from pathlib import Path
+import sys
+import tempfile
+import support as h
+exe = Path(sys.argv[1]).resolve()
+with tempfile.TemporaryDirectory(prefix='VOID-log-host-') as directory:
+    result = h.run([exe, h.ROOT, directory, *sys.argv[2:]], sources=[h.ROOT / 'tests/log', Path(directory)], timeout=1800,
+                   context={'mode': 'host-gc-allocation-cache-reload'})
+    print(result.stdout.decode(), end='')

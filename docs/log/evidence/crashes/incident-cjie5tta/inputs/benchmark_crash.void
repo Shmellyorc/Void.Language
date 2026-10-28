@@ -1,0 +1,130 @@
+use log
+use io
+use console
+use convert
+
+private var display_calls: i32 = 0
+private var builder_calls: i32 = 0
+
+value struct displayed:
+    value: i32
+func (self displayed) string() -> string:
+    display_calls++
+    return "value={self.value}"
+
+private func named() -> string:
+    builder_calls++
+    return "named"
+
+private func disabled(command: i32) -> i32:
+    convert.unwrap(log.configure(log.config(minimum = log.level.off, timestamps = false)))
+    display_calls = 0
+    builder_calls = 0
+    var checksum: i32 = 0
+    var captured: i32 = 42
+    for index in 0..<10000:
+        var accepted = false
+        if command == 1:
+            accepted = convert.unwrap(log.info("disabled"))
+        if command == 2:
+            accepted = convert.unwrap(log.info("{displayed(value = index)}"))
+        if command == 3:
+            if log.enabled(log.level.info):
+                accepted = convert.unwrap(log.info("{displayed(value = index)}"))
+        if command == 4:
+            accepted = convert.unwrap(log.write_lazy(log.level.info, named))
+        if command == 5:
+            accepted = convert.unwrap(log.write_lazy(log.level.info, func() -> string:
+                builder_calls++
+                return "{captured}"
+            ))
+        if not accepted:
+            checksum++
+    if checksum != 10000 or builder_calls != 0:
+        return 1
+    if command == 2:
+        if display_calls != 10000:
+            return 2
+    else:
+        if display_calls != 0:
+            return 3
+    return 7
+
+private func enabled(command: i32) -> i32:
+    var message = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?"
+    var count: i32 = 200
+    if command == 12:
+        for index in 0..<4:
+            message += message
+        count = 100
+    if command == 13:
+        # Caller construction is bounded and included in execution timing.
+        for index in 0..<10:
+            message += message
+        message = convert.unwrap(string.from_utf8(message.to_utf8()[0..<65500]))
+        count = 3
+    if command == 18:
+        var bytes = "INFO \"\" \"{message}\"\n".to_utf8()
+        with convert.unwrap(io.open("benchmark.log", io.open_mode.create_new)) as handle:
+            for index in 0..<count:
+                convert.unwrap(handle.write_bytes(bytes))
+            convert.unwrap(handle.flush())
+            convert.unwrap(handle.close())
+        return 7
+    if command == 19:
+        var bytes = "INFO \"\" \"{message}\"\n".to_utf8()
+        for index in 0..<count:
+            convert.unwrap(console.stdout.write_bytes(bytes))
+        return 7
+    var options = log.config(timestamps = false, console = log.console_sink.none,
+        file_path = "benchmark.log")
+    if command == 10:
+        options.console = log.console_sink.stdout
+        options.file_path = ""
+    if command == 14:
+        options.timestamps = true
+    if command >= 15 and command <= 17:
+        options.rotation_bytes = 128
+        options.max_record_bytes = 128
+        count = 21
+        if command == 15:
+            options.backups = 0
+        if command == 16:
+            options.backups = 3
+        if command == 17:
+            options.backups = 32
+    with convert.unwrap(log.open(options)) as instance:
+        var checksum: i32 = 0
+        for index in 0..<count:
+            if convert.unwrap(instance.info(message)):
+                checksum++
+            if command == 20 and index % 10 == 0:
+                convert.unwrap(instance.flush())
+        convert.unwrap(instance.close())
+        if checksum != count:
+            return 4
+    return 7
+
+private async func asynchronous(count: i32) -> i32:
+    var instance = convert.unwrap(await log.open_async(log.config(timestamps = false,
+        console = log.console_sink.none, file_path = "benchmark.log")))
+    with instance as owner:
+        var checksum: i32 = 0
+        for index in 0..<count:
+            if convert.unwrap(await owner.write_async(log.level.info, "async record")):
+                checksum++
+        convert.unwrap(await owner.close_async())
+        if checksum != count:
+            return 5
+    return 7
+
+async func entry(command: i32) -> i32:
+    if command == 0:
+        return 7
+    if command <= 5:
+        return disabled(command)
+    if command == 30:
+        return await asynchronous(100)
+    if command == 31:
+        return await asynchronous(1000)
+    return enabled(command)

@@ -2052,7 +2052,9 @@ class Semantics {
         if (!structure.initializer) for (unsigned n=0;n<structure.effective_fields.size();++n) {
             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
             Type t = *field.annotation;
-            if (ir::requires_initialization(t) && !(console::endpoint_type(t) && field.expression) && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
+            const bool complete_default = field.expression && t.definition &&
+                (t.definition->callable || !t.definition->cases.empty() || console::endpoint_type(t));
+            if (ir::requires_initialization(t) && !complete_default && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
                 if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),n,access.identity,lexical_owner()))
                     error(source,e.token,Code::visibility,"An inaccessible required field cannot be supplied by this caller: "+field.name+".","Provide an accessible owner initializer or factory.",{{span(field_owner.source,field.token),"Required field declared here."}});
                 error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
@@ -4289,7 +4291,22 @@ class Lowering {
             for(auto slot:slots) i.arguments.push_back(emit({ir::Op::load,slot},e.token));
             return emit(i,e.token);
         });
-        case K::array_index: return frontend_case([&]() -> unsigned {if(e.target!="$text.index")return select_expression(e).read();auto owner=snapshot(expression(*e.parts[0]),Type::string,e.token);auto index=expression(*e.parts[1]);return emit({ir::Op::string_index,emit({ir::Op::load,owner},e.token),index},e.token);});
+        case K::array_index: return frontend_case([&]() -> unsigned {
+            auto owner_type=e.parts[0]->type;
+            if(owner_type.kind==Type::growable_array && ir::scalar_array(owner_type)) {
+                // A value read has no selected-write lifetime: after evaluating
+                // the index, no source code runs between normalization and read.
+                // Capture the list before index effects (including rebinding or
+                // resizing it), then use the existing checked array_get path.
+                // Assignment and selected receivers still use select_expression.
+                auto owner=snapshot(expression(*e.parts[0]),owner_type,e.token);
+                auto index=expression(*e.parts[1]);
+                return emit({ir::Op::array_get,emit({ir::Op::load,owner},e.token),index},e.token);
+            }
+            if(e.target!="$text.index")return select_expression(e).read();
+            auto owner=snapshot(expression(*e.parts[0]),Type::string,e.token);auto index=expression(*e.parts[1]);
+            return emit({ir::Op::string_index,emit({ir::Op::load,owner},e.token),index},e.token);
+        });
         case K::array_slice: return frontend_case([&]() -> unsigned {
             auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
             auto first=snapshot(expression(*e.parts[1]),e.parts[1]->type,e.token);

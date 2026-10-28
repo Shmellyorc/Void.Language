@@ -1,0 +1,95 @@
+# Test-only suffix appended to a copied log module. It exercises the unchanged
+# private helpers independently, without exporting a production API.
+
+private var _perf_text = ""
+private var _perf_source: [u8] = []
+private var _perf_record: [u8] = []
+private var _perf_count: i32 = 200
+private var _perf_owner: logger?
+
+## Prepare inputs outside the timed stage.
+## @param shape Nine ASCII, escaped and Unicode input sizes.
+## @return Setup sentinel.
+func perf_setup(shape: i32) -> i32:
+    var seed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?"
+    if shape / 3 == 1:
+        seed = "a\n\t\"\\\u{1}z!"
+        for index in 0..<3:
+            seed += seed
+    if shape / 3 == 2:
+        seed = "é雪🔥abcé雪🔥abcé雪🔥abcé雪🔥abcé雪🔥abcabcd"
+    _perf_count = 200
+    if shape % 3 == 1:
+        for index in 0..<4:
+            seed += seed
+        _perf_count = 100
+    if shape % 3 == 2:
+        for index in 0..<10:
+            seed += seed
+        var length: i64 = 65500
+        if shape / 3 == 1:
+            length = 16000
+        if shape / 3 == 2:
+            length = 65472
+        seed = convert.unwrap(string.from_utf8(seed.to_utf8()[0..<length]))
+        _perf_count = 3
+    _perf_text = seed
+    _perf_source = seed.to_utf8()
+    _perf_record = convert.unwrap(_frame(config(timestamps = false), level.info, seed, ""))
+    _perf_owner = convert.unwrap(open(config(timestamps = false, console = console_sink.stdout)))
+    return 7
+
+## Run an independently timed framing component.
+## @param stage Component selection.
+## @return Observable checksum.
+func perf_stage(stage: i32) -> i32:
+    var total: i64 = 0
+    var options = config(timestamps = false)
+    var fixed_sample = convert.unwrap(time.make_instant(1609459200, 123000000))
+    for index in 0..<_perf_count:
+        if stage == 0:
+            total += _perf_source.count
+        if stage == 1:
+            if _perf_owner is Ok(var owner):
+                if convert.unwrap(owner._admit(level.info)):
+                    total++
+        if stage == 2:
+            var sample = convert.unwrap(time.now_utc())
+            total++
+        if stage == 3:
+            total += convert.unwrap(fixed_sample.format("yyyy-MM-dd'T'HH:mm:ss.fff'Z'")).byte_length
+        if stage == 4:
+            total += _perf_text.to_utf8().count
+        if stage == 5:
+            total += convert.unwrap(_escaped_size(_perf_text, 65536))
+        if stage == 6:
+            var bytes = memory.stream()
+            convert.unwrap(_quote(bytes, _perf_text, 65536))
+            total += bytes.length
+        if stage == 7:
+            total += convert.unwrap(_frame(options, level.info, _perf_text, "")).count
+        if stage == 8:
+            var bytes: [u8] = []
+            for byte in _perf_source:
+                bytes.push(byte)
+            total += bytes.count
+        if stage == 9:
+            var checksum: i64 = 0
+            for byte in _perf_source:
+                checksum += byte as i64
+            total += checksum
+        if stage == 10:
+            var bytes = memory.stream()
+            convert.unwrap(bytes.write_bytes(_perf_source))
+            total += bytes.to_bytes().count
+        if stage == 11:
+            convert.unwrap(console.stdout.write_bytes(_perf_record))
+            total += _perf_record.count
+        if stage == 12:
+            if _perf_owner is Ok(var owner):
+                convert.unwrap(owner.info(_perf_text))
+                total += _perf_record.count
+        if stage == 13:
+            # Unescaped-framing lower-bound comparator; valid for ASCII only.
+            total += "INFO \"\" \"{_perf_text}\"\n".to_utf8().count
+    return total as i32

@@ -1,0 +1,98 @@
+use log as l
+use log as alias
+use convert
+
+private var constructions: i32 = 0
+private var factories: i32 = 0
+
+value struct displayed:
+    number: i32
+
+func (self displayed) string() -> string:
+    constructions++
+    return "value={self.number}"
+
+private func message() -> string:
+    constructions++
+    return "built"
+
+private func builder() -> func() -> string:
+    factories++
+    return message
+
+private func require(ok: bool):
+    if not ok:
+        var failed: result<bool, string> = Err("Logging semantic assertion failed")
+        convert.unwrap(failed)
+
+func entry(input: i32) -> i32:
+    var settings = l.config(timestamps = false, console = l.console_sink.stdout)
+    require(settings.minimum is l.level.info)
+    require(settings.existing is l.existing_files.reject)
+    require(settings.rotation_bytes == (8388608 as i64) and settings.backups == 3)
+    require(settings.max_record_bytes == (65536 as i64))
+    var first = convert.unwrap(l.open(settings))
+    var second = convert.unwrap(l.open(settings))
+    settings.minimum = l.level.off
+    require(first.enabled(l.level.info) and not first.enabled(l.level.off))
+    require(not convert.unwrap(first.debug("eager {displayed(number = 8)}")))
+    require(constructions == 1)
+    require(not convert.unwrap(first.write_lazy(l.level.debug, builder())))
+    require(constructions == 1 and factories == 1)
+    convert.unwrap(first.write_lazy(l.level.info, func() -> string:
+        constructions++
+        if first.info("recursive") is Err(var problem):
+            require(problem.kind is l.failure_kind.busy)
+        else:
+            require(false)
+        if first.configure(settings) is Err(var problem):
+            require(problem.kind is l.failure_kind.busy)
+        else:
+            require(false)
+        if first.close() is Err(var problem):
+            require(problem.kind is l.failure_kind.busy)
+        else:
+            require(false)
+        require(not convert.unwrap(first.debug("recursive filtered")))
+        convert.unwrap(second.warn("independent"))
+        return "once"
+    ))
+    require(constructions == 2)
+    convert.unwrap(first.configure(settings))
+    require(not first.enabled(l.level.info))
+    require(not convert.unwrap(first.write(l.level.error, "off")))
+    if first.write(l.level.off, "invalid") is Err(var problem):
+        require(problem.kind is l.failure_kind.invalid_level)
+    else:
+        require(false)
+    var invalid = settings
+    invalid.minimum = l.level.info
+    invalid.console = l.console_sink.none
+    if first.configure(invalid) is Err(var problem):
+        require(problem.kind is l.failure_kind.invalid_config)
+    else:
+        require(false)
+    require(not convert.unwrap(first.info("still disabled")))
+    convert.unwrap(first.flush())
+    convert.unwrap(first.close())
+    convert.unwrap(first.close())
+    if first.info("closed even when filtered") is Err(var problem):
+        require(problem.kind is l.failure_kind.closed)
+    else:
+        require(false)
+    if first.configure(settings) is Err(var problem):
+        require(problem.kind is l.failure_kind.closed)
+    else:
+        require(false)
+    first.deinit()
+    first.deinit()
+    convert.unwrap(first.close())
+    convert.unwrap(second.close())
+    convert.unwrap(l.configure(settings))
+    require(not alias.enabled(l.level.error))
+    convert.unwrap(alias.shutdown())
+    settings.minimum = l.level.info
+    convert.unwrap(l.configure(settings))
+    convert.unwrap(alias.error("new default"))
+    convert.unwrap(l.shutdown())
+    return input

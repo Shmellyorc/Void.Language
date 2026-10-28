@@ -1,0 +1,6 @@
+/tmp/VOID-log-frontend-1v2sp_d3/main.void:2:20: error: Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.
+    code: VOID1103
+
+ 2 | async func escaped(builder: func() -> string) -> i32:
+   |                    ^^^^^^^
+

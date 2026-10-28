@@ -1,0 +1,8 @@
+use log
+use convert
+func entry(input: i32) -> i32:
+    var options = log.config(timestamps = false, console = log.console_sink.stdout)
+    var output = convert.unwrap(log.open(options))
+    convert.unwrap(output.info("hello\n雪"))
+    convert.unwrap(output.close())
+    return input

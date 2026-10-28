@@ -1,0 +1,23 @@
+{
+  "head": "f9ac49f1558f326129948bc06c829263448b7714",
+  "system": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "acceptance_tests": 263,
+  "profiles": 3,
+  "source_files": 81,
+  "evidence_files": 8189,
+  "incidents": 34,
+  "process_receipts": 1677,
+  "protected_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "release_hold": true,
+  "performance_gate": "OPEN: synchronous target unmet; independent review required",
+  "archives": {
+    "source.tar.gz": {
+      "sha256": "7aaacf3ada68532a1202a3bced5be4180df4678f3b11bcf205d73eda28b3e90a",
+      "bytes": 427783
+    },
+    "evidence.tar.gz": {
+      "sha256": "15a217a9a1ccb258932cd591f503f30a299f3f26bba75834b410781ca0153470",
+      "bytes": 17011899
+    }
+  }
+}

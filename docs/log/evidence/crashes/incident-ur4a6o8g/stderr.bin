@@ -1,0 +1,17 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:315:22: runtime error: UTF-8 text operation failed
+    var bytes = text.to_utf8()
+                     ^
+In function /@stdlib/log.void::_escaped_size
+Called from /@stdlib/log.void::_validate
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:380:8: source call
+    if _escaped_size(options.name, options.max_record_bytes - overhead) is Err(var cause):
+       ^
+Called from /@stdlib/log.void::open
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:614:21: source call
+    var validated = _validate(options)?
+                    ^
+Called from /publication.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/log/publication.void:17:38: source call
+        current = convert.unwrap(log.open(log.config(timestamps = false,
+                                     ^
+

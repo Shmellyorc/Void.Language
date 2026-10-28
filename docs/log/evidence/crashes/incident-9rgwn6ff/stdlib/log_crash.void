@@ -1,0 +1,1137 @@
+use console
+use io
+use time
+use path
+use convert
+use error as core
+
+## Record severity and inclusive filtering threshold; off cannot be emitted.
+enum level:
+    ## Most detailed application diagnostics.
+    trace
+    ## Development diagnostics.
+    debug
+    ## Ordinary application events; the default threshold.
+    info
+    ## Recoverable application problems.
+    warn
+    ## Application errors; logging does not terminate execution.
+    error
+    ## Disable every record.
+    off
+
+## Borrowed standard output destination.
+enum console_sink:
+    ## Disable console output.
+    none
+    ## Use standard output.
+    stdout
+    ## Use standard error; the default.
+    stderr
+
+## Authority over exact active and numbered backup filenames.
+enum existing_files:
+    ## Reject all pre-existing members of a new namespace.
+    reject
+    ## Adopt caller-owned regular complete files in a trusted exclusive-writer namespace.
+    adopt
+
+## Copied logger settings. Parents must exist; no directory is implicitly created.
+value struct config:
+    ## Inclusive severity threshold.
+    minimum: level = level.info
+    ## Category text, quoted and escaped in every record.
+    name: string
+    ## Borrowed console destination.
+    console: console_sink = console_sink.stderr
+    ## Include fixed millisecond UTC text.
+    timestamps: bool = true
+    ## Host filesystem path; empty disables files. Relative paths resolve once.
+    file_path: string
+    ## Positive hard byte bound for each current managed file.
+    rotation_bytes: i64 = 8388608
+    ## Number of retained exact backup slots, from zero through 32.
+    backups: i32 = 3
+    ## Positive byte budget for the complete encoded record.
+    max_record_bytes: i64 = 65536
+    ## Explicit authority for pre-existing unowned filenames.
+    existing: existing_files = existing_files.reject
+
+## Checked logging failure category.
+enum failure_kind:
+    ## Invalid settings, before filesystem mutation.
+    invalid_config
+    ## Off or another invalid record severity.
+    invalid_level
+    ## Complete encoded record exceeds its budget.
+    record_too_large
+    ## Another admitted operation reserves this logger.
+    busy
+    ## Explicitly closed or terminally deinitialized instance.
+    closed
+    ## Uncertain output requires explicit recovery configuration.
+    faulted
+    ## UTC sampling or formatting failed.
+    clock
+    ## Borrowed console transport failed.
+    console_io
+    ## File validation, acquisition or transfer failed.
+    file_io
+    ## Rotation stopped after the recorded operation.
+    rotation_io
+    ## Flush or release failed.
+    cleanup_io
+
+## Typed original causes and this operation's actual per-sink progress.
+## Partial transfers may contain message bytes. This object is not a redaction boundary.
+struct failure extends core.error:
+    ## Logging failure category.
+    const kind: failure_kind
+    ## First failing operation in execution order.
+    const operation: string
+    ## Original console error, including native progress and UTF-16 diagnostics.
+    const console_cause: console.io_error?
+    ## Original filesystem error.
+    const file_cause: io.error?
+    ## Original UTC error.
+    const clock_cause: time.error?
+    ## Original file release error accompanying another failure.
+    const cleanup_cause: io.error?
+    ## Whether console delivery was attempted.
+    const console_attempted: bool
+    ## Whether file preparation or delivery was attempted.
+    const file_attempted: bool
+    ## Whether console accepted this entire record.
+    const console_complete: bool
+    ## Whether file accepted this entire record.
+    const file_complete: bool
+    ## This record's console bytes transferred.
+    const console_bytes: i64
+    ## This record's file bytes transferred.
+    const file_bytes: i64
+
+## Managed exclusive writer. Aliases share lifecycle; GC never calls source deinit.
+## Adoption requires trusted parents, no competing writers or hostile mutations,
+## distinct file identities and no unrelated hardlink/path aliases. Metadata is not race protection.
+struct logger:
+    private _options: config
+    private _file: io.file?
+    private _namespace: string
+    private _owned_count: i32 = -1
+    private _length: i64
+    private _busy: bool
+    private _fault: bool
+    private _closed: bool
+    private _terminal: bool
+
+private func (self logger) init(options: config):
+    self._options = options
+
+private struct _receipt:
+    kind: failure_kind = failure_kind.file_io
+    operation: string
+    message: string
+    path: string
+    code: i32
+    console_cause: console.io_error?
+    file_cause: io.error?
+    clock_cause: time.error?
+    cleanup_cause: io.error?
+    console_attempted: bool
+    file_attempted: bool
+    console_complete: bool
+    file_complete: bool
+    console_bytes: i64
+    file_bytes: i64
+
+private func (self _receipt) problem() -> failure:
+    return failure(kind = self.kind, operation = self.operation, message = self.message,
+        path = self.path, code = self.code, console_cause = self.console_cause,
+        file_cause = self.file_cause, clock_cause = self.clock_cause,
+        cleanup_cause = self.cleanup_cause, console_attempted = self.console_attempted,
+        file_attempted = self.file_attempted, console_complete = self.console_complete,
+        file_complete = self.file_complete, console_bytes = self.console_bytes, file_bytes = self.file_bytes)
+
+private func _reason(kind: failure_kind, operation: string, message: string) -> failure:
+    return failure(kind = kind, operation = operation, message = message)
+
+private func (self _receipt) file_error(cause: io.error, kind: failure_kind, cleanup: bool = false):
+    if self.operation == "":
+        self.operation = cause.operation
+        self.message = cause.message
+        self.path = cause.path
+        self.code = cause.code
+        self.kind = kind
+    if cleanup:
+        self.cleanup_cause = cause
+    else:
+        self.file_cause = cause
+
+private func (self _receipt) console_error(cause: console.io_error, kind: failure_kind):
+    if self.operation == "":
+        self.operation = cause.operation
+        self.message = cause.message
+        self.path = cause.path
+        self.code = cause.code
+        self.kind = kind
+    self.console_cause = cause
+
+# Reached before any reservation/effect. Uncertain native outcomes fault conservatively.
+private struct _guard:
+    owner: logger
+    active: bool
+    uncertain: bool
+    release_file: bool
+
+private func (self logger) _emergency_close():
+    if self._file is Ok(var resource):
+        var outcome = resource.close()
+        if outcome is Err(var cause):
+            if cause.kind != io.error_kind.busy:
+                self._file = null
+            convert.unwrap(outcome)
+        else:
+            self._file = null
+
+private func (self _guard) deinit():
+    if self.active:
+        self.owner._busy = false
+        if self.uncertain:
+            self.owner._fault = true
+        if self.release_file:
+            self.owner._emergency_close()
+
+private func (self logger) _reserve(operation: string, closing: bool = false) -> result<_guard, failure>:
+    var guard = _guard(owner = self)
+    if self._busy:
+        return Err(_reason(failure_kind.busy, operation, "Logger is busy"))
+    if not closing and (self._closed or self._terminal):
+        return Err(_reason(failure_kind.closed, operation, "Logger is closed"))
+    guard.active = true
+    self._busy = true
+    return Ok(guard)
+
+private func _rank(value: level) -> i32:
+    match value:
+        level.trace:
+            return 0
+        level.debug:
+            return 1
+        level.info:
+            return 2
+        level.warn:
+            return 3
+        level.error:
+            return 4
+        level.off:
+            return 5
+    return -1
+
+private func _label(value: level) -> string:
+    match value:
+        level.trace:
+            return "TRACE"
+        level.debug:
+            return "DEBUG"
+        level.info:
+            return "INFO"
+        level.warn:
+            return "WARN"
+        level.error:
+            return "ERROR"
+        level.off:
+            return ""
+    return ""
+
+## Filter predicate only; does not reserve or guarantee writable sinks.
+## @param severity Record severity; off is always false.
+## @return True when this severity passes the configured threshold.
+func (self logger) enabled(severity: level) -> bool:
+    var rank = _rank(severity)
+    return rank >= 0 and rank < 5 and rank >= _rank(self._options.minimum)
+
+private func (self logger) _admit(severity: level) -> result<bool, failure>:
+    if _rank(severity) < 0 or severity == level.off:
+        return Err(_reason(failure_kind.invalid_level, "write", "Invalid record severity"))
+    if self._closed or self._terminal:
+        return Err(_reason(failure_kind.closed, "write", "Logger is closed"))
+    if not self.enabled(severity):
+        return Ok(false)
+    if self._busy:
+        return Err(_reason(failure_kind.busy, "write", "Logger is busy"))
+    if self._fault:
+        return Err(_reason(failure_kind.faulted, "write", "Explicit recovery configuration is required"))
+    return Ok(true)
+
+# Strict UTF-8 is a language invariant. Walk bytes once; never index string scalars repeatedly.
+private func _width(first: u8) -> i64:
+    if first < 128:
+        return 1
+    if first < 224:
+        return 2
+    if first < 240:
+        return 3
+    return 4
+
+private func _scalar(const bytes: [u8], at: i64, width: i64) -> i32:
+    if width == 1:
+        return bytes[at] as i32
+    var modulus: i32 = 32
+    if width == 3:
+        modulus = 16
+    if width == 4:
+        modulus = 8
+    var value = (bytes[at] as i32) % modulus
+    for offset in (1 as i64)..<width:
+        value = value * 64 + (bytes[at + offset] as i32) % 64
+    return value
+
+private func _escaped(value: i32) -> bool:
+    return (value < 32 or (value >= 127 and value <= 159) or value == 1564 or
+        (value >= 8206 and value <= 8207) or (value >= 8232 and value <= 8238) or
+        (value >= 8294 and value <= 8297))
+
+private func _cost(value: i32, width: i64) -> i64:
+    if value == 34 or value == 92 or value == 10 or value == 13 or value == 9:
+        return 2
+    if _escaped(value):
+        return 6
+    return width
+
+private func _escaped_size(text: string, budget: i64) -> result<i64, failure>:
+    if text.byte_length > budget:
+        return Err(_reason(failure_kind.record_too_large, "frame", "Encoded record exceeds its byte budget"))
+    var bytes = text.to_utf8()
+    var size: i64 = 0
+    var at: i64 = 0
+    for at < bytes.count:
+        var width = _width(bytes[at])
+        var cost = _cost(_scalar(bytes, at, width), width)
+        if cost > budget - size:
+            return Err(_reason(failure_kind.record_too_large, "frame", "Encoded record exceeds its byte budget"))
+        size += cost
+        at += width
+    return Ok(size)
+
+private func _quote(bytes: [u8], text: string, budget: i64) -> result<bool, failure>:
+    if text.byte_length > budget - bytes.count:
+        return Err(_reason(failure_kind.record_too_large, "frame", "Encoded record exceeds its byte budget"))
+    var input = text.to_utf8()
+    var hex = "0123456789abcdef".to_utf8()
+    var at: i64 = 0
+    for at < input.count:
+        var width = _width(input[at])
+        var value = _scalar(input, at, width)
+        if _cost(value, width) > budget - bytes.count:
+            return Err(_reason(failure_kind.record_too_large, "frame", "Encoded record exceeds its byte budget"))
+        if value == 34 or value == 92:
+            bytes.push(92)
+            bytes.push(value as u8)
+        else if value == 10 or value == 13 or value == 9:
+            bytes.push(92)
+            if value == 10:
+                bytes.push(110)
+            else if value == 13:
+                bytes.push(114)
+            else:
+                bytes.push(116)
+        else if _escaped(value):
+            bytes.push(92)
+            bytes.push(117)
+            bytes.push(hex[value / 4096 % 16])
+            bytes.push(hex[value / 256 % 16])
+            bytes.push(hex[value / 16 % 16])
+            bytes.push(hex[value % 16])
+        else:
+            for offset in (0 as i64)..<width:
+                bytes.push(input[at + offset])
+        at += width
+    return Ok(true)
+
+private func _validate(options: config) -> result<bool, failure>:
+    var valid_console = options.console == console_sink.none or options.console == console_sink.stdout or options.console == console_sink.stderr
+    var valid_existing = options.existing == existing_files.reject or options.existing == existing_files.adopt
+    if _rank(options.minimum) < 0 or not valid_console or not valid_existing:
+        return Err(_reason(failure_kind.invalid_config, "configure", "Invalid enum setting"))
+    if options.rotation_bytes <= 0 or options.max_record_bytes <= 0 or options.backups < 0 or options.backups > 32:
+        return Err(_reason(failure_kind.invalid_config, "configure", "Invalid size or backup count"))
+    if options.rotation_bytes > i64.max_value / ((options.backups as i64) + 1):
+        return Err(_reason(failure_kind.invalid_config, "configure", "Managed file bound overflows"))
+    if options.console == console_sink.none and options.file_path == "" and options.minimum != level.off:
+        return Err(_reason(failure_kind.invalid_config, "configure", "At least one sink is required"))
+    if options.file_path != "" and options.max_record_bytes > options.rotation_bytes:
+        return Err(_reason(failure_kind.invalid_config, "configure", "Record budget exceeds the file bound"))
+    var overhead: i64 = 12
+    if options.timestamps:
+        overhead = 37
+    if overhead > options.max_record_bytes:
+        return Err(_reason(failure_kind.invalid_config, "configure", "Record budget cannot fit framing"))
+    if _escaped_size(options.name, options.max_record_bytes - overhead) is Err(var cause):
+        return Err(_reason(failure_kind.invalid_config, "configure", "Record budget cannot fit the escaped name"))
+    return Ok(true)
+
+# Timestamp sampling is separate from pure framing for deterministic private-source tests.
+private func _frame(options: config, severity: level, message: string, stamp: string) -> result<[u8], failure>:
+    var overhead: i64 = 7 + _label(severity).byte_length
+    if options.timestamps:
+        overhead += 25
+    var name_size = _escaped_size(options.name, options.max_record_bytes - overhead)?
+    var message_size = _escaped_size(message, options.max_record_bytes - overhead - name_size)?
+    var bytes: [u8] = []
+    if options.timestamps:
+        for byte in stamp.to_utf8():
+            bytes.push(byte)
+        bytes.push(32)
+    for byte in _label(severity).to_utf8():
+        bytes.push(byte)
+    bytes.push(32)
+    bytes.push(34)
+    _quote(bytes, options.name, options.max_record_bytes)?
+    bytes.push(34)
+    bytes.push(32)
+    bytes.push(34)
+    _quote(bytes, message, options.max_record_bytes)?
+    bytes.push(34)
+    bytes.push(10)
+    return Ok(bytes)
+
+private func _prepare(options: config, severity: level, message: string) -> result<[u8], failure>:
+    var stamp = ""
+    if options.timestamps:
+        var sample = time.now_utc()
+        if sample is Err(var cause):
+            return Err(failure(kind = failure_kind.clock, operation = "now_utc", message = cause.message, code = cause.code, clock_cause = cause))
+        if sample is Ok(var instant):
+            var formatted = instant.format("yyyy-MM-dd'T'HH:mm:ss.fff'Z'")
+            if formatted is Err(var cause):
+                return Err(failure(kind = failure_kind.clock, operation = "format", message = cause.message, code = cause.code, clock_cause = cause))
+            if formatted is Ok(var text):
+                stamp = text
+    return _frame(options, severity, message, stamp)
+
+private func _slot(namespace: string, number: i32) -> string:
+    if number == 0:
+        return namespace
+    return "{namespace}.{number}"
+
+private func _layout_error(value: string, message: string) -> io.error:
+    return io.error(kind = io.error_kind.invalid_path, operation = "validate_file", path = value, message = message)
+
+private struct _temporary_file:
+    resource: io.file?
+
+private func (self _temporary_file) deinit():
+    if self.resource is Ok(var resource):
+        convert.unwrap(resource.close())
+
+private func (self logger) _console_record(bytes: [u8], receipt: _receipt):
+    if self._options.console != console_sink.none:
+        receipt.console_attempted = true
+        var endpoint = console.stderr
+        if self._options.console == console_sink.stdout:
+            endpoint = console.stdout
+        var outcome = endpoint.write_bytes(bytes)
+        if outcome is Err(var cause):
+            receipt.console_bytes = cause.bytes_transferred
+            receipt.console_error(cause, failure_kind.console_io)
+        if outcome is Ok(var count):
+            receipt.console_bytes = count
+            receipt.console_complete = true
+
+private func (self logger) _console_flush(receipt: _receipt):
+    if self._options.console != console_sink.none:
+        var endpoint = console.stderr
+        if self._options.console == console_sink.stdout:
+            endpoint = console.stdout
+        if endpoint.flush() is Err(var cause):
+            receipt.console_error(cause, failure_kind.cleanup_io)
+
+private var _default = logger(config())
+
+
+# BEGIN concrete sync file operations
+private func _member(value: string, bound: i64, authorized: bool) -> result<bool, failure>:
+    var observation = io.metadata(value, false)
+    if observation is Err(var cause):
+        if cause.kind == io.error_kind.not_found:
+            return Ok(false)
+        var receipt = _receipt()
+        receipt.file_error(cause, failure_kind.file_io)
+        return Err(receipt.problem())
+    if not authorized:
+        var receipt = _receipt()
+        receipt.file_error(io.error(kind = io.error_kind.already_exists, operation = "validate_file", path = value, message = "Existing managed filename requires explicit adoption"), failure_kind.file_io)
+        return Err(receipt.problem())
+    if observation is Ok(var entry):
+        if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+            var receipt = _receipt()
+            receipt.file_error(_layout_error(value, "Managed member must be a regular file within its byte bound"), failure_kind.file_io)
+            return Err(receipt.problem())
+        if entry.size > 0:
+            with _temporary_file() as temporary:
+                var acquisition = io.open(value, io.open_mode.read)
+                if acquisition is Err(var cause):
+                    var receipt = _receipt()
+                    receipt.file_error(cause, failure_kind.file_io)
+                    return Err(receipt.problem())
+                if acquisition is Ok(var resource):
+                    temporary.resource = resource
+                    var receipt = _receipt()
+                    var seek = resource.seek(-1, io.seek_origin.end)
+                    if seek is Err(var cause):
+                        receipt.file_error(cause, failure_kind.file_io)
+                    else:
+                        var tail = resource.read_exact(1)
+                        if tail is Err(var cause):
+                            receipt.file_error(cause, failure_kind.file_io)
+                        if tail is Ok(var bytes):
+                            if bytes[0] != (10 as u8):
+                                receipt.file_error(_layout_error(value, "Managed nonempty file must end with LF; explicit repair is required"), failure_kind.file_io)
+                    var close = resource.close()
+                    if close is Err(var cause):
+                        receipt.file_error(cause, failure_kind.cleanup_io, true)
+                        if cause.kind != io.error_kind.busy:
+                            temporary.resource = null
+                    else:
+                        temporary.resource = null
+                    if receipt.operation != "":
+                        return Err(receipt.problem())
+    return Ok(true)
+
+private func (self logger) _preflight(options: config, namespace: string) -> result<bool, failure>:
+    var count = options.backups
+    if namespace == self._namespace and self._owned_count > count:
+        count = self._owned_count
+    var present = false
+    for index in 0..count:
+        var retained = namespace == self._namespace and index <= self._owned_count
+        var authorized = retained or options.existing == existing_files.adopt
+        var found = _member(_slot(namespace, index), options.rotation_bytes, authorized)?
+        if index == 0:
+            present = found
+    return Ok(present)
+
+private func (self logger) _acquire(options: config, namespace: string, present: bool) -> result<bool, failure>:
+    self._namespace = namespace
+    self._owned_count = options.backups
+    var mode = io.open_mode.create_new
+    if present:
+        mode = io.open_mode.append
+    var acquisition = io.open(namespace, mode)
+    if acquisition is Err(var cause):
+        var receipt = _receipt()
+        receipt.file_error(cause, failure_kind.file_io)
+        return Err(receipt.problem())
+    if acquisition is Ok(var resource):
+        self._file = resource
+        var length = resource.length()
+        if length is Err(var cause):
+            var receipt = _receipt()
+            receipt.file_error(cause, failure_kind.file_io)
+            return Err(receipt.problem())
+        if length is Ok(var size):
+            self._length = size
+    return Ok(true)
+
+private func (self logger) _retire(receipt: _receipt, kind: failure_kind):
+    if self._file is Ok(var resource):
+        if resource.flush() is Err(var cause):
+            receipt.file_error(cause, kind)
+        var close = resource.close()
+        if close is Err(var cause):
+            receipt.file_error(cause, kind, true)
+            if cause.kind != io.error_kind.busy:
+                self._file = null
+        else:
+            self._file = null
+
+private func (self logger) _rotate(receipt: _receipt) -> bool:
+    self._retire(receipt, failure_kind.rotation_io)
+    if receipt.file_cause != null or receipt.cleanup_cause != null:
+        return false
+    var count = self._options.backups
+    var oldest = _slot(self._namespace, count)
+    if io.remove_file(oldest, true) is Err(var cause):
+        receipt.file_error(cause, failure_kind.rotation_io)
+        return false
+    if count > 0:
+        # Missing sources are permitted gaps; every destination remains no-replace.
+        for index in (count - 1)..0:
+            var source = _slot(self._namespace, index)
+            var target = _slot(self._namespace, index + 1)
+            var move = io.move_file(source, target, false)
+            if move is Err(var cause):
+                if cause.kind != io.error_kind.not_found:
+                    receipt.file_error(cause, failure_kind.rotation_io)
+                    return false
+    var acquisition = self._acquire(self._options, self._namespace, false)
+    if acquisition is Err(var cause):
+        if cause.file_cause is Ok(var original):
+            receipt.file_error(original, failure_kind.rotation_io)
+        return false
+    return true
+
+private func (self logger) _deliver(bytes: [u8], guard: _guard) -> result<bool, failure>:
+    var receipt = _receipt()
+    guard.uncertain = true
+    self._console_record(bytes, receipt)
+    if self._options.file_path != "":
+        receipt.file_attempted = true
+        var ready = true
+        if bytes.count > self._options.rotation_bytes - self._length:
+            ready = self._rotate(receipt)
+        if ready:
+            if self._file is Ok(var resource):
+                var outcome = resource.write_bytes(bytes)
+                if outcome is Err(var cause):
+                    receipt.file_bytes = cause.bytes_transferred
+                    receipt.file_error(cause, failure_kind.file_io)
+                if outcome is Ok(var count):
+                    receipt.file_bytes = count
+                    receipt.file_complete = true
+                    self._length += count
+            else:
+                receipt.file_error(io.error(kind = io.error_kind.closed, operation = "write_bytes", path = self._namespace, message = "No owned active file"), failure_kind.file_io)
+    if receipt.operation != "":
+        self._fault = true
+        return Err(receipt.problem())
+    guard.uncertain = false
+    return Ok(true)
+
+## Acquire an independent managed logger; creates only an explicitly configured file.
+## @param options Copied settings; default is info with UTC and stderr only.
+## @return Owned logger, or typed validation/acquisition failure.
+func open(options: config = config()) -> result<logger, failure>:
+    _validate(options)?
+    var instance = logger(options)
+    with instance._reserve("open")? as guard:
+        guard.release_file = true
+        if options.file_path != "":
+            var resolved = path.absolute(options.file_path)
+            if resolved is Err(var cause):
+                var receipt = _receipt()
+                receipt.file_error(cause, failure_kind.file_io)
+                return Err(receipt.problem())
+            if resolved is Ok(var namespace):
+                var present = instance._preflight(options, namespace)?
+                guard.uncertain = true
+                instance._acquire(options, namespace, present)?
+        guard.release_file = false
+        guard.uncertain = false
+        return Ok(instance)
+
+## Replace copied settings and explicitly recover a faulted instance.
+## Existing owned names retain authority. Filesystem changes are not transactional.
+## @param options Complete replacement settings; validation precedes mutation.
+## @return True after acquisition and publication, or typed primary/cleanup causes.
+func (self logger) configure(options: config) -> result<bool, failure>:
+    _validate(options)?
+    with self._reserve("configure")? as guard:
+        var namespace = ""
+        if options.file_path != "":
+            var resolved = path.absolute(options.file_path)
+            if resolved is Err(var cause):
+                var receipt = _receipt()
+                receipt.file_error(cause, failure_kind.file_io)
+                return Err(receipt.problem())
+            if resolved is Ok(var value):
+                namespace = value
+        var same_policy = (namespace == self._namespace and options.backups == self._options.backups and
+            options.rotation_bytes == self._options.rotation_bytes and options.existing == self._options.existing)
+        if not self._fault and same_policy:
+            self._options = options
+            return Ok(true)
+        # Preflight the entire replacement/retained set before closing or deleting anything.
+        var present = false
+        if namespace != "":
+            present = self._preflight(options, namespace)?
+        guard.uncertain = true
+        guard.release_file = true
+        var receipt = _receipt()
+        self._console_flush(receipt)
+        self._retire(receipt, failure_kind.cleanup_io)
+        if receipt.operation != "":
+            self._fault = true
+            guard.release_file = false
+            return Err(receipt.problem())
+        if namespace == self._namespace and namespace != "" and options.backups < self._owned_count:
+            for index in (options.backups + 1)..self._owned_count:
+                if io.remove_file(_slot(namespace, index), true) is Err(var cause):
+                    receipt.file_error(cause, failure_kind.file_io)
+                    return Err(receipt.problem())
+        if namespace != "":
+            self._acquire(options, namespace, present)?
+        self._options = options
+        self._fault = false
+        guard.release_file = false
+        guard.uncertain = false
+        return Ok(true)
+
+## Emit an eager message; file operations use this call's explicit execution mode.
+## @param severity Record severity; off is an invalid record level.
+## @param message Already evaluated text, escaped into one bounded UTF-8 line.
+## @return True for complete delivery, false when filtered, or typed failure/progress.
+func (self logger) write(severity: level, message: string) -> result<bool, failure>:
+    if not self._admit(severity)?:
+        return Ok(false)
+    with self._reserve("write")? as guard:
+        var bytes = _prepare(self._options, severity, message)?
+        return self._deliver(bytes, guard)
+
+## Drain console output and synchronize the owned file.
+## @return True when both sinks acknowledge flushing, or original typed failures.
+func (self logger) flush() -> result<bool, failure>:
+    with self._reserve("flush")? as guard:
+        if self._fault:
+            return Err(_reason(failure_kind.faulted, "flush", "Explicit recovery configuration is required"))
+        var receipt = _receipt()
+        guard.uncertain = true
+        self._console_flush(receipt)
+        if self._file is Ok(var resource):
+            if resource.flush() is Err(var cause):
+                receipt.file_error(cause, failure_kind.cleanup_io)
+        if receipt.operation != "":
+            return Err(receipt.problem())
+        guard.uncertain = false
+        return Ok(true)
+
+## Flush and close owned resources, including after a recoverable flush failure.
+## Busy preserves ownership; a native close failure retires its handle. Repeated close succeeds.
+## @return True once closed, or original primary and cleanup failures.
+func (self logger) close() -> result<bool, failure>:
+    with self._reserve("close", true)? as guard:
+        if self._closed and self._file == null:
+            return Ok(true)
+        var receipt = _receipt()
+        guard.uncertain = true
+        guard.release_file = true
+        self._console_flush(receipt)
+        self._retire(receipt, failure_kind.cleanup_io)
+        guard.release_file = false
+        if self._file == null:
+            self._closed = true
+        if receipt.operation != "":
+            return Err(receipt.problem())
+        guard.uncertain = false
+        return Ok(true)
+# END concrete sync file operations
+
+# BEGIN concrete async file operations
+private async func _member_async(value: string, bound: i64, authorized: bool) -> result<bool, failure>:
+    var observation = await io.metadata_async(value, false)
+    if observation is Err(var cause):
+        if cause.kind == io.error_kind.not_found:
+            return Ok(false)
+        var receipt = _receipt()
+        receipt.file_error(cause, failure_kind.file_io)
+        return Err(receipt.problem())
+    if not authorized:
+        var receipt = _receipt()
+        receipt.file_error(io.error(kind = io.error_kind.already_exists, operation = "validate_file", path = value, message = "Existing managed filename requires explicit adoption"), failure_kind.file_io)
+        return Err(receipt.problem())
+    if observation is Ok(var entry):
+        if entry.kind != io.entry_kind.file or entry.size < 0 or entry.size > bound:
+            var receipt = _receipt()
+            receipt.file_error(_layout_error(value, "Managed member must be a regular file within its byte bound"), failure_kind.file_io)
+            return Err(receipt.problem())
+        if entry.size > 0:
+            with _temporary_file() as temporary:
+                var acquisition = await io.open_async(value, io.open_mode.read)
+                if acquisition is Err(var cause):
+                    var receipt = _receipt()
+                    receipt.file_error(cause, failure_kind.file_io)
+                    return Err(receipt.problem())
+                if acquisition is Ok(var resource):
+                    temporary.resource = resource
+                    var receipt = _receipt()
+                    var seek = await resource.seek_async(-1, io.seek_origin.end)
+                    if seek is Err(var cause):
+                        receipt.file_error(cause, failure_kind.file_io)
+                    else:
+                        var tail = await resource.read_exact_async(1)
+                        if tail is Err(var cause):
+                            receipt.file_error(cause, failure_kind.file_io)
+                        if tail is Ok(var bytes):
+                            if bytes[0] != (10 as u8):
+                                receipt.file_error(_layout_error(value, "Managed nonempty file must end with LF; explicit repair is required"), failure_kind.file_io)
+                    var close = await resource.close_async()
+                    if close is Err(var cause):
+                        receipt.file_error(cause, failure_kind.cleanup_io, true)
+                        if cause.kind != io.error_kind.busy:
+                            temporary.resource = null
+                    else:
+                        temporary.resource = null
+                    if receipt.operation != "":
+                        return Err(receipt.problem())
+    return Ok(true)
+
+private async func (self logger) _preflight_async(options: config, namespace: string) -> result<bool, failure>:
+    var count = options.backups
+    if namespace == self._namespace and self._owned_count > count:
+        count = self._owned_count
+    var present = false
+    for index in 0..count:
+        var retained = namespace == self._namespace and index <= self._owned_count
+        var authorized = retained or options.existing == existing_files.adopt
+        var found = await _member_async(_slot(namespace, index), options.rotation_bytes, authorized)?
+        if index == 0:
+            present = found
+    return Ok(present)
+
+private async func (self logger) _acquire_async(options: config, namespace: string, present: bool) -> result<bool, failure>:
+    self._namespace = namespace
+    self._owned_count = options.backups
+    var mode = io.open_mode.create_new
+    if present:
+        mode = io.open_mode.append
+    var acquisition = await io.open_async(namespace, mode)
+    if acquisition is Err(var cause):
+        var receipt = _receipt()
+        receipt.file_error(cause, failure_kind.file_io)
+        return Err(receipt.problem())
+    if acquisition is Ok(var resource):
+        self._file = resource
+        var length = await resource.length_async()
+        if length is Err(var cause):
+            var receipt = _receipt()
+            receipt.file_error(cause, failure_kind.file_io)
+            return Err(receipt.problem())
+        if length is Ok(var size):
+            self._length = size
+    return Ok(true)
+
+private async func (self logger) _retire_async(receipt: _receipt, kind: failure_kind):
+    if self._file is Ok(var resource):
+        if await resource.flush_async() is Err(var cause):
+            receipt.file_error(cause, kind)
+        var close = await resource.close_async()
+        if close is Err(var cause):
+            receipt.file_error(cause, kind, true)
+            if cause.kind != io.error_kind.busy:
+                self._file = null
+        else:
+            self._file = null
+
+private async func (self logger) _rotate_async(receipt: _receipt) -> bool:
+    await self._retire_async(receipt, failure_kind.rotation_io)
+    if receipt.file_cause != null or receipt.cleanup_cause != null:
+        return false
+    var count = self._options.backups
+    var oldest = _slot(self._namespace, count)
+    if await io.remove_file_async(oldest, true) is Err(var cause):
+        receipt.file_error(cause, failure_kind.rotation_io)
+        return false
+    if count > 0:
+        # Missing sources are permitted gaps; every destination remains no-replace.
+        for index in (count - 1)..0:
+            var source = _slot(self._namespace, index)
+            var target = _slot(self._namespace, index + 1)
+            var move = await io.move_file_async(source, target, false)
+            if move is Err(var cause):
+                if cause.kind != io.error_kind.not_found:
+                    receipt.file_error(cause, failure_kind.rotation_io)
+                    return false
+    var acquisition = await self._acquire_async(self._options, self._namespace, false)
+    if acquisition is Err(var cause):
+        if cause.file_cause is Ok(var original):
+            receipt.file_error(original, failure_kind.rotation_io)
+        return false
+    return true
+
+private async func (self logger) _deliver_async(bytes: [u8], guard: _guard) -> result<bool, failure>:
+    var receipt = _receipt()
+    guard.uncertain = true
+    self._console_record(bytes, receipt)
+    if self._options.file_path != "":
+        receipt.file_attempted = true
+        var ready = true
+        if bytes.count > self._options.rotation_bytes - self._length:
+            ready = await self._rotate_async(receipt)
+        if ready:
+            if self._file is Ok(var resource):
+                var outcome = await resource.write_bytes_async(bytes)
+                if outcome is Err(var cause):
+                    receipt.file_bytes = cause.bytes_transferred
+                    receipt.file_error(cause, failure_kind.file_io)
+                if outcome is Ok(var count):
+                    receipt.file_bytes = count
+                    receipt.file_complete = true
+                    self._length += count
+            else:
+                receipt.file_error(io.error(kind = io.error_kind.closed, operation = "write_bytes", path = self._namespace, message = "No owned active file"), failure_kind.file_io)
+    if receipt.operation != "":
+        self._fault = true
+        return Err(receipt.problem())
+    guard.uncertain = false
+    return Ok(true)
+
+## Acquire an independent managed logger; creates only an explicitly configured file.
+## @param options Copied settings; default is info with UTC and stderr only.
+## @return Owned logger, or typed validation/acquisition failure.
+async func open_async(options: config = config()) -> result<logger, failure>:
+    _validate(options)?
+    var instance = logger(options)
+    with instance._reserve("open")? as guard:
+        guard.release_file = true
+        if options.file_path != "":
+            var resolved = path.absolute(options.file_path)
+            if resolved is Err(var cause):
+                var receipt = _receipt()
+                receipt.file_error(cause, failure_kind.file_io)
+                return Err(receipt.problem())
+            if resolved is Ok(var namespace):
+                var present = await instance._preflight_async(options, namespace)?
+                guard.uncertain = true
+                await instance._acquire_async(options, namespace, present)?
+        guard.release_file = false
+        guard.uncertain = false
+        return Ok(instance)
+
+## Replace copied settings and explicitly recover a faulted instance.
+## Existing owned names retain authority. Filesystem changes are not transactional.
+## @param options Complete replacement settings; validation precedes mutation.
+## @return True after acquisition and publication, or typed primary/cleanup causes.
+async func (self logger) configure_async(options: config) -> result<bool, failure>:
+    _validate(options)?
+    with self._reserve("configure")? as guard:
+        var namespace = ""
+        if options.file_path != "":
+            var resolved = path.absolute(options.file_path)
+            if resolved is Err(var cause):
+                var receipt = _receipt()
+                receipt.file_error(cause, failure_kind.file_io)
+                return Err(receipt.problem())
+            if resolved is Ok(var value):
+                namespace = value
+        var same_policy = (namespace == self._namespace and options.backups == self._options.backups and
+            options.rotation_bytes == self._options.rotation_bytes and options.existing == self._options.existing)
+        if not self._fault and same_policy:
+            self._options = options
+            return Ok(true)
+        # Preflight the entire replacement/retained set before closing or deleting anything.
+        var present = false
+        if namespace != "":
+            present = await self._preflight_async(options, namespace)?
+        guard.uncertain = true
+        guard.release_file = true
+        var receipt = _receipt()
+        self._console_flush(receipt)
+        await self._retire_async(receipt, failure_kind.cleanup_io)
+        if receipt.operation != "":
+            self._fault = true
+            guard.release_file = false
+            return Err(receipt.problem())
+        if namespace == self._namespace and namespace != "" and options.backups < self._owned_count:
+            for index in (options.backups + 1)..self._owned_count:
+                if await io.remove_file_async(_slot(namespace, index), true) is Err(var cause):
+                    receipt.file_error(cause, failure_kind.file_io)
+                    return Err(receipt.problem())
+        if namespace != "":
+            await self._acquire_async(options, namespace, present)?
+        self._options = options
+        self._fault = false
+        guard.release_file = false
+        guard.uncertain = false
+        return Ok(true)
+
+## Emit an eager message; file operations use this call's explicit execution mode.
+## @param severity Record severity; off is an invalid record level.
+## @param message Already evaluated text, escaped into one bounded UTF-8 line.
+## @return True for complete delivery, false when filtered, or typed failure/progress.
+async func (self logger) write_async(severity: level, message: string) -> result<bool, failure>:
+    if not self._admit(severity)?:
+        return Ok(false)
+    with self._reserve("write")? as guard:
+        var bytes = _prepare(self._options, severity, message)?
+        return await self._deliver_async(bytes, guard)
+
+## Drain console output and synchronize the owned file.
+## @return True when both sinks acknowledge flushing, or original typed failures.
+async func (self logger) flush_async() -> result<bool, failure>:
+    with self._reserve("flush")? as guard:
+        if self._fault:
+            return Err(_reason(failure_kind.faulted, "flush", "Explicit recovery configuration is required"))
+        var receipt = _receipt()
+        guard.uncertain = true
+        self._console_flush(receipt)
+        if self._file is Ok(var resource):
+            if await resource.flush_async() is Err(var cause):
+                receipt.file_error(cause, failure_kind.cleanup_io)
+        if receipt.operation != "":
+            return Err(receipt.problem())
+        guard.uncertain = false
+        return Ok(true)
+
+## Flush and close owned resources, including after a recoverable flush failure.
+## Busy preserves ownership; a native close failure retires its handle. Repeated close succeeds.
+## @return True once closed, or original primary and cleanup failures.
+async func (self logger) close_async() -> result<bool, failure>:
+    with self._reserve("close", true)? as guard:
+        if self._closed and self._file == null:
+            return Ok(true)
+        var receipt = _receipt()
+        guard.uncertain = true
+        guard.release_file = true
+        self._console_flush(receipt)
+        await self._retire_async(receipt, failure_kind.cleanup_io)
+        guard.release_file = false
+        if self._file == null:
+            self._closed = true
+        if receipt.operation != "":
+            return Err(receipt.problem())
+        guard.uncertain = false
+        return Ok(true)
+# END concrete async file operations
+
+## Build an admitted message exactly once, with no native sink lock held.
+## @param severity Record severity; filtering occurs before invoking the builder.
+## @param make_message Temporary synchronous builder; never saved in the logger.
+## @return True on complete delivery, false when filtered, or typed failure.
+func (self logger) write_lazy(severity: level, make_message: func() -> string) -> result<bool, failure>:
+    if not self._admit(severity)?:
+        return Ok(false)
+    with self._reserve("write_lazy")? as guard:
+        var message = make_message()
+        var bytes = _prepare(self._options, severity, message)?
+        return self._deliver(bytes, guard)
+
+## Terminal synchronous deterministic cleanup. GC does not invoke this method.
+## Inspect explicit close for typed diagnostics; cleanup escalates through convert.unwrap.
+func (self logger) deinit():
+    self._terminal = true
+    convert.unwrap(self.close())
+
+## Filter the application Runtime's default logger without reserving output.
+## @param severity Record severity; off returns false.
+## @return Whether the configured threshold admits this severity.
+func enabled(severity: level) -> bool:
+    return _default.enabled(severity)
+
+## Build a default-logger message only after admission.
+## @param severity Record severity.
+## @param make_message Temporary synchronous builder; zero calls when filtered.
+## @return Complete delivery, filtering, or typed failure.
+func write_lazy(severity: level, make_message: func() -> string) -> result<bool, failure>:
+    return _default.write_lazy(severity, make_message)
+
+## Emit an eager trace record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func (self logger) trace(message: string) -> result<bool, failure>:
+    return self.write(level.trace, message)
+
+## Emit an eager trace record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func trace(message: string) -> result<bool, failure>:
+    return _default.write(level.trace, message)
+
+## Emit an eager debug record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func (self logger) debug(message: string) -> result<bool, failure>:
+    return self.write(level.debug, message)
+
+## Emit an eager debug record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func debug(message: string) -> result<bool, failure>:
+    return _default.write(level.debug, message)
+
+## Emit an eager info record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func (self logger) info(message: string) -> result<bool, failure>:
+    return self.write(level.info, message)
+
+## Emit an eager info record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func info(message: string) -> result<bool, failure>:
+    return _default.write(level.info, message)
+
+## Emit an eager warn record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func (self logger) warn(message: string) -> result<bool, failure>:
+    return self.write(level.warn, message)
+
+## Emit an eager warn record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func warn(message: string) -> result<bool, failure>:
+    return _default.write(level.warn, message)
+
+## Emit an eager error record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func (self logger) error(message: string) -> result<bool, failure>:
+    return self.write(level.error, message)
+
+## Emit an eager error record using the canonical checked writer.
+## @param message Already evaluated text; ordinary formatting occurs in the caller.
+## @return True for delivery, false for filtering, or typed failure/progress.
+func error(message: string) -> result<bool, failure>:
+    return _default.write(level.error, message)
+
+## Checked write on the application Runtime's default logger.
+## @param severity Record severity; off is invalid.
+## @param message Already evaluated text.
+## @return Complete success, filtering for writes, or typed failure/progress.
+func write(severity: level, message: string) -> result<bool, failure>:
+    return _default.write(severity, message)
+
+## Checked flush on the application Runtime's default logger.
+## @return Complete success, filtering for writes, or typed failure/progress.
+func flush() -> result<bool, failure>:
+    return _default.flush()
+
+## Checked shutdown on the application Runtime's default logger.
+## @return Complete success, filtering for writes, or typed failure/progress.
+func shutdown() -> result<bool, failure>:
+    return _default.close()
+
+## Explicitly configure or replace a shut-down application default.
+## @param options Complete copied settings; file ownership requires an exclusive trusted namespace.
+## @return True after publication, or typed validation/lifecycle/acquisition failure.
+func configure(options: config) -> result<bool, failure>:
+    if _default._closed or _default._terminal:
+        _validate(options)?
+        if _default._busy:
+            return Err(_reason(failure_kind.busy, "configure", "Logger is busy"))
+        _default.close()?
+        var replacement = open(options)?
+        _default = replacement
+        return Ok(true)
+    return _default.configure(options)
+
+## Checked write on the application Runtime's default logger.
+## @param severity Record severity; off is invalid.
+## @param message Already evaluated text.
+## @return Complete success, filtering for writes, or typed failure/progress.
+async func write_async(severity: level, message: string) -> result<bool, failure>:
+    return await _default.write_async(severity, message)
+
+## Checked flush on the application Runtime's default logger.
+## @return Complete success, filtering for writes, or typed failure/progress.
+async func flush_async() -> result<bool, failure>:
+    return await _default.flush_async()
+
+## Checked shutdown on the application Runtime's default logger.
+## @return Complete success, filtering for writes, or typed failure/progress.
+async func shutdown_async() -> result<bool, failure>:
+    return await _default.close_async()
+
+## Explicitly configure or replace a shut-down application default.
+## @param options Complete copied settings; file ownership requires an exclusive trusted namespace.
+## @return True after publication, or typed validation/lifecycle/acquisition failure.
+async func configure_async(options: config) -> result<bool, failure>:
+    if _default._closed or _default._terminal:
+        _validate(options)?
+        if _default._busy:
+            return Err(_reason(failure_kind.busy, "configure", "Logger is busy"))
+        await _default.close_async()?
+        var replacement = await open_async(options)?
+        _default = replacement
+        return Ok(true)
+    return await _default.configure_async(options)

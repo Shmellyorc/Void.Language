@@ -1,0 +1,521 @@
+[
+  {
+    "profile": "debug",
+    "tests": [
+      {
+        "name": "advanced_source",
+        "seconds": 21.02,
+        "logging": false
+      },
+      {
+        "name": "stage11_globals",
+        "seconds": 1.5,
+        "logging": false
+      },
+      {
+        "name": "log_native",
+        "seconds": 386.44,
+        "logging": true
+      },
+      {
+        "name": "log_execution",
+        "seconds": 225.5,
+        "logging": true
+      },
+      {
+        "name": "log_frontend",
+        "seconds": 20.08,
+        "logging": true
+      },
+      {
+        "name": "log_files",
+        "seconds": 69.24,
+        "logging": true
+      },
+      {
+        "name": "log_oracles",
+        "seconds": 152.65,
+        "logging": true
+      },
+      {
+        "name": "log_cache",
+        "seconds": 48.05,
+        "logging": true
+      },
+      {
+        "name": "log_install",
+        "seconds": 101.65,
+        "logging": true
+      },
+      {
+        "name": "log_console",
+        "seconds": 77.26,
+        "logging": true
+      },
+      {
+        "name": "lsp_log",
+        "seconds": 15.35,
+        "logging": true
+      },
+      {
+        "name": "log_probe_normal",
+        "seconds": 1.25,
+        "logging": true
+      },
+      {
+        "name": "log_probe_optimized",
+        "seconds": 1.26,
+        "logging": true
+      },
+      {
+        "name": "stage10_console_source",
+        "seconds": 120.26,
+        "logging": false
+      },
+      {
+        "name": "io_ownership",
+        "seconds": 36.05,
+        "logging": false
+      },
+      {
+        "name": "io_native_responsiveness",
+        "seconds": 13.77,
+        "logging": false
+      },
+      {
+        "name": "io_native_close_failure",
+        "seconds": 14.07,
+        "logging": false
+      },
+      {
+        "name": "io_native_shutdown",
+        "seconds": 14.25,
+        "logging": false
+      },
+      {
+        "name": "io_native_opening_shutdown",
+        "seconds": 13.98,
+        "logging": false
+      },
+      {
+        "name": "io_native_whole_shutdown",
+        "seconds": 13.92,
+        "logging": false
+      },
+      {
+        "name": "io_native_pending_close",
+        "seconds": 14.56,
+        "logging": false
+      },
+      {
+        "name": "io_native_cancelled",
+        "seconds": 15.18,
+        "logging": false
+      },
+      {
+        "name": "io_async_source",
+        "seconds": 18.54,
+        "logging": false
+      },
+      {
+        "name": "io_errors_async",
+        "seconds": 18.04,
+        "logging": false
+      },
+      {
+        "name": "io_async_acquisition",
+        "seconds": 0.33,
+        "logging": false
+      },
+      {
+        "name": "io_native_jobs",
+        "seconds": 0.01,
+        "logging": false
+      },
+      {
+        "name": "io_kernel",
+        "seconds": 0.12,
+        "logging": false
+      },
+      {
+        "name": "async_source",
+        "seconds": 46.84,
+        "logging": false
+      },
+      {
+        "name": "async_ir",
+        "seconds": 0.06,
+        "logging": false
+      },
+      {
+        "name": "async_parallel",
+        "seconds": 2.73,
+        "logging": false
+      },
+      {
+        "name": "async_lifecycle",
+        "seconds": 5.16,
+        "logging": false
+      }
+    ],
+    "tool_sha256": {
+      "build/ci-official-debug/voidc": "f8f92e57376f08e3d765c3d242456d9bf94a15ae55533ed2311785dc7e1b0bea",
+      "build/ci-official-debug/voidls": "77568007d3141eb97291786e4d4126756444badd6c3bf77923d51a169159e4d7",
+      "build/ci-official-debug/void_io_runner": "1514300ce28619232e45b3a72bed2d6381e1a6a87d8f8094be5767038eeaa7f9",
+      "build/ci-official-debug/void_log_host": "05bab1eb6017dd35e0048fe72b4907f59267cb69a917255a12d7145cb0d58d59",
+      "build/ci-official-debug/void_log_probe_normal": "17cb3b9ff60e503865d799c30d19a200e8c42d34116a785b23cb1882845818a7",
+      "build/ci-official-debug/void_log_probe_optimized": "d6b64d5d66accb89f803d6a58741688f9c8c5761be29cea9170d89f04062c0b2",
+      "build/ci-official-debug/void_io_native_jobs": "527849aa15524c3918b39de817bf6561d3a2341250d0fa9a670a01c72a5ecc02",
+      "build/ci-official-debug/void_async_tests": "2b2c6710eec99973b5f5ed837812f1e892f676a7d872ef1d73422f796a3c9ee1",
+      "build/ci-official-debug/libvoid_runtime.a": "ef6d242361e61f6f1d0f83ab11507ceb72263a80de7038d6c2b6b16ef5b57c64",
+      "build/ci-official-debug/void-native.txt": "f6fabf61d3f139287221a03a3236361c02d33fccaacc4920f5a785028ada27ab",
+      "build/ci-official-debug/CMakeCache.txt": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940"
+    }
+  },
+  {
+    "profile": "release",
+    "tests": [
+      {
+        "name": "advanced_source",
+        "seconds": 3.51,
+        "logging": false
+      },
+      {
+        "name": "stage11_globals",
+        "seconds": 0.87,
+        "logging": false
+      },
+      {
+        "name": "log_native",
+        "seconds": 137.24,
+        "logging": true
+      },
+      {
+        "name": "log_execution",
+        "seconds": 87.03,
+        "logging": true
+      },
+      {
+        "name": "log_frontend",
+        "seconds": 3.38,
+        "logging": true
+      },
+      {
+        "name": "log_files",
+        "seconds": 25.98,
+        "logging": true
+      },
+      {
+        "name": "log_oracles",
+        "seconds": 50.76,
+        "logging": true
+      },
+      {
+        "name": "log_cache",
+        "seconds": 13.68,
+        "logging": true
+      },
+      {
+        "name": "log_install",
+        "seconds": 33.11,
+        "logging": true
+      },
+      {
+        "name": "log_console",
+        "seconds": 29.65,
+        "logging": true
+      },
+      {
+        "name": "lsp_log",
+        "seconds": 2.12,
+        "logging": true
+      },
+      {
+        "name": "log_probe_normal",
+        "seconds": 0.27,
+        "logging": true
+      },
+      {
+        "name": "log_probe_optimized",
+        "seconds": 0.27,
+        "logging": true
+      },
+      {
+        "name": "stage10_console_source",
+        "seconds": 49.04,
+        "logging": false
+      },
+      {
+        "name": "io_ownership",
+        "seconds": 14.75,
+        "logging": false
+      },
+      {
+        "name": "io_native_responsiveness",
+        "seconds": 6.57,
+        "logging": false
+      },
+      {
+        "name": "io_native_close_failure",
+        "seconds": 6.76,
+        "logging": false
+      },
+      {
+        "name": "io_native_shutdown",
+        "seconds": 6.33,
+        "logging": false
+      },
+      {
+        "name": "io_native_opening_shutdown",
+        "seconds": 6.7,
+        "logging": false
+      },
+      {
+        "name": "io_native_whole_shutdown",
+        "seconds": 6.71,
+        "logging": false
+      },
+      {
+        "name": "io_native_pending_close",
+        "seconds": 6.75,
+        "logging": false
+      },
+      {
+        "name": "io_native_cancelled",
+        "seconds": 6.88,
+        "logging": false
+      },
+      {
+        "name": "io_async_source",
+        "seconds": 8.71,
+        "logging": false
+      },
+      {
+        "name": "io_errors_async",
+        "seconds": 9.01,
+        "logging": false
+      },
+      {
+        "name": "io_async_acquisition",
+        "seconds": 0.18,
+        "logging": false
+      },
+      {
+        "name": "io_native_jobs",
+        "seconds": 0.0,
+        "logging": false
+      },
+      {
+        "name": "io_kernel",
+        "seconds": 0.05,
+        "logging": false
+      },
+      {
+        "name": "async_source",
+        "seconds": 5.58,
+        "logging": false
+      },
+      {
+        "name": "async_ir",
+        "seconds": 0.05,
+        "logging": false
+      },
+      {
+        "name": "async_parallel",
+        "seconds": 1.71,
+        "logging": false
+      },
+      {
+        "name": "async_lifecycle",
+        "seconds": 2.92,
+        "logging": false
+      }
+    ],
+    "tool_sha256": {
+      "build/ci-official-release/voidc": "4b28eed8268b3936eba68358ed79dc9b72b273cbd646134f2ac6114cc2bda578",
+      "build/ci-official-release/voidls": "2e2ebe9797cfc88f29af27e1e3bd94a0e3716b1278600d27bec0172d9b332583",
+      "build/ci-official-release/void_io_runner": "67ba852c15dda1be7f099e61df118db79a100b923668f78eb45ff88708ca2852",
+      "build/ci-official-release/void_log_host": "19fb02c8890265a523842399f2fe4963523a3f04caaf6d82541610b20a968dda",
+      "build/ci-official-release/void_log_probe_normal": "c8eb09c56f0a9e71a4cb2cc0c54e37359fc5f506c9b33134baa84cea1993daec",
+      "build/ci-official-release/void_log_probe_optimized": "440340ec7bc2be6c7466f2fe9c28a7354c965b1f2647141c1e80698754c5f689",
+      "build/ci-official-release/void_io_native_jobs": "7c86cd9e42e0b36380d0fbac031ac630ed2ecc544dbc0b14c7aa061ab5b40971",
+      "build/ci-official-release/void_async_tests": "37b4911481e80fa071ca4e5a2ade498126613da3113f4e4a0ea1a1e8b060f853",
+      "build/ci-official-release/libvoid_runtime.a": "57214c3ea1dab5ba953077c6f2ed084ca485497535bc066fe3689fe765cddf27",
+      "build/ci-official-release/void-native.txt": "b68eae90ecc1ab9d5bb64cde570194678a5ca64ece51b9185fff4ed3bccbf76a",
+      "build/ci-official-release/CMakeCache.txt": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb"
+    }
+  },
+  {
+    "profile": "strict",
+    "tests": [
+      {
+        "name": "advanced_source",
+        "seconds": 9.87,
+        "logging": false
+      },
+      {
+        "name": "stage11_globals",
+        "seconds": 2.0,
+        "logging": false
+      },
+      {
+        "name": "log_native",
+        "seconds": 449.32,
+        "logging": true
+      },
+      {
+        "name": "log_execution",
+        "seconds": 220.11,
+        "logging": true
+      },
+      {
+        "name": "log_frontend",
+        "seconds": 17.72,
+        "logging": true
+      },
+      {
+        "name": "log_files",
+        "seconds": 68.15,
+        "logging": true
+      },
+      {
+        "name": "log_oracles",
+        "seconds": 143.13,
+        "logging": true
+      },
+      {
+        "name": "log_cache",
+        "seconds": 46.51,
+        "logging": true
+      },
+      {
+        "name": "log_install",
+        "seconds": 94.53,
+        "logging": true
+      },
+      {
+        "name": "log_console",
+        "seconds": 77.81,
+        "logging": true
+      },
+      {
+        "name": "lsp_log",
+        "seconds": 11.76,
+        "logging": true
+      },
+      {
+        "name": "log_probe_normal",
+        "seconds": 1.01,
+        "logging": true
+      },
+      {
+        "name": "log_probe_optimized",
+        "seconds": 0.99,
+        "logging": true
+      },
+      {
+        "name": "stage10_console_source",
+        "seconds": 142.52,
+        "logging": false
+      },
+      {
+        "name": "io_ownership",
+        "seconds": 40.01,
+        "logging": false
+      },
+      {
+        "name": "io_native_responsiveness",
+        "seconds": 16.31,
+        "logging": false
+      },
+      {
+        "name": "io_native_close_failure",
+        "seconds": 16.6,
+        "logging": false
+      },
+      {
+        "name": "io_native_shutdown",
+        "seconds": 15.48,
+        "logging": false
+      },
+      {
+        "name": "io_native_opening_shutdown",
+        "seconds": 15.28,
+        "logging": false
+      },
+      {
+        "name": "io_native_whole_shutdown",
+        "seconds": 14.93,
+        "logging": false
+      },
+      {
+        "name": "io_native_pending_close",
+        "seconds": 15.43,
+        "logging": false
+      },
+      {
+        "name": "io_native_cancelled",
+        "seconds": 14.85,
+        "logging": false
+      },
+      {
+        "name": "io_async_source",
+        "seconds": 19.22,
+        "logging": false
+      },
+      {
+        "name": "io_errors_async",
+        "seconds": 19.09,
+        "logging": false
+      },
+      {
+        "name": "io_async_acquisition",
+        "seconds": 0.46,
+        "logging": false
+      },
+      {
+        "name": "io_native_jobs",
+        "seconds": 0.02,
+        "logging": false
+      },
+      {
+        "name": "io_kernel",
+        "seconds": 0.08,
+        "logging": false
+      },
+      {
+        "name": "async_source",
+        "seconds": 17.58,
+        "logging": false
+      },
+      {
+        "name": "async_ir",
+        "seconds": 0.11,
+        "logging": false
+      },
+      {
+        "name": "async_parallel",
+        "seconds": 3.54,
+        "logging": false
+      },
+      {
+        "name": "async_lifecycle",
+        "seconds": 5.63,
+        "logging": false
+      }
+    ],
+    "tool_sha256": {
+      "build/ci-official-sanitizers/voidc": "fbc6bb86c29a087bdf83dd9b66204eb2be37d192509ea04b12600129e6ef786a",
+      "build/ci-official-sanitizers/voidls": "c44e0f4df51c7981b4cb3d8918d7bfc080457278d0dd937a8bceebce693b0fbc",
+      "build/ci-official-sanitizers/void_io_runner": "7d6306f1dec133d2e41631c0a587b11dc95be662a3e499d2d4adb520f6fa44e4",
+      "build/ci-official-sanitizers/void_log_host": "9ea36b4ae36b75f1e6c5cbf6848f2f9af57da53b9d1aff892c996feb2c92a342",
+      "build/ci-official-sanitizers/void_log_probe_normal": "c41052f1ce3b3a94c60cfb76a3f2bdd890ceede504b98bb6a81358c711ec2ad1",
+      "build/ci-official-sanitizers/void_log_probe_optimized": "f564f4c4f99c92166f89ebb662a7f751e3a6ab1eeab4098fa15b8230b304c57a",
+      "build/ci-official-sanitizers/void_io_native_jobs": "60cd3dfcb885ceba01aff19ce7c0d6f21365f6c8949e8fd69e3aaee476aec6ef",
+      "build/ci-official-sanitizers/void_async_tests": "37a4cd267e72efb5c3ead074794905597f109300b4112b99e603b504a9321b84",
+      "build/ci-official-sanitizers/libvoid_runtime.a": "edaec1a26e25a9650751b51160a917fd7b7b51002cdcb19f644b22f87603345e",
+      "build/ci-official-sanitizers/void-native.txt": "f03a528d3990196dfb721bcf131d6525de0d2f321e9695cf4b285bcd9c5f75ff",
+      "build/ci-official-sanitizers/CMakeCache.txt": "05bad7ad190fbdbea3afdc7a700542adc7e7e147c8df85fd1aeace72158fdedb"
+    }
+  }
+]

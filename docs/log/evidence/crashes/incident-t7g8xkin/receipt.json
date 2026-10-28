@@ -1,0 +1,730 @@
+{
+  "failure_kind": "unexpected_exit",
+  "context": {
+    "profile": "build/ci-official-debug",
+    "mode": "check",
+    "expected_status": 0,
+    "expected_stdout_hex": null,
+    "hard_stack_bytes": null
+  },
+  "timed_out": false,
+  "command": [
+    "build/ci-official-debug/voidc",
+    "check",
+    "tests/log/native.void"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language",
+  "returncode": 1,
+  "signal": null,
+  "executable": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc",
+  "executable_sha256": "6d1e8cdf33d21cb983930d61688b87b25dddd2b5d75b709f89430f9ecff8e725",
+  "sources": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/channel.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/channel_crash.void",
+      "sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "original_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "preserved_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/collections.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/collections_crash.void",
+      "sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "original_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "preserved_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/console.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/console_crash.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "original_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "preserved_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/convert_crash.void",
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "original_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "preserved_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/encoding/ascii_crash.void",
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "original_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "preserved_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/encoding/base64_crash.void",
+      "sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "original_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "preserved_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/encoding/binary_crash.void",
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "original_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "preserved_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/encoding/hex_crash.void",
+      "sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "original_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "preserved_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/error.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/error_crash.void",
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "original_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "preserved_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/io/memory_crash.void",
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "original_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "preserved_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/io_crash.void",
+      "sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "original_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "preserved_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/json_crash.void",
+      "sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "original_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "preserved_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/log.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/log_crash.void",
+      "sha256": "a0f18ff2c4421be7746d657417f84f65ed60004d3f9f7840d187da56fea012a5",
+      "original_sha256": "a0f18ff2c4421be7746d657417f84f65ed60004d3f9f7840d187da56fea012a5",
+      "preserved_sha256": "a0f18ff2c4421be7746d657417f84f65ed60004d3f9f7840d187da56fea012a5",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "a0f18ff2c4421be7746d657417f84f65ed60004d3f9f7840d187da56fea012a5"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/math.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/math_crash.void",
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "original_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "preserved_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/os.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/os_crash.void",
+      "sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "original_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "preserved_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/path.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/path_crash.void",
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "original_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "preserved_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/random.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/random_crash.void",
+      "sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "original_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "preserved_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/text.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/text_crash.void",
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "original_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "preserved_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/time.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/stdlib/time_crash.void",
+      "sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "original_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "preserved_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/aot.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/aot_crash.void",
+      "sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be",
+      "original_sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be",
+      "preserved_sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/async.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/async_crash.void",
+      "sha256": "6f55f901ce539315035ebe7773163c3a2657a4541a90d31e23f0dee0eee365cc",
+      "original_sha256": "6f55f901ce539315035ebe7773163c3a2657a4541a90d31e23f0dee0eee365cc",
+      "preserved_sha256": "6f55f901ce539315035ebe7773163c3a2657a4541a90d31e23f0dee0eee365cc",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "6f55f901ce539315035ebe7773163c3a2657a4541a90d31e23f0dee0eee365cc"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/benchmark.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/benchmark_crash.void",
+      "sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480",
+      "original_sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480",
+      "preserved_sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/cancel.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/cancel_crash.void",
+      "sha256": "63115d48bf588bf0e7ffd1b3366c6542a04ea790834c3ea3242862bb711d6021",
+      "original_sha256": "63115d48bf588bf0e7ffd1b3366c6542a04ea790834c3ea3242862bb711d6021",
+      "preserved_sha256": "63115d48bf588bf0e7ffd1b3366c6542a04ea790834c3ea3242862bb711d6021",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "63115d48bf588bf0e7ffd1b3366c6542a04ea790834c3ea3242862bb711d6021"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/defaults.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/defaults_crash.void",
+      "sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc",
+      "original_sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc",
+      "preserved_sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/native.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/native_crash.void",
+      "sha256": "2eba89599dddf5bcdd413836060514fd9c049178e849bae5749d4b9ea8763b79",
+      "original_sha256": "2eba89599dddf5bcdd413836060514fd9c049178e849bae5749d4b9ea8763b79",
+      "preserved_sha256": "2eba89599dddf5bcdd413836060514fd9c049178e849bae5749d4b9ea8763b79",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2eba89599dddf5bcdd413836060514fd9c049178e849bae5749d4b9ea8763b79"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/publication.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/publication_crash.void",
+      "sha256": "e9e72c60d7fac70c283d73945f9d04c6c051740dbe904de6f5118b6a702491f6",
+      "original_sha256": "e9e72c60d7fac70c283d73945f9d04c6c051740dbe904de6f5118b6a702491f6",
+      "preserved_sha256": "e9e72c60d7fac70c283d73945f9d04c6c051740dbe904de6f5118b6a702491f6",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "e9e72c60d7fac70c283d73945f9d04c6c051740dbe904de6f5118b6a702491f6"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/semantics.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/semantics_crash.void",
+      "sha256": "04e21657ba8b90997f7fe9367c46e6c50cc5adfc50875feeb6a4ac82843c9a54",
+      "original_sha256": "04e21657ba8b90997f7fe9367c46e6c50cc5adfc50875feeb6a4ac82843c9a54",
+      "preserved_sha256": "04e21657ba8b90997f7fe9367c46e6c50cc5adfc50875feeb6a4ac82843c9a54",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "04e21657ba8b90997f7fe9367c46e6c50cc5adfc50875feeb6a4ac82843c9a54"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/smoke.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/inputs/smoke_crash.void",
+      "sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625",
+      "original_sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625",
+      "preserved_sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625"
+    }
+  ],
+  "build_inputs": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-gnu/CMakeCache.txt",
+      "sha256": "30fcf758fc2b547032431899ad55a0c555b2f09cfe174ed02118f228ee2327fc",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/CMakeCache.txt",
+      "sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/CMakeCache.txt",
+      "sha256": "05bad7ad190fbdbea3afdc7a700542adc7e7e147c8df85fd1aeace72158fdedb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/CMakeCache.txt",
+      "sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/CMakeCache.txt",
+      "sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/CMakeCache.txt",
+      "sha256": "bdb7b3bc0484036366e9ffbd79fc86e0e09658f1eefb17b7a52f4e532faf727b",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    }
+  ],
+  "provenance_inputs": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/CMakeLists.txt",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/CMakeLists.txt",
+      "sha256": "13a4500c7f52e95a18cc2b4ce6f46bd01be525d91a2701a13f58428973827f88",
+      "original_sha256": "13a4500c7f52e95a18cc2b4ce6f46bd01be525d91a2701a13f58428973827f88",
+      "preserved_sha256": "13a4500c7f52e95a18cc2b4ce6f46bd01be525d91a2701a13f58428973827f88"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/benchmarks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/benchmarks.py",
+      "sha256": "de5eb4ac3644bded187037aa1e2f5e9cce2bfaa697f021520e38ddfebd6b2c76",
+      "original_sha256": "de5eb4ac3644bded187037aa1e2f5e9cce2bfaa697f021520e38ddfebd6b2c76",
+      "preserved_sha256": "de5eb4ac3644bded187037aa1e2f5e9cce2bfaa697f021520e38ddfebd6b2c76"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/cache.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/cache.py",
+      "sha256": "565ffe0b315634b089f5fe9ccd5a837e46f59ead6c4cd9cf2cffdda02783c199",
+      "original_sha256": "565ffe0b315634b089f5fe9ccd5a837e46f59ead6c4cd9cf2cffdda02783c199",
+      "preserved_sha256": "565ffe0b315634b089f5fe9ccd5a837e46f59ead6c4cd9cf2cffdda02783c199"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/check.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/check.py",
+      "sha256": "3ff91f514d3216cd6e4e93091771efcc3cc6419679b436d9c7d71ec8e1b8de50",
+      "original_sha256": "3ff91f514d3216cd6e4e93091771efcc3cc6419679b436d9c7d71ec8e1b8de50",
+      "preserved_sha256": "3ff91f514d3216cd6e4e93091771efcc3cc6419679b436d9c7d71ec8e1b8de50"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/execution.py",
+      "sha256": "4791c3b61d44a2d577325dc90acbf1d96a326c6ca59ce5f79898ac4a261e687e",
+      "original_sha256": "4791c3b61d44a2d577325dc90acbf1d96a326c6ca59ce5f79898ac4a261e687e",
+      "preserved_sha256": "4791c3b61d44a2d577325dc90acbf1d96a326c6ca59ce5f79898ac4a261e687e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/expand_io.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/expand_io.py",
+      "sha256": "560e6b55d99b296c51c9bea925ab6e37357106fe115fc09fd24560b089dbe216",
+      "original_sha256": "560e6b55d99b296c51c9bea925ab6e37357106fe115fc09fd24560b089dbe216",
+      "preserved_sha256": "560e6b55d99b296c51c9bea925ab6e37357106fe115fc09fd24560b089dbe216"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/files.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/files.py",
+      "sha256": "15bf57f990edb8addf36d4d40422b9d5d71c0e0bef05cffefe601285ebed941a",
+      "original_sha256": "15bf57f990edb8addf36d4d40422b9d5d71c0e0bef05cffefe601285ebed941a",
+      "preserved_sha256": "15bf57f990edb8addf36d4d40422b9d5d71c0e0bef05cffefe601285ebed941a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/frontend.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/frontend.py",
+      "sha256": "1bba937c249e2ecc4a40c67219f73579ae8b125ed3c93f2b7f49e1c86e92b575",
+      "original_sha256": "1bba937c249e2ecc4a40c67219f73579ae8b125ed3c93f2b7f49e1c86e92b575",
+      "preserved_sha256": "1bba937c249e2ecc4a40c67219f73579ae8b125ed3c93f2b7f49e1c86e92b575"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/host.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/host.cpp",
+      "sha256": "6aa0b26c5472b065b5da4565966ae07b203e8351e1a4cc40ac4812c228e7be45",
+      "original_sha256": "6aa0b26c5472b065b5da4565966ae07b203e8351e1a4cc40ac4812c228e7be45",
+      "preserved_sha256": "6aa0b26c5472b065b5da4565966ae07b203e8351e1a4cc40ac4812c228e7be45"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/host.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/host.py",
+      "sha256": "8fbf349d758c087b1134ca55dc9c647d350ed75908e55a361313ab42b841a5e5",
+      "original_sha256": "8fbf349d758c087b1134ca55dc9c647d350ed75908e55a361313ab42b841a5e5",
+      "preserved_sha256": "8fbf349d758c087b1134ca55dc9c647d350ed75908e55a361313ab42b841a5e5"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/install.py",
+      "sha256": "aa6ca9da49c7767b304d1f330ce1677af5b5de6550b176bdb23b827b110f70e6",
+      "original_sha256": "aa6ca9da49c7767b304d1f330ce1677af5b5de6550b176bdb23b827b110f70e6",
+      "preserved_sha256": "aa6ca9da49c7767b304d1f330ce1677af5b5de6550b176bdb23b827b110f70e6"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/lsp.py",
+      "sha256": "9b6e3f362447909cfecec09cb099b640e9e5c474d49a1f26646bc3fbc41b7018",
+      "original_sha256": "9b6e3f362447909cfecec09cb099b640e9e5c474d49a1f26646bc3fbc41b7018",
+      "preserved_sha256": "9b6e3f362447909cfecec09cb099b640e9e5c474d49a1f26646bc3fbc41b7018"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/oracles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/oracles.py",
+      "sha256": "61e963850c57c2a13c5e364257c1ab2da9e4bd445a09e1b28a19f34b14735f09",
+      "original_sha256": "61e963850c57c2a13c5e364257c1ab2da9e4bd445a09e1b28a19f34b14735f09",
+      "preserved_sha256": "61e963850c57c2a13c5e364257c1ab2da9e4bd445a09e1b28a19f34b14735f09"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/process.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/process.py",
+      "sha256": "1d5348724ac5a9aa123f8cef9d2f40e228b21d4a28220763870bdea88c7d4afd",
+      "original_sha256": "1d5348724ac5a9aa123f8cef9d2f40e228b21d4a28220763870bdea88c7d4afd",
+      "preserved_sha256": "1d5348724ac5a9aa123f8cef9d2f40e228b21d4a28220763870bdea88c7d4afd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/profiles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/profiles.py",
+      "sha256": "12f757dcc15dc4de9be3a312e916473de2806af456b02acfd84ae9d8056ddb05",
+      "original_sha256": "12f757dcc15dc4de9be3a312e916473de2806af456b02acfd84ae9d8056ddb05",
+      "preserved_sha256": "12f757dcc15dc4de9be3a312e916473de2806af456b02acfd84ae9d8056ddb05"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/support.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/support.py",
+      "sha256": "4f33e1fabd3488120b933830928a1cc5130bc414af4ac8995cb23ea5bbece039",
+      "original_sha256": "4f33e1fabd3488120b933830928a1cc5130bc414af4ac8995cb23ea5bbece039",
+      "preserved_sha256": "4f33e1fabd3488120b933830928a1cc5130bc414af4ac8995cb23ea5bbece039"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/acceptance.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/acceptance.py",
+      "sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "original_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "preserved_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/crash.py",
+      "sha256": "844663ee1cdda40374ae88c5fbe5b8da1cc64bacbf8d595d602169b33bcb0dc6",
+      "original_sha256": "844663ee1cdda40374ae88c5fbe5b8da1cc64bacbf8d595d602169b33bcb0dc6",
+      "preserved_sha256": "844663ee1cdda40374ae88c5fbe5b8da1cc64bacbf8d595d602169b33bcb0dc6"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/crash_test.py",
+      "sha256": "a43ca97ea55c8c297fbac9df4f262e6364a2dcef2e17c06e708db3881845bb00",
+      "original_sha256": "a43ca97ea55c8c297fbac9df4f262e6364a2dcef2e17c06e708db3881845bb00",
+      "preserved_sha256": "a43ca97ea55c8c297fbac9df4f262e6364a2dcef2e17c06e708db3881845bb00"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/depth.py",
+      "sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "original_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "preserved_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/execution_2.py",
+      "sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "original_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "preserved_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/final_checks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/final_checks.py",
+      "sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "original_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "preserved_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/focused.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/focused.py",
+      "sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "original_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "preserved_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/install_2.py",
+      "sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "original_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "preserved_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/lsp_2.py",
+      "sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "original_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "preserved_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/oracles_2.py",
+      "sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "original_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "preserved_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/process_2.py",
+      "sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "original_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "preserved_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/sitecustomize.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-t7g8xkin/provenance/sitecustomize.py",
+      "sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "original_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "preserved_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc"
+    }
+  ],
+  "trigger": "Sources come from argv and explicit source_inputs; working-directory companions and canonical stdlib are retained conservatively. The exact causal subset is not inferred.",
+  "build": "/home/shmellyorc/Documents/Void.Language/build",
+  "environment": {},
+  "compiler_source_hashes": {
+    "src/backend/llvm/async_start.inc": "0e605c00493f46726f0fe1d2b11b6013153c4c9bca27341d1af55266669ab47f",
+    "src/backend/llvm/backend.cpp": "6ca8d7190d675453dc012d57bee2bb47ac983731ea4395167cc63fedf171ceab",
+    "src/backend/llvm/encoded_cfg.cpp": "8cece4596c75ad8d8aefcc2fadaf756f291abf3fa78ac186a786adc497a540dd",
+    "src/backend/llvm/encoded_cfg.hpp": "19669525012fae8d91a2d9652142e979ad854e62b11fa92b9416d449b8239ecc",
+    "src/backend/llvm/filesystem.inc": "336f101ef961863b2866ef7b763c6229adb336be61e14621d071b023d07e3128",
+    "src/backend/llvm/native_cache.cpp": "89074f43ea6efa50639e2740b578035d4f8d557b2f9ad63008a3a57c2c0a9085",
+    "src/backend/llvm/native_cache.hpp": "3756e700ac36d641a27bb45b4677c62b42433de58565c7d6231545c9e14378e6",
+    "src/backend/llvm/os.inc": "4fe2d817e5e5afac01f794cc5bdb4401f6caa86001403a10d8d8a155d76f9502",
+    "src/backend/llvm/private_fixed_call_fixture.inc": "22fc057da8b38b6c896ab6e004456aceae22b3764341c593532176b9c966de0e",
+    "src/backend/llvm/storage_audit.cpp": "a3584e447a67da51a2224a8f6f69b24d6f175f36f36c6cd1c8682e1a1ebfe381",
+    "src/format.cpp": "65aa6172548c494462e993b8ad0f5bbd7e22736b22bbc3eb4e831b424085d57d",
+    "src/frontend/binary_codec.inc": "16fe0bcde0c7aacf6c2536f17a118498dbcef3f880f33efe42b299fb95b094ca",
+    "src/frontend/capabilities.inc": "91fad855bad5d321a48c2c530711b89cd71c2a0393e56d57880bc3b0d777784e",
+    "src/frontend/collection_display.inc": "bc118b9767343dd3f05abe650e4118624c8b724886f4a867af722e9e97fa1697",
+    "src/frontend/compiler.cpp": "bdd8433bd4b8aea1ecec404538582fed637544842f9289d8cecbac6c58d1c5e8",
+    "src/frontend/construction.inc": "11dd4ab49feff3c1b428cb8cd5d957ba41d56351fb7154f3b62ae318392935d0",
+    "src/frontend/display_semantics.inc": "ab2614138c5a0c39f4f964cefab88a023ffc3d92025bf27d5ba186a636e83915",
+    "src/frontend/filesystem.inc": "a509841949985bfe5038ff28908cc5aefa84531762b12b72ca3b877577b90ed0",
+    "src/frontend/generic_declarations.inc": "38c18207bb3f60883165451e47e9db21ab5c42ad397dc919442c4fef58d78b12",
+    "src/frontend/generic_inference.inc": "cb209b877bf7b2005b1e0535195208e03ef586b84dbf3c35efcf2fe75e5f7652",
+    "src/frontend/generic_tooling.inc": "8e1cc9c63abd20869ae79c90069c1f4aed6e6c4e738fec2f11d76df5e3f55cc2",
+    "src/frontend/generics.inc": "f2e58b54a6489c2932cf6f269e8681e261b7a78f47157f99444490f398dbc7f7",
+    "src/frontend/inheritance.inc": "fddcd9b411bd8c2716c700faf388f0433db8e2813f3757f2952ffc18272d0f4a",
+    "src/frontend/json.inc": "e7b9fbf95b897b386417d1b12abe4351e7036032c8d6da57eec5668d7aaacb22",
+    "src/frontend/math.inc": "e316847a1bde10702da9b72f1af0f075f04071cbfb3b07c78052f7a6107ae239",
+    "src/frontend/os.inc": "83666cc31ec9af7dff002507102b5f7f19cc33e6b6e7709c1e7d0aebe07717b7",
+    "src/frontend/pattern_lowering.inc": "a411efc0316296a995f8ca00a5e73e243a0ffc5491b98468e909b22f5bf51fcf",
+    "src/frontend/pattern_parser.inc": "5b9a0af017b9702e82fbebc0bd0799c620174d23a7cf6296141f96d67c0f8951",
+    "src/frontend/pattern_semantics.inc": "fda278c4fdcf77713473c262922075921d8c44365720d070b99189822c9c57b3",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/source.cpp": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+    "src/frontend/stdlib_conversion.inc": "39b6a3b02a2e4f657b68069e68f28e7c73cd53c2f9e66d4fbc8fcbf82570721c",
+    "src/frontend/strings.inc": "1ca4225da42b4bb14ce1a4579fa70be84463b71f1ba8811f1c5d4f257ccc71bc",
+    "src/frontend/tooling.cpp": "7bae9162ea7aab48d88447e978f8d309e3779f6149c276de3f42ac3906d8fdbb",
+    "src/ir/async_validation.inc": "fe458a91f7b16b2789e199d0afd3093570aab818cde14b5f998a84e7f47f3c0e",
+    "src/ir/construction.inc": "fdc058bf17e3a05b46a7d2751894b86884ded7ffdd30d9af6757aea9b97b5a05",
+    "src/ir/filesystem.inc": "d60db0ca432f1d5266cfbcdcf5232e93787322de791e3ac4151f4401d91984fd",
+    "src/ir/fixed_ownership.inc": "9a76a436afd2952564475fa4734addc275694e197dc2ecb547891bc7827c0c0b",
+    "src/ir/interfaces.inc": "e66943dd9c1ab0245bf0cda04e69278724ba98eb133ad12fd06f3face5d626c2",
+    "src/ir/module.cpp": "1033a33af61d585404adddd341ff79d594466d8cfb9ca5ea03f57b1ce9a6930e",
+    "src/ir/native_binding.cpp": "ac975b25e8c646d448732e924b725b0ce60eb54cbc2414693246aa1026aebe4f",
+    "src/ir/native_storage.cpp": "8a4ace75c0e14525f05269a505818e429349f4a2891b72a3dae15189b050458c",
+    "src/ir/os.inc": "1aeab1311887356050a6656209f6b4d89bd65ad213a4773090aff98010e2dd58",
+    "src/ir/reference_capabilities.inc": "446dd632b51b4131268fd86f3fd2455f0e38552c2d1fe138b79a826ad9fcf11a",
+    "src/lsp/main.cpp": "e725f9a854a930a367390bcd5597227ee4eca6f969e8907a9f4eb6bf6a0158c2",
+    "src/lsp/positions.cpp": "ffd16fcb0863b1b2689fbbc5d7eb42ed3a1bfa7dafe87a67dbbc341b9ecc0aab",
+    "src/main.cpp": "a21aa1630db01ddb50eb80f1bb1cc91d9994231eba69ca4631ce7db933f45d07",
+    "src/native/fixture.c": "23a0ea4f50f900e5711aaff9661bb2bbfcb2bd3b85b93a9825b0b94b943950ba",
+    "src/native/fixture.h": "e2885f539910ddff220f8d10acdef40fd965c3af283bc88de9ef668123827135",
+    "src/native/sink.c": "78c175e94c600fa41a445a6144906dea3db9df8e4b69aace30fa7610002d34b2",
+    "src/native/sink.h": "158f8341f61682b4608758d2b841e7f626ef53801e230365a4bf7c85c2e2ae2b",
+    "src/native_build.cpp": "bb4dfe673a1331804753a8e79afbc1d742bab31b09b6df121c5357f453d5e407",
+    "src/native_windows.hpp": "f63d92220f790e4e10fe2119984d45eca66e2977f78fa8b6f13b7997df8a1e4c",
+    "src/numeric.cpp": "2c687512907e74a345dd49e9f9417eb5edfeb2687454875717b400e2160041c6",
+    "src/runtime/abi.cpp": "f0ce4b13c99b78ecd7c6c316dc0f3e33bbf66d4a099b133aa15329a0467e5468",
+    "src/runtime/array.cpp": "294c8efdf70130284d2432cdc901104815f7c5fa2c3b0328f529048169825933",
+    "src/runtime/async.cpp": "b7d2b56ee4a016f3b578d8b830b7aa60392a1fbeffc46625d9942f63392d787b",
+    "src/runtime/buffer.cpp": "1efdcbc0c981307fbf5ea4236838f7b2d4f552c2e623586e77d8d8f056e939fc",
+    "src/runtime/callback.cpp": "510e56937cd24f17dfb7699648b59a1df1db0b052baae380a74210909b1fcda2",
+    "src/runtime/console.cpp": "c994908428fb22b47c618d1e6e310f205ba3bc7494374b84116bba4c3f303312",
+    "src/runtime/console_abi.cpp": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c",
+    "src/runtime/console_keyboard.inc": "ecddacc7625c6834353af025529464f08af3cc53d9cb40b9548ab73a44b0d0d2",
+    "src/runtime/console_presentation.inc": "45c87f1ff65919cf1e388527a57230389ef1c9156972fc175a8c1e6a1b329124",
+    "src/runtime/console_terminfo.inc": "1a664e9813fd97d7124318a1f1107981adf8de1c98c88a1feadb156391e107e1",
+    "src/runtime/conversion.cpp": "1365fffa2445850571c1b5d630f9138701fe19ede743e9be201cacf6e9dc5771",
+    "src/runtime/coordination.cpp": "5ec3d952755f118ef24016d2491d92717ea0b049ae98cb1d6746ef82f9fbd4e0",
+    "src/runtime/dictionary.cpp": "baeebadbe9dea5664740fde3e0c5c44b7977dd0242f69fd7b98e137e1fe3b80f",
+    "src/runtime/filesystem.cpp": "0cc2d6f546c4bd4ff6ae7d7049ebbb09c892a19a4c0b822e82e04546be136feb",
+    "src/runtime/filesystem_abi.cpp": "037cdd1477d7fd1eac229ced4d308cfd442d689760302d4e329b9af8bae9464b",
+    "src/runtime/fixed_abi.cpp": "735b1e5224c45a26d7698484aab0f362035c8c41775e79889c1711235bac8b8f",
+    "src/runtime/gc_schema.cpp": "bcf1c26134b73eb4387737354bb536f04f2c177bab0db67be075b0559fcee9c4",
+    "src/runtime/heap.cpp": "0e9bf997a06815f9d7617877611b514c8a36e41281b59662fc20b505f0f3ee7b",
+    "src/runtime/list.cpp": "812803162d889416496a0d2b45d82665d334a106de00b493de8ba9da0e128846",
+    "src/runtime/native.cpp": "00a3f814cfa4f9a0eeaa2887ccbe82894f7c6c787f55d74e57c8291b1430ba81",
+    "src/runtime/native_binding.cpp": "8c11a2c4b0d4b2bf7953984e01360ea7bf26dc3ee7aefa08eb0a969552b8171d",
+    "src/runtime/native_resource.cpp": "fe0f0290197094e6ee5055633f61b7f1cdb4f99aa788a36d009c05cd7422b16e",
+    "src/runtime/os.cpp": "a40b923d132a7b671c3895009cad71381a5d317b4d5338e366d7c2af045c2004",
+    "src/runtime/os_abi.cpp": "cb1ba10195333171408d2c61fceec257a0d8da89a211784485c8fe5ae65ded5a",
+    "src/runtime/os_apple.mm": "2106be6aea6efcb556e5c9358592cc124175dae90e877b1d200ddf4bab50e2fa",
+    "src/runtime/random.cpp": "b56c4cad835e54fac6b25f7f7597269d348c45492f27ea108a0fe6dd41fa69cf",
+    "src/runtime/reload.cpp": "a7e48d4025d4eedad456214946080151b899747fcea7f2b943ce1e4973e791f5",
+    "src/runtime/temporal_abi.cpp": "ede0161d7eba5a300829319f179cf0b2d63c3ed3a5577b5d38546b842e3e0874",
+    "src/runtime/text_case.cpp": "bd7b0f973a5671c66cd792286bed3a77d3f797ae506fdb02dd1b5c6b60e31abd",
+    "src/runtime/unicode_case_tables.inc": "fae60f77cc2101e9266bdbf60ea136945b30c9a5f1288b4cb8d4d7be543141fe",
+    "src/temporal.cpp": "b17a8f180eb99e20bdd4ae7d126466f7418b6fe2dfadf2da1e0e21a2e9e6584a",
+    "include/void/async.hpp": "fc7acc8d9a95b2d32ad8e730ff47edec7bcb535b369ce0d63f521043156e0a83",
+    "include/void/backend.hpp": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2",
+    "include/void/buffer.hpp": "cf4da707545dcab5d37882c80dd19f7bea16626d43deb2613dbfae1bb9f57131",
+    "include/void/cache.hpp": "745062f95d56ecd3ec42a208882be3d285260f81de6e108ce9f56acee8fe4545",
+    "include/void/callback.hpp": "b53e04e5b782c5930e6c35aea7f57b41dacf2b487ae3fa90fc01fc87f6f981cd",
+    "include/void/console.hpp": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb",
+    "include/void/console_ops.hpp": "2afbea6d8eee7f97e536eacb138a79133f3c496d87197350d2e7c0d61b89abd2",
+    "include/void/detail/console_wide.hpp": "a4b47d68931579159e1e9b5cfbf8984727267acef6ffd253d7053e40476b3840",
+    "include/void/detail/filesystem_hooks.hpp": "c5e1ae8fa3befcdf20776cbf4982ee7100d87a9ee08e2af810fdb0c86d52064f",
+    "include/void/detail/os_integer.hpp": "4e3aa12708f55bb91ef7149ef4018554f9de9305b1d82782db972fca2bd1fa0f",
+    "include/void/diagnostic.hpp": "6ea5519568506664afdd91d4b0ac04b7a06d7757fca34d767bc769335619acb1",
+    "include/void/execution.hpp": "8db29e5a6441474405a7c2a4130658260e404fce8c0a681df64702b2e9705630",
+    "include/void/filesystem.hpp": "c916a92f60e0b368b3cde59e521cc1d21a8d7d2dcca1c8f2bb557390e68a8e36",
+    "include/void/filesystem_abi.hpp": "c4b6c7a8897e4afe43b3e55004d3d990b368fb6498c5009cbfba5170a4327941",
+    "include/void/filesystem_ops.hpp": "5b86d2e0fda6fd18cccc9aa2ba7c5410d2bf714e50fdb53271c8e4137b4fb08f",
+    "include/void/format.hpp": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b",
+    "include/void/frontend.hpp": "1906dba160f0a3bd02bb0087fcbbb01872f520b54e83feebbff68e54456ac346",
+    "include/void/gc_schema.hpp": "a00705aa14c9bd8c96655e96fe91fe9ad0bc8915675b59d868e6670db9f94098",
+    "include/void/heap.hpp": "adfc433225e93e379ba6682b19821c7e4881c0c680917466428566196d98a1c1",
+    "include/void/ir.hpp": "d87b1c0175e104dbf285ca404136e8e6848b740077de63b029c9b140bef049c9",
+    "include/void/llvm_storage_audit.hpp": "c1738800a245a438c3c52570197ef59ef068eb84fbe873242ddfa22bd5e627e5",
+    "include/void/lsp.hpp": "100e7b1139a08f9687edbaa0cf9573818c1f7797ae78dde7818969d9f41d6ec8",
+    "include/void/math_ops.hpp": "da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb",
+    "include/void/native.hpp": "ea42b49cd0f1b41e8317ccccb1238278a171408de2ef8f1b3fdce1f3c2fcfd69",
+    "include/void/native_binding.hpp": "308b0af5b8ade15195cf399813bc2c214a386148a2a28854aebc3ca95ea44147",
+    "include/void/native_build.hpp": "30bed0079880aef602fed26ad318980b10d90be5a9265119cfa3bf6adca089b0",
+    "include/void/native_resource.hpp": "4c32240beff3d0ac9e300c5d868358e3899f77097a55b5ad7b0f04d7368080b1",
+    "include/void/native_runtime.hpp": "45dc4c3d243dca40c6ac9130a14c20ca73991970fa21e412b704282c126c7b8a",
+    "include/void/native_storage.hpp": "79f9afcd2e0240dc859f516905fc7503615ed98687e7582da00728eec15d6ac7",
+    "include/void/numeric.hpp": "5397fb41d912e07f5ab983611a99920d2af806c515e3e4c9a06d708735576d3d",
+    "include/void/os.hpp": "6fb4bfc4d4545ab6668ec8c51ed69e2680b511467166232c06c4c4a541d6b77b",
+    "include/void/os_abi.hpp": "c4b82a9fa80ebecc6d28107cd1725ca3254b08c4c6db6414fc8102db89c9fb17",
+    "include/void/path.hpp": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98",
+    "include/void/private_fixed_call_research.hpp": "1f7d158771e2c3b5fe07ca377011b21d962bfc16e66a5d873c67892aea151626",
+    "include/void/reference_capabilities.hpp": "d84d04a6817f67c0b6b112bd5148daf5dbf14bec567045a3c3f01428734a5fd8",
+    "include/void/runtime.hpp": "4b2752a08c3905a2b49493ef96a63e740adc99c8ae607d02508bb0e4b1cf2f05",
+    "include/void/runtime_abi.hpp": "7d43064a058bbc712340b5745ed886666a529394090b5f3b77d1e1fc93543cb1",
+    "include/void/source.hpp": "197bdd88e6cb464acffd5c5b478aee3b4d401cbd8177a4dd447573472f213a51",
+    "include/void/temporal.hpp": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9",
+    "include/void/temporal_ops.hpp": "42a253ba5f55e5235c4492e6f548b5a1af43c082e48fa1c1742120e4a87e19e9",
+    "include/void/tooling.hpp": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba",
+    "include/void/utf8.hpp": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773"
+  },
+  "tool_input_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/voidc": "6d1e8cdf33d21cb983930d61688b87b25dddd2b5d75b709f89430f9ecff8e725"
+  }
+}

@@ -1,0 +1,5 @@
+entered native cancellation was not drained: operation=14 completion_race=0 held=1 progressed=1 result=-1 diagnostic=Async await dependency cycleCalled from /cancel.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/log/cancel.void:39:22: source call
+
+native-observation cancel.log identity=181657 bytes=0 hex=
+native-observation cancel-entered identity=181656 bytes=7 hex=656e7465726564

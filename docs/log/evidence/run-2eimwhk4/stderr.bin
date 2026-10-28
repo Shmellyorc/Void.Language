@@ -1,0 +1,8 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/log.void:333:29: error: Unknown identifier 'input'.
+    code: VOID2002
+
+ 333 |         var value = _scalar(input, at, width)
+     |                             ^^^^^
+    Module: /@stdlib/log.void
+    Hint: Declare it with var before use.
+

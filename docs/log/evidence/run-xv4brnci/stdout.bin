@@ -1,0 +1,9 @@
+transport optimize=0 partial_boundaries=18 native_closes=25 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=71 post_effect_faults=1 passed
+cancel optimize=0 native_operation=14 closes=1 passed
+cancel optimize=0 native_operation=15 closes=1 passed
+cancel optimize=0 native_operation=18 closes=1 passed
+cancel optimize=0 native_operation=30 closes=1 passed
+cancel optimize=0 native_operation=24 closes=1 passed
+715 logging native checks passed

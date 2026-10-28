@@ -1,0 +1,10 @@
+{
+  "stdlib/log.void": "d0ca6902a834eddb048aa482d4f8a70528e2b97d710d6ab6fd326b9705a6d207",
+  "stdlib/io.void": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+  "src/frontend/compiler.cpp": "bdd8433bd4b8aea1ecec404538582fed637544842f9289d8cecbac6c58d1c5e8",
+  "src/runtime/filesystem.cpp": "0cc2d6f546c4bd4ff6ae7d7049ebbb09c892a19a4c0b822e82e04546be136feb",
+  "src/runtime/async.cpp": "a46b6b0594ae16a8d7e30b0436d3323fd7fa3b6e587c9c097f92618526a1f18e",
+  "tests/log/host.cpp": "2db76bf13e9780f23f5dbc862eb0049dacd9cce8b6e9e2da62e48a22f2cd3ebf",
+  "tests/io/native_jobs.cpp": "70aea8e31612fe3c701552223c7e67de149112e3e74a6b2973d90b442dc628a8",
+  "CMakeLists.txt": "80c9b768280a450aa1c30094316a6be2ee7a8d31530809005d451d9b143d5453"
+}

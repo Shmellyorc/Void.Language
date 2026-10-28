@@ -1,0 +1,66 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-debug
+      Start  68: advanced_source
+ 1/24 Test  #68: advanced_source ..................   Passed   19.94 sec
+      Start 190: stage11_globals
+ 2/24 Test #190: stage11_globals ..................   Passed    1.40 sec
+      Start 191: log_native
+ 3/24 Test #191: log_native .......................***Failed  312.31 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-piwcm854
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/log/host.py", line 8, in <module>
+    result = h.run([exe, h.ROOT, directory, *sys.argv[2:]], sources=[h.ROOT / 'tests/log', Path(directory)], timeout=1800, small=True,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/log/support.py", line 71, in run
+    assert not result.expectation_failed, (receipt, args, result.returncode, result.stdout, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (PosixPath('/home/shmellyorc/Documents/Void.Language/docs/log/evidence/run-9qodp0w8'), ['/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/void_log_host', '/home/shmellyorc/Documents/Void.Language', '/tmp/VOID-log-host-obtx3xvp'], 1, b'reload optimize=0 pending_native_write preserved_global_file_identity passed\ntransport optimize=0 partial_boundaries=18 native_closes=25 passed\nrotation optimize=0 native_identity_and_replacement_boundaries passed\nallocation optimize=0 acquisition_failures=71 post_effect_faults=1 passed\ncancel optimize=0 native_operation=14 closes=1 passed\ncancel optimize=0 native_operation=15 closes=1 passed\ncancel optimize=0 native_operation=18 closes=1 passed\ncancel optimize=0 native_operation=30 closes=1 passed\ncancel optimize=0 native_operation=24 closes=1 passed\nreload optimize=1 pending_native_write preserved_global_file_identity passed\ntransport optimize=1 partial_boundaries=18 native_closes=25 passed\nrotation optimize=1 native_identity_and_replacement_boundaries passed\nallocation optimize=1 acquisition_failures=71 post_effect_faults=1 passed\ncancel optimize=1 native_operation=14 closes=1 passed\ncancel optimize=1 native_operation=15 closes=1 passed\ncancel optimize=1 native_operation=18 closes=1 passed\ncancel optimize=1 native_operation=30 closes=1 passed\n', 'cancelled uncertain transport permitted retry\nnative-observation cancel-entered identity=175535 bytes=7 hex=656e7465726564\nnative-observation cancel.log identity=175534 bytes=0 hex=\nnative-observation publication.log identity=175523 bytes=0 hex=\nnative-observation replacement.log identity=175508 bytes=21 hex=7265706c6163656d656e742073656e74696e656c0a\nnative-observation native.log identity=175507 bytes=36 hex=494e464f202222202241f09f94a55c6e220a494e464f202222202241f09f94a55c6e220a\nnative-observation reload.log identity=175443 bytes=28 hex=494e464f20222220226f6c64220a494e464f20222220226e6577220a\nnative-observation external-sentinel identity=175374 bytes=18 hex=65787465726e616c20636f6e74656e74730a\n')
+
+      Start 192: log_execution
+ 4/24 Test #192: log_execution ....................   Passed  211.30 sec
+      Start 193: log_frontend
+ 5/24 Test #193: log_frontend .....................   Passed   19.65 sec
+      Start 194: log_files
+ 6/24 Test #194: log_files ........................   Passed   66.57 sec
+      Start 195: log_oracles
+ 7/24 Test #195: log_oracles ......................   Passed   88.21 sec
+      Start 196: log_cache
+ 8/24 Test #196: log_cache ........................   Passed   45.97 sec
+      Start 197: log_install
+ 9/24 Test #197: log_install ......................   Passed   96.83 sec
+      Start 198: log_console
+10/24 Test #198: log_console ......................   Passed   77.70 sec
+      Start 199: lsp_log
+11/24 Test #199: lsp_log ..........................   Passed   15.42 sec
+      Start 200: log_probe_normal
+12/24 Test #200: log_probe_normal .................   Passed    0.90 sec
+      Start 201: log_probe_optimized
+13/24 Test #201: log_probe_optimized ..............   Passed    0.91 sec
+      Start 218: stage10_console_source
+14/24 Test #218: stage10_console_source ...........   Passed  116.71 sec
+      Start 239: io_ownership
+15/24 Test #239: io_ownership .....................   Passed   34.54 sec
+      Start 249: io_native_responsiveness
+16/24 Test #249: io_native_responsiveness .........   Passed   13.68 sec
+      Start 250: io_native_close_failure
+17/24 Test #250: io_native_close_failure ..........   Passed   13.87 sec
+      Start 251: io_native_shutdown
+18/24 Test #251: io_native_shutdown ...............   Passed   13.64 sec
+      Start 252: io_native_opening_shutdown
+19/24 Test #252: io_native_opening_shutdown .......   Passed   14.04 sec
+      Start 253: io_native_whole_shutdown
+20/24 Test #253: io_native_whole_shutdown .........   Passed   14.10 sec
+      Start 254: io_native_pending_close
+21/24 Test #254: io_native_pending_close ..........   Passed   14.05 sec
+      Start 255: io_native_cancelled
+22/24 Test #255: io_native_cancelled ..............   Passed   13.92 sec
+      Start 265: io_native_jobs
+23/24 Test #265: io_native_jobs ...................   Passed    0.01 sec
+      Start 266: io_kernel
+24/24 Test #266: io_kernel ........................   Passed    0.12 sec
+
+96% tests passed, 1 tests failed out of 24
+
+Total Test time (real) = 1205.78 sec
+
+The following tests FAILED:
+	191 - log_native (Failed)

@@ -321,7 +321,13 @@ void Runtime::bytes_into(void** out,std::string_view source) {
     std::string bytes(source);auto layout=fixed_scalar_layout(ScalarEncoding::u8,bytes.size());
     void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
     Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
-    if(!bytes.empty()){BufferBuilder builder(*this,layout,bytes.size(),quota);for(unsigned char byte:bytes)builder.write_scalar(byte);builder.finish_into(&backing);}
+    if(!bytes.empty()) {
+        BufferBuilder builder(*this,layout,bytes.size(),quota);
+        // bytes already owns the input across safepoints. Reuse the existing
+        // dense-u8 builder path and its bounded polling/publication protocol.
+        builder.write_bytes({reinterpret_cast<const std::byte*>(bytes.data()),bytes.size()});
+        builder.finish_into(&backing);
+    }
     array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
     auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
     auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=bytes.size();*out=result;

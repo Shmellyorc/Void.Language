@@ -1,0 +1,53 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers
+      Start  68: advanced_source
+ 1/24 Test  #68: advanced_source ..................   Passed    9.97 sec
+      Start 184: stage11_globals
+ 2/24 Test #184: stage11_globals ..................   Passed    2.05 sec
+      Start 185: log_native
+ 3/24 Test #185: log_native .......................   Passed  355.23 sec
+      Start 186: log_execution
+ 4/24 Test #186: log_execution ....................   Passed  208.99 sec
+      Start 187: log_frontend
+ 5/24 Test #187: log_frontend .....................   Passed   16.32 sec
+      Start 188: log_files
+ 6/24 Test #188: log_files ........................   Passed   67.01 sec
+      Start 189: log_oracles
+ 7/24 Test #189: log_oracles ......................   Passed  139.39 sec
+      Start 190: log_cache
+ 8/24 Test #190: log_cache ........................   Passed   43.45 sec
+      Start 191: log_install
+ 9/24 Test #191: log_install ......................   Passed   92.69 sec
+      Start 192: log_console
+10/24 Test #192: log_console ......................   Passed   75.34 sec
+      Start 193: lsp_log
+11/24 Test #193: lsp_log ..........................   Passed   11.23 sec
+      Start 194: log_probe_normal
+12/24 Test #194: log_probe_normal .................   Passed    0.93 sec
+      Start 195: log_probe_optimized
+13/24 Test #195: log_probe_optimized ..............   Passed    0.93 sec
+      Start 211: stage10_console_source
+14/24 Test #211: stage10_console_source ...........   Passed  128.80 sec
+      Start 232: io_ownership
+15/24 Test #232: io_ownership .....................   Passed   37.51 sec
+      Start 239: io_native_responsiveness
+16/24 Test #239: io_native_responsiveness .........   Passed   14.33 sec
+      Start 240: io_native_close_failure
+17/24 Test #240: io_native_close_failure ..........   Passed   14.42 sec
+      Start 241: io_native_shutdown
+18/24 Test #241: io_native_shutdown ...............   Passed   14.41 sec
+      Start 242: io_native_opening_shutdown
+19/24 Test #242: io_native_opening_shutdown .......   Passed   14.50 sec
+      Start 243: io_native_whole_shutdown
+20/24 Test #243: io_native_whole_shutdown .........   Passed   14.61 sec
+      Start 244: io_native_pending_close
+21/24 Test #244: io_native_pending_close ..........   Passed   14.61 sec
+      Start 245: io_native_cancelled
+22/24 Test #245: io_native_cancelled ..............   Passed   14.78 sec
+      Start 255: io_native_jobs
+23/24 Test #255: io_native_jobs ...................   Passed    0.03 sec
+      Start 256: io_kernel
+24/24 Test #256: io_kernel ........................   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 24
+
+Total Test time (real) = 1291.66 sec

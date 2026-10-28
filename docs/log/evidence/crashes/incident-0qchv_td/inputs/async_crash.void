@@ -1,0 +1,35 @@
+use log
+use convert
+
+async func exercise() -> result<i32, log.failure>:
+    var options = log.config(timestamps = false, console = log.console_sink.none,
+        file_path = "async 雪 %.log", rotation_bytes = 64, max_record_bytes = 64, backups = 3)
+    var instance = (await log.open_async(options))?
+    with instance as owned:
+        for index in 0..<20:
+            var sent = (await owned.write_async(log.level.info, "record {index:00}"))?
+            if not sent:
+                return Ok(1)
+        var flushed = (await owned.flush_async())?
+        options.backups = 1
+        var configured = (await owned.configure_async(options))?
+        var sent = (await owned.write_async(log.level.warn, "last"))?
+        var closed = (await owned.close_async())?
+        var again = (await owned.close_async())?
+    var configured = (await log.configure_async(log.config(timestamps = false, minimum = log.level.off)))?
+    var skipped = (await log.write_async(log.level.info, "filtered"))?
+    var flushed = (await log.flush_async())?
+    var closed = (await log.shutdown_async())?
+    var configured_again = (await log.configure_async(log.config(timestamps = false, minimum = log.level.off)))?
+    var closed_again = (await log.shutdown_async())?
+    if skipped:
+        return Ok(2)
+    return Ok(7)
+
+async func entry(input: i32) -> i32:
+    var answer = await exercise()
+    if answer is Ok(var number):
+        return number
+    if answer is Err(var problem):
+        print("{problem.operation}: {problem.message}")
+    return 99
