@@ -1,0 +1,17 @@
+Source: https://github.com/Shmellyorc/Void.Language/actions/runs/40844952491/job/123350061666
+
+2026-10-29T08:54:44.7586070Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN
+2026-10-29T08:54:48.4516800Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN - Success
+2026-10-29T08:54:48.4518630Z -- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+2026-10-29T08:54:49.0528080Z -- The OBJCXX compiler identification is Clang 23.1.4
+2026-10-29T08:54:49.5087000Z 
+2026-10-29T08:57:21.2564850Z -- Performing Test VOID_LLVM_ORC_RUNS - Success
+2026-10-29T08:57:21.9328420Z -- Found Python3: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3.12 (found version "3.12.10") found components: Interpreter
+2026-10-29T08:57:22.1098650Z -- Configuring done (173.8s)
+2026-10-29T08:57:38.6285560Z [18/1559] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+2026-10-29T08:57:38.6386570Z FAILED: [code=1] CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o 
+2026-10-29T08:57:38.6494100Z /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++  -I/Users/runner/work/Void.Language/Void.Language/include -stdlib=libc++ -nostdinc++ -isystem "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/" -g -std=c++20 -arch arm64 -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -fno-rtti -Wall -Wextra -Wpedantic -MD -MT CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o -MF CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o.d -o CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o -c /Users/runner/work/Void.Language/Void.Language/src/runtime/random.cpp
+2026-10-29T08:57:38.6602360Z /Users/runner/work/Void.Language/Void.Language/src/runtime/random.cpp:24:16: error: use of undeclared identifier 'getentropy'
+2026-10-29T08:57:38.6681490Z    24 |             if(getentropy(bytes.data(),bytes.size())!=0) code=errno;
+2026-10-29T08:57:38.6682070Z       |                ^~~~~~~~~~
+

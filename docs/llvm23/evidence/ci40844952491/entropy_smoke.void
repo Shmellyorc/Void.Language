@@ -1,0 +1,7 @@
+use random
+
+func main() -> i32:
+    if random.from_entropy() is Ok(var observed_engine):
+        var sample = observed_engine.rand_u64()
+        return 0
+    return 1

@@ -1,0 +1,28 @@
+{
+  "baseline": "cb54dcc40cf2da712ab480bd7dbc4b49e898df1b",
+  "host": "Linux gamedev 7.2.11-pikaos #101pika1 SMP PREEMPT_DYNAMIC Sat Oct 17 21:28:05 UTC 2026 x86_64 GNU/Linux",
+  "build_exit": 0,
+  "focused_ctest": {
+    "passed": 11,
+    "failed": 0,
+    "wall_seconds": 52.45
+  },
+  "encoding_probe": {
+    "default_emulated": "cp1252",
+    "passed": true,
+    "dynamic_text_accesses": 8,
+    "static_write_sites": 5,
+    "static_read_sites": 1
+  },
+  "entropy_smoke_commands": 7,
+  "native_Windows_verification": "pending",
+  "native_macOS_verification": "pending",
+  "staged_paths": [],
+  "changed_tracked_files": [
+    "docs/llvm23/ACCEPTANCE.md",
+    "docs/llvm23/COMPATIBILITY.md",
+    "docs/llvm23/IMPLEMENTATION.md",
+    "src/runtime/random.cpp",
+    "tests/io/execution.py"
+  ]
+}

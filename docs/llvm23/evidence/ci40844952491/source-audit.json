@@ -1,0 +1,47 @@
+{
+  "baseline": "cb54dcc40cf2da712ab480bd7dbc4b49e898df1b",
+  "text_IO_calls": [
+    {
+      "line": 203,
+      "operation": "write_text",
+      "encoding": "utf-8"
+    },
+    {
+      "line": 208,
+      "operation": "write_text",
+      "encoding": "utf-8"
+    },
+    {
+      "line": 229,
+      "operation": "write_text",
+      "encoding": "utf-8"
+    },
+    {
+      "line": 216,
+      "operation": "write_text",
+      "encoding": "utf-8"
+    },
+    {
+      "line": 260,
+      "operation": "write_text",
+      "encoding": "utf-8"
+    },
+    {
+      "line": 206,
+      "operation": "read_text",
+      "encoding": "utf-8"
+    }
+  ],
+  "Python_AST_otherwise_identical": true,
+  "random_function_body_byte_identical": true,
+  "unchanged_files": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "CMakeLists.txt": "f6ba5fa8ec1558b2e777e45c9f638ea4a779f3e7a08a61fc9322b598f2cd5732",
+    "cmake/LLVMPlatform.cmake": "cbb9905a7d2a84748f6a3a42e10bdb5258e53857843619da3024c8d96c6542d1",
+    "cmake/NativeBuild.cmake": "fed1e58ca1ef8f93722b33ba78ba4220da83a5224fcb46dbcc5ff3a997e47497",
+    "cmake/probes/StopToken.cpp": "2ba542b9e2fb7a959d16be0b3f28869e410512f73f41cc45d4117221f1c89876",
+    "cmake/dependencies/CMakeLists.txt": "1229aec6612b9c2026faabed0b66114eed8dbf32cc58bb67c64b4d3eaeeeb5bc",
+    "tools/ci/llvm_sdk.py": "fe46fcc151529e310af95888711eb03b229f67fcc2565d5841f03f6428b0dfdb",
+    "src/backend/llvm/backend.cpp": "15fcbba73e2909acbe8b70f44abb551fab934a91ce297b87b4dccefa9fcd0594"
+  }
+}

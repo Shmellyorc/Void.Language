@@ -1,0 +1,77 @@
+{
+  "host": "Linux x86-64, real getrandom provider; not Apple execution",
+  "results": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/ci40844952491/entropy_smoke.void"
+      ],
+      "exit_code": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/ci40844952491/entropy_smoke.void",
+        "--no-opt"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/ci40844952491/entropy_smoke.void",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci40844952491-repair/entropy-smoke",
+        "--no-opt"
+      ],
+      "exit_code": 0,
+      "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/.toolchains/ci40844952491-repair/entropy-smoke\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci40844952491-repair/entropy-smoke"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/ci40844952491/entropy_smoke.void"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/ci40844952491/entropy_smoke.void",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci40844952491-repair/entropy-smoke"
+      ],
+      "exit_code": 0,
+      "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/.toolchains/ci40844952491-repair/entropy-smoke\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci40844952491-repair/entropy-smoke"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

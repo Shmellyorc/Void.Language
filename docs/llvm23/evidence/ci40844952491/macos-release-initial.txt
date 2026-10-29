@@ -1,0 +1,17 @@
+Source: https://github.com/Shmellyorc/Void.Language/actions/runs/40844952491/job/123350061685
+
+2026-10-29T08:54:15.2532360Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN
+2026-10-29T08:54:16.7248580Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN - Success
+2026-10-29T08:54:16.7249310Z -- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+2026-10-29T08:54:16.9006600Z -- The OBJCXX compiler identification is Clang 23.1.4
+2026-10-29T08:54:17.1809720Z 
+2026-10-29T08:56:28.4368470Z -- Performing Test VOID_LLVM_ORC_RUNS - Success
+2026-10-29T08:56:28.8758680Z -- Found Python3: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3.12 (found version "3.12.10") found components: Interpreter
+2026-10-29T08:56:29.0106370Z -- Configuring done (140.0s)
+2026-10-29T08:56:49.0425970Z [17/1559] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+2026-10-29T08:56:49.0528740Z FAILED: [code=1] CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o 
+2026-10-29T08:56:49.0632960Z /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++  -I/Users/runner/work/Void.Language/Void.Language/include -stdlib=libc++ -nostdinc++ -isystem "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/" -O3 -DNDEBUG -std=c++20 -arch arm64 -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -fno-rtti -Wall -Wextra -Wpedantic -MD -MT CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o -MF CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o.d -o CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o -c /Users/runner/work/Void.Language/Void.Language/src/runtime/random.cpp
+2026-10-29T08:56:49.0736680Z /Users/runner/work/Void.Language/Void.Language/src/runtime/random.cpp:24:16: error: use of undeclared identifier 'getentropy'
+2026-10-29T08:56:49.0838400Z    24 |             if(getentropy(bytes.data(),bytes.size())!=0) code=errno;
+2026-10-29T08:56:49.0939680Z       |                ^~~~~~~~~~
+

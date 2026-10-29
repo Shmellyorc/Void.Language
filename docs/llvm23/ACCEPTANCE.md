@@ -1,5 +1,12 @@
 # LLVM 23.1.4 local acceptance
 
+**CI 40844952491 continuation:** the prior configuration repairs passed Windows
+ORC and macOS stop-token/ORC checks in both native configurations. The subsequent
+UTF-8 fixture and Apple entropy-header build fixes are ready for source review.
+[Native build repair evidence](NATIVE_BUILD_REPAIR.md) records 11/11 focused Linux
+tests, cp1252-default emulation and remaining native build/test requirements.
+No hosted run was triggered for these new changes.
+
 **2026-10-29 cross-platform follow-up:** configuration repairs against
 `a4ca3e585db945570b22c890b086fa6a53692a5f` are implemented and ready for independent
 Golden Wrench review. [Repair evidence and hosted acceptance commands](CROSS_PLATFORM_REPAIR.md)

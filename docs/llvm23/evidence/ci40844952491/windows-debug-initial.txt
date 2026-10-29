@@ -1,0 +1,21 @@
+Source: https://github.com/Shmellyorc/Void.Language/actions/runs/40844952491/job/123350061570
+
+2026-10-29T08:52:13.2604634Z -- Performing Test VOID_LLVM_ORC_RUNS
+2026-10-29T08:52:21.1702889Z -- Performing Test VOID_LLVM_ORC_RUNS - Success
+2026-10-29T08:52:21.7777530Z -- Found Python3: C:/hostedtoolcache/windows/Python/3.12.10/x64/python3.exe (found version "3.12.10") found components: Interpreter
+2026-10-29T08:52:21.8970833Z -- Configuring done (11.1s)
+2026-10-29T08:53:42.3991450Z [105/1566] Generating io-wire.void
+2026-10-29T08:53:42.3992865Z FAILED: [code=1] io-wire.void D:/a/Void.Language/Void.Language/build/Debug/io-wire.void 
+2026-10-29T08:53:42.3994568Z C:\Windows\system32\cmd.exe /C "cd /D D:\a\Void.Language\Void.Language\build\Debug && C:\hostedtoolcache\windows\Python\3.12.10\x64\python3.exe D:/a/Void.Language/Void.Language/tests/io/execution.py --generate-async D:/a/Void.Language/Void.Language/build/Debug/io-wire.void"
+2026-10-29T08:53:42.3996029Z Traceback (most recent call last):
+2026-10-29T08:53:42.4003323Z   File "D:\a\Void.Language\Void.Language\tests\io\execution.py", line 267, in <module>
+2026-10-29T08:53:42.4004099Z     main()
+2026-10-29T08:53:42.4004559Z   File "D:\a\Void.Language\Void.Language\tests\io\execution.py", line 203, in main
+2026-10-29T08:53:42.4005078Z     Path(sys.argv[2]).write_text(async_fixture())
+2026-10-29T08:53:42.4005675Z   File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\pathlib.py", line 1048, in write_text
+2026-10-29T08:53:42.4006208Z     return f.write(data)
+2026-10-29T08:53:42.4008099Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-29T08:53:42.4008750Z UnicodeEncodeError: 'charmap' codec can't encode character '\u96ea' in position 4800: character maps to <undefined>
+2026-10-29T08:53:43.5982252Z [106/1566] Linking CXX executable void_async_tests.exe
+2026-10-29T08:53:44.3736626Z [107/1566] Linking CXX executable void_retention_current.exe
+

@@ -1,0 +1,7 @@
+18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/ci40844952491/encoding_probe.py", line 52, in <module>
+    assert len(accesses) == 9, accesses  # eight writes and the errors.void read
+           ^^^^^^^^^^^^^^^^^^
+AssertionError: [{'file': '/tmp/VOID cp1252 fixtures rd_pan5p/io-wire.void', 'mode': 'w', 'encoding': 'utf-8'}, {'file': '/home/shmellyorc/Documents/Void.Language/tests/io/errors.void', 'mode': 'r', 'encoding': 'utf-8'}, {'file': '/tmp/VOID cp1252 fixtures rd_pan5p/io-errors-async.void', 'mode': 'w', 'encoding': 'utf-8'}, {'file': '/tmp/VOID io source j3ica1pk/main.void', 'mode': 'w', 'encoding': 'utf-8'}, {'file': '/tmp/VOID io source j3ica1pk/main.void', 'mode': 'w', 'encoding': 'utf-8'}, {'file': '/tmp/VOID io source j3ica1pk/main.void', 'mode': 'w', 'encoding': 'utf-8'}, {'file': '/tmp/VOID io source j3ica1pk/main.void', 'mode': 'w', 'encoding': 'utf-8'}, {'file': '/tmp/VOID io async wire 662h0qc7/main.void', 'mode': 'w', 'encoding': 'utf-8'}]

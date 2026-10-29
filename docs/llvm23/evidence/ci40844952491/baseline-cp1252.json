@@ -1,0 +1,11 @@
+{
+  "expected_failure": true,
+  "error": "'charmap' codec can't encode character '\\u96ea' in position 4713: character maps to <undefined>",
+  "source_io": [
+    {
+      "file": "/tmp/tmptdsoiwut/io-wire.void",
+      "mode": "w",
+      "requested_encoding": "locale"
+    }
+  ]
+}

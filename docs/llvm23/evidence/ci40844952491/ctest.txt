@@ -1,0 +1,27 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start 241: io_execution
+      Start 144: random_execution
+ 1/11 Test #144: random_execution .................   Passed   22.72 sec
+      Start 243: io_async_execution
+ 2/11 Test #241: io_execution .....................   Passed   23.47 sec
+      Start 143: random_host
+ 3/11 Test #143: random_host ......................   Passed   18.41 sec
+      Start 261: io_errors_async
+ 4/11 Test #243: io_async_execution ...............   Passed   20.00 sec
+      Start 260: io_errors_source
+ 5/11 Test #261: io_errors_async ..................   Passed    6.24 sec
+      Start 148: random_errors
+ 6/11 Test #260: io_errors_source .................   Passed    5.59 sec
+      Start 150: random_worker
+ 7/11 Test #150: random_worker ....................   Passed    3.52 sec
+      Start 245: io_wire_optimized
+ 8/11 Test #245: io_wire_optimized ................   Passed    0.07 sec
+      Start 244: io_wire_normal
+ 9/11 Test #244: io_wire_normal ...................   Passed    0.07 sec
+      Start   1: toolchain_stop_token
+10/11 Test   #1: toolchain_stop_token .............   Passed    0.00 sec
+11/11 Test #148: random_errors ....................   Passed    4.31 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) =  52.45 sec

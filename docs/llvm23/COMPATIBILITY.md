@@ -5,6 +5,13 @@ Consolidated local acceptance is tracked separately. Official source authority:
 [LLVM 23.1.4 release](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.4).
 The complete development archives are required, not compiler-only installers.
 
+CI [40844952491](https://github.com/Shmellyorc/Void.Language/actions/runs/40844952491)
+confirmed Windows ORC and macOS stop-token/ORC configuration success in Debug
+and Release. The [native build follow-up](NATIVE_BUILD_REPAIR.md) adds explicit
+UTF-8 fixture I/O and Apple's `<sys/random.h>` declaration without changing the
+existing toolchain/CRT/libc++ setup or entropy implementation. Native acceptance
+of the new source changes remains pending.
+
 The [2026-10-29 cross-platform repair](CROSS_PLATFORM_REPAIR.md) records actual
 Windows/macOS SDK inspection and corrects the initial runtime assumptions.
 Both repairs are implemented; native acceptance remains pending. Windows now

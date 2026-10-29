@@ -1,0 +1,183 @@
+Start testing: Oct 29 02:46 PDT
+----------------------------------------------------------
+144/369 Testing: random_execution
+144/369 Test: random_execution
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/random/execution.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"random_execution" start time: Oct 29 02:46 PDT
+Output:
+----------------------------------------------------------
+Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=False
+<end of output>
+Test time =  22.72 sec
+----------------------------------------------------------
+Test Passed.
+"random_execution" end time: Oct 29 02:46 PDT
+"random_execution" time elapsed: 00:00:22
+----------------------------------------------------------
+
+241/369 Testing: io_execution
+241/369 Test: io_execution
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"io_execution" start time: Oct 29 02:46 PDT
+Output:
+----------------------------------------------------------
+18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+<end of output>
+Test time =  23.47 sec
+----------------------------------------------------------
+Test Passed.
+"io_execution" end time: Oct 29 02:46 PDT
+"io_execution" time elapsed: 00:00:23
+----------------------------------------------------------
+
+143/369 Testing: random_host
+143/369 Test: random_host
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/random/host.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_random_host" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/random host fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"random_host" start time: Oct 29 02:46 PDT
+Output:
+----------------------------------------------------------
+Swap fault sweep: operation=0 failures=200 successes=1
+Swap fault sweep: operation=1 failures=133 successes=1
+Swap fault sweep: operation=0 failures=200 successes=1
+Swap fault sweep: operation=1 failures=133 successes=1
+Benchmark O2: 20000 iterations (raw, typed, bounded, four-item shuffle), 0.281079 s, 71154.3 iterations/s
+Random host: 2325 checks passed
+<end of output>
+Test time =  18.41 sec
+----------------------------------------------------------
+Test Passed.
+"random_host" end time: Oct 29 02:47 PDT
+"random_host" time elapsed: 00:00:18
+----------------------------------------------------------
+
+243/369 Testing: io_async_execution
+243/369 Test: io_async_execution
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/io/execution.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_runner" "--async"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"io_async_execution" start time: Oct 29 02:46 PDT
+Output:
+----------------------------------------------------------
+42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+<end of output>
+Test time =  20.00 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_execution" end time: Oct 29 02:47 PDT
+"io_async_execution" time elapsed: 00:00:20
+----------------------------------------------------------
+
+261/369 Testing: io_errors_async
+261/369 Test: io_errors_async
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/io-errors-async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/io async errors
+"io_errors_async" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =   6.24 sec
+----------------------------------------------------------
+Test Passed.
+"io_errors_async" end time: Oct 29 02:47 PDT
+"io_errors_async" time elapsed: 00:00:06
+----------------------------------------------------------
+
+260/369 Testing: io_errors_source
+260/369 Test: io_errors_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_runner" "--sync" "/home/shmellyorc/Documents/Void.Language/tests/io/errors.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/io errors
+"io_errors_source" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =   5.59 sec
+----------------------------------------------------------
+Test Passed.
+"io_errors_source" end time: Oct 29 02:47 PDT
+"io_errors_source" time elapsed: 00:00:05
+----------------------------------------------------------
+
+150/369 Testing: random_worker
+150/369 Test: random_worker
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/random/worker.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_runner"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"random_worker" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+Random worker snapshot execution: 8 processes passed
+<end of output>
+Test time =   3.52 sec
+----------------------------------------------------------
+Test Passed.
+"random_worker" end time: Oct 29 02:47 PDT
+"random_worker" time elapsed: 00:00:03
+----------------------------------------------------------
+
+245/369 Testing: io_wire_optimized
+245/369 Test: io_wire_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_wire_optimized" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/io wire optimized
+"io_wire_optimized" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"io_wire_optimized" end time: Oct 29 02:47 PDT
+"io_wire_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+244/369 Testing: io_wire_normal
+244/369 Test: io_wire_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_wire_normal" "7"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/io wire normal
+"io_wire_normal" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"io_wire_normal" end time: Oct 29 02:47 PDT
+"io_wire_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/369 Testing: toolchain_stop_token
+1/369 Test: toolchain_stop_token
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_stop_token_probe"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"toolchain_stop_token" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"toolchain_stop_token" end time: Oct 29 02:47 PDT
+"toolchain_stop_token" time elapsed: 00:00:00
+----------------------------------------------------------
+
+148/369 Testing: random_errors
+148/369 Test: random_errors
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/random/errors.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"random_errors" start time: Oct 29 02:47 PDT
+Output:
+----------------------------------------------------------
+Random checked errors/defers: 24 processes passed
+<end of output>
+Test time =   4.31 sec
+----------------------------------------------------------
+Test Passed.
+"random_errors" end time: Oct 29 02:47 PDT
+"random_errors" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Oct 29 02:47 PDT

@@ -1,5 +1,11 @@
 # LLVM 23.1.4 migration — engineering record
 
+The [CI 40844952491 native build continuation](NATIVE_BUILD_REPAIR.md), against
+`cb54dcc40cf2da712ab480bd7dbc4b49e898df1b`, records successful native configuration
+followed by cp1252 fixture-generation and missing Apple `getentropy` declaration
+failures. The two focused source corrections and local evidence are complete;
+native build/test acceptance of those changes awaits Boss-controlled CI.
+
 2026-10-29 follow-up against `a4ca3e585db945570b22c890b086fa6a53692a5f`:
 the [cross-platform configuration repair](CROSS_PLATFORM_REPAIR.md) supersedes
 the initial Windows CRT and Apple standard-library assumptions below. It records

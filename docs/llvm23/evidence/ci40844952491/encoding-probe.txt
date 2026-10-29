@@ -1,0 +1,49 @@
+18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+{
+  "emulated_default": "cp1252",
+  "native_host": "linux",
+  "VOID_text_accesses": [
+    {
+      "file": "/tmp/VOID cp1252 fixtures wn60pwui/io-wire.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/io/errors.void",
+      "mode": "r",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/tmp/VOID cp1252 fixtures wn60pwui/io-errors-async.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/tmp/VOID io source yai_toyy/main.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/tmp/VOID io source yai_toyy/main.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/tmp/VOID io source yai_toyy/main.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/tmp/VOID io source yai_toyy/main.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "/tmp/VOID io async wire u79oecbv/main.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    }
+  ],
+  "passed": true
+}

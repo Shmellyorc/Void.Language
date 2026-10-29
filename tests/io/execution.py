@@ -200,12 +200,12 @@ def async_fixture(selected=None):
 def main():
     global compiler, checks
     if sys.argv[1] == '--generate-async':
-        Path(sys.argv[2]).write_text(async_fixture())
+        Path(sys.argv[2]).write_text(async_fixture(), encoding='utf-8')
         return
     if sys.argv[1] == '--generate-errors-async':
-        selected = (Path(__file__).parent / 'errors.void').read_text().splitlines()
+        selected = (Path(__file__).parent / 'errors.void').read_text(encoding='utf-8').splitlines()
         selected = selected[:selected.index('func entry(input: i32) -> i32:')]
-        Path(sys.argv[2]).write_text(async_fixture(selected))
+        Path(sys.argv[2]).write_text(async_fixture(selected), encoding='utf-8')
         return
     compiler = Path(sys.argv[1]).resolve()
     if '--async' in sys.argv:
@@ -213,7 +213,7 @@ def main():
         with tempfile.TemporaryDirectory(prefix='VOID io async wire ') as directory:
             root = Path(directory)
             fixture = root / 'main.void'
-            fixture.write_text(async_fixture())
+            fixture.write_text(async_fixture(), encoding='utf-8')
             run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n',
                 source_inputs=(fixture,))
             run([runner, '--async', fixture], root, expected=None, source_inputs=(fixture,))
@@ -226,7 +226,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='VOID io source ') as directory:
         root = Path(directory)
         fixture = root / 'main.void'
-        fixture.write_text('\n'.join(source))
+        fixture.write_text('\n'.join(source), encoding='utf-8')
         run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n',
             source_inputs=(fixture,))
         for mode in ('jit', 'optimized', 'native', 'native-optimized'):
@@ -257,7 +257,7 @@ def main():
             'func worker() -> i32:\n    var result = io.exists("x")\n    return 1\n'
             'async func entry(value: i32) -> i32:\n    return await spawn worker()\n',
         ):
-            fixture.write_text('use io\n' + body)
+            fixture.write_text('use io\n' + body, encoding='utf-8')
             run([compiler, 'check', fixture], root, expected=None, success=False,
                 source_inputs=(fixture,))
     print(f'{checks} public source/file checks passed; {len(vectors)} numeric vectors, both byte orders, '

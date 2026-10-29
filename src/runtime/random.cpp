@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <bcrypt.h>
 #elif defined(__APPLE__)
-#include <unistd.h>
+#include <sys/random.h>
 #else
 #include <sys/random.h>
 #endif
