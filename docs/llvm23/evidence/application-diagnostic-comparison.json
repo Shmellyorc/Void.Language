@@ -1,0 +1,126 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program"
+    ],
+    "returncode": 0,
+    "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void",
+      "--no-opt"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program",
+      "--no-opt"
+    ],
+    "returncode": 0,
+    "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program"
+    ],
+    "returncode": 0,
+    "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void",
+      "--no-opt"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program",
+      "--no-opt"
+    ],
+    "returncode": 0,
+    "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/program"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/diagnostic \u00e9 # %/main.void:1:6: source call\n\n"
+  }
+]

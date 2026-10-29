@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+    "--parallel",
+    "2",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/strict-channel-corrected.xml",
+    "-R",
+    "^(channel_host|channel_execution)$"
+  ],
+  "status": 0,
+  "wall_seconds": 92.93674919998739,
+  "strict_env": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "LSAN_OPTIONS": "exitcode=87"
+  },
+  "original_full_failures": [
+    "channel_execution",
+    "channel_host"
+  ]
+}

@@ -1,0 +1,46 @@
+[
+  {
+    "profile": "ci-official-release",
+    "argv": [
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_systems.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "profile": "ci-official-release",
+    "argv": [
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_systems.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: custom equality metadata disagrees with owner declarations\n"
+  },
+  {
+    "profile": "llvm23-release",
+    "argv": [
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_systems.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "profile": "llvm23-release",
+    "argv": [
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/tests/stage10/operator_console_systems.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "VOID IR: custom equality metadata disagrees with owner declarations\n"
+  }
+]

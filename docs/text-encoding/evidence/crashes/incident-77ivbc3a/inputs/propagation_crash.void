@@ -1,0 +1,19 @@
+struct tracker:
+    total: i32
+func get(value: i32) -> result<i32, string>:
+    if value == 0:
+        return Err("no value")
+    return Ok(value)
+func work(t: tracker, value: i32) -> result<i32, string>:
+    defer {
+        t.total += 10
+    }
+    var number = get(value)?
+    return Ok(number)
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    var result = work(t, value)
+    return match result:
+        Ok(var number): number + t.total
+        Err("no value"): -t.total
+        _: -99

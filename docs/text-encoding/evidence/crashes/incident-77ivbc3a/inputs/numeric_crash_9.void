@@ -1,0 +1,41 @@
+value struct numbers:
+    a: i8 = 127 + 1
+    b: i16 = -300
+    c: i32 = 100000
+    d: i64 = -9000000000
+    e: u8 = 255
+    f: u16 = 60000
+    g: u32 = 4000000000
+    h: u64 = 18446744073709551615
+    i: f32 = 16777217 as f32
+    j: f64 = 1.25d
+    k: bool = true
+
+value struct bundle:
+    data: numbers
+    tail: i8 = 3
+
+const baseline = bundle()
+
+func exchange(a: bundle, b: bundle, select: bool) -> bundle:
+    a.data.a += 1
+    if select:
+        return a
+    return b
+
+func entry(value: i32) -> i32:
+    var original = baseline
+    var copy = exchange(original, bundle(), true)
+    var total = 0
+    for total < 2:
+        copy.tail++
+        total++
+    if original.data.a != -128 or copy.data.a != -127 or original.tail != 3 or copy.tail != 5:
+        return -1
+    if copy.data.b != -300 or copy.data.c != 100000 or copy.data.d != -9000000000:
+        return -2
+    if copy.data.e != 255 or copy.data.f != 60000 or copy.data.g != 4000000000 or copy.data.h != 18446744073709551615:
+        return -3
+    if copy.data.i != 16777217 as f32 or copy.data.j != 1.25d or not copy.data.k:
+        return -4
+    return copy.tail as i32 + value

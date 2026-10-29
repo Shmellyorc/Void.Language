@@ -1,0 +1,182 @@
+ld.lld: error: undefined symbol: __asan_option_detect_stack_use_after_return
+>>> referenced by list.cpp:31 (/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp:31)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by dictionary.cpp:13 (/home/shmellyorc/Documents/Void.Language/src/runtime/dictionary.cpp:13)
+>>>               dictionary.cpp.o:(vd::Runtime::validate_dictionary_key_schema(vd::RuntimeMetadata const&, vd::ElementSchema const&) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by console.cpp:459 (/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:459)
+>>>               console.cpp.o:(vd::console::Streams::Streams(std::shared_ptr<vd::console::Adapter>)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 315 more times
+
+ld.lld: error: undefined symbol: __asan_stack_malloc_2
+>>> referenced by list.cpp:31 (/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp:31)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by async.cpp:355 (/home/shmellyorc/Documents/Void.Language/src/runtime/async.cpp:355)
+>>>               async.cpp.o:(vd_async_new) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by list.cpp:55 (/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp:55)
+>>>               list.cpp.o:(vd::Runtime::list_write(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding, unsigned long, unsigned long, std::optional<unsigned long>)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 54 more times
+
+ld.lld: error: undefined symbol: __asan_memcpy
+>>> referenced by char_traits.h:432 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/char_traits.h:432)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by abi.cpp:21 (/home/shmellyorc/Documents/Void.Language/src/runtime/abi.cpp:21)
+>>>               abi.cpp.o:(vd::Runtime::globals_begin(std::basic_string_view<char, std::char_traits<char>>, unsigned long, vd::RuntimeFailure&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by gc_schema.hpp:47 (/home/shmellyorc/Documents/Void.Language/include/void/gc_schema.hpp:47)
+>>>               gc_schema.cpp.o:(vd::ElementSchema::ElementSchema(vd::ElementSchemaSpec)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 466 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_type_mismatch_v1
+>>> referenced by stl_tree.h:475 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:475)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by stl_tree.h:475 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:475)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by stl_tree.h:475 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tree.h:475)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 7004 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_builtin_unreachable
+>>> referenced by basic_string.h:1191 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/basic_string.h:1191)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by list.cpp:0 (/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp:0)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by std_mutex.h:120 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_mutex.h:120)
+>>>               coordination.cpp.o:(vd::Runtime::monotonic_sample()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 1003 more times
+
+ld.lld: error: undefined symbol: __asan_report_store1
+>>> referenced by char_traits.h:355 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/char_traits.h:355)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by char_traits.h:355 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/char_traits.h:355)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by callback.hpp:56 (/home/shmellyorc/Documents/Void.Language/include/void/callback.hpp:56)
+>>>               callback.cpp.o:(vd::CallbackRegistration::CallbackRegistration(vd::Runtime&, vd::CallbackProvider&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 692 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_pointer_overflow
+>>> referenced by basic_string.h:271 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/basic_string.h:271)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by array:211 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/array:211)
+>>>               coordination.cpp.o:(vd::Runtime::monotonic_sample()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by stl_iterator.h:1103 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_iterator.h:1103)
+>>>               buffer.cpp.o:(vd::DataCursor::prepare(std::shared_ptr<vd::ElementSchema const>)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 1752 more times
+
+ld.lld: error: undefined symbol: __asan_handle_no_return
+>>> referenced by list.cpp:33 (/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp:33)
+>>>               list.cpp.o:(vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by buffer.cpp:0 (/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp:0)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by native_resource.cpp:10 (/home/shmellyorc/Documents/Void.Language/src/runtime/native_resource.cpp:10)
+>>>               native_resource.cpp.o:(vd::NativeResource::own_thread() const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 1355 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_divrem_overflow
+>>> referenced by buffer.cpp:24 (/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp:24)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by gc_schema.cpp:95 (/home/shmellyorc/Documents/Void.Language/src/runtime/gc_schema.cpp:95)
+>>>               gc_schema.cpp.o:(vd::ElementSchema::ElementSchema(vd::ElementSchemaSpec)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by gc_schema.cpp:90 (/home/shmellyorc/Documents/Void.Language/src/runtime/gc_schema.cpp:90)
+>>>               gc_schema.cpp.o:(vd::ElementSchema::ElementSchema(vd::ElementSchemaSpec)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 28 more times
+
+ld.lld: error: undefined symbol: __asan_report_store8
+>>> referenced by shared_ptr_base.h:973 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:973)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by shared_ptr_base.h:1166 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1166)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by buffer.cpp:20 (/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp:20)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 2224 more times
+
+ld.lld: error: undefined symbol: __asan_report_load16
+>>> referenced by shared_ptr_base.h:1619 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1619)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by shared_ptr_base.h:1619 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1619)
+>>>               console.cpp.o:(vd::console::Streams::Streams(std::shared_ptr<vd::console::Adapter>)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by shared_ptr_base.h:1609 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1609)
+>>>               native_resource.cpp.o:(vd::NativeLibrary::get(vd::Runtime&, bool)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 191 more times
+
+ld.lld: error: undefined symbol: __asan_report_store16
+>>> referenced by shared_ptr_base.h:1619 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1619)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by shared_ptr_base.h:1609 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1609)
+>>>               native_resource.cpp.o:(vd::NativeLibrary::get(vd::Runtime&, bool)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by shared_ptr_base.h:1609 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/shared_ptr_base.h:1609)
+>>>               native_resource.cpp.o:(vd::NativeLibrary::existing(vd::Runtime&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 114 more times
+
+ld.lld: error: undefined symbol: __asan_report_load8
+>>> referenced by buffer.cpp:23 (/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp:23)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by buffer.cpp:24 (/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp:24)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by buffer.cpp:24 (/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp:24)
+>>>               buffer.cpp.o:(vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 8898 more times
+
+ld.lld: error: undefined symbol: __asan_report_store4
+>>> referenced by gc_schema.hpp:24 (/home/shmellyorc/Documents/Void.Language/include/void/gc_schema.hpp:24)
+>>>               gc_schema.cpp.o:(vd::StorageDomain::native()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by gc_schema.cpp:55 (/home/shmellyorc/Documents/Void.Language/src/runtime/gc_schema.cpp:55)
+>>>               gc_schema.cpp.o:(vd::StorageDomain::native()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by reload.cpp:9 (/home/shmellyorc/Documents/Void.Language/src/runtime/reload.cpp:9)
+>>>               reload.cpp.o:(vd::OwnedRuntimeFailure::assign(vd::RuntimeFailure const&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 565 more times
+
+ld.lld: error: undefined symbol: __asan_memset
+>>> referenced by std_mutex.h:68 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_mutex.h:68)
+>>>               callback.cpp.o:(vd::CallbackRegistration::CallbackRegistration(vd::Runtime&, vd::CallbackProvider&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by std_mutex.h:68 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/std_mutex.h:68)
+>>>               native_resource.cpp.o:(vd::NativeLibrary::get(vd::Runtime&, bool)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by stl_vector.h:106 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_vector.h:106)
+>>>               reload.cpp.o:(vd::OwnedRuntimeFailure::assign(vd::RuntimeFailure const&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 448 more times
+
+ld.lld: error: undefined symbol: __asan_stack_malloc_1
+>>> referenced by dictionary.cpp:13 (/home/shmellyorc/Documents/Void.Language/src/runtime/dictionary.cpp:13)
+>>>               dictionary.cpp.o:(vd::Runtime::validate_dictionary_key_schema(vd::RuntimeMetadata const&, vd::ElementSchema const&) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by array.cpp:12 (/home/shmellyorc/Documents/Void.Language/src/runtime/array.cpp:12)
+>>>               array.cpp.o:(vd::Runtime::list_identity[abi:cxx11](std::shared_ptr<vd::ElementSchema const> const&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by reload.cpp:8 (/home/shmellyorc/Documents/Void.Language/src/runtime/reload.cpp:8)
+>>>               reload.cpp.o:(vd::OwnedRuntimeFailure::assign(vd::RuntimeFailure const&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 104 more times
+
+ld.lld: error: undefined symbol: __asan_report_load1
+>>> referenced by optional:586 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/optional:586)
+>>>               coordination.cpp.o:(vd::Runtime::monotonic_sample()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by abi.cpp:11 (/home/shmellyorc/Documents/Void.Language/src/runtime/abi.cpp:11)
+>>>               abi.cpp.o:(vd::Runtime::admit_globals(std::basic_string_view<char, std::char_traits<char>>, bool, bool)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by optional:586 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/optional:586)
+>>>               coordination.cpp.o:(vd::Runtime::monotonic_sample()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 921 more times
+
+ld.lld: error: undefined symbol: __ubsan_handle_load_invalid_value
+>>> referenced by optional:586 (/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/optional:586)
+>>>               coordination.cpp.o:(vd::Runtime::monotonic_sample()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by dictionary.cpp:14 (/home/shmellyorc/Documents/Void.Language/src/runtime/dictionary.cpp:14)
+>>>               dictionary.cpp.o:(vd::Runtime::validate_dictionary_key_schema(vd::RuntimeMetadata const&, vd::ElementSchema const&) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by abi.cpp:11 (/home/shmellyorc/Documents/Void.Language/src/runtime/abi.cpp:11)
+>>>               abi.cpp.o:(vd::Runtime::admit_globals(std::basic_string_view<char, std::char_traits<char>>, bool, bool)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 572 more times
+
+ld.lld: error: undefined symbol: __asan_report_load4
+>>> referenced by runtime.hpp:52 (/home/shmellyorc/Documents/Void.Language/include/void/runtime.hpp:52)
+>>>               coordination.cpp.o:(vd::Runtime::monotonic_sample()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by reload.cpp:9 (/home/shmellyorc/Documents/Void.Language/src/runtime/reload.cpp:9)
+>>>               reload.cpp.o:(vd::OwnedRuntimeFailure::assign(vd::RuntimeFailure const&)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by dictionary.cpp:20 (/home/shmellyorc/Documents/Void.Language/src/runtime/dictionary.cpp:20)
+>>>               dictionary.cpp.o:(vd::Runtime::validate_dictionary_key_schema(vd::RuntimeMetadata const&, vd::ElementSchema const&) const) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 620 more times
+
+ld.lld: error: undefined symbol: __asan_stack_malloc_0
+>>> referenced by console.cpp:459 (/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:459)
+>>>               console.cpp.o:(vd::console::Streams::Streams(std::shared_ptr<vd::console::Adapter>)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by list.cpp:37 (/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp:37)
+>>>               list.cpp.o:(vd::Runtime::list_into(void**, vd::ScalarEncoding, unsigned long)) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced by console.cpp:463 (/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:463)
+>>>               console.cpp.o:(vd::console::Streams::~Streams()) in archive /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a
+>>> referenced 51 more times
+
+ld.lld: error: too many errors emitted, stopping now (use --error-limit=0 to see all errors)
+clang: error: linker command failed with exit code 1 (use -v to see invocation)

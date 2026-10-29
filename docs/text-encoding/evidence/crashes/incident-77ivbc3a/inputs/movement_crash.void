@@ -1,0 +1,8 @@
+value struct movement:
+    x: i32
+
+func (m movement) move(n: i32):
+    m.x += n
+
+private func (m movement) hidden():
+    m.x++

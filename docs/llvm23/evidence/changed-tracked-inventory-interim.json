@@ -1,0 +1,302 @@
+[
+  {
+    "path": ".github/workflows/ci-link-experiment.yml",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "a0926040b2d2cbe0e77c797107925a58d7c1fe264f5280a066ab67e282ee15b1",
+    "after_sha256": "a932cbecbc54314f9a0f8806f087af20dc5e9af793680752319a93c1f957761c"
+  },
+  {
+    "path": ".github/workflows/ci.yml",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "6e8190d2eae73d3c4040564c1800b900ba753e038a47f9c4375f0c9ebcce3334",
+    "after_sha256": "23fdc276f429abd981564069fd4f301ce4e079f18175f4c8de408ee1d9217925"
+  },
+  {
+    "path": ".github/workflows/phase23-stack-probe.yml",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "cbef5e166e06af17bccd77f57dc45f5126299300a6da2b7874e1efbc45495a86",
+    "after_sha256": "bbb9808b5ed34c3017135ec7a96f7241d1a5dc30637cea53fea237efb5cb4ff9"
+  },
+  {
+    "path": ".github/workflows/stage10-native-stack.yml",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "3de7486b6c03c9fe63617d0d954af6900589ef0fc70e35592988b9c0052a7016",
+    "after_sha256": "35551d577b5fa2db3b916e742036197a9c6ef79fa00ac948c6c5c8298410ff87"
+  },
+  {
+    "path": ".github/workflows/windows-path-probe.yml",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "9fb38b8531256dc7063a7de06df235950bcb0e655a2eb98590a0c363e1acc8df",
+    "after_sha256": "4d54b8324f52e1034a77133e3f96900a94ea65d56dee4e9de6d0c79089ca70fc"
+  },
+  {
+    "path": "CMakeLists.txt",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "80c9b768280a450aa1c30094316a6be2ee7a8d31530809005d451d9b143d5453",
+    "after_sha256": "3a431aec2b2532fb2bcc7f7bfb29f731efbb78de50f467b6a492637a511f24dc"
+  },
+  {
+    "path": "cmake/LLVMPlatform.cmake",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "6d700f09723c88967f75e2cf690a9580d54af7f04c5f05a876fed8c247180d21",
+    "after_sha256": "06d44e3cdf1a174814def06c5c5000ee396db9eecc7daa094c8303f6d635d846"
+  },
+  {
+    "path": "cmake/NativeBuild.cmake",
+    "category": "build, SDK or active CI configuration",
+    "before_sha256": "c697ee60884c4d3ad7a06a6119f250da4ef1ddcc60d1ac276234d615f9aa24f4",
+    "after_sha256": "74d6acce57336143e944b951c383e254092aea0e7c8ef46c134c67b32a3cbe07"
+  },
+  {
+    "path": "docs/CI_SANITIZER_ABI.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "fd31fe59c5f33096657338b8f9c028b30e9fc05cebbf5ecee02761f062dd0619",
+    "after_sha256": "903a03a3569617364163d290bfeca3c5ebe3b5b413ba3f919ed6d07f0a073db8"
+  },
+  {
+    "path": "docs/DEVELOPMENT_STRATEGY.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "b2a57feb9b9a583d9722191fb3597a72ed31d748d13b83187cda7f608b1fdbb9",
+    "after_sha256": "c55b19f0e6b78874173f06c779b3cb5c8825f0be2f1987c83e72ab68c9a94496"
+  },
+  {
+    "path": "docs/KNOWN_ISSUES.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "49fac3161595a7b0158b184b661a894a573f136b0786e8a328fde843e9d580b8",
+    "after_sha256": "08125c62a2031327a5578de1ac119a4ffb7f2831bb0258dad8737d2c4445afbb"
+  },
+  {
+    "path": "docs/LANGUAGE_BIBLE.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "20dbab0b92dedd2553d41f988b7055c6c9fe6627957e14ce78adf8fb2e88594d",
+    "after_sha256": "3809a0c8069adf9dc9ebb5c642ba2eeae99779fe6484825ffa2660dff3599de6"
+  },
+  {
+    "path": "docs/README.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "fc2e887aa26673630b1e91b31d601a7b5fd719523741263b5fb9bea712b35bc2",
+    "after_sha256": "16f342f4247b6dd7deec509fba25ad5bb650b254c8675577b82d137fbfe5d6f7"
+  },
+  {
+    "path": "docs/WRENCH_CLANKER.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "f04e0c9d1a2759d1726f6b28f5d0fa23ff1c0f0d4f5b9e6989984feb64bfaf56",
+    "after_sha256": "ab67cbd4239e72ecd1aaf57ecf8ff5c25b17413aabd17473f3f542d6439233a8"
+  },
+  {
+    "path": "editors/vscode/README.md",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "2a28c121cde8d2159f76d5fd0c88a3d66dda06f6fcc9166bbe730186f142d5ab",
+    "after_sha256": "881331cf7977dc2999c5feeb150a29543d9389a99f8d3c5559fa5b297d0e40ac"
+  },
+  {
+    "path": "editors/vscode/src/test/runHost.ts",
+    "category": "current documentation or editor fixture",
+    "before_sha256": "1c4300a7c4ad04ea2efc5032c6a2aab96b8e4e1439122f6b75ec3d0ab204daa6",
+    "after_sha256": "ee8be3b66e1e755d9db562e12363d4ee62265076773e14ed865b4e84e49329a4"
+  },
+  {
+    "path": "src/backend/llvm/async_start.inc",
+    "category": "production compiler/native integration",
+    "before_sha256": "0e605c00493f46726f0fe1d2b11b6013153c4c9bca27341d1af55266669ab47f",
+    "after_sha256": "56203cf0c4081bcb46adc1bd57d98b6eab84e398bb8dec22470752705b4a899f"
+  },
+  {
+    "path": "src/backend/llvm/backend.cpp",
+    "category": "production compiler/native integration",
+    "before_sha256": "4e8edaf459f4f3bc36331ffa9948cf1887a6af949064e97ceb7a2b251f1c8ab0",
+    "after_sha256": "15fcbba73e2909acbe8b70f44abb551fab934a91ce297b87b4dccefa9fcd0594"
+  },
+  {
+    "path": "src/backend/llvm/encoded_cfg.cpp",
+    "category": "production compiler/native integration",
+    "before_sha256": "8cece4596c75ad8d8aefcc2fadaf756f291abf3fa78ac186a786adc497a540dd",
+    "after_sha256": "e05a63e84397d871d09f3daa8ba43d0ae72dbd41f57d8c9cb9bb30a108bd7bc3"
+  },
+  {
+    "path": "src/backend/llvm/filesystem.inc",
+    "category": "production compiler/native integration",
+    "before_sha256": "336f101ef961863b2866ef7b763c6229adb336be61e14621d071b023d07e3128",
+    "after_sha256": "c9f3a126ceaf9edd603eea8abd391b81db23d27c4bc2c0cf74701b6ddc6f7d48"
+  },
+  {
+    "path": "src/backend/llvm/private_fixed_call_fixture.inc",
+    "category": "production compiler/native integration",
+    "before_sha256": "22fc057da8b38b6c896ab6e004456aceae22b3764341c593532176b9c966de0e",
+    "after_sha256": "00199c92cd8d76c8191116a3ef224678936695058c2894856c80b084581330d5"
+  },
+  {
+    "path": "src/backend/llvm/storage_audit.cpp",
+    "category": "production compiler/native integration",
+    "before_sha256": "a3584e447a67da51a2224a8f6f69b24d6f175f36f36c6cd1c8682e1a1ebfe381",
+    "after_sha256": "b4c601a2448673a3f62c5e0e870fa28f1e8091c6e97bd86e1e5a54814c2669e4"
+  },
+  {
+    "path": "src/ir/module.cpp",
+    "category": "production compiler/native integration",
+    "before_sha256": "1033a33af61d585404adddd341ff79d594466d8cfb9ca5ea03f57b1ce9a6930e",
+    "after_sha256": "4dd09206f64df6360e51895de72d34dd170e96bb9cafe852810f07a802644522"
+  },
+  {
+    "path": "src/native_build.cpp",
+    "category": "production compiler/native integration",
+    "before_sha256": "bb4dfe673a1331804753a8e79afbc1d742bab31b09b6df121c5357f453d5e407",
+    "after_sha256": "e449681e4eafa5a8e73cb0a58d71544df87d3f5e81bc950f236ab7e3688a95b3"
+  },
+  {
+    "path": "tests/arrays/storage_audit.cpp",
+    "category": "focused regression or test integration",
+    "before_sha256": "28bc6b9b96b560146a5f54000d27607a04d48e267418bb6bd97efdc0ad9d76d1",
+    "after_sha256": "9153e6c62f8c2818fa49b2c87e18af95fc66dce6050cd95057055ab90cc56bf5"
+  },
+  {
+    "path": "tests/cache/tests.cpp",
+    "category": "focused regression or test integration",
+    "before_sha256": "ced709614e20fa48697227b7ec9122b91f1d46d85b5ab2806b3ec893a65a08d4",
+    "after_sha256": "a04d845eef031638c5eebfb4ced74029a0a031179532bac1e800037c78fbdbb5"
+  },
+  {
+    "path": "tests/editors/run.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "d143bf4a3663643f9d953a719b4e897a3af85e8d3e146fc1a6de66e40e46530b",
+    "after_sha256": "05b3973d38235e60ac84b66d1fe0f102b79f52c7300f12434e3d181fa3ac3202"
+  },
+  {
+    "path": "tests/integration/numeric.cmake",
+    "category": "focused regression or test integration",
+    "before_sha256": "cd39435da88a9b61c27625d412c417ddecaed08a13b62e2a5aa4dd72bffd5e98",
+    "after_sha256": "7b5055479c8f347ff4ae6010aba3c8c073acc5ade5c3d3858d3f2b151567f835"
+  },
+  {
+    "path": "tests/math/bootstrap.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "f853797d2c60f1e3dd02be45a1051f3d1b38d3c3a633fb74ebba6fdd7d6f64fb",
+    "after_sha256": "cc7663605b30dd96906955c59baa61c572cb5318f9b27ba298b8630d3e9455ac"
+  },
+  {
+    "path": "tests/math/worker.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "d49e3c61a62cf6ae29579093c9f2c5ca75f8799c465db681e3ebbd2e779e8b15",
+    "after_sha256": "f9ec26628a83536ee5fbca33e305a903d59bdfaa3e9e78d039a3a0ff5ae3e45e"
+  },
+  {
+    "path": "tests/random/worker.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "72d130bb265c56c0a350d0f1ea95795fa95db71cb2a26a65f0bb2298cdb15a61",
+    "after_sha256": "45582bda17b9c02ac88788dc74f4b899c679679878637df742a834fe263fb6c0"
+  },
+  {
+    "path": "tests/stage10/console.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "f62ee72dc8383f6903c294b282e31aea59acc786b74e00817d931bdd9eb5f0cb",
+    "after_sha256": "5ffc8362a1ba12e658d4f33cd9d9754a69c5d027f991df40fd16749eca763214"
+  },
+  {
+    "path": "tests/stage9/windows_native_staging.cpp",
+    "category": "focused regression or test integration",
+    "before_sha256": "e053c4068361e6ee2a2860960c16e6e2553c038267219b3cfb8aa17e9c22ddeb",
+    "after_sha256": "8c58efbb187f53044f5054c8d548e25985d98353066f2337bce8827f1cd45f10"
+  },
+  {
+    "path": "tests/text_encoding/crash.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "844663ee1cdda40374ae88c5fbe5b8da1cc64bacbf8d595d602169b33bcb0dc6",
+    "after_sha256": "084b84e40ef209128efd435203a392511efabc2386cf74044936b8d8123d91eb"
+  },
+  {
+    "path": "tests/text_encoding/crash_test.py",
+    "category": "focused regression or test integration",
+    "before_sha256": "a43ca97ea55c8c297fbac9df4f262e6364a2dcef2e17c06e708db3881845bb00",
+    "after_sha256": "48b7a9bd586e055b0a9df197a14518f011fc744010c7309707500d53cac7a96c"
+  },
+  {
+    "path": "tools/ci/STORAGE_SHAPE_PROOF.md",
+    "category": "active tooling",
+    "before_sha256": "6d61d05b0217c6476867cf364e79606f1351bebe114096f6255e300ec48d5df7",
+    "after_sha256": "3f33932f38bdb8619714cfa484ab7218035e79a3e358f769de02abf0c86b7db0"
+  },
+  {
+    "path": "tools/ci/aot_certificate_corpus.py",
+    "category": "active tooling",
+    "before_sha256": "f163d9a0fe2ca5ed8bc4dd6843ba378616783f6c3e4bbd431d5589f7b5daf2f7",
+    "after_sha256": "aa1f722fe7ef3702caa42ede75b10fdfde6a9e74fce7c0fc2e09bc975d7bc55f"
+  },
+  {
+    "path": "tools/ci/aot_encoded_cfg_probe.py",
+    "category": "active tooling",
+    "before_sha256": "c1c51c94b673d7b0f17613a5f8a5517396ee9ecc139644ea96cf6dec12ae4524",
+    "after_sha256": "f3d23738065be62eb8c2df5ad1888fdcdcb1eb2221a746d5b67532f79092471f"
+  },
+  {
+    "path": "tools/ci/aot_incoming_probe.py",
+    "category": "active tooling",
+    "before_sha256": "7da0e78a51c3f6189fbe9a6e86c6e4edd86a5dbc2419b02d6033748a84f8bf71",
+    "after_sha256": "79a004c35481e2c2e622bc4470026ad6d96659802316f5bff486c8a65f5cb69e"
+  },
+  {
+    "path": "tools/ci/aot_outgoing_probe.py",
+    "category": "active tooling",
+    "before_sha256": "c15bb9a118f3f44e1a77734445f3c426e939eea8a9a8971dd44589c61f946290",
+    "after_sha256": "907b3c3276f11591bdb881ba23664acd3d62fd98c9d6fad816bcdc967e2ee17a"
+  },
+  {
+    "path": "tools/ci/array_abi_probe/README.md",
+    "category": "active tooling",
+    "before_sha256": "911ca26e220a5f90c3d6201cf1a1e912c5413a496491ce4bbc35538b0692ebef",
+    "after_sha256": "74b998a659bdb1b0a55f3e57577f7f75a590a74ef35eadfd5e6406a04a35b427"
+  },
+  {
+    "path": "tools/ci/array_abi_probe/machine_emit.cpp",
+    "category": "active tooling",
+    "before_sha256": "cc467b4dd31e81654986ffa014e075b03cd93fc4ca691ddec34cad64cb5b565a",
+    "after_sha256": "c39a55842e5b7686255ab4644ee80b6dffce9b2ef4c1c205dcf73dcc11e11473"
+  },
+  {
+    "path": "tools/ci/array_abi_probe/machine_proof.py",
+    "category": "active tooling",
+    "before_sha256": "16f7adf48a0ffd674ca06c8de47ee9f709e2a5fef5c2a8c8f24d294e796293f1",
+    "after_sha256": "d15b3536acac4c2bf6a69bd89347b1aed5a12b8c873438e65ee761a3d0fcfd6f"
+  },
+  {
+    "path": "tools/ci/array_abi_probe/probe.py",
+    "category": "active tooling",
+    "before_sha256": "067425eb9e202ecbe27a74c3e5a85ed6c03cb8c8ce2af09770bdc7b29058ba95",
+    "after_sha256": "e24a3136af5339853dbc7184e66e6b05fd2bb6da07a05d9cc3df7816d26a426e"
+  },
+  {
+    "path": "tools/ci/array_abi_probe/target_facts.cpp",
+    "category": "active tooling",
+    "before_sha256": "d6cdf3596dcc1e036860999f6dc733dfb84b06d688d6a914d119d0ac9daffa57",
+    "after_sha256": "8e1b7519889d06a7c34fd1057b5b82b617f133460b5dd09d011996bd2016c594"
+  },
+  {
+    "path": "tools/ci/llvm_sdk.py",
+    "category": "active tooling",
+    "before_sha256": "1a73c9337caa296eecbf5423027723d24a5fc14b86cd9897cff4d9ef135c1027",
+    "after_sha256": "f094763b72c78e20cfe35e8f2151330ed0210960885b07562b956b61054625df"
+  },
+  {
+    "path": "tools/ci/stack_probe/README.md",
+    "category": "active tooling",
+    "before_sha256": "53f84f9237cd51696068fb24cffe2f6c65ea69b4accd1ef2e180e47d6bcd9d55",
+    "after_sha256": "d29ae62be9c234ee62fe15adb1be3908bb61beb98e6a256ead3add5f61302f3f"
+  },
+  {
+    "path": "tools/ci/stack_probe/run.py",
+    "category": "active tooling",
+    "before_sha256": "a46a4447700fec723c4608656affe6d234f03ce081302825258694238ced4dfa",
+    "after_sha256": "1e757927251a967d03d5dd13b30b9c95fa9b69547d8d8b5b9b08341115ceeeb7"
+  },
+  {
+    "path": "tools/ci/stage10_native_stack.py",
+    "category": "active tooling",
+    "before_sha256": "48604485ed75c88a6d68058c36ecf0712542fb6058a388a38f969211b7b4abb0",
+    "after_sha256": "87df1c48bfdf3154c1acd842df37e5a99048a2b40dd84922dc2ab26cd83bfbad"
+  },
+  {
+    "path": "tools/package_tooling.py",
+    "category": "active tooling",
+    "before_sha256": "236c468f42506d4116d700346f7104c4793aa769a7e4b9a3f9f8740faaca58ee",
+    "after_sha256": "f063b70f56fddaa92d16a0ce3b0217d24d770538c925837fdea040146df00541"
+  }
+]

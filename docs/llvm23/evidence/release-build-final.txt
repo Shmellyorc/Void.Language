@@ -1,0 +1,1810 @@
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/advanced/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/arrays/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/collections/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/dictionaries/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/fixed_arrays/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/generics/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/growable_arrays/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/patterns/.void
+-- GLOB mismatch!
+The following files were added:
+  +/home/shmellyorc/Documents/Void.Language/examples/properties/.void
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (5.4s)
+-- Generating done (1.6s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_string_test_abi
+[  0%] Built target void_runtime_generated_abi
+[  0%] Built target native_fixture
+[  0%] Built target void_io_error_fixture
+[  0%] Built target void_native_test_fixture
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[  2%] Built target void_runtime
+[  2%] Built target void_format_numeric
+[  2%] Built target void_temporal
+[  3%] Built target void_format_zones
+[  3%] Built target void_gc_buffers
+[  3%] Built target void_gc_schemas
+[  3%] Built target void_runtime_console
+[  4%] Built target void_runtime_console_transfers
+[  4%] Built target void_runtime_console_keyboard
+[  4%] Built target void_runtime_console_wide
+[  4%] Built target void_runtime_console_terminal
+[  5%] Built target void_runtime_console_input
+[  5%] Built target void_runtime_tests
+[  5%] Built target void_runtime_failures
+[  5%] Built target void_runtime_invariants
+[  5%] Built target void_io_kernel
+[  5%] Built target void_io_native_jobs
+[  5%] Linking CXX static library libvoid_core.a
+[  5%] Built target void_core
+[  5%] Built target void_lsp
+[  5%] Linking CXX executable void_arrays_foundation
+[  5%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[  5%] Linking CXX executable void_math_ir
+[  6%] Built target void_arrays_foundation
+[  6%] Built target void_math_ir
+[  7%] Linking CXX executable void_io_ir
+[  7%] Linking CXX executable void_sessions_example
+[  7%] Built target void_io_ir
+[  7%] Built target void_sessions_example
+[  7%] Linking CXX executable void_tooling_example
+[  8%] Linking CXX executable voidls
+[  8%] Built target void_tooling_example
+[  8%] Built target voidls
+[  8%] Linking CXX executable void_lsp_tests
+[  8%] Built target void_lsp_tests
+[  8%] Linking CXX static library libvoid_llvm.a
+[  8%] Built target void_llvm
+[  8%] Linking CXX executable void_operator_keys
+[  8%] Linking CXX executable void_operator_resolution
+[  8%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[  8%] Built target void_operator_keys
+[  8%] Linking CXX executable void_operator_declarations
+[  8%] Built target void_operator_resolution
+[  8%] Linking CXX executable void_source_formatting
+[  8%] Built target void_operator_declarations
+[  8%] Linking CXX executable void_stage10_tooling
+[  8%] Built target void_stage10_tooling
+[  8%] Linking CXX executable void_display_reload
+[  8%] Built target voidc_objects
+[  8%] Linking CXX executable void_temporal_ir
+[  8%] Built target void_source_formatting
+[  8%] Linking CXX executable void_stage10_hooks
+[  8%] Built target void_display_reload
+[  9%] Linking CXX executable void_stage10_interpolation
+[ 10%] Built target void_temporal_ir
+[ 10%] Linking CXX executable void_stage10_conversion
+[ 10%] Built target void_stage10_hooks
+[ 10%] Linking CXX executable void_stage10_fields
+[ 10%] Built target void_stage10_interpolation
+[ 10%] Linking CXX executable void_runtime_generated
+[ 10%] Built target void_stage10_conversion
+[ 10%] Linking CXX executable void_fixed_arrays_tests
+[ 10%] Built target void_stage10_fields
+[ 10%] Linking CXX executable void_growable_arrays_tests
+[ 10%] Built target void_runtime_generated
+[ 10%] Linking CXX executable void_arrays_source
+[ 10%] Built target void_fixed_arrays_tests
+[ 10%] Linking CXX executable void_generics_tests
+[ 10%] Built target void_growable_arrays_tests
+[ 10%] Linking CXX executable void_collections_tests
+[ 10%] Built target void_arrays_source
+[ 10%] Linking CXX executable void_dictionaries_tests
+[ 11%] Built target void_generics_tests
+[ 11%] Linking CXX executable void_properties_tests
+[ 11%] Built target void_collections_tests
+[ 11%] Linking CXX executable void_patterns_tests
+[ 11%] Built target void_dictionaries_tests
+[ 11%] Linking CXX executable void_advanced_tests
+[ 11%] Built target void_properties_tests
+[ 11%] Linking CXX executable void_managed_tests
+[ 11%] Built target void_patterns_tests
+[ 12%] Linking CXX executable void_managed_initialization_tests
+[ 12%] Built target void_advanced_tests
+[ 12%] Built target void_managed_tests
+[ 12%] Linking CXX executable void_reference_values_tests
+[ 12%] Linking CXX executable void_composition_tests
+[ 12%] Built target void_managed_initialization_tests
+[ 12%] Linking CXX executable void_inheritance_tests
+[ 12%] Built target void_reference_values_tests
+[ 12%] Built target void_composition_tests
+[ 12%] Linking CXX executable void_interfaces_tests
+[ 12%] Linking CXX executable void_strings_tests
+[ 12%] Built target void_inheritance_tests
+[ 12%] Linking CXX executable void_runtime_callbacks
+[ 12%] Built target void_strings_tests
+[ 12%] Generating runtime-normal.o
+[ 12%] Built target void_runtime_callbacks
+[ 12%] Built target void_interfaces_tests
+[ 12%] Generating runtime-optimized.o
+[ 12%] Linking CXX executable void_runtime_aot_normal
+[ 12%] Linking CXX executable void_runtime_aot_optimized
+[ 12%] Linking CXX executable void_binary_ownership
+[ 12%] Built target void_runtime_aot_optimized
+[ 12%] Built target void_runtime_aot_normal
+[ 12%] Linking CXX executable void_text_performance
+[ 12%] Linking CXX executable void_combined_ownership
+[ 12%] Built target void_text_performance
+[ 12%] Built target void_binary_ownership
+[ 12%] Built target void_combined_ownership
+[ 13%] Linking CXX executable void_text_audit
+[ 13%] Built target void_text_audit
+[ 13%] Linking CXX executable void_text_ownership
+[ 13%] Linking CXX executable void_memory_ownership
+[ 13%] Linking CXX executable void_operator_compounds
+[ 13%] Built target void_memory_ownership
+[ 13%] Linking CXX executable void_console_source
+[ 13%] Built target void_text_ownership
+[ 13%] Built target void_operator_compounds
+[ 13%] Linking CXX executable void_operator_integration
+[ 13%] Linking CXX executable void_tests
+[ 13%] Built target void_tests
+[ 13%] Generating cache-identity-Release.cpp
+[ 13%] Built target void_console_source
+[ 13%] Generating managed-library-normal.o
+[ 14%] Built target void_operator_integration
+[ 14%] Generating managed-library-optimized.o
+[ 14%] Linking CXX executable void_managed_aot_normal
+[ 14%] Linking CXX executable void_managed_aot_optimized
+[ 14%] Built target void_managed_aot_normal
+[ 14%] Built target void_managed_aot_optimized
+[ 14%] Generating managed_initialization-library-normal.o
+[ 14%] Generating managed_initialization-library-optimized.o
+[ 14%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[ 14%] Linking CXX executable void_managed_initialization_aot_normal
+[ 14%] Linking CXX executable void_managed_initialization_aot_optimized
+[ 14%] Built target void_managed_initialization_aot_normal
+[ 14%] Generating reference_values-library-normal.o
+[ 14%] Built target void_managed_initialization_aot_optimized
+[ 14%] Generating reference_values-library-optimized.o
+[ 14%] Linking CXX static library libvoid_cache_identity.a
+[ 14%] Built target void_cache_identity
+[ 14%] Generating composition-library-normal.o
+[ 14%] Linking CXX executable void_reference_values_aot_normal
+[ 14%] Linking CXX executable void_reference_values_aot_optimized
+[ 14%] Built target void_reference_values_aot_normal
+[ 14%] Generating composition-library-optimized.o
+[ 14%] Linking CXX executable void_composition_aot_normal
+[ 14%] Built target void_reference_values_aot_optimized
+[ 14%] Generating inheritance-reloaded-normal.o
+[ 14%] Built target void_composition_aot_normal
+[ 14%] Generating inheritance-reloaded-optimized.o
+[ 14%] Generating inheritance-library-normal.o
+[ 14%] Linking CXX executable void_composition_aot_optimized
+[ 14%] Generating inheritance-library-optimized.o
+[ 14%] Linking CXX executable void_inheritance_aot_normal
+[ 14%] Built target void_composition_aot_optimized
+[ 14%] Generating interfaces-reloaded-normal.o
+[ 14%] Built target void_inheritance_aot_normal
+[ 14%] Linking CXX executable void_inheritance_aot_optimized
+[ 14%] Generating interfaces-reloaded-optimized.o
+[ 14%] Generating interfaces-library-normal.o
+[ 14%] Built target void_inheritance_aot_optimized
+[ 14%] Generating interfaces-library-optimized.o
+[ 14%] Generating strings-reloaded-normal.o
+[ 14%] Linking CXX executable void_interfaces_aot_normal
+[ 14%] Generating strings-library-normal.o
+[ 14%] Built target void_interfaces_aot_normal
+[ 14%] Linking CXX executable void_interfaces_aot_optimized
+[ 14%] Generating strings-reloaded-optimized.o
+[ 14%] Linking CXX executable void_strings_aot_normal
+[ 15%] Built target void_interfaces_aot_optimized
+[ 15%] Generating strings-library-optimized.o
+[ 15%] Linking CXX executable void_math_host
+[ 15%] Built target void_strings_aot_normal
+[ 16%] Linking CXX executable void_strings_aot_optimized
+[ 16%] Linking CXX executable void_os_host
+[ 16%] Built target void_strings_aot_optimized
+[ 17%] Linking CXX executable void_random_host
+[ 17%] Built target void_math_host
+[ 17%] Generating combined-async-normal.o
+[ 17%] Built target void_os_host
+[ 17%] Generating combined-async-optimized.o
+[ 17%] Built target void_random_host
+[ 17%] Linking CXX executable void_globals
+[ 17%] Linking CXX executable void_combined_async_normal
+[ 18%] Linking CXX executable void_combined_async_optimized
+[ 18%] Built target void_combined_async_normal
+[ 18%] Built target void_combined_async_optimized
+[ 18%] Linking CXX executable void_log_host
+[ 18%] Linking CXX executable void_io_runner
+[ 18%] Built target void_globals
+[ 18%] Linking CXX executable void_collections_stdlib_host
+[ 18%] Built target void_io_runner
+[ 18%] Linking CXX executable void_channel_host
+[ 18%] Built target void_log_host
+[ 18%] Linking CXX executable void_channel_benchmark
+[ 18%] Built target void_collections_stdlib_host
+[ 18%] Linking CXX executable void_native_tests
+[ 19%] Built target void_channel_host
+[ 19%] Built target void_channel_benchmark
+[ 19%] Generating io-wire-normal.o
+[ 19%] Linking CXX executable void_io_ownership
+[ 19%] Built target void_native_tests
+[ 19%] Generating io-wire-optimized.o
+[ 19%] Built target void_io_ownership
+[ 19%] Linking CXX executable void_io_native
+[ 19%] Built target void_io_native
+[ 19%] Generating io-probe-normal.o, io-probe-normal.o.cpp
+[ 19%] Building CXX object CMakeFiles/void_io_probe_normal.dir/io-probe-normal.o.cpp.o
+[ 19%] Linking CXX executable void_io_probe_normal
+[ 19%] Built target void_io_probe_normal
+[ 20%] Generating io-probe-optimized.o, io-probe-optimized.o.cpp
+[ 20%] Linking CXX executable void_io_wire_normal
+[ 20%] Built target void_io_wire_normal
+[ 20%] Generating io-async-normal.o
+[ 20%] Building CXX object CMakeFiles/void_io_probe_optimized.dir/io-probe-optimized.o.cpp.o
+[ 20%] Linking CXX executable void_io_probe_optimized
+[ 20%] Built target void_io_probe_optimized
+[ 20%] Generating io-async-optimized.o
+[ 20%] Linking CXX executable void_io_async_normal
+[ 20%] Built target void_io_async_normal
+[ 20%] Linking CXX executable void_async_tests
+[ 20%] Linking CXX executable void_io_wire_optimized
+[ 20%] Built target void_io_wire_optimized
+[ 20%] Linking CXX executable void_retention_current
+[ 21%] Built target void_async_tests
+[ 21%] Linking CXX executable void_sprint6_tests
+[ 21%] Built target void_retention_current
+[ 21%] Linking CXX executable void_sprint4_tests
+[ 21%] Built target void_sprint6_tests
+[ 22%] Linking CXX executable void_native_example
+[ 22%] Linking CXX executable void_io_async_optimized
+[ 22%] Built target void_io_async_optimized
+[ 22%] Linking CXX executable voidc
+[ 22%] Built target void_sprint4_tests
+[ 22%] Linking CXX executable void_operator_reload
+[ 22%] Built target void_native_example
+[ 22%] Linking CXX executable void_json_host
+[ 22%] Built target voidc
+[ 22%] Building CXX object CMakeFiles/void_cache_tests.dir/tests/cache/tests.cpp.o
+[ 22%] Built target void_operator_reload
+[ 22%] Generating fixed_arrays-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-main-normal.o
+[ 22%] Linking CXX executable void_fixed_arrays_cli_main_normal
+[ 22%] Built target void_fixed_arrays_cli_main_normal
+[ 22%] Generating fixed_arrays-copies-normal.o
+[ 23%] Built target void_json_host
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-copies-normal.o
+[ 23%] Generating fixed_arrays-order-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_copies_normal
+[ 23%] Built target void_fixed_arrays_cli_copies_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-order-normal.o
+[ 23%] Generating fixed_arrays-numeric-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_order_normal
+[ 23%] Built target void_fixed_arrays_cli_order_normal
+[ 23%] Generating fixed_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-indexes-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_indexes_normal
+[ 23%] Built target void_fixed_arrays_cli_indexes_normal
+[ 23%] Generating fixed_arrays-index_types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-index_types-normal.o
+[ 23%] Linking CXX executable void_fixed_arrays_cli_index_types_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-numeric-normal.o
+[ 23%] Built target void_fixed_arrays_cli_index_types_normal
+[ 23%] Linking CXX executable void_fixed_arrays_cli_numeric_normal
+[ 23%] Generating fixed_arrays-empty-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-empty-normal.o
+[ 23%] Built target void_fixed_arrays_cli_numeric_normal
+[ 23%] Linking CXX executable void_fixed_arrays_cli_empty_normal
+[ 23%] Generating fixed_arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-large-normal.o
+[ 23%] Built target void_fixed_arrays_cli_empty_normal
+[ 23%] Generating fixed_arrays-value_fields-normal.o
+[ 24%] Linking CXX executable void_fixed_arrays_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-value_fields-normal.o
+[ 24%] Built target void_fixed_arrays_cli_large_normal
+[ 24%] Linking CXX executable void_fixed_arrays_cli_value_fields_normal
+[ 25%] Generating fixed_arrays-bounds_order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-bounds_order-normal.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_bounds_order_normal
+[ 25%] Built target void_fixed_arrays_cli_value_fields_normal
+[ 25%] Generating fixed_arrays-loops-normal.o
+[ 25%] Built target void_fixed_arrays_cli_bounds_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-loops-normal.o
+[ 25%] Generating fixed_arrays-main-optimized.o
+[ 25%] Linking CXX executable void_fixed_arrays_cli_loops_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-main-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_main_optimized
+[ 26%] Built target void_fixed_arrays_cli_loops_normal
+[ 26%] Generating fixed_arrays-copies-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-copies-optimized.o
+[ 26%] Built target void_fixed_arrays_cli_main_optimized
+[ 26%] Generating fixed_arrays-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-order-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_order_optimized
+[ 26%] Linking CXX executable void_fixed_arrays_cli_copies_optimized
+[ 26%] Built target void_fixed_arrays_cli_copies_optimized
+[ 26%] Built target void_fixed_arrays_cli_order_optimized
+[ 26%] Generating fixed_arrays-indexes-optimized.o
+[ 26%] Generating fixed_arrays-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-indexes-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_indexes_optimized
+[ 26%] Linking CXX executable void_cache_tests
+[ 26%] Built target void_fixed_arrays_cli_indexes_optimized
+[ 26%] Generating fixed_arrays-index_types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-index_types-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_index_types_optimized
+[ 26%] Built target void_fixed_arrays_cli_index_types_optimized
+[ 26%] Generating fixed_arrays-empty-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-empty-optimized.o
+[ 26%] Linking CXX executable void_fixed_arrays_cli_empty_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-numeric-optimized.o
+[ 27%] Built target void_fixed_arrays_cli_empty_optimized
+[ 27%] Linking CXX executable void_fixed_arrays_cli_numeric_optimized
+[ 27%] Generating fixed_arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-large-optimized.o
+[ 27%] Built target void_fixed_arrays_cli_numeric_optimized
+[ 28%] Generating fixed_arrays-value_fields-optimized.o
+[ 28%] Linking CXX executable void_fixed_arrays_cli_large_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-value_fields-optimized.o
+[ 28%] Built target void_fixed_arrays_cli_large_optimized
+[ 28%] Generating fixed_arrays-bounds_order-optimized.o
+[ 28%] Linking CXX executable void_fixed_arrays_cli_value_fields_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-bounds_order-optimized.o
+[ 28%] Linking CXX executable void_fixed_arrays_cli_bounds_order_optimized
+[ 28%] Built target void_fixed_arrays_cli_value_fields_optimized
+[ 28%] Generating fixed_arrays-loops-optimized.o
+[ 28%] Built target void_fixed_arrays_cli_bounds_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/fixed_arrays-loops-optimized.o
+[ 28%] Generating growable_arrays-main-normal.o
+[ 28%] Linking CXX executable void_fixed_arrays_cli_loops_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-main-normal.o
+[ 28%] Linking CXX executable void_growable_arrays_cli_main_normal
+[ 28%] Built target void_fixed_arrays_cli_loops_optimized
+[ 28%] Generating growable_arrays-aliases-normal.o
+[ 29%] Built target void_growable_arrays_cli_main_normal
+[ 29%] Generating growable_arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-aliases-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-selection-normal.o
+[ 29%] Linking CXX executable void_growable_arrays_cli_selection_normal
+[ 29%] Linking CXX executable void_growable_arrays_cli_aliases_normal
+[ 29%] Built target void_growable_arrays_cli_selection_normal
+[ 29%] Built target void_growable_arrays_cli_aliases_normal
+[ 29%] Generating growable_arrays-invalidation-normal.o
+[ 29%] Generating growable_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-invalidation-normal.o
+[ 29%] Linking CXX executable void_growable_arrays_cli_indexes_normal
+[ 29%] Linking CXX executable void_growable_arrays_cli_invalidation_normal
+[ 29%] Built target void_growable_arrays_cli_indexes_normal
+[ 29%] Built target void_growable_arrays_cli_invalidation_normal
+[ 29%] Generating growable_arrays-numeric-normal.o
+[ 29%] Generating growable_arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-large-normal.o
+[ 29%] Linking CXX executable void_growable_arrays_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-numeric-normal.o
+[ 29%] Built target void_growable_arrays_cli_large_normal
+[ 29%] Linking CXX executable void_growable_arrays_cli_numeric_normal
+[ 29%] Generating growable_arrays-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-main-optimized.o
+[ 29%] Built target void_growable_arrays_cli_numeric_normal
+[ 29%] Linking CXX executable void_growable_arrays_cli_main_optimized
+[ 29%] Generating growable_arrays-aliases-optimized.o
+[ 29%] Built target void_growable_arrays_cli_main_optimized
+[ 29%] Generating growable_arrays-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-aliases-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-selection-optimized.o
+[ 29%] Linking CXX executable void_growable_arrays_cli_aliases_optimized
+[ 30%] Linking CXX executable void_growable_arrays_cli_selection_optimized
+[ 30%] Built target void_growable_arrays_cli_aliases_optimized
+[ 30%] Generating growable_arrays-invalidation-optimized.o
+[ 30%] Built target void_growable_arrays_cli_selection_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-invalidation-optimized.o
+[ 30%] Generating growable_arrays-indexes-optimized.o
+[ 30%] Linking CXX executable void_growable_arrays_cli_invalidation_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-indexes-optimized.o
+[ 30%] Built target void_cache_tests
+[ 30%] Generating growable_arrays-numeric-optimized.o
+[ 30%] Linking CXX executable void_growable_arrays_cli_indexes_optimized
+[ 30%] Built target void_growable_arrays_cli_invalidation_optimized
+[ 30%] Generating growable_arrays-large-optimized.o
+[ 31%] Built target void_growable_arrays_cli_indexes_optimized
+[ 31%] Generating arrays-strings-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-large-optimized.o
+[ 31%] Linking CXX executable void_growable_arrays_cli_large_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/growable_arrays-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-strings-normal.o
+[ 31%] Linking CXX executable void_growable_arrays_cli_numeric_optimized
+[ 31%] Linking CXX executable void_arrays_cli_strings_normal
+[ 31%] Built target void_growable_arrays_cli_large_optimized
+[ 31%] Generating arrays-values-normal.o
+[ 31%] Built target void_growable_arrays_cli_numeric_optimized
+[ 31%] Built target void_arrays_cli_strings_normal
+[ 31%] Generating arrays-nested-normal.o
+[ 31%] Generating arrays-defaults-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-defaults-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-nested-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_defaults_normal
+[ 31%] Linking CXX executable void_arrays_cli_nested_normal
+[ 31%] Built target void_arrays_cli_defaults_normal
+[ 31%] Generating arrays-interfaces-normal.o
+[ 31%] Built target void_arrays_cli_nested_normal
+[ 31%] Generating arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-values-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_values_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-interfaces-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_interfaces_normal
+[ 31%] Built target void_arrays_cli_values_normal
+[ 31%] Generating arrays-tree-normal.o
+[ 31%] Built target void_arrays_cli_interfaces_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-tree-normal.o
+[ 31%] Generating arrays-readonly-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_tree_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-readonly-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-selection-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_readonly_normal
+[ 31%] Linking CXX executable void_arrays_cli_selection_normal
+[ 31%] Built target void_arrays_cli_tree_normal
+[ 31%] Generating arrays-iteration-normal.o
+[ 31%] Built target void_arrays_cli_readonly_normal
+[ 31%] Built target void_arrays_cli_selection_normal
+[ 31%] Generating arrays-ranges-normal.o
+[ 31%] Generating arrays-invalidation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-invalidation-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_invalidation_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-iteration-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-ranges-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_iteration_normal
+[ 31%] Built target void_arrays_cli_invalidation_normal
+[ 31%] Generating arrays-nested_failure-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_ranges_normal
+[ 31%] Built target void_arrays_cli_iteration_normal
+[ 31%] Generating arrays-large-normal.o
+[ 31%] Built target void_arrays_cli_ranges_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-nested_failure-normal.o
+[ 31%] Generating arrays-cycles-normal.o
+[ 31%] Linking CXX executable void_arrays_cli_nested_failure_normal
+[ 32%] Built target void_arrays_cli_nested_failure_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-cycles-normal.o
+[ 32%] Generating arrays-empty-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-large-normal.o
+[ 32%] Linking CXX executable void_arrays_cli_cycles_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-empty-normal.o
+[ 32%] Linking CXX executable void_arrays_cli_large_normal
+[ 32%] Linking CXX executable void_arrays_cli_empty_normal
+[ 32%] Built target void_arrays_cli_cycles_normal
+[ 33%] Generating arrays-failures-normal.o
+[ 33%] Built target void_arrays_cli_large_normal
+[ 34%] Generating arrays-strings-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-failures-normal.o
+[ 34%] Built target void_arrays_cli_empty_normal
+[ 34%] Generating arrays-values-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-strings-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-values-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_failures_normal
+[ 34%] Linking CXX executable void_arrays_cli_strings_optimized
+[ 34%] Built target void_arrays_cli_failures_normal
+[ 34%] Generating arrays-nested-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_values_optimized
+[ 34%] Built target void_arrays_cli_strings_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-nested-optimized.o
+[ 34%] Generating arrays-defaults-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-defaults-optimized.o
+[ 34%] Built target void_arrays_cli_values_optimized
+[ 34%] Generating arrays-interfaces-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_nested_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-interfaces-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_defaults_optimized
+[ 34%] Built target void_arrays_cli_nested_optimized
+[ 34%] Generating arrays-selection-optimized.o
+[ 34%] Built target void_arrays_cli_defaults_optimized
+[ 34%] Generating arrays-tree-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-tree-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_interfaces_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-selection-optimized.o
+[ 34%] Built target void_arrays_cli_interfaces_optimized
+[ 34%] Generating arrays-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-readonly-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_tree_optimized
+[ 34%] Linking CXX executable void_arrays_cli_readonly_optimized
+[ 34%] Linking CXX executable void_arrays_cli_selection_optimized
+[ 34%] Built target void_arrays_cli_tree_optimized
+[ 34%] Generating arrays-iteration-optimized.o
+[ 34%] Built target void_arrays_cli_readonly_optimized
+[ 34%] Built target void_arrays_cli_selection_optimized
+[ 34%] Generating arrays-ranges-optimized.o
+[ 34%] Generating arrays-invalidation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-invalidation-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_invalidation_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-iteration-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-ranges-optimized.o
+[ 34%] Linking CXX executable void_arrays_cli_iteration_optimized
+[ 35%] Built target void_arrays_cli_invalidation_optimized
+[ 35%] Generating arrays-nested_failure-optimized.o
+[ 36%] Linking CXX executable void_arrays_cli_ranges_optimized
+[ 36%] Built target void_arrays_cli_iteration_optimized
+[ 36%] Generating arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-nested_failure-optimized.o
+[ 36%] Built target void_arrays_cli_ranges_optimized
+[ 37%] Generating arrays-cycles-optimized.o
+[ 37%] Linking CXX executable void_arrays_cli_nested_failure_optimized
+[ 37%] Built target void_arrays_cli_nested_failure_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-large-optimized.o
+[ 37%] Generating arrays-empty-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-cycles-optimized.o
+[ 37%] Linking CXX executable void_arrays_cli_large_optimized
+[ 37%] Linking CXX executable void_arrays_cli_cycles_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-empty-optimized.o
+[ 37%] Linking CXX executable void_arrays_cli_empty_optimized
+[ 37%] Built target void_arrays_cli_large_optimized
+[ 37%] Generating arrays-failures-optimized.o
+[ 37%] Built target void_arrays_cli_cycles_optimized
+[ 37%] Generating generics-main-normal.o
+[ 37%] Built target void_arrays_cli_empty_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/arrays-failures-optimized.o
+[ 37%] Generating generics-functions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-main-normal.o
+[ 37%] Linking CXX executable void_arrays_cli_failures_optimized
+[ 37%] Linking CXX executable void_generics_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-functions-normal.o
+[ 37%] Built target void_arrays_cli_failures_optimized
+[ 37%] Linking CXX executable void_generics_cli_functions_normal
+[ 37%] Generating generics-types-normal.o
+[ 37%] Built target void_generics_cli_main_normal
+[ 37%] Generating generics-constraints-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-constraints-normal.o
+[ 37%] Built target void_generics_cli_functions_normal
+[ 37%] Generating generics-arrays-normal.o
+[ 37%] Linking CXX executable void_generics_cli_types_normal
+[ 37%] Linking CXX executable void_generics_cli_constraints_normal
+[ 37%] Built target void_generics_cli_types_normal
+[ 37%] Built target void_generics_cli_constraints_normal
+[ 37%] Generating generics-initialization-normal.o
+[ 37%] Generating generics-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-initialization-normal.o
+[ 37%] Linking CXX executable void_generics_cli_methods_normal
+[ 37%] Linking CXX executable void_generics_cli_initialization_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-arrays-normal.o
+[ 37%] Built target void_generics_cli_methods_normal
+[ 37%] Linking CXX executable void_generics_cli_arrays_normal
+[ 37%] Generating generics-failures-normal.o
+[ 37%] Built target void_generics_cli_initialization_normal
+[ 37%] Generating generics-imports-normal.o
+[ 37%] Built target void_generics_cli_arrays_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-failures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-imports-normal.o
+[ 37%] Generating generics-order-normal.o
+[ 37%] Linking CXX executable void_generics_cli_imports_normal
+[ 37%] Linking CXX executable void_generics_cli_failures_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-order-normal.o
+[ 37%] Linking CXX executable void_generics_cli_order_normal
+[ 38%] Built target void_generics_cli_failures_normal
+[ 38%] Built target void_generics_cli_imports_normal
+[ 38%] Generating generics-reload-normal.o
+[ 38%] Generating generics-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-reload-normal.o
+[ 38%] Built target void_generics_cli_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-large-normal.o
+[ 38%] Generating generics-main-optimized.o
+[ 38%] Linking CXX executable void_generics_cli_reload_normal
+[ 38%] Linking CXX executable void_generics_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-main-optimized.o
+[ 38%] Built target void_generics_cli_reload_normal
+[ 38%] Linking CXX executable void_generics_cli_main_optimized
+[ 38%] Generating generics-functions-optimized.o
+[ 38%] Built target void_generics_cli_large_normal
+[ 38%] Generating generics-types-optimized.o
+[ 38%] Built target void_generics_cli_main_optimized
+[ 38%] Generating generics-constraints-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-functions-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-types-optimized.o
+[ 38%] Linking CXX executable void_generics_cli_functions_optimized
+[ 38%] Linking CXX executable void_generics_cli_types_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-constraints-optimized.o
+[ 38%] Linking CXX executable void_generics_cli_constraints_optimized
+[ 38%] Built target void_generics_cli_functions_optimized
+[ 38%] Built target void_generics_cli_types_optimized
+[ 38%] Generating generics-arrays-optimized.o
+[ 38%] Generating generics-initialization-optimized.o
+[ 39%] Built target void_generics_cli_constraints_optimized
+[ 39%] Generating generics-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-methods-optimized.o
+[ 39%] Linking CXX executable void_generics_cli_initialization_optimized
+[ 39%] Linking CXX executable void_generics_cli_methods_optimized
+[ 39%] Built target void_generics_cli_initialization_optimized
+[ 39%] Built target void_generics_cli_methods_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-arrays-optimized.o
+[ 39%] Generating generics-failures-optimized.o
+[ 39%] Generating generics-imports-optimized.o
+[ 39%] Linking CXX executable void_generics_cli_arrays_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-failures-optimized.o
+[ 39%] Linking CXX executable void_generics_cli_imports_optimized
+[ 39%] Linking CXX executable void_generics_cli_failures_optimized
+[ 39%] Built target void_generics_cli_arrays_optimized
+[ 40%] Generating generics-order-optimized.o
+[ 40%] Built target void_generics_cli_imports_optimized
+[ 40%] Generating generics-large-optimized.o
+[ 40%] Built target void_generics_cli_failures_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-order-optimized.o
+[ 40%] Generating generics-reload-optimized.o
+[ 40%] Linking CXX executable void_generics_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/generics-reload-optimized.o
+[ 41%] Linking CXX executable void_generics_cli_large_optimized
+[ 41%] Linking CXX executable void_generics_cli_reload_optimized
+[ 41%] Built target void_generics_cli_order_optimized
+[ 41%] Generating collections-main-normal.o
+[ 41%] Built target void_generics_cli_large_optimized
+[ 41%] Built target void_generics_cli_reload_optimized
+[ 41%] Generating collections-nested-normal.o
+[ 41%] Generating collections-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-main-normal.o
+[ 41%] Linking CXX executable void_collections_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-order-normal.o
+[ 41%] Linking CXX executable void_collections_cli_order_normal
+[ 41%] Built target void_collections_cli_main_normal
+[ 41%] Generating collections-bounds-normal.o
+[ 41%] Built target void_collections_cli_order_normal
+[ 41%] Generating collections-invalidation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-bounds-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-invalidation-normal.o
+[ 41%] Linking CXX executable void_collections_cli_bounds_normal
+[ 41%] Linking CXX executable void_collections_cli_nested_normal
+[ 41%] Linking CXX executable void_collections_cli_invalidation_normal
+[ 41%] Built target void_collections_cli_bounds_normal
+[ 41%] Built target void_collections_cli_nested_normal
+[ 41%] Generating collections-large-normal.o
+[ 41%] Built target void_collections_cli_invalidation_normal
+[ 41%] Generating collections-readonly-normal.o
+[ 41%] Generating collections-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-readonly-normal.o
+[ 41%] Linking CXX executable void_collections_cli_large_normal
+[ 42%] Linking CXX executable void_collections_cli_readonly_normal
+[ 43%] Built target void_collections_cli_large_normal
+[ 43%] Built target void_collections_cli_readonly_normal
+[ 43%] Generating collections-main-optimized.o
+[ 43%] Generating collections-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-main-optimized.o
+[ 43%] Linking CXX executable void_collections_cli_numeric_normal
+[ 43%] Linking CXX executable void_collections_cli_main_optimized
+[ 43%] Built target void_collections_cli_numeric_normal
+[ 43%] Generating collections-order-optimized.o
+[ 43%] Built target void_collections_cli_main_optimized
+[ 43%] Generating collections-bounds-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-bounds-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-order-optimized.o
+[ 43%] Linking CXX executable void_collections_cli_bounds_optimized
+[ 43%] Linking CXX executable void_collections_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-nested-optimized.o
+[ 43%] Built target void_collections_cli_order_optimized
+[ 43%] Linking CXX executable void_collections_cli_nested_optimized
+[ 43%] Built target void_collections_cli_bounds_optimized
+[ 43%] Generating collections-invalidation-optimized.o
+[ 43%] Generating collections-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-large-optimized.o
+[ 44%] Built target void_collections_cli_nested_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-invalidation-optimized.o
+[ 44%] Generating collections-readonly-optimized.o
+[ 44%] Linking CXX executable void_collections_cli_large_optimized
+[ 44%] Linking CXX executable void_collections_cli_invalidation_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-readonly-optimized.o
+[ 44%] Linking CXX executable void_collections_cli_readonly_optimized
+[ 44%] Built target void_collections_cli_large_optimized
+[ 44%] Built target void_collections_cli_invalidation_optimized
+[ 44%] Generating collections-numeric-optimized.o
+[ 44%] Generating dictionaries-main-normal.o
+[ 44%] Built target void_collections_cli_readonly_optimized
+[ 44%] Generating dictionaries-keys-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-main-normal.o
+[ 44%] Linking CXX executable void_dictionaries_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/collections-numeric-optimized.o
+[ 44%] Built target void_dictionaries_cli_main_normal
+[ 44%] Generating dictionaries-nested-normal.o
+[ 44%] Linking CXX executable void_collections_cli_numeric_optimized
+[ 44%] Built target void_collections_cli_numeric_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-keys-normal.o
+[ 44%] Generating dictionaries-order-normal.o
+[ 44%] Linking CXX executable void_dictionaries_cli_keys_normal
+[ 45%] Built target void_dictionaries_cli_keys_normal
+[ 45%] Generating dictionaries-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-nested-normal.o
+[ 46%] Linking CXX executable void_dictionaries_cli_order_normal
+[ 46%] Linking CXX executable void_dictionaries_cli_large_normal
+[ 46%] Linking CXX executable void_dictionaries_cli_nested_normal
+[ 46%] Built target void_dictionaries_cli_order_normal
+[ 46%] Built target void_dictionaries_cli_nested_normal
+[ 46%] Generating dictionaries-transactions-normal.o
+[ 46%] Built target void_dictionaries_cli_large_normal
+[ 46%] Generating dictionaries-literal-normal.o
+[ 46%] Generating dictionaries-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-literal-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-transactions-normal.o
+[ 46%] Linking CXX executable void_dictionaries_cli_literal_normal
+[ 46%] Linking CXX executable void_dictionaries_cli_transactions_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-main-optimized.o
+[ 46%] Built target void_dictionaries_cli_literal_normal
+[ 46%] Linking CXX executable void_dictionaries_cli_main_optimized
+[ 46%] Built target void_dictionaries_cli_transactions_normal
+[ 46%] Generating dictionaries-keys-optimized.o
+[ 46%] Generating dictionaries-nested-optimized.o
+[ 46%] Built target void_dictionaries_cli_main_optimized
+[ 46%] Generating dictionaries-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-keys-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-order-optimized.o
+[ 46%] Linking CXX executable void_dictionaries_cli_keys_optimized
+[ 46%] Linking CXX executable void_dictionaries_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-nested-optimized.o
+[ 46%] Built target void_dictionaries_cli_keys_optimized
+[ 46%] Generating dictionaries-large-optimized.o
+[ 46%] Linking CXX executable void_dictionaries_cli_nested_optimized
+[ 46%] Built target void_dictionaries_cli_order_optimized
+[ 46%] Generating dictionaries-transactions-optimized.o
+[ 46%] Built target void_dictionaries_cli_nested_optimized
+[ 46%] Generating dictionaries-literal-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-transactions-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/dictionaries-literal-optimized.o
+[ 46%] Linking CXX executable void_dictionaries_cli_large_optimized
+[ 46%] Linking CXX executable void_dictionaries_cli_transactions_optimized
+[ 46%] Linking CXX executable void_dictionaries_cli_literal_optimized
+[ 46%] Built target void_dictionaries_cli_large_optimized
+[ 46%] Built target void_dictionaries_cli_transactions_optimized
+[ 46%] Generating properties-main-normal.o
+[ 47%] Built target void_dictionaries_cli_literal_optimized
+[ 47%] Generating properties-generic-normal.o
+[ 47%] Generating properties-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-generic-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-order-normal.o
+[ 47%] Linking CXX executable void_properties_cli_generic_normal
+[ 47%] Linking CXX executable void_properties_cli_main_normal
+[ 47%] Linking CXX executable void_properties_cli_order_normal
+[ 47%] Built target void_properties_cli_generic_normal
+[ 47%] Generating properties-references-normal.o
+[ 47%] Built target void_properties_cli_order_normal
+[ 47%] Built target void_properties_cli_main_normal
+[ 47%] Generating properties-methods-normal.o
+[ 47%] Generating properties-callable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-callable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-references-normal.o
+[ 47%] Linking CXX executable void_properties_cli_methods_normal
+[ 47%] Linking CXX executable void_properties_cli_callable_normal
+[ 48%] Linking CXX executable void_properties_cli_references_normal
+[ 48%] Built target void_properties_cli_callable_normal
+[ 48%] Built target void_properties_cli_methods_normal
+[ 49%] Generating properties-imports-normal.o
+[ 49%] Generating properties-selection-normal.o
+[ 49%] Built target void_properties_cli_references_normal
+[ 49%] Generating properties-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-failure-normal.o
+[ 49%] Linking CXX executable void_properties_cli_imports_normal
+[ 49%] Linking CXX executable void_properties_cli_failure_normal
+[ 49%] Linking CXX executable void_properties_cli_selection_normal
+[ 49%] Built target void_properties_cli_imports_normal
+[ 49%] Generating properties-receiver-normal.o
+[ 49%] Built target void_properties_cli_selection_normal
+[ 49%] Built target void_properties_cli_failure_normal
+[ 49%] Generating properties-generic-optimized.o
+[ 49%] Generating properties-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-receiver-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-generic-optimized.o
+[ 49%] Linking CXX executable void_properties_cli_receiver_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-main-optimized.o
+[ 49%] Linking CXX executable void_properties_cli_generic_optimized
+[ 49%] Linking CXX executable void_properties_cli_main_optimized
+[ 49%] Built target void_properties_cli_receiver_normal
+[ 49%] Built target void_properties_cli_generic_optimized
+[ 49%] Generating properties-order-optimized.o
+[ 49%] Generating properties-references-optimized.o
+[ 49%] Built target void_properties_cli_main_optimized
+[ 49%] Generating properties-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-order-optimized.o
+[ 49%] Linking CXX executable void_properties_cli_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-references-optimized.o
+[ 49%] Linking CXX executable void_properties_cli_methods_optimized
+[ 49%] Linking CXX executable void_properties_cli_references_optimized
+[ 49%] Built target void_properties_cli_order_optimized
+[ 50%] Generating properties-callable-optimized.o
+[ 51%] Built target void_properties_cli_methods_optimized
+[ 51%] Built target void_properties_cli_references_optimized
+[ 51%] Generating properties-selection-optimized.o
+[ 51%] Generating properties-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-callable-optimized.o
+[ 51%] Linking CXX executable void_properties_cli_callable_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-selection-optimized.o
+[ 51%] Linking CXX executable void_properties_cli_imports_optimized
+[ 51%] Linking CXX executable void_properties_cli_selection_optimized
+[ 51%] Built target void_properties_cli_callable_optimized
+[ 51%] Generating properties-failure-optimized.o
+[ 51%] Built target void_properties_cli_imports_optimized
+[ 51%] Built target void_properties_cli_selection_optimized
+[ 51%] Generating properties-receiver-optimized.o
+[ 51%] Generating patterns-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-failure-optimized.o
+[ 51%] Linking CXX executable void_properties_cli_failure_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/properties-receiver-optimized.o
+[ 51%] Linking CXX executable void_patterns_cli_main_normal
+[ 51%] Linking CXX executable void_properties_cli_receiver_optimized
+[ 51%] Built target void_properties_cli_failure_optimized
+[ 51%] Generating patterns-results-normal.o
+[ 51%] Built target void_patterns_cli_main_normal
+[ 51%] Built target void_properties_cli_receiver_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-results-normal.o
+[ 51%] Generating patterns-values-normal.o
+[ 51%] Generating patterns-interfaces-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-interfaces-normal.o
+[ 51%] Linking CXX executable void_patterns_cli_results_normal
+[ 51%] Linking CXX executable void_patterns_cli_interfaces_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-values-normal.o
+[ 51%] Built target void_patterns_cli_results_normal
+[ 51%] Linking CXX executable void_patterns_cli_values_normal
+[ 52%] Generating patterns-generic-normal.o
+[ 52%] Built target void_patterns_cli_interfaces_normal
+[ 52%] Generating patterns-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-generic-normal.o
+[ 52%] Built target void_patterns_cli_values_normal
+[ 52%] Linking CXX executable void_patterns_cli_generic_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-large-normal.o
+[ 52%] Generating patterns-nullable-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/nullable.void:9:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 9 |     match result:
+   |     ^^^^^
+    Module: /nullable.void
+
+[ 52%] Linking CXX executable void_patterns_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-nullable-normal.o
+[ 52%] Built target void_patterns_cli_generic_normal
+[ 52%] Linking CXX executable void_patterns_cli_nullable_normal
+[ 52%] Generating patterns-control-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/control.void:14:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 14 |     match current:
+    |     ^^^^^
+    Module: /control.void
+
+[ 52%] Built target void_patterns_cli_large_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-control-normal.o
+[ 52%] Generating patterns-combined-normal.o
+[ 52%] Linking CXX executable void_patterns_cli_control_normal
+[ 53%] Built target void_patterns_cli_nullable_normal
+[ 53%] Generating patterns-unmatched-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/unmatched.void:2:12: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 2 |     return match x:
+   |            ^^^^^
+    Module: /unmatched.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-combined-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-unmatched-normal.o
+[ 54%] Built target void_patterns_cli_control_normal
+[ 54%] Linking CXX executable void_patterns_cli_combined_normal
+[ 55%] Linking CXX executable void_patterns_cli_unmatched_normal
+[ 55%] Generating patterns-transactions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-transactions-normal.o
+[ 55%] Built target void_patterns_cli_unmatched_normal
+[ 55%] Built target void_patterns_cli_combined_normal
+[ 55%] Linking CXX executable void_patterns_cli_transactions_normal
+[ 55%] Generating patterns-types-normal.o
+[ 55%] Generating patterns-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-nested-normal.o
+[ 55%] Linking CXX executable void_patterns_cli_types_normal
+[ 55%] Built target void_patterns_cli_transactions_normal
+[ 55%] Generating patterns-fields-normal.o
+[ 55%] Linking CXX executable void_patterns_cli_nested_normal
+[ 55%] Built target void_patterns_cli_types_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-fields-normal.o
+[ 55%] Generating patterns-relocation-normal.o
+[ 55%] Linking CXX executable void_patterns_cli_fields_normal
+[ 55%] Built target void_patterns_cli_nested_normal
+[ 55%] Generating patterns-main-optimized.o
+[ 55%] Built target void_patterns_cli_fields_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-main-optimized.o
+[ 55%] Generating patterns-results-optimized.o
+[ 55%] Linking CXX executable void_patterns_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-results-optimized.o
+[ 56%] Linking CXX executable void_patterns_cli_results_optimized
+[ 56%] Built target void_patterns_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-relocation-normal.o
+[ 56%] Generating patterns-values-optimized.o
+[ 56%] Linking CXX executable void_patterns_cli_relocation_normal
+[ 56%] Built target void_patterns_cli_results_optimized
+[ 56%] Generating patterns-interfaces-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-values-optimized.o
+[ 56%] Built target void_patterns_cli_relocation_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-interfaces-optimized.o
+[ 56%] Generating patterns-generic-optimized.o
+[ 56%] Linking CXX executable void_patterns_cli_values_optimized
+[ 56%] Linking CXX executable void_patterns_cli_interfaces_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-generic-optimized.o
+[ 56%] Linking CXX executable void_patterns_cli_generic_optimized
+[ 56%] Built target void_patterns_cli_values_optimized
+[ 56%] Built target void_patterns_cli_interfaces_optimized
+[ 56%] Generating patterns-large-optimized.o
+[ 56%] Generating patterns-nullable-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/nullable.void:9:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 9 |     match result:
+   |     ^^^^^
+    Module: /nullable.void
+
+[ 56%] Built target void_patterns_cli_generic_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-nullable-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-large-optimized.o
+[ 56%] Generating patterns-control-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/control.void:14:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 14 |     match current:
+    |     ^^^^^
+    Module: /control.void
+
+[ 56%] Linking CXX executable void_patterns_cli_nullable_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-control-optimized.o
+[ 56%] Linking CXX executable void_patterns_cli_large_optimized
+[ 56%] Linking CXX executable void_patterns_cli_control_optimized
+[ 56%] Built target void_patterns_cli_nullable_optimized
+[ 57%] Built target void_patterns_cli_large_optimized
+[ 57%] Generating patterns-combined-optimized.o
+[ 57%] Generating patterns-unmatched-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/unmatched.void:2:12: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 2 |     return match x:
+   |            ^^^^^
+    Module: /unmatched.void
+
+[ 57%] Built target void_patterns_cli_control_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-unmatched-optimized.o
+[ 57%] Generating patterns-transactions-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-combined-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_unmatched_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-transactions-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_combined_optimized
+[ 57%] Linking CXX executable void_patterns_cli_transactions_optimized
+[ 57%] Built target void_patterns_cli_unmatched_optimized
+[ 57%] Generating patterns-nested-optimized.o
+[ 57%] Built target void_patterns_cli_combined_optimized
+[ 57%] Built target void_patterns_cli_transactions_optimized
+[ 57%] Generating patterns-types-optimized.o
+[ 57%] Generating patterns-fields-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-nested-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_types_optimized
+[ 57%] Linking CXX executable void_patterns_cli_nested_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-fields-optimized.o
+[ 57%] Linking CXX executable void_patterns_cli_fields_optimized
+[ 57%] Built target void_patterns_cli_types_optimized
+[ 57%] Built target void_patterns_cli_nested_optimized
+[ 57%] Generating patterns-relocation-optimized.o
+[ 57%] Generating advanced-closures-normal.o
+[ 57%] Built target void_patterns_cli_fields_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-closures-normal.o
+[ 57%] Generating advanced-captures-normal.o
+[ 57%] Linking CXX executable void_advanced_cli_closures_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-captures-normal.o
+[ 57%] Built target void_advanced_cli_closures_normal
+[ 57%] Linking CXX executable void_advanced_cli_captures_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/patterns-relocation-optimized.o
+[ 57%] Generating advanced-callbacks-normal.o
+[ 57%] Linking CXX executable void_patterns_cli_relocation_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-callbacks-normal.o
+[ 57%] Built target void_advanced_cli_captures_normal
+[ 57%] Generating advanced-defer-normal.o
+[ 57%] Linking CXX executable void_advanced_cli_callbacks_normal
+[ 57%] Built target void_patterns_cli_relocation_optimized
+[ 57%] Generating advanced-with-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-defer-normal.o
+[ 57%] Built target void_advanced_cli_callbacks_normal
+[ 58%] Linking CXX executable void_advanced_cli_defer_normal
+[ 59%] Generating advanced-events-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-with-normal.o
+[ 60%] Linking CXX executable void_advanced_cli_with_normal
+[ 60%] Built target void_advanced_cli_defer_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-events-normal.o
+[ 60%] Generating advanced-cleanup_failure-normal.o
+[ 60%] Linking CXX executable void_advanced_cli_events_normal
+[ 60%] Built target void_advanced_cli_with_normal
+[ 60%] Generating advanced-propagation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-cleanup_failure-normal.o
+[ 60%] Built target void_advanced_cli_events_normal
+[ 60%] Linking CXX executable void_advanced_cli_cleanup_failure_normal
+[ 60%] Generating advanced-event_snapshot-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-propagation-normal.o
+[ 60%] Linking CXX executable void_advanced_cli_propagation_normal
+[ 61%] Built target void_advanced_cli_cleanup_failure_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-event_snapshot-normal.o
+[ 61%] Generating advanced-nullable-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_event_snapshot_normal
+[ 61%] Built target void_advanced_cli_propagation_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-nullable-normal.o
+[ 61%] Generating advanced-large-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_nullable_normal
+[ 61%] Built target void_advanced_cli_event_snapshot_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-large-normal.o
+[ 61%] Generating advanced-fixed_capture-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_large_normal
+[ 61%] Built target void_advanced_cli_nullable_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-fixed_capture-normal.o
+[ 61%] Generating advanced-inheritance-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_fixed_capture_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-inheritance-normal.o
+[ 61%] Built target void_advanced_cli_large_normal
+[ 61%] Generating advanced-scope-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_inheritance_normal
+[ 61%] Built target void_advanced_cli_fixed_capture_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-scope-normal.o
+[ 61%] Generating advanced-with_transaction-normal.o
+[ 61%] Linking CXX executable void_advanced_cli_scope_normal
+[ 62%] Built target void_advanced_cli_inheritance_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-with_transaction-normal.o
+[ 62%] Generating advanced-combined-normal.o
+[ 62%] Linking CXX executable void_advanced_cli_with_transaction_normal
+[ 62%] Built target void_advanced_cli_scope_normal
+[ 62%] Generating advanced-function_arrays-normal.o
+[ 62%] Built target void_advanced_cli_with_transaction_normal
+[ 62%] Generating advanced-identity-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-function_arrays-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-combined-normal.o
+[ 62%] Linking CXX executable void_advanced_cli_function_arrays_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-identity-normal.o
+[ 62%] Linking CXX executable void_advanced_cli_combined_normal
+[ 62%] Linking CXX executable void_advanced_cli_identity_normal
+[ 62%] Built target void_advanced_cli_function_arrays_normal
+[ 62%] Generating advanced-generic_callbacks-normal.o
+[ 62%] Built target void_advanced_cli_combined_normal
+[ 62%] Built target void_advanced_cli_identity_normal
+[ 62%] Generating advanced-dictionary_closures-normal.o
+[ 62%] Generating advanced-construction_cleanup-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-generic_callbacks-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-construction_cleanup-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-dictionary_closures-normal.o
+[ 62%] Linking CXX executable void_advanced_cli_generic_callbacks_normal
+[ 62%] Linking CXX executable void_advanced_cli_dictionary_closures_normal
+[ 62%] Linking CXX executable void_advanced_cli_construction_cleanup_normal
+[ 62%] Built target void_advanced_cli_generic_callbacks_normal
+[ 62%] Built target void_advanced_cli_construction_cleanup_normal
+[ 62%] Built target void_advanced_cli_dictionary_closures_normal
+[ 62%] Generating advanced-composite_defaults-normal.o
+[ 62%] Generating advanced-closures-optimized.o
+[ 62%] Generating advanced-captures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-closures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-composite_defaults-normal.o
+[ 62%] Linking CXX executable void_advanced_cli_closures_optimized
+[ 62%] Linking CXX executable void_advanced_cli_composite_defaults_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-captures-optimized.o
+[ 62%] Linking CXX executable void_advanced_cli_captures_optimized
+[ 62%] Built target void_advanced_cli_composite_defaults_normal
+[ 62%] Built target void_advanced_cli_closures_optimized
+[ 62%] Generating advanced-callbacks-optimized.o
+[ 62%] Generating advanced-defer-optimized.o
+[ 62%] Built target void_advanced_cli_captures_optimized
+[ 62%] Generating advanced-with-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-callbacks-optimized.o
+[ 62%] Linking CXX executable void_advanced_cli_callbacks_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-defer-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-with-optimized.o
+[ 62%] Linking CXX executable void_advanced_cli_defer_optimized
+[ 62%] Built target void_advanced_cli_callbacks_optimized
+[ 62%] Linking CXX executable void_advanced_cli_with_optimized
+[ 62%] Generating advanced-events-optimized.o
+[ 62%] Built target void_advanced_cli_defer_optimized
+[ 62%] Generating advanced-cleanup_failure-optimized.o
+[ 62%] Built target void_advanced_cli_with_optimized
+[ 62%] Generating advanced-propagation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-events-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-cleanup_failure-optimized.o
+[ 62%] Linking CXX executable void_advanced_cli_events_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-propagation-optimized.o
+[ 62%] Linking CXX executable void_advanced_cli_cleanup_failure_optimized
+[ 62%] Linking CXX executable void_advanced_cli_propagation_optimized
+[ 62%] Built target void_advanced_cli_events_optimized
+[ 62%] Generating advanced-event_snapshot-optimized.o
+[ 62%] Built target void_advanced_cli_cleanup_failure_optimized
+[ 62%] Built target void_advanced_cli_propagation_optimized
+[ 62%] Generating advanced-nullable-optimized.o
+[ 62%] Generating advanced-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-nullable-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-event_snapshot-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-large-optimized.o
+[ 63%] Linking CXX executable void_advanced_cli_nullable_optimized
+[ 63%] Linking CXX executable void_advanced_cli_event_snapshot_optimized
+[ 63%] Linking CXX executable void_advanced_cli_large_optimized
+[ 63%] Built target void_advanced_cli_nullable_optimized
+[ 63%] Built target void_advanced_cli_event_snapshot_optimized
+[ 63%] Generating advanced-fixed_capture-optimized.o
+[ 63%] Built target void_advanced_cli_large_optimized
+[ 63%] Generating advanced-inheritance-optimized.o
+[ 63%] Generating advanced-scope-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-fixed_capture-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-inheritance-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-scope-optimized.o
+[ 63%] Linking CXX executable void_advanced_cli_fixed_capture_optimized
+[ 63%] Linking CXX executable void_advanced_cli_inheritance_optimized
+[ 63%] Linking CXX executable void_advanced_cli_scope_optimized
+[ 63%] Built target void_advanced_cli_fixed_capture_optimized
+[ 63%] Built target void_advanced_cli_inheritance_optimized
+[ 63%] Generating advanced-with_transaction-optimized.o
+[ 63%] Generating advanced-combined-optimized.o
+[ 63%] Built target void_advanced_cli_scope_optimized
+[ 64%] Generating advanced-function_arrays-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-with_transaction-optimized.o
+[ 64%] Linking CXX executable void_advanced_cli_with_transaction_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-function_arrays-optimized.o
+[ 64%] Linking CXX executable void_advanced_cli_function_arrays_optimized
+[ 64%] Built target void_advanced_cli_with_transaction_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-combined-optimized.o
+[ 64%] Generating advanced-identity-optimized.o
+[ 65%] Linking CXX executable void_advanced_cli_combined_optimized
+[ 65%] Built target void_advanced_cli_function_arrays_optimized
+[ 65%] Generating advanced-generic_callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-identity-optimized.o
+[ 65%] Built target void_advanced_cli_combined_optimized
+[ 65%] Linking CXX executable void_advanced_cli_identity_optimized
+[ 65%] Generating advanced-dictionary_closures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-generic_callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-dictionary_closures-optimized.o
+[ 65%] Linking CXX executable void_advanced_cli_generic_callbacks_optimized
+[ 65%] Built target void_advanced_cli_identity_optimized
+[ 65%] Generating advanced-construction_cleanup-optimized.o
+[ 65%] Linking CXX executable void_advanced_cli_dictionary_closures_optimized
+[ 65%] Built target void_advanced_cli_generic_callbacks_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-construction_cleanup-optimized.o
+[ 65%] Generating advanced-composite_defaults-optimized.o
+[ 65%] Built target void_advanced_cli_dictionary_closures_optimized
+[ 65%] Linking CXX executable void_advanced_cli_construction_cleanup_optimized
+[ 65%] Generating managed-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/advanced-composite_defaults-optimized.o
+[ 65%] Built target void_advanced_cli_construction_cleanup_optimized
+[ 66%] Generating managed-cli-handoffs-normal.o
+[ 66%] Linking CXX executable void_managed_cli_main_normal
+[ 66%] Linking CXX executable void_advanced_cli_composite_defaults_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-handoffs-normal.o
+[ 66%] Built target void_managed_cli_main_normal
+[ 66%] Built target void_advanced_cli_composite_defaults_optimized
+[ 66%] Linking CXX executable void_managed_cli_handoffs_normal
+[ 66%] Generating managed-cli-order-normal.o
+[ 66%] Generating managed-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-imports-normal.o
+[ 66%] Built target void_managed_cli_handoffs_normal
+[ 67%] Linking CXX executable void_managed_cli_imports_normal
+[ 67%] Linking CXX executable void_managed_cli_order_normal
+[ 67%] Generating managed-cli-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-numeric-normal.o
+[ 67%] Built target void_managed_cli_imports_normal
+[ 67%] Built target void_managed_cli_order_normal
+[ 67%] Generating managed-cli-main-optimized.o
+[ 67%] Generating managed-cli-null_failure-normal.o
+[ 67%] Linking CXX executable void_managed_cli_numeric_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-null_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-main-optimized.o
+[ 67%] Linking CXX executable void_managed_cli_null_failure_normal
+[ 67%] Built target void_managed_cli_numeric_normal
+[ 67%] Linking CXX executable void_managed_cli_main_optimized
+[ 67%] Generating managed-cli-handoffs-optimized.o
+[ 67%] Built target void_managed_cli_null_failure_normal
+[ 68%] Built target void_managed_cli_main_optimized
+[ 68%] Generating managed-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-handoffs-optimized.o
+[ 68%] Generating managed-cli-imports-optimized.o
+[ 68%] Linking CXX executable void_managed_cli_handoffs_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-imports-optimized.o
+[ 68%] Linking CXX executable void_managed_cli_order_optimized
+[ 68%] Linking CXX executable void_managed_cli_imports_optimized
+[ 68%] Built target void_managed_cli_handoffs_optimized
+[ 68%] Generating managed-cli-numeric-optimized.o
+[ 68%] Built target void_managed_cli_order_optimized
+[ 68%] Built target void_managed_cli_imports_optimized
+[ 68%] Generating managed-cli-null_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-numeric-optimized.o
+[ 68%] Generating managed_initialization-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed-cli-null_failure-optimized.o
+[ 68%] Linking CXX executable void_managed_cli_numeric_optimized
+[ 68%] Linking CXX executable void_managed_cli_null_failure_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-main-normal.o
+[ 68%] Linking CXX executable void_managed_initialization_cli_main_normal
+[ 68%] Built target void_managed_cli_numeric_optimized
+[ 68%] Generating managed_initialization-cli-stress-normal.o
+[ 68%] Built target void_managed_cli_null_failure_optimized
+[ 68%] Generating managed_initialization-cli-numeric-normal.o
+[ 68%] Built target void_managed_initialization_cli_main_normal
+[ 68%] Generating managed_initialization-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-stress-normal.o
+[ 68%] Linking CXX executable void_managed_initialization_cli_numeric_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-imports-normal.o
+[ 68%] Linking CXX executable void_managed_initialization_cli_stress_normal
+[ 68%] Linking CXX executable void_managed_initialization_cli_imports_normal
+[ 68%] Built target void_managed_initialization_cli_numeric_normal
+[ 68%] Built target void_managed_initialization_cli_stress_normal
+[ 68%] Generating managed_initialization-cli-failure-normal.o
+[ 68%] Generating managed_initialization-cli-fail_default-normal.o
+[ 68%] Built target void_managed_initialization_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-fail_default-normal.o
+[ 68%] Generating managed_initialization-cli-fail_argument-normal.o
+[ 68%] Linking CXX executable void_managed_initialization_cli_failure_normal
+[ 68%] Linking CXX executable void_managed_initialization_cli_fail_default_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-fail_argument-normal.o
+[ 68%] Linking CXX executable void_managed_initialization_cli_fail_argument_normal
+[ 69%] Built target void_managed_initialization_cli_failure_normal
+[ 69%] Built target void_managed_initialization_cli_fail_default_normal
+[ 69%] Generating managed_initialization-cli-fail_child-normal.o
+[ 69%] Generating managed_initialization-cli-main-optimized.o
+[ 69%] Built target void_managed_initialization_cli_fail_argument_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-fail_child-normal.o
+[ 69%] Generating managed_initialization-cli-stress-optimized.o
+[ 69%] Linking CXX executable void_managed_initialization_cli_fail_child_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-main-optimized.o
+[ 69%] Linking CXX executable void_managed_initialization_cli_main_optimized
+[ 69%] Built target void_managed_initialization_cli_fail_child_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-stress-optimized.o
+[ 69%] Generating managed_initialization-cli-numeric-optimized.o
+[ 69%] Linking CXX executable void_managed_initialization_cli_stress_optimized
+[ 70%] Built target void_managed_initialization_cli_main_optimized
+[ 70%] Generating managed_initialization-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-numeric-optimized.o
+[ 70%] Built target void_managed_initialization_cli_stress_optimized
+[ 70%] Linking CXX executable void_managed_initialization_cli_numeric_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-imports-optimized.o
+[ 70%] Generating managed_initialization-cli-failure-optimized.o
+[ 70%] Linking CXX executable void_managed_initialization_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-failure-optimized.o
+[ 70%] Built target void_managed_initialization_cli_numeric_optimized
+[ 70%] Generating managed_initialization-cli-fail_default-optimized.o
+[ 70%] Linking CXX executable void_managed_initialization_cli_failure_optimized
+[ 70%] Built target void_managed_initialization_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-fail_default-optimized.o
+[ 71%] Generating managed_initialization-cli-fail_argument-optimized.o
+[ 71%] Built target void_managed_initialization_cli_failure_optimized
+[ 71%] Linking CXX executable void_managed_initialization_cli_fail_default_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-fail_argument-optimized.o
+[ 71%] Generating managed_initialization-cli-fail_child-optimized.o
+[ 71%] Linking CXX executable void_managed_initialization_cli_fail_argument_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/managed_initialization-cli-fail_child-optimized.o
+[ 71%] Built target void_managed_initialization_cli_fail_default_optimized
+[ 71%] Linking CXX executable void_managed_initialization_cli_fail_child_optimized
+[ 71%] Generating reference_values-cli-copies-normal.o
+[ 71%] Built target void_managed_initialization_cli_fail_argument_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-copies-normal.o
+[ 71%] Generating reference_values-cli-readonly-normal.o
+[ 71%] Built target void_managed_initialization_cli_fail_child_optimized
+[ 71%] Linking CXX executable void_reference_values_cli_copies_normal
+[ 71%] Generating reference_values-cli-initialization-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-readonly-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-initialization-normal.o
+[ 72%] Linking CXX executable void_reference_values_cli_readonly_normal
+[ 72%] Built target void_reference_values_cli_copies_normal
+[ 72%] Linking CXX executable void_reference_values_cli_initialization_normal
+[ 72%] Generating reference_values-cli-templates-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-templates-normal.o
+[ 72%] Built target void_reference_values_cli_readonly_normal
+[ 72%] Generating reference_values-cli-methods-normal.o
+[ 72%] Built target void_reference_values_cli_initialization_normal
+[ 72%] Linking CXX executable void_reference_values_cli_templates_normal
+[ 72%] Generating reference_values-cli-staged-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-staged-normal.o
+[ 72%] Built target void_reference_values_cli_templates_normal
+[ 72%] Linking CXX executable void_reference_values_cli_methods_normal
+[ 72%] Generating reference_values-cli-order-normal.o
+[ 72%] Linking CXX executable void_reference_values_cli_staged_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-order-normal.o
+[ 72%] Built target void_reference_values_cli_methods_normal
+[ 72%] Generating reference_values-cli-imports-normal.o
+[ 72%] Linking CXX executable void_reference_values_cli_order_normal
+[ 72%] Built target void_reference_values_cli_staged_normal
+[ 72%] Generating reference_values-cli-required-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-required-normal.o
+[ 72%] Linking CXX executable void_reference_values_cli_imports_normal
+[ 72%] Built target void_reference_values_cli_order_normal
+[ 73%] Generating reference_values-cli-stress-normal.o
+[ 73%] Linking CXX executable void_reference_values_cli_required_normal
+[ 74%] Built target void_reference_values_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-stress-normal.o
+[ 74%] Generating reference_values-cli-null_failure-normal.o
+[ 74%] Built target void_reference_values_cli_required_normal
+[ 74%] Generating reference_values-cli-copies-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-null_failure-normal.o
+[ 74%] Linking CXX executable void_reference_values_cli_stress_normal
+[ 74%] Linking CXX executable void_reference_values_cli_null_failure_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-copies-optimized.o
+[ 74%] Linking CXX executable void_reference_values_cli_copies_optimized
+[ 74%] Built target void_reference_values_cli_stress_normal
+[ 74%] Generating reference_values-cli-readonly-optimized.o
+[ 74%] Built target void_reference_values_cli_null_failure_normal
+[ 74%] Generating reference_values-cli-initialization-optimized.o
+[ 74%] Built target void_reference_values_cli_copies_optimized
+[ 74%] Generating reference_values-cli-templates-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-templates-optimized.o
+[ 74%] Linking CXX executable void_reference_values_cli_readonly_optimized
+[ 74%] Linking CXX executable void_reference_values_cli_initialization_optimized
+[ 74%] Linking CXX executable void_reference_values_cli_templates_optimized
+[ 74%] Built target void_reference_values_cli_readonly_optimized
+[ 74%] Built target void_reference_values_cli_initialization_optimized
+[ 74%] Generating reference_values-cli-staged-optimized.o
+[ 74%] Generating reference_values-cli-methods-optimized.o
+[ 74%] Built target void_reference_values_cli_templates_optimized
+[ 74%] Generating reference_values-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-staged-optimized.o
+[ 74%] Linking CXX executable void_reference_values_cli_methods_optimized
+[ 74%] Linking CXX executable void_reference_values_cli_staged_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-order-optimized.o
+[ 74%] Linking CXX executable void_reference_values_cli_order_optimized
+[ 75%] Built target void_reference_values_cli_methods_optimized
+[ 75%] Built target void_reference_values_cli_staged_optimized
+[ 75%] Generating reference_values-cli-imports-optimized.o
+[ 75%] Generating reference_values-cli-required-optimized.o
+[ 75%] Built target void_reference_values_cli_order_optimized
+[ 75%] Generating reference_values-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-required-optimized.o
+[ 75%] Linking CXX executable void_reference_values_cli_imports_optimized
+[ 75%] Linking CXX executable void_reference_values_cli_required_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-stress-optimized.o
+[ 75%] Built target void_reference_values_cli_imports_optimized
+[ 75%] Linking CXX executable void_reference_values_cli_stress_optimized
+[ 75%] Built target void_reference_values_cli_required_optimized
+[ 75%] Generating reference_values-cli-null_failure-optimized.o
+[ 75%] Generating composition-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/reference_values-cli-null_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-main-normal.o
+[ 75%] Linking CXX executable void_reference_values_cli_null_failure_optimized
+[ 75%] Built target void_reference_values_cli_stress_optimized
+[ 75%] Linking CXX executable void_composition_cli_main_normal
+[ 75%] Generating composition-cli-stress-normal.o
+[ 75%] Built target void_reference_values_cli_null_failure_optimized
+[ 75%] Generating composition-cli-imports-normal.o
+[ 75%] Built target void_composition_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-stress-normal.o
+[ 75%] Generating composition-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-imports-normal.o
+[ 75%] Linking CXX executable void_composition_cli_stress_normal
+[ 75%] Linking CXX executable void_composition_cli_imports_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-order-normal.o
+[ 75%] Built target void_composition_cli_stress_normal
+[ 75%] Linking CXX executable void_composition_cli_order_normal
+[ 75%] Built target void_composition_cli_imports_normal
+[ 75%] Generating composition-cli-staged-normal.o
+[ 75%] Generating composition-cli-receiver_order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-staged-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-receiver_order-normal.o
+[ 75%] Built target void_composition_cli_order_normal
+[ 75%] Generating composition-cli-main-optimized.o
+[ 75%] Linking CXX executable void_composition_cli_staged_normal
+[ 75%] Linking CXX executable void_composition_cli_receiver_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-main-optimized.o
+[ 75%] Built target void_composition_cli_staged_normal
+[ 75%] Linking CXX executable void_composition_cli_main_optimized
+[ 76%] Built target void_composition_cli_receiver_order_normal
+[ 76%] Generating composition-cli-stress-optimized.o
+[ 76%] Generating composition-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-imports-optimized.o
+[ 76%] Built target void_composition_cli_main_optimized
+[ 76%] Generating composition-cli-order-optimized.o
+[ 76%] Linking CXX executable void_composition_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-stress-optimized.o
+[ 77%] Linking CXX executable void_composition_cli_stress_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-order-optimized.o
+[ 78%] Built target void_composition_cli_imports_optimized
+[ 78%] Generating composition-cli-staged-optimized.o
+[ 78%] Linking CXX executable void_composition_cli_order_optimized
+[ 78%] Built target void_composition_cli_stress_optimized
+[ 78%] Generating composition-cli-receiver_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-staged-optimized.o
+[ 78%] Built target void_composition_cli_order_optimized
+[ 78%] Generating inheritance-cli-main-normal.o
+[ 78%] Linking CXX executable void_composition_cli_staged_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/composition-cli-receiver_order-optimized.o
+[ 78%] Linking CXX executable void_composition_cli_receiver_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-main-normal.o
+[ 78%] Built target void_composition_cli_staged_optimized
+[ 78%] Linking CXX executable void_inheritance_cli_main_normal
+[ 78%] Generating inheritance-cli-initialization-normal.o
+[ 78%] Built target void_composition_cli_receiver_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-initialization-normal.o
+[ 79%] Generating inheritance-cli-stress-normal.o
+[ 79%] Built target void_inheritance_cli_main_normal
+[ 79%] Linking CXX executable void_inheritance_cli_initialization_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-stress-normal.o
+[ 79%] Generating inheritance-cli-order-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_stress_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-order-normal.o
+[ 79%] Built target void_inheritance_cli_initialization_normal
+[ 79%] Linking CXX executable void_inheritance_cli_order_normal
+[ 79%] Generating inheritance-cli-imports-normal.o
+[ 79%] Built target void_inheritance_cli_stress_normal
+[ 79%] Generating inheritance-cli-receiver_order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-receiver_order-normal.o
+[ 79%] Built target void_inheritance_cli_order_normal
+[ 79%] Linking CXX executable void_inheritance_cli_imports_normal
+[ 79%] Generating inheritance-cli-nested-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_receiver_order_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-nested-normal.o
+[ 79%] Built target void_inheritance_cli_imports_normal
+[ 79%] Generating inheritance-cli-results-normal.o
+[ 79%] Linking CXX executable void_inheritance_cli_nested_normal
+[ 79%] Built target void_inheritance_cli_receiver_order_normal
+[ 79%] Generating inheritance-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-failure-normal.o
+[ 79%] Built target void_inheritance_cli_nested_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-results-normal.o
+[ 79%] Generating inheritance-cli-main-optimized.o
+[ 79%] Linking CXX executable void_inheritance_cli_failure_normal
+[ 79%] Linking CXX executable void_inheritance_cli_results_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-main-optimized.o
+[ 80%] Built target void_inheritance_cli_failure_normal
+[ 80%] Linking CXX executable void_inheritance_cli_main_optimized
+[ 80%] Built target void_inheritance_cli_results_normal
+[ 80%] Generating inheritance-cli-initialization-optimized.o
+[ 80%] Generating inheritance-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-initialization-optimized.o
+[ 80%] Built target void_inheritance_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-stress-optimized.o
+[ 81%] Linking CXX executable void_inheritance_cli_initialization_optimized
+[ 82%] Generating inheritance-cli-order-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_stress_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-order-optimized.o
+[ 82%] Built target void_inheritance_cli_initialization_optimized
+[ 82%] Generating inheritance-cli-imports-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_order_optimized
+[ 82%] Built target void_inheritance_cli_stress_optimized
+[ 82%] Generating inheritance-cli-receiver_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-imports-optimized.o
+[ 82%] Built target void_inheritance_cli_order_optimized
+[ 82%] Linking CXX executable void_inheritance_cli_imports_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-receiver_order-optimized.o
+[ 82%] Generating inheritance-cli-nested-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_receiver_order_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-nested-optimized.o
+[ 82%] Built target void_inheritance_cli_imports_optimized
+[ 82%] Generating inheritance-cli-results-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_nested_optimized
+[ 82%] Built target void_inheritance_cli_receiver_order_optimized
+[ 82%] Generating inheritance-cli-failure-optimized.o
+[ 82%] Built target void_inheritance_cli_nested_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-failure-optimized.o
+[ 82%] Generating interfaces-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/inheritance-cli-results-optimized.o
+[ 82%] Linking CXX executable void_inheritance_cli_failure_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-main-normal.o
+[ 82%] Linking CXX executable void_inheritance_cli_results_optimized
+[ 82%] Linking CXX executable void_interfaces_cli_main_normal
+[ 82%] Built target void_inheritance_cli_failure_optimized
+[ 82%] Built target void_inheritance_cli_results_optimized
+[ 82%] Generating interfaces-cli-stress-normal.o
+[ 82%] Generating interfaces-cli-nullable-normal.o
+[ 82%] Built target void_interfaces_cli_main_normal
+[ 82%] Generating interfaces-cli-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-nullable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-selection-normal.o
+[ 82%] Linking CXX executable void_interfaces_cli_nullable_normal
+[ 83%] Linking CXX executable void_interfaces_cli_stress_normal
+[ 83%] Linking CXX executable void_interfaces_cli_selection_normal
+[ 83%] Built target void_interfaces_cli_nullable_normal
+[ 83%] Built target void_interfaces_cli_stress_normal
+[ 83%] Built target void_interfaces_cli_selection_normal
+[ 83%] Generating interfaces-cli-handoffs-normal.o
+[ 84%] Generating interfaces-cli-imports-normal.o
+[ 84%] Generating interfaces-cli-cycles-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-handoffs-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-cycles-normal.o
+[ 84%] Linking CXX executable void_interfaces_cli_handoffs_normal
+[ 84%] Linking CXX executable void_interfaces_cli_imports_normal
+[ 84%] Linking CXX executable void_interfaces_cli_cycles_normal
+[ 84%] Built target void_interfaces_cli_handoffs_normal
+[ 84%] Built target void_interfaces_cli_imports_normal
+[ 84%] Generating interfaces-cli-static-normal.o
+[ 84%] Built target void_interfaces_cli_cycles_normal
+[ 84%] Generating interfaces-cli-main-optimized.o
+[ 84%] Generating interfaces-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-static-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-main-optimized.o
+[ 84%] Linking CXX executable void_interfaces_cli_static_normal
+[ 84%] Linking CXX executable void_interfaces_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-stress-optimized.o
+[ 84%] Built target void_interfaces_cli_static_normal
+[ 84%] Built target void_interfaces_cli_main_optimized
+[ 84%] Generating interfaces-cli-nullable-optimized.o
+[ 84%] Linking CXX executable void_interfaces_cli_stress_optimized
+[ 84%] Generating interfaces-cli-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-nullable-optimized.o
+[ 84%] Built target void_interfaces_cli_stress_optimized
+[ 84%] Generating interfaces-cli-handoffs-optimized.o
+[ 84%] Linking CXX executable void_interfaces_cli_selection_optimized
+[ 84%] Linking CXX executable void_interfaces_cli_nullable_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-handoffs-optimized.o
+[ 84%] Built target void_interfaces_cli_selection_optimized
+[ 85%] Built target void_interfaces_cli_nullable_optimized
+[ 85%] Generating interfaces-cli-imports-optimized.o
+[ 85%] Linking CXX executable void_interfaces_cli_handoffs_optimized
+[ 85%] Generating interfaces-cli-cycles-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-cycles-optimized.o
+[ 85%] Built target void_interfaces_cli_handoffs_optimized
+[ 85%] Linking CXX executable void_interfaces_cli_imports_optimized
+[ 85%] Generating interfaces-cli-static-optimized.o
+[ 85%] Linking CXX executable void_interfaces_cli_cycles_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/interfaces-cli-static-optimized.o
+[ 85%] Built target void_interfaces_cli_imports_optimized
+[ 85%] Generating strings-cli-main-normal.o
+[ 85%] Built target void_interfaces_cli_cycles_optimized
+[ 85%] Linking CXX executable void_interfaces_cli_static_optimized
+[ 85%] Generating strings-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-main-normal.o
+[ 85%] Linking CXX executable void_strings_cli_main_normal
+[ 85%] Built target void_interfaces_cli_static_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-stress-normal.o
+[ 85%] Generating strings-cli-initialization-normal.o
+[ 85%] Linking CXX executable void_strings_cli_stress_normal
+[ 85%] Built target void_strings_cli_main_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-initialization-normal.o
+[ 85%] Generating strings-cli-unicode-normal.o
+[ 85%] Linking CXX executable void_strings_cli_initialization_normal
+[ 85%] Built target void_strings_cli_stress_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-unicode-normal.o
+[ 85%] Generating strings-cli-main-optimized.o
+[ 85%] Linking CXX executable void_strings_cli_unicode_normal
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-main-optimized.o
+[ 85%] Built target void_strings_cli_initialization_normal
+[ 86%] Generating strings-cli-stress-optimized.o
+[ 86%] Linking CXX executable void_strings_cli_main_optimized
+[ 86%] Built target void_strings_cli_unicode_normal
+[ 86%] Generating strings-cli-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-stress-optimized.o
+[ 86%] Built target void_strings_cli_main_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-initialization-optimized.o
+[ 86%] Generating strings-cli-unicode-optimized.o
+[ 86%] Linking CXX executable void_strings_cli_stress_optimized
+[ 86%] Linking CXX executable void_strings_cli_initialization_optimized
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/strings-cli-unicode-optimized.o
+[ 86%] Linking CXX executable void_strings_cli_unicode_optimized
+[ 86%] Built target void_strings_cli_stress_optimized
+[ 86%] Generating log-probe-normal.o, log-probe-normal.o.cpp
+[ 86%] Built target void_strings_cli_initialization_optimized
+[ 86%] Generating log-probe-optimized.o, log-probe-optimized.o.cpp
+[ 86%] Built target void_strings_cli_unicode_optimized
+[ 86%] Generating native-main-normal.o
+[ 86%] Linking CXX executable void_native_aot_main_normal
+[ 86%] Built target void_native_aot_main_normal
+[ 86%] Generating native-main-optimized.o
+[ 86%] Linking CXX executable void_native_aot_main_optimized
+[ 86%] Built target void_native_aot_main_optimized
+[ 86%] Generating native-terminated_nul-normal.o
+[ 86%] Linking CXX executable void_native_aot_terminated_nul_normal
+[ 86%] Built target void_native_aot_terminated_nul_normal
+[ 86%] Generating native-terminated_nul-optimized.o
+[ 86%] Linking CXX executable void_native_aot_terminated_nul_optimized
+[ 86%] Built target void_native_aot_terminated_nul_optimized
+[ 86%] Generating native-closed-normal.o
+[ 86%] Linking CXX executable void_native_aot_closed_normal
+[ 86%] Built target void_native_aot_closed_normal
+[ 86%] Generating native-closed-optimized.o
+[ 86%] Linking CXX executable void_native_aot_closed_optimized
+[ 86%] Built target void_native_aot_closed_optimized
+[ 86%] Generating native-duplicate-normal.o
+[ 86%] Linking CXX executable void_native_aot_duplicate_normal
+[ 86%] Built target void_native_aot_duplicate_normal
+[ 86%] Generating native-duplicate-optimized.o
+[ 86%] Linking CXX executable void_native_aot_duplicate_optimized
+[ 86%] Built target void_native_aot_duplicate_optimized
+[ 86%] Generating native-cleanup_failure-normal.o
+[ 86%] Linking CXX executable void_native_aot_cleanup_failure_normal
+[ 86%] Built target void_native_aot_cleanup_failure_normal
+[ 87%] Generating native-cleanup_failure-optimized.o
+[ 87%] Linking CXX executable void_native_aot_cleanup_failure_optimized
+[ 87%] Built target void_native_aot_cleanup_failure_optimized
+[ 87%] Generating native-integrated-normal.o
+[ 87%] Linking CXX executable void_native_aot_integrated_normal
+[ 87%] Built target void_native_aot_integrated_normal
+[ 87%] Generating native-integrated-optimized.o
+[ 87%] Linking CXX executable void_native_aot_integrated_optimized
+[ 88%] Built target void_native_aot_integrated_optimized
+[ 89%] Generating native-integrated_cancel-normal.o
+[ 89%] Linking CXX executable void_native_aot_integrated_cancel_normal
+[ 89%] Built target void_native_aot_integrated_cancel_normal
+[ 89%] Generating native-integrated_cancel-optimized.o
+[ 89%] Linking CXX executable void_native_aot_integrated_cancel_optimized
+[ 89%] Built target void_native_aot_integrated_cancel_optimized
+[ 89%] Generating native-integrated_failure-normal.o
+[ 89%] Linking CXX executable void_native_aot_integrated_failure_normal
+[ 89%] Built target void_native_aot_integrated_failure_normal
+[ 89%] Generating native-integrated_failure-optimized.o
+[ 89%] Linking CXX executable void_native_aot_integrated_failure_optimized
+[ 89%] Built target void_native_aot_integrated_failure_optimized
+[ 89%] Generating async-spawn-normal.o
+[ 89%] Linking CXX executable void_async_aot_spawn_normal
+[ 89%] Built target void_async_aot_spawn_normal
+[ 89%] Generating async-spawn-optimized.o
+[ 89%] Linking CXX executable void_async_aot_spawn_optimized
+[ 89%] Built target void_async_aot_spawn_optimized
+[ 89%] Generating async-spawn_cancel-normal.o
+[ 89%] Linking CXX executable void_async_aot_spawn_cancel_normal
+[ 89%] Built target void_async_aot_spawn_cancel_normal
+[ 89%] Generating async-spawn_cancel-optimized.o
+[ 89%] Linking CXX executable void_async_aot_spawn_cancel_optimized
+[ 89%] Built target void_async_aot_spawn_cancel_optimized
+[ 89%] Generating async-spawn_failure-normal.o
+[ 89%] Linking CXX executable void_async_aot_spawn_failure_normal
+[ 89%] Built target void_async_aot_spawn_failure_normal
+[ 89%] Generating async-spawn_failure-optimized.o
+[ 90%] Linking CXX executable void_async_aot_spawn_failure_optimized
+[ 90%] Built target void_async_aot_spawn_failure_optimized
+[ 90%] Generating async-activation-normal.o
+[ 90%] Linking CXX executable void_async_aot_activation_normal
+[ 90%] Built target void_async_aot_activation_normal
+[ 90%] Generating async-activation-optimized.o
+[ 90%] Linking CXX executable void_async_aot_activation_optimized
+[ 90%] Built target void_async_aot_activation_optimized
+[ 90%] Generating async-managed-normal.o
+[ 90%] Linking CXX executable void_async_aot_managed_normal
+[ 90%] Built target void_async_aot_managed_normal
+[ 90%] Generating async-managed-optimized.o
+[ 90%] Linking CXX executable void_async_aot_managed_optimized
+[ 90%] Built target void_async_aot_managed_optimized
+[ 90%] Generating async-large-normal.o
+[ 90%] Linking CXX executable void_async_aot_large_normal
+[ 90%] Built target void_async_aot_large_normal
+[ 90%] Generating async-large-optimized.o
+[ 90%] Linking CXX executable void_async_aot_large_optimized
+[ 90%] Built target void_async_aot_large_optimized
+[ 90%] Generating async-closures-normal.o
+[ 90%] Linking CXX executable void_async_aot_closures_normal
+[ 90%] Built target void_async_aot_closures_normal
+[ 90%] Generating async-closures-optimized.o
+[ 91%] Linking CXX executable void_async_aot_closures_optimized
+[ 91%] Built target void_async_aot_closures_optimized
+[ 91%] Generating async-loops-normal.o
+[ 91%] Linking CXX executable void_async_aot_loops_normal
+[ 91%] Built target void_async_aot_loops_normal
+[ 91%] Generating async-loops-optimized.o
+[ 91%] Linking CXX executable void_async_aot_loops_optimized
+[ 91%] Built target void_async_aot_loops_optimized
+[ 91%] Generating async-values-normal.o
+[ 91%] Linking CXX executable void_async_aot_values_normal
+[ 91%] Built target void_async_aot_values_normal
+[ 91%] Generating async-values-optimized.o
+[ 91%] Linking CXX executable void_async_aot_values_optimized
+[ 91%] Built target void_async_aot_values_optimized
+[ 91%] Generating async-methods-normal.o
+[ 91%] Linking CXX executable void_async_aot_methods_normal
+[ 92%] Built target void_async_aot_methods_normal
+[ 92%] Generating async-methods-optimized.o
+[ 92%] Linking CXX executable void_async_aot_methods_optimized
+[ 92%] Built target void_async_aot_methods_optimized
+[ 92%] Generating async-lifecycle-normal.o
+[ 92%] Linking CXX executable void_async_aot_lifecycle_normal
+[ 92%] Built target void_async_aot_lifecycle_normal
+[ 92%] Building CXX object CMakeFiles/void_log_probe_normal.dir/log-probe-normal.o.cpp.o
+[ 92%] Generating async-lifecycle-optimized.o
+[ 92%] Linking CXX executable void_async_aot_lifecycle_optimized
+[ 92%] Built target void_async_aot_lifecycle_optimized
+[ 92%] Generating async-lifecycle_exits-normal.o
+[ 93%] Linking CXX executable void_async_aot_lifecycle_exits_normal
+[ 93%] Built target void_async_aot_lifecycle_exits_normal
+[ 93%] Generating async-lifecycle_exits-optimized.o
+[ 93%] Linking CXX executable void_async_aot_lifecycle_exits_optimized
+[ 93%] Built target void_async_aot_lifecycle_exits_optimized
+[ 93%] Linking CXX executable void_log_probe_normal
+[ 93%] Generating async-lifecycle_cancelled-normal.o
+[ 93%] Built target void_log_probe_normal
+[ 93%] Generating async-lifecycle_cancelled-optimized.o
+[ 93%] Linking CXX executable void_async_aot_lifecycle_cancelled_normal
+[ 93%] Built target void_async_aot_lifecycle_cancelled_normal
+[ 93%] Generating async-lifecycle_failures-normal.o
+[ 93%] Linking CXX executable void_async_aot_lifecycle_cancelled_optimized
+[ 93%] Built target void_async_aot_lifecycle_cancelled_optimized
+[ 93%] Generating async-lifecycle_failures-optimized.o
+[ 93%] Linking CXX executable void_async_aot_lifecycle_failures_normal
+[ 93%] Built target void_async_aot_lifecycle_failures_normal
+[ 94%] Generating async-lifecycle_primary-normal.o
+[ 94%] Linking CXX executable void_async_aot_lifecycle_failures_optimized
+[ 94%] Linking CXX executable void_async_aot_lifecycle_primary_normal
+[ 94%] Built target void_async_aot_lifecycle_failures_optimized
+[ 94%] Built target void_async_aot_lifecycle_primary_normal
+[ 94%] Generating async-lifecycle_primary-optimized.o
+[ 94%] Generating async-lifecycle_resources-normal.o
+[ 94%] Linking CXX executable void_async_aot_lifecycle_resources_normal
+[ 94%] Linking CXX executable void_async_aot_lifecycle_primary_optimized
+[ 94%] Built target void_async_aot_lifecycle_resources_normal
+[ 94%] Generating async-lifecycle_resources-optimized.o
+[ 94%] Built target void_async_aot_lifecycle_primary_optimized
+[ 94%] Generating async-lifecycle_values-normal.o
+[ 94%] Linking CXX executable void_async_aot_lifecycle_values_normal
+[ 94%] Linking CXX executable void_async_aot_lifecycle_resources_optimized
+[ 94%] Built target void_async_aot_lifecycle_values_normal
+[ 94%] Built target void_async_aot_lifecycle_resources_optimized
+[ 94%] Generating async-lifecycle_values-optimized.o
+[ 94%] Generating async-syntax-values-normal.o
+[ 94%] Linking CXX executable void_async_aot_lifecycle_values_optimized
+[ 95%] Built target void_async_aot_lifecycle_values_optimized
+[ 95%] Generating async-syntax-values-optimized.o
+[ 95%] Linking CXX executable void_async_syntax_values_normal
+[ 95%] Built target void_async_syntax_values_normal
+[ 95%] Generating async-syntax-errors-normal.o
+[ 95%] Linking CXX executable void_async_syntax_errors_normal
+[ 95%] Linking CXX executable void_async_syntax_values_optimized
+[ 95%] Built target void_async_syntax_errors_normal
+[ 95%] Generating async-syntax-errors-optimized.o
+[ 95%] Built target void_async_syntax_values_optimized
+[ 95%] Generating async-syntax-cancelled-normal.o
+[ 96%] Linking CXX executable void_async_syntax_cancelled_normal
+[ 96%] Building CXX object CMakeFiles/void_log_probe_optimized.dir/log-probe-optimized.o.cpp.o
+[ 96%] Built target void_async_syntax_cancelled_normal
+[ 96%] Generating async-syntax-cancelled-optimized.o
+[ 96%] Linking CXX executable void_async_syntax_errors_optimized
+[ 96%] Built target void_async_syntax_errors_optimized
+[ 96%] Generating async-syntax-failure-normal.o
+[ 96%] Linking CXX executable void_async_syntax_cancelled_optimized
+[ 96%] Built target void_async_syntax_cancelled_optimized
+[ 96%] Generating async-syntax-failure-optimized.o
+[ 96%] Linking CXX executable void_async_syntax_failure_normal
+[ 96%] Built target void_async_syntax_failure_normal
+[ 97%] Generating async-syntax-spawn-normal.o
+[ 97%] Linking CXX executable void_async_syntax_failure_optimized
+[ 97%] Linking CXX executable void_async_syntax_spawn_normal
+[ 97%] Built target void_async_syntax_failure_optimized
+[ 97%] Generating async-syntax-spawn-optimized.o
+[ 97%] Built target void_async_syntax_spawn_normal
+[ 98%] Generating retention-growth-normal.o
+[ 98%] Linking CXX executable void_async_syntax_spawn_optimized
+[ 98%] Linking CXX executable void_log_probe_optimized
+[ 98%] Built target void_async_syntax_spawn_optimized
+[ 98%] Generating retention-growth-optimized.o
+[ 99%] Built target void_log_probe_optimized
+[ 99%] Generating retention-workers-normal.o
+[ 99%] Linking CXX executable void_retention_aot_growth_normal
+[ 99%] Linking CXX executable void_retention_aot_workers_normal
+[ 99%] Linking CXX executable void_retention_aot_growth_optimized
+[ 99%] Built target void_retention_aot_growth_normal
+[ 99%] Generating retention-workers-optimized.o
+[ 99%] Built target void_retention_aot_growth_optimized
+[ 99%] Built target void_retention_aot_workers_normal
+[ 99%] Linking CXX executable void_retention_aot_workers_optimized
+[100%] Built target void_retention_aot_workers_optimized

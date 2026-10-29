@@ -1,0 +1,64 @@
+[
+  {
+    "name": "stage11-console",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/replay-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/stage11-console-preopt.ll",
+      "/main.void"
+    ],
+    "source_claim": "Stage11 retained preopt IR; logging captured diagnostic IR or source-associated workload, not original crashing process bytes",
+    "inputs_sha256": {
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/stage11-console-preopt.ll": "402019ad2887f892d65f8effa2aa516342d02013d19e54835187d4b0d2fe59e0",
+      "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/metrics/replay.cpp": "de8dd35fd8f71ff3665f2a74ee0b6a0558da9094860626e9310f8e84c4dc224f"
+    },
+    "status": 0,
+    "stdout": "Verified standard O2 replay seconds=2.991861e-01\n",
+    "stderr": "",
+    "process_wall_seconds": 0.34595721698133275,
+    "hard_stack_bytes": 1048576,
+    "working_directory": "/tmp/VOID LLVM23 DSE acceptance nq3gg9_g"
+  },
+  {
+    "name": "logging-captured",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/replay-llvm23",
+      "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/dse-input-investigation/captures/logging/preopt.bc",
+      "/performance.void"
+    ],
+    "source_claim": "Stage11 retained preopt IR; logging captured diagnostic IR or source-associated workload, not original crashing process bytes",
+    "inputs_sha256": {
+      "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/flat-builder/performance.void": "89c1b9ac17d734c65ce6b5114b3ff923c5aa5cd39b0b6c00ef0ca02884c4576e",
+      "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/dse-input-investigation/captures/logging/preopt.bc": "1c1b046641d143e7c38e2b4168fdab1de028459a3250e05bff2eb5985fbde272",
+      "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/metrics/replay.cpp": "de8dd35fd8f71ff3665f2a74ee0b6a0558da9094860626e9310f8e84c4dc224f"
+    },
+    "status": 0,
+    "stdout": "Verified standard O2 replay seconds=2.235891e+00\n",
+    "stderr": "",
+    "process_wall_seconds": 2.2991431080154143,
+    "hard_stack_bytes": 1048576,
+    "working_directory": "/tmp/VOID LLVM23 DSE acceptance nq3gg9_g"
+  },
+  {
+    "name": "logging-source-associated",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/flat-builder/performance.void",
+      "1",
+      "1",
+      "6",
+      "12800",
+      "1000"
+    ],
+    "source_claim": "Stage11 retained preopt IR; logging captured diagnostic IR or source-associated workload, not original crashing process bytes",
+    "inputs_sha256": {
+      "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/flat-builder/performance.void": "89c1b9ac17d734c65ce6b5114b3ff923c5aa5cd39b0b6c00ef0ca02884c4576e",
+      "/home/shmellyorc/Documents/Void.Language/docs/llvm23/evidence/metrics/metrics.cpp": "e4d18917a716d3a12bc4e04edd425dbaba8d57a89e697c4187bdbd524b86b546"
+    },
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.240875,\"typed_lowering_seconds\":0.496149,\"jit_setup_seconds\":0.000958865,\"llvm_compile_seconds\":7.04827,\"samples\":[{\"wall_seconds\":0.00810672,\"cpu_seconds\":0.00805,\"checksum\":12800},{\"wall_seconds\":0.00811605,\"cpu_seconds\":0.008066,\"checksum\":12800},{\"wall_seconds\":0.00803655,\"cpu_seconds\":0.007992,\"checksum\":12800}],\"code_jit_teardown_seconds\":0.00131996,\"peak_rss_kib\":167024}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.860428637999576,
+    "hard_stack_bytes": 1048576,
+    "working_directory": "/tmp/VOID LLVM23 DSE acceptance nq3gg9_g"
+  }
+]

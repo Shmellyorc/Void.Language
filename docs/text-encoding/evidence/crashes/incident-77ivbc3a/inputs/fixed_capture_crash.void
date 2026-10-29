@@ -1,0 +1,11 @@
+func make(value: i32) -> func() -> i32:
+    var items: [i32, 64]
+    items[63] = value
+    return func() -> i32:
+        items[63] += 1
+        return items[63]
+func entry(value: i32) -> i32:
+    var callback = make(value)
+    var alias = callback
+    var first = callback()
+    return first + alias()

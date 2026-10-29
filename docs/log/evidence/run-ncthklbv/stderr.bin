@@ -1,0 +1,44 @@
+/tmp/VOID-log-frontend-0xj1cj0u/main.void:5:14: error: A call may mutate readonly reference leaf 'logger'.
+    code: VOID2007
+
+ 5 |     instance.info("readonly")
+   |              ^^^^
+    Module: /main.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:117:8
+
+ 117 | struct logger:
+     |        ^^^^^^
+    Module: /@stdlib/log.void
+    Reference authority enters this declaration here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:1220:7
+
+ 1220 | func (self logger) info(message: string) -> result<bool, failure>:
+      |       ^^^^
+    Module: /@stdlib/log.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+
+/tmp/VOID-log-frontend-0xj1cj0u/main.void:5:14: error: A call may retain readonly reference leaf 'logger' in mutable object storage.
+    code: VOID2007
+
+ 5 |     instance.info("readonly")
+   |              ^^^^
+    Module: /main.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:117:8
+
+ 117 | struct logger:
+     |        ^^^^^^
+    Module: /@stdlib/log.void
+    Reference authority enters this declaration here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:1220:7
+
+ 1220 | func (self logger) info(message: string) -> result<bool, failure>:
+      |       ^^^^
+    Module: /@stdlib/log.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+
+/tmp/VOID-log-frontend-0xj1cj0u/main.void:5:14: error: Cannot call a mutating method through readonly receiver storage.
+    code: VOID2007
+
+ 5 |     instance.info("readonly")
+   |              ^^^^
+    Module: /main.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

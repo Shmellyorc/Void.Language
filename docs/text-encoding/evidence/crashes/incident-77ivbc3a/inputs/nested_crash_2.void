@@ -1,0 +1,46 @@
+interface readable:
+    func read() -> i32
+struct node:
+    value: i32
+func (n node) read() -> i32:
+    return n.value
+value struct record<t>:
+    fixed: [t, 2]
+    shared: [t]
+func cut<t>(values: [t]) -> [t]:
+    return values[-1..0]
+func entry(value: i32) -> i32:
+    var inferred = [[node(value = value)]]
+    var inferred_copy = inferred[0..0]
+    if inferred_copy[0][0].value != value:
+        return -50
+    var n = node(value = value)
+    var views: [readable] = []
+    views.insert(0, n)
+    var view_copy = views[0..0]
+    var records: [record<i32>] = [record(fixed = [1, 2], shared = [3])]
+    records.insert(0, records[0])
+    records[0].fixed[0] = 10
+    if records[1].fixed[0] != 1:
+        return -100
+    var copied = cut(records)
+    copied[0].fixed[0] = 20
+    copied[0].shared.push(4)
+    if records[1].fixed[0] != 1 or records[0].shared.count != 2:
+        return -200
+    var words = ["a", "c"]
+    words.insert(1, "b")
+    var text = words[0..<3]
+    words.clear()
+    if text[1] != "b":
+        return -300
+    var fixed: [[i32], 2] = [[1], [2]]
+    var sliced = fixed[0..1]
+    sliced[0].push(3)
+    if fixed[0].count != 2:
+        return -400
+    var refs: [node?] = []
+    refs.insert(0, n)
+    refs.insert(-1, null)
+    refs.clear()
+    return view_copy[0].read() + copied[0].fixed[0] + text.count as i32

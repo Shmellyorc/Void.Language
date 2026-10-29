@@ -1,0 +1,54 @@
+interface readable:
+    func read() -> i32
+struct node:
+    value: i32
+    next: node?
+    links: {string: node?}
+func (n node) read() -> i32:
+    return n.value
+value struct record<t>:
+    fixed: [t, 2]
+    list: [t]
+    lookup: {string: t}
+value struct template_store:
+    values: {string: i32} = {"initial": 4}
+func choose<t>(items: {string: t}) -> t:
+    return items["value"]
+func entry(value: i32) -> i32:
+    var first = template_store()
+    var second = template_store()
+    first.values["initial"] = 8
+    if second.values["initial"] != 4:
+        return -50
+    var n = node(value = value)
+    n.next = n
+    n.links["self"] = n
+    n.links["empty"] = null
+    if not n.links.contains("empty") or n.links["empty"] != null:
+        return -75
+    var views: {string: readable} = {"value": n}
+    var data: {string: record<i32>} = {"value": record(fixed = [1, 2], list = [3], lookup = {"a": 4})}
+    var copy = choose(data)
+    copy.fixed[0] = 10
+    copy.list.push(5)
+    copy.lookup["a"] = 6
+    if data["value"].fixed[0] != 1 or data["value"].list.count != 2 or data["value"].lookup["a"] != 6:
+        return -100
+    data["value"].fixed[0] = 20
+    if copy.fixed[0] != 10:
+        return -200
+    var nested: {string: {i32: [node?]}} = {"inner": {1: [n, null]}}
+    nested["inner"][1].push(n)
+    var arrays = [data, data]
+    arrays[0]["other"] = copy
+    if arrays[1].count != 2 or nested["inner"][1].count != 3:
+        return -300
+    var defaults: [{i32: string}, 2]
+    defaults[0][0] = "fresh"
+    if defaults[1].count != 0:
+        return -400
+    var repeated: [template_store, 2]
+    repeated[0].values["initial"] = 10
+    if repeated[1].values["initial"] != 4:
+        return -500
+    return views["value"].read() + data["value"].fixed[0]

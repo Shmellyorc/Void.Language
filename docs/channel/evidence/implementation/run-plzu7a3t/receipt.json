@@ -1,0 +1,15 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_channel_host",
+    "/home/shmellyorc/Documents/Void.Language",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/channel-host"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/channel-host",
+  "status": 0,
+  "seconds": 7.1665712429676205,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "828612d5adea9757b7a08f4af94daf377d0a04bdc1466c9dea4f6d5e34dd22a4",
+  "object_hashes": {},
+  "output_hashes": {}
+}

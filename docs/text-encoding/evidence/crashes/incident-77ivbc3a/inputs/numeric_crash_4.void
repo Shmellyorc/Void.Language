@@ -1,0 +1,31 @@
+value struct numbers:
+    small: i8
+    signed16: i16
+    signed32: i32
+    signed64: i64
+    unsigned8: u8
+    unsigned16: u16
+    unsigned32: u32
+    unsigned: u64
+    single: f32
+    double: f64
+    enabled: bool
+
+func (n numbers) init(small: i8 = -4, unsigned: u64 = 18446744073709551615, single: f32 = 0.1, double: f64 = 0.1, enabled: bool = true, signed16: i16 = -32768, signed32: i32 = -2147483648, signed64: i64 = -9223372036854775808, unsigned8: u8 = 255, unsigned16: u16 = 65535, unsigned32: u32 = 4294967295):
+    n.signed16 = signed16
+    n.signed32 = signed32
+    n.signed64 = signed64
+    n.unsigned8 = unsigned8
+    n.unsigned16 = unsigned16
+    n.unsigned32 = unsigned32
+    n.small = small
+    n.unsigned = unsigned
+    n.single = single
+    n.double = double
+    n.enabled = enabled
+
+func entry(value: i32) -> i32:
+    const n = numbers()
+    if n.signed16 == -32768 and n.signed32 == -2147483648 and n.signed64 == -9223372036854775808 and n.unsigned8 == 255 and n.unsigned16 == 65535 and n.unsigned32 == 4294967295 and n.enabled and n.unsigned == 18446744073709551615 and n.single == 0.1 and n.double == 0.1:
+        return (n.small as i32) + value
+    return 0

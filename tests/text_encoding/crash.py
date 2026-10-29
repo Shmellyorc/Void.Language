@@ -35,6 +35,9 @@ def _signal_name(status):
 
 
 def _sources(command, cwd, source_inputs, environment):
+    # subprocess treats explicit env=None exactly like an omitted environment;
+    # an explicit empty mapping must still remain empty.
+    environment = os.environ if environment is None else environment
     working = Path(cwd or Path.cwd()).resolve()
     arguments = list(map(str, command)) if not isinstance(command, str) else [command]
     sources = {p for p in working.glob('*.void') if p.is_file()}

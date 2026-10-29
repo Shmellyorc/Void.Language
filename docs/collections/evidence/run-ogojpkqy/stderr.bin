@@ -1,0 +1,36 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:35:19: error: Type mismatch: expected string, received i32.
+    code: VOID2001
+
+ 35 |     var zero: t = 0
+    |                   ^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-k0mdxhym/string-order.void:31:20
+
+ 31 |     var output = c.numeric_less("a", "b")
+    |                    ^^^^^^^^^^^^
+    Module: /string-order.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:34:6
+
+ 34 | func numeric_less<t>(const left: t, const right: t) -> bool:
+    |      ^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+    Expected: string
+    Received: i32
+
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:40:17: error: Strings support only +, == and !=.
+    code: VOID2016
+
+ 40 |     return left < right
+    |                 ^
+    Module: /@stdlib/collections.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-k0mdxhym/string-order.void:31:20
+
+ 31 |     var output = c.numeric_less("a", "b")
+    |                    ^^^^^^^^^^^^
+    Module: /string-order.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:34:6
+
+ 34 | func numeric_less<t>(const left: t, const right: t) -> bool:
+    |      ^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+

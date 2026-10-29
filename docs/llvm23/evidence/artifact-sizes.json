@@ -1,0 +1,32 @@
+[
+  {
+    "artifact": "voidc",
+    "llvm19_bytes": 54614824,
+    "llvm23_bytes": 69872600,
+    "ratio_23_to_19": 1.2793705972576237
+  },
+  {
+    "artifact": "voidls",
+    "llvm19_bytes": 6632960,
+    "llvm23_bytes": 7647808,
+    "ratio_23_to_19": 1.1530007719027402
+  },
+  {
+    "artifact": "libvoid_llvm.a",
+    "llvm19_bytes": 1603824,
+    "llvm23_bytes": 1574462,
+    "ratio_23_to_19": 0.9816925049132573
+  },
+  {
+    "artifact": "libvoid_core.a",
+    "llvm19_bytes": 9286608,
+    "llvm23_bytes": 9272818,
+    "ratio_23_to_19": 0.9985150659961096
+  },
+  {
+    "artifact": "libvoid_runtime.a",
+    "llvm19_bytes": 3224630,
+    "llvm23_bytes": 3213430,
+    "ratio_23_to_19": 0.9965267332996344
+  }
+]

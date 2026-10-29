@@ -1,0 +1,53 @@
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+Executing prepublish script 'npm run vscode:prepublish'...
+
+> void-language@0.1.0 vscode:prepublish
+> npm run build
+
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+ INFO  Files included in the VSIX:
+void-language-linux-x64.vsix
+├─ [Content_Types].xml 
+├─ extension.vsixmanifest 
+└─ extension/
+   ├─ language-configuration.json [0.36 KB]
+   ├─ package.json [3.53 KB]
+   ├─ readme.md 
+   ├─ dist/
+   │  ├─ THIRD_PARTY_NOTICES.txt [10.39 KB]
+   │  └─ extension.js [962.53 KB]
+   ├─ server/
+   │  ├─ DEPENDENCIES.txt [0.45 KB]
+   │  ├─ LOCAL-ACCEPTANCE.txt [0.25 KB]
+   │  ├─ voidls [7.29 MB]
+   │  └─ NOTICES/
+   │     └─ LLVM-23.1.4.txt [14.79 KB]
+   └─ syntaxes/
+      └─ void.tmLanguage.json [2.24 KB]
+
+The file extension/server/voidls is large (7.29 MB)
+
+ DONE  Packaged: /home/shmellyorc/Documents/Void.Language/build/llvm23-packages/void-language-linux-x64.vsix (12 files, 3.1 MB)
+/home/shmellyorc/Documents/Void.Language/build/llvm23-packages/void-tooling-linux-x64.tar.gz

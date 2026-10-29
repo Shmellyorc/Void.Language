@@ -7,15 +7,6 @@ import support as h
 
 compiler = Path(sys.argv[1]).resolve()
 small = '--small-stack' in sys.argv
-manifest = (compiler.parent / 'void-native.txt').read_text().splitlines()
-clang, linker, runtime, fixture = manifest[1:5]
-flags = ['--driver-mode=g++', '-pthread', '--ld-path=' + linker]
-if sys.platform.startswith('linux'):
-    flags += ['-ldl']
-if 'san' in compiler.parent.name:
-    flags += ['-fsanitize=address,undefined']
-if os.name == 'nt':
-    flags += ['-fms-runtime-lib=dll', '-llegacy_stdio_definitions']
 checks = 0
 with tempfile.TemporaryDirectory(prefix='VOID-channel-execution-') as directory:
     work = Path(directory)
@@ -47,7 +38,7 @@ func main():
             h.run([compiler, 'run', source, *arguments, '--no-cache', *switches], expected=expected, small=small)
             obj, exe = work / 'app.o', work / ('app.exe' if os.name == 'nt' else 'app')
             h.run([compiler, 'emit', source, '-o', obj, *switches], small=small)
-            h.run([clang, obj, runtime, fixture, *flags, '-o', exe])
+            h.link(compiler, obj, exe)
             h.run([exe, *arguments], expected=expected, small=small)
             checks += 4
     # Automatic .void caching must create code artifacts and fresh Runtime state.

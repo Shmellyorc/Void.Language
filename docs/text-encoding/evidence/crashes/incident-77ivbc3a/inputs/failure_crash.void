@@ -1,0 +1,21 @@
+struct child:
+    value: i32
+
+struct base:
+    child: child
+    value: i32
+
+func (b base) init(c: child, divisor: i32):
+    b.child = c
+    b.value = 100 / divisor
+
+struct derived extends base:
+    extra: i32
+
+func (d derived) init(c: child, divisor: i32):
+    super.init(c, divisor)
+    d.extra = 2
+
+func entry(value: i32) -> i32:
+    var d = derived(child(value = 7), value)
+    return d.child.value + d.value + d.extra

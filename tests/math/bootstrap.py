@@ -57,7 +57,7 @@ def retain(command, *args, **kwargs):
 
 _original_preserve = crash.preserve
 
-def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
+def preserve(command, cwd, result, source_inputs=(), provenance_inputs=(), **context):
     working = Path(cwd or Path.cwd()).resolve()
     # Controlled Math fixtures may contain an edited relocated stdlib. Preserve
     # those actual bytes too, without recursively scanning the repository root.
@@ -66,7 +66,8 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=()):
     descendants = tuple(p for p in working.rglob('*.void') if p.is_file()) if controlled else ()
     return _original_preserve(command, cwd, result,
                               (*source_inputs, *descendants),
-                              (*provenance_inputs, *HERE.glob('*.*'), *((IDENTITY,) if IDENTITY else ())))
+                              (*provenance_inputs, *HERE.glob('*.*'), *((IDENTITY,) if IDENTITY else ())),
+                              **context)
 
 crash.preserve = preserve
 base.preserve = preserve

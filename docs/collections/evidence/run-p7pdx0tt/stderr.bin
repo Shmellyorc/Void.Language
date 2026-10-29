@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-wpcp92un/fixed.void:32:20: error: Cannot infer generic parameter 't'; supply explicit type arguments.
+    code: VOID2001
+
+ 32 |     var output = c.sum(input)
+    |                    ^^^
+    Module: /fixed.void
+

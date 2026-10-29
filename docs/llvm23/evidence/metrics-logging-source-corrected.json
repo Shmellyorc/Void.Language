@@ -1,0 +1,24 @@
+[
+  {
+    "version": "19",
+    "argv": [
+      "build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "23",
+    "argv": [
+      "build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  }
+]

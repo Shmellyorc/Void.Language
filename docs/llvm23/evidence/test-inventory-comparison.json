@@ -1,0 +1,35 @@
+{
+  "counts": {
+    "release": 368,
+    "debug": 381,
+    "strict": 358
+  },
+  "debug_only": [
+    "arrays_storage_audit",
+    "private_fixed_call_normal_0_2_observed",
+    "private_fixed_call_normal_0_2_unobserved",
+    "private_fixed_call_normal_3_2_observed",
+    "private_fixed_call_normal_3_2_unobserved",
+    "private_fixed_call_normal_7_16384_observed",
+    "private_fixed_call_normal_7_16384_unobserved",
+    "private_fixed_call_optimized_0_2_observed",
+    "private_fixed_call_optimized_0_2_unobserved",
+    "private_fixed_call_optimized_3_2_observed",
+    "private_fixed_call_optimized_3_2_unobserved",
+    "private_fixed_call_optimized_7_16384_observed",
+    "private_fixed_call_optimized_7_16384_unobserved"
+  ],
+  "strict_only": [],
+  "release_only_vs_strict": [
+    "binary_stack",
+    "channel_stack",
+    "combined_stack",
+    "io_async_stack",
+    "io_stack",
+    "lsp_const_recovery_stack",
+    "lsp_io_stack",
+    "lsp_text_encoding_stack",
+    "memory_stack",
+    "text_encoding_stack"
+  ]
+}

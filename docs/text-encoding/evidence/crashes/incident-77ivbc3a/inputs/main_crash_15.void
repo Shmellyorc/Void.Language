@@ -1,0 +1,44 @@
+value struct position:
+    x: i32 = 4
+
+func (p position) init():
+    p.x++
+
+struct node:
+    value: i32
+    next: node?
+
+func (n node) init(value: i32 = 7):
+    n.value = value
+
+struct account:
+    owner: node
+    position: position
+    amount: i32
+
+func (a account) normalize():
+    if a.amount < 0:
+        a.amount = 0
+    a.amount += a.owner.value
+
+func amount_of(const a: account) -> i32:
+    return a.amount
+
+func (a account) init(owner: node, amount: i32 = 2):
+    a.owner = owner
+    a.amount = amount
+    var local_view = a
+    local_view.normalize()
+    a.amount = amount_of(a)
+
+func entry(value: i32) -> i32:
+    var owner = node(value)
+    var a = account(amount = value, owner = owner)
+    var alias = a
+    alias.amount++
+    const view = a
+    var i = 0
+    for i < 600:
+        var garbage = node(i)
+        i++
+    return view.amount + a.position.x

@@ -1,0 +1,17 @@
+use "/wrappers.void" as library
+use "/native_bridge.void" as bridge
+func work(value: i32) -> i32:
+    var result = 0
+    for i in 0..<value:
+        result += 1
+    return result
+async func entry(value: i32) -> i32:
+    with library.open() as owner:
+        owner.connect(value)
+        owner.retain("failure-owned native bytes")
+        defer {
+            owner.close()
+            var discarded = owner.byte(0 as u64)
+        }
+        var pending = spawn work(value)
+        return bridge.terminated("primary\0failure") as i32

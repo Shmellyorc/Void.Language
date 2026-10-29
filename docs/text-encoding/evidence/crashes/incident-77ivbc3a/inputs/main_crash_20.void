@@ -1,0 +1,11 @@
+use "./math.void" as math
+
+func entry(value: i32) -> i32:
+    var wide: i64 = math.calculate(value as i64)
+    var speed: f32 = 100
+    var distance: f64 = math.scale(0.1, 10)
+    var bits: u64 = 18446744073709551615
+    bits++
+    if speed == 100 and distance == 1 and bits == 0:
+        return (wide - math.wide_bonus) as i32
+    return -1

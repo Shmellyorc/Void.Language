@@ -1,0 +1,12 @@
+use log
+use io
+use convert
+func entry(n: i32) -> i32:
+    convert.unwrap(io.remove_file("benchmark.log", missing_ok = true))
+    var gameplay_log = convert.unwrap(log.open(log.config(file_path = "benchmark.log", console = log.console_sink.none, timestamps = false)))
+    var total: i32 = 0
+    for index in 0..<n:
+        if convert.unwrap(gameplay_log.info("gameplay record")):
+            total++
+    convert.unwrap(gameplay_log.close())
+    return total

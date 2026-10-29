@@ -1,0 +1,25 @@
+use channel
+func exercise<t>(const value: t):
+    var bus = channel.router<t>()
+    var calls = 0
+    bus.subscribe("t", func(const payload: t):
+        calls += 1
+    )
+    bus.emit("t", value)
+    if calls != 1:
+        var zero = 0
+        var failed = 1 / zero
+func main():
+    exercise<i8>(7)
+    exercise<u8>(7)
+    exercise<i16>(7)
+    exercise<u16>(7)
+    exercise<i32>(7)
+    exercise<u32>(7)
+    exercise<i64>(7)
+    exercise<u64>(7)
+    exercise<f32>(7)
+    exercise<f64>(7)
+    exercise<bool>(true)
+    exercise<[i32, 2]>([1, 2])
+    print(7)

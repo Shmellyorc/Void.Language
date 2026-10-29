@@ -1,0 +1,8 @@
+use "./base.void" as b
+
+struct derived extends b.base:
+    extra: i32
+
+override func (d derived) read() -> i32:
+    return d.value + d.extra
+

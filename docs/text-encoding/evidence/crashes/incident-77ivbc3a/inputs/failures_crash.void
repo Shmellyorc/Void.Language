@@ -1,0 +1,9 @@
+struct node:
+    value: i32
+func entry(value: i32) -> i32:
+    var list: [node] = [node(value = value)]
+    list.push(node(value = 3))
+    var fixed: [node, 2] = [list[0], list[1]]
+    var copy = fixed
+    copy[0] = node(value = 10)
+    return list.remove_at(0).value + copy[0].value

@@ -1,0 +1,8 @@
+use channel
+struct message:
+    amount: i32
+func receive(const amount: i32):
+    pass
+func main():
+    const bus = channel.router<i32>()
+    bus.subscribe("t", receive)

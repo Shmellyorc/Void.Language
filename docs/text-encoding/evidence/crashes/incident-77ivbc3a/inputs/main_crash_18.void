@@ -1,0 +1,30 @@
+use "/wrappers.void" as library
+use "/native_bridge.void" as bridge
+
+func entry(value: i32) -> i32:
+    var failed = library.create(false)
+    var rejected = match failed:
+        Ok(_): false
+        Err(_): true
+    if not rejected:
+        return -1000
+    if library.scalars(value) != value:
+        return -1000
+    if bridge.terminated("UTF-8 é") != 8 as u64:
+        return -1000
+    var copied = bridge.copy("a\0é")
+    if copied != "a\0é" or bridge.length(copied) != 4 as u64:
+        return -1000
+    with library.open() as owner:
+        owner.retain(copied)
+        copied = "different backing"
+        if owner.byte(0 as u64) != 97 or owner.byte(1 as u64) != 0 or owner.byte(2 as u64) != 195:
+            return -1000
+        owner.connect(value)
+        var same = owner.invoke(2)
+        var foreign = owner.foreign(3)
+        owner.disconnect()
+        owner.release_text()
+        if owner.byte(0 as u64) != -1:
+            return -1000
+        return same + foreign

@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-d6epz0hh/mutable-handler.void:8:24: error: Type mismatch: expected func(readonly /mutable-handler.void::message), received func(/mutable-handler.void::message).
+    code: VOID2001
+
+ 8 |     bus.subscribe("t", func(payload: message):
+   |                        ^^^^
+    Module: /mutable-handler.void
+    Expected: func(readonly /mutable-handler.void::message)
+    Received: func(/mutable-handler.void::message)
+

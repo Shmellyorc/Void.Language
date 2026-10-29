@@ -1,0 +1,15 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+    "check",
+    "/home/shmellyorc/Documents/Void.Language/tests/channel/semantics.void"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+  "status": 0,
+  "seconds": 0.12414917099522427,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "e691eb1e1d418bd24c3a53f028157399374b15f78bbc29d25907421725bb5af5",
+  "object_hashes": {},
+  "output_hashes": {}
+}

@@ -1,0 +1,11 @@
+struct tracker:
+    total: i32
+struct resource:
+    tracker: tracker
+func (r resource) deinit():
+    r.tracker.total += 1
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    with resource(tracker=t) as r:
+        var inner = tracker(total=value)
+    return t.total

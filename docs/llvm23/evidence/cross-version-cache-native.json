@@ -1,0 +1,85 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "run",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/main.void",
+      "7",
+      "--cache"
+    ],
+    "status": 0,
+    "stdout": "49\n",
+    "stderr": "Debug cache: miss\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "run",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/main.void",
+      "7",
+      "--cache"
+    ],
+    "status": 0,
+    "stdout": "49\n",
+    "stderr": "Debug cache: hit\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/main.void",
+      "7",
+      "--cache"
+    ],
+    "status": 0,
+    "stdout": "49\n",
+    "stderr": "Debug cache: miss\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/main.void",
+      "7",
+      "--cache"
+    ],
+    "status": 0,
+    "stdout": "49\n",
+    "stderr": "Debug cache: hit\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+      "run",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/main.void",
+      "7",
+      "--cache"
+    ],
+    "status": 0,
+    "stdout": "49\n",
+    "stderr": "Debug cache: hit\n"
+  },
+  {
+    "cache_before": {
+      "bf348f1e327ed54505560622cb60ba01b1cf61ca11db4d7cedaaf1cdc3ae68db": "5f2640c5edb223e28b0bde2c2516d601a02d8218322c84b00da42746ec5275dc"
+    },
+    "cache_after": {
+      "4ed1013e44441c1f9cee698dab20e0bc416434aa25a1ed805d844d1cc46e0503": "899dfe17fc7e64d727454f1ebfe4e6514d2b22766335bdd84fd979ff19eb08c0",
+      "bf348f1e327ed54505560622cb60ba01b1cf61ca11db4d7cedaaf1cdc3ae68db": "5f2640c5edb223e28b0bde2c2516d601a02d8218322c84b00da42746ec5275dc"
+    },
+    "result": "distinct identities; both warm hits; original LLVM19 object preserved"
+  },
+  {
+    "argv": [
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/private/voidc",
+      "build",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/main.void",
+      "-o",
+      "/tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/owner"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "Native toolchain resources missing or invalid: /tmp/VOID LLVM cross cache \u00e9 # % hbgwwmo_/private/void-native.txt\n",
+    "owner_preserved": true
+  }
+]

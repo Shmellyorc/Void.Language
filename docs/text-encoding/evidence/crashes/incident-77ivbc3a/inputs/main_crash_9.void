@@ -1,0 +1,9 @@
+use "./game.void" as game
+
+## Shared project score, available directly in project modules.
+var score = 0
+
+func main():
+    game.reward_player()
+    game.reward_player()
+    print(score, game.enemies_defeated)

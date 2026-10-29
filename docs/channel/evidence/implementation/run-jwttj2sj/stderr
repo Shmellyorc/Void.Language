@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-ij5r_4sw/extra-argument.void:8:9: error: Incorrect argument count for 'emit'.
+    code: VOID2004
+
+ 8 |     bus.emit("t", 7, 8)
+   |         ^^^^
+    Module: /extra-argument.void
+

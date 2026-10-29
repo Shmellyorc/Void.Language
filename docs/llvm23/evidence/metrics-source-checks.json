@@ -1,0 +1,122 @@
+[
+  {
+    "version": "19",
+    "case": "numeric",
+    "argv": [
+      "build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "19",
+    "case": "json",
+    "argv": [
+      "build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "19",
+    "case": "async",
+    "argv": [
+      "build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "19",
+    "case": "logging",
+    "argv": [
+      "build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:6:9: error: Duplicate declaration or shadowing of 'logger'.\n    code: VOID2005\n\n 6 |     var logger = convert.unwrap(log.open(log.config(file_path = \"benchmark.log\", console = log.console_sink.none, timestamps = false)))\n   |         ^^^^^^\n    Module: /logging.void\n    Hint: Assign to the existing variable, or choose a distinct name.\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:9:20: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 9 |         if convert.unwrap(logger.info(\"gameplay record\")):\n   |                    ^^^^^^\n    Module: /logging.void\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:9:27: error: Unknown import qualifier 'logger'.\n    code: VOID3003\n\n 9 |         if convert.unwrap(logger.info(\"gameplay record\")):\n   |                           ^^^^^^\n    Module: /logging.void\n    Hint: Import the module with this alias before calling it.\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:11:13: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 11 |     convert.unwrap(logger.close())\n    |             ^^^^^^\n    Module: /logging.void\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:11:20: error: Unknown import qualifier 'logger'.\n    code: VOID3003\n\n 11 |     convert.unwrap(logger.close())\n    |                    ^^^^^^\n    Module: /logging.void\n    Hint: Import the module with this alias before calling it.\n\n"
+  },
+  {
+    "version": "19",
+    "case": "text",
+    "argv": [
+      "build/ci-official-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "23",
+    "case": "numeric",
+    "argv": [
+      "build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "23",
+    "case": "json",
+    "argv": [
+      "build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "23",
+    "case": "async",
+    "argv": [
+      "build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "version": "23",
+    "case": "logging",
+    "argv": [
+      "build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:6:9: error: Duplicate declaration or shadowing of 'logger'.\n    code: VOID2005\n\n 6 |     var logger = convert.unwrap(log.open(log.config(file_path = \"benchmark.log\", console = log.console_sink.none, timestamps = false)))\n   |         ^^^^^^\n    Module: /logging.void\n    Hint: Assign to the existing variable, or choose a distinct name.\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:9:20: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 9 |         if convert.unwrap(logger.info(\"gameplay record\")):\n   |                    ^^^^^^\n    Module: /logging.void\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:9:27: error: Unknown import qualifier 'logger'.\n    code: VOID3003\n\n 9 |         if convert.unwrap(logger.info(\"gameplay record\")):\n   |                           ^^^^^^\n    Module: /logging.void\n    Hint: Import the module with this alias before calling it.\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:11:13: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 11 |     convert.unwrap(logger.close())\n    |             ^^^^^^\n    Module: /logging.void\n\n/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void:11:20: error: Unknown import qualifier 'logger'.\n    code: VOID3003\n\n 11 |     convert.unwrap(logger.close())\n    |                    ^^^^^^\n    Module: /logging.void\n    Hint: Import the module with this alias before calling it.\n\n"
+  },
+  {
+    "version": "23",
+    "case": "text",
+    "argv": [
+      "build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  }
+]

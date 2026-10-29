@@ -15360,3 +15360,29 @@ diff, exact commands/hashes and pending native probes: stage10/engineering/ci96/
 No Git mutation, hosted rerun, policy change, publication or new dependency.
 Step42 and Stage10 INCOMPLETE; Wrench review and Boss-controlled native execution
 next, Steps43–44 separate. Existing unexplained/deferred observations preserved.
+
+## 2026-10-28 — complete local LLVM/Clang/LLD 23.1.4 migration
+
+Boss authorized the full migration from `db808efe0fa191ed25733513cc9ebcebbadc3bc2`.
+The official complete SDK is verified/installed beside the preserved LLVM19 SDK.
+Active CMake/native manifests, LLVM APIs, SDK installer, packaging, optional tools
+and all five workflow pins are migrated. Shared verified no-TM standard O2 remains
+byte-identical; no DSE suppression, Runtime redesign or unrelated logging/text
+optimization. Source-backed baseline metadata/diagnostic and harness defects are
+repaired with original failures retained.
+
+Local coverage: effective Release **368/368**, clean Debug/research **381/381**,
+effective fatal ASan/UBSan/leak **358/358**. Both frontend hard 1 MiB gates, six
+focused JIT/native checks, real editor/install/package checks, cross-SDK cache and
+stale-native-manifest rejection pass. Twenty serial checked performance comparisons
+and three bounded DSE-associated executions pass on actual hard 1 MiB stacks.
+Observed compilation points improve 10.5–26.5%; execution deltas/sampling limits
+and larger artifacts are recorded rather than hidden. The LLVM19 DSE cause/repair
+remains unproven. Nine pre-existing dirty log documents, historical evidence and
+protected root README remain preserved. Git, branches, hosted CI and publication
+remain untouched; native Windows/macOS/hosted acceptance is pending.
+
+Exact source/test/binary identities, all failed and corrected receipts, API changes,
+remaining limits and independent Golden Wrench review handoff:
+[implementation](llvm23/IMPLEMENTATION.md), [compatibility](llvm23/COMPATIBILITY.md),
+[acceptance](llvm23/ACCEPTANCE.md). Local engineering stops for review.

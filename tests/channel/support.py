@@ -22,6 +22,20 @@ def stack():
     resource.setrlimit(resource.RLIMIT_STACK, (1048576, 1048576))
 
 
+def link(compiler, obj, executable):
+    compiler = Path(compiler)
+    manifest = (compiler.parent / 'void-native.txt').read_text().splitlines()
+    clang, linker, *resources = manifest[1:5]
+    resources = [str((compiler.parent / path).resolve()) if not Path(path).is_absolute() else path
+                 for path in resources]
+    flags = ['--driver-mode=g++', *manifest[5:]]
+    if linker:
+        flags += ['--ld-path=' + linker]
+    if sys.platform.startswith('linux'):
+        flags += ['-ldl']
+    return run([clang, obj, *resources, *flags, '-o', executable])
+
+
 def run(args, cwd=None, status=0, expected=None, small=False, timeout=180, **kwargs):
     args = list(map(str, args))
     receipt = Path(tempfile.mkdtemp(prefix='run-', dir=EVIDENCE))

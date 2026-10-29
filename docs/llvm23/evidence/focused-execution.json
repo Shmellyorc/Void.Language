@@ -1,0 +1,30 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/architecture.void",
+      "7",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "returncode": 0,
+    "stdout": "49\n",
+    "stderr": "",
+    "hard_stack_bytes": 1048576
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/architecture.void",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/architecture-normal",
+      "--no-opt"
+    ],
+    "returncode": 0,
+    "stdout": "Built native executable: /home/shmellyorc/Documents/Void.Language/build/llvm23-probes/architecture-normal\n",
+    "stderr": "",
+    "hard_stack_bytes": 1048576
+  }
+]

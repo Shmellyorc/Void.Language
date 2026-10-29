@@ -1,0 +1,942 @@
+
+> void-language@0.1.0 test:host
+> node out/test/runHost.js
+
+Installing extensions...
+Extension 'void-language-linux-x64.vsix' was successfully installed.
+(node:1946303) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `code --trace-deprecation ...` to show where the warning was created)
+[90m[main 2026-10-28T23:54:02.682Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-28T23:54:02.787Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-28T23:54:02.874Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-28T23:54:02.874Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-28T23:54:02.919Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-28T23:54:02.921Z][0m update#setState disabled
+[90m[main 2026-10-28T23:54:02.921Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-28T23:54:04.244Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-10-28T23:54:04.889Z][0m [AgentHost:stderr] (node:1946787) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 1946911.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=45a21b34-c22d-417f-877e-6c5e5523de79 requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=45a21b34-c22d-417f-877e-6c5e5523de79 durationMs=841
+[AgentHost:renderer] Protocol connection established; clientId=45a21b34-c22d-417f-877e-6c5e5523de79
+Loading development extension at /tmp/VOID editor é😀 80WRiu/harness
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Editor test begins: trusted
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Native server launched: ["/tmp/VOID editor é😀 80WRiu/extensions/void-language.void-language-0.1.0/server/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Activation ready: {"state":"running","entry":"/tmp/VOID editor é😀 80WRiu/project space # %/main.void"}
+Editor diagnostics: []
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":1,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 404
+
+{"id":2,"jsonrpc":"2.0","result":[{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"},{"range":{"end":{"character":27,"line":3},"start":{"character":18,"line":3}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+Native stdout: Content-Length: 868
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'u'.\nHint: Declare it with var before use.","range":{"end":{"character":1,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":3,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 222
+
+{"id":4,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 869
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'us'.\nHint: Declare it with var before use.","range":{"end":{"character":2,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":5,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 222
+
+{"id":6,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 874
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID2002","message":"Unknown identifier 'unknown'.\nHint: Declare it with var before use.","range":{"end":{"character":7,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"},{"code":"VOID1101","message":"Imports must precede constant and function declarations.\nHint: Move use declarations to the start of this file.","range":{"end":{"character":24,"line":2},"start":{"character":4,"line":2}},"severity":1,"source":"VOID"},{"code":"VOID3003","message":"Unknown import qualifier 'worker'.\nHint: Import the module with this alias before calling it.","range":{"end":{"character":17,"line":4},"start":{"character":11,"line":4}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 36
+
+{"id":7,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 222
+
+{"id":8,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 369
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found '<newline>'.","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 2185
+
+{"id":9,"jsonrpc":"2.0","result":[{"detail":"i32","documentation":"","kind":3,"label":"entry","textEdit":{"newText":"entry","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"false","textEdit":{"newText":"false","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"format(value, spec: string) -> result<string, string>","documentation":"Invariant type-aware display and formatting.","kind":3,"label":"format","textEdit":{"newText":"format","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"func","textEdit":{"newText":"func","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"if","textEdit":{"newText":"if","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"match","textEdit":{"newText":"match","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"not","textEdit":{"newText":"not","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"null","textEdit":{"newText":"null","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"print(*values, sep = space, end = newline, file = console.stdout, flush = false)","documentation":"Invariant type-aware display and formatting.","kind":3,"label":"print","textEdit":{"newText":"print","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"string(value) -> string","documentation":"Invariant type-aware display and formatting.","kind":3,"label":"string","textEdit":{"newText":"string","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}},{"detail":"keyword","documentation":"","kind":14,"label":"true","textEdit":{"newText":"true","range":{"end":{"character":13,"line":0},"start":{"character":13,"line":0}}}}]}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 223
+
+{"id":10,"jsonrpc":"2.0","result":{"range":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}},"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 361
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID1101","message":"Expected an expression, found 'use'.","range":{"end":{"character":3,"line":2},"start":{"character":0,"line":2}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+PASS real typing: incomplete top-level keywords/expressions/imports recover in the same native process
+PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Settings Sync: Account status changed from uninitialized to unavailable
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Console/composite source docs, definition, pattern navigation, enum completion, print hover/signature passed
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+PASS documentation provider transitions (UI observation requires VOID_TEST_CDP_PORT)
+Operator hover presentation: [["public&nbsp;operator&nbsp;\\+\\(left:&nbsp;readonly&nbsp;/worker&nbsp;space.void::editor\\_number,&nbsp;right:&nbsp;readonly&nbsp;/worker&nbsp;space.void::editor\\_number\\)&nbsp;-\\>&nbsp;/worker&nbsp;space.void::editor\\_number\n\nDeclared&nbsp;by&nbsp;/worker&nbsp;space.void::editor\\_number\n\nEffects:&nbsp;synchronous"]]
+Stage 39 conservative formatting/literal preservation/idempotence/stale-edit rejection passed
+Before save
+After save
+Before close
+After close
+Document close/open events verified
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/ODNlODZkMmQtMmYzNS00MTdlLTk4NGMtNTdmYTZjZDAwNzU3" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Diagnostics/navigation/unsaved repair/close-reopen passed
+Native server launched: ["/tmp/VOID editor é😀 80WRiu/extensions/void-language.void-language-0.1.0/server/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/tmp/VOID editor é😀 80WRiu/extensions/void-language.void-language-0.1.0/server/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/second.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 192
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/second.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 36
+
+{"id":1,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native exit: code=0, signal=null
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/second.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 192
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/second.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 36
+
+{"id":1,"jsonrpc":"2.0","result":[]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/tmp/VOID editor é😀 80WRiu/project space # %/voidls disappears",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdin error: Error: Focused transport failure before close
+Native stdin error: Error: Focused transport failure before close
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native exit: code=null, signal=SIGTERM
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native exit: code=null, signal=SIGTERM
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 443
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[{"code":"VOID3002","message":"Cannot find imported file '/main.void'.\nHint: Check this path relative to the importing file or virtual project root.","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":1,"source":"VOID"}],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/worker space.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}Content-Length: 260
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"calculate(x: i32) -> i32","kind":12,"name":"calculate","range":{"end":{"character":0,"line":2},"start":{"character":0,"line":0}},"selectionRange":{"end":{"character":14,"line":0},"start":{"character":5,"line":0}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 190
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/main.void"}}Content-Length: 200
+
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"diagnostics":[],"uri":"file:///tmp/VOID%20editor%20%C3%A9%F0%9F%98%80%2080WRiu/project%20space%20%23%20%25/worker%20space.void"}}
+Native stdout: Content-Length: 477
+
+{"id":1,"jsonrpc":"2.0","result":[{"detail":"entry(x: i32) -> i32","kind":12,"name":"entry","range":{"end":{"character":0,"line":4},"start":{"character":0,"line":2}},"selectionRange":{"end":{"character":10,"line":2},"start":{"character":5,"line":2}}},{"detail":"private worker: no result","kind":2,"name":"worker","range":{"end":{"character":34,"line":1},"start":{"character":28,"line":1}},"selectionRange":{"end":{"character":34,"line":1},"start":{"character":28,"line":1}}}]}
+Native stdout: Content-Length: 38
+
+{"id":2,"jsonrpc":"2.0","result":null}
+Native server launched: ["/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",["--entry","/tmp/VOID editor é😀 80WRiu/project space # %/main.void"],{"cwd":"/tmp/VOID editor é😀 80WRiu/project space # %","shell":false}]
+Native exit: code=0, signal=null
+Native stdout: Content-Length: 600
+
+{"id":0,"jsonrpc":"2.0","result":{"capabilities":{"completionProvider":{"triggerCharacters":["."," ","\"","/",":"]},"definitionProvider":true,"documentFormattingProvider":true,"documentSymbolProvider":true,"experimental":{"refreshProject":true,"voidToolingProtocol":1},"hoverProvider":true,"positionEncoding":"utf-16","referencesProvider":true,"renameProvider":{"prepareProvider":true},"signatureHelpProvider":{"triggerCharacters":["(",","]},"textDocumentSync":{"change":1,"openClose":true,"save":{"includeText":false}},"workspaceSymbolProvider":true},"serverInfo":{"name":"VOID","version":"0.2.0"}}}
+Native stdout: Content-Length: 38
+
+{"id":1,"jsonrpc":"2.0","result":null}
+Native stderr: textDocument/didOpen: Server has shut down
+textDocument/didOpen: Server has shut down
+
+Native exit: code=0, signal=null
+PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup
+[90m[main 2026-10-28T23:54:16.270Z][0m Extension host with pid 1946911 exited with code: 0, signal: unknown.
+Exit code:   0
+[90m[main 2026-10-28T23:54:16.860Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-28T23:54:16.948Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-28T23:54:17.034Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-28T23:54:17.035Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-28T23:54:17.082Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-28T23:54:17.084Z][0m update#setState disabled
+[90m[main 2026-10-28T23:54:17.084Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-28T23:54:18.526Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-10-28T23:54:19.148Z][0m [AgentHost:stderr] (node:1948261) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 1948364.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=5e86b52b-1115-461e-abba-706d62131739 requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=5e86b52b-1115-461e-abba-706d62131739 durationMs=733
+[AgentHost:renderer] Protocol connection established; clientId=5e86b52b-1115-461e-abba-706d62131739
+Loading development extension at /tmp/VOID editor é😀 80WRiu/harness
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+Unknown channel: agentHostClientProxy
+Editor test begins: untrusted
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NzFmN2QwMjktODBmZi00ZmU0LTk5OGUtMWNlZDA3YzBkYzgz" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NzFmN2QwMjktODBmZi00ZmU0LTk5OGUtMWNlZDA3YzBkYzgz" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Activation ready: {"state":"stopped"}
+Editor diagnostics: []
+PASS real editor restricted trust: no native child spawned
+[90m[main 2026-10-28T23:54:20.683Z][0m Extension host with pid 1948364 exited with code: 0, signal: unknown.
+[90m[main 2026-10-28T23:54:21.291Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-10-28T23:54:21.382Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-10-28T23:54:21.473Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-10-28T23:54:21.474Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-10-28T23:54:21.506Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-10-28T23:54:21.506Z][0m update#setState disabled
+[90m[main 2026-10-28T23:54:21.507Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-10-28T23:54:22.985Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-10-28T23:54:23.654Z][0m [AgentHost:stderr] (node:1949154) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 1949268.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=8c489acc-e471-4a86-8a66-bb337b72aa7c requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=8c489acc-e471-4a86-8a66-bb337b72aa7c durationMs=822
+[AgentHost:renderer] Protocol connection established; clientId=8c489acc-e471-4a86-8a66-bb337b72aa7c
+Loading development extension at /tmp/VOID editor é😀 80WRiu/harness
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+speech
+DELTA: authIssuers
+languageModelRateLimit
+Proceeding with EXTRA proposals (authIssuers, languageModelRateLimit) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+Unknown channel: agentHostClientProxy
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/OTNiMjQ0OTktMzQ3ZS00YjY4LTk3MDQtOTU3MTYzYmYxM2M5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Editor test begins: multi-root
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/OTNiMjQ0OTktMzQ3ZS00YjY4LTk3MDQtOTU3MTYzYmYxM2M5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Activation ready: {"state":"stopped"}
+Editor diagnostics: []
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+PASS real editor multi-root: explanatory error, no native child spawned
+[90m[main 2026-10-28T23:54:25.831Z][0m Extension host with pid 1949268 exited with code: 0, signal: unknown.
+Exit code:   0

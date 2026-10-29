@@ -1,0 +1,25 @@
+struct holder:
+    value: i32
+    reads: i32
+    writes: i32
+property (h holder) item: i32:
+    get:
+        return h.value
+    set(value):
+        h.writes += 1
+        h.value = value
+struct state:
+    selected: holder
+    saved: holder
+func change(s: state) -> i32:
+    s.selected = holder(value = 100)
+    s.saved.value = 40
+    return 5
+func entry(value: i32) -> i32:
+    var s = state(selected = holder(value = 7), saved = holder())
+    s.saved = s.selected
+    s.selected.item += change(s)
+    if s.saved.value != 12 or s.selected.value != 100 or s.saved.writes != 1:
+        return -100
+    s.selected.item = value
+    return s.saved.item + s.selected.item

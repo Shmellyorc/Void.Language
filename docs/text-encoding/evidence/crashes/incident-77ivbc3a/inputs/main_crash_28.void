@@ -1,0 +1,15 @@
+use "./shapes.void" as geometry
+
+func entry(value: i32) -> i32:
+    var original: geometry.shape
+    var copy = original
+    copy.position.x = value
+    var moved = geometry.moved(copy, 10)
+    const selected = geometry.choose(moved, original, value >= 0)
+    var independent = selected
+    independent.position.y += 20
+    if original.position.x != 4 or original.position.y != 2 or copy.position.x != value:
+        return -1000
+    if selected.enabled and selected.weight == 1.5d:
+        return selected.position.x + selected.position.y + independent.position.y
+    return -2000

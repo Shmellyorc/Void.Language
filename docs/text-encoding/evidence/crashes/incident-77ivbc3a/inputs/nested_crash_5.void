@@ -1,0 +1,21 @@
+enum tree:
+    empty
+    leaf(value: i32)
+    branch(children: [tree])
+value struct point:
+    x: i32
+    text: string
+func entry(x: i32) -> i32:
+    var root = tree.branch([tree.empty, tree.leaf(x)])
+    var score = 0
+    if root is tree.branch([tree.empty, tree.leaf(var value), .._]):
+        score = value
+    var original = point(x = x, text = "same")
+    var copy = original
+    if copy is original:
+        score += 1
+    if copy is point(x = var coordinate, text = "same"):
+        score += coordinate
+    if x is 10..<0:
+        score += 2
+    return score

@@ -1,0 +1,31 @@
+struct box:
+    number: i32 = 0
+
+async func change(owner: box, amount: i32) -> i32:
+    defer {
+        owner.number += 100
+    }
+    owner.number += amount
+    return owner.number
+
+async func mark(owner: box):
+    owner.number += 1
+
+async func label(text: string) -> string:
+    return text + " done"
+
+async func entry(value: i32) -> i32:
+    var owner = box(number = 1)
+    var words = label("work")
+    var first = change(owner, 2)
+    owner.number = 10
+    var second = change(owner, 3)
+    if owner.number != 10:
+        return -1000
+    var a = await first
+    var b = await second
+    await mark(owner)
+    var text = await words
+    if text != "work done":
+        return -2000
+    return a + b + owner.number

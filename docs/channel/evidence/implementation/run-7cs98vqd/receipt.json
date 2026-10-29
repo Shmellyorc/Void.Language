@@ -1,0 +1,14 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/channel-host/async-o2",
+    "7"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+  "status": 0,
+  "seconds": 0.02848934003850445,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "bdad559f63cc04a4b85ab1fb457451018b087fc828a24577b4d4a84c63545b3b",
+  "object_hashes": {},
+  "output_hashes": {}
+}

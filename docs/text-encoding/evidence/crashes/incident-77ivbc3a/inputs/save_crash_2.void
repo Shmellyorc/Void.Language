@@ -1,0 +1,21 @@
+use os
+use path
+use io
+
+# os discovers a location; io explicitly creates and writes it.
+# The two derived error types require separate result handling.
+func save_score(directory: string, score: i32) -> result<i64, io.error>:
+    var created = io.create_directories(directory)?
+    var destination = path.join([directory, "score.txt"])?
+    return io.write_text(destination, "{score}")
+
+func main():
+    var location = os.data_dir("com.studio.game")
+    if location is Ok(var directory):
+        var saved = save_score(directory, 42)
+        if saved is Ok(var written):
+            print("Saved bytes:", written)
+        else if saved is Err(var reason):
+            print(reason.message)
+    else if location is Err(var reason):
+        print(reason.operation, reason.message)

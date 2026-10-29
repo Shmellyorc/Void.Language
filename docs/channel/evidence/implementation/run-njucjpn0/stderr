@@ -1,0 +1,8 @@
+/tmp/VOID-channel-rejections-w_twfnh0/missing-argument.void:8:9: error: Incorrect argument count: missing required argument 'handler'.
+    code: VOID2004
+
+ 8 |     bus.subscribe("t")
+   |         ^^^^^^^^^
+    Module: /missing-argument.void
+    Hint: Supply an explicit constructed value or every required argument.
+

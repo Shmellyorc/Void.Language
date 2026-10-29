@@ -1,0 +1,41 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node?
+    count: i32
+
+struct container:
+    payload: packet
+
+struct root:
+    child: container
+
+func mark(state: node, digit: i32) -> i32:
+    state.value = state.value * 10 + digit
+    return 7
+
+func marked_node(state: node, digit: i32) -> node:
+    state.value = state.value * 10 + digit
+    return node(value = 2)
+
+func make(value: i32) -> root:
+    # Retire allocation homes before the caller selects the old child.
+    return root(child = container(payload = packet(owner = node(value = value), count = 10)))
+
+func replace(r: root, n: node) -> i32:
+    r.child = container(payload = packet(owner = n, count = 20))
+    # Collect after replacing the edge: only the caller's selected owner keeps
+    # the old container alive. Cross the current CLI allocation budget (256).
+    var i = 0
+    for i < 256:
+        var garbage = node(value = i)
+        i++
+    return 5
+
+func entry(value: i32) -> i32:
+    var state = node()
+    var ordered = packet(count = mark(state, 1), owner = marked_node(state, 2))
+    var r = make(value)
+    r.child.payload.count += replace(r, ordered.owner as node)
+    return r.child.payload.count + (r.child.payload.owner as node).value + state.value + value

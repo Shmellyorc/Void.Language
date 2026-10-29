@@ -1,0 +1,33 @@
+value struct point:
+    value: i32
+property (p point) doubled: i32:
+    get:
+        return p.value * 2
+    set(value):
+        p.value = value / 2
+property (p point) ignored: i32:
+    get:
+        return p.value
+    set(value):
+        pass
+struct holder:
+    point: point
+    denominator: i32
+property (h holder) current: point:
+    get:
+        var checked = 100 / h.denominator
+        return h.point
+    set(value):
+        h.point = value
+func mutate(h: holder, value: i32) -> i32:
+    h.denominator = 1
+    h.point.value = 99
+    return value
+func entry(value: i32) -> i32:
+    var h = holder(denominator = value)
+    if value < 0:
+        h.denominator = 1
+        h.current.ignored = mutate(h, 5)
+        return h.point.value
+    h.current.doubled = mutate(h, 14)
+    return h.point.value

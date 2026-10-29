@@ -1,0 +1,20 @@
+[
+  {
+    "path": "build/ci-official-release/voidc",
+    "status": 0,
+    "stdout": "\tlinux-vdso.so.1 (0x00007f90ae47e000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f90ab4e5000)\n\tlibz.so.1 => /usr/lib/x86_64-linux-gnu/libz.so.1 (0x00007f90ae430000)\n\tlibzstd.so.1 => /usr/lib/x86_64-linux-gnu/libzstd.so.1 (0x00007f90ab41b000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f90ab000000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f90ae400000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f90aae00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f90ae480000)\n",
+    "stderr": ""
+  },
+  {
+    "path": "build/llvm23-release/voidc",
+    "status": 0,
+    "stdout": "\tlinux-vdso.so.1 (0x00007f37ffe34000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f37fc4e5000)\n\tlibz.so.1 => /usr/lib/x86_64-linux-gnu/libz.so.1 (0x00007f37ffde6000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f37fc200000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f37ffdb8000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f37fc000000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f37ffe36000)\n",
+    "stderr": ""
+  },
+  {
+    "path": "build/llvm23-release/voidls",
+    "status": 0,
+    "stdout": "\tlinux-vdso.so.1 (0x00007fc40c4f9000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007fc40bce5000)\n\tlibz.so.1 => /usr/lib/x86_64-linux-gnu/libz.so.1 (0x00007fc40bcc6000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fc40ba00000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fc40b9d2000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007fc40b600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fc40c4fb000)\n",
+    "stderr": ""
+  }
+]

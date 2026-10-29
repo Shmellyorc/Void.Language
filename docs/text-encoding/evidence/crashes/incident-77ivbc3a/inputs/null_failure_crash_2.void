@@ -1,0 +1,12 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node?
+
+func unwrap(p: packet) -> node:
+    return p.owner as node
+
+func entry(value: i32) -> i32:
+    var p = packet()
+    return unwrap(p).value

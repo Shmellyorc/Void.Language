@@ -1,0 +1,29 @@
+struct node:
+    value: i32
+
+value struct pair:
+    left: node?
+    right: node?
+    count: i32
+
+value struct outer:
+    pair: pair
+
+func copied(const input: outer) -> outer:
+    var result = input
+    result.pair.count++
+    return result
+
+func entry(value: i32) -> i32:
+    var mutable = node(value = value)
+    const readonly = node(value = 20)
+    var a = outer(pair = pair(left = readonly, right = mutable, count = 1))
+    var b = a
+    b.pair.count++
+    var shared = b.pair.right as node
+    shared.value++
+    var c = copied(b)
+    c.pair.count++
+    b.pair.left = mutable
+    mutable.value++
+    return (b.pair.left as node).value + (a.pair.left as node).value + c.pair.count

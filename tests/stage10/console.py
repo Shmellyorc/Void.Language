@@ -368,6 +368,11 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
     assert p.stdout == (b"legacy:17\r\n" if os.name == "nt" else b"legacy:17\n") and p.stderr == b""
     checks += 1
     # Existing native cache identity paths: cold, hit, corrupted entry, source change.
+    # Earlier normal/O2 source runs now populate the automatic cache. Start the
+    # explicit cold/corruption fixture with only its own private cache entries.
+    cache_directory = root / ".void/cache/v1"
+    if cache_directory.exists():
+        shutil.rmtree(cache_directory)
     cached = root / "cached.void"
     cached.write_text('print("cache-v1")\n', encoding="utf-8")
     for _ in range(2):
@@ -376,6 +381,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
         cache_statuses.append(p.stderr.decode())
         checks += 1
     if "Debug cache: unavailable" not in cache_statuses[0]:
+        assert "Debug cache: miss" in cache_statuses[0]
         assert "Debug cache: hit" in cache_statuses[1]
         entry = next((root / ".void/cache/v1").iterdir())
         entry.write_bytes(b"corrupted console native object")
@@ -393,6 +399,8 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
         assert p.stdout==expected+legacy_zero and p.stderr.endswith(combined_cleanup),(label,p.stdout,p.stderr)
         combined_cache.append(dict(case=label,stdout_hex=p.stdout.hex(),stderr_hex=p.stderr.hex()));return p
     cache_directory=root/".void/cache/v1"
+    if cache_directory.exists():
+        shutil.rmtree(cache_directory)
     before_files=set(cache_directory.iterdir()) if cache_directory.exists() else set()
     first=cached_combined("cold",combined);second=cached_combined("hit",combined)
     if b"Debug cache: unavailable" not in first.stderr:

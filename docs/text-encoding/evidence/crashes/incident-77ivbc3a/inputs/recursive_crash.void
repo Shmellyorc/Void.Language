@@ -1,0 +1,22 @@
+value struct tally:
+    total: i32
+
+func (t tally) even(left: i32):
+    if left > 0:
+        t.total += 1
+        t.odd(left - 1)
+
+func (t tally) odd(left: i32):
+    if left > 0:
+        t.even(left - 1)
+
+func (t tally) inspect(left: i32) -> i32:
+    if left > 0:
+        return t.inspect(left - 1)
+    return t.total
+
+func entry(value: i32) -> i32:
+    var t = tally()
+    t.even(value)
+    const copied = t
+    return copied.inspect(2)

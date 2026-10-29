@@ -1,0 +1,15 @@
+func change(values: [u8, 2097152]) -> [u8, 2097152]:
+    values[-1] = 29
+    return values
+
+func entry(value: i32) -> i32:
+    var original: [u8, 2097152]
+    original[0] = 17
+    var copy = original
+    copy[-1] = 9
+    var changed = change(copy)
+    if original[0] != 17 or original[-1] != 0 or copy[-1] != 9:
+        return -1000
+    if changed[0] != 17 or changed[-1] != 29:
+        return -2000
+    return changed[0] as i32 + changed[-1] as i32 + value

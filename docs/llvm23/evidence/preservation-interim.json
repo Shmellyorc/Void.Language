@@ -1,0 +1,61 @@
+[
+  {
+    "path": "docs/log/BENCHMARKS.md",
+    "initial_sha256": "0b6ccc3f536d5d5e90c347874a5f4a5b9a38f9f84ccd38e79e0d460da7f5c4c1",
+    "now_sha256": "0b6ccc3f536d5d5e90c347874a5f4a5b9a38f9f84ccd38e79e0d460da7f5c4c1",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/HANDOFF.md",
+    "initial_sha256": "d0792fef52879b128fef5a8866d8b77122f62c6d6442242460874ce350a03619",
+    "now_sha256": "d0792fef52879b128fef5a8866d8b77122f62c6d6442242460874ce350a03619",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/IMPLEMENTATION.md",
+    "initial_sha256": "4621b3447dd5f76f701b656ac44291894c03dd734a4aff8cd6590fb93543851d",
+    "now_sha256": "4621b3447dd5f76f701b656ac44291894c03dd734a4aff8cd6590fb93543851d",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/PERFORMANCE_REPAIR.md",
+    "initial_sha256": "3c20171d68887af1cdc14f1fd9c66dfdd8e18453c1b7172376ebda2c56ce31c1",
+    "now_sha256": "3c20171d68887af1cdc14f1fd9c66dfdd8e18453c1b7172376ebda2c56ce31c1",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/CRASH_CLASSIFICATION.md",
+    "initial_sha256": "2448f91e2c1a11cf941f0d36dbedb01c6476fb81fac88535159ff11ed716ee24",
+    "now_sha256": "2448f91e2c1a11cf941f0d36dbedb01c6476fb81fac88535159ff11ed716ee24",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/C_SUPERVISOR_CAPTURE.md",
+    "initial_sha256": "15a2ea5789cb8f6092f453cbce471012718f54c674c54b8e038796cad2ba380e",
+    "now_sha256": "15a2ea5789cb8f6092f453cbce471012718f54c674c54b8e038796cad2ba380e",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/DSE_INPUT_REVIEW.md",
+    "initial_sha256": "92243f1ccab545004d015bb470c3b689766faa112a069928066fb2dec84c304c",
+    "now_sha256": "92243f1ccab545004d015bb470c3b689766faa112a069928066fb2dec84c304c",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/HOTPATH_REVIEW.md",
+    "initial_sha256": "2a2b1f3322d8412bad009d9f7c67fefe5e76f3fef6a8e5954e2612aec7fd32b5",
+    "now_sha256": "2a2b1f3322d8412bad009d9f7c67fefe5e76f3fef6a8e5954e2612aec7fd32b5",
+    "preserved": true
+  },
+  {
+    "path": "docs/log/RESIDENT_TEXT_CAPTURE.md",
+    "initial_sha256": "967ddb5cd7122455c64affefa6d9198c3c8fe1227c8a5dc19143f2dfbe27c77e",
+    "now_sha256": "967ddb5cd7122455c64affefa6d9198c3c8fe1227c8a5dc19143f2dfbe27c77e",
+    "preserved": true
+  },
+  {
+    "path": "README.md",
+    "preserved": true,
+    "sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+  }
+]

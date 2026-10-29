@@ -1,0 +1,16 @@
+enum choice:
+    yes(value: i32)
+    no
+value struct packet:
+    value: result<i32, string>
+struct holder:
+    value: choice
+func (h holder) init(value: i32):
+    h.value = choice.yes(value)
+func entry(value: i32) -> i32:
+    var p = packet(value=Ok(value))
+    var h = holder(value)
+    var values: [result<i32, string>, 2] = [p.value, Err("no")]
+    if h.value is choice.yes(var number) and values[0] is Ok(var first):
+        return number + first
+    return 0

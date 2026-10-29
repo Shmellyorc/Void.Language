@@ -1,0 +1,36 @@
+value struct payload:
+    tiny: i8 = -7
+    small: i16 = 300
+    amount: i32 = 2
+    wide: i64 = -9000000000
+    byte: u8 = 255
+    word: u16 = 60000
+    unsigned: u32 = 4000000000
+    huge: u64 = 18446744073709551615
+    single: f32 = 0.5f
+    double: f64 = 1.25d
+    active: bool
+
+func (p payload) adjust(amount: i32) -> payload:
+    p.amount += amount
+    p.tiny++
+    p.huge++
+    p.active = not p.active
+    return p
+
+func (p payload) valid() -> bool:
+    return p.tiny == -6 and p.small == 300 and p.wide == -9000000000 and p.byte == 255 and p.word == 60000 and p.unsigned == 4000000000 and p.huge == 0 and p.single == 0.5f and p.double == 1.25d and p.active
+
+value struct envelope:
+    prefix: i8
+    data: payload
+    tail: u16
+
+func entry(value: i32) -> i32:
+    var original = envelope()
+    var copy = original
+    var returned = copy.data.adjust(value)
+    returned.amount += 10
+    if copy.data.valid() and returned.valid():
+        return returned.amount + original.data.amount + copy.data.amount
+    return -1

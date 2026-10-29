@@ -1,0 +1,9 @@
+use "/native_bridge.void" as bridge
+use "/wrappers.void" as library
+func entry(value: i32) -> i32:
+    with library.open() as owner:
+        defer {
+            owner.close()
+            var discarded = owner.byte(0 as u64)
+        }
+        return bridge.terminated("primary\0failure") as i32

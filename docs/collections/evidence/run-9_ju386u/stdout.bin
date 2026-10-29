@@ -1,0 +1,21 @@
+operation=1 optimized=0 injected_allocation_failures=384
+operation=2 optimized=0 injected_allocation_failures=64
+operation=3 optimized=0 injected_allocation_failures=93
+operation=4 optimized=0 injected_allocation_failures=267
+operation=5 optimized=0 injected_allocation_failures=320
+operation=6 optimized=0 injected_allocation_failures=272
+operation=7 optimized=0 injected_allocation_failures=390
+operation=8 optimized=0 injected_allocation_failures=94
+map publication optimized=0 partial_effect_failures=65 passed
+collections cache/reload/captures/active leases optimized=0 passed
+operation=1 optimized=1 injected_allocation_failures=384
+operation=2 optimized=1 injected_allocation_failures=64
+operation=3 optimized=1 injected_allocation_failures=93
+operation=4 optimized=1 injected_allocation_failures=267
+operation=5 optimized=1 injected_allocation_failures=320
+operation=6 optimized=1 injected_allocation_failures=272
+operation=7 optimized=1 injected_allocation_failures=390
+operation=8 optimized=1 injected_allocation_failures=94
+map publication optimized=1 partial_effect_failures=65 passed
+collections cache/reload/captures/active leases optimized=1 passed
+Collections forced-GC and allocation sweeps passed

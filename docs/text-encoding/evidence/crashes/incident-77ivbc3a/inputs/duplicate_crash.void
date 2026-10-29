@@ -1,0 +1,6 @@
+use "/wrappers.void" as library
+func entry(value: i32) -> i32:
+    with library.open() as owner:
+        owner.close()
+        owner.close()
+    return value

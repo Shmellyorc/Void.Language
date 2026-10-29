@@ -1,0 +1,37 @@
+[
+  {
+    "name": "numeric",
+    "source": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void",
+    "async": false,
+    "input": 1000000,
+    "expected": 499501000
+  },
+  {
+    "name": "json",
+    "source": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void",
+    "async": false,
+    "input": 32,
+    "expected": 1664
+  },
+  {
+    "name": "async",
+    "source": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void",
+    "async": true,
+    "input": 16,
+    "expected": 112
+  },
+  {
+    "name": "logging",
+    "source": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void",
+    "async": false,
+    "input": 32,
+    "expected": 32
+  },
+  {
+    "name": "text",
+    "source": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void",
+    "async": false,
+    "input": 16384,
+    "expected": 1
+  }
+]

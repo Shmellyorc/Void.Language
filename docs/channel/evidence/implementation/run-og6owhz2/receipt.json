@@ -1,0 +1,13 @@
+{
+  "args": [
+    "/tmp/VOID-channel-execution-bgwth96g/app"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+  "status": 0,
+  "seconds": 0.008398086007218808,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "74d8acd97fa917e5d011091a4e01a5fb1a9b8d451411373fbc68f291b4753205",
+  "object_hashes": {},
+  "output_hashes": {}
+}

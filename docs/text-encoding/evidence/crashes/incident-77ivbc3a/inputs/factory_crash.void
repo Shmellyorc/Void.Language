@@ -1,0 +1,5 @@
+use "./base.void" as b
+use "./derived.void" as d
+
+func make(value: i32) -> b.base:
+    return d.derived(value = value, extra = 3)

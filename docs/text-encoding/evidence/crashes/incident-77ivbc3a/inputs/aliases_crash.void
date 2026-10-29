@@ -1,0 +1,43 @@
+const seed: [i32] = [7, 8]
+
+value struct holder:
+    data: [i32]
+    fixed: [i32, 2] = [1, 2]
+
+struct box:
+    data: [i32]
+
+func identity(values: [i32]) -> [i32]:
+    values.push(9)
+    return values
+
+func entry(value: i32) -> i32:
+    var empty: [i32] = []
+    var fresh: [i32] = []
+    empty.push(1)
+    if fresh.count != 0 or seed.count != 2 or seed[-1] != 8:
+        return -101
+    var signed: i64 = -1
+    var unsigned: u64 = 0
+    if empty[signed] != 1 or empty[unsigned] != 1:
+        return -102
+    var first: holder = holder()
+    var other: holder = holder()
+    first.data.push(10)
+    if other.data.count != 0:
+        return -100
+    var copy = first
+    copy.fixed[0] = 99
+    if first.fixed[0] != 1 or copy.fixed[0] != 99:
+        return -103
+    copy.data.push(value)
+    var returned = identity(copy.data)
+    returned[-1] += 2
+    var object = box()
+    object.data = returned
+    object.data[0] = 3
+    var inferred = [4, 5, 6]
+    var defaults: [bool]
+    defaults.push(true)
+    var fixed: [i32, 3] = [1, 2, 3]
+    return first.data[0] + first.data[1] + first.data[-1] + inferred.remove_at(-3) + fixed.count as i32 + defaults.count as i32

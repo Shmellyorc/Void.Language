@@ -1,0 +1,17 @@
+struct tracker:
+    total: i32
+struct resource:
+    tracker: tracker
+    n: i32
+func (r resource) deinit():
+    r.tracker.total += r.n
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    for n in 0..<4:
+        with resource(tracker=t, n=n) as r:
+            if n == 1:
+                continue
+            if n == 2:
+                break
+            t.total += 10
+    return t.total

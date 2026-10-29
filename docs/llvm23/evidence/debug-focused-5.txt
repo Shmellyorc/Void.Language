@@ -1,0 +1,48 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start  36: application_workflow_stage9
+1/4 Test  #36: application_workflow_stage9 ......   Passed    2.51 sec
+    Start  39: arrays_storage_audit
+2/4 Test  #39: arrays_storage_audit .............   Passed    5.40 sec
+    Start 359: stage10_console_aot
+3/4 Test #359: stage10_console_aot ..............***Failed  389.96 sec
+operator_console_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_compound_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_workload: exact normal/O2 JIT and linked AOT verified
+console_sum_display: exact normal/O2 JIT and linked AOT verified
+console_sum_failure: exact normal/O2 JIT and linked AOT verified
+console_collections: exact normal/O2 JIT and linked AOT verified
+console_collection_invalidated: exact normal/O2 JIT and linked AOT verified
+console_collection_failed_hook: exact normal/O2 JIT and linked AOT verified
+console_keys: exact normal/O2 JIT and linked AOT verified
+console_terminal: exact normal/O2 JIT and linked AOT verified
+console_exit: exact normal/O2 JIT and linked AOT verified
+console_zero: exact normal/O2 JIT and linked AOT verified
+console_cleanup_primary: exact normal/O2 JIT and linked AOT verified
+console_cleanup_only: exact normal/O2 JIT and linked AOT verified
+console_print: exact normal/O2 JIT and linked AOT verified
+console_order: exact normal/O2 JIT and linked AOT verified
+console_reads: exact normal/O2 JIT and linked AOT verified
+console_fail: exact normal/O2 JIT and linked AOT verified
+console_endpoints: exact normal/O2 JIT and linked AOT verified
+console_read_errors: exact normal/O2 JIT and linked AOT verified
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 399, in <module>
+    assert b"Debug cache: miss" in first.stderr and b"Debug cache: hit" in second.stderr,(first.stderr,second.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (b'Debug cache: hit\ndone [10, 20, 30, 12, 10, 31, 40, 10, 10, 1, 2, 3, 50, 50, 50, 50, 51];', b'Debug cache: hit\ndone [10, 20, 30, 12, 10, 31, 40, 10, 10, 1, 2, 3, 50, 50, 50, 50, 51];')
+
+    Start 370: application_native_sprint4
+4/4 Test #370: application_native_sprint4 .......   Passed    2.94 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Label Time Summary:
+research    =   5.40 sec*proc (1 test)
+
+Total Test time (real) = 400.82 sec
+
+The following tests FAILED:
+	359 - stage10_console_aot (Failed)
+Errors while running CTest

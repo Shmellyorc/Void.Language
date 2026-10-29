@@ -1,0 +1,60 @@
+# Exercise growth of nested Pattern children/values, expression match arms,
+# and statement arms owning optional Pattern nodes.
+value struct row:
+    a: i32
+    b: i32
+    c: i32
+    d: i32
+    e: i32
+    f: i32
+    g: i32
+    h: i32
+    i: i32
+func entry(value: i32) -> i32:
+    var mask = 0
+    var items: [i32] = [value, value + 1, value + 2, value + 3, value + 4, value + 5, value + 6, value + 7, value + 8]
+    if items is [i32(0), 1, 2, 3, 4, 5, 6, 7, 8]:
+        mask += 2
+    if items is [i32(7), 8, 9, 10, 11, 12, 13, 14, 15]:
+        mask += 1
+    if items is [i32(8), 9, 10, 11, 12, 13, 14, 15, 16]:
+        mask += 4
+    var entries: {i32: i32} = {0: value, 1: value + 1, 2: value + 2, 3: value + 3, 4: value + 4, 5: value + 5, 6: value + 6, 7: value + 7, 8: value + 8}
+    if entries is {0: 7, 1: 8, 2: 9, 3: 10, 4: 11, 5: 12, 6: 13, 7: 14, 8: 15}:
+        mask += 8
+    var record = row(a=value, b=value + 1, c=value + 2, d=value + 3, e=value + 4, f=value + 5, g=value + 6, h=value + 7, i=value + 8)
+    if record is row(a=7, b=8, c=9, d=10, e=11, f=12, g=13, h=14, i=15):
+        mask += 16
+    var selected = match value:
+        0..<1: 100
+        1..<2: 101
+        2..<3: 102
+        3..<4: 103
+        4..<5: 104
+        5..<6: 105
+        6..<7: 106
+        7..<8: 107
+        8..<9: 108
+        _: 200
+    match value:
+        0:
+            mask += 32
+        1:
+            mask += 0
+        2:
+            mask += 0
+        3:
+            mask += 0
+        4:
+            mask += 0
+        5:
+            mask += 0
+        6:
+            mask += 0
+        7:
+            mask += 64
+        8:
+            mask += 128
+        _:
+            mask += 256
+    return selected + mask

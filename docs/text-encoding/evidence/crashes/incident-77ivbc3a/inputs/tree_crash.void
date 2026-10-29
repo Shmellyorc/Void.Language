@@ -1,0 +1,7 @@
+struct node:
+    value: i32
+    children: [node]
+func entry(value: i32) -> i32:
+    var root = node(value = value)
+    root.children.push(node(value = 3))
+    return root.children[0].value + root.value

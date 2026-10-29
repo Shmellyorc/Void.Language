@@ -1,0 +1,6 @@
+/tmp/VOID-channel-rejections-ij5r_4sw/async-transfer.void:6:18: error: Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.
+    code: VOID1103
+
+ 6 | async func carry(bus: channel.router<i32>) -> i32:
+   |                  ^^^
+

@@ -1,0 +1,30 @@
+value struct point:
+    x: i32
+
+func (p point) callback() -> func() -> i32:
+    return func() -> i32:
+        p.x += 1
+        return p.x
+
+func nested() -> func() -> i32:
+    var n = 1
+    var outer = func() -> func() -> i32:
+        return func() -> i32:
+            n += 2
+            return n
+    return outer()
+
+func entry(value: i32) -> i32:
+    var p = point(x=value)
+    var a = p.callback()
+    p.x = 100
+    var b = a
+    var x = a()
+    var y = b()
+    var n = nested()
+    var funcs: [func() -> i32] = []
+    for index in 0..<3:
+        funcs.push(func() -> i32:
+            return index
+        )
+    return x + y + p.x + n() + n() + funcs[0]() + funcs[2]()

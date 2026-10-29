@@ -1,0 +1,21 @@
+value struct label:
+    text: string = "before"
+
+func (l label) init(text: string = "ready"):
+    l.text = text
+
+struct message:
+    title: string
+    nested: label
+
+func (m message) init(text: string = "done"):
+    m.title = m.nested.text + text
+
+func entry(value: i32) -> i32:
+    var m = message()
+    const item = label()
+    var copy = item
+    copy.text += "!"
+    if m.title == "readydone" and copy.text == "ready!" and item.text == "ready":
+        return value + 2
+    return -100

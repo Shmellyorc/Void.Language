@@ -1,0 +1,16 @@
+[
+  {
+    "tool": ".toolchains/llvm-23.1.4/bin/ld64.lld",
+    "status": 0,
+    "stdout": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\n",
+    "stderr": "",
+    "claim": "Linux-hosted LLD flavor version-output check only; no native target execution"
+  },
+  {
+    "tool": ".toolchains/llvm-23.1.4/bin/lld-link",
+    "status": 0,
+    "stdout": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\n",
+    "stderr": "",
+    "claim": "Linux-hosted LLD flavor version-output check only; no native target execution"
+  }
+]

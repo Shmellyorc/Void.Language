@@ -50,22 +50,35 @@ required-reference readiness, safe helper contexts and complete-object commit; s
 
 ## Building the compiler
 
-VOID requires the complete LLVM **19.1.7** SDK, including headers and development
+VOID requires the complete LLVM **23.1.4** SDK, including headers and development
 libraries. For a first program, start with the
 [root README](../README.md#a-small-example).
+The [migration record](llvm23/IMPLEMENTATION.md) and
+[local acceptance](llvm23/ACCEPTANCE.md) distinguish the current toolchain from
+the historical LLVM19 feature and verification records below.
+The protected root README's older toolchain commands are superseded by this
+build section; its source examples remain separate from those setup commands.
 
 ### Linux dependencies and build
 
-Requires CMake 3.24+, a C++20 compiler, and the complete **LLVM 19.1.7** development
-SDK. The tests also require Python 3.9+, matching Clang 19.1.7 and `llvm-dwarfdump`.
-On Debian-family distributions that provide these versions:
+Requires CMake 3.24+, C++20, and the complete **LLVM 23.1.4** development SDK.
+Use matching Clang, LLD and `llvm-dwarfdump`. CI uses Python 3.12; the official
+SDK installer requires Python 3.12+. Install the verified full SDK separately at
+`.toolchains/llvm-23.1.4`, retaining its provenance receipt. Do not assume a
+distribution's compiler-only package provides this exact version. On Debian-family
+distributions, install host dependencies and configure with explicit SDK paths:
 
 ```sh
-sudo apt-get install build-essential cmake ninja-build python3 llvm-19-dev clang-19 lld-19 libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libz3-dev
+sudo apt-get install build-essential cmake ninja-build python3 libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+void_llvm23_sdk="$PWD/.toolchains/llvm-23.1.4"
 cmake -S . -B build/debug -G Ninja \
-  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
-  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
-  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld \
+  -DLLVM_DIR="$void_llvm23_sdk/lib/cmake/llvm" \
+  -DCMAKE_C_COMPILER="$void_llvm23_sdk/bin/clang" \
+  -DCMAKE_CXX_COMPILER="$void_llvm23_sdk/bin/clang++" \
+  -DVOID_CLANG="$void_llvm23_sdk/bin/clang" \
+  -DVOID_DWARFDUMP="$void_llvm23_sdk/bin/llvm-dwarfdump" \
+  -DVOID_LINKER="$void_llvm23_sdk/bin/ld.lld" \
+  -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$void_llvm23_sdk/bin/ld.lld" \
   -DCMAKE_BUILD_TYPE=Debug
 cmake --build build/debug --parallel 4
 ctest --test-dir build/debug --output-on-failure
@@ -84,7 +97,7 @@ uses direct LLVM arguments and Runtime copy helpers, without envelope
 permissions, store-identity protocols or a linked-byte certificate gate. It is
 separate from already implemented production source arrays.
 
-Verify your distribution actually provides 19.1.7. CMake rejects different SDK
+Verify the SDK actually provides 23.1.4. CMake rejects different SDK
 versions. LLVM's development package depends on other development libraries;
 keep them installed. In particular, missing `libzstd-dev` prevents the installed
 LLVM CMake targets from linking. `libedit-dev` supplies the optional SDK
@@ -99,7 +112,8 @@ under ptrace; use an environment without that tracing restriction.
 CMake matches the selected SDK's RTTI setting across all linked C++ targets.
 The complete official Linux archive has RTTI disabled; ASan/UBSan remain enabled,
 but Clang's RTTI-dependent vptr check is unavailable in that ABI. A complete
-RTTI-enabled LLVM 19.1.7 SDK supplies the separate vptr validation configuration.
+RTTI-enabled LLVM 23.1.4 SDK would be required for separate vptr validation;
+that is not claimed for the official no-RTTI artifact tested here.
 See [the CI sanitizer investigation and coverage limits](CI_SANITIZER_ABI.md).
 
 ### Native execution and linking
@@ -109,7 +123,7 @@ build/debug/voidc check examples/architecture.void
 build/debug/voidc run examples/architecture.void 10
 # 52
 build/debug/voidc emit examples/architecture.void -o build/debug/architecture.o
-clang-19 -fuse-ld=/usr/lib/llvm-19/bin/ld.lld build/debug/architecture.o -o build/debug/architecture
+"$void_llvm23_sdk/bin/clang" --ld-path="$void_llvm23_sdk/bin/ld.lld" build/debug/architecture.o -o build/debug/architecture
 build/debug/architecture 10
 # 52
 ```
@@ -136,16 +150,18 @@ argument count. They are not substitutes for the source commands above.
 ### Windows and macOS
 
 The [CI workflow](../.github/workflows/ci.yml) downloads complete official
-LLVM 19.1.7 development archives, including headers and static libraries.
+LLVM 23.1.4 development archives, including headers and static libraries.
 Windows uses the MSVC/Windows SDK environment and `clang-cl`, with the release
 MSVC dynamic runtime and iterator ABI matching the prebuilt LLVM libraries in
 both build configurations. The native AOT link uses the SDK's `clang` driver,
 with `-llegacy_stdio_definitions` to resolve the direct native `printf` symbol
 through the active MSVC library search paths. Use a Visual Studio developer
 environment (CI initializes it before configuration and testing).
-macOS selects the official archive matching the runner architecture and uses
+macOS selects the official ARM64 archive matching the supported runner and uses
 the Xcode SDK. Linux installs development dependencies explicitly and selects
-the same archive's LLD 19.1.7 because its static LLVM libraries contain bitcode.
+the same archive's LLD 23.1.4. Inspected LLVM23 Linux library members are native
+ELF, whereas inspected LLVM19 members were bitcode; this is not an exhaustive
+cross-platform archive-format claim.
 CMake matches the LLVM backend's RTTI setting to the selected SDK, retaining
 exception support. Configuration links and executes an ORC host as an SDK check.
 On Windows, stale exported DIA library paths are resolved against the active

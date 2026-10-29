@@ -1,0 +1,5 @@
+const template: {i32: i32} = {1: 2, 3: 4}
+func entry(value: i32) -> i32:
+    if value == 1:
+        return {1: 2}.count as i32
+    return template.count as i32 + value

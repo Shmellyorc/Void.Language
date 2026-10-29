@@ -1,0 +1,72 @@
+[
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64",
+    "library": "libLLVMCore.a",
+    "member": "AbstractCallSite.cpp.o",
+    "first_8_bytes_hex": "4243c0de35140000",
+    "format": "LLVM bitcode"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64",
+    "library": "libLLVMOrcJIT.a",
+    "member": "COFFVCRuntimeSupport.cpp.o",
+    "first_8_bytes_hex": "4243c0de35140000",
+    "format": "LLVM bitcode"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64",
+    "library": "libLLVMScalarOpts.a",
+    "member": "ADCE.cpp.o",
+    "first_8_bytes_hex": "4243c0de35140000",
+    "format": "LLVM bitcode"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64",
+    "library": "libLLVMX86CodeGen.a",
+    "member": "X86ArgumentStackSlotRebase.cpp.o",
+    "first_8_bytes_hex": "4243c0de35140000",
+    "format": "LLVM bitcode"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64",
+    "library": "libLLVMSupport.a",
+    "member": "blake3.c.o",
+    "first_8_bytes_hex": "4243c0de35140000",
+    "format": "LLVM bitcode"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4",
+    "library": "libLLVMCore.a",
+    "member": "AbstractCallSite.cpp.o",
+    "first_8_bytes_hex": "7f454c4602010100",
+    "format": "ELF"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4",
+    "library": "libLLVMOrcJIT.a",
+    "member": "AbsoluteSymbols.cpp.o",
+    "first_8_bytes_hex": "7f454c4602010100",
+    "format": "ELF"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4",
+    "library": "libLLVMScalarOpts.a",
+    "member": "ADCE.cpp.o",
+    "first_8_bytes_hex": "7f454c4602010100",
+    "format": "ELF"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4",
+    "library": "libLLVMX86CodeGen.a",
+    "member": "X86ArgumentStackSlotRebase.cpp.o",
+    "first_8_bytes_hex": "7f454c4602010100",
+    "format": "ELF"
+  },
+  {
+    "sdk": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4",
+    "library": "libLLVMSupport.a",
+    "member": "blake3.c.o",
+    "first_8_bytes_hex": "7f454c4602010100",
+    "format": "ELF"
+  }
+]

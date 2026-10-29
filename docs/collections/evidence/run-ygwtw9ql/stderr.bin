@@ -1,0 +1,8 @@
+/tmp/VOID-collections-negative-9454a7ce/readonly-nested.void:32:15: error: Cannot mutate a readonly list.
+    code: VOID2007
+
+ 32 |     output[0].push(node())
+    |               ^^^^
+    Module: /readonly-nested.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

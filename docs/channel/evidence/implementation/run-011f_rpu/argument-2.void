@@ -1,0 +1,12 @@
+use channel
+use "state.void" as state
+use "state.void" as alias
+
+func on_damage(const amount: i32):
+    print("Damage:", amount)
+
+func main():
+    const connection = state.combat.subscribe("player/damaged", on_damage)
+    alias.combat.emit("player/damaged", 25)
+    print(state.combat.unsubscribe(connection))
+    state.combat.clear()

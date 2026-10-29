@@ -1,0 +1,31 @@
+const default_y: i32 = 10
+
+value struct point:
+    x: i32 = 4
+    y: i32 = 1
+
+func (p point) init(x: i32 = 3, y: i32 = default_y):
+    p.x = x + p.x
+    p.y = y
+
+func (p point) move(amount: i32):
+    p.x += amount
+
+value struct box:
+    child: point
+    enabled: bool = true
+
+func (b box) init(amount: i32 = 2):
+    b.child.move(amount)
+
+value struct secret:
+    x: i32
+
+private func (s secret) init(x: i32 = 8):
+    s.x = x
+
+value struct envelope:
+    child: secret
+
+func make_secret(value: i32) -> secret:
+    return secret(value)

@@ -1,0 +1,15 @@
+use "./types.void" as types
+
+func copied(value: types.box) -> types.box:
+    value.child.move(100)
+    return value
+
+func entry(value: i32) -> i32:
+    const original = types.box()
+    var copy = copied(original)
+    copy.child.move(value)
+    var implicit: types.box
+    const named = types.point(y = 20, x = value)
+    const private_default = types.envelope()
+    const made = types.make_secret(5)
+    return copy.child.x - original.child.x + implicit.child.x + named.x + named.y + private_default.child.x + made.x

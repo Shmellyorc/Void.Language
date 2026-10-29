@@ -1,5 +1,16 @@
 # LLVM SDK RTTI and sanitizer compatibility
 
+## Current LLVM 23 migration — 28 October 2026
+
+The [migration](llvm23/IMPLEMENTATION.md) retains matching SDK RTTI throughout
+all C++ consumers, project exception handling, strict ASan/UBSan/leak checks
+and host-generated function-type metadata. Actual LLVM 23 SDK settings and local
+outcomes, including effective **358/358** strict tests after retained harness
+corrections, belong in [compatibility](llvm23/COMPATIBILITY.md) and
+[acceptance](llvm23/ACCEPTANCE.md). The LLVM 19 comparison and commands below
+remain historical evidence, not active build instructions or LLVM 23 results.
+
+
 ## Run #7 investigation, 11 October 2026
 
 Read the actual [Ubuntu job log](https://github.com/Shmellyorc/Void.Language/actions/runs/38120807013/job/114414960372).

@@ -1,0 +1,13 @@
+{
+  "args": [
+    "/tmp/VOID-channel-receiver-72iziirr/receiver"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+  "status": 0,
+  "seconds": 0.04284036601893604,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "be39fe2955ce01e471394fee99b15943fb695cb078874176738203f8d9b9ba18",
+  "object_hashes": {},
+  "output_hashes": {}
+}

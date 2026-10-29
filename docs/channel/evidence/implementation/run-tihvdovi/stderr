@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-d6epz0hh/worker-global.void:11:15: error: Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.
+    code: VOID1103
+
+ 11 |     var job = spawn work(input)
+    |               ^^^^^
+    Module: /worker-global.void
+

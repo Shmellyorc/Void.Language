@@ -1,0 +1,52 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-DVOID_LLVM_RESEARCH=1",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "-isystem",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include",
+      "-g",
+      "-std=c++20",
+      "-D_GNU_SOURCE",
+      "-D_GLIBCXX_USE_CXX11_ABI=1",
+      "-D__STDC_CONSTANT_MACROS",
+      "-D__STDC_FORMAT_MACROS",
+      "-D__STDC_LIMIT_MACROS",
+      "-fno-rtti",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-fsyntax-only",
+      "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/storage_audit.cpp"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/storage_audit.cpp:428:67: error: indirection requires pointer operand ('const MCSubtargetInfo' invalid)\n  428 |   std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(*tm.getMCSubtargetInfo(), ctx));\n      |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/src/backend/llvm/storage_audit.cpp:430:59: error: indirection requires pointer operand ('const MCRegisterInfo' invalid)\n  430 |   const auto &ii = *tm.getMCInstrInfo(); const auto &ri = *tm.getMCRegisterInfo();\n      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/src/backend/llvm/storage_audit.cpp:769:26: error: no matching constructor for initialization of 'NativeStoragePlanner'\n  769 |     NativeStoragePlanner planner({i.triple, i.layout.getStringRepresentation(),\n      |                          ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n  770 |       uint64_t(std::numeric_limits<int64_t>::max()), i.layout.getStackAlignment().value(),\n      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n  771 |       [](ir::Type) -> StorageExtent { throw std::logic_error(\"Use actual LLVM homes for AOT inventory\"); }});\n      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/include/void/native_storage.hpp:27:7: note: candidate constructor (the implicit copy constructor) not viable: cannot convert initializer list argument to 'const NativeStoragePlanner'\n   27 | class NativeStoragePlanner {\n      |       ^~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/include/void/native_storage.hpp:27:7: note: candidate constructor (the implicit move constructor) not viable: cannot convert initializer list argument to 'NativeStoragePlanner'\n   27 | class NativeStoragePlanner {\n      |       ^~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/include/void/native_storage.hpp:31:14: note: candidate constructor not viable: cannot convert initializer list argument to 'StorageTarget'\n   31 |     explicit NativeStoragePlanner(StorageTarget target);\n      |              ^                    ~~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/src/backend/llvm/storage_audit.cpp:807:8: warning: 'moveBefore' is deprecated: Use iterators as instruction positions [-Wdeprecated-declarations]\n  807 |     a->moveBefore(&*f->getEntryBlock().getFirstInsertionPt());\n      |        ^\n/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/IR/Instruction.h:277:12: note: 'moveBefore' has been explicitly marked deprecated here\n  277 |   LLVM_ABI LLVM_DEPRECATED(\"Use iterators as instruction positions\",\n      |            ^\n/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Support/Compiler.h:252:50: note: expanded from macro 'LLVM_DEPRECATED'\n  252 | #define LLVM_DEPRECATED(MSG, FIX) __attribute__((deprecated(MSG, FIX)))\n      |                                                  ^\n/home/shmellyorc/Documents/Void.Language/src/backend/llvm/storage_audit.cpp:900:26: error: unknown type name 'LLVMTargetMachine'; did you mean 'TargetMachine'?\n  900 |   auto *tm = static_cast<LLVMTargetMachine *>(i.machine.get());\n      |                          ^~~~~~~~~~~~~~~~~\n      |                          TargetMachine\n/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Target/TargetMachine.h:84:16: note: 'TargetMachine' declared here\n   84 | class LLVM_ABI TargetMachine {\n      |                ^\n1 warning and 4 errors generated.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-DVOID_LLVM_RESEARCH=1",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "-isystem",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include",
+      "-g",
+      "-std=c++20",
+      "-D_GNU_SOURCE",
+      "-D_GLIBCXX_USE_CXX11_ABI=1",
+      "-D__STDC_CONSTANT_MACROS",
+      "-D__STDC_FORMAT_MACROS",
+      "-D__STDC_LIMIT_MACROS",
+      "-fno-rtti",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-fsyntax-only",
+      "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/encoded_cfg.cpp"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/encoded_cfg.cpp:174:69: error: indirection requires pointer operand ('const MCSubtargetInfo' invalid)\n  174 |     std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(*tm.getMCSubtargetInfo(),context));\n      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/src/backend/llvm/encoded_cfg.cpp:177:56: error: indirection requires pointer operand ('const MCRegisterInfo' invalid)\n  177 |     const auto &ii=*tm.getMCInstrInfo();const auto &ri=*tm.getMCRegisterInfo();\n      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~\n2 errors generated.\n"
+  }
+]

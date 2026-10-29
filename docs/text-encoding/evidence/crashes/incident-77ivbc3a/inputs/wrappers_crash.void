@@ -1,0 +1,71 @@
+use "/native_bridge.void" as bridge
+
+struct resource:
+    handle: bridge.resource? = null
+    bias: i32 = 0
+
+func create(success: bool) -> result<resource, string>:
+    var owner = resource()
+    var handle = bridge.acquire(success)
+    if handle == null:
+        return Err("native acquisition failed")
+    owner.handle = handle
+    return Ok(owner)
+
+func open() -> resource:
+    var acquired = create(true)
+    return match acquired:
+        Ok(var owner): owner
+        Err(_): resource()
+
+func (owner resource) deinit():
+    if owner.handle != null:
+        bridge.destroy(owner.handle as bridge.resource)
+        owner.handle = null
+
+func (owner resource) close():
+    bridge.close(owner.handle as bridge.resource)
+
+func (owner resource) retain(text: string):
+    bridge.retain(owner.handle as bridge.resource, text)
+
+func (owner resource) release_text():
+    bridge.release_text(owner.handle as bridge.resource)
+
+func (owner resource) byte(index: u64) -> i32:
+    return bridge.byte(owner.handle as bridge.resource, index)
+
+func (owner resource) on_value(value: i32) -> i32:
+    return owner.bias + value
+
+func (owner resource) connect(bias: i32):
+    owner.bias = bias
+    bridge.register(owner.handle as bridge.resource, owner.on_value)
+
+func (owner resource) invoke(value: i32) -> i32:
+    return bridge.invoke(owner.handle as bridge.resource, value)
+
+func (owner resource) foreign(value: i32) -> i32:
+    return bridge.foreign(owner.handle as bridge.resource, value)
+
+func (owner resource) disconnect():
+    bridge.unregister(owner.handle as bridge.resource)
+
+func scalars(value: i32) -> i32:
+    if bridge.scalar_i8(-127 as i8) != -127 as i8:
+        return -1000
+    if bridge.scalar_i16(-32000 as i16) != -32000 as i16:
+        return -1000
+    if bridge.scalar_i32(value) != value or bridge.scalar_i64(-9000000000 as i64) != -9000000000 as i64:
+        return -1000
+    if bridge.scalar_u8(255 as u8) != 255 as u8 or bridge.scalar_u16(65000 as u16) != 65000 as u16:
+        return -1000
+    if bridge.scalar_u32(4000000000 as u32) != 4000000000 as u32:
+        return -1000
+    if bridge.scalar_u64(18000000000000000000 as u64) != 18000000000000000000 as u64:
+        return -1000
+    if bridge.scalar_f32(1.25f) != 1.25f or bridge.scalar_f64(2.5d) != 2.5d:
+        return -1000
+    if not bridge.scalar_bool(true) or bridge.scalar_bool(false):
+        return -1000
+    return value

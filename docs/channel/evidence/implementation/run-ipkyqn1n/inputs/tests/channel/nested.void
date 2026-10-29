@@ -1,0 +1,14 @@
+use channel
+func entry(input: i32) -> i32:
+    var bus = channel.router<i32>()
+    var total = 0
+    bus.subscribe("tick", func(const depth: i32):
+        total += 1
+        if depth > 0:
+            bus.emit("tick", depth - 1)
+    )
+    bus.emit("tick", 16)
+    bus.clear()
+    if total != 17:
+        return -1
+    return 7

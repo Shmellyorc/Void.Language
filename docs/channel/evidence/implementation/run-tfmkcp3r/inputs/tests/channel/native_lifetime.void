@@ -1,0 +1,20 @@
+use channel
+use "/native_bridge.void" as bridge
+var bus = channel.router<i32>()
+var saved: channel.subscription? = null
+var total = 0
+func entry(command: i32) -> i32:
+    if command == 0:
+        var owner = bridge.acquire(true) as bridge.resource
+        bridge.retain(owner, "A")
+        saved = bus.subscribe("topic", func(const amount: i32):
+            total += bridge.byte(owner, 0) + amount
+        )
+    else if command == 1:
+        bus.clear()
+    else if command == 2:
+        if saved is Ok(var token):
+            bus.unsubscribe(token)
+    else:
+        bus.emit("topic", 1)
+    return total

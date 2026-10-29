@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-yxv19iw_/callback-width.void:8:24: error: Type mismatch: expected func(readonly i32), received func(readonly i64).
+    code: VOID2001
+
+ 8 |     bus.subscribe("t", func(const amount: i64):
+   |                        ^^^^
+    Module: /callback-width.void
+    Expected: func(readonly i32)
+    Received: func(readonly i64)
+

@@ -1,0 +1,4 @@
+use "/lib/movement.void" as geometry
+
+value struct wrapper:
+    using geometry.movement

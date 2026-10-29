@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/dse-input-investigation/captures/logging/preopt.ll",
+    "bytes": 18835546,
+    "sha256": "9eca9f54e226da000d0d58765c3534201b61354d51c6a66ef820ed125f79e723"
+  },
+  {
+    "path": "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/dse-input-investigation/captures/logging/preopt.bc",
+    "bytes": 4932540,
+    "sha256": "1c1b046641d143e7c38e2b4168fdab1de028459a3250e05bff2eb5985fbde272"
+  },
+  {
+    "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/stage11-console-preopt.ll",
+    "bytes": 971489,
+    "sha256": "402019ad2887f892d65f8effa2aa516342d02013d19e54835187d4b0d2fe59e0"
+  },
+  {
+    "path": "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/combined-keys/void_log_host-timing",
+    "bytes": 54752384,
+    "sha256": "c284712dd4958faf41547deb49a851306256a9075cf59d968671272bc17e96bb"
+  },
+  {
+    "path": "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/native-core-classification/cores/original-core-10-core.1682824",
+    "bytes": 120406016,
+    "sha256": "2c313fd4d8fba185efdceb35f519a5f6d8bc3d80e47e37b3ed367569405aad24"
+  },
+  {
+    "path": "/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/flat-builder/performance.void",
+    "bytes": 152,
+    "sha256": "89c1b9ac17d734c65ce6b5114b3ff923c5aa5cd39b0b6c00ef0ca02884c4576e"
+  }
+]

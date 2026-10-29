@@ -1,6 +1,8 @@
-// LLVM 19.1.7 investigation only. Not a VOID emitter or production certificate.
+// LLVM 23.1.4 investigation only. Not a VOID emitter or production certificate.
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/ADT/StringExtras.h>
+#include <llvm/Analysis/RuntimeLibcallInfo.h>
+#include <llvm/Analysis/TargetLibraryInfo.h>
 #include <llvm/CodeGen/MachineFrameInfo.h>
 #include <llvm/CodeGen/MachineFunctionPass.h>
 #include <llvm/CodeGen/MachineModuleInfo.h>
@@ -288,9 +290,9 @@ void checkObject(State &s, StringRef bytes, TargetMachine &tm, const Target &tar
   auto object = object::ObjectFile::createObjectFile(MemoryBufferRef(bytes, "private-object"));
   if (!object) { consumeError(object.takeError()); fail(s, "object", "object parser failed"); return; }
   MCContext ctx(Triple(s.triple), tm.getMCAsmInfo(), tm.getMCRegisterInfo(), tm.getMCSubtargetInfo());
-  std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(*tm.getMCSubtargetInfo(), ctx));
+  std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(tm.getMCSubtargetInfo(), ctx));
   if (!dis) { fail(s, "object", "no disassembler"); return; }
-  const auto &ii = *tm.getMCInstrInfo(); const auto &ri = *tm.getMCRegisterInfo();
+  const auto &ii = *tm.getMCInstrInfo(); const auto &ri = tm.getMCRegisterInfo();
   std::set<std::string> seen;
   std::set<std::tuple<uint64_t, uint64_t, uint64_t>> anchors;
   auto symbols = object::computeSymbolSizes(**object);
@@ -357,7 +359,7 @@ void checkObject(State &s, StringRef bytes, TargetMachine &tm, const Target &tar
 } // namespace
 int main(int argc, char **argv) {
   // INPUT MODE(normal|O2) REPORT OBJECT [FAULT(none|frame|sp|omit|encoded)] [CALLER-CERT]
-  if (argc < 5 || argc > 7 || StringRef(LLVM_VERSION_STRING) != "19.1.7") return 1;
+  if (argc < 5 || argc > 7 || StringRef(LLVM_VERSION_STRING) != "23.1.4") return 1;
   if (sys::fs::exists(argv[4])) { errs() << "refusing an existing delivery path\n"; return 1; }
   State s; if (argc > 5 && StringRef(argv[5]) != "none") s.fault = argv[5];
   if (!s.fault.empty() && s.fault != "frame" && s.fault != "sp" && s.fault != "omit" && s.fault != "encoded") return 1;
@@ -379,11 +381,11 @@ int main(int argc, char **argv) {
   LLVMContext context; SMDiagnostic diagnostic;
   auto module = parseIRFile(argv[1], diagnostic, context);
   if (!module) { diagnostic.print(argv[0], errs()); return 1; }
-  s.triple = module->getTargetTriple(); std::string error;
+  s.triple = module->getTargetTriple().str(); std::string error;
   if (s.triple != "x86_64-pc-linux-gnu" && s.triple != "x86_64-pc-windows-msvc" &&
       s.triple != "arm64-apple-macosx14.0.0") return 1;
-  const auto *target = TargetRegistry::lookupTarget(s.triple, error); if (!target) { errs() << error; return 1; }
-  std::unique_ptr<TargetMachine> machine(target->createTargetMachine(s.triple, "generic", "", TargetOptions(), Reloc::PIC_, std::nullopt, CodeGenOptLevel::Default));
+  const auto *target = TargetRegistry::lookupTarget(Triple(s.triple), error); if (!target) { errs() << error; return 1; }
+  std::unique_ptr<TargetMachine> machine(target->createTargetMachine(Triple(s.triple), "generic", "", TargetOptions(), Reloc::PIC_, std::nullopt, CodeGenOptLevel::Default));
   if (!machine || module->getDataLayout() != machine->createDataLayout() || verifyModule(*module, &errs())) return 1;
   for (auto &f : *module) if (!f.isDeclaration()) {
     auto &p = s.plans[f.getName().str()];
@@ -419,12 +421,16 @@ int main(int argc, char **argv) {
   std::error_code irError; raw_fd_ostream optimized(optimizedPath, irError); if (irError) return 1;
   module->print(optimized, nullptr); optimized.close();
   SmallVector<char, 0> buffer; raw_svector_ostream output(buffer);
-  auto *tm = static_cast<LLVMTargetMachine *>(machine.get());
+  auto *tm = machine.get();
   legacy::PassManager pm; auto *mmi = new MachineModuleInfoWrapperPass(tm); auto *config = tm->createPassConfig(pm);
   config->setDisableVerify(false);
   config->insertPass(&FinalizeISelID, new Early(s));
   config->insertPass(&PrologEpilogCodeInserterID, new Audit(s, 0));
   pm.add(config); pm.add(mmi);
+  const auto &options = tm->Options;
+  pm.add(new TargetLibraryInfoWrapperPass(TargetLibraryInfoImpl(tm->getTargetTriple(), options.VecLib)));
+  pm.add(new RuntimeLibraryInfoWrapper(tm->getTargetTriple(), options.ExceptionModel,
+      options.FloatABIType, options.EABIVersion, options.MCOptions.ABIName, options.VecLib));
   if (config->addISelPasses()) return 1;
   config->addMachinePasses(); config->setInitialized();
   pm.add(new Audit(s, 1));

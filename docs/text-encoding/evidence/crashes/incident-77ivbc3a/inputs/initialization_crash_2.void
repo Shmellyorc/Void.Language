@@ -1,0 +1,22 @@
+struct child:
+    value: i32
+
+struct base_user:
+    owner: child
+    health: i32
+
+func (u base_user) init(c: child, health: i32 = 100):
+    u.owner = c
+    u.health = health
+
+struct player extends base_user:
+    armor: i32
+
+func (p player) init(c: child, armor: i32):
+    super.init(c, health = 80)
+    p.armor = armor
+
+func entry(value: i32) -> i32:
+    var p = player(child(value = value), armor = 2)
+    var b: base_user = p
+    return b.owner.value + b.health + p.armor

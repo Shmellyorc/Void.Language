@@ -1,0 +1,16 @@
+func make(start: i32) -> {string: func(i32) -> i32}:
+    var total = start
+    return {
+        "add": func(number: i32) -> i32:
+            total += number
+            return total
+    }
+func entry(value: i32) -> i32:
+    var handlers = make(value)
+    var alias = handlers["add"]
+    var results: {string: i32} = {
+        "sum": match value:
+            7: 3
+            _: 0
+    }
+    return handlers["add"](1) + alias(2) + results["sum"]

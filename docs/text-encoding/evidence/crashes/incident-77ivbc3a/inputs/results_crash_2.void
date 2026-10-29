@@ -1,0 +1,21 @@
+enum option:
+    empty
+    some(value: i32)
+func divide(x: i32) -> result<i32, string>:
+    if x == 0:
+        return Err("zero")
+    return Ok(100 / x)
+func twice(x: i32) -> result<i32, string>:
+    var value = divide(x)?
+    return Ok(value * 2)
+func entry(x: i32) -> i32:
+    var value = twice(x)
+    match value:
+        Ok(var n):
+            var item = option.some(n)
+            if item is option.some(var answer):
+                return answer
+        Err(var reason):
+            if reason == "zero":
+                return -1
+    return -2

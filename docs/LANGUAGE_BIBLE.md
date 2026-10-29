@@ -1,5 +1,15 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+## Active backend migration — 28 October 2026
+
+Boss authorizes LLVM/Clang/LLD **23.1.4**, retaining C++20, the single typed IR
+and shared verified O2/JIT/AOT lowering. [Migration record](llvm23/IMPLEMENTATION.md)
+and [acceptance](llvm23/ACCEPTANCE.md) record completed local validation and
+pending independent/native/hosted acceptance. Earlier LLVM 19 milestone
+descriptions remain historical. No source
+language, ownership, GC, reload or numeric semantic change is authorized.
+
+
 The [Boss-approved generic operator amendment, 28 October 2026](collections/GENERIC_OPERATORS.md)
 permits public operators on exact substituted public nominal owners in concrete
 generic bodies. Ordinary imports, private/internal visibility, readonly authority
@@ -3128,7 +3138,7 @@ This section matters especially when an AI assistant inherits this file without 
 
     **Still OPEN:** Exact declaration grammar; operand and return-type restrictions; resolution and ambiguity rules; whether `!=` derives automatically from `==`; equality/hash consistency for dictionary keys; and which operators apply to which struct families and generic types. These choices are not finalized by this approval.
 29. **Error diagnostics codes:** [RESOLVED CORE: diagnostic IDs allocated; future features add new IDs] Illustrative IDs in earlier examples are not guarantees. `DIAGNOSTICS.md` already assigns stable current IDs including VOID1001–VOID4001 and VOID9001; additional language features require new codes without repurposing assigned IDs.
-30. **Compiler implementation language and LLVM integration:** [RESOLVED AND IMPLEMENTED: C++20 and LLVM 19.1.7] Resolved: VOID 2.0 uses C++20 with LLVM/Clang/LLD 19.1.7 and a shared LLVM lowering path for ORC JIT and native AOT. The former C versus C++ API tradeoff remains a historical architecture note, not an open implementation-language choice.
+30. **Compiler implementation language and LLVM integration:** [RESOLVED: C++20; LLVM 23.1.4 MIGRATION AUTHORIZED] VOID 2.0 uses C++20; Boss authorizes LLVM/Clang/LLD 23.1.4 and a shared LLVM lowering path for ORC JIT and native AOT. The former C versus C++ API tradeoff remains a historical architecture note, not an open implementation-language choice.
 31. **`using` remaining design scope:** [IMPLEMENTED CORE: Phase 19 one-hop using; transitive promotion open] Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion remains deferred; Phase 21 integrates structural interfaces without transitive promotion; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
 32. **`has` operator:** [OWNER-APPROVED; see Sprint 6 acceptance] `has Component` checks nominal `using` composition, including inherited `using` storage; `has Interface` checks structural interface conformance through existing compiler rules. `has` uses compile-time type information, not runtime reflection. `is` retains pattern matching and `as` retains conversion. `has` grants no implicit conversions, access permissions or readonly bypasses. Sprint 6 approves type operands and specialization-time checking of both branches, without refinement. See STAGE8_ERGONOMICS.md for the exact grammar, boundaries and actual acceptance. See Section 12.1; existing agreed language decisions remain binding.
 33. **Method-only reuse without embedded state:** [FUTURE DESIGN: stateless/method-only reuse] Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.

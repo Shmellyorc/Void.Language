@@ -1,0 +1,65 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_arrays_storage_audit",
+      "--emit-proof",
+      "/home/shmellyorc/Documents/Void.Language/examples/managed_structs/main.void",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/cert-main-normal.o",
+      "normal"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "errors": {},
+    "owner_preserved_on_rejection": null
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_arrays_storage_audit",
+      "--emit-proof",
+      "/home/shmellyorc/Documents/Void.Language/examples/managed_structs/main.void",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/cert-main-O2.o",
+      "O2"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "AOT machine storage/emission certification failed: __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; \n",
+    "errors": {
+      "__vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void": [
+        "unmatched allocation (including clone/merge) receives no subtraction credit",
+        "unmatched allocation (including clone/merge) receives no subtraction credit",
+        "unmatched allocation (including clone/merge) receives no subtraction credit",
+        "unmatched allocation (including clone/merge) receives no subtraction credit"
+      ]
+    },
+    "owner_preserved_on_rejection": true
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_arrays_storage_audit",
+      "--emit-proof",
+      "/home/shmellyorc/Documents/Void.Language/examples/managed_structs/handoffs.void",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/cert-handoffs-normal.o",
+      "normal"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "errors": {},
+    "owner_preserved_on_rejection": null
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_arrays_storage_audit",
+      "--emit-proof",
+      "/home/shmellyorc/Documents/Void.Language/examples/managed_structs/handoffs.void",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-probes/cert-handoffs-O2.o",
+      "O2"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "errors": {},
+    "owner_preserved_on_rejection": null
+  }
+]

@@ -1,0 +1,39 @@
+struct ledger:
+    number: i32 = 0
+
+async func tick() -> i32:
+    return 1
+
+async func child(owner: ledger):
+    defer {
+        owner.number += 1
+    }
+    var ignored = await tick()
+    owner.number += 100
+
+async func fallible(owner: ledger) -> result<i32, i32>:
+    with tasks.group() as jobs:
+        var pending = child(owner)
+        var ignored = await tick()
+        var rejected: result<i32, i32> = Err(9)
+        var answer = rejected?
+        return Ok(answer)
+
+async func entry(value: i32) -> i32:
+    var owner = ledger()
+    for index in 0..<3:
+        with tasks.group() as jobs:
+            var pending = child(owner)
+            var ignored = await tick()
+            continue
+    for index in 0..<3:
+        with tasks.group() as jobs:
+            var pending = child(owner)
+            var ignored = await tick()
+            break
+    var result = await fallible(owner)
+    match result:
+        Ok(var answer):
+            return 0
+        Err(var error):
+            return owner.number + error

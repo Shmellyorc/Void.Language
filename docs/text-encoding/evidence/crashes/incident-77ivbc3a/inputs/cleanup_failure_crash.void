@@ -1,0 +1,17 @@
+struct tracker:
+    total: i32
+
+func step(t: tracker, n: i32, divisor: i32):
+    t.total = t.total * 10 + n
+    var checked = 10 / divisor
+
+func work(t: tracker, divisor: i32):
+    defer step(t, 1, 1)
+    defer step(t, 2, divisor)
+    defer step(t, 3, 1)
+    var checked = 30 / divisor
+
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    work(t, value)
+    return t.total

@@ -1,0 +1,22 @@
+value struct multiplier:
+    amount: i32
+func (m multiplier) call(value: i32) -> i32:
+    return m.amount * value
+struct counter:
+    value: i32
+func (c counter) call(value: i32) -> i32:
+    c.value += value
+    return c.value
+func make() -> multiplier:
+    return multiplier(amount = 3)
+func apply<t>(action: t, value: i32) -> i32:
+    return action(value)
+func entry(value: i32) -> i32:
+    var m = multiplier(amount = 2)
+    var c = counter()
+    var alias = c
+    if apply(m, 3) != 6:
+        return -100
+    var first = m(value)
+    var second = alias(2)
+    return first + second + make()(1) + c(1)

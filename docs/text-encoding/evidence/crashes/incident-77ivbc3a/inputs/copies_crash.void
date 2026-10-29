@@ -1,0 +1,26 @@
+const template: [i32, 3] = [1, 2, 3]
+
+func change(values: [i32, 3], value: i32) -> [i32, 3]:
+    values[0] = value
+    return values
+
+func select(a: [i32, 3], b: [i32, 3], pick: bool) -> [i32, 3]:
+    if pick:
+        return a
+    return b
+
+func eighth(a: [i32, 3], b: [i32, 3], c: [i32, 3], d: [i32, 3], e: [i32, 3], f: [i32, 3], g: [i32, 3], h: [i32, 3]) -> [i32, 3]:
+    h[1] += 7
+    return h
+
+func entry(value: i32) -> i32:
+    var original = template
+    var copy = original
+    copy[0] = value
+    var changed = change(copy, 20)
+    var chosen = select(original, changed, value < 0)
+    var result = eighth(original, copy, changed, original, copy, changed, chosen, original)
+    if original[0] != 1 or original[1] != 2 or copy[0] != value or changed[0] != 20:
+        return -1000
+    result[0] += chosen[0]
+    return result[0] + result[1]

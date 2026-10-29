@@ -1,0 +1,47 @@
+struct box:
+    number: i32 = 0
+
+value struct packet:
+    items: [i32, 2]
+    owner: box
+
+async func identity<t>(value: t) -> t:
+    return value
+
+func forward<t>(value: t) -> t:
+    return value
+
+func next(owner: box) -> i32:
+    owner.number += 1
+    return owner.number
+
+async func pair(first: i32, second: i32) -> i32:
+    return first * 10 + second
+
+async func result_copy(value: packet) -> result<packet, string>:
+    var task = identity<packet>(value)
+    return Ok(await task)
+
+async func entry(value: i32) -> i32:
+    var owner = box(number = 0)
+    var order = pair(next(owner), next(owner))
+    var original = packet(owner = owner)
+    original.items[0] = value
+    var job = result_copy(original)
+    original.items[0] = 100
+    var forwarded = forward(job)
+    var answer = await forwarded
+    var copied = match answer:
+        Ok(var item): item
+        Err(_): original
+    copied.items[0] += 1
+    copied.owner.number += 10
+    var again = await job
+    var prior = match again:
+        Ok(var item): item.items[0]
+        Err(_): -1000
+    var ordered = await order
+    var nullable: box? = await identity<box?>(owner)
+    if nullable == null:
+        return -1000
+    return copied.items[0] + prior + owner.number + ordered

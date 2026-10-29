@@ -11,6 +11,7 @@ with tempfile.TemporaryDirectory(prefix='VOID editor installation é😀 ') as d
     (root/'app/systems/player.void').write_text(api)
     (root/'standard/io/files.void').write_text(api)
     (root/'standard/console.void').write_bytes((repo/'stdlib/console.void').read_bytes())
+    (root/'standard/error.void').write_bytes((repo/'stdlib/error.void').read_bytes())
     env['VOID_STDLIB_ROOT']=str(root/'standard')
     env['VOID_STAGE8_EXPLICIT_ENTRY']='1' if a.explicit_entry else ''
     for name in ['nvim','vim']:

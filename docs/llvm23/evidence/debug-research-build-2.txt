@@ -1,0 +1,10 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 20%] Built target void_core
+[ 60%] Built target void_runtime
+[ 60%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/storage_audit.cpp.o
+[ 80%] Linking CXX static library libvoid_llvm.a
+[ 80%] Built target void_llvm
+[100%] Linking CXX executable void_arrays_storage_audit
+[100%] Built target void_arrays_storage_audit

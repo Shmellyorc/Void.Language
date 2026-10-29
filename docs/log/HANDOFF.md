@@ -1,5 +1,202 @@
 # VOID logging — mandatory performance repair handoff
 
+## Native C supervisor: 12 plus 50 complete — STOP for review
+
+See [C_SUPERVISOR_CAPTURE.md](C_SUPERVISOR_CAPTURE.md). The completed private
+C-supervisor campaign retained all twelve native statuses: **12 original VOIDC
+launches, all exit 0, no new VOIDC SIGSEGV or core**. Seven controlled fixtures
+verified normal/signal/launch-failure/timeout handling and retention of a native
+status despite a subsequent report-writing failure. Their deliberate crash cores
+are fixture evidence only.
+
+Boss subsequently ran the separate 50-attempt campaign from the delivered ZIP,
+after recovery established zero prior launches. It ran **15:10:41–15:26:52 PDT on
+28 October 2026: all 50 native exits 0**, independently checked against durable raw
+wait records. No SIGSEGV, new VOIDC core, timeout, launch failure, evidence error
+or unknown status occurred. All 50 actual soft/hard 1 MiB stacks, filter `0x37`,
+argv/environment and private mappings were verified; 2,400 PERF observations are
+preserved without performance acceptance. Supervisor, collector and journal read
+exited 0; the journal returned no entries. The full saved log and raw record
+confirm attempt 50 completed although the user's paste stopped at its START line.
+
+**The 50-launch budget is exhausted. Do not rerun the ZIP, delete its claim or
+start another campaign.** No target remained active at review. The earlier 12
+attempts and pre-launch ZIP remain unchanged and separately identifiable. Detailed
+completion evidence is `c-supervisor-capture-50/post-user-run/verification.json`.
+
+Original binary, all 61 inputs, prior cores and all earlier results remain intact.
+There is no new resident-text or causal evidence from VOIDC. **Classification D:
+unresolved. Performance OPEN; release HOLD.** No compiler/Runtime/LLVM repair or
+logging implementation. The user-run outcomes have been inspected offline; no
+new original core exists to analyze. **STOP for independent Golden Wrench review.**
+
+Private handoff:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/c-supervisor-capture-50/EVIDENCE_INDEX.md`.
+
+## Bounded DSE input investigation — cause remains unresolved
+
+See [DSE_INPUT_REVIEW.md](DSE_INPUT_REVIEW.md). One private diagnostic executable
+captured the complete logging pre-O2 module, optimizer configuration and pass
+events. One source capture and one serialized replay each completed 458 DSE
+invocations; one replay of the preserved Stage 11 module completed 35. All passed
+pre/post LLVM verification. No unchanged-original launch or new core occurred.
+
+The same-`finish` replays preserve VOIDC's null-target-machine optimizer recipe.
+Pinned `opt default<O2>` is not equivalent: its inspected pipeline adds SLP
+vectorization and uses a target machine. Ordinary `opt` optimization controls were
+therefore left unused. Diagnostic preparation and comparison-tool errors are
+preserved and reconciled separately from native crashes.
+
+No invalid input or crash-linked broken invariant was established. Original
+executable, all 61 inputs, core and historical evidence remain intact. Shared
+production correctness cannot be excluded from impact. **Disposition D; STOP for
+Golden Wrench review. Performance OPEN; release HOLD.** No production/test repair,
+optimizer workaround or logging implementation.
+
+Private handoff:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/dse-input-investigation/EVIDENCE_INDEX.md`.
+
+## Resident-text follow-up exhausted — no new core
+
+See [RESIDENT_TEXT_CAPTURE.md](RESIDENT_TEXT_CAPTURE.md). The separately authorized
+12-launch budget ended with eleven exit-0 observations and one launcher metadata
+failure after the original process started; that native exit is unknown and is
+not a pass. No new core was captured. Each complete run verified `r-xp` executable
+mapping, process-local filter `0x37`, and actual soft/hard 1,048,576-byte stack.
+Original executable/source identities and prior evidence remain intact.
+
+There are no new resident bytes, fault registers or failing backtrace to compare.
+The earlier LLVM DSE general-protection capture remains the fault evidence, with
+cause pending. **Disposition D; STOP for Golden Wrench review. Performance OPEN;
+release HOLD.** No target runs beyond the bound, production/test repair or logging
+implementation. The report records the launcher defect and the preserved
+diagnostic-tool outcomes explicitly.
+
+Private handoff:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/resident-text-capture/EVIDENCE_INDEX.md`.
+
+## Native core captured; cause pending — STOP for Golden Wrench review
+
+Current baseline: `db808efe0fa191ed25733513cc9ebcebbadc3bc2`.
+See [CRASH_CLASSIFICATION.md](CRASH_CLASSIFICATION.md) for the complete bounded
+investigation. **Disposition D: unresolved. Performance OPEN; release HOLD.**
+
+The unchanged original executable and all 61 original inputs were verified.
+Attempts 1–9 passed; attempt 10 reproduced SIGSEGV and yielded an unmodified-process
+Linux core. Further launches stopped immediately. New incident: `incident-w415alhc`.
+Original incidents `incident-vs4b96zy` and `incident-tg6xt8tp` remain preserved.
+Actual soft/hard execution stack: 1,048,576 bytes. Only process-local core
+configuration and evidence-directory privacy permissions changed.
+
+The core and kernel journal identify a general-protection fault in LLVM 19.1.7
+`eliminateDeadStores`, through VOIDC's O2 compilation pipeline, before generated
+benchmark execution. RIP `0x5565df5f470e`; RSP `0x7ffd8c5ec580`. The stack state
+does not support stack exhaustion. On-disk disassembly shows `shr $0x4,%eax` at
+the PC, but the core omits resident executable-text pages. No invalid compiler
+operation or broken Runtime invariant is proven. Shared production correctness
+remains potentially affected; this is component localization, not a repair.
+
+Private evidence:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/native-core-classification`.
+Core SHA-256: `2c313fd4d8fba185efdceb35f519a5f6d8bc3d80e47e37b3ed367569405aad24`.
+`EVIDENCE_INDEX.md` and `review/void-log-native-core-review.tar.gz` provide the
+compact handoff without raw cores or binaries. Complete original environmental
+identity cannot be claimed because the original full environment was not retained.
+
+No production/test changes, no secondary instrumentation and no additional
+original-command runs after capture. `text.translate_scalars` implementation
+remains blocked. The next review concerns cause-specific evidence collection,
+including the resident-code gap; no optimizer/Runtime workaround is justified.
+
+## Previous investigation: architecture approved; crash reproduced
+
+Boss approved `text.translate_scalars` with mandatory refinements. That approval
+remains valid. Its section 1 also requires stopping if the experimental SIGSEGV
+cannot be isolated sufficiently to exclude a relevant production defect.
+
+The original executable and all 61 captured source files were hash-verified.
+The crash **reproduced on the third original-command O2 run**, exit -11, with
+empty stdout/stderr. The new original-binary incident is `incident-tg6xt8tp`;
+`incident-vs4b96zy` remains unchanged. Two phase-instrumented O2 runs, one normal
+run, five original-binary signal-preload runs, strict ASan/UBSan/leak normal/O2,
+and three preload runs without unwinder prewarm all passed. Across all 16
+invocations: **15 passes, one signal**. None of the diagnostic variants captured
+a failing stack. Passing controls do not resolve the original defect.
+
+The fault remains unclassified among harness, generated prototype code and
+compiler/Runtime; a relevant production correctness defect cannot be excluded.
+**Implementation stops under the explicit section 1 condition.** No production
+or repository test source changed; the suspect flat builder was only diagnostic
+input. The approved text operation and logger integration have not started.
+No new full correctness matrix or performance acceptance is claimed. Performance
+gate **OPEN**, release **HOLD**.
+
+Detailed escalation and raw evidence:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/approved-crash-classification/ESCALATION.md`.
+That directory also contains bounded plans, exact commands/hashes, all receipts,
+a separate raw index and `review/void-log-approved-crash-review.tar.gz`.
+No ptrace or Git mutations were used. Historical evidence and the previous
+263/263 result remain unchanged. The next decision concerns a bounded causal
+crash investigation, not another approval of the text architecture.
+
+## Prior decision: stop before a new shared Runtime contract
+
+Continuation baseline: `db808efe0fa191ed25733513cc9ebcebbadc3bc2`.
+**Architecture review required; performance gate OPEN; release HOLD.**
+Neither remaining hot path is repaired to acceptance. No production or repository
+test source changed. The explicit stop instruction is in Boss's current directive,
+section 3; it is not an inferred permission requirement.
+
+Review [HOTPATH_REVIEW.md](HOTPATH_REVIEW.md) for the measured alternatives, exact
+root causes, explicit targets and proposed ownership/GC/aliasing/failure contract.
+The requested decision is whether to approve or revise a generic bounded Unicode
+scalar substitution operation in `text`, with logging escape policy retained in
+source. The proposed shared operation has not been implemented.
+
+Ordinary file200 reproduced at 17.323 ms against 2.981 ms prepared direct I/O.
+Schema views improve small quote time 8.875 → 7.425 ms but leave full console
+13.477 ms. Flat construction plus read/write key views improves expanded heavy
+frame 926.213 → 343.877 ms, while occasional-escape 1-KiB framing regresses
+138.957 → 181.101 ms. These experiments do not meet acceptance. The expanded
+matrix covers ASCII, occasional escapes, heavy controls, ordinary Unicode and
+mixed escaped Unicode at 64 B, 1 KiB and near-budget sizes. Fair prepared-I/O,
+complete source encoding/framing/I/O and native algorithm controls are distinct.
+
+New raw evidence lives at
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/`.
+Its `EVIDENCE_INDEX.md` indexes every dataset, hashes, receipts and the compact
+`review/void-log-hotpath-review.tar.gz` package. No new raw evidence/binaries are
+staged or added under repository evidence. The previous 263/263 source/test evidence,
+all original incidents and root README remain unchanged. No staging, commits,
+branches, pushes, hosted CI or ptrace were performed.
+
+### Newly encountered failures and limitations
+
+| Observation | Preserved evidence | Actual disposition |
+|---|---|---|
+| Combined keys + flat source, JIT O2, exit -11, no measurement stdout/stderr | `crashes/incident-vs4b96zy`, `receipts/run-xr2lodp9`; executable SHA `c284712dd4958faf41547deb49a851306256a9075cf59d968671272bc17e96bb` | Unresolved. Phase/LLVM-signal diagnostic completed; no causal stack captured. Empty stdout does not localize compilation versus setup/first sample. No assertion that prior LLVM incidents explain it. |
+| Diagnostic host compile exit 1: incomplete `llvm::StringRef` | `crashes/incident-asxnan14`, `receipts/run-0e_vtqsw` | Test-host header omission corrected by including `llvm/ADT/StringRef.h`; all five subsequent host builds passed. Original source and stderr retained. |
+| Launcher used unavailable `python` | `drivers/void-hotpath-diagnostic-build.log` | No Python/build process started. Used installed `python3`; no product change. |
+| Async confirmation extractor expected `PERF` rather than `ASYNC` | `baseline/async-confirm.stdout`, original empty `async-confirm.json`, corrected `async-confirm-parsed.json` | Parsing corrected from preserved stdout; 64 samples recovered, no rerun. An exploratory median over the empty derived list also failed before correction. |
+| Original async1000 higher than historical median | `baseline/original-repeat.json`, separate `original-confirm.json` | 158.233 then 141.688 ms on the same frozen executable; isolated-matrix async1000 132.280 then 120.285 ms. Specific environmental/cost cause unresolved. No changed scheduler code and no post-change regression-fix claim. |
+
+Instrumented counts and uninstrumented latency are separate. Three-sample medians
+are host observations, with an active desktop; compiler time is separate. No new
+Debug/Release/strict complete matrix is claimed. Full normal/O2 JIT/AOT, hard-stack,
+GC/OOM, array/reference/lease, logger byte/budget/UTC, sink/rotation/partial-write,
+async lifecycle, cache/reload/tooling/installed checks remain required after an
+approved implementation. Native Windows/macOS remains pending.
+
+### Full modified source/test inventory
+
+Production source: **none**. Repository tests: **none**. Documentation:
+`docs/log/HOTPATH_REVIEW.md` (new), `PERFORMANCE_REPAIR.md`, `BENCHMARKS.md`,
+`IMPLEMENTATION.md`, `HANDOFF.md`. External experiment source patches, host/oracle
+sources, generation/build/run drivers and SHA-256 inventories are included in the
+compact review package. They are candidates for review, not production changes.
+
+## Previous sprint handoff (preserved report)
+
 **Ready for independent Golden Wrench review. Release remains on hold.** Both
 performance investigations and the demonstrated main repairs are complete.
 Fresh local correctness validation passed **263/263 selected CTests**. The

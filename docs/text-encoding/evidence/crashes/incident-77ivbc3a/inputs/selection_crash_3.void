@@ -1,0 +1,20 @@
+interface sampleable:
+    func sample(amount: i32) -> i32
+struct child:
+    n: i32
+func (c child) sample(amount: i32) -> i32:
+    c.n += amount
+    return c.n
+struct owner:
+    using child
+func (o owner) replace() -> i32:
+    o.child = child(n = 90)
+    var garbage = child(n = 91)
+    return 1
+func create() -> owner:
+    return owner(child = child(n = 10))
+func entry(value: i32) -> i32:
+    var o = create()
+    var view: sampleable = o
+    var result = view.sample(o.replace())
+    return result * 100 + o.child.n + value

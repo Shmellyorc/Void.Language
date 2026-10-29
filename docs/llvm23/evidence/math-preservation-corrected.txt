@@ -1,0 +1,4 @@
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation 4k2tawbi/synthetic-evidence/incident-4wz1btzo
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation 4k2tawbi/synthetic-evidence/incident-kz7ebnpi
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation 4k2tawbi/synthetic-evidence/incident-i93c6d1h
+Math preservation: 3 synthetic reserved-87/timeout incidents, edited nested sources, compiler identity and original output verified and disposed

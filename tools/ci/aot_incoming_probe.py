@@ -27,8 +27,8 @@ def main():
     records = [json.loads(x) for x in (a.corpus/'records.jsonl').read_text().splitlines()]
     version = subprocess.run([str(a.llvm_bin/'llvm-objdump'),'--version'],check=True,
                              capture_output=True,text=True).stdout
-    if not re.search(r'version 19\.1\.7(?:\D|$)',version):
-        raise RuntimeError('LLVM 19.1.7 required')
+    if not re.search(r'version 23\.1\.4(?:\D|$)',version):
+        raise RuntimeError('LLVM 23.1.4 required')
     results = []
     for stem, marker in (('main','63686f6f7365'),('numeric','65786368616e6765')):
         record = next(r for r in records if r['kind']=='integration' and r['mode']=='normal'
@@ -39,7 +39,7 @@ def main():
             raise RuntimeError('candidate/control identity collision')
         cert = json.loads(Path(record['certificate']).read_text())
         profile = json.loads(cert['profile'])
-        if profile['llvm']!='19.1.7' or profile['ir_pipeline']!='verify-only':
+        if profile['llvm']!='23.1.4' or profile['ir_pipeline']!='verify-only':
             raise RuntimeError('unexpected witness profile')
         control_hash = hashlib.sha256(executable.read_bytes()).hexdigest()
         caller = next(f for f in cert['functions'] if '3a3a656e747279' in f)

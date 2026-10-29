@@ -1,0 +1,2 @@
+Real Vim terminal: automatic menus and acceptance passed for all five prefixes
+Real Vim terminal: visible automatic signature transitions passed

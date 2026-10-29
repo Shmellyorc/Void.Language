@@ -117,7 +117,7 @@ Resources resources(const char* argv0) {
     const auto config=executable.parent_path()/"void-native.txt";
     std::ifstream file(config);std::vector<std::string> lines;std::string line;
     while(std::getline(file,line)){if(!line.empty() && line.back()=='\r')line.pop_back();lines.push_back(line);}
-    if(!file.eof() || lines.size()<5 || lines[0]!="VOID native 19.1.7 v1")
+    if(!file.eof() || lines.size()<5 || lines[0]!="VOID native 23.1.4 v1")
         throw std::runtime_error("Native toolchain resources missing or invalid: "+path_utf8(config));
     auto path=[&](const std::string& text){auto p=utf8_path(text);return p.is_absolute()?p:(config.parent_path()/p).lexically_normal();};
     Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{}};
@@ -147,7 +147,7 @@ void version(const fs::path& tool,const char* expected,const fs::path& capture) 
     std::ifstream file(capture);std::string text((std::istreambuf_iterator<char>(file)),{});
     const auto position=text.find(expected);
     if(position==std::string::npos || (position+std::char_traits<char>::length(expected)<text.size() && std::isdigit(static_cast<unsigned char>(text[position+std::char_traits<char>::length(expected)]))))
-        throw std::runtime_error("Native toolchain requires matching LLVM/Clang/LLD 19.1.7: "+path_utf8(tool));
+        throw std::runtime_error("Native toolchain requires matching LLVM/Clang/LLD 23.1.4: "+path_utf8(tool));
 }
 }
 void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize) {
@@ -171,14 +171,14 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     const auto& work=stage.directory;
     const auto executable=work/"program";
 #endif
-    version(config.driver,"clang version 19.1.7",work/"version.txt");
-    if(!config.linker.empty())version(config.linker,"LLD 19.1.7",work/"version.txt");
+    version(config.driver,"clang version 23.1.4",work/"version.txt");
+    if(!config.linker.empty())version(config.linker,"LLD 23.1.4",work/"version.txt");
     const auto object=work/"program.o";
     emit_object(analysis.lower(ir::Emission::entry),object,optimize,true);
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
     args.insert(args.end(),config.flags.begin(),config.flags.end());
-    // LLD 19 interprets '%' in absolute output paths. The driver's child working
+    // LLD interprets '%' in absolute output paths. The driver's child working
     // directory gives the linker a relative name. Windows uses a short private
     // workspace because Clang cannot chdir to a genuine long project path.
 #ifdef _WIN32

@@ -1,0 +1,7 @@
+use channel
+func main():
+    var bus = channel.router<i32>()
+    bus.subscribe("t", func(const amount: i32):
+        print(amount)
+    )
+    bus.emit("t", 7)

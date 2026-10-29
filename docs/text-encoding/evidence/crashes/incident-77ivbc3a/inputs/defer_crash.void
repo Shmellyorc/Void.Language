@@ -1,0 +1,20 @@
+struct log:
+    values: [i32]
+
+func add(l: log, n: i32):
+    l.values.push(n)
+
+func perform(l: log, value: i32) -> i32:
+    var n = value
+    defer add(l, n)
+    defer {
+        add(l, n)
+        n += 1
+    }
+    n = 20
+    return n
+
+func entry(value: i32) -> i32:
+    var l = log(values=[])
+    var result = perform(l, value)
+    return result + l.values[0] * 10 + l.values[1]

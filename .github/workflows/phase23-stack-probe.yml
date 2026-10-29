@@ -30,12 +30,12 @@ jobs:
       - name: Cache pinned LLVM SDK
         uses: actions/cache@v5
         with:
-          path: .toolchains/llvm-19.1.7
-          key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
-      - name: Install and verify LLVM 19.1.7
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install and verify LLVM 23.1.4
         run: python tools/ci/llvm_sdk.py
       - name: Execute native guarded stack probes
-        run: python tools/ci/stack_probe/run.py --llvm-bin .toolchains/llvm-19.1.7/bin --output build/phase23-stack-probe
+        run: python tools/ci/stack_probe/run.py --llvm-bin .toolchains/llvm-23.1.4/bin --output build/phase23-stack-probe
       - name: Publish concise job summary
         if: always()
         shell: python

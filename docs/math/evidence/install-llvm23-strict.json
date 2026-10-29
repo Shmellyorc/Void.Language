@@ -1,0 +1,11 @@
+{
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+  "processes": 7,
+  "modes": [
+    "JIT O0",
+    "JIT O2",
+    "AOT O0",
+    "AOT O2"
+  ],
+  "relocated": true
+}

@@ -1,0 +1,20 @@
+const origin_x: i32 = 4
+
+value struct point:
+    x: i32 = origin_x
+    y: i32
+
+value struct shape:
+    position: point = point(y = 2)
+    enabled: bool = true
+    weight: f64 = 1.5d
+
+func moved(original: shape, amount: i32) -> shape:
+    original.position.x += amount
+    original.position.y++
+    return original
+
+func choose(left: shape, right: shape, use_left: bool) -> shape:
+    if use_left:
+        return left
+    return right

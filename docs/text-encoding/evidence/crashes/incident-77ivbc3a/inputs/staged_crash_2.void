@@ -1,0 +1,28 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node?
+    count: i32
+
+value struct outer:
+    nested: packet
+
+struct owner:
+    required: node
+    payload: outer
+
+func update(o: owner):
+    o.payload.nested.count++
+
+func (o owner) init(n: node):
+    o.required = n
+    o.payload = outer(nested = packet(owner = n, count = 3))
+    update(o)
+
+func entry(value: i32) -> i32:
+    var n = node(value = value)
+    var p = owner(n)
+    var copy = p.payload
+    copy.nested.count++
+    return (copy.nested.owner as node).value + p.payload.nested.count + copy.nested.count

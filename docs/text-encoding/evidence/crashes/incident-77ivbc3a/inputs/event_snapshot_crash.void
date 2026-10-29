@@ -1,0 +1,21 @@
+struct emitter:
+    event changed: func(i32)
+func (e emitter) fire(n: i32):
+    e.changed.emit(n)
+struct observer:
+    emitter: emitter
+    total: i32
+func (o observer) first(n: i32):
+    o.total = o.total * 10 + n
+    o.emitter.changed -= o.second
+    if n == 1:
+        o.emitter.fire(2)
+func (o observer) second(n: i32):
+    o.total = o.total * 10 + 9
+func entry(value: i32) -> i32:
+    var e = emitter()
+    var o = observer(emitter=e, total=0)
+    e.changed += o.first
+    e.changed += o.second
+    e.fire(1)
+    return o.total

@@ -1,0 +1,13 @@
+func identity<t>(value: t) -> t:
+    return value
+value struct payload<t>:
+    data: t
+func entry(value: i32) -> i32:
+    var a: [u8, 2097152]
+    a[0] = 7
+    var boxed = payload(data = identity(a))
+    var copy = identity(boxed)
+    copy.data[0] = 9
+    if a[0] != 7 or boxed.data[0] != 7 or copy.data[0] != 9:
+        return -100
+    return value + boxed.data[0] as i32

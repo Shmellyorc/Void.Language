@@ -172,6 +172,30 @@ def exercise(root):
     assert entry['current_sha256'] != entry['original_sha256']
     original.write_bytes(raw)
 
+    # Both process entry points must honor subprocess's env=None contract before
+    # launch snapshots, while preserving the distinction from an empty mapping.
+    key = 'VOID_CRASH_RECORD_ENV_TEST'
+    previous_value = os.environ.get(key)
+    os.environ[key] = 'inherited'
+    environment_script = 'import os; print(os.environ.get("' + key + '", "empty"))'
+    try:
+        for environment, expected_output in [(None, b'inherited\n'), ({}, b'empty\n')]:
+            result = run([sys.executable, '-c', environment_script, original], cwd=root,
+                         env=environment, capture_output=True, expected_returncode=0,
+                         expected_stdout=expected_output)
+            assert not result.expectation_failed
+            child = subprocess.Popen([sys.executable, '-c', environment_script, original],
+                                     cwd=root, env=environment, stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
+            output, errors = child.communicate(timeout=10)
+            assert child.returncode == 0 and output == expected_output and not errors
+    finally:
+        if previous_value is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = previous_value
+    assert len(list(kept.glob('*/receipt.json'))) == len(baseline) + 5
+
 
 install()
 legacy = ROOT / 'docs/text-encoding/evidence/synthetic-preservation'
@@ -196,4 +220,5 @@ print(json.dumps({'intentional_incidents_verified': 13, 'checked_crash_preserved
                   'ordinary_rejection_ignored': True, 'assertion_and_timeout_preserved': True,
                   'passing_retry_keeps_original': True, 'temporary_outputs_removed': True,
                   'launch_bytes_survive_source_changes': True,
+                  'none_and_empty_environments_verified': True,
                   'repository_artifacts_added': 0}))

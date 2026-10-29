@@ -1,0 +1,18 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 39: arrays_storage_audit
+1/1 Test #39: arrays_storage_audit .............***Failed    3.57 sec
+private fixed normal certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+private fixed O2 certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+AOT machine storage/emission certification failed: virtual___vd_2f7374726573732e766f69643a3a626173653a3a6d6574686f643a3a72656164__void: unmatched allocation (including clone/merge) receives no subtraction credit; virtual___vd_2f7374726573732e766f69643a3a626173653a3a6d6574686f643a3a72656164__void: unmatched allocation (including clone/merge) receives no subtraction credit; virtual___vd_2f7374726573732e766f69643a3a626173653a3a6d6574686f643a3a72656164__void: unmatched allocation (including clone/merge) receives no subtraction credit; virtual___vd_2f7374726573732e766f69643a3a626173653a3a6d6574686f643a3a72656164__void: unmatched allocation (including clone/merge) receives no subtraction credit; virtual___vd_2f7374726573732e766f69643a3a626173653a3a6d6574686f643a3a72656164__void: final encoded calls differ from machine certificate; 
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+research    =   3.57 sec*proc (1 test)
+
+Total Test time (real) =   3.58 sec
+
+The following tests FAILED:
+	 39 - arrays_storage_audit (Failed)                     research
+Errors while running CTest

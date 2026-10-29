@@ -1,0 +1,47 @@
+value struct counter:
+    count: i32 = 1
+
+func (c counter) init():
+    pass
+
+func (c counter) wait():
+    pass
+
+func (c counter) bump():
+    pass
+    c.count += 2
+    pass
+
+func update():
+    pass
+
+func entry(value: i32) -> i32:
+    pass # Intentional placeholder; execution continues.
+    update()
+    var c = counter()
+    c.wait()
+    c.bump()
+    if value < 0:
+        pass
+    else if value == 0:
+        if true:
+            pass
+        else:
+            pass
+    else:
+        pass
+    var i = 0
+    var total = 0
+    for i < 4:
+        pass
+        if i == 1:
+            pass
+            i++
+            continue
+        total += i
+        i++
+    for:
+        pass
+        break
+    pass
+    return value + total + c.count

@@ -22,6 +22,30 @@ int main(int argc,char**argv){try{
         require(!storage.write(false,object),"optional publication allocation escaped");
     }
     const auto identity=std::string(vd::compiler_build_identity());require(identity.empty() || identity.size()==64,"invalid embedded content ID");
+    {
+        auto equality=vd::analyze_source({"/equality.void",R"VOID(value struct counter:
+    amount: i32
+    operator ==(const left: counter, const right: counter) -> bool:
+        return left.amount == right.amount
+func unused() -> i32:
+    return 99
+func entry(n: i32) -> i32:
+    var item = counter(amount = n)
+    return item.amount
+)VOID"});
+        require(equality.succeeded(),"equality retention fixture analysis");
+        auto entry=equality.program->lower(vd::ir::Emission::entry);
+        vd::ir::validate(entry);
+        unsigned operators=0;
+        for(const auto& function:entry.functions){
+            operators+=function.operator_glyph=="==";
+            require(function.source_name!="unused","entry emission retained unrelated function");
+        }
+        require(operators==1,"entry emission lost custom equality declaration");
+        vd::Jit emitted({},vd::ir::Emission::entry);
+        for(bool optimized:{false,true})require(emitted.compile(*equality.program,optimized)->invoke(7)==7,
+                                               "custom equality metadata broke entry execution");
+    }
     auto path=root/"main.void";auto source=vd::read_source(std::filesystem::path(argv[2])/"examples/advanced/combined.void").text();write(path,source);
     auto a=analyze(path);vd::Jit jit({root,identity});auto old=jit.compile(*a,false);require(old->invoke(7)==47,"cold result");
     bool supported=jit.cache_status()!="unavailable";

@@ -1,0 +1,28 @@
+value struct movement:
+    x: i32
+
+func (m movement) move(amount: i32) -> i32:
+    m.x += amount
+    return m.x
+
+struct container:
+    using motion: movement
+
+struct root:
+    child: container
+
+func make(value: i32) -> root:
+    return root(child = container(motion = movement(x = value)))
+
+func replace(r: root) -> i32:
+    r.child = container(motion = movement(x = 90))
+    var i = 0
+    for i < 256:
+        var garbage = container()
+        i++
+    return 3
+
+func entry(value: i32) -> i32:
+    var r = make(value)
+    var selected = r.child.move(replace(r))
+    return selected + r.child.x

@@ -1,0 +1,6 @@
+{
+  "status": 0,
+  "stdout": "-- original=65; files=64\n-- directory matched: /home/shmellyorc/Documents/Void.Language/tests/numeric/programs/.void\n",
+  "stderr": "",
+  "repair": "LIST_DIRECTORIES false retains all .void regular source files; excludes automatic cache directory"
+}

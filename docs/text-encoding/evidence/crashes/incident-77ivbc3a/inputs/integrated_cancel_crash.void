@@ -1,0 +1,16 @@
+use "/wrappers.void" as library
+func work(value: i32) -> i32:
+    var result = 0
+    for:
+        result += 1
+        if result == 1000:
+            result = 0
+    return result
+async func entry(value: i32) -> i32:
+    with library.open() as owner:
+        owner.connect(value)
+        owner.retain("cancel-owned native bytes")
+        with tasks.group() as jobs:
+            var pending = spawn work(value)
+            pending.cancel()
+            return await pending

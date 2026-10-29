@@ -1,0 +1,21 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+    "emit",
+    "/home/shmellyorc/Documents/Void.Language/examples/channel/local.void",
+    "-o",
+    "/tmp/VOID-channel-execution-v_u_550p/app.o"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+  "status": 0,
+  "seconds": 0.16383680299622938,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "32f2fc6a6a780b908e1dc8bfd1a90d22ac39fd8cf77d1e3854ef87df4f10e8cf",
+  "object_hashes": {
+    "/tmp/VOID-channel-execution-v_u_550p/app.o": "0b637c87093633395e59e6ed13297975ea3cf3611d173169a3f68559f0d8b47d"
+  },
+  "output_hashes": {
+    "/tmp/VOID-channel-execution-v_u_550p/app.o": "0b637c87093633395e59e6ed13297975ea3cf3611d173169a3f68559f0d8b47d"
+  }
+}

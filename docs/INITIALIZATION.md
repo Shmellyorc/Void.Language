@@ -34,7 +34,7 @@ The owner approved C1 in INITIALIZATION_PROPOSAL.md, including recursive nested
 construction, required-child availability, visibility, conservative initialization
 reload dependencies and the specific obsolete Phase 13 test updates. This document
 describes implemented source behavior; final verification is recorded in WORK_LOG.md.
-Fallible constructors and resource lifetimes remain separate future work. LLVM remains pinned to 19.1.7 with the existing SDK-wide RTTI policy.
+Fallible constructors and resource lifetimes remain separate future work. LLVM is pinned to 23.1.4 under the [migration](llvm23/COMPATIBILITY.md), preserving the SDK-wide RTTI policy.
 
 ## Source interface
 

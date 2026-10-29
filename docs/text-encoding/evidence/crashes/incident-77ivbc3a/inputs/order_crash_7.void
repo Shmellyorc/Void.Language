@@ -1,0 +1,18 @@
+value struct counter:
+    value: i32
+
+func (c counter) next() -> i32:
+    c.value++
+    return c.value
+
+value struct pair:
+    code: i32 = 7
+
+func (p pair) init(first: i32, second: i32 = 9):
+    p.code = p.code * 1000 + first * 100 + second * 10
+
+func entry(value: i32) -> i32:
+    var c = counter(value = value)
+    const p = pair(second = c.next(), first = c.next())
+    const q = pair(c.next())
+    return p.code + q.code + c.value

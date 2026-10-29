@@ -53,10 +53,10 @@ def main():
         return proc.stdout
 
     for name in ('clang', 'clang++', 'llc', 'opt', 'lli', 'llvm-link', 'llvm-objdump'):
-        if not re.search(r'version 19\.1\.7(?:\D|$)', run([tools / name, '--version'], name + '-version')):
-            raise RuntimeError('LLVM 19.1.7 required: ' + name)
-    if run([tools / 'llvm-config', '--version'], 'sdk-version').strip() != '19.1.7':
-        raise RuntimeError('LLVM 19.1.7 SDK required')
+        if not re.search(r'version 23\.1\.4(?:\D|$)', run([tools / name, '--version'], name + '-version')):
+            raise RuntimeError('LLVM 23.1.4 required: ' + name)
+    if run([tools / 'llvm-config', '--version'], 'sdk-version').strip() != '23.1.4':
+        raise RuntimeError('LLVM 23.1.4 SDK required')
     flags = shlex.split(run([tools / 'llvm-config', '--cxxflags'], 'cxxflags'))
     libs = shlex.split(run([tools / 'llvm-config', '--ldflags', '--libs', 'all', '--system-libs'], 'linkflags'))
     emitter = output / 'machine-emit'

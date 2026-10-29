@@ -1,0 +1,73 @@
+struct counter:
+    value: i32
+func endpoint(c: counter, result: i64) -> i64:
+    c.value = c.value * 10 + result as i32
+    return result
+func entry(value: i32) -> i32:
+    var sum = 0
+    for n in 0..3:
+        sum += n
+    for n in reverse 3..<0:
+        sum = sum * 10 + n
+    if sum != 6123:
+        return -100
+    var equal = 0
+    for n in 4..4:
+        equal++
+    for n in reverse 4..4:
+        equal++
+    for n in 4..<4:
+        equal += 100
+    for n in reverse 4..<4:
+        equal += 100
+    if equal != 2:
+        return -200
+    var min: i64 = -9223372036854775808
+    var max: i64 = 9223372036854775807
+    var bounds: [i64, 4] = [0, 0, 0, 0]
+    for n in min..max:
+        bounds[0] = n
+        break
+    for n in reverse min..max:
+        bounds[1] = n
+        break
+    for n in reverse min..<max:
+        bounds[2] = n
+        break
+    for n in reverse max..<min:
+        bounds[3] = n
+        break
+    if bounds[0] != min or bounds[1] != max or bounds[2] != max - 1 or bounds[3] != min + 1:
+        return -300
+    var ends = 0
+    for n in max - 1..max:
+        ends++
+    for n in min + 1..min:
+        ends++
+    for n in reverse max - 1..<max:
+        ends++
+    for n in reverse min + 1..<min:
+        ends++
+    var low: i32 = -2147483648
+    var high: i32 = 2147483647
+    for n in high - 1..high:
+        ends++
+        n = low
+    for n in low + 1..low:
+        ends++
+    if ends != 10:
+        return -400
+    var calls = counter()
+    var order = 0
+    for n in reverse endpoint(calls, 1)..<endpoint(calls, 4):
+        order = order * 10 + n as i32
+    if calls.value != 14 or order != 321:
+        return -500
+    var list = [1, 2, 3]
+    var total = 0
+    for index in 0..<list.count:
+        total += list[index]
+        list.push(9)
+    if total != 6 or list.count != 6:
+        return -600
+    return value + ends + equal + total

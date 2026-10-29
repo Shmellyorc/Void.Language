@@ -1,0 +1,17 @@
+value struct tree:
+    number: i32
+    children: [tree]
+func entry(value: i32) -> i32:
+    var root = tree(number = value)
+    root.children.push(tree(number = 3))
+    root.children[0].children.push(root)
+    var defaults: [tree, 2]
+    defaults[0].children.push(tree(number = 10))
+    var independent = defaults
+    independent[0].number = 99
+    if defaults[1].children.count != 0 or defaults[0].number != 0 or independent[0].children[0].number != 10:
+        return -100
+    var sum = root.children[0].children[0].number
+    const frozen = root
+    var read = frozen.children[0].children[0]
+    return sum + read.number

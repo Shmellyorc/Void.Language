@@ -1,0 +1,17 @@
+value struct packet:
+    data: [u8, 1048576]
+    children: [string]
+func entry(value: i32) -> i32:
+    var arrays: [packet, 2]
+    arrays[0].data[0] = 7
+    arrays[0].children.push("live")
+    var copy = arrays
+    copy[0].data[0] = 9
+    if arrays[0].data[0] != 7 or arrays[1].data[0] != 0 or copy[0].data[0] != 9:
+        return -100
+    var total = 0
+    for item, index in reverse arrays:
+        total += item.data[0] as i32
+        if index == 0 and item.children[0] != "live":
+            return -200
+    return total + value

@@ -1,0 +1,49 @@
+value struct adder:
+    stored: i32
+property (a adder) amount: i32:
+    get:
+        return a.stored
+func (a adder) call(value: i32) -> i32:
+    return a.amount + value
+func identity<t>(value: t) -> t:
+    return value
+func apply<t>(callback: func(t) -> t, value: t) -> t:
+    return callback(value)
+enum state:
+    ready(value: i32)
+    absent
+struct tracker:
+    total: i32
+struct resource:
+    tracker: tracker
+func (r resource) deinit():
+    r.tracker.total += 3
+struct emitter:
+    event changed: func(i32)
+func (e emitter) fire(value: i32):
+    e.changed.emit(value)
+func compute(value: i32) -> result<state, string>:
+    if value < 0:
+        return Err("negative")
+    return Ok(state.ready(identity(value)))
+func perform(t: tracker, value: i32) -> result<i32, string>:
+    var e = emitter()
+    var total = 0
+    var callback = func(number: i32):
+        total += number
+    e.changed += callback
+    with resource(tracker=t) as r:
+        defer e.fire(1)
+        var item = compute(value)?
+        if item is state.ready(var number):
+            e.fire(number)
+    return Ok(total)
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    var values: {string: result<i32, string>} = {"run": perform(t, value)}
+    var keys: [string] = ["run", "other"]
+    var a = adder(stored=value)
+    var callback: func(i32) -> i32 = a
+    if keys is ["run", ..var rest] and values is {"run": Ok(var amount)}:
+        return amount + t.total * 10 + apply(callback, 2) + rest.count as i32
+    return -t.total

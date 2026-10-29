@@ -87,10 +87,10 @@ def main():
 
     for tool in ('clang', 'clang++', 'opt', 'llc', *(('lli',) if args.jit else ())):
         version = command([tools / tool, '--version'], output, tool + '-version')
-        if not re.search(r'version 19\.1\.7(?:\D|$)', version):
-            raise RuntimeError(f'{tool} must be LLVM 19.1.7')
-    if command([tools / 'llvm-config', '--version'], output, 'llvm-config-version').strip() != '19.1.7':
-        raise RuntimeError('development SDK must be LLVM 19.1.7')
+        if not re.search(r'version 23\.1\.4(?:\D|$)', version):
+            raise RuntimeError(f'{tool} must be LLVM 23.1.4')
+    if command([tools / 'llvm-config', '--version'], output, 'llvm-config-version').strip() != '23.1.4':
+        raise RuntimeError('development SDK must be LLVM 23.1.4')
     cxxflags = shlex.split(command([tools / 'llvm-config', '--cxxflags'], output, 'sdk-cxxflags'))
     linkflags = shlex.split(command([tools / 'llvm-config', '--ldflags', '--libs', 'core', 'support',
                                     'target', 'x86', 'aarch64', '--system-libs'], output, 'sdk-linkflags'))

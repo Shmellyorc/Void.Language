@@ -73,7 +73,7 @@ def verify_pe():
     values = {}
     for target in ('voidc', 'void_tests'):
         binary = BUILD / (target + '.exe')
-        run('pe-' + target, [str(Path('.toolchains/llvm-19.1.7/bin/llvm-readobj.exe').resolve()),
+        run('pe-' + target, [str(Path('.toolchains/llvm-23.1.4/bin/llvm-readobj.exe').resolve()),
                              '--file-headers', str(binary)])
         text = (EVIDENCE / ('pe-' + target + '.log')).read_text(encoding='utf-8', errors='replace')
         reserves = re.findall(r'^\s*SizeOfStackReserve:\s+(0x[0-9a-fA-F]+|[0-9]+)\s*$', text, re.M)

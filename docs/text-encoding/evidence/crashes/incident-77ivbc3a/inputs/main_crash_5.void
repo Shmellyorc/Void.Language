@@ -1,0 +1,10 @@
+use "/game/scoring.void" as scoring
+
+const bonus = base_score + 5
+const base_score: i32 = 20
+const enabled = true and not false
+
+func entry(value: i32) -> i32:
+    if enabled:
+        return scoring.calculate(value)
+    return 0

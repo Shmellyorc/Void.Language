@@ -1,0 +1,17 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+    "run",
+    "/home/shmellyorc/Documents/Void.Language/tests/channel/nested.void",
+    "7",
+    "--no-cache"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+  "status": 0,
+  "seconds": 0.10713519901037216,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "bbfedf84e9388ed0ea73a7b9532ed25021647c089b4b88621e19a02c15b2afff",
+  "object_hashes": {},
+  "output_hashes": {}
+}

@@ -1,0 +1,12 @@
+use random
+
+func main():
+    var world = random.generator(seed = 42)
+    var snapshot = world
+    print(world.rand_range(1, 6))
+    print(snapshot.rand_range(1, 6))
+    print(world.rand_f32(0.5, 1.0))
+    var rewards = ["coin", "key", "gem"]
+    print(world.choose(rewards))
+    world.shuffle(rewards)
+    print(rewards)

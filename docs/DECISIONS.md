@@ -1,5 +1,19 @@
 # Architectural decisions
 
+## 28 October 2026 — complete LLVM 23.1.4 migration authorized
+
+Boss authorizes replacing the active LLVM/Clang/LLD 19.1.7 requirement with
+exactly 23.1.4, preserving one compiler/Runtime, verified standard O2, existing
+GC/ABI/cache identities and native publication/security behavior. The official
+complete SDK is installed separately; historical LLVM19 SDKs, measurements and
+unresolved DSE incidents remain preserved. Earlier dated version pins below are
+historical. [Implementation](llvm23/IMPLEMENTATION.md),
+[compatibility](llvm23/COMPATIBILITY.md) and [local acceptance](llvm23/ACCEPTANCE.md)
+record the actual outcome. Native platform acceptance, Git, hosted CI and
+publication remain Boss-controlled; independent Golden Wrench review follows
+local completion. This authorization does not approve unrelated logging or
+standard-library changes.
+
 ## 25 October 2026 — runtime globals authorized
 
 Boss approves outermost `var` in every module; selected-entry public/internal

@@ -1,0 +1,8 @@
+use "./types.void" as model
+
+func entry(value: i32) -> i32:
+    var parent = model.make(value)
+    var child = model.make(2)
+    parent.link(child)
+    const view = parent
+    return view.child().value + parent.value

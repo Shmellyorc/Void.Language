@@ -1,0 +1,7 @@
+## One counter shared by every import of this module.
+var enemies_defeated = 0
+
+## Record one defeated enemy and update the project score.
+func reward_player():
+    score += 10
+    enemies_defeated += 1

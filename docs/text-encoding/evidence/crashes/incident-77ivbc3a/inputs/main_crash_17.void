@@ -1,0 +1,5 @@
+use "/math/calculator.void" as calculator
+use "/helpers/numbers.void"
+
+func entry(value: i32) -> i32:
+    return calculator.double(value) + increment(value)

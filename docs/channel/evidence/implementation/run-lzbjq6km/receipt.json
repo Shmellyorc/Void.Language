@@ -1,0 +1,19 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+    "build",
+    "/home/shmellyorc/Documents/Void.Language/tests/channel/receiver.void",
+    "-o",
+    "/tmp/VOID-channel-receiver-o0wkp50m/receiver"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+  "status": 0,
+  "seconds": 0.22970556799555197,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "bbfedf84e9388ed0ea73a7b9532ed25021647c089b4b88621e19a02c15b2afff",
+  "object_hashes": {},
+  "output_hashes": {
+    "/tmp/VOID-channel-receiver-o0wkp50m/receiver": "8304986aa26c4e75b7f05c7045fe8675cc180247f076f9005da790e2a0fa022c"
+  }
+}

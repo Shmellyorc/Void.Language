@@ -1,0 +1,22 @@
+struct box<t>:
+    value: t
+func (b box<t>) init(value: t):
+    b.value = value
+func (b box<t>) get() -> t:
+    return b.value
+value struct cell<t>:
+    value: t
+    values: [t]
+func (c cell<t>) init():
+    c.value += 1
+func make<t>() -> t:
+    return t()
+func entry(value: i32) -> i32:
+    var held = box(value = value)
+    var items: [cell<i32>, 3]
+    items[0].value = 9
+    items[0].values.push(value)
+    if items[1].value != 1 or items[1].values.count != 0:
+        return -100
+    var fresh = make<cell<i32>>()
+    return held.get() + items[1].value + fresh.value

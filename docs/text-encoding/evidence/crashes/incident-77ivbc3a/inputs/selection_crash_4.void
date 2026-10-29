@@ -1,0 +1,25 @@
+value struct meter:
+    total: i32
+func (m meter) call(delta: i32) -> i32:
+    m.total += delta
+    return m.total
+struct counter:
+    total: i32
+func (c counter) call(delta: i32) -> i32:
+    c.total += delta
+    return c.total
+struct holder:
+    meter: meter
+    items: [counter]
+property (h holder) current: meter:
+    get:
+        return h.meter
+    set(value):
+        h.meter = value
+func entry(value: i32) -> i32:
+    var h = holder(items = [counter()])
+    var a = h.meter(2)
+    var b = h.current(3)
+    var c = h.items[0](value)
+    h.items[0].total += 1
+    return a + b + c + h.items[0].total

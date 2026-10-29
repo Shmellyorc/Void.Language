@@ -1,0 +1,42 @@
+value struct inner:
+    text: string
+    count: i32
+
+value struct parcel:
+    tag: i64
+    part: inner
+
+struct base:
+    title: string = "base"
+
+struct box extends base:
+    data: parcel
+
+interface readable:
+    func read() -> string
+
+func (b box) read() -> string:
+    return b.data.part.text
+
+func forward(p: parcel) -> parcel:
+    var garbage = "unrelated" + " garbage"
+    var result = p
+    result.part.count++
+    return result
+
+func inspect(b: box) -> i32:
+    if b.title == "base" and b.data.part.text == "rooted\0🎮":
+        return 7
+    return -100
+
+func entry(value: i32) -> i32:
+    var b = box(data = parcel(part = inner(text = "rooted\0🎮", count = value)))
+    const view: readable = b
+    var index = 0
+    for index < 300:
+        b.data = forward(b.data)
+        var garbage = "temporary" + "文字"
+        if view.read() != "rooted\u{0}\u{1f3ae}" or b.title != "base":
+            return -100
+        index++
+    return b.data.part.count

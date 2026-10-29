@@ -1,0 +1,16 @@
+struct counter:
+    value: i32
+
+struct parent:
+    owner: counter
+    value: i32
+
+func (p parent) init(c: counter, value: i32):
+    p.owner = c
+    c.value++
+    p.value = value
+
+func entry(value: i32) -> i32:
+    var c = counter(value = 7)
+    var p = parent(c, 100 / value)
+    return p.value

@@ -1,0 +1,4 @@
+func entry(value: i32) -> i32:
+    var numbers: [i32, 3] = [10, 20, 30]
+    numbers[1] = value
+    return numbers[0] + numbers[1]

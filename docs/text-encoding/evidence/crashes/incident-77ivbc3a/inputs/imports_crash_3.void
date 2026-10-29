@@ -1,0 +1,6 @@
+use "./lib/base.void" as b
+use "./lib/factory.void" as factory
+
+func entry(value: i32) -> i32:
+    var root: b.base = factory.make(value)
+    return root.read()

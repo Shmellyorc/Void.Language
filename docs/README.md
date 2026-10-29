@@ -1,5 +1,16 @@
 # VOID documentation
 
+## LLVM 23.1.4 migration — authorized 28 October 2026
+
+Boss authorized the complete migration from LLVM/Clang/LLD 19.1.7 to 23.1.4.
+The [engineering record](llvm23/IMPLEMENTATION.md), [compatibility notes](llvm23/COMPATIBILITY.md)
+and [local acceptance](llvm23/ACCEPTANCE.md) record the locally completed migration: effective Release **368/368**, Debug
+**381/381**, effective strict **358/358**, actual 1 MiB, editor/install/AOT and
+bounded performance/reliability checks. Original failures and LLVM19 incidents
+remain intact. Independent Golden Wrench review, native Windows/macOS and hosted
+seven-job acceptance remain pending; no Git or hosted CI action was performed.
+
+
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
 
 Boss authorized lifting the special stabilization hold after local acceptance of

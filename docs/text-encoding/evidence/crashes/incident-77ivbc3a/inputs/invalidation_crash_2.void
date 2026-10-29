@@ -1,0 +1,23 @@
+func entry(value: i32) -> i32:
+    var items = [1, 2]
+    for item in items:
+        if value == 1:
+            items.insert(0, 3)
+        if value == 2:
+            items.clear()
+        if value == 3:
+            items.clear()
+            break
+        if value == 4:
+            items.insert(items.count, 3)
+            return item
+        if value == 5:
+            items[0] = 10
+    if value == 6:
+        for item in reverse items:
+            items.clear()
+    var empty: [i32] = []
+    for item in empty:
+        pass
+    empty.clear()
+    return items.count as i32

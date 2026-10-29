@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-yxv19iw_/constructor-arguments.void:7:23: error: Unknown generic constructor argument; use its declared field or initializer parameter.
+    code: VOID2004
+
+ 7 |     var bus = channel.router<i32>(7)
+   |                       ^^^^^^
+    Module: /constructor-arguments.void
+

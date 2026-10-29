@@ -1,5 +1,21 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## LLVM 23.1.4 migration — Boss authorization, 28 October 2026
+
+Boss authorizes the complete compiler/toolchain migration and consolidated local
+verification. [Engineering record](llvm23/IMPLEMENTATION.md),
+[compatibility](llvm23/COMPATIBILITY.md), [acceptance](llvm23/ACCEPTANCE.md).
+Local engineering completes with effective Release 368/368, Debug 381/381 and
+effective strict 358/358 plus hard-stack/editor/install/native and bounded metrics.
+Original failures/focused corrections remain separate. Independent review and
+native Windows/macOS/hosted acceptance are pending.
+The active toolchain requirement is LLVM/Clang/LLD 23.1.4; older dated
+19.1.7 pins below are historical. Preserve one frontend/IR/backend, verified O2,
+GC/ABI/generation leases and platform protections. Git, hosted CI, publication
+and root README remain Boss-controlled. The LLVM 19 DSE root cause is unresolved;
+a migration pass cannot establish a repair. Stop after local completion for review.
+
+
 ## Channel router implementation handoff — 27 October 2026
 
 Boss authorized the complete typed router with readonly payloads and reusable

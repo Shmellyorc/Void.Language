@@ -1,0 +1,26 @@
+struct base:
+    value: i32
+
+func (b base) direct() -> i32:
+    return b.value
+
+virtual func (b base) read() -> i32:
+    return b.value
+
+struct derived extends base:
+    extra: i32
+
+override func (d derived) read() -> i32:
+    return d.value
+
+func entry(mode: i32) -> i32:
+    var b: base = derived(value = 17, extra = 1)
+    var count = 0
+    var result = 0
+    for count < 100000:
+        if mode == 0:
+            result += b.direct()
+        else:
+            result += b.read()
+        count++
+    return result

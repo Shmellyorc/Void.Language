@@ -1,0 +1,7 @@
+use "./imports/api.void"
+use "./imports/implementation.void" as factory
+func consume(const r: readable) -> i32:
+    return r.read()
+func entry(value: i32) -> i32:
+    var r = factory.create(value)
+    return consume(r)

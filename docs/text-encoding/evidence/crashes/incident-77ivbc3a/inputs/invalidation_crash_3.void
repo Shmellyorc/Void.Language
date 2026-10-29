@@ -1,0 +1,12 @@
+func resize(values: [i32], value: i32) -> i32:
+    if value == 1:
+        values.push(40)
+    if value == 2:
+        values.remove_at(0)
+        values.push(40)
+    return 8
+
+func entry(value: i32) -> i32:
+    var values = [10, 20, 30]
+    values[-1] += resize(values, value)
+    return values[-1]

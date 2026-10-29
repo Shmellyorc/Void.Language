@@ -1,0 +1,18 @@
+value struct score:
+    private const value: i32 = 0
+
+func (self score) init(value: i32):
+    self.value = value
+
+func (self score) label() -> string:
+    return """Score: {self.value:000}
+Ready: {true}
+"""
+
+func entry(input: i32) -> i32:
+    var current = score(value = input)
+    var label = current.label()
+    if format(value = 2.125d, spec = "0.00") is Ok(var amount):
+        if amount == "2.12":
+            return label.length as i32
+    return 0

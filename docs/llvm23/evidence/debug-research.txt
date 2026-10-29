@@ -1,0 +1,43 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start 39: arrays_storage_audit
+ 1/13 Test #39: arrays_storage_audit ..............................***Failed    0.52 sec
+private fixed normal certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+private fixed O2 certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+AOT machine storage/emission certification failed: __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unsupported dynamic/opaque frame; no dynamic-storage certificate; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: inexact/duplicated original home __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void/home/24 (planned=64/align8, machine=0/align1); __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: inexact/duplicated original home __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void/home/25 (planned=32/align8, machine=0/align1); 
+
+      Start 40: private_fixed_call_normal_0_2_observed
+ 2/13 Test #40: private_fixed_call_normal_0_2_observed ............   Passed    0.01 sec
+      Start 41: private_fixed_call_normal_0_2_unobserved
+ 3/13 Test #41: private_fixed_call_normal_0_2_unobserved ..........   Passed    0.01 sec
+      Start 42: private_fixed_call_normal_3_2_observed
+ 4/13 Test #42: private_fixed_call_normal_3_2_observed ............   Passed    0.01 sec
+      Start 43: private_fixed_call_normal_3_2_unobserved
+ 5/13 Test #43: private_fixed_call_normal_3_2_unobserved ..........   Passed    0.01 sec
+      Start 44: private_fixed_call_normal_7_16384_observed
+ 6/13 Test #44: private_fixed_call_normal_7_16384_observed ........   Passed    2.04 sec
+      Start 45: private_fixed_call_normal_7_16384_unobserved
+ 7/13 Test #45: private_fixed_call_normal_7_16384_unobserved ......   Passed    1.10 sec
+      Start 46: private_fixed_call_optimized_0_2_observed
+ 8/13 Test #46: private_fixed_call_optimized_0_2_observed .........   Passed    0.01 sec
+      Start 47: private_fixed_call_optimized_0_2_unobserved
+ 9/13 Test #47: private_fixed_call_optimized_0_2_unobserved .......   Passed    0.01 sec
+      Start 48: private_fixed_call_optimized_3_2_observed
+10/13 Test #48: private_fixed_call_optimized_3_2_observed .........   Passed    0.01 sec
+      Start 49: private_fixed_call_optimized_3_2_unobserved
+11/13 Test #49: private_fixed_call_optimized_3_2_unobserved .......   Passed    0.00 sec
+      Start 50: private_fixed_call_optimized_7_16384_observed
+12/13 Test #50: private_fixed_call_optimized_7_16384_observed .....   Passed    2.22 sec
+      Start 51: private_fixed_call_optimized_7_16384_unobserved
+13/13 Test #51: private_fixed_call_optimized_7_16384_unobserved ...   Passed    1.06 sec
+
+92% tests passed, 1 tests failed out of 13
+
+Label Time Summary:
+private_calls    =   6.47 sec*proc (12 tests)
+research         =   6.99 sec*proc (13 tests)
+
+Total Test time (real) =   7.00 sec
+
+The following tests FAILED:
+	 39 - arrays_storage_audit (Failed)                     research
+Errors while running CTest

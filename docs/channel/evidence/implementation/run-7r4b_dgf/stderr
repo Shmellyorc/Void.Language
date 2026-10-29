@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-w_twfnh0/token-construction.void:7:25: error: Initializer is private to /@stdlib/channel.void.
+    code: VOID3003
+
+ 7 |     var token = channel.subscription()
+   |                         ^^^^^^^^^^^^
+    Module: /token-construction.void
+

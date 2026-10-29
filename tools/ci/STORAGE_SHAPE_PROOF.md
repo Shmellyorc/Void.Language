@@ -1,6 +1,10 @@
+> Active tools now require LLVM/Clang/LLD **23.1.4**. Historical measurements
+> and LLVM 19 source references below remain evidence from their original runs;
+> they do not certify LLVM 23 results. See [migration](../../docs/llvm23/COMPATIBILITY.md).
+
 # P23-2 storage-shape proof reproduction
 
-LLVM 19.1.7 and its matching development SDK are required. Public AOT stays on its
+LLVM 23.1.4 and its matching development SDK are required. Public AOT stays on its
 original path. The explicit compiler-fixture entry shares the real AOT module and
 CLI adapter producer, then invokes the staged service. It does not permit source
 native arrays or activate ORC/LSP certification.
@@ -9,7 +13,7 @@ native arrays or activate ORC/LSP certification.
 cmake --build build/ci-debug -j4
 ctest --test-dir build/ci-debug -R '^arrays_storage_audit$' --output-on-failure
 python3 tools/ci/aot_certificate_corpus.py --build build/ci-debug --root . \
-  --cxx /usr/bin/clang++-19 --output build/aot-certificate-corpus-example
+  --cxx /path/to/llvm-23.1.4/bin/clang++ --output build/aot-certificate-corpus-example
 ```
 
 The corpus driver requires a fresh directory and native Linux x64. It reads the
@@ -94,7 +98,7 @@ After generating a fresh corpus as above, native original-control witnesses are:
 
 ```sh
 python3 tools/ci/aot_incoming_probe.py --corpus build/aot-certificate-corpus-example \
-  --llvm-bin /usr/lib/llvm-19/bin --output build/aot-incoming-example
+  --llvm-bin /path/to/llvm-23.1.4/bin --output build/aot-incoming-example
 ```
 
 This requires native Linux x64, GDB and permitted ptrace. It executes only distinct
@@ -104,12 +108,12 @@ and numeric's measured hidden-result pointer and written result fields. Failed
 certificate outputs are never executed. The normal-profile witnesses do not imply
 an O2/native Windows/macOS ABI proof or a complete caller/callee charging rule.
 
-Independent pinned MIR observation for the numeric normal fixture is reproducible
-with the installed LLVM 19.1.7 tools (find its exact record/object path in
+The historical pinned MIR observation for the numeric normal fixture is reproducible
+with the preserved LLVM 19.1.7 tools (find its exact record/object path in
 records.jsonl, then use that object's .optimized.ll snapshot):
 
 ```sh
-/usr/lib/llvm-19/bin/llc -O2 -relocation-model=pic -mcpu=generic \
+/path/to/llvm-19.1.7/bin/llc -O2 -relocation-model=pic -mcpu=generic \
   -stop-after=finalize-isel input.o.optimized.ll -o numeric-finalize-isel.mir
 ```
 
@@ -117,13 +121,15 @@ Inspect the call's LEA from stack.47 to RDI and post-call loads from that slot,
 with size=64/alignment=8 and no AllocaInst identity. This is independent compile
 inspection, not certified delivery or native execution of a rejected object.
 
-For the newly reconciled managed main/handoffs cases, an explicit accepted subset
-can be tested at inherited and 1 MiB stack limits:
+For the current managed handoffs case, an explicit accepted subset can be tested
+at inherited and 1 MiB stack limits. LLVM 23 O2 now clones four homes in main;
+that research certificate fails closed, as recorded in the migration compatibility
+notes. The original LLVM 19 main acceptance remains historical:
 
 ```sh
 python3 tools/ci/storage_shape_probe.py --build build/ci-debug --root . \
-  --cxx /usr/bin/clang++-19 --llvm-bin /usr/lib/llvm-19/bin \
-  --programs main handoffs --output build/aot-canonical-small-stack-example
+  --cxx /path/to/llvm-23.1.4/bin/clang++ --llvm-bin /path/to/llvm-23.1.4/bin \
+  --programs handoffs --output build/aot-canonical-small-stack-example
 ```
 
 The default still selects all three historical programs, including null_failure,
@@ -141,10 +147,10 @@ reports, then use a fresh output directory:
 ctest --test-dir build/ci-debug -R '^arrays_storage_audit$' --output-on-failure
 python3 tools/ci/aot_outgoing_probe.py \
   --fixtures 'build/ci-debug/storage shape fixtures' \
-  --llvm-bin /usr/lib/llvm-19/bin --output build/aot-outgoing-example
+  --llvm-bin /path/to/llvm-23.1.4/bin --output build/aot-outgoing-example
 ```
 
-This native Linux x64 driver requires permitted GDB ptrace and LLVM 19.1.7. It
+This native Linux x64 driver requires permitted GDB ptrace and LLVM 23.1.4. It
 compiles distinct ordinary controls from the saved optimized IR, independently
 links their C caller/callees, checks exact results and side effects at inherited
 and 1 MiB stack limits, and measures caller SP while stepping over callees.
@@ -173,7 +179,7 @@ Then run:
 python3 tools/ci/aot_encoded_cfg_probe.py \
   --audit build/ci-debug/void_arrays_storage_audit \
   --fixtures 'build/ci-debug/storage shape fixtures' \
-  --controls build/aot-outgoing-example --llvm-bin /usr/lib/llvm-19/bin \
+  --controls build/aot-outgoing-example --llvm-bin /path/to/llvm-23.1.4/bin \
   --output build/aot-encoded-cfg-example
 ```
 

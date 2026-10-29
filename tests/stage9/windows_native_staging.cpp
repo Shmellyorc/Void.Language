@@ -170,7 +170,7 @@ int run_helper(int argc,char** argv)try {
     // A disposable configured driver exercises zero-exit malformed output and
     // transfer failures through the real compiler, without production test hooks.
     if(argc==2 && std::string(argv[1])=="--version") {
-        std::cout<<"clang version 19.1.7\n";return 0;
+        std::cout<<"clang version 23.1.4\n";return 0;
     }
     if(argc>2 && std::string(argv[1])=="--driver-mode=g++") {
         fs::path work,collision;

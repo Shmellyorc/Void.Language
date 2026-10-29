@@ -1,0 +1,69 @@
+struct cell:
+    value: i32
+
+value struct carrier:
+    ref: base?
+    count: i32
+
+struct base:
+    child: cell?
+    value: i32
+
+virtual func (b base) accept(n: i32, flag: bool, wide: f64) -> bool:
+    return flag and n == (wide as i32)
+
+virtual func (b base) get_cell() -> cell?:
+    return b.child
+
+virtual func (b base) get_carrier() -> carrier:
+    return carrier(ref = b, count = 3)
+
+virtual func (b base) scale(n: f64) -> f64:
+    return n
+
+virtual func (b base) mutate(n: i32):
+    b.value += n
+
+struct derived extends base:
+    own: i32
+    other: cell?
+
+override func (d derived) accept(n: i32, flag: bool, wide: f64) -> bool:
+    return flag and n == d.own and wide == 5.0d
+
+override func (d derived) get_cell() -> cell?:
+    return d.other
+
+override func (d derived) get_carrier() -> carrier:
+    return carrier(ref = d, count = d.own)
+
+override func (d derived) scale(n: f64) -> f64:
+    return n + 0.5d
+
+override func (d derived) mutate(n: i32):
+    super.mutate(n)
+    d.own++
+
+func factory(value: i32) -> carrier:
+    var d = derived(child = cell(value = value), own = value, other = cell(value = value + 1))
+    var b: base = d
+    if not b.accept(value, true, 5.0d):
+        return carrier()
+    return b.get_carrier()
+
+func consume(c: carrier) -> i32:
+    var count = 0
+    for count < 256:
+        var garbage = cell(value = count)
+        count++
+    var b = c.ref as base
+    var snapshot = b.get_carrier()
+    b.mutate(2)
+    if snapshot.ref != b:
+        return -999
+    if b.get_carrier().count != snapshot.count + 1:
+        return -999
+    return (b.get_cell() as cell).value + snapshot.count + ((b.scale(2.0d) * 2.0d) as i32) + b.value
+
+func entry(value: i32) -> i32:
+    return consume(factory(value))

@@ -1,0 +1,5 @@
+{
+  "unchanged_from_head": true,
+  "sha256": "1b0df185bf51bc52218345e78f23c60c3dd21fa0d93188846870cc7510f013f9",
+  "recipe": "void finish(llvm::Module& module, bool optimize) {\n    std::string message;\n    llvm::raw_string_ostream stream(message);\n    if (llvm::verifyModule(module, &stream)) throw std::runtime_error(\"invalid LLVM lowering: \" + message);\n    if (optimize) {\n        llvm::LoopAnalysisManager loops;\n        llvm::FunctionAnalysisManager functions;\n        llvm::CGSCCAnalysisManager cgscc;\n        llvm::ModuleAnalysisManager modules;\n        llvm::PassBuilder builder;\n        builder.registerModuleAnalyses(modules);\n        builder.registerCGSCCAnalyses(cgscc);\n        builder.registerFunctionAnalyses(functions);\n        builder.registerLoopAnalyses(loops);\n        builder.crossRegisterProxies(loops, functions, cgscc, modules);\n        auto pipeline = builder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);\n        pipeline.run(module, modules);\n        if (llvm::verifyModule(module, &stream)) throw std::runtime_error(\"invalid optimized LLVM IR: \" + message);\n    }\n}\n"
+}

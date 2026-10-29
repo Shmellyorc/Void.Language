@@ -1,0 +1,11 @@
+{
+  "production_and_test_sources_unchanged": true,
+  "input_count": 1326,
+  "reference": "docs/llvm23/evidence/integration-source-freeze-acceptance-2.json",
+  "documentation_changes_only": [
+    "tools/ci/STORAGE_SHAPE_PROOF.md",
+    "tools/ci/array_abi_probe/README.md",
+    "tools/ci/stack_probe/README.md"
+  ],
+  "note": "Initial broad comparison also included tool README/proof documents; these three approved present-tense pin corrections are documentation changes, not executable input drift."
+}

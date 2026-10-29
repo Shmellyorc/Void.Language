@@ -1,0 +1,882 @@
+[
+  {
+    "case": "numeric",
+    "mode": "normal",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void",
+      "0",
+      "0",
+      "1000000",
+      "499501000"
+    ],
+    "source_sha256": "d34a6c677e400b028ee7b224e29932004d3d0001125ff0a40da87f0148a18528",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.00572921,\"typed_lowering_seconds\":0.000998075,\"jit_setup_seconds\":0.000820715,\"llvm_compile_seconds\":0.0202534,\"samples\":[{\"wall_seconds\":0.0415093,\"cpu_seconds\":0.041321,\"checksum\":499501000},{\"wall_seconds\":0.0414914,\"cpu_seconds\":0.041315,\"checksum\":499501000},{\"wall_seconds\":0.0418491,\"cpu_seconds\":0.041508,\"checksum\":499501000}],\"code_jit_teardown_seconds\":0.000271218,\"peak_rss_kib\":47580}\n",
+    "stderr": "",
+    "process_wall_seconds": 0.1648173410212621,
+    "metric": {
+      "analysis_seconds": 0.00572921,
+      "typed_lowering_seconds": 0.000998075,
+      "jit_setup_seconds": 0.000820715,
+      "llvm_compile_seconds": 0.0202534,
+      "samples": [
+        {
+          "wall_seconds": 0.0415093,
+          "cpu_seconds": 0.041321,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.0414914,
+          "cpu_seconds": 0.041315,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.0418491,
+          "cpu_seconds": 0.041508,
+          "checksum": 499501000
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000271218,
+      "peak_rss_kib": 47580
+    },
+    "execution_median_seconds": 0.0415093
+  },
+  {
+    "case": "numeric",
+    "mode": "normal",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void",
+      "0",
+      "0",
+      "1000000",
+      "499501000"
+    ],
+    "source_sha256": "d34a6c677e400b028ee7b224e29932004d3d0001125ff0a40da87f0148a18528",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.00582638,\"typed_lowering_seconds\":0.00103673,\"jit_setup_seconds\":0.00111651,\"llvm_compile_seconds\":0.0169076,\"samples\":[{\"wall_seconds\":0.0418175,\"cpu_seconds\":0.041616,\"checksum\":499501000},{\"wall_seconds\":0.0421084,\"cpu_seconds\":0.041898,\"checksum\":499501000},{\"wall_seconds\":0.0423288,\"cpu_seconds\":0.042125,\"checksum\":499501000}],\"code_jit_teardown_seconds\":0.000361668,\"peak_rss_kib\":45380}\n",
+    "stderr": "",
+    "process_wall_seconds": 0.1641975449747406,
+    "metric": {
+      "analysis_seconds": 0.00582638,
+      "typed_lowering_seconds": 0.00103673,
+      "jit_setup_seconds": 0.00111651,
+      "llvm_compile_seconds": 0.0169076,
+      "samples": [
+        {
+          "wall_seconds": 0.0418175,
+          "cpu_seconds": 0.041616,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.0421084,
+          "cpu_seconds": 0.041898,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.0423288,
+          "cpu_seconds": 0.042125,
+          "checksum": 499501000
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000361668,
+      "peak_rss_kib": 45380
+    },
+    "execution_median_seconds": 0.0421084
+  },
+  {
+    "case": "numeric",
+    "mode": "O2",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void",
+      "1",
+      "0",
+      "1000000",
+      "499501000"
+    ],
+    "source_sha256": "d34a6c677e400b028ee7b224e29932004d3d0001125ff0a40da87f0148a18528",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.00578965,\"typed_lowering_seconds\":0.00104657,\"jit_setup_seconds\":0.00109948,\"llvm_compile_seconds\":0.0198979,\"samples\":[{\"wall_seconds\":0.00549596,\"cpu_seconds\":0.005469,\"checksum\":499501000},{\"wall_seconds\":0.00544437,\"cpu_seconds\":0.005432,\"checksum\":499501000},{\"wall_seconds\":0.00544776,\"cpu_seconds\":0.005433,\"checksum\":499501000}],\"code_jit_teardown_seconds\":0.000332988,\"peak_rss_kib\":48556}\n",
+    "stderr": "",
+    "process_wall_seconds": 0.05749875702895224,
+    "metric": {
+      "analysis_seconds": 0.00578965,
+      "typed_lowering_seconds": 0.00104657,
+      "jit_setup_seconds": 0.00109948,
+      "llvm_compile_seconds": 0.0198979,
+      "samples": [
+        {
+          "wall_seconds": 0.00549596,
+          "cpu_seconds": 0.005469,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.00544437,
+          "cpu_seconds": 0.005432,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.00544776,
+          "cpu_seconds": 0.005433,
+          "checksum": 499501000
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000332988,
+      "peak_rss_kib": 48556
+    },
+    "execution_median_seconds": 0.00544776
+  },
+  {
+    "case": "numeric",
+    "mode": "O2",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/numeric.void",
+      "1",
+      "0",
+      "1000000",
+      "499501000"
+    ],
+    "source_sha256": "d34a6c677e400b028ee7b224e29932004d3d0001125ff0a40da87f0148a18528",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.00978222,\"typed_lowering_seconds\":0.00170787,\"jit_setup_seconds\":0.00110293,\"llvm_compile_seconds\":0.025282,\"samples\":[{\"wall_seconds\":0.00574273,\"cpu_seconds\":0.005708,\"checksum\":499501000},{\"wall_seconds\":0.0057987,\"cpu_seconds\":0.00578,\"checksum\":499501000},{\"wall_seconds\":0.00571962,\"cpu_seconds\":0.005699,\"checksum\":499501000}],\"code_jit_teardown_seconds\":0.000245869,\"peak_rss_kib\":49632}\n",
+    "stderr": "",
+    "process_wall_seconds": 0.07007704098941758,
+    "metric": {
+      "analysis_seconds": 0.00978222,
+      "typed_lowering_seconds": 0.00170787,
+      "jit_setup_seconds": 0.00110293,
+      "llvm_compile_seconds": 0.025282,
+      "samples": [
+        {
+          "wall_seconds": 0.00574273,
+          "cpu_seconds": 0.005708,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.0057987,
+          "cpu_seconds": 0.00578,
+          "checksum": 499501000
+        },
+        {
+          "wall_seconds": 0.00571962,
+          "cpu_seconds": 0.005699,
+          "checksum": 499501000
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000245869,
+      "peak_rss_kib": 49632
+    },
+    "execution_median_seconds": 0.00574273
+  },
+  {
+    "case": "json",
+    "mode": "normal",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void",
+      "0",
+      "0",
+      "32",
+      "1664"
+    ],
+    "source_sha256": "86f23f0f010d17a7ff75b0c019c7a712c9988f4f1276589ebe4ba77580b0b6d9",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0891733,\"typed_lowering_seconds\":0.172298,\"jit_setup_seconds\":0.000689356,\"llvm_compile_seconds\":2.82026,\"samples\":[{\"wall_seconds\":0.0732532,\"cpu_seconds\":0.072811,\"checksum\":1664},{\"wall_seconds\":0.0729625,\"cpu_seconds\":0.072499,\"checksum\":1664},{\"wall_seconds\":0.0731175,\"cpu_seconds\":0.072655,\"checksum\":1664}],\"code_jit_teardown_seconds\":0.000708427,\"peak_rss_kib\":99804}\n",
+    "stderr": "",
+    "process_wall_seconds": 3.3244854059885256,
+    "metric": {
+      "analysis_seconds": 0.0891733,
+      "typed_lowering_seconds": 0.172298,
+      "jit_setup_seconds": 0.000689356,
+      "llvm_compile_seconds": 2.82026,
+      "samples": [
+        {
+          "wall_seconds": 0.0732532,
+          "cpu_seconds": 0.072811,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0729625,
+          "cpu_seconds": 0.072499,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0731175,
+          "cpu_seconds": 0.072655,
+          "checksum": 1664
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000708427,
+      "peak_rss_kib": 99804
+    },
+    "execution_median_seconds": 0.0731175
+  },
+  {
+    "case": "json",
+    "mode": "normal",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void",
+      "0",
+      "0",
+      "32",
+      "1664"
+    ],
+    "source_sha256": "86f23f0f010d17a7ff75b0c019c7a712c9988f4f1276589ebe4ba77580b0b6d9",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0902023,\"typed_lowering_seconds\":0.17325,\"jit_setup_seconds\":0.000925905,\"llvm_compile_seconds\":2.29488,\"samples\":[{\"wall_seconds\":0.0705983,\"cpu_seconds\":0.070084,\"checksum\":1664},{\"wall_seconds\":0.0697784,\"cpu_seconds\":0.069306,\"checksum\":1664},{\"wall_seconds\":0.0697882,\"cpu_seconds\":0.069307,\"checksum\":1664}],\"code_jit_teardown_seconds\":0.000781206,\"peak_rss_kib\":93840}\n",
+    "stderr": "",
+    "process_wall_seconds": 2.791578994016163,
+    "metric": {
+      "analysis_seconds": 0.0902023,
+      "typed_lowering_seconds": 0.17325,
+      "jit_setup_seconds": 0.000925905,
+      "llvm_compile_seconds": 2.29488,
+      "samples": [
+        {
+          "wall_seconds": 0.0705983,
+          "cpu_seconds": 0.070084,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0697784,
+          "cpu_seconds": 0.069306,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0697882,
+          "cpu_seconds": 0.069307,
+          "checksum": 1664
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000781206,
+      "peak_rss_kib": 93840
+    },
+    "execution_median_seconds": 0.0697882
+  },
+  {
+    "case": "json",
+    "mode": "O2",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void",
+      "1",
+      "0",
+      "32",
+      "1664"
+    ],
+    "source_sha256": "86f23f0f010d17a7ff75b0c019c7a712c9988f4f1276589ebe4ba77580b0b6d9",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0898,\"typed_lowering_seconds\":0.173207,\"jit_setup_seconds\":0.000955145,\"llvm_compile_seconds\":2.76247,\"samples\":[{\"wall_seconds\":0.0691842,\"cpu_seconds\":0.068755,\"checksum\":1664},{\"wall_seconds\":0.0687334,\"cpu_seconds\":0.068303,\"checksum\":1664},{\"wall_seconds\":0.0685459,\"cpu_seconds\":0.068114,\"checksum\":1664}],\"code_jit_teardown_seconds\":0.000674207,\"peak_rss_kib\":91012}\n",
+    "stderr": "",
+    "process_wall_seconds": 3.2542878559906967,
+    "metric": {
+      "analysis_seconds": 0.0898,
+      "typed_lowering_seconds": 0.173207,
+      "jit_setup_seconds": 0.000955145,
+      "llvm_compile_seconds": 2.76247,
+      "samples": [
+        {
+          "wall_seconds": 0.0691842,
+          "cpu_seconds": 0.068755,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0687334,
+          "cpu_seconds": 0.068303,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0685459,
+          "cpu_seconds": 0.068114,
+          "checksum": 1664
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000674207,
+      "peak_rss_kib": 91012
+    },
+    "execution_median_seconds": 0.0687334
+  },
+  {
+    "case": "json",
+    "mode": "O2",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/json.void",
+      "1",
+      "0",
+      "32",
+      "1664"
+    ],
+    "source_sha256": "86f23f0f010d17a7ff75b0c019c7a712c9988f4f1276589ebe4ba77580b0b6d9",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.092412,\"typed_lowering_seconds\":0.172457,\"jit_setup_seconds\":0.000720386,\"llvm_compile_seconds\":3.51303,\"samples\":[{\"wall_seconds\":0.0732748,\"cpu_seconds\":0.072797,\"checksum\":1664},{\"wall_seconds\":0.0722312,\"cpu_seconds\":0.071782,\"checksum\":1664},{\"wall_seconds\":0.0720371,\"cpu_seconds\":0.071601,\"checksum\":1664}],\"code_jit_teardown_seconds\":0.000628727,\"peak_rss_kib\":95224}\n",
+    "stderr": "",
+    "process_wall_seconds": 4.0170984280412085,
+    "metric": {
+      "analysis_seconds": 0.092412,
+      "typed_lowering_seconds": 0.172457,
+      "jit_setup_seconds": 0.000720386,
+      "llvm_compile_seconds": 3.51303,
+      "samples": [
+        {
+          "wall_seconds": 0.0732748,
+          "cpu_seconds": 0.072797,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0722312,
+          "cpu_seconds": 0.071782,
+          "checksum": 1664
+        },
+        {
+          "wall_seconds": 0.0720371,
+          "cpu_seconds": 0.071601,
+          "checksum": 1664
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000628727,
+      "peak_rss_kib": 95224
+    },
+    "execution_median_seconds": 0.0722312
+  },
+  {
+    "case": "async",
+    "mode": "normal",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void",
+      "0",
+      "1",
+      "16",
+      "112"
+    ],
+    "source_sha256": "1fa197bf5e8e548bfbef2cefa1dad1be66c7cf308a229a247ecb59bf7ee3c259",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0827722,\"typed_lowering_seconds\":0.11672,\"jit_setup_seconds\":0.000650547,\"llvm_compile_seconds\":2.37342,\"samples\":[{\"wall_seconds\":0.00238344,\"cpu_seconds\":0.002869,\"checksum\":112},{\"wall_seconds\":0.00240691,\"cpu_seconds\":0.002598,\"checksum\":112},{\"wall_seconds\":0.00194807,\"cpu_seconds\":0.002227,\"checksum\":112}],\"code_jit_teardown_seconds\":0.000668446,\"peak_rss_kib\":91008}\n",
+    "stderr": "",
+    "process_wall_seconds": 2.602133961976506,
+    "metric": {
+      "analysis_seconds": 0.0827722,
+      "typed_lowering_seconds": 0.11672,
+      "jit_setup_seconds": 0.000650547,
+      "llvm_compile_seconds": 2.37342,
+      "samples": [
+        {
+          "wall_seconds": 0.00238344,
+          "cpu_seconds": 0.002869,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00240691,
+          "cpu_seconds": 0.002598,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00194807,
+          "cpu_seconds": 0.002227,
+          "checksum": 112
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000668446,
+      "peak_rss_kib": 91008
+    },
+    "execution_median_seconds": 0.00238344
+  },
+  {
+    "case": "async",
+    "mode": "normal",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void",
+      "0",
+      "1",
+      "16",
+      "112"
+    ],
+    "source_sha256": "1fa197bf5e8e548bfbef2cefa1dad1be66c7cf308a229a247ecb59bf7ee3c259",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0820666,\"typed_lowering_seconds\":0.116032,\"jit_setup_seconds\":0.000898895,\"llvm_compile_seconds\":1.8438,\"samples\":[{\"wall_seconds\":0.00249651,\"cpu_seconds\":0.002974,\"checksum\":112},{\"wall_seconds\":0.00200228,\"cpu_seconds\":0.002283,\"checksum\":112},{\"wall_seconds\":0.00161849,\"cpu_seconds\":0.001888,\"checksum\":112}],\"code_jit_teardown_seconds\":0.000546567,\"peak_rss_kib\":82356}\n",
+    "stderr": "",
+    "process_wall_seconds": 2.0675825369544327,
+    "metric": {
+      "analysis_seconds": 0.0820666,
+      "typed_lowering_seconds": 0.116032,
+      "jit_setup_seconds": 0.000898895,
+      "llvm_compile_seconds": 1.8438,
+      "samples": [
+        {
+          "wall_seconds": 0.00249651,
+          "cpu_seconds": 0.002974,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00200228,
+          "cpu_seconds": 0.002283,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00161849,
+          "cpu_seconds": 0.001888,
+          "checksum": 112
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000546567,
+      "peak_rss_kib": 82356
+    },
+    "execution_median_seconds": 0.00200228
+  },
+  {
+    "case": "async",
+    "mode": "O2",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void",
+      "1",
+      "1",
+      "16",
+      "112"
+    ],
+    "source_sha256": "1fa197bf5e8e548bfbef2cefa1dad1be66c7cf308a229a247ecb59bf7ee3c259",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0818595,\"typed_lowering_seconds\":0.118741,\"jit_setup_seconds\":0.000908825,\"llvm_compile_seconds\":2.37032,\"samples\":[{\"wall_seconds\":0.00297408,\"cpu_seconds\":0.003543,\"checksum\":112},{\"wall_seconds\":0.00200233,\"cpu_seconds\":0.002289,\"checksum\":112},{\"wall_seconds\":0.00197145,\"cpu_seconds\":0.002377,\"checksum\":112}],\"code_jit_teardown_seconds\":0.000559087,\"peak_rss_kib\":86976}\n",
+    "stderr": "",
+    "process_wall_seconds": 2.6004667800152674,
+    "metric": {
+      "analysis_seconds": 0.0818595,
+      "typed_lowering_seconds": 0.118741,
+      "jit_setup_seconds": 0.000908825,
+      "llvm_compile_seconds": 2.37032,
+      "samples": [
+        {
+          "wall_seconds": 0.00297408,
+          "cpu_seconds": 0.003543,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00200233,
+          "cpu_seconds": 0.002289,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00197145,
+          "cpu_seconds": 0.002377,
+          "checksum": 112
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000559087,
+      "peak_rss_kib": 86976
+    },
+    "execution_median_seconds": 0.00200233
+  },
+  {
+    "case": "async",
+    "mode": "O2",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/async.void",
+      "1",
+      "1",
+      "16",
+      "112"
+    ],
+    "source_sha256": "1fa197bf5e8e548bfbef2cefa1dad1be66c7cf308a229a247ecb59bf7ee3c259",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0820787,\"typed_lowering_seconds\":0.118493,\"jit_setup_seconds\":0.000650937,\"llvm_compile_seconds\":3.23016,\"samples\":[{\"wall_seconds\":0.0021977,\"cpu_seconds\":0.002758,\"checksum\":112},{\"wall_seconds\":0.00194209,\"cpu_seconds\":0.002244,\"checksum\":112},{\"wall_seconds\":0.00162877,\"cpu_seconds\":0.001855,\"checksum\":112}],\"code_jit_teardown_seconds\":0.000505088,\"peak_rss_kib\":92928}\n",
+    "stderr": "",
+    "process_wall_seconds": 3.4583592010312714,
+    "metric": {
+      "analysis_seconds": 0.0820787,
+      "typed_lowering_seconds": 0.118493,
+      "jit_setup_seconds": 0.000650937,
+      "llvm_compile_seconds": 3.23016,
+      "samples": [
+        {
+          "wall_seconds": 0.0021977,
+          "cpu_seconds": 0.002758,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00194209,
+          "cpu_seconds": 0.002244,
+          "checksum": 112
+        },
+        {
+          "wall_seconds": 0.00162877,
+          "cpu_seconds": 0.001855,
+          "checksum": 112
+        }
+      ],
+      "code_jit_teardown_seconds": 0.000505088,
+      "peak_rss_kib": 92928
+    },
+    "execution_median_seconds": 0.00194209
+  },
+  {
+    "case": "logging",
+    "mode": "normal",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void",
+      "0",
+      "0",
+      "32",
+      "32"
+    ],
+    "source_sha256": "649a31fcd7490048c8d9152a636e4440b30178b52882be17af5198a7d2bbf258",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.238063,\"typed_lowering_seconds\":0.492709,\"jit_setup_seconds\":0.000739996,\"llvm_compile_seconds\":6.89084,\"samples\":[{\"wall_seconds\":0.00252543,\"cpu_seconds\":0.002507,\"checksum\":32},{\"wall_seconds\":0.00188086,\"cpu_seconds\":0.001862,\"checksum\":32},{\"wall_seconds\":0.00167309,\"cpu_seconds\":0.001661,\"checksum\":32}],\"code_jit_teardown_seconds\":0.00105654,\"peak_rss_kib\":174200}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.661803886992857,
+    "metric": {
+      "analysis_seconds": 0.238063,
+      "typed_lowering_seconds": 0.492709,
+      "jit_setup_seconds": 0.000739996,
+      "llvm_compile_seconds": 6.89084,
+      "samples": [
+        {
+          "wall_seconds": 0.00252543,
+          "cpu_seconds": 0.002507,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00188086,
+          "cpu_seconds": 0.001862,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00167309,
+          "cpu_seconds": 0.001661,
+          "checksum": 32
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00105654,
+      "peak_rss_kib": 174200
+    },
+    "execution_median_seconds": 0.00188086
+  },
+  {
+    "case": "logging",
+    "mode": "normal",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void",
+      "0",
+      "0",
+      "32",
+      "32"
+    ],
+    "source_sha256": "649a31fcd7490048c8d9152a636e4440b30178b52882be17af5198a7d2bbf258",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.235301,\"typed_lowering_seconds\":0.484693,\"jit_setup_seconds\":0.000938375,\"llvm_compile_seconds\":5.36757,\"samples\":[{\"wall_seconds\":0.00258197,\"cpu_seconds\":0.002562,\"checksum\":32},{\"wall_seconds\":0.00184511,\"cpu_seconds\":0.001832,\"checksum\":32},{\"wall_seconds\":0.00174946,\"cpu_seconds\":0.001733,\"checksum\":32}],\"code_jit_teardown_seconds\":0.00106963,\"peak_rss_kib\":152176}\n",
+    "stderr": "",
+    "process_wall_seconds": 6.130681083013769,
+    "metric": {
+      "analysis_seconds": 0.235301,
+      "typed_lowering_seconds": 0.484693,
+      "jit_setup_seconds": 0.000938375,
+      "llvm_compile_seconds": 5.36757,
+      "samples": [
+        {
+          "wall_seconds": 0.00258197,
+          "cpu_seconds": 0.002562,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00184511,
+          "cpu_seconds": 0.001832,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00174946,
+          "cpu_seconds": 0.001733,
+          "checksum": 32
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00106963,
+      "peak_rss_kib": 152176
+    },
+    "execution_median_seconds": 0.00184511
+  },
+  {
+    "case": "logging",
+    "mode": "O2",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void",
+      "1",
+      "0",
+      "32",
+      "32"
+    ],
+    "source_sha256": "649a31fcd7490048c8d9152a636e4440b30178b52882be17af5198a7d2bbf258",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.241444,\"typed_lowering_seconds\":0.490361,\"jit_setup_seconds\":0.000941325,\"llvm_compile_seconds\":6.98804,\"samples\":[{\"wall_seconds\":0.00258365,\"cpu_seconds\":0.002558,\"checksum\":32},{\"wall_seconds\":0.00191245,\"cpu_seconds\":0.001903,\"checksum\":32},{\"wall_seconds\":0.00182625,\"cpu_seconds\":0.001813,\"checksum\":32}],\"code_jit_teardown_seconds\":0.0010878,\"peak_rss_kib\":160472}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.764765143976547,
+    "metric": {
+      "analysis_seconds": 0.241444,
+      "typed_lowering_seconds": 0.490361,
+      "jit_setup_seconds": 0.000941325,
+      "llvm_compile_seconds": 6.98804,
+      "samples": [
+        {
+          "wall_seconds": 0.00258365,
+          "cpu_seconds": 0.002558,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00191245,
+          "cpu_seconds": 0.001903,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00182625,
+          "cpu_seconds": 0.001813,
+          "checksum": 32
+        }
+      ],
+      "code_jit_teardown_seconds": 0.0010878,
+      "peak_rss_kib": 160472
+    },
+    "execution_median_seconds": 0.00191245
+  },
+  {
+    "case": "logging",
+    "mode": "O2",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/workloads/logging.void",
+      "1",
+      "0",
+      "32",
+      "32"
+    ],
+    "source_sha256": "649a31fcd7490048c8d9152a636e4440b30178b52882be17af5198a7d2bbf258",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.235115,\"typed_lowering_seconds\":0.482949,\"jit_setup_seconds\":0.000635867,\"llvm_compile_seconds\":9.31474,\"samples\":[{\"wall_seconds\":0.00252798,\"cpu_seconds\":0.002501,\"checksum\":32},{\"wall_seconds\":0.00181576,\"cpu_seconds\":0.001804,\"checksum\":32},{\"wall_seconds\":0.00168662,\"cpu_seconds\":0.001671,\"checksum\":32}],\"code_jit_teardown_seconds\":0.00111455,\"peak_rss_kib\":180668}\n",
+    "stderr": "",
+    "process_wall_seconds": 10.074605714995414,
+    "metric": {
+      "analysis_seconds": 0.235115,
+      "typed_lowering_seconds": 0.482949,
+      "jit_setup_seconds": 0.000635867,
+      "llvm_compile_seconds": 9.31474,
+      "samples": [
+        {
+          "wall_seconds": 0.00252798,
+          "cpu_seconds": 0.002501,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00181576,
+          "cpu_seconds": 0.001804,
+          "checksum": 32
+        },
+        {
+          "wall_seconds": 0.00168662,
+          "cpu_seconds": 0.001671,
+          "checksum": 32
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00111455,
+      "peak_rss_kib": 180668
+    },
+    "execution_median_seconds": 0.00181576
+  },
+  {
+    "case": "text",
+    "mode": "normal",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void",
+      "0",
+      "0",
+      "16384",
+      "1"
+    ],
+    "source_sha256": "70c41db819857709962b35c0d8f725ffa888af90851daee05fd6e9c0e003a8b6",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0321715,\"typed_lowering_seconds\":0.03611,\"jit_setup_seconds\":0.000666437,\"llvm_compile_seconds\":0.70773,\"samples\":[{\"wall_seconds\":2.11628,\"cpu_seconds\":2.10643,\"checksum\":1},{\"wall_seconds\":2.08342,\"cpu_seconds\":2.07353,\"checksum\":1},{\"wall_seconds\":2.07424,\"cpu_seconds\":2.06484,\"checksum\":1}],\"code_jit_teardown_seconds\":0.00189412,\"peak_rss_kib\":62324}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.071243376994971,
+    "metric": {
+      "analysis_seconds": 0.0321715,
+      "typed_lowering_seconds": 0.03611,
+      "jit_setup_seconds": 0.000666437,
+      "llvm_compile_seconds": 0.70773,
+      "samples": [
+        {
+          "wall_seconds": 2.11628,
+          "cpu_seconds": 2.10643,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.08342,
+          "cpu_seconds": 2.07353,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.07424,
+          "cpu_seconds": 2.06484,
+          "checksum": 1
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00189412,
+      "peak_rss_kib": 62324
+    },
+    "execution_median_seconds": 2.08342
+  },
+  {
+    "case": "text",
+    "mode": "normal",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void",
+      "0",
+      "0",
+      "16384",
+      "1"
+    ],
+    "source_sha256": "70c41db819857709962b35c0d8f725ffa888af90851daee05fd6e9c0e003a8b6",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0310245,\"typed_lowering_seconds\":0.0361252,\"jit_setup_seconds\":0.000907785,\"llvm_compile_seconds\":0.558165,\"samples\":[{\"wall_seconds\":2.15453,\"cpu_seconds\":2.1435,\"checksum\":1},{\"wall_seconds\":2.07483,\"cpu_seconds\":2.06506,\"checksum\":1},{\"wall_seconds\":2.18238,\"cpu_seconds\":2.17107,\"checksum\":1}],\"code_jit_teardown_seconds\":0.00185214,\"peak_rss_kib\":58876}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.057318960025441,
+    "metric": {
+      "analysis_seconds": 0.0310245,
+      "typed_lowering_seconds": 0.0361252,
+      "jit_setup_seconds": 0.000907785,
+      "llvm_compile_seconds": 0.558165,
+      "samples": [
+        {
+          "wall_seconds": 2.15453,
+          "cpu_seconds": 2.1435,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.07483,
+          "cpu_seconds": 2.06506,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.18238,
+          "cpu_seconds": 2.17107,
+          "checksum": 1
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00185214,
+      "peak_rss_kib": 58876
+    },
+    "execution_median_seconds": 2.15453
+  },
+  {
+    "case": "text",
+    "mode": "O2",
+    "llvm": "23",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm23",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void",
+      "1",
+      "0",
+      "16384",
+      "1"
+    ],
+    "source_sha256": "70c41db819857709962b35c0d8f725ffa888af90851daee05fd6e9c0e003a8b6",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0296893,\"typed_lowering_seconds\":0.0365455,\"jit_setup_seconds\":0.000908885,\"llvm_compile_seconds\":0.657068,\"samples\":[{\"wall_seconds\":2.13424,\"cpu_seconds\":2.12405,\"checksum\":1},{\"wall_seconds\":2.0919,\"cpu_seconds\":2.08222,\"checksum\":1},{\"wall_seconds\":2.08479,\"cpu_seconds\":2.07466,\"checksum\":1}],\"code_jit_teardown_seconds\":0.00193896,\"peak_rss_kib\":60496}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.054407356015872,
+    "metric": {
+      "analysis_seconds": 0.0296893,
+      "typed_lowering_seconds": 0.0365455,
+      "jit_setup_seconds": 0.000908885,
+      "llvm_compile_seconds": 0.657068,
+      "samples": [
+        {
+          "wall_seconds": 2.13424,
+          "cpu_seconds": 2.12405,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.0919,
+          "cpu_seconds": 2.08222,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.08479,
+          "cpu_seconds": 2.07466,
+          "checksum": 1
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00193896,
+      "peak_rss_kib": 60496
+    },
+    "execution_median_seconds": 2.0919
+  },
+  {
+    "case": "text",
+    "mode": "O2",
+    "llvm": "19",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-metrics/metrics-llvm19",
+      "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/performance.void",
+      "1",
+      "0",
+      "16384",
+      "1"
+    ],
+    "source_sha256": "70c41db819857709962b35c0d8f725ffa888af90851daee05fd6e9c0e003a8b6",
+    "status": 0,
+    "stdout": "METRIC {\"analysis_seconds\":0.0281671,\"typed_lowering_seconds\":0.0369003,\"jit_setup_seconds\":0.000720036,\"llvm_compile_seconds\":0.867475,\"samples\":[{\"wall_seconds\":2.18883,\"cpu_seconds\":2.17098,\"checksum\":1},{\"wall_seconds\":2.16366,\"cpu_seconds\":2.15015,\"checksum\":1},{\"wall_seconds\":2.23316,\"cpu_seconds\":2.21997,\"checksum\":1}],\"code_jit_teardown_seconds\":0.00188177,\"peak_rss_kib\":62988}\n",
+    "stderr": "",
+    "process_wall_seconds": 7.537157511978876,
+    "metric": {
+      "analysis_seconds": 0.0281671,
+      "typed_lowering_seconds": 0.0369003,
+      "jit_setup_seconds": 0.000720036,
+      "llvm_compile_seconds": 0.867475,
+      "samples": [
+        {
+          "wall_seconds": 2.18883,
+          "cpu_seconds": 2.17098,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.16366,
+          "cpu_seconds": 2.15015,
+          "checksum": 1
+        },
+        {
+          "wall_seconds": 2.23316,
+          "cpu_seconds": 2.21997,
+          "checksum": 1
+        }
+      ],
+      "code_jit_teardown_seconds": 0.00188177,
+      "peak_rss_kib": 62988
+    },
+    "execution_median_seconds": 2.18883
+  }
+]

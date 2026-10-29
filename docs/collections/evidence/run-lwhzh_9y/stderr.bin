@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-9454a7ce/stdlib/collections.void:352:5: error: Private collection guard requires a growable list.
+    code: VOID2001
+
+ 352 |     _collections_check({1: 2}, 0)
+     |     ^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/collections.void
+

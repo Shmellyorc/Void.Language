@@ -1,0 +1,7 @@
+use math
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var value = (index % 1000) as f64
+        total += math.round<f64>(math.sqrt<f64>(value * value + 1.0d)) as i32
+    return total

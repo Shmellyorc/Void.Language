@@ -1,6 +1,9 @@
+> Active tools now require LLVM/Clang/LLD **23.1.4**. Historical measurements
+> below retain their original LLVM 19 identities and are not LLVM 23 acceptance.
+
 # Phase 23 array call storage investigation
 
-This standalone LLVM 19.1.7 harness compares raw aggregate calls with explicit
+This standalone LLVM 23.1.4 harness compares raw aggregate calls with explicit
 address-based calls. It does not implement production arrays, change their ABI,
 enforce a compiler limit or alter either CI workflow.
 
@@ -8,10 +11,10 @@ Full reproduction on native Linux x64, without historical build artifacts:
 
 ```sh
 python3 tools/ci/array_abi_probe/probe.py \
-  --llvm-bin /usr/lib/llvm-19/bin \
+  --llvm-bin /path/to/llvm-23.1.4/bin \
   --output build/p23-2-array-calls --cross-targets --jit
 python3 tools/ci/array_abi_probe/test_audit.py \
-  --llvm-bin /usr/lib/llvm-19/bin \
+  --llvm-bin /path/to/llvm-23.1.4/bin \
   --artifacts build/p23-2-array-calls \
   --raw-baseline build/p23-2-array-calls
 ```
@@ -111,10 +114,10 @@ The newer, independent proof uses the same generated address protocol and C host
 
 ```sh
 python3 tools/ci/array_abi_probe/machine_proof.py \
-  --llvm-bin /usr/lib/llvm-19/bin \
+  --llvm-bin /path/to/llvm-23.1.4/bin \
   --output build/p23-2-machine-proof-example --cross-targets
 python3 tools/ci/array_abi_probe/test_machine.py \
-  --llvm-bin /usr/lib/llvm-19/bin \
+  --llvm-bin /path/to/llvm-23.1.4/bin \
   --artifacts build/p23-2-machine-proof-example
 ```
 
@@ -173,7 +176,7 @@ GC/staging, transformation-lineage, target/profile and const-borrow obligations.
 To independently identify post-PEI changes in the Linux normal semantic caller:
 
 ```sh
-/usr/lib/llvm-19/bin/llc -mcpu=generic -O2 -relocation-model=pic -filetype=obj \
+/path/to/llvm-23.1.4/bin/llc -mcpu=generic -O2 -relocation-model=pic -filetype=obj \
   -print-after-all -filter-print-funcs=snapshot_case \
   build/p23-2-machine-proof-example/x86_64-pc-linux-gnu/normal/semantics-caller.optimized.ll \
   -o build/p23-2-machine-proof-example/late-pass-witness.o \

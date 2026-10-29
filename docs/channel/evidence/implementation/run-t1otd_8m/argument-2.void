@@ -1,0 +1,11 @@
+use channel
+struct message:
+    amount: i32
+func receive(const amount: i32):
+    pass
+async func carry(bus: channel.router<i32>) -> i32:
+    return 7
+async func entry(input: i32) -> i32:
+    var bus = channel.router<i32>()
+    var job = carry(bus)
+    return await job

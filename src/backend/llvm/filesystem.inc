@@ -37,7 +37,7 @@
                             llvm::ConstantInt::get(size_type, asynchronous ? layout.getTypeAllocSize(payload) : 0),
                             offset_map(task_offsets), llvm::ConstantInt::get(size_type, task_offsets.size()),
                             llvm::ConstantInt::get(size_type, asynchronous ? field_offset(instruction.type, 1) : 0),
-                            b.CreateGlobalStringPtr(asynchronous ? instruction.type.definition->identity : "")
+                            b.CreateGlobalString(asynchronous ? instruction.type.definition->identity : "")
                         }), "filesystem.reply.layout");
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
                     auto* references_type = llvm::ArrayType::get(b.getPtrTy(), 4);

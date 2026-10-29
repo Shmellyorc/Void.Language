@@ -1,0 +1,16 @@
+func entry(value: i32) -> i32:
+    var a: [string, 2] = ["a", "b"]
+    var b = a
+    b[0] = "c"
+    var list: [string] = ["x"]
+    list.push("y")
+    if a[0] != "a" or b[0] != "c" or list.remove_at(-1) != "y":
+        return -100
+    b[1] += "changed"
+    list[0] += "!"
+    if b[1] != "bchanged" or a[1] != "b":
+        return -300
+    for item, index in reverse list:
+        if item != "x!" or index != 0:
+            return -200
+    return value + a.count as i32 + list.count as i32

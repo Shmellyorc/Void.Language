@@ -1,0 +1,51 @@
+[
+  {
+    "profile": "release",
+    "constructed_link_argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "example.o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/libvoid_runtime.a",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/libvoid_native_fixture.a",
+      "--driver-mode=g++",
+      "-pthread",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "example.exe"
+    ],
+    "instrumented": false
+  },
+  {
+    "profile": "debug",
+    "constructed_link_argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "example.o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_runtime.a",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_native_fixture.a",
+      "--driver-mode=g++",
+      "-pthread",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "example.exe"
+    ],
+    "instrumented": false
+  },
+  {
+    "profile": "strict",
+    "constructed_link_argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "example.o",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_native_fixture.a",
+      "--driver-mode=g++",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "example.exe"
+    ],
+    "instrumented": true
+  }
+]

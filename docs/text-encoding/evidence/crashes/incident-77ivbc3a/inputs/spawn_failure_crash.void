@@ -1,0 +1,6 @@
+func calculate(value: i32) -> i32:
+    return 100 / value
+
+async func entry(value: i32) -> i32:
+    var task = spawn calculate(0)
+    return await task

@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/ADT/StringExtras.h>
+#include <llvm/Analysis/RuntimeLibcallInfo.h>
+#include <llvm/Analysis/TargetLibraryInfo.h>
 #include <llvm/CodeGen/MachineFrameInfo.h>
 #include <llvm/CodeGen/MachineFunctionPass.h>
 #include <llvm/CodeGen/MachineModuleInfo.h>
@@ -252,7 +254,9 @@ struct Early : MachineFunctionPass {
       objects.push_back(json::Object{{"index", index}, {"bytes", fi.getObjectSize(index)},
         {"offset", fi.getObjectOffset(index)}, {"alignment", int64_t(fi.getObjectAlign(index).value())},
         {"fixed", fi.isFixedObjectIndex(index)}, {"spill", fi.isSpillSlotObjectIndex(index)},
-        {"has_alloca_identity", allocation != nullptr}});
+        {"has_alloca_identity", allocation != nullptr},
+        {"alloca_static_at_isel", allocation && allocation->isStaticAlloca()},
+        {"alloca_block_at_isel", allocation ? allocation->getParent()->getName().str() : std::string{}}});
     }
     for (auto &bb : mf) {
       int64_t area = -1;
@@ -351,7 +355,7 @@ struct Audit : MachineFunctionPass {
           const auto *count = allocation ? dyn_cast<ConstantInt>(allocation->getArraySize()) : nullptr;
           const bool stillZero = allocation && allocation->isStaticAlloca() && count &&
             (count->isZero() || mf.getDataLayout().getTypeAllocSize(allocation->getAllocatedType()).isZero());
-          // LLVM 19.1.7 FunctionLoweringInfo::set changes a static zero-byte
+          // LLVM 23.1.4 FunctionLoweringInfo::set changes a static zero-byte
           // alloca into a one-byte object with the SAME AllocaInst provenance.
           // It remains wholly in F. It never represents any byte of P for R.
           const bool zeroPhysical = home.bytes == 0 && stillZero && size == 1;
@@ -425,9 +429,9 @@ void checkObject(State &s, StringRef bytes, TargetMachine &tm, const Target &tar
   auto object = object::ObjectFile::createObjectFile(MemoryBufferRef(bytes, "private-object"));
   if (!object) { consumeError(object.takeError()); fail(s, "object", "object parser failed"); return; }
   MCContext ctx(Triple(s.triple), tm.getMCAsmInfo(), tm.getMCRegisterInfo(), tm.getMCSubtargetInfo());
-  std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(*tm.getMCSubtargetInfo(), ctx));
+  std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(tm.getMCSubtargetInfo(), ctx));
   if (!dis) { fail(s, "object", "no disassembler"); return; }
-  const auto &ii = *tm.getMCInstrInfo(); const auto &ri = *tm.getMCRegisterInfo();
+  const auto &ii = *tm.getMCInstrInfo(); const auto &ri = tm.getMCRegisterInfo();
   std::set<std::string> seen;
   std::set<std::tuple<uint64_t, uint64_t, uint64_t>> anchors;
   auto symbols = object::computeSymbolSizes(**object);
@@ -533,10 +537,10 @@ struct AotObjectEmitter::Impl {
         throw std::runtime_error("Native LLVM emission/audit target unavailable");
       auto &r = *PassRegistry::getPassRegistry(); initializeCore(r); initializeCodeGen(r); initializeTarget(r);
     });
-    if (StringRef(LLVM_VERSION_STRING) != "19.1.7") throw std::runtime_error("Storage audit requires LLVM 19.1.7");
-    std::string error; target = TargetRegistry::lookupTarget(triple, error);
+    if (StringRef(LLVM_VERSION_STRING) != "23.1.4") throw std::runtime_error("Storage audit requires LLVM 23.1.4");
+    std::string error; target = TargetRegistry::lookupTarget(Triple(triple), error);
     if (!target) throw std::runtime_error(error);
-    machine.reset(target->createTargetMachine(triple, "generic", "", TargetOptions(), Reloc::PIC_,
+    machine.reset(target->createTargetMachine(Triple(triple), "generic", "", TargetOptions(), Reloc::PIC_,
                                              std::nullopt, CodeGenOptLevel::Default));
     if (!machine) throw std::runtime_error("Cannot create AOT target machine");
     const Triple selected(triple);
@@ -548,7 +552,7 @@ struct AotObjectEmitter::Impl {
       {"cpu", machine->getTargetCPU()}, {"features", machine->getTargetFeatureString()},
       {"data_layout", layout.getStringRepresentation()}, {"relocation", int64_t(machine->getRelocationModel())},
       {"code_model", int64_t(machine->getCodeModel())}, {"machine_opt", int64_t(machine->getOptLevel())},
-      {"target_options", "LLVM19.1.7-default;VOID-AOT-v1"},
+      {"target_options", "LLVM23.1.4-default;VOID-AOT-v1"},
       {"ir_pipeline", optimize ? "default<O2>;PassBuilder(no-TM)" : "verify-only"}});
   }
   std::string module_digest() const {
@@ -559,7 +563,7 @@ struct AotObjectEmitter::Impl {
     if (module_digest() != expected) throw std::invalid_argument("AOT frozen module/profile content mismatch");
   }
   void check_module() const {
-    if (!module || module->getDataLayout() != layout || module->getTargetTriple() != triple)
+    if (!module || module->getDataLayout() != layout || module->getTargetTriple() != Triple(triple))
       throw std::invalid_argument("AOT inventory/emission target identity mismatch");
     for (const auto &f : *module) {
       for (auto name : {"target-cpu", "tune-cpu", "target-features", "target-abi"}) {
@@ -667,7 +671,7 @@ void recordCanonicalRewrite(State &s, Home &home, Value *oldValue, Value *newVal
     }
   home.canonical = next; home.canonicalProved = proved;
   s.rewriteEvents.push_back(json::Object{{"original_identity", home.name},
-    {"pass", s.activePasses.back()}, {"rule", "LLVM19.1.7-InstCombine-i8-count-to-array"},
+    {"pass", s.activePasses.back()}, {"rule", "LLVM23.1.4-InstCombine-i8-count-to-array"},
     {"proved", proved}, {"bytes", int64_t(home.bytes)}, {"subtraction_credit", 0}});
 }
 // Observations identify births/deaths across actual production pass boundaries.
@@ -767,7 +771,7 @@ void AotObjectEmitter::freeze(Module &module, const LoweringInventory &inventory
     if (!input || input->accounted != all_storage_roles())
       throw std::invalid_argument("Incomplete lowering storage categories for " + f.getName().str());
     NativeStoragePlanner planner({i.triple, i.layout.getStringRepresentation(),
-      uint64_t(std::numeric_limits<int64_t>::max()), i.layout.getStackAlignment().value(),
+      uint64_t(std::numeric_limits<int64_t>::max()), i.layout.getStackAlignment().value().value(),
       [](ir::Type) -> StorageExtent { throw std::logic_error("Use actual LLVM homes for AOT inventory"); }});
     auto &plan = s.plans[f.getName().str()]; plan.policy = input->array_carrying;
     std::set<const AllocaInst *> seen;
@@ -804,7 +808,7 @@ void AotObjectEmitter::freeze(Module &module, const LoweringInventory &inventory
     s.plans[f->getName().str()].entryMoves.push_back(json::Object{
       {"identity", home->identity}, {"original_block", a->getParent()->getName().str()},
       {"maximum_executions_per_invocation", 1}, {"original_identity_retained", true}});
-    a->moveBefore(&*f->getEntryBlock().getFirstInsertionPt());
+    a->moveBefore(f->getEntryBlock().getFirstInsertionPt());
   }
   // Original call-graph closure keeps array-free callers under the proof gate
   // even when optimization removes every physical trace of the inlined home.
@@ -897,12 +901,19 @@ void AotObjectEmitter::deliver(const std::filesystem::path &destination) {
   if (!i.optimized || i.emitted) throw std::logic_error("Invalid audited AOT delivery lifecycle");
   i.emitted = true; i.check_module(); i.check_digest(i.optimizedDigest); auto &s = i.state;
   SmallVector<char, 0> bytes; raw_svector_ostream buffer(bytes);
-  auto *tm = static_cast<LLVMTargetMachine *>(i.machine.get());
+  auto *tm = i.machine.get();
   legacy::PassManager pm; auto *mmi = new MachineModuleInfoWrapperPass(tm); auto *config = tm->createPassConfig(pm);
   config->setDisableVerify(false);
   config->insertPass(&FinalizeISelID, new Early(s));
   config->insertPass(&PrologEpilogCodeInserterID, new Audit(s, 0));
   pm.add(config); pm.add(mmi);
+  // Match LLVM 23's ordinary target codegen setup. The default legacy runtime
+  // library analysis uses an unknown triple and otherwise expands host memset
+  // into IR loops, moving later static homes out of the entry block.
+  const auto &options = tm->Options;
+  pm.add(new TargetLibraryInfoWrapperPass(TargetLibraryInfoImpl(tm->getTargetTriple(), options.VecLib)));
+  pm.add(new RuntimeLibraryInfoWrapper(tm->getTargetTriple(), options.ExceptionModel,
+      options.FloatABIType, options.EABIVersion, options.MCOptions.ABIName, options.VecLib));
   if (config->addISelPasses()) throw std::runtime_error("Audited AOT instruction selection unavailable");
   config->addMachinePasses(); config->setInitialized(); pm.add(new Audit(s, 1));
   if (tm->addAsmPrinter(pm, buffer, nullptr, CodeGenFileType::ObjectFile, mmi->getMMI().getContext()))

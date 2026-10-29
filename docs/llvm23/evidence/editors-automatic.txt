@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/editors/run.py", line 31, in <module>
+    failure=pathlib.Path(str(output)+'.error');raise RuntimeError(name+': '+completed.stdout+'\n'+(failure.read_text() if failure.exists() else (root/'vim.log').read_text() if (root/'vim.log').exists() else 'no result'))
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: nvim: 
+...ellyorc/Documents/Void.Language/tests/editors/neovim.lua:39: attempt to index a nil value
+

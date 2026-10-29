@@ -1,4 +1,4 @@
-# LLVM 19's Windows release exports the producer's absolute DIA SDK path.
+# Windows LLVM releases may export the producer's absolute DIA SDK path.
 # Resolve that dependency to the real consumer SDK; never drop the library.
 function(void_resolve_llvm_dia)
   if(NOT WIN32)
@@ -43,9 +43,8 @@ function(void_resolve_llvm_dia)
   endforeach()
 endfunction()
 
-# Pinned libc++ 19 includes stop_token but gates it as experimental. Probe the
-# actual Apple SDK link before enabling its supported opt-in. No replacement
-# cancellation implementation, newer stdlib, or experimental link archive.
+# libc++ 23 exposes C++20 cancellation without the libc++ 19 experimental opt-in.
+# Keep an actual compile/link check against the selected Apple SDK and library.
 function(void_enable_libcxx_stop_token target)
   if(NOT APPLE)
     return()
@@ -57,17 +56,7 @@ function(void_enable_libcxx_stop_token target)
   file(READ "${PROJECT_SOURCE_DIR}/cmake/probes/StopToken.cpp" stop_token_probe)
   check_cxx_source_compiles("${stop_token_probe}" VOID_HAS_STANDARD_STOP_TOKEN)
   if(NOT VOID_HAS_STANDARD_STOP_TOKEN)
-    set(CMAKE_REQUIRED_DEFINITIONS -D_LIBCPP_ENABLE_EXPERIMENTAL)
-    check_cxx_source_compiles("#include <version>
-#if !defined(_LIBCPP_VERSION) || _LIBCPP_VERSION != 190107
-#error This opt-in is only verified for pinned libc++ 19.1.7
-#endif
-${stop_token_probe}" VOID_HAS_LIBCXX19_EXPERIMENTAL_STOP_TOKEN)
-    if(NOT VOID_HAS_LIBCXX19_EXPERIMENTAL_STOP_TOKEN)
-      message(FATAL_ERROR "The native C++20 stop-token compile/link probe failed; inspect CMakeConfigureLog.yaml. VOID requires real cancellation support.")
-    endif()
-    target_compile_definitions(${target} INTERFACE _LIBCPP_ENABLE_EXPERIMENTAL)
-    message(STATUS "VOID: verified pinned libc++ 19 stop-token experimental opt-in")
+    message(FATAL_ERROR "The native C++20 stop-token compile/link probe failed; inspect CMakeConfigureLog.yaml. VOID requires real cancellation support with LLVM 23.1.4.")
   endif()
   cmake_pop_check_state()
 endfunction()

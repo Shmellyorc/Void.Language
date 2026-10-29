@@ -1,0 +1,195 @@
+[  0%] Building CXX object CMakeFiles/void_format_objects.dir/src/format.cpp.o
+[  0%] Building C object CMakeFiles/void_native_fixture.dir/src/native/fixture.c.o
+[  0%] Building C object CMakeFiles/void_native_fixture.dir/src/native/sink.c.o
+[  0%] Linking C static library libvoid_native_fixture.a
+[  0%] Built target void_native_fixture
+[  0%] Building CXX object CMakeFiles/void_zone_objects.dir/third_party/date/src/tz.cpp.o
+[  0%] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2s.c.o
+[  0%] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/f2s.c.o
+[  0%] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2fixed.c.o
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:86:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz_private.h:31:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+[  0%] Built target void_format_objects
+[  0%] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:201:23: warning: unused variable 'folder_delimiter' [-Wunused-const-variable]
+  201 | static CONSTDATA char folder_delimiter = '/';
+      |                       ^~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:318:1: warning: unused function 'get_download_folder' [-Wunused-function]
+  318 | get_download_folder()
+      | ^~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:458:1: warning: unused function 'get_install' [-Wunused-function]
+  458 | get_install()
+      | ^~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:3728:1: warning: unused function 'get_version' [-Wunused-function]
+ 3728 | get_version(const std::string& path)
+      | ^~~~~~~~~~~
+In file included from /home/shmellyorc/Documents/Void.Language/src/temporal.cpp:3:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+4 warnings generated.
+8 warnings generated.
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[  0%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/gc_schema.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/heap.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:666:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  666 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:673:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  673 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:674:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  674 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:687:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  687 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 50%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native.cpp.o
+[100%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/native_cache.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:302:78: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  302 |             fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalStringPtr(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable || (inactive && (kind==11 || kind==13 || kind>=14)))}));
+      |                                                                            ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:305:163: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  305 |         auto* record=new llvm::GlobalVariable(*module,element_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(element_record_type,{b.CreateGlobalStringPtr(element_key(root)),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(root))),llvm::ConstantInt::get(size_type,layout.getABITypeAlign(type(root)).value()),llvm::ConstantInt::get(size_type,fields.size()),data}),"array.element");
+      |                                                                                                                                                                 ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:375:51: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  375 |         b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Null or incompatible function value"),dispatcher->getArg(dispatcher->arg_size()-1));if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(result)));
+      |                                                 ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:394:56: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  394 |     auto string=[&](const std::string& text) {return b.CreateGlobalStringPtr(text,"",0,module.get());};
+      |                                                      ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:436:25: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  436 |         b.CreateStore(b.CreateGlobalStringPtr("Invalid managed virtual receiver or generation type catalog"),dispatcher->getArg(dispatcher->arg_size()-1));
+      |                       ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:796:130: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  796 |             b.CreateCall(module->getOrInsertFunction("vd_display_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(f.name),object,failure});
+      |                                                                                                                                ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:813:268: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  813 |         if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Invalid async resume state"),failure);return_failure();}
+      |                                                                                                                                                                                                                                                                          ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:846:41: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  846 |                         b.CreateStore(b.CreateGlobalStringPtr(trace), address);
+      |                                       ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:857:41: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+  857 |                         b.CreateStore(b.CreateGlobalStringPtr(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
+      |                                       ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1111:109: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1111 |                     if(nominal_types.contains(instruction.type.definition->identity)) arguments.push_back(b.CreateGlobalStringPtr(instruction.type.definition->identity));
+      |                                                                                                           ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1123:103: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1123 |                         {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalStringPtr(found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
+      |                                                                                                     ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1173:367: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1173 |                             if(instruction.type.kind==ir::Type::interface_ref)for(const auto* binding:bindings)if(binding->view==dynamic && binding->interface==instruction.type){auto* found=b.CreateICmpEQ(selected,b.getInt64(index));matches=b.CreateOr(matches,found);auto* value=b.CreateCall(module->getOrInsertFunction("vd_gc_witness",b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(binding->key)});witness=b.CreateSelect(found,value,witness);}
+      |                                                                                                                                                                                                                                                                                                                                                                             ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1243:398: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1243 |                     auto* result=b.CreateCall(module->getOrInsertFunction(native_provider(instruction.callee)=="void.fixture.v1"?"vd_native_fixture_call":"vd_native_sink_call",b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.getInt32(op),bits,object,text,function,environment,entry,output,b.CreateGlobalStringPtr(op==14?instruction.type.definition->identity:""),failure});
+      |                                                                                                                                                                                                                                                                                                                                                                                                            ~ ^
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1308:
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/filesystem.inc:40:31: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+   40 |                             b.CreateGlobalStringPtr(asynchronous ? instruction.type.definition->identity : "")
+      |                             ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1345:47: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1345 |                             cases.push_back(b.CreateGlobalStringPtr(value_type.definition->identity + "." + variant.name));
+      |                                             ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1486:44: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1486 |                                 {storage,b.CreateGlobalStringPtr(llvm::StringRef(text.data(),text.size())),llvm::ConstantInt::get(size_type,text.size()),failure});
+      |                                          ~ ^
+In file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1726:
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/async_start.inc:26:318: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+   26 |         {task,frame,llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(plan.frame)),offset_map(plan.offsets),llvm::ConstantInt::get(size_type,plan.offsets.size()),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(payload)),offset_map(task_offsets),llvm::ConstantInt::get(size_type,task_offsets.size()),b.CreateGlobalStringPtr(f.task.definition->identity),async_generation,plan.resume,failure,b.getInt32(f.worker)});check();
+      |                                                                                                                                                                                                                                                                                                                            ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:1745:16: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 1745 |             {b.CreateGlobalStringPtr(contract), llvm::ConstantInt::get(size_type, contract.size()), llvm::ConstantInt::get(size_type, input.globals.size()), failure});
+      |              ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:2189:31: error: no member named 'CreateGlobalStringPtr' in 'llvm::IRBuilder<>'
+ 2189 |         b.CreateCall(puts, {b.CreateGlobalStringPtr("VOID: expected one optional decimal i32 input")}); b.CreateRet(b.getInt32(2));
+      |                             ~ ^
+/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:2193:97: warning: 'InsertPosition' is deprecated: Use BasicBlock::iterators for insertion instead [-Wdeprecated-declarations]
+ 2193 |         auto* truncated = llvm::CastInst::CreateTruncOrBitCast(parsed, b.getInt32Ty(), "input", parse->getTerminator());
+      |                                                                                                 ^~~~~
+      |                                                                                                 BasicBlock::iterator
+/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/IR/Instruction.h:57:12: note: 'InsertPosition' has been explicitly marked deprecated here
+   57 |   LLVM_ABI LLVM_DEPRECATED("Use BasicBlock::iterators for insertion instead",
+      |            ^
+/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Support/Compiler.h:252:50: note: expanded from macro 'LLVM_DEPRECATED'
+  252 | #define LLVM_DEPRECATED(MSG, FIX) __attribute__((deprecated(MSG, FIX)))
+      |                                                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+1 warning and 20 errors generated.
+gmake[3]: *** [CMakeFiles/void_llvm.dir/build.make:79: CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:1965: CMakeFiles/void_llvm.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2185: CMakeFiles/voidc.dir/rule] Error 2
+gmake: *** [Makefile:388: voidc] Error 2

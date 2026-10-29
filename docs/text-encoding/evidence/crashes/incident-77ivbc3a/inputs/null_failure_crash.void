@@ -1,0 +1,9 @@
+struct node:
+    value: i32
+
+func unwrap(n: node?) -> node:
+    return n as node
+
+func entry(value: i32) -> i32:
+    var missing: node?
+    return unwrap(missing).value

@@ -1,0 +1,18 @@
+use channel
+var bus = channel.router<i32>()
+var total = 0
+func receive(const amount: i32):
+    total += amount
+async func pause() -> i32:
+    return 3
+async func entry(input: i32) -> i32:
+    var local = channel.router<i32>()
+    local.subscribe("score", receive)
+    const token = bus.subscribe("score", receive)
+    var job = pause()
+    var amount = await job
+    local.emit("score", amount)
+    bus.emit("score", amount + 1)
+    bus.unsubscribe(token)
+    local.clear()
+    return total

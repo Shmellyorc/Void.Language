@@ -1,0 +1,24 @@
+value struct counter:
+    count: i32
+
+func (c counter) next() -> i32:
+    c.count++
+    return c.count
+
+func (c counter) read(value: i32) -> i32:
+    return c.count * 10 + value
+
+func (c counter) set(a: i32, b: i32) -> i32:
+    c.count = a * 10 + b
+    return c.count
+
+func (c counter) snapshot() -> counter:
+    c.count++
+    return c
+
+func entry(value: i32) -> i32:
+    var c = counter(count = value)
+    var a = c.read(c.next())
+    var b = c.set(c.next(), c.next())
+    var d = c.snapshot().read(c.next())
+    return a + b + d + c.count

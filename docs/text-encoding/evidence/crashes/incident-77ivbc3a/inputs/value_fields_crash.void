@@ -1,0 +1,19 @@
+value struct packet:
+    numbers: [i32, 2] = [4, 8]
+    tag: i32 = 1
+
+func change(value: packet) -> packet:
+    value.numbers[0] = 20
+    value.tag = 9
+    return value
+
+func entry(value: i32) -> i32:
+    var original = packet()
+    var copy = original
+    copy.numbers[1] = value
+    var changed = change(copy)
+    if original.numbers[0] != 4 or original.numbers[1] != 8 or copy.numbers[0] != 4:
+        return -1000
+    if changed.numbers[0] != 20 or copy.tag != 1 or original.tag != 1:
+        return -2000
+    return changed.numbers[0] + changed.numbers[1] + changed.tag

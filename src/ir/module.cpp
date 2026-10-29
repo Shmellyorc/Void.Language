@@ -26,9 +26,10 @@ void retain_entry(Module& module) {
     keep(module.entry_symbol);
     // Globals are eager, ordered application state, including imported globals.
     for(const auto& global:module.globals)keep(global.initializer);
-    // Generation metadata describes complete dispatch families. Conservatively
-    // retain these families even when no source call currently exercises them.
-    for(const auto& function:module.functions)if(!function.virtual_slot.empty())keep(function.name);
+    // Generation/type metadata describes complete dispatch and custom-equality
+    // families. Retain their declarations even without a reachable source call.
+    for(const auto& function:module.functions)
+        if(!function.virtual_slot.empty() || function.operator_glyph=="==")keep(function.name);
     for(const auto& binding:module.interface_bindings)
         for(const auto& [name,method]:binding.methods){(void)name;keep(method.second);}
     while(!pending.empty()) {

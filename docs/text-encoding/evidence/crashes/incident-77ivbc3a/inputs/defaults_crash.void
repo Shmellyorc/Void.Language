@@ -1,0 +1,17 @@
+struct node:
+    value: i32
+value struct item:
+    child: node?
+func (i item) init():
+    i.child = node(value = 3)
+struct holder:
+    values: [item, 2]
+func entry(value: i32) -> i32:
+    var a: [item, 2]
+    a[0].child = node(value = value)
+    var first = a[0].child as node
+    first.value++
+    var second = a[1].child as node
+    var h = holder()
+    var third = h.values[1].child as node
+    return first.value + second.value + third.value

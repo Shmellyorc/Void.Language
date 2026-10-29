@@ -1,0 +1,35 @@
+struct holder:
+    items: [i32, 3] = [1, 2, 3]
+    calls: i32
+
+func index(owner: holder) -> i64:
+    owner.calls += 1
+    owner.items[0] += 10
+    return -1
+
+func rhs(owner: holder) -> i32:
+    owner.calls += 10
+    owner.items[1] = 90
+    return 4
+
+func replace(owner: holder) -> i32:
+    owner.items[0] = 40
+    return 0
+
+func bump(owner: holder) -> i32:
+    owner.items[0] += 1
+    return 5
+
+func first(const snapshot: [i32, 3], ignored: i32) -> i32:
+    return snapshot[0]
+
+func entry(value: i32) -> i32:
+    var owner = holder()
+    owner.items[index(owner)] += rhs(owner)
+    var saved = first(owner.items, replace(owner))
+    if owner.calls != 11 or owner.items[1] != 90 or owner.items[2] != 7 or saved != 11:
+        return -1000
+    var literal: [i32, 3] = [owner.items[0], bump(owner), owner.items[0]]
+    if literal[0] != 40 or literal[1] != 5 or literal[2] != 41:
+        return -2000
+    return owner.items[0] + owner.items[1] + owner.items[2] + saved + value

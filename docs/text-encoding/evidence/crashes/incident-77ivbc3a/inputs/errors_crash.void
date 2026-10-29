@@ -1,0 +1,5 @@
+func entry(value: i32) -> i32:
+    var total: bool = value
+    const bonus = 42
+    bonus += 1
+    return missing(value)

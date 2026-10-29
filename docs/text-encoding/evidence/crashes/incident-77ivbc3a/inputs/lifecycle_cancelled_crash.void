@@ -1,0 +1,24 @@
+struct ledger:
+    number: i32 = 0
+
+async func tick() -> i32:
+    return 1
+
+async func child(owner: ledger) -> i32:
+    defer {
+        owner.number += 1
+    }
+    return await tick()
+
+func request<t>(job: t):
+    job.cancel()
+
+async func stop<t>(job: t):
+    request(job)
+    defer request(job)
+
+async func entry(value: i32) -> i32:
+    var owner = ledger()
+    var pending = child(owner)
+    var canceller = stop(pending)
+    return await pending

@@ -1,0 +1,28 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/channel-host/async-o0.o",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_runtime.a",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_native_fixture.a",
+    "--driver-mode=g++",
+    "-pthread",
+    "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "-ldl",
+    "-o",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/channel-host/async-o0"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+  "status": 0,
+  "seconds": 0.044565046031493694,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "c336d48383874cffaab0dc4c5c359456d871f21380b746520dde5c7f4c125a67",
+  "object_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/channel-host/async-o0.o": "059dd1f705231d721e1598f6923429e648af00ddbb594030cea0fc78a4173932",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_runtime.a": "47f88b5591e53543b4326b8be9b6a9da12112cf33100d2780cbb65d7252e26cd",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_native_fixture.a": "8cf4f45b688eb4005dbfd13241d7558c8828604ce7dc55ed629a5d3a4164d8a6"
+  },
+  "output_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/channel-host/async-o0": "9f09f5d0fc3bf9a890eb6e5fd11fd2b8bdfdea1b8a9fc6c3565c1a826b24f819"
+  }
+}

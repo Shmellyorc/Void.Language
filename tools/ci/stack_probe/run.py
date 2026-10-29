@@ -1,4 +1,4 @@
-"""Native-only LLVM 19.1.7 stack experiment. Never configures the compiler project."""
+"""Native-only LLVM 23.1.4 stack experiment. Never configures the compiler project."""
 from pathlib import Path
 import argparse
 import hashlib
@@ -127,7 +127,7 @@ def classify(returncode, stdout, stderr, depth, frame_bytes, kib, system, negati
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--llvm-bin', type=Path, help='LLVM 19.1.7 bin directory; defaults to PATH')
+    parser.add_argument('--llvm-bin', type=Path, help='LLVM 23.1.4 bin directory; defaults to PATH')
     parser.add_argument('--output', type=Path, default=Path('build/phase23-stack-probe'))
     parser.add_argument('--generator', default='Ninja' if shutil.which('ninja') else 'Unix Makefiles')
     args = parser.parse_args()
@@ -186,15 +186,15 @@ def main():
         if (system, native_arch) not in [('Linux', 'x64'), ('Windows', 'x64'), ('Darwin', 'arm64')]:
             raise RuntimeError(f'Unsupported native host {system} {machine}')
         if not args.llvm_bin and not shutil.which('clang'):
-            raise RuntimeError('LLVM 19.1.7 clang not found')
+            raise RuntimeError('LLVM 23.1.4 clang not found')
         bin_dir = args.llvm_bin.resolve() if args.llvm_bin else Path(shutil.which('clang')).resolve().parent
         suffix = '.exe' if system == 'Windows' else ''
         clang = bin_dir / ('clang' + suffix)
         cxx = bin_dir / ('clang-cl.exe' if system == 'Windows' else 'clang++')
         for name, compiler in [('clang', clang), ('cxx', cxx)]:
             version = command([compiler, '--version'], name + '-version.log').stdout
-            if not re.search(r'clang version 19\.1\.7(?:\D|$)', version):
-                raise RuntimeError(f'{name} must be Clang 19.1.7')
+            if not re.search(r'clang version 23\.1\.4(?:\D|$)', version):
+                raise RuntimeError(f'{name} must be Clang 23.1.4')
         target = command([clang, '-dumpmachine'], 'native-target.log').stdout.strip()
         if not target.startswith(('x86_64-' if native_arch == 'x64' else ('aarch64-', 'arm64-'))):
             raise RuntimeError('Compiler target architecture differs from executing host')

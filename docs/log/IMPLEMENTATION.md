@@ -394,3 +394,114 @@ validated executable identities, baseline HEAD, an unchanged index and protected
 README. Engineering stops for independent Golden Wrench review with the
 performance gate **OPEN** and release **HOLD**. Native Windows/macOS is pending;
 no staging, commits, branches, pushes, hosted CI or ptrace.
+
+## Hot-path repair continuation, 28 October 2026
+
+Boss authorized both remaining formatting investigations from
+`db808efe0fa191ed25733513cc9ebcebbadc3bc2`. The worktree was clean at entry.
+The prior 263-test evidence, source/review archives, raw samples and incidents
+remain unchanged. New detailed evidence is local, outside the repository:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/`. Its freeze
+records 787 source/document/test files, 11 frozen executables and an independent
+hash inventory of all historical logging evidence. No production changes have
+been selected yet.
+
+An isolated repeat completed 216 original-workload observations, 544 JIT framing
+observations, 544 instrumented AOT framing observations and 272 JIT async matrix
+observations at unchanged GC budget 256 and actual hard 1 MiB stacks. Sources
+matched the freeze before and after. Small ASCII quote/frame/console medians were
+8.875/11.434/15.046 ms; escape-heavy 1-KiB framing was 925.852 ms.
+
+A test-only scalar-read schema-key experiment replaces temporary key strings with
+immutable string views, retaining the same catalog, root, nominal, extent and
+backing checks. Small quote time fell to 7.425 ms and native allocations from
+16,222 to 3,222. Full small console remained 13.477 ms. Escape-heavy framing did
+not materially improve (954.266 ms). Removing this allocation alone is insufficient.
+
+A separate source-only flat byte-builder experiment removes replacement arrays,
+slices and stream-state construction, preserving budget checks and exact-byte
+oracles. Escape-heavy 1-KiB framing measured 399.606 ms with zero source managed
+constructions, but still 217,600 checked pushes and 501,536 native allocations.
+This is an investigation checkpoint, not a selected repair or acceptance. The
+next comparison isolates schema-key work on writes as well as reads and adds
+complete-framing controls, occasional escapes and mixed Unicode inputs before
+choosing a production approach. Significant new shared Runtime contracts still
+require Golden Wrench architecture review under the current directive.
+
+
+The combined key-view experiment completed the stream comparison; its first flat
+launch then terminated with SIGSEGV before a measurement row. `incident-vs4b96zy`
+preserves the original executable identity, inputs and empty stdout/stderr. A new
+host added phase markers and LLVM signal stack reporting (no ptrace). Its first
+compile failed because `StringRef` required an explicit header (`incident-asxnan14`);
+that test-only include was corrected. The diagnostic execution completed without
+reproducing the original failure. The original remains unresolved; a passing
+related execution does not replace it or establish a compiler/runtime cause.
+
+The expanded 16-shape comparison completed 640 timing and 384 instrumented JIT O2
+observations. It includes source `_frame` plus direct output on every record and
+an independent scalar-aware native reference encoder, kept distinct from prepared
+I/O. The native control is not a Runtime implementation. Complete output/count
+oracles passed. Heavy frame baseline/combined-flat medians were 926.213/343.877 ms;
+occasionally escaped 1-KiB input regressed 138.957/181.101 ms. The flat candidate
+is not selected. Its 14,336 native allocations and zero source constructions
+still accompany 217,600 checked pushes and 2,456,517 Runtime polls.
+
+The original async1000 baseline was elevated, so an unchanged-executable
+confirmation was justified and retained separately: 158.233 then 141.688 ms.
+A separate isolated async matrix measured 132.280 then 120.285 ms at 1,000 logged
+file operations. No cause for host variation is established; no scheduler edit or
+regression-fix claim is made. A reporting prefix error initially produced an empty
+confirmation JSON; all 64 native samples were recovered from intact ASYNC stdout
+into a new parsed file. No native run was repeated to conceal that error.
+
+`targets.json` fixes heavy 1-KiB/100 screens at 10 ms complete framing and 20 ms
+complete console output before production selection. Neither current candidate
+meets them. Existing source text and memory facilities retain checked per-byte
+work or per-write atomic state costs. A general bounded scalar-substitution
+operation is proposed with explicit rooting, lease, alias, NativeSafe, budget and
+failure obligations in `HOTPATH_REVIEW.md`. It is a significant shared contract,
+so the current Boss directive requires stopping for architecture review before
+implementation. No production change has been selected or implemented; neither
+remaining path is claimed repaired. Full new correctness verification remains
+pending an approved implementation. Prior 263/263 evidence remains unchanged.
+
+This checkpoint updates only five documentation files and supplies external
+source-only experiment/review material with separate raw evidence indexes.
+Historical reports remain labeled and intact below the new current-status notices.
+The performance gate stays OPEN and release HOLD. Boss controls commits.
+
+
+## Architecture approved; crash precondition not cleared
+
+Boss approved the general `text.translate_scalars` contract with exact existing
+text errors, canonical private-operation/typed-IR authorization, stable
+per-application rule-table ownership, and bounded checked Runtime work. The first
+mandatory action was crash reproduction/classification before relying on the flat
+prototype. No shared operation implementation began.
+
+The original failing executable SHA and all 61 recorded source identities matched.
+Three unchanged original-command O2 runs produced two passes and then SIGSEGV
+(-11), captured as `approved-crash-classification/crashes/incident-tg6xt8tp` by
+`tests/text_encoding/crash.py`. Original `incident-vs4b96zy` remains byte-identical.
+The new failure again has empty stdout/stderr and no failing PC/phase.
+
+Bounded controlled comparisons followed: two O2 and one normal phase/signal host;
+five original-binary signal-preload runs; normal/O2 strict ASan/UBSan/leak hosts
+built with actual profile flags; three original-binary preloads with the unwinder
+prewarm removed to reduce allocator perturbation. All 13 controls passed. Strict
+runs emitted 48 component rows each with byte/count/checksum checks, exit zero
+and no sanitizer reports. Vendor LLVM/generated JIT code are not thereby made
+sanitizer-instrumented. No fault occurred while signal capture was installed.
+No ptrace was used. The complete ledger is 16 invocations, 15 passes, one signal;
+the 720 passing diagnostic rows are not performance acceptance data.
+
+The bounded plans are exhausted without causal classification. A passing smaller
+fixture would not establish a reduction without a reliable failing predicate,
+so no minimized reproducer or compiler/Runtime/harness attribution is claimed.
+As explicitly required by approval section 1, implementation stops and escalates:
+a relevant production correctness defect cannot be excluded. Architecture approval
+remains valid; no renewed text-architecture permission is requested. Full final
+validation and both performance repairs remain pending. Performance gate OPEN,
+release HOLD. New evidence and a separate compact review archive are external;
+previous sources, raw evidence, incidents, archives and the root README are kept.

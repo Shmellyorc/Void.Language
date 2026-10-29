@@ -1,3 +1,6 @@
+> Active tools now require LLVM/Clang/LLD **23.1.4**. Historical measurements
+> below retain their original LLVM 19 identities and are not LLVM 23 acceptance.
+
 # Phase 23 native stack investigation
 
 Investigation only. This does not implement arrays, enforce a compiler storage
@@ -8,7 +11,7 @@ Existing normal CI push/PR triggers still operate independently.
 
 ## What runs
 
-On Ubuntu x64, Windows x64 and macOS ARM64, pinned LLVM/Clang 19.1.7 generates
+On Ubuntu x64, Windows x64 and macOS ARM64, pinned LLVM/Clang 23.1.4 generates
 four simultaneously live pointer-array homes, four root descriptors and a Frame.
 Planned static sizes are 64/128/256 KiB, including descriptor/frame bytes, at O0/O2.
 Each recursive call registers actual VOID runtime roots. Collection at the deepest
@@ -100,10 +103,10 @@ are not substitutes for these hosted executions.
 
 ## Local reproduction
 
-Use a native supported host and LLVM 19.1.7, CMake and Ninja (or Unix Makefiles):
+Use a native supported host and LLVM 23.1.4, CMake and Ninja (or Unix Makefiles):
 
 ```sh
-python3 tools/ci/stack_probe/run.py --llvm-bin /usr/lib/llvm-19/bin --output build/phase23-stack-probe
+python3 tools/ci/stack_probe/run.py --llvm-bin /path/to/llvm-23.1.4/bin --output build/phase23-stack-probe
 ```
 
 On Windows run from a configured x64 Visual Studio SDK environment and pass the

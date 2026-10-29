@@ -1,0 +1,12 @@
+{
+  "tracked_migration_files": 58,
+  "new_files": 19546,
+  "categories": {
+    "build/active CI configuration": 8,
+    "current documentation/editor fixture": 13,
+    "production compiler/native integration": 8,
+    "regression/test integration": 14,
+    "active tooling": 15
+  },
+  "protected_inputs_preserved": 10
+}

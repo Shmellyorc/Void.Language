@@ -1,0 +1,5 @@
+use "/values.void" as values
+const bonus: i32 = values.base + root_bonus
+func calculate(x: i32) -> i32:
+    const stable: i32 = x + bonus
+    return stable + 1

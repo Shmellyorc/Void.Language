@@ -1,0 +1,13 @@
+use json
+use convert
+struct payload:
+    label: string
+    score: i32
+    points: [i32]
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var data = convert.unwrap(json.parse_as<payload>("{{\"label\":\"unit\",\"score\":7,\"points\":[1,2,3]}}"))
+        var output = convert.unwrap(json.stringify(data))
+        total += data.score + data.points[1] + (output.byte_length as i32)
+    return total

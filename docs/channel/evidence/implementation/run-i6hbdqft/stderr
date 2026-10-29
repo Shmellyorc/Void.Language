@@ -1,0 +1,8 @@
+/tmp/VOID-channel-rejections-ij5r_4sw/payload-null.void:8:19: error: null requires a nullable managed-reference context.
+    code: VOID2001
+
+ 8 |     bus.emit("t", null)
+   |                   ^^^^
+    Module: /payload-null.void
+    Hint: Use a type annotation such as node?.
+

@@ -1,0 +1,20 @@
+interface readable:
+    func read() -> i32
+value struct meter:
+    n: i32 = 7
+func (m meter) read() -> i32:
+    return m.n
+struct base:
+    using meter
+struct derived extends base:
+    n: i32 = 20
+func (d derived) read() -> i32:
+    return d.n
+func entry(value: i32) -> i32:
+    var d = derived()
+    var b: base = d
+    var x: readable = b
+    var y: readable = d
+    if x == y:
+        return x.read() * 100 + y.read()
+    return 0

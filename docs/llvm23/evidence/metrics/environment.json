@@ -1,0 +1,37 @@
+{
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "machine": "x86_64",
+  "cpu": "AMD Ryzen 7 1700X Eight-Core Processor",
+  "hard_stack_bytes": 1048576,
+  "samples_per_compilation": 3,
+  "uncached_compilations_per_case_and_mode": 1,
+  "measurement_host_sha256": {
+    "19": "b870ae83eb482308b454a141122fc85876531ae91d917be7d1ea814cd59ada6c",
+    "23": "b7dd5445468e83ebd5fbd201e6ce680c1a4d135fc1f8ab8c506e94b604f6ce25"
+  },
+  "aslr_sysctl": "2",
+  "load_average_start": "3.54 3.67 4.05 2/4136 2153300",
+  "stdlib_sha256": {
+    "stdlib/channel.void": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+    "stdlib/collections.void": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+    "stdlib/console.void": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+    "stdlib/convert.void": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+    "stdlib/encoding/ascii.void": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+    "stdlib/encoding/base64.void": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+    "stdlib/encoding/binary.void": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+    "stdlib/encoding/hex.void": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+    "stdlib/error.void": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+    "stdlib/io/memory.void": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+    "stdlib/io.void": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+    "stdlib/json.void": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+    "stdlib/log.void": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+    "stdlib/math.void": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+    "stdlib/os.void": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+    "stdlib/path.void": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+    "stdlib/random.void": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+    "stdlib/text.void": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+    "stdlib/time.void": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b"
+  },
+  "analysis_contract": "Same sources and current stdlib; preserved LLVM19 Release libraries versus migrated LLVM23 Release libraries. Full module emission, persistent cache disabled. Wall compilation and in-process execution measured separately.",
+  "working_directory": "/tmp/VOID LLVM metrics 0lj98nlv"
+}

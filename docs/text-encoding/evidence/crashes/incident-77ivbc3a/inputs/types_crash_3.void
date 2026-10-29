@@ -1,0 +1,14 @@
+use "./helpers.void" as helpers
+
+struct cell:
+    value: i32
+
+private func (c cell) init(value: i32 = 3):
+    c.value = value
+    helpers.bump(c)
+
+func (c cell) add(amount: i32):
+    c.value += amount
+
+func make(value: i32) -> cell:
+    return cell(value)

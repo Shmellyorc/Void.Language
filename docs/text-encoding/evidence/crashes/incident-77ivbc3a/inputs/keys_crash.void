@@ -1,0 +1,48 @@
+const template: {string: i32} = {"a": 1, "a": 2}
+struct node:
+    value: i32
+value struct tag<t>:
+    value: t
+value struct label:
+    name: string
+    tag: i32
+    owner: node?
+func roundtrip<t>(key: t, value: i32) -> i32:
+    var items: {t: i32}
+    items[key] = value
+    return items[key]
+func entry(value: i32) -> i32:
+    var n = node(value = value)
+    var other = node(value = value)
+    var refs: {node?: i32} = {null: 1, n: 2, other: 3}
+    const frozen = n
+    if not refs.contains(frozen) or refs[frozen] != 2 or template["a"] != 2 or template.count != 1:
+        return -50
+    n.value = 99
+    if refs[n] != 2 or refs[other] != 3 or refs[null] != 1:
+        return -100
+    var key = label(name = "a\0b", tag = value, owner = n)
+    var keys = {key: value}
+    key.tag = 10
+    if not keys.contains(label(name = "a\0b", tag = value, owner = n)):
+        return -200
+    var same = "a" + "\0b"
+    var strings = {"a\0b": 7, "a": 9}
+    if strings[same] != 7 or strings.count != 2:
+        return -300
+    var collisions = {0: 1, 8: 2, 16: 3, 24: 4}
+    if not collisions.remove(8) or collisions[16] != 3 or collisions[24] != 4:
+        return -400
+    collisions[8] = 8
+    var last = 0
+    for item, original in collisions:
+        last = original
+    if last != 8:
+        return -500
+    if roundtrip<i8>(-128, 1) + roundtrip<i16>(-32768, 1) + roundtrip<i32>(-1, 1) + roundtrip<i64>(-9223372036854775808, 1) != 4:
+        return -600
+    if roundtrip<u8>(255, 1) + roundtrip<u16>(65535, 1) + roundtrip<u32>(4294967295, 1) + roundtrip<u64>(18446744073709551615, 1) + roundtrip<bool>(true, 1) != 5:
+        return -700
+    if roundtrip<tag<i64>>(tag(value = value as i64), value) != value:
+        return -800
+    return keys[label(name = same, tag = value, owner = n)]

@@ -403,3 +403,167 @@ C++ library/OS copies and should not be read as payload-copy counts.
 All original and intermediate measurements remain available. See
 [PERFORMANCE_REPAIR.md](PERFORMANCE_REPAIR.md) for mechanisms, safety arguments,
 remaining limits and the independent-review hold.
+
+## db808efe hot-path continuation: architecture checkpoint
+
+**Neither new hot path is accepted.** See [HOTPATH_REVIEW.md](HOTPATH_REVIEW.md)
+for the required architecture decision. No production or repository test source
+was changed. The earlier sprint and its raw data below remain historical evidence.
+New raw data is external at
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/`.
+`EVIDENCE_INDEX.md` indexes source/executable identities, commands, receipts,
+failures, CPU/wall observations, counters and the compact review archive.
+
+The unchanged baseline was frozen (787 source/document/test files, 11 executables)
+and repeated before experimentation: 216 original-workload observations, 544 JIT
+framing observations, 544 independently emitted AOT O2 instrumented framing
+observations and 272 JIT async observations. Historical logging evidence has its
+own hash inventory. New observations do not overwrite old results.
+
+New expanded measurements use JIT O2 with GC budget 256 and soft **and hard**
+1 MiB stacks, one warmup and three measured samples per component. Compilation
+is outside execution timing. Builds and validations run sequentially; the user's
+desktop remains active, so small differences are not precision guarantees. Native
+operation counters come from separate instrumented runs, not timed ranking runs.
+The expanded harness adds source control branches to both compared variants;
+do not mix its counts with the earlier harness as if only the formatter changed.
+
+### Expanded framing comparison
+
+Median wall milliseconds. Baseline is unchanged production formatting; candidate
+is the test-only flat byte builder plus immutable read/write schema keys. This
+candidate is rejected for acceptance: ordinary text remains too slow and occasional
+escapes regress. Full per-stage CPU, min/max wall, ns/input byte, ns/complete-output
+byte and counter summaries are in `summary.json`; all samples remain separately.
+
+| Input | Bytes / record | Complete output / record | Records | Baseline frame ms | Candidate frame ms | Candidate CPU ms |
+|---|---:|---:|---:|---:|---:|---:|
+| ASCII 64 B | 64 | 75 | 200 | 10.884 | 10.105 | 10.055 |
+| ASCII 1 KiB | 1,024 | 1,035 | 100 | 60.883 | 53.249 | 52.988 |
+| ASCII near budget | 65,500 | 65,511 | 3 | 111.035 | 97.719 | 97.244 |
+| Heavy controls 64 B | 64 | 147 | 200 | 130.130 | 50.852 | 50.579 |
+| Heavy controls 1 KiB | 1,024 | 2,187 | 100 | 926.213 | 343.877 | 342.235 |
+| Heavy controls 16,000 B | 16,000 | 34,011 | 3 | 431.623 | 157.554 | 156.887 |
+| Unicode 64 B | 64 | 75 | 200 | 8.340 | 7.815 | 7.773 |
+| Unicode 1 KiB | 1,024 | 1,035 | 100 | 39.694 | 35.805 | 35.513 |
+| Unicode near budget | 65,472 | 65,483 | 3 | 71.685 | 64.363 | 63.857 |
+| Heavy controls near budget | 30,816 | 65,495 | 3 | 842.008 | 299.759 | 298.280 |
+| Occasional ASCII 64 B | 64 | 77 | 200 | 27.182 | 30.175 | 29.817 |
+| Occasional ASCII 1 KiB | 1,024 | 1,067 | 100 | 138.957 | 181.101 | 179.668 |
+| Occasional ASCII near budget | 63,539 | 65,536 | 3 | 245.763 | 326.894 | 325.165 |
+| Mixed Unicode 64 B | 64 | 92 | 200 | 41.410 | 36.428 | 36.219 |
+| Mixed Unicode 1 KiB | 1,024 | 1,307 | 100 | 246.120 | 222.060 | 220.875 |
+| Mixed Unicode near budget | 51,772 | 65,536 | 3 | 363.380 | 328.776 | 327.258 |
+
+### Fair controls and byte costs
+
+Stage 11 writes complete bytes prepared before timing: an I/O floor. Stage 14
+calls the **same source `_frame` on every record**, then direct console output:
+a complete encoding/framing/I/O comparator without logger admission/delivery guards.
+Stage 15 performs independent native UTF-8 decoding, exact escaping and complete
+framing, including its exact-byte equality check inside timing: an algorithmic
+lower bound, without managed roots, Runtime validation or sink I/O. It is not an
+implementation of a new Runtime contract. Stages 11/12/14 verify complete bytes
+and write counts outside timing; 6/7 check lengths; all check stable checksums.
+The oracle handles C1, bidi, separators, emoji and combining characters by scalar.
+
+| Input | Prepared I/O ms | Complete source frame + direct I/O ms | Native encoding/frame ms | Baseline full logger ms | Candidate full logger ms |
+|---|---:|---:|---:|---:|---:|
+| ASCII 64 B | 1.610 | 12.439 | 0.198 | 14.612 | 13.954 |
+| Heavy controls 1 KiB | 7.926 | 949.305 | 1.976 | 932.257 | 355.783 |
+| Heavy controls near budget | 6.681 | 853.640 | 1.962 | 852.033 | 310.076 |
+| Occasional ASCII 1 KiB | 4.271 | 141.815 | 1.764 | 145.588 | 187.917 |
+| Occasional ASCII near budget | 6.663 | 251.812 | 3.260 | 256.389 | 334.149 |
+| Mixed Unicode 1 KiB | 5.077 | 254.221 | 1.600 | 255.874 | 228.816 |
+| Mixed Unicode near budget | 6.638 | 372.516 | 2.378 | 373.349 | 333.010 |
+
+| Heavy controls, 1 KiB × 100 | Wall ms | CPU ms | ns/input byte | ns/complete-output byte |
+|---|---:|---:|---:|---:|
+| Baseline framing | 926.213 | 919.429 | 9045.05 | 4235.09 |
+| Candidate framing | 343.877 | 342.235 | 3358.17 | 1572.37 |
+| Baseline full logger | 932.257 | 925.348 | 9104.07 | 4262.72 |
+| Candidate full logger | 355.783 | 353.859 | 3474.45 | 1626.81 |
+| Complete source control | 949.305 | 943.197 | 9270.55 | 4340.67 |
+| Native algorithm control | 1.976 | 1.907 | 19.30 | 9.04 |
+
+Before production selection, `targets.json` fixes the heavy 1-KiB/100 screen at
+**10 ms complete framing** and **20 ms complete console logging**, corresponding
+to 97.66/195.31 ns per input byte and 45.72/91.45 ns per complete output byte.
+Measured native framing is about 1.976 ms and prepared output about 7.926 ms;
+neither is functionally identical to a safe full logger. No sum of separately timed
+stages is claimed as an end-to-end observation. Ordinary file200 retains the
+single-digit-ms and approximately 2–3× prepared-I/O screen. No candidate meets these
+screens. Near-budget output is checked at 65,495–65,536 bytes in relevant cases;
+this is the default configured record budget, not a new global cap.
+
+### Async preservation and baseline variability
+
+The full unchanged-binary matrix includes 100/250/500/1,000 operations across all
+17 modes: direct sync/async and logged sync/async file/console, timestamps off/on,
+and empty async activations. The original file200 repeat is 17.323 ms versus
+2.981 ms prepared direct I/O (5.81×). Its async1000 result was elevated relative
+to the prior sprint: **158.233 ms**, versus historical **125.811 ms**. Original
+samples are retained. A justified unchanged-executable confirmation gave
+**141.688 ms**, not a replacement result. Confirmation file200/direct values
+were 18.045/3.141 ms. CPU moved as well as wall time; a specific system cause has
+not been established, and these differences are not called a repaired regression.
+
+The isolated async comparison is a different harness/workload and must be kept
+separate from those original-workload observations:
+
+| File workload, timestamps off | 100 | 250 | 500 | 1,000 |
+|---|---:|---:|---:|---:|
+| Direct sync | 1.213 | 3.095 | 5.732 | 11.378 |
+| Direct async | 4.483 | 10.554 | 21.208 | 44.283 |
+| Logging sync | 5.092 | 12.347 | 24.679 | 47.883 |
+| Logging async | 11.308 | 27.550 | 59.848 | 132.280 |
+
+Unchanged-binary confirmation (same isolated matrix, milliseconds):
+
+| File workload | 100 | 250 | 500 | 1,000 |
+|---|---:|---:|---:|---:|
+| Direct sync | 1.273 | 3.161 | 5.882 | 11.668 |
+| Direct async | 4.817 | 11.945 | 21.750 | 48.588 |
+| Logging sync | 5.347 | 12.644 | 25.686 | 50.972 |
+| Logging async | 11.652 | 26.664 | 55.225 | 120.285 |
+
+The scheduler, alias index, retained-result policy and Handle removal code are
+byte-identical to the baseline. No new async repair was selected. Completed
+output/cleanup oracles passed. These are baseline preservation observations,
+not a post-production-change async signoff. The formatter candidates did not
+receive the required full async/correctness matrix because none was selected.
+
+The expanded timing runs contain 640 observations, and instrumentation adds 384.
+The later original confirmation adds 108 and async confirmation 64. The async
+confirmation initially used the wrong JSON prefix (`PERF` instead of `ASYNC`),
+producing an empty derived file; original stdout contains all 64 passing samples.
+`async-confirm-parsed.json` corrects extraction without rerunning or overwriting
+that empty file. This was a reporting error, not a failed native execution.
+
+A test-only combined/flat launch terminated with SIGSEGV before its first timing
+row. The original incident remains unresolved; a phase-marked, signal-stack-enabled
+host completed without reproducing it. A separate missing LLVM header in that
+diagnostic host was corrected. See the failure inventory in `HANDOFF.md` and raw
+incident receipts. There is no new sanitizer/full-suite pass at this checkpoint;
+the prior 263/263 evidence remains preserved and native Windows/macOS is pending.
+
+
+## Approved-architecture crash gate
+
+Before implementing the approved general text operation, the preserved combined
+keys/flat prototype's original O2 executable was run three times with matched
+source/command identities and actual hard 1 MiB stacks. The third reproduced
+SIGSEGV (-11), with no measurement output. Thirteen subsequent controlled
+phase/signal/sanitizer invocations passed, including normal/O2 strict
+ASan/UBSan/leak diagnostics. These controls produced no failing stack and do not
+classify the original fault. There are 15 passing invocations, one signal and
+720 diagnostic rows including warmups; they are not new performance acceptance
+measurements. No formatter, schema or Runtime production change was selected.
+
+The original heavy 10-ms framing / 20-ms console and small-file single-digit-ms
+screens remain unchanged and unmet. Source/executable/environment identities and
+per-attempt results are preserved under the external `approved-crash-classification`
+directory, alongside `ESCALATION.md`. Section 1 of the architecture approval now
+requires stopping implementation because a relevant production defect cannot be
+excluded. Prior benchmark tables and the 263/263 baseline remain historical,
+unchanged evidence; the final implementation validation matrix remains pending.

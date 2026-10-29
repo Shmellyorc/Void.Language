@@ -1,0 +1,18 @@
+{
+  "voidc": {
+    "sha256": "bbfedf84e9388ed0ea73a7b9532ed25021647c089b4b88621e19a02c15b2afff",
+    "bytes": 69871640
+  },
+  "voidls": {
+    "sha256": "cf77dd80c825979be9e297d867a06e4ff98dbb0c04b7ad5b7bf662b3694629f2",
+    "bytes": 7647232
+  },
+  "libvoid_llvm.a": {
+    "sha256": "c3cca85a333309087f930609a79bf3cce6c470689855252242f27862c0b78b41",
+    "bytes": 1573870
+  },
+  "void-native.txt": {
+    "sha256": "8df13d6937972b4cab2a52b8a1a0e8a60f7098d91c18165f4bd1f73d4409c14e",
+    "bytes": 349
+  }
+}

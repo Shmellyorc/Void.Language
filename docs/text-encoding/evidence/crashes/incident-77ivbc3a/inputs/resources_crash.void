@@ -1,0 +1,20 @@
+use os
+use path
+use io
+
+# JIT reads relative to the compiler/embedding host image. Linked AOT reads
+# relative to the application's image, or the actual macOS bundle resources.
+func main():
+    var discovered = os.resource_dir()
+    if discovered is Ok(var directory):
+        var composed = path.join([directory, "assets", "hello.txt"])
+        if composed is Ok(var asset):
+            var content = io.read_text(asset)
+            if content is Ok(var text):
+                print(text)
+            else if content is Err(var reason):
+                print(reason.message)
+        else if composed is Err(var reason):
+            print(reason.message)
+    else if discovered is Err(var reason):
+        print(reason.operation, reason.message)

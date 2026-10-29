@@ -1,5 +1,17 @@
 # VOID 2.0: Development Strategy and Compiler Architecture Roadmap
 
+## LLVM 23.1.4 migration — 28 October 2026
+
+Boss authorizes a complete migration using the existing compiler/Runtime
+architecture. [Implementation](llvm23/IMPLEMENTATION.md),
+[compatibility](llvm23/COMPATIBILITY.md) and [acceptance](llvm23/ACCEPTANCE.md)
+are the active checkpoint. The new required toolchain is LLVM/Clang/LLD 23.1.4;
+dated LLVM 19 milestones below retain their original evidence. Local migration
+validation is complete (effective Release 368/368, Debug 381/381, effective strict
+358/358); independent Golden Wrench review and native/hosted acceptance remain
+pending. No historical incident is reclassified as repaired by the upgrade.
+
+
 ## Stage 11 runtime globals — authorized 25 October 2026
 
 Boss authorized complete file-level runtime globals, including direct project-root

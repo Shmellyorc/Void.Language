@@ -1,0 +1,11 @@
+value struct box<t>:
+    value: t
+func identity<t>(value: t) -> t:
+    return value
+func entry(value: i32) -> i32:
+    var item = box<i32>(value=value)
+    if item is box<i32>(var copy) and value is i32(var scalar):
+        if copy is box:
+            if value is identity<i32>(7):
+                return copy.value + scalar
+    return 0

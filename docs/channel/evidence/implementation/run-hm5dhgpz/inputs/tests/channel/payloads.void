@@ -1,0 +1,101 @@
+use channel
+
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+
+struct message:
+    amount: i32
+
+interface reader:
+    func read() -> i32
+
+func (self message) read() -> i32:
+    return self.amount
+
+value struct packet:
+    items: [i32, 524288]
+    child: message
+
+enum choice:
+    yes(amount: i32)
+    no
+
+func entry(input: i32) -> i32:
+    var total = 0
+    var original = message(amount = 7)
+    var managed = channel.router<message>()
+    managed.subscribe("m", func(const payload: message):
+        require(payload == original)
+        total += payload.amount
+        original.amount += 1
+    )
+    managed.subscribe("m", func(const payload: message):
+        total += payload.amount
+    )
+    const readonly = original
+    managed.emit("m", readonly)
+    require(total == 15)
+    var list_bus = channel.router<[message]>()
+    list_bus.subscribe("l", func(const payload: [message]):
+        require(payload[0] == original)
+        total += payload[0].amount
+    )
+    list_bus.emit("l", [original])
+    require(total == 23)
+    var map_bus = channel.router<{string: message}>()
+    map_bus.subscribe("d", func(const payload: {string: message}):
+        require(payload["key"] == original)
+        total += payload["key"].amount
+    )
+    map_bus.emit("d", {"key": original})
+    require(total == 31)
+    var optional = channel.router<message?>()
+    optional.subscribe("n", func(const payload: message?):
+        if payload is Ok(var found):
+            total += found.amount
+        else:
+            total += 1
+    )
+    optional.emit("n", null)
+    optional.emit("n", original)
+    require(total == 40)
+    var interfaces = channel.router<reader>()
+    interfaces.subscribe("i", func(const payload: reader):
+        total += payload.read()
+    )
+    interfaces.emit("i", original)
+    require(total == 48)
+    var value = packet(child = original)
+    value.items[524287] = 7
+    var values = channel.router<packet>()
+    values.subscribe("v", func(const payload: packet):
+        total += payload.items[524287]
+        require(payload.child == original)
+        value.items[524287] = 99
+    )
+    values.subscribe("v", func(const payload: packet):
+        total += payload.items[524287]
+    )
+    values.emit("v", value)
+    require(total == 62 and value.items[524287] == 99)
+    var texts = channel.router<string>()
+    texts.subscribe("s", func(const payload: string):
+        require(payload == "雪\0🔥")
+    )
+    texts.emit("s", "雪\0🔥")
+    var enums = channel.router<choice>()
+    enums.subscribe("e", func(const payload: choice):
+        if payload is choice.yes(var amount):
+            total += amount
+    )
+    enums.emit("e", choice.yes(2))
+    var results = channel.router<result<i32, string>>()
+    results.subscribe("r", func(const payload: result<i32, string>):
+        if payload is Ok(var amount):
+            total += amount
+    )
+    results.emit("r", Ok(3))
+    require(total == 67)
+    return 7

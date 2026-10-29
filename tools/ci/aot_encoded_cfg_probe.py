@@ -161,7 +161,7 @@ def main():
         path=out/(name+'.never-executed.o');path.write_bytes(changed)
         verify(path,name,False,needle)
     version=subprocess.run([str(a.llvm_bin/'llvm-mc'),'--version'],check=True,capture_output=True,text=True).stdout
-    if not re.search(r'version 19\.1\.7(?:\D|$)',version):raise RuntimeError('LLVM 19.1.7 assembler required')
+    if not re.search(r'version 23\.1\.4(?:\D|$)',version):raise RuntimeError('LLVM 23.1.4 assembler required')
     for count,expected in ((4095,True),(4096,False)):
         source=out/('resource-'+str(count)+'.s');path=source.with_suffix('.never-executed.o')
         source.write_text('.text\n.globl sample\n.type sample,@function\nsample:\n.rept '+str(count)+'\nnop\n.endr\nret\n.size sample,.-sample\n')

@@ -1,0 +1,20 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node
+    count: i32
+
+func changed(p: packet) -> packet:
+    p.count++
+    p.owner.value++
+    return p
+
+func entry(value: i32) -> i32:
+    var n = node(value = value)
+    var a = packet(owner = n, count = 10)
+    var b = changed(a)
+    b.owner = node(value = 90)
+    if a.owner != n or b.owner == n:
+        return -999
+    return a.count + b.count + n.value

@@ -30,7 +30,7 @@ std::string read(const std::filesystem::path &p) { std::ifstream f(p,std::ios::b
 std::unique_ptr<llvm::Module> parse(llvm::LLVMContext &c, AotObjectEmitter &e, const std::string &body) {
     llvm::SMDiagnostic d; auto m=llvm::parseAssemblyString(body,d,c);
     if(!m) throw std::runtime_error("invalid fixture LLVM IR");
-    m->setTargetTriple(e.triple()); m->setDataLayout(e.data_layout()); return m;
+    m->setTargetTriple(llvm::Triple(e.triple())); m->setDataLayout(e.data_layout()); return m;
 }
 LoweringInventory inventory(llvm::Module &m,bool arrays=true,bool omit=false,bool incomplete=false) {
     LoweringInventory result;
@@ -472,8 +472,29 @@ int main(int argc,char **argv) {
         if(linux_x64) for(bool optimized:{false,true}) for(const auto *file:{"main","handoffs"}) {
             auto p=compile_project(std::filesystem::path(argv[2])/"examples/managed_structs"/(std::string(file)+".void"));
             const auto object=out/(std::string(file)+(optimized?"-O2.o":"-normal.o"));
-            emit_aot_storage_proof(p.module,object,optimized,object.string()+".certificate.json");
-            check(std::filesystem::exists(object),"exact AOT fixture did not certify");
+            if (optimized && std::string(file)=="main") {
+                // LLVM 23 O2 inlines node.add into make_cycle and clones four
+                // homes. This research checker deliberately cannot authorize
+                // cloned ownership. Require its exact fail-closed disposition;
+                // ordinary optimized AOT/JIT execution remains covered below
+                // and by the independently linked source CLI suites.
+                {std::ofstream owner(object);owner<<"existing owner object";}
+                rejects([&]{emit_aot_storage_proof(p.module,object,true,object.string()+".certificate.json");},
+                        "unmatched allocation (including clone/merge) receives no subtraction credit");
+                check(read(object)=="existing owner object","cloned-home rejection damaged destination");
+                auto certificate=llvm::json::parse(read(object.string()+".certificate.json"));
+                check(bool(certificate),"cloned-home rejection certificate missing");
+                auto *errors=certificate->getAsObject()->getObject("errors");
+                auto *reasons=errors ? errors->getArray("__vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void") : nullptr;
+                check(errors && errors->size()==1 && reasons && reasons->size()==4,
+                      "LLVM 23 cloned-home rejection changed");
+                for(const auto& reason:*reasons)
+                    check(reason.getAsString()=="unmatched allocation (including clone/merge) receives no subtraction credit",
+                          "unexpected LLVM 23 cloned-home rejection");
+            } else {
+                emit_aot_storage_proof(p.module,object,optimized,object.string()+".certificate.json");
+                check(std::filesystem::exists(object),"exact AOT fixture did not certify");
+            }
             if(optimized) {
                 // Same real module without compiler-owned home identities must
                 // retain the former rejection; shape/byte equality is no proof.
@@ -505,7 +526,23 @@ int main(int argc,char **argv) {
             // the real virtual tail dispatcher outlined so this negative checks
             // final-byte reconciliation rather than an incidental inline choice.
             const auto seed=out/"virtual-tail-source-O2.o";
-            emit_aot_storage_proof(p.module,seed,true,seed.string()+".certificate.json");
+            {std::ofstream owner(seed);owner<<"existing seed object";}
+            // LLVM 23's inliner also clones four homes in this seed. Keep its
+            // exact rejection; only the independently verified original IR is
+            // needed to construct the existing outlined-dispatcher negative.
+            rejects([&]{emit_aot_storage_proof(p.module,seed,true,seed.string()+".certificate.json");},
+                    "unmatched allocation (including clone/merge) receives no subtraction credit");
+            check(read(seed)=="existing seed object","rejected virtual seed damaged destination");
+            auto seed_report=llvm::json::parse(read(seed.string()+".certificate.json"));
+            check(bool(seed_report),"virtual seed rejection report missing");
+            unsigned clones=0,encoded=0;
+            for(const auto& entry:*seed_report->getAsObject()->getObject("errors"))
+                for(const auto& reason:*entry.second.getAsArray()) {
+                    if(reason.getAsString()=="unmatched allocation (including clone/merge) receives no subtraction credit")++clones;
+                    else if(reason.getAsString()=="final encoded calls differ from machine certificate")++encoded;
+                    else check(false,"unexpected LLVM 23 virtual seed rejection");
+                }
+            check(clones==4 && encoded==1,"LLVM 23 virtual seed rejection changed");
             llvm::LLVMContext context;AotObjectEmitter emitter(llvm::sys::getDefaultTargetTriple(),true);
             auto original=parse(context,emitter,read(seed.string()+".original.ll"));
             unsigned dispatchers=0;

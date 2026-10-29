@@ -1,8 +1,8 @@
 # Same-build, host-only native link resources; never search the caller's cwd.
-find_program(VOID_CLANG NAMES clang-19 clang HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
+find_program(VOID_CLANG NAMES clang clang-23 NAMES_PER_DIR HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
 execute_process(COMMAND "${VOID_CLANG}" --version OUTPUT_VARIABLE native_version RESULT_VARIABLE native_status)
-if(NOT native_status EQUAL 0 OR NOT native_version MATCHES "clang version 19\\.1\\.7([^0-9]|$)")
-  message(FATAL_ERROR "Native builds require Clang 19.1.7; set VOID_CLANG")
+if(NOT native_status EQUAL 0 OR NOT native_version MATCHES "clang version 23\\.1\\.4([^0-9]|$)")
+  message(FATAL_ERROR "Native builds require Clang 23.1.4; set VOID_CLANG")
 endif()
 set(native_flags "-pthread\n")
 if(WIN32)
@@ -40,7 +40,7 @@ endif()
 if(VOID_SANITIZERS AND NOT MSVC)
   string(APPEND native_flags "-fsanitize=address,undefined\n")
 endif()
-set(native_header "VOID native 19.1.7 v1\n${VOID_CLANG}\n${VOID_LINKER}\n")
+set(native_header "VOID native 23.1.4 v1\n${VOID_CLANG}\n${VOID_LINKER}\n")
 file(GENERATE OUTPUT "$<TARGET_FILE_DIR:voidc>/void-native.txt"
   CONTENT "${native_header}$<TARGET_FILE:void_runtime>\n$<TARGET_FILE:void_native_fixture>\n${native_flags}")
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt"

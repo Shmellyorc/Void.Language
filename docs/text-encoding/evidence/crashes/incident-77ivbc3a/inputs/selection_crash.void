@@ -1,0 +1,35 @@
+value struct item:
+    left: i32 = 1
+    right: i32 = 2
+    fixed: [i32, 2] = [3, 4]
+struct node:
+    value: i32
+func change(a: [item]) -> i32:
+    a[0].right = 20
+    a[0].fixed[0] = 30
+    return 5
+func erase(a: [[i32]]) -> i32:
+    a.remove_at(0)
+    return 9
+func erase_node(a: [node]) -> i32:
+    a.remove_at(0)
+    return 10
+func entry(value: i32) -> i32:
+    var a: [item] = [item()]
+    a[0].left += change(a)
+    if a[0].left != 6 or a[0].right != 20 or a[0].fixed[0] != 30:
+        return -100
+    var outer: [[i32]] = [[1, 2]]
+    var inner = outer[0]
+    outer[0][0] = erase(outer)
+    if outer.count != 0 or inner[0] != 9:
+        return -200
+    var nodes: [node] = [node()]
+    var held = nodes[0]
+    nodes[0].value = erase_node(nodes)
+    var fixed: [[i32, 2], 2] = [[1, 2], [3, 4]]
+    var copy = fixed
+    copy[0][0] = 90
+    if fixed[0][0] != 1 or copy[0][0] != 90 or nodes.count != 0 or held.value != 10:
+        return -300
+    return value + a[0].left + inner[0] + held.value

@@ -1,0 +1,13 @@
+/tmp/VOID-collections-negative-wpcp92un/readonly-min.void:32:9: error: Cannot write through readonly reference leaf 'node'.
+    code: VOID2007
+
+ 32 |         found.number = 9
+    |         ^^^^^
+    Module: /readonly-min.void
+    Reference type declared here. at /tmp/VOID-collections-negative-wpcp92un/readonly-min.void:2:8
+
+ 2 | struct node:
+   |        ^^^^
+    Module: /readonly-min.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

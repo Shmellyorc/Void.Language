@@ -1,0 +1,15 @@
+struct box<t>:
+    value: t
+func identity<t>(value: t) -> t:
+    return value
+func at<t>(items: [t], index: i32) -> t:
+    return items[index]
+func entry(value: i32) -> i32:
+    var list: [box<i32>] = [box(value = value)]
+    list.push(box(value = 3))
+    if value < 0:
+        return at(list, 20).value
+    var fixed: [box<i32>, 2] = [list[0], list[1]]
+    var copy = identity(fixed)
+    copy[0] = box(value = 10)
+    return identity(list).remove_at(0).value + copy[0].value

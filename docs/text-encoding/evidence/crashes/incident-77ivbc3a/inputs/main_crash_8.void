@@ -1,0 +1,10 @@
+func identity<t>(value: t) -> t:
+    return value
+
+struct box<t>:
+    value: t
+
+func entry(value: i32) -> i32:
+    var held = box(value = identity(value))
+    var numbers: [i32] = [held.value, 5]
+    return identity(numbers)[0]

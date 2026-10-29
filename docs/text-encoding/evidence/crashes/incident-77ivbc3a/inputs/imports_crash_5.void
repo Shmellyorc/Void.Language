@@ -1,0 +1,15 @@
+use "./types.void" as model
+
+struct container:
+    child: model.cell
+
+func adjust(c: container):
+    c.child.add(2)
+
+func (c container) init(value: i32):
+    c.child = model.make(value)
+    adjust(c)
+
+func entry(value: i32) -> i32:
+    var c = container(value)
+    return c.child.value

@@ -1,5 +1,18 @@
 # Known issues and deferred work
 
+## LLVM migration and unresolved optimizer incident — 28 October 2026
+
+Boss authorizes migration to LLVM/Clang/LLD 23.1.4. Local validation is tracked
+in [acceptance](llvm23/ACCEPTANCE.md): effective Release 368/368, Debug 381/381
+and effective strict 358/358 complete locally, with original failures retained.
+Independent review, native Windows/macOS and hosted seven-job acceptance remain
+pending; no new release lock is claimed. The [LLVM 19 DSE classification](log/CRASH_CLASSIFICATION.md)
+and [input review](log/DSE_INPUT_REVIEW.md) remain unresolved historical incidents.
+Passing LLVM 23 workloads will not prove the original root cause or its repair.
+Historical SDK/checksum statements below describe their dated configurations;
+the new installer verifies official release SHA-256 archive identities.
+
+
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
 
 Boss authorized this status change once `await job?` passed local acceptance.

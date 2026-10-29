@@ -1,0 +1,32 @@
+struct ledger:
+    number: i32 = 0
+
+struct resource:
+    log: ledger
+
+func (owner resource) deinit():
+    owner.log.number = owner.log.number * 10 + 3
+
+async func tick() -> i32:
+    return 1
+
+async func use_resource(owner: resource):
+    defer {
+        owner.log.number = owner.log.number * 10 + 2
+    }
+    var ignored = await tick()
+    owner.log.number = owner.log.number * 10 + 1
+
+async func entry(value: i32) -> i32:
+    var log = ledger()
+    with resource(log = log) as owner:
+        var pending = use_resource(owner)
+    if log.number != 123:
+        return 1
+    log.number = 0
+    for index in 0..<2:
+        with resource(log = log) as owner:
+            var pending = use_resource(owner)
+            var ignored = await tick()
+            break
+    return value + log.number

@@ -1,4 +1,4 @@
-"""Native Linux x64 outgoing-SP witnesses, LLVM 19.1.7 only.
+"""Native Linux x64 outgoing-SP witnesses, LLVM 23.1.4 only.
 
 Uses saved focused-fixture optimized IR to compile distinct ordinary controls.
 Never links a staged/rejected object. GDB measures caller instructions, stepping
@@ -68,8 +68,8 @@ def main():
         return proc.stdout
 
     for name in ('llc','clang','llvm-nm'):
-        if not re.search(r'version 19\.1\.7(?:\D|$)',run([args.llvm_bin/name,'--version'],name+'-version')):
-            raise RuntimeError('LLVM 19.1.7 required')
+        if not re.search(r'version 23\.1\.4(?:\D|$)',run([args.llvm_bin/name,'--version'],name+'-version')):
+            raise RuntimeError('LLVM 23.1.4 required')
     host=out/'host.c'; host.write_text(HOST)
     cases=dict(reserved=(42,1), **{'reserved-padding':(6021,1), 'padding':(10055,1),
                'multiple':(16076,2), 'branch':(None,1), 'loop':(10055,3),
@@ -79,7 +79,7 @@ def main():
             label=case+'-'+mode; source=args.fixtures/('outgoing-'+label+'.ll')
             cert_path=source.with_suffix('.json')
             cert=json.loads(cert_path.read_text()); profile=json.loads(cert['profile'])
-            if profile['llvm']!='19.1.7' or 'linux' not in profile['triple'] or not profile['triple'].startswith('x86_64'):
+            if profile['llvm']!='23.1.4' or 'linux' not in profile['triple'] or not profile['triple'].startswith('x86_64'):
                 raise RuntimeError('unexpected fixture target/profile')
             if profile['ir_pipeline']!=('verify-only' if mode=='normal' else 'default<O2>;PassBuilder(no-TM)'):
                 raise RuntimeError('unexpected optimization identity')

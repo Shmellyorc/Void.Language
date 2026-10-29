@@ -1,0 +1,18 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 39: arrays_storage_audit
+1/1 Test #39: arrays_storage_audit .............***Failed    1.16 sec
+private fixed normal certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+private fixed O2 certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+AOT machine storage/emission certification failed: __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unmatched allocation (including clone/merge) receives no subtraction credit; 
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+research    =   1.16 sec*proc (1 test)
+
+Total Test time (real) =   1.17 sec
+
+The following tests FAILED:
+	 39 - arrays_storage_audit (Failed)                     research
+Errors while running CTest

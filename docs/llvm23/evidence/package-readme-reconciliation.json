@@ -1,0 +1,11 @@
+{
+  "tested_vsix_sha256": "a6548b243cec1538b0b9518d1097ed9bb7ef9f53f907d24ee666f56d706dc994",
+  "final_vsix_sha256": "d1ff8312baa0662176e262dabaff570dc2dcbe692df82e8e6d6fe66005d79ecd",
+  "changed_members": [
+    "extension/readme.md",
+    "extension/server/DEPENDENCIES.txt"
+  ],
+  "dependency_audit_difference": "ASLR addresses only; resolved dependencies identical",
+  "executable_extension_and_server_payloads_identical": true,
+  "initial_comparison": "An over-strict preparation assertion expected only README differences; live ldd audits also contain ASLR addresses. Actual binary payloads and resolved dependencies are unchanged."
+}

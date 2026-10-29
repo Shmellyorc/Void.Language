@@ -1,0 +1,27 @@
+Corrected strict channel cases: 0
+numeric normal 19 0
+numeric normal 23 0
+numeric O2 23 0
+numeric O2 19 0
+json normal 19 0
+json normal 23 0
+json O2 23 0
+json O2 19 0
+async normal 19 0
+async normal 23 0
+async O2 23 0
+async O2 19 0
+logging normal 19 0
+logging normal 23 0
+logging O2 23 0
+logging O2 19 0
+text normal 19 0
+text normal 23 0
+text O2 23 0
+text O2 19 0
+20/20 bounded representative measurements passed their independent checksums.
+stage11-console 0
+logging-captured 0
+logging-source-associated 0
+3/3 bounded DSE-associated checks passed; no historical cause or repair inferred.
+All bounded migration measurements completed.

@@ -1,0 +1,15 @@
+value struct child:
+    x: i32
+
+func (c child) init(seed: i32 = 0):
+    c.x = 100 / seed
+
+value struct wrapper:
+    child: child
+
+func entry(value: i32) -> i32:
+    if value < 0:
+        return wrapper(child = child(100 / (value + 1))).child.x
+    if value == 0:
+        return wrapper().child.x
+    return wrapper(child = child(value)).child.x

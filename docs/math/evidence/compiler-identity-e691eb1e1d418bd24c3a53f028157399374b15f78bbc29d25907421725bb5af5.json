@@ -1,0 +1,6 @@
+{
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+  "compiler_sha256": "e691eb1e1d418bd24c3a53f028157399374b15f78bbc29d25907421725bb5af5",
+  "native_manifest_sha256": "b9caa708afe5eabdda14e363a1446d108f1c5b94587058f24f2fa8aa29315838",
+  "native_manifest": "VOID native 23.1.4 v1\n/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang\n/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\n/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_runtime.a\n/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/libvoid_native_fixture.a\n-pthread\n"
+}

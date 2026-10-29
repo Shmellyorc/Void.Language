@@ -94,7 +94,7 @@ void finish(llvm::Module& module, bool optimize) {
     }
 }
 std::unique_ptr<llvm::TargetMachine> native_machine() {
-    const auto triple = llvm::sys::getDefaultTargetTriple();
+    const llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
     std::string error;
     auto* target = llvm::TargetRegistry::lookupTarget(triple, error);
     if (!target) throw std::runtime_error(error);
@@ -299,10 +299,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             else if(t.kind==ir::Type::growable_array){kind=15;target=list_key(ir::array_element(t));}
             else if(t.kind==ir::Type::dictionary){kind=16;target="void.dict.v1/"+element_key(ir::array_element(t));}
             else throw std::invalid_argument("unsupported native array element");
-            fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalStringPtr(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable || (inactive && (kind==11 || kind==13 || kind>=14)))}));
+            fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalString(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable || (inactive && (kind==11 || kind==13 || kind>=14)))}));
         };visit(root,0,false);
         auto* fields_type=llvm::ArrayType::get(element_field_type,fields.size());auto* data=new llvm::GlobalVariable(*module,fields_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(fields_type,fields),"array.element.fields");
-        auto* record=new llvm::GlobalVariable(*module,element_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(element_record_type,{b.CreateGlobalStringPtr(element_key(root)),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(root))),llvm::ConstantInt::get(size_type,layout.getABITypeAlign(type(root)).value()),llvm::ConstantInt::get(size_type,fields.size()),data}),"array.element");
+        auto* record=new llvm::GlobalVariable(*module,element_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(element_record_type,{b.CreateGlobalString(element_key(root)),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(root))),llvm::ConstantInt::get(size_type,layout.getABITypeAlign(type(root)).value()),llvm::ConstantInt::get(size_type,fields.size()),data}),"array.element");
         element_records.emplace(root,record);return record;
     };
     auto* dictionary_record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),size_type,size_type);
@@ -372,7 +372,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             auto* invoke=llvm::BasicBlock::Create(context,"invoke_callable",dispatcher);selected->addCase(b.getInt64(function_ids.at(target.name)),invoke);b.SetInsertPoint(invoke);
             std::vector<llvm::Value*> arguments;if(target.closure)arguments.push_back(b.CreateExtractValue(dispatcher->getArg(0),1));for(unsigned n=1;n<dispatcher->arg_size();++n)arguments.push_back(dispatcher->getArg(n));auto* value=b.CreateCall(functions.at(target.name),arguments);if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(value);
         }
-        b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Null or incompatible function value"),dispatcher->getArg(dispatcher->arg_size()-1));if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(result)));
+        b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalString("Null or incompatible function value"),dispatcher->getArg(dispatcher->arg_size()-1));if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(result)));
     }
     std::map<std::string,llvm::Function*> callable_comparisons;
     for(const auto& [key,t]:callable_types){
@@ -391,7 +391,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     const auto* record_layout=layout.getStructLayout(record_type);
     if(record_layout->getSizeInBytes()!=sizeof(RuntimeTypeRecord) || record_layout->getElementOffset(3)!=offsetof(RuntimeTypeRecord,size) || record_layout->getElementOffset(5)!=offsetof(RuntimeTypeRecord,count) || record_layout->getElementOffset(6)!=offsetof(RuntimeTypeRecord,dictionary_key_schema) || record_layout->getElementOffset(7)!=offsetof(RuntimeTypeRecord,dictionary_key_forbidden))
         throw std::invalid_argument("runtime nominal descriptor ABI mismatch");
-    auto string=[&](const std::string& text) {return b.CreateGlobalStringPtr(text,"",0,module.get());};
+    auto string=[&](const std::string& text) {return b.CreateGlobalString(text,"",0,module.get());};
     std::vector<llvm::Constant*> records,keys;
     for(const auto& [key,t]:nominal_types) {
         auto payload=t.kind==ir::Type::interface_ref ? t : ir::Type(t.definition);
@@ -433,7 +433,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             if(root.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(result);
         }
         b.SetInsertPoint(invalid);
-        b.CreateStore(b.CreateGlobalStringPtr("Invalid managed virtual receiver or generation type catalog"),dispatcher->getArg(dispatcher->arg_size()-1));
+        b.CreateStore(b.CreateGlobalString("Invalid managed virtual receiver or generation type catalog"),dispatcher->getArg(dispatcher->arg_size()-1));
         if(root.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(root.result)));
     }
     // Canonical data-only contracts use independently inferred effects, including
@@ -793,7 +793,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         }
         if(display_body) {
             llvm::Value* object=f.parameters[0].kind==ir::Type::managed_ref?static_cast<llvm::Value*>(fn->getArg(0)):llvm::ConstantPointerNull::get(b.getPtrTy());
-            b.CreateCall(module->getOrInsertFunction("vd_display_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(f.name),object,failure});
+            b.CreateCall(module->getOrInsertFunction("vd_display_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalString(f.name),object,failure});
             auto* invalid=llvm::BasicBlock::Create(context,"display_hook_error",fn);auto* ready=llvm::BasicBlock::Create(context,"display_hook_ready",fn);
             b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),invalid,ready);b.SetInsertPoint(invalid);
             // Entry failed before any source cleanup was reached or guard pushed.
@@ -810,7 +810,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.SetInsertPoint(invalid); return_failure(); blocks[0] = ready; b.SetInsertPoint(ready);
         }
         llvm::SwitchInst* resume_states=nullptr;unsigned resume_serial=0;
-        if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Invalid async resume state"),failure);return_failure();}
+        if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalString("Invalid async resume state"),failure);return_failure();}
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
             active_block=n;b.SetInsertPoint(blocks[n]);
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
@@ -843,7 +843,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                             source_message(loc, instruction.source_excerpt, "source call");
                         auto* frames = b.CreateStructGEP(failure_type, failure, 2);
                         auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
-                        b.CreateStore(b.CreateGlobalStringPtr(trace), address);
+                        b.CreateStore(b.CreateGlobalString(trace), address);
                         b.CreateStore(b.CreateAdd(count, b.getInt32(1)), count_address);
                         b.CreateBr(done); b.SetInsertPoint(done); return_failure();
                 };
@@ -854,8 +854,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     if (failure) {
                         auto message = source_message(loc,instruction.source_excerpt,"runtime error: " + description);
                         message += "In function " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n";
-                        b.CreateStore(b.CreateGlobalStringPtr(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
-                    } else { b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
+                        b.CreateStore(b.CreateGlobalString(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
+                    } else { b.CreateCall(llvm::Intrinsic::getOrInsertDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
                     b.SetInsertPoint(valid);
                 };
                 auto selected_failure = [&] {
@@ -969,7 +969,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     if(instruction.op==Op::array_get) {
                         auto* value=t.kind==ir::Type::growable_array ?
                             b.CreateCall(module->getOrInsertFunction("vd_list_read_index",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,encoding,index,b.getInt32(numeric::signed_integer(operand_type(instruction.b))),failure}) :
-                            b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});array_failure();
+                            b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});
+                        fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Array operation failed during index access");
                         auto element=ir::array_element(t);auto* narrow=b.CreateTruncOrBitCast(value,b.getIntNTy(numeric::width(element)));
                         v=numeric::floating(element)?b.CreateBitCast(narrow,type(element)):narrow;
                     } else {
@@ -1108,7 +1109,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
                     auto* storage=value_roots[n].at(values.size());
                     std::vector<llvm::Value*> arguments{storage,llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),payload};
-                    if(nominal_types.contains(instruction.type.definition->identity)) arguments.push_back(b.CreateGlobalStringPtr(instruction.type.definition->identity));
+                    if(nominal_types.contains(instruction.type.definition->identity)) arguments.push_back(b.CreateGlobalString(instruction.type.definition->identity));
                     arguments.push_back(failure);
                     std::vector<llvm::Type*> parameter_types;for(auto* arg:arguments) parameter_types.push_back(arg->getType());
                     auto abi=module->getOrInsertFunction(nominal_types.contains(instruction.type.definition->identity) ? "vd_gc_construct_typed" : "vd_gc_construct",llvm::FunctionType::get(b.getVoidTy(),parameter_types,false));
@@ -1120,7 +1121,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto found = std::find_if(input.globals.begin(), input.globals.end(), [&](const auto& g) { return g.identity == instruction.callee; });
                     auto* storage = value_roots[n].at(values.size());
                     b.CreateCall(module->getOrInsertFunction("vd_global_cell", b.getVoidTy(), b.getPtrTy(), size_type, b.getPtrTy(), b.getPtrTy()),
-                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalStringPtr(found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
+                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalString(found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
                     selected_failure();
                     v = b.CreateLoad(b.getPtrTy(), storage); break;
                 }
@@ -1170,7 +1171,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     for(const auto& [key,dynamic]:nominal_types){
                         if(dynamic.kind==ir::Type::managed_ref) {
                             if(instruction.type.kind==ir::Type::managed_ref && ir::subtype(dynamic,instruction.type))matches=b.CreateOr(matches,b.CreateICmpEQ(selected,b.getInt64(index)));
-                            if(instruction.type.kind==ir::Type::interface_ref)for(const auto* binding:bindings)if(binding->view==dynamic && binding->interface==instruction.type){auto* found=b.CreateICmpEQ(selected,b.getInt64(index));matches=b.CreateOr(matches,found);auto* value=b.CreateCall(module->getOrInsertFunction("vd_gc_witness",b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(binding->key)});witness=b.CreateSelect(found,value,witness);}
+                            if(instruction.type.kind==ir::Type::interface_ref)for(const auto* binding:bindings)if(binding->view==dynamic && binding->interface==instruction.type){auto* found=b.CreateICmpEQ(selected,b.getInt64(index));matches=b.CreateOr(matches,found);auto* value=b.CreateCall(module->getOrInsertFunction("vd_gc_witness",b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalString(binding->key)});witness=b.CreateSelect(found,value,witness);}
                         }
                         ++index;
                     }
@@ -1240,7 +1241,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         }else {if(t==ir::Type::f32)argument=b.CreateBitCast(argument,b.getInt32Ty());else if(t==ir::Type::f64)argument=b.CreateBitCast(argument,b.getInt64Ty());bits=b.CreateZExtOrTrunc(argument,b.getInt64Ty());}
                     }
                     llvm::Value* output=llvm::ConstantPointerNull::get(b.getPtrTy());if(instruction.type==ir::Type::string || instruction.type.kind==ir::Type::managed_ref)output=value_roots[n].at(values.size());
-                    auto* result=b.CreateCall(module->getOrInsertFunction(native_provider(instruction.callee)=="void.fixture.v1"?"vd_native_fixture_call":"vd_native_sink_call",b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.getInt32(op),bits,object,text,function,environment,entry,output,b.CreateGlobalStringPtr(op==14?instruction.type.definition->identity:""),failure});
+                    auto* result=b.CreateCall(module->getOrInsertFunction(native_provider(instruction.callee)=="void.fixture.v1"?"vd_native_fixture_call":"vd_native_sink_call",b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.getInt32(op),bits,object,text,function,environment,entry,output,b.CreateGlobalString(op==14?instruction.type.definition->identity:""),failure});
                     auto* bad=llvm::BasicBlock::Create(context,"native.failure",fn);auto* okay=llvm::BasicBlock::Create(context,"native.valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,okay);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(okay);
                     if(instruction.type==ir::Type::none)v=llvm::UndefValue::get(b.getInt8Ty());else if(instruction.type==ir::Type::string || instruction.type.kind==ir::Type::managed_ref)v=b.CreateLoad(type(instruction.type),output);else if(instruction.type==ir::Type::f32)v=b.CreateBitCast(b.CreateTrunc(result,b.getInt32Ty()),b.getFloatTy());else if(instruction.type==ir::Type::f64)v=b.CreateBitCast(result,b.getDoubleTy());else v=b.CreateZExtOrTrunc(result,type(instruction.type));break;
                 }
@@ -1342,7 +1343,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     std::vector<llvm::Constant*> cases;
                     if (enumeration) {
                         for (const auto& variant : value_type.definition->cases) {
-                            cases.push_back(b.CreateGlobalStringPtr(value_type.definition->identity + "." + variant.name));
+                            cases.push_back(b.CreateGlobalString(value_type.definition->identity + "." + variant.name));
                         }
                     }
                     auto* names = new llvm::GlobalVariable(*module, cases_type, true,
@@ -1483,7 +1484,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         if(instruction.op==Op::string_literal) {
                             const auto& text=input.strings.at(instruction.immediate);
                             b.CreateCall(module->getOrInsertFunction("vd_string_literal",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),
-                                {storage,b.CreateGlobalStringPtr(llvm::StringRef(text.data(),text.size())),llvm::ConstantInt::get(size_type,text.size()),failure});
+                                {storage,b.CreateGlobalString(llvm::StringRef(text.data(),text.size())),llvm::ConstantInt::get(size_type,text.size()),failure});
                         } else b.CreateCall(module->getOrInsertFunction("vd_string_concat",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{storage,values[instruction.a],values[instruction.b],failure});
                         v=b.CreateLoad(b.getPtrTy(),storage);
                     }
@@ -1525,7 +1526,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     case math::Kind::log2:id=llvm::Intrinsic::log2;break;
                     default:throw std::invalid_argument("invalid validated Math operation");
                     }
-                    auto* target=llvm::Intrinsic::getDeclaration(module.get(),id,{scalar});
+                    auto* target=llvm::Intrinsic::getOrInsertDeclaration(module.get(),id,{scalar});
                     if(kind==math::Kind::pow)v=b.CreateCall(target,{values[instruction.a],values[instruction.b]});
                     else v=b.CreateCall(target,{values[instruction.a]});
                     break;
@@ -1742,7 +1743,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto* failure = wrapper->getArg(wrapper->arg_size() - 1);
         auto contract = global_contract(input);
         auto* state = b.CreateCall(module->getOrInsertFunction("vd_globals_begin", b.getInt32Ty(), b.getPtrTy(), size_type, size_type, b.getPtrTy()),
-            {b.CreateGlobalStringPtr(contract), llvm::ConstantInt::get(size_type, contract.size()), llvm::ConstantInt::get(size_type, input.globals.size()), failure});
+            {b.CreateGlobalString(contract), llvm::ConstantInt::get(size_type, contract.size()), llvm::ConstantInt::get(size_type, input.globals.size()), failure});
         auto* dispatch = llvm::BasicBlock::Create(context, "globals.dispatch", wrapper);
         b.CreateCondBr(b.CreateICmpSLT(state, b.getInt32(0)), failed, dispatch);
         b.SetInsertPoint(dispatch); b.CreateCondBr(b.CreateICmpEQ(state, b.getInt32(1)), initialize, run);
@@ -1998,7 +1999,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     auto context = std::make_unique<llvm::LLVMContext>();
     auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),selected->name);
     module->setDataLayout(impl_->jit->getDataLayout());
-    module->setTargetTriple(impl_->jit->getTargetTriple().str());
+    module->setTargetTriple(impl_->jit->getTargetTriple());
     finish(*module, optimize);
     auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty());
     if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals);
@@ -2084,7 +2085,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     auto context = std::make_unique<llvm::LLVMContext>();
     auto module = std::make_unique<llvm::Module>("root proof", *context);
     module->setDataLayout(impl_->jit->getDataLayout());
-    module->setTargetTriple(impl_->jit->getTargetTriple().str());
+    module->setTargetTriple(impl_->jit->getTargetTriple());
     llvm::IRBuilder<> b(*context);
     auto* ptr = b.getPtrTy();
     auto alloc = module->getOrInsertFunction("vd_probe_allocate", llvm::FunctionType::get(ptr, false));
@@ -2146,7 +2147,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
                         ,storage_proof ? &inventory : nullptr
 #endif
                         );
-    module->setTargetTriple(triple);
+    module->setTargetTriple(machine->getTargetTriple());
     module->setDataLayout(machine->createDataLayout());
     if (!runtime_object) {
     const ir::Function* entry_function = nullptr;
@@ -2186,11 +2187,11 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         b.CreateCondBr(valid, ready, invalid);
         b.SetInsertPoint(invalid);
         auto puts = module->getOrInsertFunction("puts", llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, false));
-        b.CreateCall(puts, {b.CreateGlobalStringPtr("VOID: expected one optional decimal i32 input")}); b.CreateRet(b.getInt32(2));
+        b.CreateCall(puts, {b.CreateGlobalString("VOID: expected one optional decimal i32 input")}); b.CreateRet(b.getInt32(2));
         b.SetInsertPoint(ready);
         auto* selected = b.CreatePHI(b.getInt32Ty(), 2);
         selected->addIncoming(b.getInt32(0), start);
-        auto* truncated = llvm::CastInst::CreateTruncOrBitCast(parsed, b.getInt32Ty(), "input", parse->getTerminator());
+        auto* truncated = llvm::CastInst::CreateTruncOrBitCast(parsed, b.getInt32Ty(), "input", parse->getTerminator()->getIterator());
         selected->addIncoming(truncated, parse); input_value = selected;
     }
     if(source_program && input.application) {
@@ -2240,7 +2241,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         auto* stream=b.CreateLoad(b.getPtrTy(),stream_global);
 #endif
         auto print_error=module->getOrInsertFunction("fprintf",llvm::FunctionType::get(b.getInt32Ty(),{b.getPtrTy(),b.getPtrTy()},true));
-        auto* format=b.CreateGlobalStringPtr("%s");
+        auto* format=b.CreateGlobalString("%s");
         b.CreateCall(print_error, {stream,format,message});
         auto* count = b.CreateLoad(b.getInt32Ty(), b.CreateStructGEP(failure_type, failure, 1));
         auto* start = b.GetInsertBlock();
@@ -2260,13 +2261,13 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         auto* exit = llvm::BasicBlock::Create(context, "exit", main);
         b.CreateCondBr(b.CreateICmpUGT(count, b.getInt32(32)), truncated, exit);
         b.SetInsertPoint(truncated);
-        b.CreateCall(print_error, {stream,format,b.CreateGlobalStringPtr("\nSource call trace limited to 32 callers.\n")}); b.CreateBr(exit);
-        b.SetInsertPoint(exit); b.CreateCall(print_error,{stream,format,b.CreateGlobalStringPtr("\n")}); b.CreateRet(b.getInt32(1)); b.SetInsertPoint(success);
+        b.CreateCall(print_error, {stream,format,b.CreateGlobalString("\nSource call trace limited to 32 callers.\n")}); b.CreateBr(exit);
+        b.SetInsertPoint(exit); b.CreateCall(print_error,{stream,format,b.CreateGlobalString("\n")}); b.CreateRet(b.getInt32(1)); b.SetInsertPoint(success);
     }
     auto print = module->getOrInsertFunction("printf",
         llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, true));
     if(input.application)b.CreateRet(result);
-    else {b.CreateCall(print, {b.CreateGlobalStringPtr("%d\n"), result});
+    else {b.CreateCall(print, {b.CreateGlobalString("%d\n"), result});
     b.CreateRet(b.getInt32(0));}
     }
 #ifdef VOID_LLVM_RESEARCH
@@ -2310,7 +2311,7 @@ void emit_private_fixed_call_research(const ir::Module& input, const std::filesy
     auto machine=native_machine();
     llvm::LLVMContext context;
     auto module=lower(input,context,"",machine->createDataLayout(),input.entry_symbol,nullptr,nullptr,nullptr,true);
-    module->setTargetTriple(machine->getTargetTriple().str());
+    module->setTargetTriple(machine->getTargetTriple());
     finish(*module,optimize);
     write_object(*module,*machine,output);
 }

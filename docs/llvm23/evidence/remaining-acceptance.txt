@@ -1,0 +1,6 @@
+release-numeric-corrected 0
+release-frontend-hard-stack 0
+debug-frontend-hard-stack 0
+debug-final 0
+strict-final 8
+Stopped after failing profile; original log preserved.

@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 344: frontend
+1/1 Test #344: frontend .........................   Passed    9.29 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   9.30 sec

@@ -1,5 +1,57 @@
 # Logging performance repair
 
+## Architecture approved; implementation blocked by reproduced crash
+
+Boss approved `text.translate_scalars` with mandatory refinements. That approval
+remains valid. Its section 1 also requires stopping if the experimental SIGSEGV
+cannot be isolated sufficiently to exclude a relevant production defect.
+
+The original executable and all 61 captured source files were hash-verified.
+The crash **reproduced on the third original-command O2 run**, exit -11, with
+empty stdout/stderr. The new original-binary incident is `incident-tg6xt8tp`;
+`incident-vs4b96zy` remains unchanged. Two phase-instrumented O2 runs, one normal
+run, five original-binary signal-preload runs, strict ASan/UBSan/leak normal/O2,
+and three preload runs without unwinder prewarm all passed. Across all 16
+invocations: **15 passes, one signal**. None of the diagnostic variants captured
+a failing stack. Passing controls do not resolve the original defect.
+
+The fault remains unclassified among harness, generated prototype code and
+compiler/Runtime; a relevant production correctness defect cannot be excluded.
+**Implementation stops under the explicit section 1 condition.** No production
+or repository test source changed; the suspect flat builder was only diagnostic
+input. The approved text operation and logger integration have not started.
+No new full correctness matrix or performance acceptance is claimed. Performance
+gate **OPEN**, release **HOLD**.
+
+Detailed escalation and raw evidence:
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/approved-crash-classification/ESCALATION.md`.
+That directory also contains bounded plans, exact commands/hashes, all receipts,
+a separate raw index and `review/void-log-approved-crash-review.tar.gz`.
+No ptrace or Git mutations were used. Historical evidence and the previous
+263/263 result remain unchanged. The next decision concerns a bounded causal
+crash investigation, not another approval of the text architecture.
+
+## Prior checkpoint: architecture review required
+
+The hot-path continuation starts from `db808efe0fa191ed25733513cc9ebcebbadc3bc2`.
+Both remaining paths were measured, but neither has an accepted repair. **No
+production/test source changed.** Scalar key views help ordinary reads but leave
+checked traversal dominant; a flat builder plus key views reduces heavy framing
+to 343.877 ms while regressing occasional escapes. Expanded byte-checked controls,
+explicit heavy targets and a proposed general bounded scalar-substitution operation
+are in [HOTPATH_REVIEW.md](HOTPATH_REVIEW.md). Boss explicitly requires architecture
+review before implementing a significant shared Runtime contract, so work stops
+at that boundary. Performance gate **OPEN**, release **HOLD**. The earlier 263/263
+result below is preserved baseline evidence, not validation of a new repair.
+
+All new raw evidence is outside Git at
+`/home/shmellyorc/.local/state/void-log-hotpath/db808efe-20261028/`;
+see its `EVIDENCE_INDEX.md` and compact source/review package. The original new
+SIGSEGV remains unresolved and preserved. Benchmark tables and limitations appear
+in the continuation section of [BENCHMARKS.md](BENCHMARKS.md).
+
+## Previous sprint (preserved report)
+
 Status: **both investigations and main repairs complete; performance gate OPEN,
 release HOLD pending independent Golden Wrench review**. Fresh correctness
 validation passed 263/263 selected CTests. The synchronous screening target is

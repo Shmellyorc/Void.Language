@@ -1,0 +1,36 @@
+value struct links:
+    prefix: u8
+    next: node?
+    suffix: bool
+
+struct node:
+    using edges: links
+    value: i32
+
+value struct carrier:
+    tag: i8
+    required: node
+    using nested: links
+    wide: i64
+    count: i32
+
+func make(value: i32) -> carrier:
+    var a = node(value = value)
+    var b = node(value = value + 1)
+    a.next = b
+    b.next = a
+    return carrier(required = a, nested = links(next = b), count = 1)
+
+func churn(p: carrier, limit: i32) -> carrier:
+    var i = 0
+    for i < limit:
+        var garbage = node(value = i)
+        p.count++
+        i++
+    return p
+
+func entry(value: i32) -> i32:
+    var p = churn(make(value), 1000)
+    var q = p
+    q.count++
+    return p.required.value + (q.next as node).value + p.count + q.count

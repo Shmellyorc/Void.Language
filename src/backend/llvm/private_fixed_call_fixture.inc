@@ -81,7 +81,7 @@ auto rr=roots();enter(rr);
 auto* source=caller->getArg(0);auto* result=caller->getArg(1);
 auto* l=caller->getArg(2);auto* q=caller->getArg(3);auto* fail=caller->getArg(4);
 auto* cleanup=llvm::BasicBlock::Create(context,"cleanup",caller);
-auto* answer=llvm::PHINode::Create(word,20,"processed_result",cleanup);
+auto* answer=llvm::PHINode::Create(word,20,"processed_result",cleanup->end());
 auto guard=[&]() {
     auto* next=llvm::BasicBlock::Create(context,"continue",caller);auto* previous=b.GetInsertBlock();
     b.CreateCondBr(failed(fail),cleanup,next);answer->addIncoming(b.getInt64(0),previous);b.SetInsertPoint(next);
@@ -90,7 +90,7 @@ guard();
 auto* distinct=llvm::BasicBlock::Create(context,"distinct_context",caller);
 auto* alias=llvm::BasicBlock::Create(context,"aliased_context",caller);
 b.CreateCondBr(b.CreateICmpNE(source,result),distinct,alias);b.SetInsertPoint(alias);
-b.CreateStore(b.CreateGlobalStringPtr("Invalid aliased context"),fail);
+b.CreateStore(b.CreateGlobalString("Invalid aliased context"),fail);
 b.CreateBr(cleanup);answer->addIncoming(b.getInt64(0),alias);b.SetInsertPoint(distinct);
 // Check the compiler's scalar type/extent once at the embedding boundary.
 // Per-operation root/buffer/publication validation stays in Runtime helpers.

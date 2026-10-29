@@ -1,0 +1,37 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 20%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[ 60%] Built target void_runtime
+[ 60%] Linking CXX static library libvoid_core.a
+[ 60%] Built target void_core
+[ 80%] Built target void_llvm
+[ 80%] Building CXX object CMakeFiles/void_arrays_storage_audit.dir/tests/arrays/storage_audit.cpp.o
+[100%] Linking CXX executable void_arrays_storage_audit
+[100%] Built target void_arrays_storage_audit
+[  0%] Built target void_zone_objects
+[  0%] Built target void_managed_test_abi
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 20%] Built target void_core
+[ 60%] Built target void_runtime
+[ 80%] Built target void_llvm
+[ 80%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[ 80%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_cache_tests.dir/tests/cache/tests.cpp.o
+[100%] Linking CXX executable void_cache_tests
+[100%] Built target void_cache_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 20%] Built target void_core
+[ 60%] Built target void_runtime
+[ 80%] Built target void_llvm
+[ 80%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc

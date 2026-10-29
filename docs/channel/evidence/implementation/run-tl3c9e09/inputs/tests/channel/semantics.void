@@ -1,0 +1,114 @@
+use channel
+
+func require(ok: bool):
+    if not ok:
+        var zero = 0
+        var failed = 1 / zero
+
+struct holder:
+    bus: channel.router<i32>
+
+func publish(bus: channel.router<i32>, amount: i32):
+    bus.emit("score", amount)
+
+func entry(input: i32) -> i32:
+    var bus = channel.router<i32>()
+    var other = channel.router<i32>()
+    var total = 0
+    var callback = func(const amount: i32):
+        total += amount
+    const first = bus.subscribe("score", callback)
+    const second = bus.subscribe("score", callback)
+    require(first != second)
+    const copied = first
+    require(not other.unsubscribe(copied))
+    var foreign_type = channel.router<i64>()
+    require(not foreign_type.unsubscribe(copied))
+    var object = holder(bus = bus)
+    publish(object.bus, 2)
+    require(total == 4)
+    require(bus.unsubscribe(copied))
+    require(not bus.unsubscribe(first))
+    bus.emit("score", 3)
+    require(total == 7)
+    bus.clear()
+    bus.clear()
+    require(not bus.unsubscribe(second))
+    bus.emit("score", 90)
+    require(total == 7)
+    bus.subscribe("", callback)
+    bus.subscribe("a\0b", callback)
+    bus.subscribe("雪/🔥", callback)
+    bus.subscribe("é", callback)
+    bus.emit("a", 100)
+    bus.emit("A\0b", 100)
+    bus.emit("雪", 100)
+    bus.emit("雪/*", 100)
+    bus.emit("é", 100)
+    bus.emit("", 1)
+    bus.emit("a\0b", 2)
+    const readonly = bus
+    readonly.emit("雪/🔥", 3)
+    require(total == 13)
+    bus.emit("é", 1)
+    require(total == 14)
+    bus.clear()
+    var trace = ""
+    var b_token: channel.subscription? = null
+    var third = func(const amount: i32):
+        trace += "C"
+    var a = func(const amount: i32):
+        trace += "A"
+        if amount == 1:
+            if b_token is Ok(var live):
+                require(bus.unsubscribe(live))
+            bus.subscribe("tick", third)
+            bus.emit("tick", 2)
+    var b = func(const amount: i32):
+        trace += "B"
+    bus.subscribe("tick", a)
+    b_token = bus.subscribe("tick", b)
+    bus.emit("tick", 1)
+    require(trace == "AACB")
+    bus.clear()
+    trace = ""
+    var clearing = func(const amount: i32):
+        trace += "A"
+        bus.clear()
+        bus.emit("tick", 3)
+        bus.subscribe("tick", third)
+        bus.emit("tick", 4)
+    bus.subscribe("tick", clearing)
+    const old = bus.subscribe("tick", b)
+    bus.emit("tick", 1)
+    require(trace == "ACB")
+    require(not bus.unsubscribe(old))
+    bus.clear()
+    var own: channel.subscription? = null
+    var self_removing = func(const amount: i32):
+        trace += "S"
+        if own is Ok(var self_token):
+            bus.unsubscribe(self_token)
+        if amount == 1:
+            bus.emit("tick", 2)
+    own = bus.subscribe("tick", self_removing)
+    bus.subscribe("tick", b)
+    trace = ""
+    bus.emit("tick", 1)
+    require(trace == "SBB")
+    bus.clear()
+    for count in 0..<128:
+        bus.subscribe("many", callback)
+    total = 0
+    var evaluations = 0
+    var next_topic = func() -> string:
+        evaluations += 1
+        return "many"
+    var next_payload = func() -> i32:
+        evaluations += 1
+        return 1
+    bus.emit(next_topic(), next_payload())
+    require(evaluations == 2)
+    require(total == 128)
+    bus.clear()
+    return 7

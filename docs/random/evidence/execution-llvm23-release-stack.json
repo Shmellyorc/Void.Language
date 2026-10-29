@@ -1,0 +1,9 @@
+{
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+  "compiler_sha256": "32f2fc6a6a780b908e1dc8bfd1a90d22ac39fd8cf77d1e3854ef87df4f10e8cf",
+  "source_sha256": "13f0331f5e59fc7462e4f7234366de663fa24f5269a94f66a4ad77294cc697ca",
+  "oracle_sha256": "36e56674f9715a31baa2cfee1245056faca1ec27b5143c56200d063aa19fe8d1",
+  "vectors": 792,
+  "processes": 7,
+  "small_stack": true
+}

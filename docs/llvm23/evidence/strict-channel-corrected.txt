@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start 206: channel_host
+    Start 208: channel_execution
+1/2 Test #206: channel_host .....................   Passed   30.81 sec
+2/2 Test #208: channel_execution ................   Passed   92.91 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  92.92 sec

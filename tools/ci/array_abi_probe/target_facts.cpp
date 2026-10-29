@@ -14,18 +14,18 @@
 #include <string>
 
 int main(int argc, char** argv) {
-    if (argc != 2 || std::string(LLVM_VERSION_STRING) != "19.1.7") return 1;
+    if (argc != 2 || std::string(LLVM_VERSION_STRING) != "23.1.4") return 1;
     LLVMInitializeX86TargetInfo(); LLVMInitializeX86Target(); LLVMInitializeX86TargetMC();
     LLVMInitializeAArch64TargetInfo(); LLVMInitializeAArch64Target(); LLVMInitializeAArch64TargetMC();
     std::string error;
-    const auto* target = llvm::TargetRegistry::lookupTarget(argv[1], error);
+    const auto* target = llvm::TargetRegistry::lookupTarget(llvm::Triple(argv[1]), error);
     if (!target) { llvm::errs() << error << '\n'; return 1; }
     std::unique_ptr<llvm::TargetMachine> machine(target->createTargetMachine(
-        argv[1], "generic", "", llvm::TargetOptions(), llvm::Reloc::PIC_));
+        llvm::Triple(argv[1]), "generic", "", llvm::TargetOptions(), llvm::Reloc::PIC_));
     if (!machine) return 1;
     llvm::LLVMContext context;
     llvm::Module module("target-facts", context);
-    module.setTargetTriple(argv[1]);
+    module.setTargetTriple(llvm::Triple(argv[1]));
     module.setDataLayout(machine->createDataLayout());
     auto* function = llvm::Function::Create(llvm::FunctionType::get(llvm::Type::getVoidTy(context), false),
         llvm::GlobalValue::ExternalLinkage, "profile", module);

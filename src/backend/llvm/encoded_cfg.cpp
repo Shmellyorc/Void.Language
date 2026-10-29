@@ -116,7 +116,7 @@ std::string inspect_research_cfg(StringRef bytes, StringRef function, StringRef 
     {"object_sha256",toHex(SHA256::hash(arrayRefFromStringRef(bytes)))}};
   json::Array instructions;
   try {
-    require(StringRef(LLVM_VERSION_STRING)=="19.1.7","LLVM version mismatch");
+    require(StringRef(LLVM_VERSION_STRING)=="23.1.4","LLVM version mismatch");
     Triple triple(tm.getTargetTriple());require(triple.isOSLinux() && triple.getArch()==Triple::x86_64,"unsupported target profile");
     auto parsed=object::ObjectFile::createObjectFile(MemoryBufferRef(bytes,"research-object"));
     if(!parsed)throw std::runtime_error(toString(parsed.takeError()));
@@ -171,10 +171,10 @@ std::string inspect_research_cfg(StringRef bytes, StringRef function, StringRef 
     for(const auto &[offset,r]:relocations)relocReport.push_back(json::Object{{"offset",int64_t(offset)},{"type",int64_t(r.type)},{"symbol",r.symbol},{"addend",r.addend}});
     result["relocations"]=std::move(relocReport);result["function_extent"]=int64_t(extent);
     MCContext context(triple,tm.getMCAsmInfo(),tm.getMCRegisterInfo(),tm.getMCSubtargetInfo());
-    std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(*tm.getMCSubtargetInfo(),context));
+    std::unique_ptr<MCDisassembler> dis(target.createMCDisassembler(tm.getMCSubtargetInfo(),context));
     std::unique_ptr<MCInstrAnalysis> analysis(target.createMCInstrAnalysis(tm.getMCInstrInfo()));
     require(bool(dis)&&bool(analysis),"MC decoder/analysis unavailable");
-    const auto &ii=*tm.getMCInstrInfo();const auto &ri=*tm.getMCRegisterInfo();
+    const auto &ii=*tm.getMCInstrInfo();const auto &ri=tm.getMCRegisterInfo();
     std::vector<Node> nodes;std::map<uint64_t,size_t> boundaries;std::set<uint64_t> usedRelocations;
     const std::set<std::string> ordinary={"MOV32ri","MOV64rr","MOV32rr","LEA64r","TEST32rr","XOR32rr",
       "ADD64rr","CMP32ri8","CMP32ri","CMP32rr","ADD32ri8","ADD32ri","INC32r","DEC32r","MOV64mr","MOV64rm",

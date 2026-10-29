@@ -1,0 +1,1040 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+        Start   1: stage10_operator_reload
+  1/368 Test   #1: stage10_operator_reload ...................   Passed   17.01 sec
+        Start   2: stage10_operator_keys
+  2/368 Test   #2: stage10_operator_keys .....................   Passed    0.12 sec
+        Start   3: stage10_operator_resolution
+  3/368 Test   #3: stage10_operator_resolution ...............   Passed    0.72 sec
+        Start   4: stage10_operator_declarations
+  4/368 Test   #4: stage10_operator_declarations .............   Passed    0.33 sec
+        Start   5: stage10_source_formatting
+  5/368 Test   #5: stage10_source_formatting .................   Passed    0.22 sec
+        Start   6: stage10_tooling
+  6/368 Test   #6: stage10_tooling ...........................   Passed    0.07 sec
+        Start   7: stage10_display_reload
+  7/368 Test   #7: stage10_display_reload ....................   Passed    1.31 sec
+        Start   8: stage10_temporal_ir
+  8/368 Test   #8: stage10_temporal_ir .......................   Passed    1.30 sec
+        Start   9: format_temporal
+  9/368 Test   #9: format_temporal ...........................   Passed    0.03 sec
+        Start  10: stage10_hooks
+ 10/368 Test  #10: stage10_hooks .............................   Passed    1.46 sec
+        Start  11: stage10_interpolation
+ 11/368 Test  #11: stage10_interpolation .....................   Passed    0.39 sec
+        Start  12: stage10_conversion
+ 12/368 Test  #12: stage10_conversion ........................   Passed   75.53 sec
+        Start  13: stage10_fields
+ 13/368 Test  #13: stage10_fields ............................   Passed    0.18 sec
+        Start  14: format_numeric
+ 14/368 Test  #14: format_numeric ............................   Passed    0.04 sec
+        Start  15: format_zones
+ 15/368 Test  #15: format_zones ..............................   Passed    0.17 sec
+        Start  16: json_readonly
+ 16/368 Test  #16: json_readonly .............................   Passed    2.41 sec
+        Start  17: json_dynamic
+ 17/368 Test  #17: json_dynamic ..............................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/dynamic.py", line 37, in <module>
+    h.run([h.compiler,'run',source_path,*flags],source_path,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  18: json_numbers
+ 18/368 Test  #18: json_numbers ..............................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/numbers.py", line 33, in <module>
+    h.run([h.compiler,'run',src,*flags],src,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  19: json_schema
+ 19/368 Test  #19: json_schema ...............................***Failed    0.06 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/schema.py", line 47, in <module>
+    h.run([h.compiler,'run',src,*flags],src,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  20: json_bounds
+ 20/368 Test  #20: json_bounds ...............................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/bounds.py", line 66, in <module>
+    h.run([h.compiler,'run',src,*flags],src,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  21: json_install
+ 21/368 Test  #21: json_install ..............................***Failed    0.06 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/install.py", line 7, in <module>
+    h.run(['cmake','--install',h.compiler.parent,'--prefix',prefix,'--component','compiler'],src)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  22: json_adversarial
+ 22/368 Test  #22: json_adversarial ..........................***Failed    0.14 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/adversarial.py", line 69, in <module>
+    h.run([h.compiler,'run',src,*flags],src,('\n'.join(expected)+'\n').encode(),timeout=300)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  23: json_metering
+ 23/368 Test  #23: json_metering .............................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/metering.py", line 11, in <module>
+    h.run([h.compiler, 'run', source, '--no-cache', *flags], source, expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  24: json_execution_validated
+ 24/368 Test  #24: json_execution_validated ..................***Failed    0.06 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  25: json_execution_accessors
+ 25/368 Test  #25: json_execution_accessors ..................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  26: json_execution_dynamic_smoke
+ 26/368 Test  #26: json_execution_dynamic_smoke ..............***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  27: json_execution_typed_smoke
+ 27/368 Test  #27: json_execution_typed_smoke ................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  28: json_execution_shapes
+ 28/368 Test  #28: json_execution_shapes .....................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  29: json_execution_ownership
+ 29/368 Test  #29: json_execution_ownership ..................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  30: json_execution_nested_inference
+ 30/368 Test  #30: json_execution_nested_inference ...........***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  31: json_stress_fixed
+ 31/368 Test  #31: json_stress_fixed .........................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/stress.py", line 41, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=600)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  32: json_stress_wide
+ 32/368 Test  #32: json_stress_wide ..........................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/stress.py", line 41, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=600)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/json/harness.py", line 23, in run
+    r=preserving_run(args,cwd=cwd,capture_output=True,timeout=timeout,preexec_fn=stack,env=env,
+        source_inputs=[source],provenance_inputs=list(Path(__file__).parent.glob('*.py')))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 231, in run
+    _sources(command, kwargs.get('cwd'), source_inputs, environment)}
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 57, in _sources
+    configured = environment.get('VOID_STDLIB_ROOT')
+                 ^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+        Start  33: json_host
+ 33/368 Test  #33: json_host .................................   Passed   58.09 sec
+        Start  34: json_preservation
+ 34/368 Test  #34: json_preservation .........................   Passed    0.29 sec
+        Start  35: json_lsp
+ 35/368 Test  #35: json_lsp ..................................   Passed    0.82 sec
+        Start  36: application_workflow_stage9
+ 36/368 Test  #36: application_workflow_stage9 ...............***Failed    1.27 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage9/workflow.py", line 104, in <module>
+    assert 'main.void:' in native.stderr and 'index' in native.stderr
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+        Start  37: native_output_paths_ci88
+ 37/368 Test  #37: native_output_paths_ci88 ..................   Passed    0.38 sec
+        Start  38: long_physical_paths_ci89
+ 38/368 Test  #38: long_physical_paths_ci89 ..................   Passed    0.36 sec
+        Start  39: gc_buffers
+ 39/368 Test  #39: gc_buffers ................................   Passed    0.83 sec
+        Start  40: gc_schemas
+ 40/368 Test  #40: gc_schemas ................................   Passed    0.04 sec
+        Start  41: arrays_foundation
+ 41/368 Test  #41: arrays_foundation .........................   Passed    0.05 sec
+        Start  42: runtime_console
+ 42/368 Test  #42: runtime_console ...........................   Passed    0.01 sec
+        Start  43: runtime_console_endpoints
+ 43/368 Test  #43: runtime_console_endpoints .................   Passed    0.06 sec
+        Start  44: runtime_console_transfers
+ 44/368 Test  #44: runtime_console_transfers .................   Passed    0.01 sec
+        Start  45: runtime_console_native_transfers
+ 45/368 Test  #45: runtime_console_native_transfers ..........   Passed    0.21 sec
+        Start  46: runtime_console_keyboard
+ 46/368 Test  #46: runtime_console_keyboard ..................   Passed    0.00 sec
+        Start  47: runtime_console_terminal
+ 47/368 Test  #47: runtime_console_terminal ..................   Passed    0.00 sec
+        Start  48: runtime_console_native_keyboard
+ 48/368 Test  #48: runtime_console_native_keyboard ...........   Passed    0.13 sec
+        Start  49: runtime_console_native_terminal
+ 49/368 Test  #49: runtime_console_native_terminal ...........   Passed    0.74 sec
+        Start  50: runtime_console_wide
+ 50/368 Test  #50: runtime_console_wide ......................   Passed    0.02 sec
+        Start  51: runtime_console_input
+ 51/368 Test  #51: runtime_console_input .....................   Passed    0.01 sec
+        Start  52: runtime_console_native_input
+ 52/368 Test  #52: runtime_console_native_input ..............   Passed    0.11 sec
+        Start  53: runtime_coordination
+ 53/368 Test  #53: runtime_coordination ......................   Passed    2.04 sec
+        Start  54: runtime_generated
+ 54/368 Test  #54: runtime_generated .........................   Passed    0.41 sec
+        Start  55: fixed_arrays_source
+ 55/368 Test  #55: fixed_arrays_source .......................   Passed    1.41 sec
+        Start  56: growable_arrays_source
+ 56/368 Test  #56: growable_arrays_source ....................   Passed    1.28 sec
+        Start  57: arrays_source
+ 57/368 Test  #57: arrays_source .............................   Passed    2.61 sec
+        Start  58: generics_source
+ 58/368 Test  #58: generics_source ...........................   Passed    1.99 sec
+        Start  59: generics_hint_execution
+ 59/368 Test  #59: generics_hint_execution ...................   Passed    2.45 sec
+        Start  60: generics_hint_lsp
+ 60/368 Test  #60: generics_hint_lsp .........................   Passed    0.08 sec
+        Start  61: collections_source
+ 61/368 Test  #61: collections_source ........................   Passed    6.47 sec
+        Start  62: dictionaries_source
+ 62/368 Test  #62: dictionaries_source .......................   Passed    4.91 sec
+        Start  63: properties_source
+ 63/368 Test  #63: properties_source .........................   Passed    1.84 sec
+        Start  64: patterns_source
+ 64/368 Test  #64: patterns_source ...........................   Passed    5.09 sec
+        Start  65: debug_cache
+ 65/368 Test  #65: debug_cache ...............................   Passed    0.94 sec
+        Start  66: debug_cache_processes
+ 66/368 Test  #66: debug_cache_processes .....................   Passed    2.21 sec
+        Start  67: automatic_cache_processes
+ 67/368 Test  #67: automatic_cache_processes .................   Passed    0.47 sec
+        Start  68: advanced_source
+ 68/368 Test  #68: advanced_source ...........................   Passed    2.75 sec
+        Start  69: fixed_arrays_cli
+ 69/368 Test  #69: fixed_arrays_cli ..........................   Passed    2.36 sec
+        Start  70: growable_arrays_cli
+ 70/368 Test  #70: growable_arrays_cli .......................   Passed    2.78 sec
+        Start  71: arrays_cli
+ 71/368 Test  #71: arrays_cli ................................   Passed    3.85 sec
+        Start  72: generics_cli
+ 72/368 Test  #72: generics_cli ..............................   Passed    2.03 sec
+        Start  73: collections_cli
+ 73/368 Test  #73: collections_cli ...........................   Passed    4.89 sec
+        Start  74: dictionaries_cli
+ 74/368 Test  #74: dictionaries_cli ..........................   Passed    2.82 sec
+        Start  75: properties_cli
+ 75/368 Test  #75: properties_cli ............................   Passed    3.65 sec
+        Start  76: patterns_cli
+ 76/368 Test  #76: patterns_cli ..............................   Passed    1.79 sec
+        Start  77: advanced_cli
+ 77/368 Test  #77: advanced_cli ..............................   Passed    4.61 sec
+        Start  78: managed_source
+ 78/368 Test  #78: managed_source ............................   Passed    0.85 sec
+        Start  79: managed_aot_normal
+ 79/368 Test  #79: managed_aot_normal ........................   Passed    0.01 sec
+        Start  80: managed_aot_optimized
+ 80/368 Test  #80: managed_aot_optimized .....................   Passed    0.00 sec
+        Start  81: managed_cli
+ 81/368 Test  #81: managed_cli ...............................   Passed    0.85 sec
+        Start  82: managed_initialization_source
+ 82/368 Test  #82: managed_initialization_source .............   Passed    3.11 sec
+        Start  83: managed_initialization_aot_normal
+ 83/368 Test  #83: managed_initialization_aot_normal .........   Passed    0.01 sec
+        Start  84: managed_initialization_aot_optimized
+ 84/368 Test  #84: managed_initialization_aot_optimized ......   Passed    0.01 sec
+        Start  85: managed_initialization_cli
+ 85/368 Test  #85: managed_initialization_cli ................   Passed    1.26 sec
+        Start  86: reference_values_source
+ 86/368 Test  #86: reference_values_source ...................   Passed    1.03 sec
+        Start  87: reference_values_aot_normal
+ 87/368 Test  #87: reference_values_aot_normal ...............   Passed    0.01 sec
+        Start  88: reference_values_aot_optimized
+ 88/368 Test  #88: reference_values_aot_optimized ............   Passed    0.01 sec
+        Start  89: reference_values_cli
+ 89/368 Test  #89: reference_values_cli ......................   Passed    1.72 sec
+        Start  90: composition_source
+ 90/368 Test  #90: composition_source ........................   Passed    0.70 sec
+        Start  91: composition_aot_normal
+ 91/368 Test  #91: composition_aot_normal ....................   Passed    0.02 sec
+        Start  92: composition_aot_optimized
+ 92/368 Test  #92: composition_aot_optimized .................   Passed    0.01 sec
+        Start  93: composition_cli
+ 93/368 Test  #93: composition_cli ...........................   Passed    0.99 sec
+        Start  94: inheritance_source
+ 94/368 Test  #94: inheritance_source ........................   Passed    1.08 sec
+        Start  95: inheritance_aot_normal
+ 95/368 Test  #95: inheritance_aot_normal ....................   Passed    0.01 sec
+        Start  96: inheritance_aot_optimized
+ 96/368 Test  #96: inheritance_aot_optimized .................   Passed    0.01 sec
+        Start  97: inheritance_cli
+ 97/368 Test  #97: inheritance_cli ...........................   Passed    1.45 sec
+        Start  98: interfaces_source
+ 98/368 Test  #98: interfaces_source .........................   Passed    2.11 sec
+        Start  99: interfaces_aot_normal
+ 99/368 Test  #99: interfaces_aot_normal .....................   Passed    0.01 sec
+        Start 100: interfaces_aot_optimized
+100/368 Test #100: interfaces_aot_optimized ..................   Passed    0.01 sec
+        Start 101: interfaces_cli
+101/368 Test #101: interfaces_cli ............................   Passed    1.25 sec
+        Start 102: strings_source
+102/368 Test #102: strings_source ............................   Passed    1.47 sec
+        Start 103: strings_aot_normal
+103/368 Test #103: strings_aot_normal ........................   Passed    0.02 sec
+        Start 104: strings_aot_optimized
+104/368 Test #104: strings_aot_optimized .....................   Passed    0.02 sec
+        Start 105: strings_cli
+105/368 Test #105: strings_cli ...............................   Passed    0.60 sec
+        Start 106: runtime_callbacks
+106/368 Test #106: runtime_callbacks .........................   Passed    0.23 sec
+        Start 107: runtime_failures
+107/368 Test #107: runtime_failures ..........................   Passed    0.00 sec
+        Start 108: runtime_aot_normal
+108/368 Test #108: runtime_aot_normal ........................   Passed    0.03 sec
+        Start 109: runtime_aot_optimized
+109/368 Test #109: runtime_aot_optimized .....................   Passed    0.04 sec
+        Start 110: runtime_invariants
+110/368 Test #110: runtime_invariants ........................   Passed    0.03 sec
+        Start 111: lsp_positions
+111/368 Test #111: lsp_positions .............................   Passed    0.00 sec
+        Start 112: lsp_protocol
+112/368 Test #112: lsp_protocol ..............................   Passed    0.31 sec
+        Start 113: lsp_stage11_globals
+113/368 Test #113: lsp_stage11_globals .......................   Passed    0.09 sec
+        Start 114: lsp_stage8
+114/368 Test #114: lsp_stage8 ................................   Passed    0.35 sec
+        Start 115: documentation_execution
+115/368 Test #115: documentation_execution ...................   Passed    0.45 sec
+        Start 116: lsp_documentation
+116/368 Test #116: lsp_documentation .........................   Passed    0.14 sec
+        Start 117: math_host
+117/368 Test #117: math_host .................................   Passed    0.61 sec
+        Start 118: math_ir
+118/368 Test #118: math_ir ...................................   Passed    0.30 sec
+        Start 119: math_execution
+119/368 Test #119: math_execution ............................   Passed   15.23 sec
+        Start 120: math_frontend
+120/368 Test #120: math_frontend .............................   Passed    7.96 sec
+        Start 121: math_errors
+121/368 Test #121: math_errors ...............................   Passed    2.91 sec
+        Start 122: math_worker
+122/368 Test #122: math_worker ...............................   Passed    1.22 sec
+        Start 123: lsp_math
+123/368 Test #123: lsp_math ..................................   Passed    0.29 sec
+        Start 124: math_install
+124/368 Test #124: math_install ..............................   Passed    0.72 sec
+        Start 125: math_preservation
+125/368 Test #125: math_preservation .........................***Failed    0.22 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/math/preservation.py", line 43, in <module>
+    result=h.preserving_run([sys.executable,'-c',emit+'raise SystemExit(87)'],
+                            cwd=root,capture_output=True,source_inputs=(source,))
+  File "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py", line 285, in run
+    preserve(command, kwargs.get('cwd'), result, source_inputs, provenance_inputs,
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+             failure_kind=kind, evidence_context=evidence_context, environment=kwargs.get('env'),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+             source_snapshots=source_snapshots)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: preserve() got an unexpected keyword argument 'failure_kind'
+
+        Start 126: math_stack
+126/368 Test #126: math_stack ................................   Passed   15.41 sec
+        Start 127: math_frontend_stack
+127/368 Test #127: math_frontend_stack .......................   Passed    9.00 sec
+        Start 128: os_execution
+128/368 Test #128: os_execution ..............................   Passed   20.53 sec
+        Start 129: os_stack
+129/368 Test #129: os_stack ..................................   Passed   20.60 sec
+        Start 130: os_edges
+130/368 Test #130: os_edges ..................................   Passed    2.63 sec
+        Start 131: os_edges_stack
+131/368 Test #131: os_edges_stack ............................   Passed    2.55 sec
+        Start 132: os_host
+132/368 Test #132: os_host ...................................   Passed    4.31 sec
+        Start 133: os_errors
+133/368 Test #133: os_errors .................................   Passed    3.72 sec
+        Start 134: os_frontend
+134/368 Test #134: os_frontend ...............................   Passed    4.48 sec
+        Start 135: lsp_os
+135/368 Test #135: lsp_os ....................................   Passed    0.96 sec
+        Start 136: os_cache
+136/368 Test #136: os_cache ..................................   Passed    2.97 sec
+        Start 137: os_owner
+137/368 Test #137: os_owner ..................................   Passed   10.12 sec
+        Start 138: os_examples
+138/368 Test #138: os_examples ...............................   Passed    2.68 sec
+        Start 139: os_install
+139/368 Test #139: os_install ................................   Passed    8.37 sec
+        Start 140: os_frontend_stack
+140/368 Test #140: os_frontend_stack .........................   Passed    4.62 sec
+        Start 141: os_host_stack
+141/368 Test #141: os_host_stack .............................   Passed    4.21 sec
+        Start 142: random_host
+142/368 Test #142: random_host ...............................   Passed   16.39 sec
+        Start 143: random_execution
+143/368 Test #143: random_execution ..........................   Passed   20.65 sec
+        Start 144: random_frontend
+144/368 Test #144: random_frontend ...........................   Passed    5.06 sec
+        Start 145: lsp_random
+145/368 Test #145: lsp_random ................................   Passed    0.57 sec
+        Start 146: random_install
+146/368 Test #146: random_install ............................   Passed    1.97 sec
+        Start 147: random_errors
+147/368 Test #147: random_errors .............................   Passed    3.77 sec
+        Start 148: random_preservation
+148/368 Test #148: random_preservation .......................   Passed    0.30 sec
+        Start 149: random_worker
+149/368 Test #149: random_worker .............................   Passed    3.10 sec
+        Start 150: random_reference
+150/368 Test #150: random_reference ..........................   Passed    0.02 sec
+        Start 151: random_stack
+151/368 Test #151: random_stack ..............................   Passed   21.24 sec
+        Start 152: random_frontend_stack
+152/368 Test #152: random_frontend_stack .....................   Passed    5.53 sec
+        Start 153: binary_execution
+153/368 Test #153: binary_execution ..........................   Passed   11.98 sec
+        Start 154: lsp_binary
+154/368 Test #154: lsp_binary ................................   Passed    0.12 sec
+        Start 155: binary_ownership
+155/368 Test #155: binary_ownership ..........................   Passed    0.18 sec
+        Start 156: binary_stack
+156/368 Test #156: binary_stack ..............................   Passed    0.53 sec
+        Start 157: lsp_const_recovery
+157/368 Test #157: lsp_const_recovery ........................   Passed    0.82 sec
+        Start 158: lsp_const_recovery_stack
+158/368 Test #158: lsp_const_recovery_stack ..................   Passed    0.86 sec
+        Start 159: combined_ownership
+159/368 Test #159: combined_ownership ........................   Passed    5.01 sec
+        Start 160: combined_async_normal
+160/368 Test #160: combined_async_normal .....................   Passed    0.03 sec
+        Start 161: combined_async_optimized
+161/368 Test #161: combined_async_optimized ..................   Passed    0.03 sec
+        Start 162: combined_execution
+162/368 Test #162: combined_execution ........................   Passed   17.48 sec
+        Start 163: lsp_combined
+163/368 Test #163: lsp_combined ..............................   Passed    1.13 sec
+        Start 164: combined_stack
+164/368 Test #164: combined_stack ............................   Passed   16.19 sec
+        Start 165: memory_execution
+165/368 Test #165: memory_execution ..........................   Passed   40.55 sec
+        Start 166: lsp_memory
+166/368 Test #166: lsp_memory ................................   Passed    0.38 sec
+        Start 167: text_encoding_text
+167/368 Test #167: text_encoding_text ........................   Passed    2.52 sec
+        Start 168: text_encoding_hex
+168/368 Test #168: text_encoding_hex .........................   Passed    0.89 sec
+        Start 169: text_encoding_base64
+169/368 Test #169: text_encoding_base64 ......................   Passed    1.67 sec
+        Start 170: text_encoding_ascii
+170/368 Test #170: text_encoding_ascii .......................   Passed    0.88 sec
+        Start 171: text_encoding_oracles
+171/368 Test #171: text_encoding_oracles .....................   Passed  135.53 sec
+        Start 172: text_encoding_interop
+172/368 Test #172: text_encoding_interop .....................   Passed    4.50 sec
+        Start 173: text_encoding_large
+173/368 Test #173: text_encoding_large .......................   Passed   21.26 sec
+        Start 174: text_encoding_errors
+174/368 Test #174: text_encoding_errors ......................   Passed    3.93 sec
+        Start 175: text_encoding_crash_preservation
+175/368 Test #175: text_encoding_crash_preservation ..........   Passed    1.27 sec
+        Start 176: lsp_text_encoding
+176/368 Test #176: lsp_text_encoding .........................   Passed    0.61 sec
+        Start 177: text_encoding_install
+177/368 Test #177: text_encoding_install .....................   Passed    3.40 sec
+        Start 178: text_encoding_stack
+178/368 Test #178: text_encoding_stack .......................   Passed    1.32 sec
+        Start 179: lsp_text_encoding_stack
+179/368 Test #179: lsp_text_encoding_stack ...................   Passed    0.63 sec
+        Start 180: text_encoding_depth
+180/368 Test #180: text_encoding_depth .......................   Passed    0.14 sec
+        Start 181: text_encoding_semantic_depth
+181/368 Test #181: text_encoding_semantic_depth ..............   Passed    0.51 sec
+        Start 182: text_encoding_ir
+182/368 Test #182: text_encoding_ir ..........................   Passed    0.24 sec
+        Start 183: text_encoding_inventory
+183/368 Test #183: text_encoding_inventory ...................   Passed    0.09 sec
+        Start 184: text_encoding_ownership
+184/368 Test #184: text_encoding_ownership ...................   Passed    3.00 sec
+        Start 185: memory_ownership
+185/368 Test #185: memory_ownership ..........................   Passed    1.37 sec
+        Start 186: memory_stack
+186/368 Test #186: memory_stack ..............................   Passed    1.38 sec
+        Start 187: lsp_stage7
+187/368 Test #187: lsp_stage7 ................................   Passed    0.17 sec
+        Start 188: lsp_demo
+188/368 Test #188: lsp_demo ..................................   Passed    0.07 sec
+        Start 189: stage10_operator_compounds
+189/368 Test #189: stage10_operator_compounds ................   Passed    2.00 sec
+        Start 190: stage11_globals
+190/368 Test #190: stage11_globals ...........................   Passed    0.76 sec
+        Start 191: log_native
+191/368 Test #191: log_native ................................   Passed  106.74 sec
+        Start 192: log_execution
+192/368 Test #192: log_execution .............................   Passed   74.96 sec
+        Start 193: log_frontend
+193/368 Test #193: log_frontend ..............................   Passed    4.03 sec
+        Start 194: log_files
+194/368 Test #194: log_files .................................   Passed   22.19 sec
+        Start 195: log_oracles
+195/368 Test #195: log_oracles ...............................   Passed   41.45 sec
+        Start 196: log_cache
+196/368 Test #196: log_cache .................................   Passed   12.22 sec
+        Start 197: log_install
+197/368 Test #197: log_install ...............................   Passed   28.51 sec
+        Start 198: log_console
+198/368 Test #198: log_console ...............................   Passed   23.54 sec
+        Start 199: lsp_log
+199/368 Test #199: lsp_log ...................................   Passed    2.43 sec
+        Start 200: log_probe_normal
+200/368 Test #200: log_probe_normal ..........................   Passed    0.27 sec
+        Start 201: log_probe_optimized
+201/368 Test #201: log_probe_optimized .......................   Passed    0.25 sec
+        Start 202: collections_stdlib_host
+202/368 Test #202: collections_stdlib_host ...................   Passed   21.81 sec
+        Start 203: collections_stdlib_execution
+203/368 Test #203: collections_stdlib_execution ..............   Passed   51.76 sec
+        Start 204: collections_stdlib_failures
+204/368 Test #204: collections_stdlib_failures ...............   Passed   33.59 sec
+        Start 205: collections_stdlib_frontend
+205/368 Test #205: collections_stdlib_frontend ...............   Passed    3.28 sec
+        Start 206: lsp_collections_stdlib
+206/368 Test #206: lsp_collections_stdlib ....................   Passed    0.20 sec
+        Start 207: collections_stdlib_oracles
+207/368 Test #207: collections_stdlib_oracles ................   Passed   10.82 sec
+        Start 208: collections_stdlib_install
+208/368 Test #208: collections_stdlib_install ................   Passed    4.19 sec
+        Start 209: collections_stdlib_cache
+209/368 Test #209: collections_stdlib_cache ..................   Passed    1.02 sec
+        Start 210: collections_stdlib_operators
+210/368 Test #210: collections_stdlib_operators ..............   Passed    1.12 sec
+        Start 211: collections_stdlib_stack
+211/368 Test #211: collections_stdlib_stack ..................   Passed   50.45 sec
+        Start 212: channel_host
+212/368 Test #212: channel_host ..............................   Passed    7.95 sec
+        Start 213: channel_frontend
+213/368 Test #213: channel_frontend ..........................   Passed    2.19 sec
+        Start 214: channel_execution
+214/368 Test #214: channel_execution .........................   Passed   27.05 sec
+        Start 215: lsp_channel
+215/368 Test #215: lsp_channel ...............................   Passed    0.15 sec
+        Start 216: channel_receiver
+216/368 Test #216: channel_receiver ..........................   Passed    1.20 sec
+        Start 217: channel_stack
+217/368 Test #217: channel_stack .............................   Passed   28.65 sec
+        Start 218: stage10_console_source
+218/368 Test #218: stage10_console_source ....................   Passed   40.45 sec
+        Start 219: stage10_operator_integration
+219/368 Test #219: stage10_operator_integration ..............   Passed   16.26 sec
+        Start 220: native_source
+220/368 Test #220: native_source .............................   Passed    2.59 sec
+        Start 221: stage6_integrated
+221/368 Test #221: stage6_integrated .........................   Passed    3.29 sec
+        Start 222: stage6_cache_processes
+222/368 Test #222: stage6_cache_processes ....................   Passed    4.02 sec
+        Start 223: native_aot_main_normal
+223/368 Test #223: native_aot_main_normal ....................   Passed    0.04 sec
+        Start 224: native_aot_main_optimized
+224/368 Test #224: native_aot_main_optimized .................   Passed    0.05 sec
+        Start 225: native_aot_terminated_nul_normal
+225/368 Test #225: native_aot_terminated_nul_normal ..........   Passed    0.04 sec
+        Start 226: native_aot_terminated_nul_optimized
+226/368 Test #226: native_aot_terminated_nul_optimized .......   Passed    0.04 sec
+        Start 227: native_aot_closed_normal
+227/368 Test #227: native_aot_closed_normal ..................   Passed    0.04 sec
+        Start 228: native_aot_closed_optimized
+228/368 Test #228: native_aot_closed_optimized ...............   Passed    0.04 sec
+        Start 229: native_aot_duplicate_normal
+229/368 Test #229: native_aot_duplicate_normal ...............   Passed    0.03 sec
+        Start 230: native_aot_duplicate_optimized
+230/368 Test #230: native_aot_duplicate_optimized ............   Passed    0.32 sec
+        Start 231: native_aot_cleanup_failure_normal
+231/368 Test #231: native_aot_cleanup_failure_normal .........   Passed    0.04 sec
+        Start 232: native_aot_cleanup_failure_optimized
+232/368 Test #232: native_aot_cleanup_failure_optimized ......   Passed    0.04 sec
+        Start 233: native_aot_integrated_normal
+233/368 Test #233: native_aot_integrated_normal ..............   Passed    0.04 sec
+        Start 234: native_aot_integrated_optimized
+234/368 Test #234: native_aot_integrated_optimized ...........   Passed    0.03 sec
+        Start 235: native_aot_integrated_cancel_normal
+235/368 Test #235: native_aot_integrated_cancel_normal .......   Passed    0.04 sec
+        Start 236: native_aot_integrated_cancel_optimized
+236/368 Test #236: native_aot_integrated_cancel_optimized ....   Passed    0.04 sec
+        Start 237: native_aot_integrated_failure_normal
+237/368 Test #237: native_aot_integrated_failure_normal ......   Passed    0.04 sec
+        Start 238: native_aot_integrated_failure_optimized
+238/368 Test #238: native_aot_integrated_failure_optimized ...   Passed    0.04 sec
+        Start 239: io_ownership
+239/368 Test #239: io_ownership ..............................   Passed   12.44 sec
+        Start 240: io_execution
+240/368 Test #240: io_execution ..............................   Passed   23.88 sec
+        Start 241: io_crash_preservation
+241/368 Test #241: io_crash_preservation .....................   Passed    0.27 sec
+        Start 242: io_async_execution
+242/368 Test #242: io_async_execution ........................   Passed   18.65 sec
+        Start 243: io_wire_normal
+243/368 Test #243: io_wire_normal ............................   Passed    0.08 sec
+        Start 244: io_wire_optimized
+244/368 Test #244: io_wire_optimized .........................   Passed    0.08 sec
+        Start 245: lsp_io
+245/368 Test #245: lsp_io ....................................   Passed    0.88 sec
+        Start 246: io_stack
+246/368 Test #246: io_stack ..................................   Passed   23.48 sec
+        Start 247: io_async_stack
+247/368 Test #247: io_async_stack ............................   Passed   18.90 sec
+        Start 248: lsp_io_stack
+248/368 Test #248: lsp_io_stack ..............................   Passed    0.89 sec
+        Start 249: io_native_responsiveness
+249/368 Test #249: io_native_responsiveness ..................   Passed    5.10 sec
+        Start 250: io_native_close_failure
+250/368 Test #250: io_native_close_failure ...................   Passed    4.99 sec
+        Start 251: io_native_shutdown
+251/368 Test #251: io_native_shutdown ........................   Passed    5.12 sec
+        Start 252: io_native_opening_shutdown
+252/368 Test #252: io_native_opening_shutdown ................   Passed    5.00 sec
+        Start 253: io_native_whole_shutdown
+253/368 Test #253: io_native_whole_shutdown ..................   Passed    5.26 sec
+        Start 254: io_native_pending_close
+254/368 Test #254: io_native_pending_close ...................   Passed    5.07 sec
+        Start 255: io_native_cancelled
+255/368 Test #255: io_native_cancelled .......................   Passed    4.94 sec
+        Start 256: io_probe_normal
+256/368 Test #256: io_probe_normal ...........................   Passed    0.01 sec
+        Start 257: io_probe_optimized
+257/368 Test #257: io_probe_optimized ........................   Passed    0.01 sec
+        Start 258: io_async_source
+258/368 Test #258: io_async_source ...........................   Passed    6.79 sec
+        Start 259: io_errors_source
+259/368 Test #259: io_errors_source ..........................   Passed    5.88 sec
+        Start 260: io_errors_async
+260/368 Test #260: io_errors_async ...........................   Passed    6.53 sec
+        Start 261: io_examples_install
+261/368 Test #261: io_examples_install .......................   Passed    7.30 sec
+        Start 262: io_async_acquisition
+262/368 Test #262: io_async_acquisition ......................   Passed    0.14 sec
+        Start 263: io_async_normal
+263/368 Test #263: io_async_normal ...........................   Passed    0.06 sec
+        Start 264: io_async_optimized
+264/368 Test #264: io_async_optimized ........................   Passed    0.06 sec
+        Start 265: io_native_jobs
+265/368 Test #265: io_native_jobs ............................   Passed    0.01 sec
+        Start 266: io_kernel
+266/368 Test #266: io_kernel .................................   Passed    0.05 sec
+        Start 267: io_ir
+267/368 Test #267: io_ir .....................................   Passed    0.43 sec
+        Start 268: io_cross_volume
+268/368 Test #268: io_cross_volume ...........................   Passed    1.21 sec
+        Start 269: async_source
+269/368 Test #269: async_source ..............................   Passed    4.99 sec
+        Start 270: async_syntax_source
+270/368 Test #270: async_syntax_source .......................   Passed    2.74 sec
+        Start 271: async_syntax_stack
+271/368 Test #271: async_syntax_stack ........................   Passed    2.72 sec
+        Start 272: async_ir
+272/368 Test #272: async_ir ..................................   Passed    0.04 sec
+        Start 273: async_parallel
+273/368 Test #273: async_parallel ............................   Passed    1.18 sec
+        Start 274: async_lifecycle
+274/368 Test #274: async_lifecycle ...........................   Passed    2.35 sec
+        Start 275: async_aot_spawn_normal
+275/368 Test #275: async_aot_spawn_normal ....................   Passed    0.04 sec
+        Start 276: async_aot_spawn_optimized
+276/368 Test #276: async_aot_spawn_optimized .................   Passed    0.04 sec
+        Start 277: async_aot_spawn_cancel_normal
+277/368 Test #277: async_aot_spawn_cancel_normal .............   Passed    0.04 sec
+        Start 278: async_aot_spawn_cancel_optimized
+278/368 Test #278: async_aot_spawn_cancel_optimized ..........   Passed    0.04 sec
+        Start 279: async_aot_spawn_failure_normal
+279/368 Test #279: async_aot_spawn_failure_normal ............   Passed    0.04 sec
+        Start 280: async_aot_spawn_failure_optimized
+280/368 Test #280: async_aot_spawn_failure_optimized .........   Passed    0.03 sec
+        Start 281: async_aot_activation_normal
+281/368 Test #281: async_aot_activation_normal ...............   Passed    0.03 sec
+        Start 282: async_aot_activation_optimized
+282/368 Test #282: async_aot_activation_optimized ............   Passed    0.04 sec
+        Start 283: async_aot_managed_normal
+283/368 Test #283: async_aot_managed_normal ..................   Passed    0.04 sec
+        Start 284: async_aot_managed_optimized
+284/368 Test #284: async_aot_managed_optimized ...............   Passed    0.04 sec
+        Start 285: async_aot_large_normal
+285/368 Test #285: async_aot_large_normal ....................   Passed    1.35 sec
+        Start 286: async_aot_large_optimized
+286/368 Test #286: async_aot_large_optimized .................   Passed    1.33 sec
+        Start 287: async_aot_closures_normal
+287/368 Test #287: async_aot_closures_normal .................   Passed    0.04 sec
+        Start 288: async_aot_closures_optimized
+288/368 Test #288: async_aot_closures_optimized ..............   Passed    0.04 sec
+        Start 289: async_aot_loops_normal
+289/368 Test #289: async_aot_loops_normal ....................   Passed    0.04 sec
+        Start 290: async_aot_loops_optimized
+290/368 Test #290: async_aot_loops_optimized .................   Passed    0.04 sec
+        Start 291: async_aot_values_normal
+291/368 Test #291: async_aot_values_normal ...................   Passed    0.03 sec
+        Start 292: async_aot_values_optimized
+292/368 Test #292: async_aot_values_optimized ................   Passed    0.04 sec
+        Start 293: async_aot_methods_normal
+293/368 Test #293: async_aot_methods_normal ..................   Passed    0.03 sec
+        Start 294: async_aot_methods_optimized
+294/368 Test #294: async_aot_methods_optimized ...............   Passed    0.04 sec
+        Start 295: async_aot_lifecycle_normal
+295/368 Test #295: async_aot_lifecycle_normal ................   Passed    0.04 sec
+        Start 296: async_aot_lifecycle_optimized
+296/368 Test #296: async_aot_lifecycle_optimized .............   Passed    0.04 sec
+        Start 297: async_aot_lifecycle_exits_normal
+297/368 Test #297: async_aot_lifecycle_exits_normal ..........   Passed    0.03 sec
+        Start 298: async_aot_lifecycle_exits_optimized
+298/368 Test #298: async_aot_lifecycle_exits_optimized .......   Passed    0.04 sec
+        Start 299: async_aot_lifecycle_cancelled_normal
+299/368 Test #299: async_aot_lifecycle_cancelled_normal ......   Passed    0.03 sec
+        Start 300: async_aot_lifecycle_cancelled_optimized
+300/368 Test #300: async_aot_lifecycle_cancelled_optimized ...   Passed    0.04 sec
+        Start 301: async_aot_lifecycle_failures_normal
+301/368 Test #301: async_aot_lifecycle_failures_normal .......   Passed    0.04 sec
+        Start 302: async_aot_lifecycle_failures_optimized
+302/368 Test #302: async_aot_lifecycle_failures_optimized ....   Passed    0.04 sec
+        Start 303: async_aot_lifecycle_primary_normal
+303/368 Test #303: async_aot_lifecycle_primary_normal ........   Passed    0.04 sec
+        Start 304: async_aot_lifecycle_primary_optimized
+304/368 Test #304: async_aot_lifecycle_primary_optimized .....   Passed    0.04 sec
+        Start 305: async_aot_lifecycle_resources_normal
+305/368 Test #305: async_aot_lifecycle_resources_normal ......   Passed    0.04 sec
+        Start 306: async_aot_lifecycle_resources_optimized
+306/368 Test #306: async_aot_lifecycle_resources_optimized ...   Passed    0.04 sec
+        Start 307: async_aot_lifecycle_values_normal
+307/368 Test #307: async_aot_lifecycle_values_normal .........   Passed    0.04 sec
+        Start 308: async_aot_lifecycle_values_optimized
+308/368 Test #308: async_aot_lifecycle_values_optimized ......   Passed    0.04 sec
+        Start 309: async_syntax_aot_values_normal
+309/368 Test #309: async_syntax_aot_values_normal ............   Passed    0.31 sec
+        Start 310: async_syntax_aot_values_optimized
+310/368 Test #310: async_syntax_aot_values_optimized .........   Passed    0.38 sec
+        Start 311: async_syntax_aot_errors_normal
+311/368 Test #311: async_syntax_aot_errors_normal ............   Passed    0.27 sec
+        Start 312: async_syntax_aot_errors_optimized
+312/368 Test #312: async_syntax_aot_errors_optimized .........   Passed    0.29 sec
+        Start 313: async_syntax_aot_cancelled_normal
+313/368 Test #313: async_syntax_aot_cancelled_normal .........   Passed    0.15 sec
+        Start 314: async_syntax_aot_cancelled_optimized
+314/368 Test #314: async_syntax_aot_cancelled_optimized ......   Passed    0.19 sec
+        Start 315: async_syntax_aot_failure_normal
+315/368 Test #315: async_syntax_aot_failure_normal ...........   Passed    0.16 sec
+        Start 316: async_syntax_aot_failure_optimized
+316/368 Test #316: async_syntax_aot_failure_optimized ........   Passed    0.18 sec
+        Start 317: async_syntax_aot_spawn_normal
+317/368 Test #317: async_syntax_aot_spawn_normal .............   Passed    0.13 sec
+        Start 318: async_syntax_aot_spawn_optimized
+318/368 Test #318: async_syntax_aot_spawn_optimized ..........   Passed    0.16 sec
+        Start 319: lsp_async_syntax
+319/368 Test #319: lsp_async_syntax ..........................   Passed    0.10 sec
+        Start 320: core
+320/368 Test #320: core ......................................   Passed    0.10 sec
+        Start 321: jit
+321/368 Test #321: jit .......................................   Passed    0.14 sec
+        Start 322: reload
+322/368 Test #322: reload ....................................   Passed    0.25 sec
+        Start 323: gc
+323/368 Test #323: gc ........................................   Passed    0.03 sec
+        Start 324: native
+324/368 Test #324: native ....................................   Passed    0.02 sec
+        Start 325: sessions_demo
+325/368 Test #325: sessions_demo .............................   Passed    0.04 sec
+        Start 326: tooling_demo
+326/368 Test #326: tooling_demo ..............................   Passed    0.04 sec
+        Start 327: sessions
+327/368 Test #327: sessions ..................................   Passed    0.06 sec
+        Start 328: tooling
+328/368 Test #328: tooling ...................................   Passed    0.20 sec
+        Start 329: analysis
+329/368 Test #329: analysis ..................................   Passed    0.48 sec
+        Start 330: numeric
+330/368 Test #330: numeric ...................................   Passed    2.02 sec
+        Start 331: frontend
+331/368 Test #331: frontend ..................................   Passed    4.27 sec
+        Start 332: modules
+332/368 Test #332: modules ...................................   Passed    0.68 sec
+        Start 333: numeric_sprint2
+333/368 Test #333: numeric_sprint2 ...........................   Passed    1.21 sec
+        Start 334: async_retention_sprint5
+334/368 Test #334: async_retention_sprint5 ...................   Passed    9.48 sec
+        Start 335: async_retention_aot_growth_normal
+335/368 Test #335: async_retention_aot_growth_normal .........   Passed    0.59 sec
+        Start 336: async_retention_aot_growth_optimized
+336/368 Test #336: async_retention_aot_growth_optimized ......   Passed    0.39 sec
+        Start 337: async_retention_aot_workers_normal
+337/368 Test #337: async_retention_aot_workers_normal ........   Passed    0.50 sec
+        Start 338: async_retention_aot_workers_optimized
+338/368 Test #338: async_retention_aot_workers_optimized .....   Passed    0.51 sec
+        Start 339: ergonomics_sprint6_host
+339/368 Test #339: ergonomics_sprint6_host ...................   Passed    0.54 sec
+        Start 340: ergonomics_sprint6
+340/368 Test #340: ergonomics_sprint6 ........................   Passed    1.29 sec
+        Start 341: stage10_fields_aot
+341/368 Test #341: stage10_fields_aot ........................   Passed    0.32 sec
+        Start 342: stage10_temporal_install
+342/368 Test #342: stage10_temporal_install ..................   Passed    2.49 sec
+        Start 343: stage10_temporal_aot
+343/368 Test #343: stage10_temporal_aot ......................   Passed    4.59 sec
+        Start 344: stage11_globals_stack
+344/368 Test #344: stage11_globals_stack .....................   Passed    0.37 sec
+        Start 345: stage11_globals_aot
+345/368 Test #345: stage11_globals_aot .......................   Passed    3.58 sec
+        Start 346: stage10_console_aot
+346/368 Test #346: stage10_console_aot .......................***Failed    0.70 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 91, in <module>
+    p = run([compiler, "run", source, *switches], stdin, status)
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py", line 36, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', PosixPath('/tmp/VOID console source d9rm4jv9/operator_console_systems.void'), '--no-opt'], 1, b'', b'VOID IR: custom equality metadata disagrees with owner declarations\n')
+
+        Start 347: stage10_operators_aot
+347/368 Test #347: stage10_operators_aot .....................   Passed   66.95 sec
+        Start 348: stage10_conversion_aot
+348/368 Test #348: stage10_conversion_aot ....................   Passed    0.45 sec
+        Start 349: lsp_sprint6
+349/368 Test #349: lsp_sprint6 ...............................   Passed    0.29 sec
+        Start 350: lsp_stage10_fields
+350/368 Test #350: lsp_stage10_fields ........................   Passed    0.11 sec
+        Start 351: lsp_stage10_display
+351/368 Test #351: lsp_stage10_display .......................   Passed    2.00 sec
+        Start 352: lsp_stage10_intelligence
+352/368 Test #352: lsp_stage10_intelligence ..................   Passed    0.17 sec
+        Start 353: lsp_stage10_source_formatting
+353/368 Test #353: lsp_stage10_source_formatting .............   Passed    0.25 sec
+        Start 354: local_libraries
+354/368 Test #354: local_libraries ...........................   Passed    0.30 sec
+        Start 355: lsp_sprint4
+355/368 Test #355: lsp_sprint4 ...............................   Passed    0.09 sec
+        Start 356: application_native_sprint4_host
+356/368 Test #356: application_native_sprint4_host ...........   Passed    0.63 sec
+        Start 357: application_native_sprint4
+357/368 Test #357: application_native_sprint4 ................***Failed    1.78 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint4.py", line 68, in <module>
+    for extra in [[],['--no-opt']]:run([compiler,'run',source,*extra],1,diagnostic='index')
+                                   ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint4.py", line 14, in run
+    if diagnostic: assert diagnostic in result.stderr+result.stdout,(args,result.stdout,result.stderr)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', PosixPath('/tmp/VOID Sprint 4 q_gmib69/main.void')], '', '/tmp/VOID Sprint 4 q_gmib69/main.void:3:14: runtime error: Array operation failed\n    return xs[0]\n             ^\nIn function /main.void::main\nCalled from /main.void::$app_adapter\n/tmp/VOID Sprint 4 q_gmib69/main.void:1:6: source call\n\n')
+
+        Start 358: text_collections_sprint3
+358/368 Test #358: text_collections_sprint3 ..................   Passed   13.90 sec
+        Start 359: lsp_sprint3
+359/368 Test #359: lsp_sprint3 ...............................   Passed    0.11 sec
+        Start 360: lsp_sprint2
+360/368 Test #360: lsp_sprint2 ...............................   Passed    0.13 sec
+        Start 361: aot
+361/368 Test #361: aot .......................................   Passed    0.10 sec
+        Start 362: source_cli
+362/368 Test #362: source_cli ................................   Passed    3.01 sec
+        Start 363: value_structs_cli
+363/368 Test #363: value_structs_cli .........................   Passed    0.78 sec
+        Start 364: receiver_methods_cli
+364/368 Test #364: receiver_methods_cli ......................   Passed    1.62 sec
+        Start 365: initialization_cli
+365/368 Test #365: initialization_cli ........................   Passed    1.91 sec
+        Start 366: modules_cli
+366/368 Test #366: modules_cli ...............................   Passed   15.01 sec
+        Start 367: analysis_cli
+367/368 Test #367: analysis_cli ..............................   Passed    0.47 sec
+        Start 368: numeric_cli
+368/368 Test #368: numeric_cli ...............................   Passed   16.74 sec
+
+95% tests passed, 20 tests failed out of 368
+
+Total Test time (real) = 1735.68 sec
+
+The following tests FAILED:
+	 17 - json_dynamic (Failed)
+	 18 - json_numbers (Failed)
+	 19 - json_schema (Failed)
+	 20 - json_bounds (Failed)
+	 21 - json_install (Failed)
+	 22 - json_adversarial (Failed)
+	 23 - json_metering (Failed)
+	 24 - json_execution_validated (Failed)
+	 25 - json_execution_accessors (Failed)
+	 26 - json_execution_dynamic_smoke (Failed)
+	 27 - json_execution_typed_smoke (Failed)
+	 28 - json_execution_shapes (Failed)
+	 29 - json_execution_ownership (Failed)
+	 30 - json_execution_nested_inference (Failed)
+	 31 - json_stress_fixed (Failed)
+	 32 - json_stress_wide (Failed)
+	 36 - application_workflow_stage9 (Failed)
+	125 - math_preservation (Failed)
+	346 - stage10_console_aot (Failed)
+	357 - application_native_sprint4 (Failed)
+Errors while running CTest

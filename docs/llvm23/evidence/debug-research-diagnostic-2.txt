@@ -1,0 +1,18 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 39: arrays_storage_audit
+1/1 Test #39: arrays_storage_audit .............***Failed    0.58 sec
+private fixed normal certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+private fixed O2 certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+AOT machine storage/emission certification failed: __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unsupported dynamic/opaque frame; no dynamic-storage certificate; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: inexact/duplicated original home __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void/home/24 (planned=64/align8, machine=0/align1); __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: inexact/duplicated original home __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void/home/25 (planned=32/align8, machine=0/align1); 
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+research    =   0.58 sec*proc (1 test)
+
+Total Test time (real) =   0.71 sec
+
+The following tests FAILED:
+	 39 - arrays_storage_audit (Failed)                     research
+Errors while running CTest

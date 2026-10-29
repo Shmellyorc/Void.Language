@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="13"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="6"
+	timestamp="2026-10-28T16:15:14"
+	>
+	<testcase name="arrays_storage_audit" classname="arrays_storage_audit" time="0.523367" status="fail">
+		<failure message="Failed"/>
+		<properties>
+			<property name="cmake_labels" value="research"/>
+		</properties>
+		<system-out>private fixed normal certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+private fixed O2 certification retained: AOT machine storage/emission certification failed: private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; private_call: unproved incoming ownership; 
+AOT machine storage/emission certification failed: __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: unsupported dynamic/opaque frame; no dynamic-storage certificate; __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: inexact/duplicated original home __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void/home/24 (planned=64/align8, machine=0/align1); __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void: inexact/duplicated original home __vd_2f6d61696e2e766f69643a3a6d616b655f6379636c65__void/home/25 (planned=32/align8, machine=0/align1); 
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_normal_0_2_observed" classname="private_fixed_call_normal_0_2_observed" time="0.00557714" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>15 private-call cases passed; returned argument 0, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_normal_0_2_unobserved" classname="private_fixed_call_normal_0_2_unobserved" time="0.00639102" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>12 private-call cases passed; returned argument 0, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_normal_3_2_observed" classname="private_fixed_call_normal_3_2_observed" time="0.00793875" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>15 private-call cases passed; returned argument 3, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_normal_3_2_unobserved" classname="private_fixed_call_normal_3_2_unobserved" time="0.00635545" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>12 private-call cases passed; returned argument 3, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_normal_7_16384_observed" classname="private_fixed_call_normal_7_16384_observed" time="2.04001" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>15 private-call cases passed; returned argument 7, extent 16384
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_normal_7_16384_unobserved" classname="private_fixed_call_normal_7_16384_unobserved" time="1.09511" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>12 private-call cases passed; returned argument 7, extent 16384
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_optimized_0_2_observed" classname="private_fixed_call_optimized_0_2_observed" time="0.00789093" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>15 private-call cases passed; returned argument 0, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_optimized_0_2_unobserved" classname="private_fixed_call_optimized_0_2_unobserved" time="0.00557382" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>12 private-call cases passed; returned argument 0, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_optimized_3_2_observed" classname="private_fixed_call_optimized_3_2_observed" time="0.00532996" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>15 private-call cases passed; returned argument 3, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_optimized_3_2_unobserved" classname="private_fixed_call_optimized_3_2_unobserved" time="0.00423077" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>12 private-call cases passed; returned argument 3, extent 2
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_optimized_7_16384_observed" classname="private_fixed_call_optimized_7_16384_observed" time="2.21855" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>15 private-call cases passed; returned argument 7, extent 16384
+</system-out>
+	</testcase>
+	<testcase name="private_fixed_call_optimized_7_16384_unobserved" classname="private_fixed_call_optimized_7_16384_unobserved" time="1.06446" status="run">
+		<properties>
+			<property name="cmake_labels" value="private_calls;research"/>
+		</properties>
+		<system-out>12 private-call cases passed; returned argument 7, extent 16384
+</system-out>
+	</testcase>
+</testsuite>

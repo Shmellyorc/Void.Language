@@ -1,0 +1,10 @@
+struct node:
+    value: i32
+func entry(value: i32) -> i32:
+    var mutable = node(value = value)
+    const frozen = mutable
+    var values: [node] = [frozen]
+    values.push(frozen)
+    var alias: [node] = values
+    var read = alias[0]
+    return read.value + values.count as i32

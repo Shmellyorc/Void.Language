@@ -1,0 +1,11 @@
+interface readable:
+    func read() -> i32
+struct node:
+    value: i32
+func (n node) read() -> i32:
+    return n.value
+struct carrier:
+    values: [readable]
+func entry(value: i32) -> i32:
+    var held = carrier(values = [node(value = value)])
+    return held.values[0].read()

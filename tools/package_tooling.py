@@ -12,12 +12,12 @@ audit=subprocess.run(args,text=True,stdout=subprocess.PIPE,stderr=subprocess.STD
 with tempfile.TemporaryDirectory(prefix='void-tooling-package-') as temp:
     stage=pathlib.Path(temp)/('void-tooling-'+a.target);(stage/'bin').mkdir(parents=True)
     shutil.copy2(server,stage/'bin'/server.name)
-    notice=a.llvm_notice or next((p for p in [pathlib.Path('/usr/share/doc/llvm-19/copyright'),pathlib.Path('/usr/lib/llvm-19/share/llvm/LICENSE.TXT')] if p.is_file()),None)
+    notice=a.llvm_notice or next((p for p in [pathlib.Path('/usr/share/doc/llvm-23/copyright'),pathlib.Path('/usr/lib/llvm-23/share/llvm/LICENSE.TXT')] if p.is_file()),None)
     if not notice or not notice.is_file():raise SystemExit('Supply --llvm-notice with the pinned SDK LLVM license/notice file')
-    (stage/'NOTICES').mkdir();shutil.copy2(notice,stage/'NOTICES/LLVM-19.1.7.txt')
+    (stage/'NOTICES').mkdir();shutil.copy2(notice,stage/'NOTICES/LLVM-23.1.4.txt')
     shutil.copytree(repo/'editors/vim',stage/'share/void/vim');shutil.copytree(repo/'editors/neovim',stage/'share/void/neovim')
     (stage/'DEPENDENCIES.txt').write_text(audit)
-    (stage/'LOCAL-ACCEPTANCE.txt').write_text('Private local acceptance artifact. Repository UNLICENSED; no public redistribution authorized.\nDependencies listed separately are required from the host OS. This is not a self-contained portable bundle.\nLLVM/Clang/LLD 19.1.7 remains the build toolchain.\n')
+    (stage/'LOCAL-ACCEPTANCE.txt').write_text('Private local acceptance artifact. Repository UNLICENSED; no public redistribution authorized.\nDependencies listed separately are required from the host OS. This is not a self-contained portable bundle.\nLLVM/Clang/LLD 23.1.4 remains the build toolchain.\n')
     (stage/'manifest.json').write_text(json.dumps({'target':a.target,'sha256':hashlib.sha256(server.read_bytes()).hexdigest(),'dependencies':audit,'publicRedistribution':False},indent=2)+'\n')
     archive=out/(stage.name+('.zip' if os.name=='nt' else '.tar.gz'))
     if os.name=='nt':

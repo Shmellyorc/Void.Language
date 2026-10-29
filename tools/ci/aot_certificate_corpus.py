@@ -50,7 +50,7 @@ def attempt(config, command, original, kind, source, mode):
         if hashlib.sha256(cert['inventory'].encode('utf-8')).hexdigest().upper() != cert['inventory_sha256']:
             raise RuntimeError('inventory digest mismatch')
         profile = json.loads(cert['profile'])
-        if profile['llvm'] != '19.1.7' or profile['ir_pipeline'] != (
+        if profile['llvm'] != '23.1.4' or profile['ir_pipeline'] != (
                 'verify-only' if mode == 'normal' else 'default<O2>;PassBuilder(no-TM)'):
             raise RuntimeError('profile mismatch')
     elif result.returncode != 1 or obj.read_bytes() != b'owner destination\n':

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="92"
+	timestamp="2026-10-28T19:04:35"
+	>
+	<testcase name="channel_host" classname="channel_host" time="30.8077" status="run">
+		<properties/>
+		<system-out>subscribe O0 once=0 path=0 failures=423 released_markers=409
+subscribe O0 once=0 path=1 failures=185 released_markers=166
+subscribe O0 once=0 path=2 failures=369 released_markers=340
+subscribe O0 once=0 path=3 failures=303 released_markers=284
+unsubscribe O0 once=0 survivor=0 before=31 after=37
+unsubscribe O0 once=0 survivor=1 before=37 after=36
+subscribe O0 once=1 path=0 failures=423 released_markers=409
+subscribe O0 once=1 path=1 failures=185 released_markers=166
+subscribe O0 once=1 path=2 failures=369 released_markers=340
+subscribe O0 once=1 path=3 failures=303 released_markers=284
+unsubscribe O0 once=1 survivor=0 before=31 after=37
+unsubscribe O0 once=1 survivor=1 before=37 after=36
+emit O0 no_delivery_failures=255 partial_failures=90
+subscribe O2 once=0 path=0 failures=423 released_markers=409
+subscribe O2 once=0 path=1 failures=185 released_markers=166
+subscribe O2 once=0 path=2 failures=369 released_markers=340
+subscribe O2 once=0 path=3 failures=303 released_markers=284
+unsubscribe O2 once=0 survivor=...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="channel_execution" classname="channel_execution" time="92.9101" status="run">
+		<properties/>
+		<system-out>Channel execution: 56 JIT/link/native/cache checks; hard stack=default
+</system-out>
+	</testcase>
+</testsuite>

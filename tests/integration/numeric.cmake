@@ -1,6 +1,7 @@
 include("${CMAKE_CURRENT_LIST_DIR}/native_link.cmake")
 file(MAKE_DIRECTORY "${OUTPUT}")
-file(GLOB programs "${ROOT}/tests/numeric/programs/*.void")
+# Automatic JIT caching creates a .void directory beside these source files.
+file(GLOB programs LIST_DIRECTORIES false "${ROOT}/tests/numeric/programs/*.void")
 foreach(source IN LISTS programs)
   get_filename_component(name "${source}" NAME_WE)
   foreach(mode normal optimized)

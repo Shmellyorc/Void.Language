@@ -7,7 +7,7 @@ Phase 20 preserves U1–U7 while adding static ancestry precedence, inherited us
 The owner approved U1–U7 in [COMPOSITION_PROPOSAL.md](COMPOSITION_PROPOSAL.md),
 including named and unnamed embeddings. This guide describes the implementation;
 actual validation results and hosted limitations are recorded in WORK_LOG.md.
-LLVM remains pinned to 19.1.7. The single frontend, semantic model, shared IR,
+LLVM is pinned to 23.1.4 under the [migration](llvm23/COMPATIBILITY.md). The single frontend, semantic model, shared IR,
 LLVM lowering and coordinated runtime remain authoritative.
 
 ## Source surface

@@ -6,7 +6,7 @@ import tempfile
 import harness as h
 compiler=Path(sys.argv[1]).resolve();runner=Path(sys.argv[2]).resolve()
 manifest=(compiler.parent/'void-native.txt').read_text().splitlines()
-assert manifest[0]=='VOID native 19.1.7 v1'
+assert manifest[0]=='VOID native 23.1.4 v1'
 flags=['--driver-mode=g++',*manifest[5:]]
 if manifest[2]:flags+=['--ld-path='+manifest[2]]
 if sys.platform.startswith('linux'):flags+=['-ldl']

@@ -1,0 +1,10 @@
+struct item:
+    value: i32
+enum pair:
+    empty
+    ready(first: item, second: item)
+func entry(x: i32) -> i32:
+    var value = pair.ready(item(value = 2), item(value = 100 / x))
+    return match value:
+        pair.empty: -1
+        pair.ready(var first, var second): first.value + second.value
