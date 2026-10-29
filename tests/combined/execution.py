@@ -6,6 +6,9 @@ import subprocess
 import sys
 import tempfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from test_platform import native_text
+
 compiler = Path(sys.argv[1]).resolve()
 fixtures = Path(__file__).parent
 small = '--small-stack' in sys.argv
@@ -113,7 +116,7 @@ private func floating<t>(text: string, expected: [u8]) -> bool:
     return false
 
 func main() -> i32:
-''' + '\n'.join(checks_source) + '\n    return 0\n')
+''' + '\n'.join(checks_source) + '\n    return 0\n', encoding='utf-8')
     console = root / 'input.void'
     console.write_text('''use console
 
@@ -129,14 +132,14 @@ func main() -> i32:
     print(read())
     print(read())
     return 0
-''')
+''', encoding='utf-8')
     console_input = 'Ada🎮\r\n\nB\rC\né🎮X'.encode() + b'\xff'
     console_output = 'Prompt: Ada🎮\n\nB\nC\né\n🎮X\n\n\n\n\n'.encode()
     run([compiler, 'check', fixtures / 'async.void'])
     scenarios = [(fixtures / 'error.void', b'', b''),
                  (fixtures / 'conversion.void', b'', b'conversion passed\n'),
                  (numeric, b'', b''), (console, console_input, console_output),
-                 (fixtures / 'ownership.void', b'', b'1\n')]
+                 (fixtures / 'ownership.void', b'', native_text('1\n'))]
     for index, (source, data, expected) in enumerate(scenarios):
         run([compiler, 'check', source])
         for flags in (['--no-opt'], []):
@@ -146,10 +149,10 @@ func main() -> i32:
             run([executable], data, expected=expected)
             if source.name == 'ownership.void':
                 for scenario in range(1, 7):
-                    run([compiler, 'run', source, scenario, *flags], expected=b'1\n')
-                    run([executable, scenario], expected=b'1\n')
+                    run([compiler, 'run', source, scenario, *flags], expected=native_text('1\n'))
+                    run([executable, scenario], expected=native_text('1\n'))
     failure = root / 'unwrap.void'
-    failure.write_text('use convert\nfunc main() -> i32:\n    var failed: result<i32, string> = Err("reason")\n    return convert.unwrap(failed)\n')
+    failure.write_text('use convert\nfunc main() -> i32:\n    var failed: result<i32, string> = Err("reason")\n    return convert.unwrap(failed)\n', encoding='utf-8')
     for flags in (['--no-opt'], []):
         output = run([compiler, 'run', failure, *flags], status=1)
         assert b'convert.unwrap received Err' in output.stderr, output.stderr
@@ -166,7 +169,7 @@ func main() -> i32:
         ('use io/memory\n', 'var invalid = _memory_write([], [], 0)'),
     ]
     for prefix, body in negatives:
-        failure.write_text(prefix + '\nfunc main():\n    ' + body + '\n')
+        failure.write_text(prefix + '\nfunc main():\n    ' + body + '\n', encoding='utf-8')
         run([compiler, 'check', failure], status=1)
     failure.write_text('''use error as core
 struct child extends core.error:
@@ -177,7 +180,7 @@ func outer() -> result<i32, core.error>:
     return Ok(inner()?)
 func main():
     var value = outer()
-''')
+''', encoding='utf-8')
     rejected = run([compiler, 'check', failure], status=1)
     assert b'exactly matching error types' in rejected.stderr, rejected.stderr
     failure.write_text('''use convert
@@ -189,7 +192,7 @@ func main():
     var value: result<object, string> = Ok(object())
     var escaped = escape(value)
     escaped.value = 3
-''')
+''', encoding='utf-8')
     rejected = run([compiler, 'check', failure], status=1)
     assert b'readonly' in rejected.stderr.lower(), rejected.stderr
 

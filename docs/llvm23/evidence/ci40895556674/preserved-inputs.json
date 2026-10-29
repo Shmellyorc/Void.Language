@@ -1,0 +1,52 @@
+{
+  "HEAD": "75c31fe23a24144bf5d2f2796f4d404fa9897ce0",
+  "index_unchanged": true,
+  "production_sources_unchanged": true,
+  "inputs": [
+    {
+      "file": "README.md",
+      "unchanged": true,
+      "sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+    },
+    {
+      "file": "CMakeLists.txt",
+      "unchanged": true,
+      "sha256": "570d343ff16d2e1b8cb6d5fa2a15d9e3db7fb8e141e59e6eafb2bd9b7927da9b"
+    },
+    {
+      "file": "cmake/LLVMPlatform.cmake",
+      "unchanged": true,
+      "sha256": "cbb9905a7d2a84748f6a3a42e10bdb5258e53857843619da3024c8d96c6542d1"
+    },
+    {
+      "file": "cmake/NativeBuild.cmake",
+      "unchanged": true,
+      "sha256": "e036c133266efe780bfe9bf1f20498b1c7a869929210baddb2ff5f63c457e5d1"
+    },
+    {
+      "file": "tools/ci/llvm_sdk.py",
+      "unchanged": true,
+      "sha256": "fe46fcc151529e310af95888711eb03b229f67fcc2565d5841f03f6428b0dfdb"
+    },
+    {
+      "file": "src/runtime/random.cpp",
+      "unchanged": true,
+      "sha256": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d"
+    },
+    {
+      "file": "src/runtime/filesystem.cpp",
+      "unchanged": true,
+      "sha256": "0cc2d6f546c4bd4ff6ae7d7049ebbb09c892a19a4c0b822e82e04546be136feb"
+    },
+    {
+      "file": "src/backend/llvm/backend.cpp",
+      "unchanged": true,
+      "sha256": "15fcbba73e2909acbe8b70f44abb551fab934a91ce297b87b4dccefa9fcd0594"
+    },
+    {
+      "file": "cmake/probes/StopToken.cpp",
+      "unchanged": true,
+      "sha256": "2ba542b9e2fb7a959d16be0b3f28869e410512f73f41cc45d4117221f1c89876"
+    }
+  ]
+}

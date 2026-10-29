@@ -1,0 +1,50 @@
+Job 123523563704; original lines 61942-61951; SHA256=915469c6d40bcb859b5c826d9ef86d9d54e90b33e2a3d80d2ee257bd974e9018
+2026-10-29T15:19:03.6190314Z         Start 125: combined_execution
+2026-10-29T15:19:09.5272274Z 125/319 Test #125: combined_execution ........................***Failed    5.91 sec
+2026-10-29T15:19:09.5273052Z Traceback (most recent call last):
+2026-10-29T15:19:09.5366527Z   File "D:\a\Void.Language\Void.Language\tests\combined\execution.py", line 141, in <module>
+2026-10-29T15:19:09.5367336Z     run([compiler, 'check', source])
+2026-10-29T15:19:09.5367897Z   File "D:\a\Void.Language\Void.Language\tests\combined\execution.py", line 24, in run
+2026-10-29T15:19:09.5368518Z     assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+2026-10-29T15:19:09.5369702Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-29T15:19:09.5371290Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Debug/voidc.exe'), 'check', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID combined o88a_cpd/vectors.void')], 1, b'', b'C:/Users/runneradmin/AppData/Local/Temp/VOID combined o88a_cpd/vectors.void:72:22: error: Invalid UTF-8 source.\r\n    code: VOID1001\r\n\r\n 72 |     if not (bad<i8>("\\xE9", false)):\r\n    |                      ^^^^\r\n    Module: /vectors.void\r\n    Hint: Save this file as UTF-8.\r\n\r\n')
+2026-10-29T15:19:09.5372751Z 
+
+Job 123523563753; original lines 26990-26997; SHA256=4dd6e7873dfc8ee7a6a8217d735f582f53c6561fa370aab725c245cbeb598bd6
+2026-10-29T16:28:10.7294280Z         Start 261: io_native_jobs
+2026-10-29T16:28:10.7520720Z 261/362 Test #261: io_native_jobs ............................   Passed    0.02 sec
+2026-10-29T16:28:10.7521970Z         Start 262: io_kernel
+2026-10-29T16:28:10.9449290Z 262/362 Test #262: io_kernel .................................***Failed    0.19 sec
+2026-10-29T16:28:10.9450610Z invalid native filename fixture: created=0 errno=92
+2026-10-29T16:28:10.9451790Z filesystem did not consistently reject the invalid native path
+2026-10-29T16:28:10.9452540Z 
+2026-10-29T16:28:10.9453060Z         Start 263: io_ir
+
+Job 123523563856; original lines 26979-26986; SHA256=fe0d89fd552cbf25db6da824542eaebc905ce68673a2acee9472461878413aee
+2026-10-29T15:19:56.6743950Z         Start 261: io_native_jobs
+2026-10-29T15:19:56.6845170Z 261/362 Test #261: io_native_jobs ............................   Passed    0.01 sec
+2026-10-29T15:19:56.6845940Z         Start 262: io_kernel
+2026-10-29T15:19:56.8328760Z 262/362 Test #262: io_kernel .................................***Failed    0.15 sec
+2026-10-29T15:19:56.8329200Z invalid native filename fixture: created=0 errno=92
+2026-10-29T15:19:56.8329760Z filesystem did not consistently reject the invalid native path
+2026-10-29T15:19:56.8330050Z 
+2026-10-29T15:19:56.8330130Z         Start 263: io_ir
+
+Job 123523564053; original lines 637-653; SHA256=7797eaccfbc7bb7853a77f7cfe911cb4b9de81d135f6adb9b049c2ac382899b0
+2026-10-29T14:52:54.0047982Z [1/9] Creating directories for 'zlib-populate'
+2026-10-29T14:52:54.0049064Z [1/9] Performing download step (download, verify and extract) for 'zlib-populate'
+2026-10-29T14:52:54.0049521Z -- Downloading...
+2026-10-29T14:52:54.0050368Z    dst='D:/a/Void.Language/Void.Language/.toolchains/llvm-23.1.4-deps-build/_deps/zlib-subbuild/zlib-populate-prefix/src/zlib-1.3.2.tar.gz'
+2026-10-29T14:52:54.0051262Z    timeout='none'
+2026-10-29T14:52:54.0051562Z    inactivity timeout='none'
+2026-10-29T14:52:54.0052022Z -- Using src='https://zlib.net/fossils/zlib-1.3.2.tar.gz'
+2026-10-29T14:52:54.0052499Z -- [download 100% complete]
+2026-10-29T14:52:54.0052822Z -- verifying file...
+2026-10-29T14:52:54.0053650Z        file='D:/a/Void.Language/Void.Language/.toolchains/llvm-23.1.4-deps-build/_deps/zlib-subbuild/zlib-populate-prefix/src/zlib-1.3.2.tar.gz'
+2026-10-29T14:52:54.0054433Z -- SHA256 hash of
+2026-10-29T14:52:54.0054955Z     D:/a/Void.Language/Void.Language/.toolchains/llvm-23.1.4-deps-build/_deps/zlib-subbuild/zlib-populate-prefix/src/zlib-1.3.2.tar.gz
+2026-10-29T14:52:54.0055534Z   does not match expected value
+2026-10-29T14:52:54.0055905Z     expected: 'bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16'
+2026-10-29T14:52:54.0056403Z       actual: 'fa97962f226d2391fad51534abdf7ceb51ebdd58a5d278ae7f8d99d1b3124448'
+2026-10-29T14:52:54.0056780Z -- Hash mismatch, removing...
+2026-10-29T14:52:54.0057062Z -- Using src='https://zlib.net/fossils/zlib-1.3.2.tar.gz'

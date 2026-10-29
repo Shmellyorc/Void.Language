@@ -1,0 +1,44 @@
+{
+  "native_host": "linux",
+  "native_macOS_observation": false,
+  "kernel_source_sha256": "fed5ddc0036ccaca59df387e78db42f5d5c6ac9e2ac628dc8458d4cae3cea639",
+  "cases": [
+    {
+      "injected_case": "absent",
+      "status": 0,
+      "stdout": "invalid native filename fixture: created=0 errno=84\ninvalid native filename lookup: status=-1 errno=2\nnative filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed\n",
+      "stderr": ""
+    },
+    {
+      "injected_case": "eilseq",
+      "status": 0,
+      "stdout": "invalid native filename fixture: created=0 errno=84\ninvalid native filename lookup: status=-1 errno=84\nnative filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed\n",
+      "stderr": ""
+    },
+    {
+      "injected_case": "success",
+      "status": 1,
+      "stdout": "invalid native filename fixture: created=0 errno=84\ninvalid native filename lookup: status=0 errno=0\n",
+      "stderr": "invalid native filename lookup must report absence or invalid encoding\n"
+    },
+    {
+      "injected_case": "unrelated_error",
+      "status": 1,
+      "stdout": "invalid native filename fixture: created=0 errno=84\ninvalid native filename lookup: status=-1 errno=13\n",
+      "stderr": "invalid native filename lookup must report absence or invalid encoding\n"
+    },
+    {
+      "injected_case": "creation_error",
+      "status": 1,
+      "stdout": "invalid native filename fixture: created=0 errno=13\n",
+      "stderr": "unexpected native invalid-filename creation failure\n"
+    },
+    {
+      "injected_case": "directory_change",
+      "status": 1,
+      "stdout": "invalid native filename fixture: created=0 errno=84\ninvalid native filename lookup: status=-1 errno=2\n",
+      "stderr": "rejected filename creation changed directory entries\n"
+    }
+  ],
+  "passed": true
+}

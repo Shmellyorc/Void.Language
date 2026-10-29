@@ -1,5 +1,17 @@
 # LLVM 23.1.4 local acceptance
 
+**Latest: CI 40895556674**, baseline
+`75c31fe23a24144bf5d2f2796f4d404fa9897ce0`. The
+[consolidated repair record](CI40895556674_REPAIR.md) inventories all four native
+failures and the three focused repairs. Local Release **12/12**, Debug **12/12**,
+fatal ASan/UBSan **11/11**, cp1252-controlled full combined execution (**74
+processes / 246 parsing assertions**), six positive/negative filename oracle
+cases, real pinned static dependency API/link/run, archive fallback/hash
+rejection and three required-package negative checks pass. The next normal
+Boss-controlled native CI supplies Windows CRT/COFF and Apple lookup/runtime
+acceptance; the user waived a separate pre-repair macOS observation. No hosted
+CI or Git mutation was performed. **Stop for independent Golden Wrench review.**
+
 **CI 40861888611 stabilization:** [complete native triage](NATIVE_CI_TRIAGE.md)
 records every original Windows/macOS failure, all feasible corrections and the
 remaining native gates. Linux full Release **369/369**, focused Debug **26/26**

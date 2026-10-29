@@ -5,6 +5,19 @@ Consolidated local acceptance is tracked separately. Official source authority:
 [LLVM 23.1.4 release](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.4).
 The complete development archives are required, not compiler-only installers.
 
+At baseline `75c31fe23a24144bf5d2f2796f4d404fa9897ce0`,
+[CI 40895556674 follow-up](CI40895556674_REPAIR.md) repairs the remaining combined
+fixture encoding/CRT text expectations, Apple rejected-filename lookup oracle
+and zlib archive availability. Only native CLI integer text uses the existing
+newline helper; console transport and binary bytes retain exact assertions.
+Apple creation rejection must be EILSEQ, lookup must fail with ENOENT/EILSEQ,
+directory contents must be unchanged and VOID must reject the invalid path.
+Actual lookup status/errno will be logged by native CI; no observation is
+inferred from the old assertion failure. The alternate upstream zlib 1.3.2
+archive matches the unchanged digest. Static `/MT`, SDK/DIA protections and
+Apple libc++ pairing remain unchanged; no production ABI/runtime change occurs.
+Local results establish Linux behavior and controlled oracle coverage only.
+
 At baseline `5198c7ac9c256fd05f53ff5ba594c38dc0093b7f`,
 [CI 40861888611](https://github.com/Shmellyorc/Void.Language/actions/runs/40861888611)
 completed Windows/macOS native builds and exposed the test failures inventoried

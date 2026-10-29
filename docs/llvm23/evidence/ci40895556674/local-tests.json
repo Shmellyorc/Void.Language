@@ -1,0 +1,209 @@
+{
+  "host": "Linux x86_64",
+  "results": [
+    {
+      "profile": "release",
+      "passed": 12,
+      "failed": 0,
+      "ORC_compile_link_run": true,
+      "tests": [
+        {
+          "name": "toolchain_stop_token",
+          "seconds": 0.00619215,
+          "status": "run"
+        },
+        {
+          "name": "runtime_console_transfers",
+          "seconds": 0.0203576,
+          "status": "run"
+        },
+        {
+          "name": "runtime_console_native_transfers",
+          "seconds": 0.234292,
+          "status": "run"
+        },
+        {
+          "name": "combined_ownership",
+          "seconds": 4.64137,
+          "status": "run"
+        },
+        {
+          "name": "combined_async_normal",
+          "seconds": 0.0431099,
+          "status": "run"
+        },
+        {
+          "name": "combined_async_optimized",
+          "seconds": 0.0575816,
+          "status": "run"
+        },
+        {
+          "name": "combined_execution",
+          "seconds": 13.4762,
+          "status": "run"
+        },
+        {
+          "name": "lsp_combined",
+          "seconds": 1.04447,
+          "status": "run"
+        },
+        {
+          "name": "combined_stack",
+          "seconds": 14.2019,
+          "status": "run"
+        },
+        {
+          "name": "io_execution",
+          "seconds": 21.5924,
+          "status": "run"
+        },
+        {
+          "name": "io_crash_preservation",
+          "seconds": 0.288326,
+          "status": "run"
+        },
+        {
+          "name": "io_kernel",
+          "seconds": 0.0488378,
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "profile": "debug",
+      "passed": 12,
+      "failed": 0,
+      "ORC_compile_link_run": true,
+      "tests": [
+        {
+          "name": "toolchain_stop_token",
+          "seconds": 0.00515653,
+          "status": "run"
+        },
+        {
+          "name": "runtime_console_transfers",
+          "seconds": 0.0179456,
+          "status": "run"
+        },
+        {
+          "name": "runtime_console_native_transfers",
+          "seconds": 0.441412,
+          "status": "run"
+        },
+        {
+          "name": "combined_ownership",
+          "seconds": 11.5799,
+          "status": "run"
+        },
+        {
+          "name": "combined_async_normal",
+          "seconds": 0.0385446,
+          "status": "run"
+        },
+        {
+          "name": "combined_async_optimized",
+          "seconds": 0.0380701,
+          "status": "run"
+        },
+        {
+          "name": "combined_execution",
+          "seconds": 42.3218,
+          "status": "run"
+        },
+        {
+          "name": "lsp_combined",
+          "seconds": 7.52185,
+          "status": "run"
+        },
+        {
+          "name": "combined_stack",
+          "seconds": 37.2131,
+          "status": "run"
+        },
+        {
+          "name": "io_execution",
+          "seconds": 51.483,
+          "status": "run"
+        },
+        {
+          "name": "io_crash_preservation",
+          "seconds": 0.251461,
+          "status": "run"
+        },
+        {
+          "name": "io_kernel",
+          "seconds": 0.119661,
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "profile": "strict",
+      "passed": 11,
+      "failed": 0,
+      "ORC_compile_link_run": true,
+      "tests": [
+        {
+          "name": "toolchain_stop_token",
+          "seconds": 0.0226695,
+          "status": "run"
+        },
+        {
+          "name": "runtime_console_transfers",
+          "seconds": 0.0372284,
+          "status": "run"
+        },
+        {
+          "name": "runtime_console_native_transfers",
+          "seconds": 0.8764,
+          "status": "run"
+        },
+        {
+          "name": "combined_ownership",
+          "seconds": 12.879,
+          "status": "run"
+        },
+        {
+          "name": "combined_async_normal",
+          "seconds": 0.0597663,
+          "status": "run"
+        },
+        {
+          "name": "combined_async_optimized",
+          "seconds": 0.0644085,
+          "status": "run"
+        },
+        {
+          "name": "combined_execution",
+          "seconds": 53.3187,
+          "status": "run"
+        },
+        {
+          "name": "lsp_combined",
+          "seconds": 5.74748,
+          "status": "run"
+        },
+        {
+          "name": "io_execution",
+          "seconds": 55.1782,
+          "status": "run"
+        },
+        {
+          "name": "io_crash_preservation",
+          "seconds": 0.274075,
+          "status": "run"
+        },
+        {
+          "name": "io_kernel",
+          "seconds": 0.0897161,
+          "status": "run"
+        }
+      ]
+    }
+  ],
+  "sanitizers": {
+    "ASAN_OPTIONS": "halt_on_error=1:abort_on_error=0:exitcode=87:detect_leaks=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "native_Windows_or_macOS_acceptance": false
+}

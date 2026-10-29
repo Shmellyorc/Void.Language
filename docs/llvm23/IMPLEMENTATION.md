@@ -1,5 +1,16 @@
 # LLVM 23.1.4 migration — engineering record
 
+**Latest continuation, baseline `75c31fe23a24144bf5d2f2796f4d404fa9897ce0`:**
+[CI 40895556674 consolidated follow-up](CI40895556674_REPAIR.md) records all four
+remaining native job failures, explicit UTF-8 combined fixtures, the masked CRT
+integer-output oracle, the Boss-authorized ENOENT/EILSEQ filename lookup oracle
+with actual-result logging, and an identical, hash-verified alternate zlib asset.
+Local focused Release **12/12**, Debug **12/12**, fatal ASan/UBSan **11/11**, full
+cp1252-controlled combined execution, six filename oracle cases and real static
+dependency/fallback/negative checks pass. No separate native macOS observation
+was available or invented. Native acceptance awaits the next normal Boss CI;
+stop for independent Golden Wrench review. Earlier notes retain their history.
+
 **Current continuation, baseline `5198c7ac9c256fd05f53ff5ba594c38dc0093b7f`:**
 [CI 40861888611 native failure inventory and repairs](NATIVE_CI_TRIAGE.md)
 supersede the pending native-build status in the historical notes below. All four

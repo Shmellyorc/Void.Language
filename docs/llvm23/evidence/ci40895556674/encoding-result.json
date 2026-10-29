@@ -1,0 +1,71 @@
+{
+  "native_host": "linux",
+  "controlled_default": "cp1252",
+  "baseline_failure": "([PosixPath('/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc'), 'check', PosixPath('/tmp/VOID combined otxihmx4/vectors.void')], 1, b'', b'/tmp/VOID combined otxihmx4/vectors.void:72:22: error: Invalid UTF-8 source.\\n    code: VOID1001\\n\\n 72 |     if not (bad<i8>(\"\\\\xE9\", false)):\\n    |                      ^^^^\\n    Module: /vectors.void\\n    Hint: Save this file as UTF-8.\\n\\n')",
+  "baseline_processes": 16,
+  "fixed_processes": 74,
+  "parsing_assertions": 246,
+  "fixed_VOID_writes": [
+    {
+      "file": "vectors.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "input.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    },
+    {
+      "file": "unwrap.void",
+      "mode": "w",
+      "encoding": "utf-8"
+    }
+  ],
+  "wire_and_binary_oracles_unchanged": true,
+  "CRT_text_expectations_checked": [
+    "LF",
+    "CRLF"
+  ],
+  "passed": true
+}

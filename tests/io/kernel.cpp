@@ -9,6 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <thread>
+#include <vector>
 
 #ifndef _WIN32
 #include <cerrno>
@@ -364,6 +365,8 @@ void native_failure_cases(const fs::path& root) {
     require(perform(Operation::copy_file, protected_file, link, 1).error != ErrorKind::success &&
             read(original).bytes == "preserved", "replacement copy followed destination link");
 
+    auto before_invalid = perform(Operation::entries, root, {}, 0, 100);
+    okay(before_invalid, "enumerate before invalid filename creation");
     auto invalid = root / std::string("invalid-\xff", 9);
     auto descriptor = ::open(invalid.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
     auto creation_error = descriptor < 0 ? errno : 0;
@@ -380,13 +383,25 @@ void native_failure_cases(const fs::path& root) {
     } else {
 #ifdef __APPLE__
         // APFS can reject malformed UTF-8 at creation. There is then no invalid
-        // entry to enumerate; verify that exact native rejection, not a failed
-        // fixture silently treated as successful creation.
+        // entry to enumerate. Lookup may report absence instead of rechecking
+        // encoding; neither successful lookup nor an unrelated error is valid.
         require(creation_error == EILSEQ, "unexpected native invalid-filename creation failure");
         struct stat absent{};
-        require(::lstat(invalid.c_str(), &absent) < 0 && errno == EILSEQ,
-                "filesystem did not consistently reject the invalid native path");
-        okay(perform(Operation::entries, root, {}, 0, 100), "enumerate after native filename rejection");
+        errno = 0;
+        auto lookup_status = ::lstat(invalid.c_str(), &absent);
+        auto lookup_error = errno;
+        std::cout << "invalid native filename lookup: status=" << lookup_status
+                  << " errno=" << lookup_error << '\n';
+        require(lookup_status < 0 && (lookup_error == ENOENT || lookup_error == EILSEQ),
+                "invalid native filename lookup must report absence or invalid encoding");
+        auto after_invalid = perform(Operation::entries, root, {}, 0, 100);
+        okay(after_invalid, "enumerate after native filename rejection");
+        std::vector<std::string> before_names, after_names;
+        for (const auto& entry : before_invalid.entries) before_names.push_back(entry.name);
+        for (const auto& entry : after_invalid.entries) after_names.push_back(entry.name);
+        std::sort(before_names.begin(), before_names.end());
+        std::sort(after_names.begin(), after_names.end());
+        require(before_names == after_names, "rejected filename creation changed directory entries");
 #else
         require(false, "could not create invalid native filename fixture");
 #endif
