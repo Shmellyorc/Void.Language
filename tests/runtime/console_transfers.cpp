@@ -316,6 +316,7 @@ void simple(const char* mode,const char* path){
 int main(int argc,char** argv){try{
 #ifdef _WIN32
     if(argc==3 && vd_windows_console_native(argv[1],argv[2]))return 0;
+    vd_windows_console_closed_peers();
 #endif
 #ifndef _WIN32
     if(argc>=3){std::string mode=argv[1];

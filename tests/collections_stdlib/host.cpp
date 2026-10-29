@@ -119,8 +119,17 @@ void reload(const std::filesystem::path& root,const std::filesystem::path& work,
     auto original=analyze(path);auto old=jit.compile(*original,optimized);
     std::ofstream(work/"original-contract.txt",std::ios::binary)<<original->compatibility_contract();
     std::ofstream(work/"changed-contract.txt",std::ios::binary)<<replacement->compatibility_contract();
-    require(jit.cache_status()=="miss","collections cache did not miss");
-    auto fresh=jit.compile(*original,optimized);require(jit.cache_status()=="hit","collections cache did not hit");
+#ifdef _WIN32
+    // The production cache has no verified Windows ACL publisher and fails closed.
+    constexpr auto first_status="unavailable", next_status="unavailable";
+#else
+    constexpr auto first_status="miss", next_status="hit";
+#endif
+    require(jit.cache_status()==first_status,"collections first cache status");
+    auto fresh=jit.compile(*original,optimized);require(jit.cache_status()==next_status,"collections second cache status");
+#ifdef _WIN32
+    require(!std::filesystem::exists(cache_root/".void"),"unavailable cache persisted native code");
+#endif
     require(old->invoke(0)==0 && old->invoke(1)==301 && fresh->invoke(3)==0 && old->invoke(4)==7,"cached application state not independent");
     vd::ReloadSlot slot(old);require(jit.replace(slot,*replacement,optimized),"compatible captured comparator reload rejected");
     require(slot.invoke(1)==3301 && old->invoke(1)==3601 && slot.invoke(4)==0 && old->invoke(4)==7,"captured comparator/equality lost new/old generation behavior");

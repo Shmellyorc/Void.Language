@@ -19,7 +19,7 @@ def point(text,needle,delta=0):
 with tempfile.TemporaryDirectory(prefix='VOID OS LSP ') as directory:
     entry=Path(directory)/'main.void'
     base='use os as system\nfunc main():\n    var face = "😀"\n    var location = system.data_dir("com.game")\n    var process = system.process_id()\n'
-    entry.write_text(base)
+    entry.write_text(base, encoding='utf-8')
     with Client(server,entry) as client:
         client.request('initialize',{'capabilities':{'textDocument':{'signatureHelp':{'signatureInformation':{'documentationFormat':['plaintext']}}}}})
         client.notify('initialized',{});client.sync()

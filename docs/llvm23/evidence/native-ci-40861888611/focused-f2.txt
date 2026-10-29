@@ -1,0 +1,37 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start 125: math_install
+ 1/16 Test #125: math_install ...........................   Passed    0.75 sec
+      Start 193: log_execution
+ 2/16 Test #193: log_execution ..........................   Passed   70.09 sec
+      Start 204: collections_stdlib_execution
+ 3/16 Test #204: collections_stdlib_execution ...........   Passed   50.08 sec
+      Start 205: collections_stdlib_failures
+ 4/16 Test #205: collections_stdlib_failures ............   Passed   31.59 sec
+      Start 213: channel_host
+ 5/16 Test #213: channel_host ...........................   Passed    7.72 sec
+      Start 243: io_async_execution
+ 6/16 Test #243: io_async_execution .....................   Passed   16.80 sec
+      Start 310: async_syntax_aot_values_normal
+ 7/16 Test #310: async_syntax_aot_values_normal .........   Passed    0.31 sec
+      Start 311: async_syntax_aot_values_optimized
+ 8/16 Test #311: async_syntax_aot_values_optimized ......   Passed    0.36 sec
+      Start 312: async_syntax_aot_errors_normal
+ 9/16 Test #312: async_syntax_aot_errors_normal .........   Passed    0.22 sec
+      Start 313: async_syntax_aot_errors_optimized
+10/16 Test #313: async_syntax_aot_errors_optimized ......   Passed    0.27 sec
+      Start 314: async_syntax_aot_cancelled_normal
+11/16 Test #314: async_syntax_aot_cancelled_normal ......   Passed    0.15 sec
+      Start 315: async_syntax_aot_cancelled_optimized
+12/16 Test #315: async_syntax_aot_cancelled_optimized ...   Passed    0.17 sec
+      Start 316: async_syntax_aot_failure_normal
+13/16 Test #316: async_syntax_aot_failure_normal ........   Passed    0.14 sec
+      Start 317: async_syntax_aot_failure_optimized
+14/16 Test #317: async_syntax_aot_failure_optimized .....   Passed    0.17 sec
+      Start 318: async_syntax_aot_spawn_normal
+15/16 Test #318: async_syntax_aot_spawn_normal ..........   Passed    0.12 sec
+      Start 319: async_syntax_aot_spawn_optimized
+16/16 Test #319: async_syntax_aot_spawn_optimized .......   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 16
+
+Total Test time (real) = 179.09 sec

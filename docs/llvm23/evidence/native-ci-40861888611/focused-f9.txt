@@ -1,0 +1,29 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  43: runtime_console
+ 1/12 Test  #43: runtime_console ....................   Passed    0.01 sec
+      Start  44: runtime_console_endpoints
+ 2/12 Test  #44: runtime_console_endpoints ..........   Passed    0.06 sec
+      Start  45: runtime_console_transfers
+ 3/12 Test  #45: runtime_console_transfers ..........   Passed    0.02 sec
+      Start  46: runtime_console_native_transfers
+ 4/12 Test  #46: runtime_console_native_transfers ...   Passed    0.21 sec
+      Start  47: runtime_console_keyboard
+ 5/12 Test  #47: runtime_console_keyboard ...........   Passed    0.01 sec
+      Start  48: runtime_console_terminal
+ 6/12 Test  #48: runtime_console_terminal ...........   Passed    0.01 sec
+      Start  49: runtime_console_native_keyboard
+ 7/12 Test  #49: runtime_console_native_keyboard ....   Passed    0.13 sec
+      Start  50: runtime_console_native_terminal
+ 8/12 Test  #50: runtime_console_native_terminal ....   Passed    0.73 sec
+      Start  51: runtime_console_wide
+ 9/12 Test  #51: runtime_console_wide ...............   Passed    0.03 sec
+      Start  52: runtime_console_input
+10/12 Test  #52: runtime_console_input ..............   Passed    0.01 sec
+      Start  53: runtime_console_native_input
+11/12 Test  #53: runtime_console_native_input .......   Passed    0.11 sec
+      Start 199: log_console
+12/12 Test #199: log_console ........................   Passed   22.50 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) =  23.83 sec

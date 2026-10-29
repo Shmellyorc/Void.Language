@@ -29,11 +29,9 @@ def exercise(root):
     else:
         script = 'import resource; resource.setrlimit(resource.RLIMIT_CORE,(0,0)); ' + script
     executable = Path(sys.executable).resolve()
-    try:
-        selected_executable = os.path.relpath(executable, root)
-    except ValueError:
-        # Windows can place the interpreter and temporary storage on different drives.
-        selected_executable = str(executable)
+    # CreateProcess does not resolve the application against cwd. On Darwin,
+    # lexical /var paths can also traverse a different depth through /private.
+    selected_executable = str(executable)
     first = run([selected_executable, '-c', script, original], cwd=root, capture_output=True,
                 source_inputs=(companion,), provenance_inputs=(Path(__file__).resolve(),))
     assert first.returncode != 0
@@ -80,11 +78,13 @@ def exercise(root):
     assert rejected.returncode == 1
     receipts = list(kept.glob('*/receipt.json'))
     assert len(receipts) == 8
+    assert any(json.loads(receipt.read_text())['command'] ==
+               [selected_executable, '-c', script, str(original)] for receipt in receipts)
     collisions = 0
     fatal_counts = {87: 0, 86: 0, windows_status: 0}
     for receipt in receipts:
         record = json.loads(receipt.read_text())
-        entry = next(item for item in record['sources'] if item['original'] == str(original))
+        entry = next(item for item in record['sources'] if item['original'] == str(original.resolve()))
         assert entry['sha256'] == expected
         assert entry['original_sha256'] == entry['preserved_sha256'] == expected
         copy = Path(entry['copy'])
@@ -92,13 +92,13 @@ def exercise(root):
         assert copy.read_bytes() == original.read_bytes()
         assert copy.stat().st_mode & 0o222 == 0
         assert record['executable_sha256'] == hashlib.sha256(executable.read_bytes()).hexdigest()
-        assert record['cwd'] == str(root)
+        assert record['cwd'] == str(root.resolve())
         if record['returncode'] in fatal_counts:
             fatal_counts[record['returncode']] += 1
             assert record['signal'] is None
             assert (receipt.parent / 'stdout.bin').read_bytes() == fatal_stdout
             assert (receipt.parent / 'stderr.bin').read_bytes() == fatal_stderr
-        matching = [item for item in record['sources'] if item['original'] == str(companion)]
+        matching = [item for item in record['sources'] if item['original'] == str(companion.resolve())]
         if matching:
             collisions += 1
             saved = Path(matching[0]['copy'])
@@ -145,7 +145,7 @@ def exercise(root):
         data = json.loads(added.pop().read_text())
         assert data['failure_kind'] == kind and data['context'] == context
         assert result.expectation_failed
-        assert any(s['original'] == str(companion) for s in data['sources'])
+        assert any(s['original'] == str(companion.resolve()) for s in data['sources'])
     before_case = set(kept.glob('*/receipt.json'))
     try:
         run([sys.executable, '-c', 'import time; time.sleep(60)', original], cwd=root,
@@ -157,7 +157,7 @@ def exercise(root):
         data = json.loads(added.pop().read_text())
         assert data['failure_kind'] == 'timeout' and data['timed_out']
         assert data['context'] == context
-    run([sys.executable, '-c', 'print("correct")', original], cwd=root, capture_output=True,
+    run([sys.executable, '-c', 'import os; os.write(1, b"correct\\n")', original], cwd=root, capture_output=True,
         expected_returncode=0, expected_stdout=b'correct\n')
     assert len(list(kept.glob('*/receipt.json'))) == len(baseline) + 4
     before_case = set(kept.glob('*/receipt.json'))
@@ -167,7 +167,7 @@ def exercise(root):
     added = set(kept.glob('*/receipt.json')) - before_case
     assert len(added) == 1
     data = json.loads(added.pop().read_text())
-    entry = next(item for item in data['sources'] if item['original'] == str(original))
+    entry = next(item for item in data['sources'] if item['original'] == str(original.resolve()))
     assert Path(entry['copy']).read_bytes() == raw and entry['captured_at'] == 'subprocess_launch'
     assert entry['current_sha256'] != entry['original_sha256']
     original.write_bytes(raw)
@@ -177,7 +177,7 @@ def exercise(root):
     key = 'VOID_CRASH_RECORD_ENV_TEST'
     previous_value = os.environ.get(key)
     os.environ[key] = 'inherited'
-    environment_script = 'import os; print(os.environ.get("' + key + '", "empty"))'
+    environment_script = 'import os; os.write(1, (os.environ.get("' + key + '", "empty") + "\\n").encode())'
     try:
         for environment, expected_output in [(None, b'inherited\n'), ({}, b'empty\n')]:
             result = run([sys.executable, '-c', environment_script, original], cwd=root,

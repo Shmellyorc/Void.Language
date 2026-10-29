@@ -24,7 +24,7 @@ func entry(input: i32) -> i32:
     print(math.sin(value) > 0.0)
     return 0
 ''')
-    expected=b'2\n2\ntrue\n-8\ntrue\n0\n'
+    expected=b'2\n2\ntrue\n-8\ntrue\n' + h.native_text('0\n')
     for mode,flags in [('O0',['--no-opt']),('O2',[])]:
         h.run([installed,'run',fixture,'2',*flags],work,expected,env=env)
         executable=work/('installed-'+mode+('.exe' if os.name=='nt' else ''))

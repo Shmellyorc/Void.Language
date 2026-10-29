@@ -60,12 +60,12 @@ with tempfile.TemporaryDirectory(prefix='VOID math synthetic preservation ') as 
         assert sum(record['returncode']==87 for record in records)==2
         for receipt,record in zip(receipts,records):
             incident=receipt.parent
-            assert record['cwd']==str(root)
+            assert record['cwd']==str(root.resolve())
             assert record['executable_sha256']==hashlib.sha256(Path(record['executable']).read_bytes()).hexdigest()
             assert (incident/'stdout.bin').read_bytes()==stdout
             assert (incident/'stderr.bin').read_bytes()==stderr
             for expected_source,raw in ((source,original),(imported,edited)):
-                preserved=next(item for item in record['sources'] if item['original']==str(expected_source))
+                preserved=next(item for item in record['sources'] if item['original']==str(expected_source.resolve()))
                 assert Path(preserved['copy']).name.endswith('_crash.void')
                 assert Path(preserved['copy']).read_bytes()==raw
                 expected_hash=hashlib.sha256(raw).hexdigest()

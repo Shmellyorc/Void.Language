@@ -9,5 +9,5 @@ print(result.stdout.decode(), end='')
 for mode in ('o0', 'o2'):
     native = work / ('async-' + mode + ('.exe' if sys.platform == 'win32' else ''))
     h.link(exe, work / ('async-' + mode + '.o'), native)
-    h.run([native, '7'], expected=b'7\n', small=sys.platform != 'win32')
+    h.run([native, '7'], expected=h.native_text('7\n'), small=sys.platform != 'win32')
 print('Channel owner-async independently linked O0/O2 AOT passed')

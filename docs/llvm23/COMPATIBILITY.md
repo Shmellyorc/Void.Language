@@ -5,6 +5,38 @@ Consolidated local acceptance is tracked separately. Official source authority:
 [LLVM 23.1.4 release](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.4).
 The complete development archives are required, not compiler-only installers.
 
+At baseline `5198c7ac9c256fd05f53ff5ba594c38dc0093b7f`,
+[CI 40861888611](https://github.com/Shmellyorc/Void.Language/actions/runs/40861888611)
+completed Windows/macOS native builds and exposed the test failures inventoried
+in [native triage](NATIVE_CI_TRIAGE.md). The current repair confines the production
+change to Windows closed-pipe write error classification. It preserves borrowed
+handles, cancellation, partial progress, Native-safe coordination and cleanup.
+Native link manifests omit unsupported Windows `-pthread` while retaining the
+static CRT libraries; Unix threading and Apple vendor libc++/system-runtime
+pairing are unchanged. No C++ runtime is redistributed or ABI changed.
+
+CLI/host text follows native CRT newlines. VOID print bytes, logging frame LF,
+binary streams, diagnostics, preserved snapshots and wire protocols remain exact;
+tests construct the appropriate text expectations without normalizing captures.
+Generated VOID sources and native manifests use explicit UTF-8 in the affected
+fixtures. Original command provenance stays lexical; receipt source/cwd identities
+are canonical, matching Windows short paths and macOS temporary-path aliases.
+
+Persistent native-code caching was already **unavailable on Windows** at this
+baseline: there is no verified ACL-safe publisher. The new tests require that
+strict fallback and no persistent cache directory while still executing fresh
+Runtime/reload/lease checks. POSIX publication/miss/hit/bypass assertions remain.
+This sprint does not add a Windows cache implementation or unsafe fallback.
+
+macOS hard-stack LSP tests now enforce and query both 1 MiB limits in the native
+child before exec and retain them in passing output. The running Python launcher
+is not resized. The invalid-native-filename fixture must report whether creation
+succeeded and its errno; when an invalid entry exists, enumeration must reject
+it. Apple's creation-time rejection is tested separately from VOID input-path
+rejection. **Actual macOS stack/filename observations and the Win32 closed-pipe
+test body remain native acceptance requirements.** Production filesystem UTF-8
+validation and all VFS escape/alias protections remain unchanged.
+
 CI [40844952491](https://github.com/Shmellyorc/Void.Language/actions/runs/40844952491)
 confirmed Windows ORC and macOS stop-token/ORC configuration success in Debug
 and Release. The [native build follow-up](NATIVE_BUILD_REPAIR.md) adds explicit

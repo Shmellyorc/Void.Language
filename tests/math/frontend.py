@@ -18,7 +18,7 @@ with tempfile.TemporaryDirectory(prefix='VOID math frontend ') as directory:
         result=h.run([compiler,'check',source],work,status=0 if valid else 1,small=small,sources=(source,))
         if diagnostic:
             assert diagnostic.encode() in result.stderr,(diagnostic,result.stderr)
-            assert str(source).encode()+b':' in result.stderr,result.stderr
+            assert source.resolve().as_posix().encode('utf-8')+b':' in result.stderr,result.stderr
         return source
     for target in ('i8','u8','i16','u16','i32','u32','i64','u64','f32','f64'):
         declarations=[f'var input: {target} = 1']

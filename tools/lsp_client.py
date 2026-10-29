@@ -15,9 +15,10 @@ def frame(message):
 
 
 class Client:
-    def __init__(self, executable, entry):
+    def __init__(self, executable, entry, *, preexec_fn=None):
         self.process = subprocess.Popen([str(executable), "--entry", str(entry)],
-                                        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        preexec_fn=preexec_fn)
         self.messages = queue.Queue()
         self.logs = bytearray()
         self.serial = 0

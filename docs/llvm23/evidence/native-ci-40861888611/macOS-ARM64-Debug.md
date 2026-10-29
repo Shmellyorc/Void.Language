@@ -1,0 +1,168 @@
+# Original CTest failure blocks
+
+## json_preservation
+
+```text
+----------------------------------------------------------
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random synthetic preservation fhg4mpmg/evidence/incident-la65xj8j
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random synthetic preservation fhg4mpmg/evidence/incident-r7jtwtyv
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random synthetic preservation fhg4mpmg/evidence/incident-huvoq5bm
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/random/preservation.py", line 32, in <module>
+    preserved=next(x for x in record['sources'] if x['original']==str(source))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+```
+
+
+## math_preservation
+
+```text
+----------------------------------------------------------
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math synthetic preservation or4spusn/synthetic-evidence/incident-mqjo4j08
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math synthetic preservation or4spusn/synthetic-evidence/incident-r4zqn32a
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math synthetic preservation or4spusn/synthetic-evidence/incident-ypnbwif4
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/math/preservation.py", line 63, in <module>
+    assert record['cwd']==str(root)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+```
+
+
+## random_preservation
+
+```text
+----------------------------------------------------------
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random synthetic preservation d8dbn6_w/evidence/incident-8neff6rn
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random synthetic preservation d8dbn6_w/evidence/incident-ku48k5xd
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random synthetic preservation d8dbn6_w/evidence/incident-dj9zahko
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/random/preservation.py", line 32, in <module>
+    preserved=next(x for x in record['sources'] if x['original']==str(source))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+```
+
+
+## lsp_const_recovery_stack
+
+```text
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/stage11/lsp_const_recovery.py", line 12, in <module>
+    resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
+ValueError: current limit exceeds maximum limit
+```
+
+
+## text_encoding_crash_preservation
+
+```text
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/crash_test.py", line 207, in <module>
+    exercise(disposable)
+  File "/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/crash_test.py", line 37, in exercise
+    first = run([selected_executable, '-c', script, original], cwd=root, capture_output=True,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/crash.py", line 252, in run
+    with subprocess.Popen(command, *args, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/crash.py", line 343, in __init__
+    super().__init__(command, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '../../../../../../Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12'
+```
+
+
+## lsp_text_encoding_stack
+
+```text
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/lsp.py", line 14, in <module>
+    resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
+ValueError: current limit exceeds maximum limit
+```
+
+
+## log_install
+
+```text
+----------------------------------------------------------
+CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/log/evidence/crashes/incident-vw6u41_t
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/log/install.py", line 34, in <module>
+    h.run([sys.executable,Path(__file__).with_name('lsp.py'),server],cwd=work,env=env,sources=[source],context={'mode':'installed-lsp'});checks+=1
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/Void.Language/Void.Language/tests/log/support.py", line 73, in run
+    assert not result.expectation_failed, (receipt, args, result.returncode, result.stdout, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (PosixPath('/Users/runner/work/Void.Language/Void.Language/docs/log/evidence/run-8spmfr1r'), ['/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12', '/Users/runner/work/Void.Language/Void.Language/tests/log/lsp.py', '/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID-log-installed-0wt67p5n/relocated 雪 # %/bin/voidls'], 1, b'', 'Traceback (most recent call last):\n  File "/Users/runner/work/Void.Language/Void.Language/tests/log/lsp.py", line 11, in <module>\n    h.stack()\n  File "/Users/runner/work/Void.Language/Void.Language/tests/log/support.py", line 20, in stack\n    resource.setrlimit(resource.RLIMIT_STACK, (1048576, 1048576))\nValueError: current limit exceeds maximum limit\n')
+```
+
+
+## lsp_log
+
+```text
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/log/lsp.py", line 11, in <module>
+    h.stack()
+  File "/Users/runner/work/Void.Language/Void.Language/tests/log/support.py", line 20, in stack
+    resource.setrlimit(resource.RLIMIT_STACK, (1048576, 1048576))
+ValueError: current limit exceeds maximum limit
+```
+
+
+## collections_stdlib_install
+
+```text
+----------------------------------------------------------
+CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/collections/evidence/crashes/incident-747h346c
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/collections_stdlib/install.py", line 32, in <module>
+    h.run([sys.executable, Path(__file__).with_name('lsp.py'), lsp], cwd=work, env=env, sources=[source], context={'mode': 'installed-lsp'})
+  File "/Users/runner/work/Void.Language/Void.Language/tests/collections_stdlib/support.py", line 70, in run
+    assert not result.expectation_failed, (receipt, args, result.returncode, result.stdout, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (PosixPath('/Users/runner/work/Void.Language/Void.Language/docs/collections/evidence/run-5_9zsvl4'), ['/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12', '/Users/runner/work/Void.Language/Void.Language/tests/collections_stdlib/lsp.py', '/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID-collections-installed-16an38cm/relocated 雪 # %/bin/voidls'], 1, b'CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/collections/evidence/crashes/incident-et2yljl1\n', 'Traceback (most recent call last):\n  File "/Users/runner/work/Void.Language/Void.Language/tests/collections_stdlib/lsp.py", line 73, in <module>\n    check(\'error\' not in response and \'main.void\' in str(response.get(\'result\')), response)\n  File "/Users/runner/work/Void.Language/Void.Language/tests/collections_stdlib/lsp.py", line 18, in check\n    assert ok, detail\n           ^^\nAssertionError: {\'error\': {\'code\': -32602, \'message\': \'<document identity>:1:1: error: Import escapes the project root.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: External imports require an explicit permission/identity contract and are not enabled in this phase.\\n\'}, \'id\': 28, \'jsonrpc\': \'2.0\'}\n')
+```
+
+
+## io_crash_preservation
+
+```text
+----------------------------------------------------------
+CRASH EVIDENCE: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID disposable io preservation 0lhse53t/incidents/incident-yve66hpa
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/io/preservation.py", line 128, in <module>
+    main()
+  File "/Users/runner/work/Void.Language/Void.Language/tests/io/preservation.py", line 95, in main
+    assert record['cwd'] == str(working)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+```
+
+
+## lsp_io_stack
+
+```text
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/runner/work/Void.Language/Void.Language/tests/io/lsp.py", line 12, in <module>
+    resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
+ValueError: current limit exceeds maximum limit
+```
+
+
+## io_kernel
+
+```text
+----------------------------------------------------------
+invalid native filename escaped UTF-8 validation
+```

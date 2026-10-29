@@ -12,7 +12,7 @@ with tempfile.TemporaryDirectory(prefix='VOID random errors ') as directory:
         for flags in (['--no-opt'],[]):
             result=h.run([compiler,'run',source,*flags],work,b'cleanup\n',status=1)
             assert b'convert.unwrap received Err' in result.stderr,result.stderr
-            assert str(source).encode() in result.stderr,result.stderr
+            assert source.resolve().as_posix().encode('utf-8') in result.stderr,result.stderr
             exe=work/('error'+str(serial)+str(bool(flags))+('.exe' if sys.platform=='win32' else ''))
             h.run([compiler,'build',source,'-o',exe,*flags],work)
             result=h.run([exe],work,b'cleanup\n',status=1,sources=(source,))

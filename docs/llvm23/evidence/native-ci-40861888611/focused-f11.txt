@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  35: json_preservation
+1/5 Test  #35: json_preservation ..................   Passed    0.93 sec
+    Start 126: math_preservation
+2/5 Test #126: math_preservation ..................   Passed    0.90 sec
+    Start 149: random_preservation
+3/5 Test #149: random_preservation ................   Passed    0.30 sec
+    Start 176: text_encoding_crash_preservation
+4/5 Test #176: text_encoding_crash_preservation ...   Passed    1.23 sec
+    Start 242: io_crash_preservation
+5/5 Test #242: io_crash_preservation ..............   Passed    0.25 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   3.62 sec

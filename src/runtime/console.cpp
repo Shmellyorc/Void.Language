@@ -390,7 +390,10 @@ private:
             return {work.count,input(stream) && work.count==0,{}};
         }
         if(input(stream) && (work.error==ERROR_BROKEN_PIPE || work.error==ERROR_HANDLE_EOF))return {work.count,work.count==0,{}};
-        auto error=windows_error(work.error);
+        // ERROR_NO_DATA means an empty nonblocking pipe on READ, but a closed
+        // peer on WRITE. Retrying the latter can never make forward progress.
+        auto error=!input(stream) && work.error==ERROR_NO_DATA
+            ? Error{ErrorKind::broken_pipe,work.error} : windows_error(work.error);
         if(work.error==ERROR_OPERATION_ABORTED && control){control.os_code=work.error;error=control;}
         return {work.count,false,error};
     }

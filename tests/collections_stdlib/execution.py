@@ -13,8 +13,8 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-execution-') as direct
     work = Path(directory)
     for name in fixtures:
         source = h.ROOT / 'examples/collections_stdlib/main.void' if name == 'example' else Path(__file__).with_name(name + '.void')
-        expected = '1 1 2 3\nenemy hero\na é 雪\n10 20\ntrue\n14 6\n'.encode('utf-8') if name == 'example' else b'7\n'
-        arguments = ['7'] if 'func entry(' in source.read_text() else []
+        expected = '1 1 2 3\nenemy hero\na é 雪\n10 20\ntrue\n14 6\n'.encode('utf-8') if name == 'example' else b'7\n' if name == 'authority' else h.native_text('7\n')
+        arguments = ['7'] if 'func entry(' in source.read_text(encoding='utf-8') else []
         h.run([compiler, 'check', source], small=small)
         for optimize in (False, True):
             switches = [] if optimize else ['--no-opt']

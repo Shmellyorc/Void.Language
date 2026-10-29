@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="11"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="165"
+	timestamp="2026-10-29T06:48:09"
+	>
+	<testcase name="toolchain_stop_token" classname="toolchain_stop_token" time="0.0191092" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="json_preservation" classname="json_preservation" time="1.17275" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID JSON preservation d4k6a745/incidents/incident-wt8s5g86
+CRASH EVIDENCE: /tmp/VOID JSON preservation d4k6a745/incidents/incident-bzr8gzbi
+CRASH EVIDENCE: /tmp/VOID JSON preservation d4k6a745/incidents/incident-l91ly7_9
+JSON adapter: ordinary rejection and 3 reserved-status/timeout receipts verified
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_transfers" classname="runtime_console_transfers" time="0.0407838" status="run">
+		<properties/>
+		<system-out>184 checked console transfer/deadline/cancellation checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="1.45752" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-v_3mgdya
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-l6k4nvq6
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-qfykj72s
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-kdtm43xp
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-9mu_t9kp
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-8duthsp5
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-14xl_lts
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-uq831kb_
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-wfod32ys
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-z70iuksh
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest ty55oqru/evidence/incident-8b6miri1
+CRASH EVIDENCE: /tmp/VOID crash pr...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="log_cache" classname="log_cache" time="52.5421" status="run">
+		<properties/>
+		<system-out>Logging cache: 6 miss/hit/bypass executions with fresh Runtime defaults
+</system-out>
+	</testcase>
+	<testcase name="log_console" classname="log_console" time="90.1304" status="run">
+		<properties/>
+		<system-out>Logging actual console: 16 redirected/live-UTC/closed-peer/file-independence observations
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_host" classname="collections_stdlib_host" time="113.087" status="run">
+		<properties/>
+		<system-out>operation=1 optimized=0 injected_allocation_failures=384
+operation=2 optimized=0 injected_allocation_failures=64
+operation=3 optimized=0 injected_allocation_failures=93
+operation=4 optimized=0 injected_allocation_failures=267
+operation=5 optimized=0 injected_allocation_failures=320
+operation=6 optimized=0 injected_allocation_failures=272
+operation=7 optimized=0 injected_allocation_failures=390
+operation=8 optimized=0 injected_allocation_failures=94
+map publication optimized=0 partial_effect_failures=65 passed
+collections cache/reload/captures/active leases optimized=0 passed
+operation=1 optimized=1 injected_allocation_failures=384
+operation=2 optimized=1 injected_allocation_failures=64
+operation=3 optimized=1 injected_allocation_failures=93
+operation=4 optimized=1 injected_allocation_failures=267
+operation=5 optimized=1 injected_allocation_failures=320
+operation=6 optimized=1 injected_allocation_failures=272
+operation=7 optimized=1 injected_allocation_failures=390
+operation=8 optimized=1 injected_allocation_f...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_cache" classname="collections_stdlib_cache" time="3.19467" status="run">
+		<properties/>
+		<system-out>Collections automatic cache miss/hit/bypass and fresh captured-callback/equality state passed
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="63.6225" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.285533" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation hmxndypr/incidents/incident-aj9w5u_u
+CRASH EVIDENCE: /tmp/VOID disposable io preservation hmxndypr/incidents/incident-091m_nek
+CRASH EVIDENCE: /tmp/VOID disposable io preservation hmxndypr/incidents/incident-6gxr0x05
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+	<testcase name="io_kernel" classname="io_kernel" time="0.0848624" status="run">
+		<properties/>
+		<system-out>invalid native filename fixture: created=1 errno=0
+native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -7,11 +7,11 @@ import tempfile
 from crash import crashed, preserve
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
 from lsp_client import Client
+from test_platform import small_stack, report_stack
 
 server = Path(sys.argv[1]).resolve()
-if '--small-stack' in sys.argv:
-    import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
+stack = small_stack if '--small-stack' in sys.argv else None
+
 checks = 0
 
 
@@ -42,8 +42,8 @@ func main():
 '''
 with tempfile.TemporaryDirectory(prefix='VOID text LSP ') as directory:
     entry = Path(directory) / 'main.void'
-    entry.write_text(base)
-    client = Client(server, entry)
+    entry.write_text(base, encoding='utf-8')
+    client = Client(server, entry, preexec_fn=stack)
     current = base
     version = 0
     try:
@@ -53,7 +53,7 @@ with tempfile.TemporaryDirectory(prefix='VOID text LSP ') as directory:
             global current, version
             current = updated
             # Preserve the exact edited source on disk before a possible server crash.
-            entry.write_text(updated)
+            entry.write_text(updated, encoding='utf-8')
             version += 1
             document = {'uri': entry.as_uri(), 'version': version}
             if version == 1:
@@ -118,4 +118,6 @@ with tempfile.TemporaryDirectory(prefix='VOID text LSP ') as directory:
             preserve([server, '--entry', entry], directory,
                      SimpleNamespace(returncode=status, stdout=b'', stderr=bytes(client.logs)))
         check(status == 0, (status, bytes(client.logs)))
+        if stack:
+            report_stack(client.logs)
 print(f'{checks} persistent LSP documentation/completion/recovery checks passed')

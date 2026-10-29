@@ -29,10 +29,10 @@ func main():
     if os.executable_path() is Ok(var image):
         if os.env("VOID_OS_EXPECT_IMAGE") is Ok(var expected):
             print(image == expected)
-''')
+''', encoding='utf-8')
     expected=({'linux':'linux','darwin':'macos','win32':'windows'}[sys.platform]+'\ntrue\ntrue\n').encode()
     exec_host=h.ROOT/'tests/os/exec_host.py'
-    lines=(relocated/'bin/void-native.txt').read_text().splitlines()
+    lines=(relocated/'bin/void-native.txt').read_text(encoding='utf-8').splitlines()
     clang,linker=lines[1:3]
     resources=[(installed.parent/p).resolve() if not Path(p).is_absolute() else Path(p) for p in lines[3:5]]
     flags=lines[5:]

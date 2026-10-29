@@ -11,6 +11,7 @@
 #include <thread>
 
 #ifndef _WIN32
+#include <cerrno>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -364,10 +365,36 @@ void native_failure_cases(const fs::path& root) {
             read(original).bytes == "preserved", "replacement copy followed destination link");
 
     auto invalid = root / std::string("invalid-\xff", 9);
-    std::ofstream(invalid) << "invalid native name";
-    require(perform(Operation::entries, root, {}, 0, 100).error == ErrorKind::invalid_path,
-            "invalid native filename escaped UTF-8 validation");
-    fs::remove(invalid);
+    auto descriptor = ::open(invalid.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
+    auto creation_error = descriptor < 0 ? errno : 0;
+    std::cout << "invalid native filename fixture: created=" << (descriptor >= 0)
+              << " errno=" << creation_error << '\n';
+    if (descriptor >= 0) {
+        require(::close(descriptor) == 0, "close invalid filename fixture");
+        struct stat actual{};
+        require(::lstat(invalid.c_str(), &actual) == 0 && S_ISREG(actual.st_mode),
+                "invalid filename fixture was not created with its exact native bytes");
+        require(perform(Operation::entries, root, {}, 0, 100).error == ErrorKind::invalid_path,
+                "invalid native filename escaped UTF-8 validation");
+        require(::unlink(invalid.c_str()) == 0, "remove invalid filename fixture");
+    } else {
+#ifdef __APPLE__
+        // APFS can reject malformed UTF-8 at creation. There is then no invalid
+        // entry to enumerate; verify that exact native rejection, not a failed
+        // fixture silently treated as successful creation.
+        require(creation_error == EILSEQ, "unexpected native invalid-filename creation failure");
+        struct stat absent{};
+        require(::lstat(invalid.c_str(), &absent) < 0 && errno == EILSEQ,
+                "filesystem did not consistently reject the invalid native path");
+        okay(perform(Operation::entries, root, {}, 0, 100), "enumerate after native filename rejection");
+#else
+        require(false, "could not create invalid native filename fixture");
+#endif
+    }
+    // VOID's own validation must reject malformed input before any OS lookup,
+    // on both byte-preserving filesystems and filesystems which reject creation.
+    require(perform(Operation::metadata, invalid).error == ErrorKind::invalid_path,
+            "invalid input path escaped UTF-8 validation");
 }
 #endif
 }

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="26"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="399"
+	timestamp="2026-10-29T06:46:02"
+	>
+	<testcase name="toolchain_stop_token" classname="toolchain_stop_token" time="0.0032021" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="json_preservation" classname="json_preservation" time="1.01429" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID JSON preservation byol1i17/incidents/incident-dynf2qf6
+CRASH EVIDENCE: /tmp/VOID JSON preservation byol1i17/incidents/incident-i1vzkvio
+CRASH EVIDENCE: /tmp/VOID JSON preservation byol1i17/incidents/incident-_eo3q112
+JSON adapter: ordinary rejection and 3 reserved-status/timeout receipts verified
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_transfers" classname="runtime_console_transfers" time="0.0163877" status="run">
+		<properties/>
+		<system-out>184 checked console transfer/deadline/cancellation checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_frontend" classname="math_frontend" time="17.3893" status="run">
+		<properties/>
+		<system-out>Math frontend: 356 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="math_errors" classname="math_errors" time="5.21609" status="run">
+		<properties/>
+		<system-out>Math inherited checked failures: 11 cases x four modes; 66 processes passed
+</system-out>
+	</testcase>
+	<testcase name="math_preservation" classname="math_preservation" time="0.95588" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID math synthetic preservation hwk36bhs/synthetic-evidence/incident-36z9hsq8
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation hwk36bhs/synthetic-evidence/incident-fjcsf_hx
+CRASH EVIDENCE: /tmp/VOID math synthetic preservation hwk36bhs/synthetic-evidence/incident-nr59ewhx
+Math preservation: 3 synthetic reserved-87/timeout incidents, edited nested sources, compiler identity and original output verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="17.291" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="7.06468" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_errors" classname="random_errors" time="16.2563" status="run">
+		<properties/>
+		<system-out>Random checked errors/defers: 24 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_preservation" classname="random_preservation" time="0.30256" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID random synthetic preservation hfau2164/evidence/incident-32i61mzj
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation hfau2164/evidence/incident-a8p7tl64
+CRASH EVIDENCE: /tmp/VOID random synthetic preservation hfau2164/evidence/incident-9avr8_9q
+Random preservation: 3 synthetic reserved-status/timeout incidents verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery_stack" classname="lsp_const_recovery_stack" time="4.34992" status="run">
+		<properties/>
+		<system-out>Const/global completion recovery: 472 assertions passed with actual 1 MiB server stack
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="1.24531" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-fm6m_h1f
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-md_xeo0o
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-6h980qrn
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-jdgu98ub
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-8gyc0n06
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-ho716807
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-lbbcgng7
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-lgf6lur0
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-ayq2kpa_
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-9e62u0wm
+CRASH EVIDENCE: /tmp/VOID crash preservation selftest iynt6ddi/evidence/incident-xm3nprxr
+CRASH EVIDENCE: /tmp/VOID crash pr...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_text_encoding_stack" classname="lsp_text_encoding_stack" time="3.94886" status="run">
+		<properties/>
+		<system-out>54 persistent LSP documentation/completion/recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="log_cache" classname="log_cache" time="48.7504" status="run">
+		<properties/>
+		<system-out>Logging cache: 6 miss/hit/bypass executions with fresh Runtime defaults
+</system-out>
+	</testcase>
+	<testcase name="log_install" classname="log_install" time="113.434" status="run">
+		<properties/>
+		<system-out>Logging installation: 15 relocated check/JIT/O2/build/independent-AOT/LSP checks
+</system-out>
+	</testcase>
+	<testcase name="log_console" classname="log_console" time="82.5017" status="run">
+		<properties/>
+		<system-out>Logging actual console: 16 redirected/live-UTC/closed-peer/file-independence observations
+</system-out>
+	</testcase>
+	<testcase name="lsp_log" classname="lsp_log" time="15.6224" status="run">
+		<properties/>
+		<system-out>Logging LSP: 38 checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_host" classname="collections_stdlib_host" time="218.386" status="run">
+		<properties/>
+		<system-out>operation=1 optimized=0 injected_allocation_failures=384
+operation=2 optimized=0 injected_allocation_failures=64
+operation=3 optimized=0 injected_allocation_failures=93
+operation=4 optimized=0 injected_allocation_failures=267
+operation=5 optimized=0 injected_allocation_failures=320
+operation=6 optimized=0 injected_allocation_failures=272
+operation=7 optimized=0 injected_allocation_failures=390
+operation=8 optimized=0 injected_allocation_failures=94
+map publication optimized=0 partial_effect_failures=65 passed
+collections cache/reload/captures/active leases optimized=0 passed
+operation=1 optimized=1 injected_allocation_failures=384
+operation=2 optimized=1 injected_allocation_failures=64
+operation=3 optimized=1 injected_allocation_failures=93
+operation=4 optimized=1 injected_allocation_failures=267
+operation=5 optimized=1 injected_allocation_failures=320
+operation=6 optimized=1 injected_allocation_failures=272
+operation=7 optimized=1 injected_allocation_failures=390
+operation=8 optimized=1 injected_allocation_f...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_collections_stdlib" classname="lsp_collections_stdlib" time="0.857763" status="run">
+		<properties/>
+		<system-out>Collections LSP: 40 checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_install" classname="collections_stdlib_install" time="8.64116" status="run">
+		<properties/>
+		<system-out>Collections installed/relocated check, JIT/O2, build, independent AOT and LSP passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_cache" classname="collections_stdlib_cache" time="2.05728" status="run">
+		<properties/>
+		<system-out>Collections automatic cache miss/hit/bypass and fresh captured-callback/equality state passed
+</system-out>
+	</testcase>
+	<testcase name="channel_execution" classname="channel_execution" time="175.452" status="run">
+		<properties/>
+		<system-out>Channel execution: 56 JIT/link/native/cache checks; hard stack=default
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="52.7656" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.257451" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/VOID disposable io preservation g5qs_1q1/incidents/incident-k75j42me
+CRASH EVIDENCE: /tmp/VOID disposable io preservation g5qs_1q1/incidents/incident-e_u1vqcv
+CRASH EVIDENCE: /tmp/VOID disposable io preservation g5qs_1q1/incidents/incident-ub9qlyqv
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+	<testcase name="lsp_io_stack" classname="lsp_io_stack" time="5.78199" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_kernel" classname="io_kernel" time="0.124681" status="run">
+		<properties/>
+		<system-out>invalid native filename fixture: created=1 errno=0
+native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,57 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start 216: collections_stdlib_host
+      Start 228: channel_execution
+ 1/26 Test #228: channel_execution ..................   Passed  175.45 sec
+      Start 211: log_install
+ 2/26 Test #216: collections_stdlib_host ............   Passed  218.39 sec
+      Start 212: log_console
+ 3/26 Test #211: log_install ........................   Passed  113.43 sec
+      Start 254: io_execution
+ 4/26 Test #212: log_console ........................   Passed   82.50 sec
+      Start 210: log_cache
+ 5/26 Test #254: io_execution .......................   Passed   52.77 sec
+      Start 147: os_errors
+ 6/26 Test #210: log_cache ..........................   Passed   48.75 sec
+      Start 134: math_frontend
+ 7/26 Test #147: os_errors ..........................   Passed   17.29 sec
+      Start 161: random_errors
+ 8/26 Test #134: math_frontend ......................   Passed   17.39 sec
+      Start 213: lsp_log
+ 9/26 Test #161: random_errors ......................   Passed   16.26 sec
+      Start 222: collections_stdlib_install
+10/26 Test #213: lsp_log ............................   Passed   15.62 sec
+      Start 149: lsp_os
+11/26 Test #222: collections_stdlib_install .........   Passed    8.64 sec
+      Start 262: lsp_io_stack
+12/26 Test #262: lsp_io_stack .......................   Passed    5.78 sec
+      Start 135: math_errors
+13/26 Test #149: lsp_os .............................   Passed    7.06 sec
+      Start 172: lsp_const_recovery_stack
+14/26 Test #172: lsp_const_recovery_stack ...........   Passed    4.35 sec
+      Start 193: lsp_text_encoding_stack
+15/26 Test #135: math_errors ........................   Passed    5.22 sec
+      Start 223: collections_stdlib_cache
+16/26 Test #223: collections_stdlib_cache ...........   Passed    2.06 sec
+      Start 189: text_encoding_crash_preservation
+17/26 Test #193: lsp_text_encoding_stack ............   Passed    3.95 sec
+      Start 139: math_preservation
+18/26 Test #189: text_encoding_crash_preservation ...   Passed    1.25 sec
+      Start 220: lsp_collections_stdlib
+19/26 Test #139: math_preservation ..................   Passed    0.96 sec
+      Start  35: json_preservation
+20/26 Test #220: lsp_collections_stdlib .............   Passed    0.86 sec
+      Start 162: random_preservation
+21/26 Test #162: random_preservation ................   Passed    0.30 sec
+      Start 255: io_crash_preservation
+22/26 Test #255: io_crash_preservation ..............   Passed    0.26 sec
+      Start 280: io_kernel
+23/26 Test #280: io_kernel ..........................   Passed    0.12 sec
+      Start  58: runtime_console_transfers
+24/26 Test  #58: runtime_console_transfers ..........   Passed    0.02 sec
+      Start   1: toolchain_stop_token
+25/26 Test   #1: toolchain_stop_token ...............   Passed    0.00 sec
+26/26 Test  #35: json_preservation ..................   Passed    1.01 sec
+
+100% tests passed, 0 tests failed out of 26
+
+Total Test time (real) = 399.99 sec

@@ -5,6 +5,7 @@
 #include "void/runtime.hpp"
 #include <atomic>
 #include <future>
+#include <iostream>
 #include <semaphore>
 #include <string>
 #include <vector>
@@ -252,6 +253,30 @@ void wide_read_error(const char* path){
     require(!native_ok && native_error==6 && native_count==0 && result.transfer.error.kind==ErrorKind::closed && result.transfer.error.os_code==6 && result.transfer.completed==0 && result.text.empty(),"actual ReadConsoleW invalid-handle error/progress changed");
     require(!runtime.close(),"native wide read error Runtime close");report<<"PASS host invalidated private handle at actual ReadConsoleW boundary; native FALSE/error 6/zero units preserved as Runtime closed/6/zero bytes\n";
 }
+}
+void vd_windows_console_closed_peers(){
+    auto verify=[](HANDLE writer){
+        Standard standard(STD_OUTPUT_HANDLE,writer);
+        vd::Runtime runtime;
+        auto result=runtime.console_context()->write(Stream::output,Bytes{'x'},1000);
+        require(result.completed==0 && !result.eof && result.error.kind==ErrorKind::broken_pipe,
+                "closed native pipe write must fail as broken_pipe without retrying to deadline");
+        require(result.error.os_code==ERROR_NO_DATA || result.error.os_code==ERROR_BROKEN_PIPE ||
+                result.error.os_code==ERROR_PIPE_NOT_CONNECTED,"closed pipe lost native error code");
+        require(!runtime.close(),"closed pipe Runtime cleanup");
+        DWORD flags=0;require(GetHandleInformation(writer,&flags),"Runtime closed borrowed pipe writer");
+        std::cerr<<"closed native pipe: completed="<<result.completed
+                 <<" os_code="<<result.error.os_code<<" borrowed_writer_open=1\n";
+    };
+    Handle reader,writer;
+    require(CreatePipe(&reader.value,&writer.value,nullptr,4096),"closed anonymous pipe fixture");
+    require(CloseHandle(reader.value),"close anonymous pipe peer");reader.value=nullptr;
+    verify(writer.value);
+    for(bool overlapped:{false,true}){
+        Pipe pipe(overlapped,true);
+        require(CloseHandle(pipe.peer.value),"close named pipe peer");pipe.peer.value=nullptr;
+        verify(pipe.borrowed.value);
+    }
 }
 bool vd_windows_console_native(const char* mode,const char* report){
     std::string value(mode);

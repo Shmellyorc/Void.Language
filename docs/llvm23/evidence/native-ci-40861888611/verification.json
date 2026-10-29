@@ -1,0 +1,2780 @@
+{
+  "profiles": {
+    "release": {
+      "tests": 369,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": "530",
+      "cases": {
+        "toolchain_stop_token": {
+          "passed": true,
+          "seconds": 0.00586175
+        },
+        "stage10_operator_reload": {
+          "passed": true,
+          "seconds": 18.5952
+        },
+        "stage10_operator_keys": {
+          "passed": true,
+          "seconds": 0.122644
+        },
+        "stage10_operator_resolution": {
+          "passed": true,
+          "seconds": 0.800265
+        },
+        "stage10_operator_declarations": {
+          "passed": true,
+          "seconds": 0.398556
+        },
+        "stage10_source_formatting": {
+          "passed": true,
+          "seconds": 0.236389
+        },
+        "stage10_tooling": {
+          "passed": true,
+          "seconds": 0.0666555
+        },
+        "stage10_display_reload": {
+          "passed": true,
+          "seconds": 1.45587
+        },
+        "stage10_temporal_ir": {
+          "passed": true,
+          "seconds": 1.30299
+        },
+        "format_temporal": {
+          "passed": true,
+          "seconds": 0.023831
+        },
+        "stage10_hooks": {
+          "passed": true,
+          "seconds": 1.59289
+        },
+        "stage10_interpolation": {
+          "passed": true,
+          "seconds": 0.400629
+        },
+        "stage10_conversion": {
+          "passed": true,
+          "seconds": 83.7062
+        },
+        "stage10_fields": {
+          "passed": true,
+          "seconds": 0.197573
+        },
+        "format_numeric": {
+          "passed": true,
+          "seconds": 0.0403602
+        },
+        "format_zones": {
+          "passed": true,
+          "seconds": 0.170699
+        },
+        "json_readonly": {
+          "passed": true,
+          "seconds": 1.79934
+        },
+        "json_dynamic": {
+          "passed": true,
+          "seconds": 8.17205
+        },
+        "json_numbers": {
+          "passed": true,
+          "seconds": 12.5488
+        },
+        "json_schema": {
+          "passed": true,
+          "seconds": 16.6646
+        },
+        "json_bounds": {
+          "passed": true,
+          "seconds": 16.5419
+        },
+        "json_install": {
+          "passed": true,
+          "seconds": 18.2555
+        },
+        "json_adversarial": {
+          "passed": true,
+          "seconds": 23.5103
+        },
+        "json_metering": {
+          "passed": true,
+          "seconds": 18.3157
+        },
+        "json_execution_validated": {
+          "passed": true,
+          "seconds": 6.74663
+        },
+        "json_execution_accessors": {
+          "passed": true,
+          "seconds": 4.81643
+        },
+        "json_execution_dynamic_smoke": {
+          "passed": true,
+          "seconds": 4.24875
+        },
+        "json_execution_typed_smoke": {
+          "passed": true,
+          "seconds": 9.71928
+        },
+        "json_execution_shapes": {
+          "passed": true,
+          "seconds": 13.5428
+        },
+        "json_execution_ownership": {
+          "passed": true,
+          "seconds": 6.84422
+        },
+        "json_execution_nested_inference": {
+          "passed": true,
+          "seconds": 5.2055
+        },
+        "json_stress_fixed": {
+          "passed": true,
+          "seconds": 31.4929
+        },
+        "json_stress_wide": {
+          "passed": true,
+          "seconds": 24.9958
+        },
+        "json_host": {
+          "passed": true,
+          "seconds": 56.9301
+        },
+        "json_preservation": {
+          "passed": true,
+          "seconds": 0.948823
+        },
+        "json_lsp": {
+          "passed": true,
+          "seconds": 0.851027
+        },
+        "application_workflow_stage9": {
+          "passed": true,
+          "seconds": 2.04021
+        },
+        "native_output_paths_ci88": {
+          "passed": true,
+          "seconds": 0.399584
+        },
+        "long_physical_paths_ci89": {
+          "passed": true,
+          "seconds": 0.390642
+        },
+        "gc_buffers": {
+          "passed": true,
+          "seconds": 0.882804
+        },
+        "gc_schemas": {
+          "passed": true,
+          "seconds": 0.0517872
+        },
+        "arrays_foundation": {
+          "passed": true,
+          "seconds": 0.0858452
+        },
+        "runtime_console": {
+          "passed": true,
+          "seconds": 0.0107187
+        },
+        "runtime_console_endpoints": {
+          "passed": true,
+          "seconds": 0.0606697
+        },
+        "runtime_console_transfers": {
+          "passed": true,
+          "seconds": 0.0182061
+        },
+        "runtime_console_native_transfers": {
+          "passed": true,
+          "seconds": 0.203439
+        },
+        "runtime_console_keyboard": {
+          "passed": true,
+          "seconds": 0.00383206
+        },
+        "runtime_console_terminal": {
+          "passed": true,
+          "seconds": 0.0035983
+        },
+        "runtime_console_native_keyboard": {
+          "passed": true,
+          "seconds": 0.126315
+        },
+        "runtime_console_native_terminal": {
+          "passed": true,
+          "seconds": 0.734868
+        },
+        "runtime_console_wide": {
+          "passed": true,
+          "seconds": 0.0205152
+        },
+        "runtime_console_input": {
+          "passed": true,
+          "seconds": 0.00571587
+        },
+        "runtime_console_native_input": {
+          "passed": true,
+          "seconds": 0.109596
+        },
+        "runtime_coordination": {
+          "passed": true,
+          "seconds": 2.04289
+        },
+        "runtime_generated": {
+          "passed": true,
+          "seconds": 0.417494
+        },
+        "fixed_arrays_source": {
+          "passed": true,
+          "seconds": 1.55602
+        },
+        "growable_arrays_source": {
+          "passed": true,
+          "seconds": 1.27997
+        },
+        "arrays_source": {
+          "passed": true,
+          "seconds": 2.80004
+        },
+        "generics_source": {
+          "passed": true,
+          "seconds": 2.25838
+        },
+        "generics_hint_execution": {
+          "passed": true,
+          "seconds": 2.51385
+        },
+        "generics_hint_lsp": {
+          "passed": true,
+          "seconds": 0.0804429
+        },
+        "collections_source": {
+          "passed": true,
+          "seconds": 7.19672
+        },
+        "dictionaries_source": {
+          "passed": true,
+          "seconds": 5.76509
+        },
+        "properties_source": {
+          "passed": true,
+          "seconds": 1.91458
+        },
+        "patterns_source": {
+          "passed": true,
+          "seconds": 6.29328
+        },
+        "debug_cache": {
+          "passed": true,
+          "seconds": 1.0504
+        },
+        "debug_cache_processes": {
+          "passed": true,
+          "seconds": 2.15725
+        },
+        "automatic_cache_processes": {
+          "passed": true,
+          "seconds": 0.463585
+        },
+        "advanced_source": {
+          "passed": true,
+          "seconds": 2.64715
+        },
+        "fixed_arrays_cli": {
+          "passed": true,
+          "seconds": 0.904994
+        },
+        "growable_arrays_cli": {
+          "passed": true,
+          "seconds": 2.07797
+        },
+        "arrays_cli": {
+          "passed": true,
+          "seconds": 1.14618
+        },
+        "generics_cli": {
+          "passed": true,
+          "seconds": 0.927693
+        },
+        "collections_cli": {
+          "passed": true,
+          "seconds": 3.76489
+        },
+        "dictionaries_cli": {
+          "passed": true,
+          "seconds": 1.05701
+        },
+        "properties_cli": {
+          "passed": true,
+          "seconds": 3.06358
+        },
+        "patterns_cli": {
+          "passed": true,
+          "seconds": 0.559948
+        },
+        "advanced_cli": {
+          "passed": true,
+          "seconds": 2.91831
+        },
+        "managed_source": {
+          "passed": true,
+          "seconds": 0.969559
+        },
+        "managed_aot_normal": {
+          "passed": true,
+          "seconds": 0.00574592
+        },
+        "managed_aot_optimized": {
+          "passed": true,
+          "seconds": 0.00531749
+        },
+        "managed_cli": {
+          "passed": true,
+          "seconds": 0.464346
+        },
+        "managed_initialization_source": {
+          "passed": true,
+          "seconds": 3.23734
+        },
+        "managed_initialization_aot_normal": {
+          "passed": true,
+          "seconds": 0.0101185
+        },
+        "managed_initialization_aot_optimized": {
+          "passed": true,
+          "seconds": 0.00875777
+        },
+        "managed_initialization_cli": {
+          "passed": true,
+          "seconds": 0.633658
+        },
+        "reference_values_source": {
+          "passed": true,
+          "seconds": 1.08508
+        },
+        "reference_values_aot_normal": {
+          "passed": true,
+          "seconds": 0.00855641
+        },
+        "reference_values_aot_optimized": {
+          "passed": true,
+          "seconds": 0.00877659
+        },
+        "reference_values_cli": {
+          "passed": true,
+          "seconds": 0.889237
+        },
+        "composition_source": {
+          "passed": true,
+          "seconds": 0.749883
+        },
+        "composition_aot_normal": {
+          "passed": true,
+          "seconds": 0.00890171
+        },
+        "composition_aot_optimized": {
+          "passed": true,
+          "seconds": 0.00930368
+        },
+        "composition_cli": {
+          "passed": true,
+          "seconds": 0.484184
+        },
+        "inheritance_source": {
+          "passed": true,
+          "seconds": 1.23176
+        },
+        "inheritance_aot_normal": {
+          "passed": true,
+          "seconds": 0.0154506
+        },
+        "inheritance_aot_optimized": {
+          "passed": true,
+          "seconds": 0.0139845
+        },
+        "inheritance_cli": {
+          "passed": true,
+          "seconds": 0.685282
+        },
+        "interfaces_source": {
+          "passed": true,
+          "seconds": 2.51288
+        },
+        "interfaces_aot_normal": {
+          "passed": true,
+          "seconds": 0.00833162
+        },
+        "interfaces_aot_optimized": {
+          "passed": true,
+          "seconds": 0.00974297
+        },
+        "interfaces_cli": {
+          "passed": true,
+          "seconds": 0.635634
+        },
+        "strings_source": {
+          "passed": true,
+          "seconds": 1.48703
+        },
+        "strings_aot_normal": {
+          "passed": true,
+          "seconds": 0.0143325
+        },
+        "strings_aot_optimized": {
+          "passed": true,
+          "seconds": 0.0135813
+        },
+        "strings_cli": {
+          "passed": true,
+          "seconds": 0.326855
+        },
+        "runtime_callbacks": {
+          "passed": true,
+          "seconds": 0.257419
+        },
+        "runtime_failures": {
+          "passed": true,
+          "seconds": 0.00309366
+        },
+        "runtime_aot_normal": {
+          "passed": true,
+          "seconds": 0.0362503
+        },
+        "runtime_aot_optimized": {
+          "passed": true,
+          "seconds": 0.0340591
+        },
+        "runtime_invariants": {
+          "passed": true,
+          "seconds": 0.0367747
+        },
+        "lsp_positions": {
+          "passed": true,
+          "seconds": 0.00321639
+        },
+        "lsp_protocol": {
+          "passed": true,
+          "seconds": 0.326427
+        },
+        "lsp_stage11_globals": {
+          "passed": true,
+          "seconds": 0.100271
+        },
+        "lsp_stage8": {
+          "passed": true,
+          "seconds": 0.395998
+        },
+        "documentation_execution": {
+          "passed": true,
+          "seconds": 0.500834
+        },
+        "lsp_documentation": {
+          "passed": true,
+          "seconds": 0.176957
+        },
+        "math_host": {
+          "passed": true,
+          "seconds": 0.574449
+        },
+        "math_ir": {
+          "passed": true,
+          "seconds": 0.320619
+        },
+        "math_execution": {
+          "passed": true,
+          "seconds": 18.919
+        },
+        "math_frontend": {
+          "passed": true,
+          "seconds": 9.11026
+        },
+        "math_errors": {
+          "passed": true,
+          "seconds": 3.19291
+        },
+        "math_worker": {
+          "passed": true,
+          "seconds": 1.37178
+        },
+        "lsp_math": {
+          "passed": true,
+          "seconds": 0.3193
+        },
+        "math_install": {
+          "passed": true,
+          "seconds": 0.742774
+        },
+        "math_preservation": {
+          "passed": true,
+          "seconds": 0.9178
+        },
+        "math_stack": {
+          "passed": true,
+          "seconds": 19.7086
+        },
+        "math_frontend_stack": {
+          "passed": true,
+          "seconds": 12.2377
+        },
+        "os_execution": {
+          "passed": true,
+          "seconds": 21.2807
+        },
+        "os_stack": {
+          "passed": true,
+          "seconds": 21.8535
+        },
+        "os_edges": {
+          "passed": true,
+          "seconds": 2.75011
+        },
+        "os_edges_stack": {
+          "passed": true,
+          "seconds": 2.70169
+        },
+        "os_host": {
+          "passed": true,
+          "seconds": 4.45384
+        },
+        "os_errors": {
+          "passed": true,
+          "seconds": 4.16141
+        },
+        "os_frontend": {
+          "passed": true,
+          "seconds": 4.96835
+        },
+        "lsp_os": {
+          "passed": true,
+          "seconds": 1.19667
+        },
+        "os_cache": {
+          "passed": true,
+          "seconds": 3.21061
+        },
+        "os_owner": {
+          "passed": true,
+          "seconds": 11.4252
+        },
+        "os_examples": {
+          "passed": true,
+          "seconds": 2.76441
+        },
+        "os_install": {
+          "passed": true,
+          "seconds": 8.25166
+        },
+        "os_frontend_stack": {
+          "passed": true,
+          "seconds": 5.44588
+        },
+        "os_host_stack": {
+          "passed": true,
+          "seconds": 4.42493
+        },
+        "random_host": {
+          "passed": true,
+          "seconds": 18.6198
+        },
+        "random_execution": {
+          "passed": true,
+          "seconds": 21.9121
+        },
+        "random_frontend": {
+          "passed": true,
+          "seconds": 5.82778
+        },
+        "lsp_random": {
+          "passed": true,
+          "seconds": 0.619519
+        },
+        "random_install": {
+          "passed": true,
+          "seconds": 2.0311
+        },
+        "random_errors": {
+          "passed": true,
+          "seconds": 4.11314
+        },
+        "random_preservation": {
+          "passed": true,
+          "seconds": 0.298784
+        },
+        "random_worker": {
+          "passed": true,
+          "seconds": 3.37437
+        },
+        "random_reference": {
+          "passed": true,
+          "seconds": 0.0197175
+        },
+        "random_stack": {
+          "passed": true,
+          "seconds": 21.7179
+        },
+        "random_frontend_stack": {
+          "passed": true,
+          "seconds": 6.83211
+        },
+        "binary_execution": {
+          "passed": true,
+          "seconds": 11.5205
+        },
+        "lsp_binary": {
+          "passed": true,
+          "seconds": 0.140888
+        },
+        "binary_ownership": {
+          "passed": true,
+          "seconds": 0.179883
+        },
+        "binary_stack": {
+          "passed": true,
+          "seconds": 0.339403
+        },
+        "lsp_const_recovery": {
+          "passed": true,
+          "seconds": 0.743639
+        },
+        "lsp_const_recovery_stack": {
+          "passed": true,
+          "seconds": 0.732016
+        },
+        "combined_ownership": {
+          "passed": true,
+          "seconds": 5.27194
+        },
+        "combined_async_normal": {
+          "passed": true,
+          "seconds": 0.0306338
+        },
+        "combined_async_optimized": {
+          "passed": true,
+          "seconds": 0.0299159
+        },
+        "combined_execution": {
+          "passed": true,
+          "seconds": 15.6711
+        },
+        "lsp_combined": {
+          "passed": true,
+          "seconds": 1.09856
+        },
+        "combined_stack": {
+          "passed": true,
+          "seconds": 18.2425
+        },
+        "memory_execution": {
+          "passed": true,
+          "seconds": 37.3567
+        },
+        "lsp_memory": {
+          "passed": true,
+          "seconds": 0.355775
+        },
+        "text_encoding_text": {
+          "passed": true,
+          "seconds": 1.50806
+        },
+        "text_encoding_hex": {
+          "passed": true,
+          "seconds": 0.529328
+        },
+        "text_encoding_base64": {
+          "passed": true,
+          "seconds": 0.937244
+        },
+        "text_encoding_ascii": {
+          "passed": true,
+          "seconds": 0.528968
+        },
+        "text_encoding_oracles": {
+          "passed": true,
+          "seconds": 63.2248
+        },
+        "text_encoding_interop": {
+          "passed": true,
+          "seconds": 2.72657
+        },
+        "text_encoding_large": {
+          "passed": true,
+          "seconds": 19.4926
+        },
+        "text_encoding_errors": {
+          "passed": true,
+          "seconds": 1.57135
+        },
+        "text_encoding_crash_preservation": {
+          "passed": true,
+          "seconds": 1.33935
+        },
+        "lsp_text_encoding": {
+          "passed": true,
+          "seconds": 0.621257
+        },
+        "text_encoding_install": {
+          "passed": true,
+          "seconds": 3.30373
+        },
+        "text_encoding_stack": {
+          "passed": true,
+          "seconds": 1.42875
+        },
+        "lsp_text_encoding_stack": {
+          "passed": true,
+          "seconds": 0.656508
+        },
+        "text_encoding_depth": {
+          "passed": true,
+          "seconds": 0.148016
+        },
+        "text_encoding_semantic_depth": {
+          "passed": true,
+          "seconds": 0.546426
+        },
+        "text_encoding_ir": {
+          "passed": true,
+          "seconds": 0.282414
+        },
+        "text_encoding_inventory": {
+          "passed": true,
+          "seconds": 0.0938114
+        },
+        "text_encoding_ownership": {
+          "passed": true,
+          "seconds": 3.14292
+        },
+        "memory_ownership": {
+          "passed": true,
+          "seconds": 1.44101
+        },
+        "memory_stack": {
+          "passed": true,
+          "seconds": 0.794296
+        },
+        "lsp_stage7": {
+          "passed": true,
+          "seconds": 0.170886
+        },
+        "lsp_demo": {
+          "passed": true,
+          "seconds": 0.0913406
+        },
+        "stage10_operator_compounds": {
+          "passed": true,
+          "seconds": 2.23762
+        },
+        "stage11_globals": {
+          "passed": true,
+          "seconds": 0.617276
+        },
+        "log_native": {
+          "passed": true,
+          "seconds": 108.87
+        },
+        "log_execution": {
+          "passed": true,
+          "seconds": 72.3491
+        },
+        "log_frontend": {
+          "passed": true,
+          "seconds": 3.81644
+        },
+        "log_files": {
+          "passed": true,
+          "seconds": 21.0913
+        },
+        "log_oracles": {
+          "passed": true,
+          "seconds": 50.0361
+        },
+        "log_cache": {
+          "passed": true,
+          "seconds": 12.0809
+        },
+        "log_install": {
+          "passed": true,
+          "seconds": 32.1482
+        },
+        "log_console": {
+          "passed": true,
+          "seconds": 26.0457
+        },
+        "lsp_log": {
+          "passed": true,
+          "seconds": 2.22145
+        },
+        "log_probe_normal": {
+          "passed": true,
+          "seconds": 0.255104
+        },
+        "log_probe_optimized": {
+          "passed": true,
+          "seconds": 0.253068
+        },
+        "collections_stdlib_host": {
+          "passed": true,
+          "seconds": 23.6548
+        },
+        "collections_stdlib_execution": {
+          "passed": true,
+          "seconds": 61.6882
+        },
+        "collections_stdlib_failures": {
+          "passed": true,
+          "seconds": 38.5022
+        },
+        "collections_stdlib_frontend": {
+          "passed": true,
+          "seconds": 3.19798
+        },
+        "lsp_collections_stdlib": {
+          "passed": true,
+          "seconds": 0.222048
+        },
+        "collections_stdlib_oracles": {
+          "passed": true,
+          "seconds": 14.1842
+        },
+        "collections_stdlib_install": {
+          "passed": true,
+          "seconds": 4.23918
+        },
+        "collections_stdlib_cache": {
+          "passed": true,
+          "seconds": 1.08463
+        },
+        "collections_stdlib_operators": {
+          "passed": true,
+          "seconds": 0.985763
+        },
+        "collections_stdlib_stack": {
+          "passed": true,
+          "seconds": 52.3153
+        },
+        "channel_host": {
+          "passed": true,
+          "seconds": 7.77247
+        },
+        "channel_frontend": {
+          "passed": true,
+          "seconds": 2.29472
+        },
+        "channel_execution": {
+          "passed": true,
+          "seconds": 31.4126
+        },
+        "lsp_channel": {
+          "passed": true,
+          "seconds": 0.154422
+        },
+        "channel_receiver": {
+          "passed": true,
+          "seconds": 1.24543
+        },
+        "channel_stack": {
+          "passed": true,
+          "seconds": 27.4785
+        },
+        "stage10_console_source": {
+          "passed": true,
+          "seconds": 38.4434
+        },
+        "stage10_operator_integration": {
+          "passed": true,
+          "seconds": 16.7164
+        },
+        "native_source": {
+          "passed": true,
+          "seconds": 2.14539
+        },
+        "stage6_integrated": {
+          "passed": true,
+          "seconds": 3.29348
+        },
+        "stage6_cache_processes": {
+          "passed": true,
+          "seconds": 3.94212
+        },
+        "native_aot_main_normal": {
+          "passed": true,
+          "seconds": 0.0351957
+        },
+        "native_aot_main_optimized": {
+          "passed": true,
+          "seconds": 0.0302004
+        },
+        "native_aot_terminated_nul_normal": {
+          "passed": true,
+          "seconds": 0.0308015
+        },
+        "native_aot_terminated_nul_optimized": {
+          "passed": true,
+          "seconds": 0.0300427
+        },
+        "native_aot_closed_normal": {
+          "passed": true,
+          "seconds": 0.0326089
+        },
+        "native_aot_closed_optimized": {
+          "passed": true,
+          "seconds": 0.0309591
+        },
+        "native_aot_duplicate_normal": {
+          "passed": true,
+          "seconds": 0.0311226
+        },
+        "native_aot_duplicate_optimized": {
+          "passed": true,
+          "seconds": 0.0324733
+        },
+        "native_aot_cleanup_failure_normal": {
+          "passed": true,
+          "seconds": 0.0306646
+        },
+        "native_aot_cleanup_failure_optimized": {
+          "passed": true,
+          "seconds": 0.029177
+        },
+        "native_aot_integrated_normal": {
+          "passed": true,
+          "seconds": 0.0298926
+        },
+        "native_aot_integrated_optimized": {
+          "passed": true,
+          "seconds": 0.031024
+        },
+        "native_aot_integrated_cancel_normal": {
+          "passed": true,
+          "seconds": 0.0321258
+        },
+        "native_aot_integrated_cancel_optimized": {
+          "passed": true,
+          "seconds": 0.0298571
+        },
+        "native_aot_integrated_failure_normal": {
+          "passed": true,
+          "seconds": 0.0318777
+        },
+        "native_aot_integrated_failure_optimized": {
+          "passed": true,
+          "seconds": 0.0321891
+        },
+        "io_ownership": {
+          "passed": true,
+          "seconds": 15.088
+        },
+        "io_execution": {
+          "passed": true,
+          "seconds": 22.6992
+        },
+        "io_crash_preservation": {
+          "passed": true,
+          "seconds": 0.260228
+        },
+        "io_async_execution": {
+          "passed": true,
+          "seconds": 18.6151
+        },
+        "io_wire_normal": {
+          "passed": true,
+          "seconds": 0.0617473
+        },
+        "io_wire_optimized": {
+          "passed": true,
+          "seconds": 0.0811712
+        },
+        "lsp_io": {
+          "passed": true,
+          "seconds": 0.853811
+        },
+        "io_stack": {
+          "passed": true,
+          "seconds": 21.5961
+        },
+        "io_async_stack": {
+          "passed": true,
+          "seconds": 18.8879
+        },
+        "lsp_io_stack": {
+          "passed": true,
+          "seconds": 0.866031
+        },
+        "io_native_responsiveness": {
+          "passed": true,
+          "seconds": 4.87662
+        },
+        "io_native_close_failure": {
+          "passed": true,
+          "seconds": 5.48024
+        },
+        "io_native_shutdown": {
+          "passed": true,
+          "seconds": 5.72253
+        },
+        "io_native_opening_shutdown": {
+          "passed": true,
+          "seconds": 5.65585
+        },
+        "io_native_whole_shutdown": {
+          "passed": true,
+          "seconds": 6.07818
+        },
+        "io_native_pending_close": {
+          "passed": true,
+          "seconds": 5.246
+        },
+        "io_native_cancelled": {
+          "passed": true,
+          "seconds": 5.26621
+        },
+        "io_probe_normal": {
+          "passed": true,
+          "seconds": 0.00548615
+        },
+        "io_probe_optimized": {
+          "passed": true,
+          "seconds": 0.00628037
+        },
+        "io_async_source": {
+          "passed": true,
+          "seconds": 7.17385
+        },
+        "io_errors_source": {
+          "passed": true,
+          "seconds": 5.8119
+        },
+        "io_errors_async": {
+          "passed": true,
+          "seconds": 7.97764
+        },
+        "io_examples_install": {
+          "passed": true,
+          "seconds": 7.7969
+        },
+        "io_async_acquisition": {
+          "passed": true,
+          "seconds": 0.157142
+        },
+        "io_async_normal": {
+          "passed": true,
+          "seconds": 0.043715
+        },
+        "io_async_optimized": {
+          "passed": true,
+          "seconds": 0.0630862
+        },
+        "io_native_jobs": {
+          "passed": true,
+          "seconds": 0.00545008
+        },
+        "io_kernel": {
+          "passed": true,
+          "seconds": 0.0425152
+        },
+        "io_ir": {
+          "passed": true,
+          "seconds": 0.428888
+        },
+        "io_cross_volume": {
+          "passed": true,
+          "seconds": 1.29269
+        },
+        "async_source": {
+          "passed": true,
+          "seconds": 5.23359
+        },
+        "async_syntax_source": {
+          "passed": true,
+          "seconds": 2.68171
+        },
+        "async_syntax_stack": {
+          "passed": true,
+          "seconds": 2.70999
+        },
+        "async_ir": {
+          "passed": true,
+          "seconds": 0.0458088
+        },
+        "async_parallel": {
+          "passed": true,
+          "seconds": 0.962578
+        },
+        "async_lifecycle": {
+          "passed": true,
+          "seconds": 1.77275
+        },
+        "async_aot_spawn_normal": {
+          "passed": true,
+          "seconds": 0.0296801
+        },
+        "async_aot_spawn_optimized": {
+          "passed": true,
+          "seconds": 0.0315899
+        },
+        "async_aot_spawn_cancel_normal": {
+          "passed": true,
+          "seconds": 0.0290506
+        },
+        "async_aot_spawn_cancel_optimized": {
+          "passed": true,
+          "seconds": 0.0303848
+        },
+        "async_aot_spawn_failure_normal": {
+          "passed": true,
+          "seconds": 0.0305053
+        },
+        "async_aot_spawn_failure_optimized": {
+          "passed": true,
+          "seconds": 0.0297451
+        },
+        "async_aot_activation_normal": {
+          "passed": true,
+          "seconds": 0.0304439
+        },
+        "async_aot_activation_optimized": {
+          "passed": true,
+          "seconds": 0.0310321
+        },
+        "async_aot_managed_normal": {
+          "passed": true,
+          "seconds": 0.0290301
+        },
+        "async_aot_managed_optimized": {
+          "passed": true,
+          "seconds": 0.0303821
+        },
+        "async_aot_large_normal": {
+          "passed": true,
+          "seconds": 1.40069
+        },
+        "async_aot_large_optimized": {
+          "passed": true,
+          "seconds": 1.33137
+        },
+        "async_aot_closures_normal": {
+          "passed": true,
+          "seconds": 0.0291097
+        },
+        "async_aot_closures_optimized": {
+          "passed": true,
+          "seconds": 0.0310823
+        },
+        "async_aot_loops_normal": {
+          "passed": true,
+          "seconds": 0.0296758
+        },
+        "async_aot_loops_optimized": {
+          "passed": true,
+          "seconds": 0.0296423
+        },
+        "async_aot_values_normal": {
+          "passed": true,
+          "seconds": 0.0318142
+        },
+        "async_aot_values_optimized": {
+          "passed": true,
+          "seconds": 0.0316372
+        },
+        "async_aot_methods_normal": {
+          "passed": true,
+          "seconds": 0.0302197
+        },
+        "async_aot_methods_optimized": {
+          "passed": true,
+          "seconds": 0.0295672
+        },
+        "async_aot_lifecycle_normal": {
+          "passed": true,
+          "seconds": 0.0290394
+        },
+        "async_aot_lifecycle_optimized": {
+          "passed": true,
+          "seconds": 0.0301159
+        },
+        "async_aot_lifecycle_exits_normal": {
+          "passed": true,
+          "seconds": 0.0294017
+        },
+        "async_aot_lifecycle_exits_optimized": {
+          "passed": true,
+          "seconds": 0.0312457
+        },
+        "async_aot_lifecycle_cancelled_normal": {
+          "passed": true,
+          "seconds": 0.0305338
+        },
+        "async_aot_lifecycle_cancelled_optimized": {
+          "passed": true,
+          "seconds": 0.0298075
+        },
+        "async_aot_lifecycle_failures_normal": {
+          "passed": true,
+          "seconds": 0.0312352
+        },
+        "async_aot_lifecycle_failures_optimized": {
+          "passed": true,
+          "seconds": 0.0296926
+        },
+        "async_aot_lifecycle_primary_normal": {
+          "passed": true,
+          "seconds": 0.0302565
+        },
+        "async_aot_lifecycle_primary_optimized": {
+          "passed": true,
+          "seconds": 0.0346776
+        },
+        "async_aot_lifecycle_resources_normal": {
+          "passed": true,
+          "seconds": 0.0300421
+        },
+        "async_aot_lifecycle_resources_optimized": {
+          "passed": true,
+          "seconds": 0.0278678
+        },
+        "async_aot_lifecycle_values_normal": {
+          "passed": true,
+          "seconds": 0.0317909
+        },
+        "async_aot_lifecycle_values_optimized": {
+          "passed": true,
+          "seconds": 0.0301119
+        },
+        "async_syntax_aot_values_normal": {
+          "passed": true,
+          "seconds": 0.292346
+        },
+        "async_syntax_aot_values_optimized": {
+          "passed": true,
+          "seconds": 0.408273
+        },
+        "async_syntax_aot_errors_normal": {
+          "passed": true,
+          "seconds": 0.223585
+        },
+        "async_syntax_aot_errors_optimized": {
+          "passed": true,
+          "seconds": 0.27647
+        },
+        "async_syntax_aot_cancelled_normal": {
+          "passed": true,
+          "seconds": 0.148816
+        },
+        "async_syntax_aot_cancelled_optimized": {
+          "passed": true,
+          "seconds": 0.195363
+        },
+        "async_syntax_aot_failure_normal": {
+          "passed": true,
+          "seconds": 0.142698
+        },
+        "async_syntax_aot_failure_optimized": {
+          "passed": true,
+          "seconds": 0.165298
+        },
+        "async_syntax_aot_spawn_normal": {
+          "passed": true,
+          "seconds": 0.116767
+        },
+        "async_syntax_aot_spawn_optimized": {
+          "passed": true,
+          "seconds": 0.139336
+        },
+        "lsp_async_syntax": {
+          "passed": true,
+          "seconds": 0.104254
+        },
+        "core": {
+          "passed": true,
+          "seconds": 0.00931621
+        },
+        "jit": {
+          "passed": true,
+          "seconds": 0.0397635
+        },
+        "reload": {
+          "passed": true,
+          "seconds": 0.284326
+        },
+        "gc": {
+          "passed": true,
+          "seconds": 0.0200416
+        },
+        "native": {
+          "passed": true,
+          "seconds": 0.019838
+        },
+        "sessions_demo": {
+          "passed": true,
+          "seconds": 0.0439027
+        },
+        "tooling_demo": {
+          "passed": true,
+          "seconds": 0.0386497
+        },
+        "sessions": {
+          "passed": true,
+          "seconds": 0.0526004
+        },
+        "tooling": {
+          "passed": true,
+          "seconds": 0.171919
+        },
+        "analysis": {
+          "passed": true,
+          "seconds": 0.447921
+        },
+        "numeric": {
+          "passed": true,
+          "seconds": 2.00738
+        },
+        "frontend": {
+          "passed": true,
+          "seconds": 4.217
+        },
+        "modules": {
+          "passed": true,
+          "seconds": 0.64567
+        },
+        "numeric_sprint2": {
+          "passed": true,
+          "seconds": 1.34059
+        },
+        "async_retention_sprint5": {
+          "passed": true,
+          "seconds": 10.3789
+        },
+        "async_retention_aot_growth_normal": {
+          "passed": true,
+          "seconds": 0.397125
+        },
+        "async_retention_aot_growth_optimized": {
+          "passed": true,
+          "seconds": 0.390508
+        },
+        "async_retention_aot_workers_normal": {
+          "passed": true,
+          "seconds": 0.473898
+        },
+        "async_retention_aot_workers_optimized": {
+          "passed": true,
+          "seconds": 0.448722
+        },
+        "ergonomics_sprint6_host": {
+          "passed": true,
+          "seconds": 0.318881
+        },
+        "ergonomics_sprint6": {
+          "passed": true,
+          "seconds": 1.35226
+        },
+        "stage10_fields_aot": {
+          "passed": true,
+          "seconds": 0.330521
+        },
+        "stage10_temporal_install": {
+          "passed": true,
+          "seconds": 2.43716
+        },
+        "stage10_temporal_aot": {
+          "passed": true,
+          "seconds": 5.03414
+        },
+        "stage11_globals_stack": {
+          "passed": true,
+          "seconds": 0.375709
+        },
+        "stage11_globals_aot": {
+          "passed": true,
+          "seconds": 3.54476
+        },
+        "stage10_console_aot": {
+          "passed": true,
+          "seconds": 158.414
+        },
+        "stage10_operators_aot": {
+          "passed": true,
+          "seconds": 63.7735
+        },
+        "stage10_conversion_aot": {
+          "passed": true,
+          "seconds": 0.504064
+        },
+        "lsp_sprint6": {
+          "passed": true,
+          "seconds": 0.285992
+        },
+        "lsp_stage10_fields": {
+          "passed": true,
+          "seconds": 0.0813798
+        },
+        "lsp_stage10_display": {
+          "passed": true,
+          "seconds": 2.23836
+        },
+        "lsp_stage10_intelligence": {
+          "passed": true,
+          "seconds": 0.168084
+        },
+        "lsp_stage10_source_formatting": {
+          "passed": true,
+          "seconds": 0.250513
+        },
+        "local_libraries": {
+          "passed": true,
+          "seconds": 0.328777
+        },
+        "lsp_sprint4": {
+          "passed": true,
+          "seconds": 0.0809457
+        },
+        "application_native_sprint4_host": {
+          "passed": true,
+          "seconds": 0.418789
+        },
+        "application_native_sprint4": {
+          "passed": true,
+          "seconds": 2.20604
+        },
+        "text_collections_sprint3": {
+          "passed": true,
+          "seconds": 15.2629
+        },
+        "lsp_sprint3": {
+          "passed": true,
+          "seconds": 0.119598
+        },
+        "lsp_sprint2": {
+          "passed": true,
+          "seconds": 0.105912
+        },
+        "aot": {
+          "passed": true,
+          "seconds": 0.0599749
+        },
+        "source_cli": {
+          "passed": true,
+          "seconds": 2.48788
+        },
+        "value_structs_cli": {
+          "passed": true,
+          "seconds": 0.584154
+        },
+        "receiver_methods_cli": {
+          "passed": true,
+          "seconds": 1.09777
+        },
+        "initialization_cli": {
+          "passed": true,
+          "seconds": 1.32806
+        },
+        "modules_cli": {
+          "passed": true,
+          "seconds": 8.34771
+        },
+        "analysis_cli": {
+          "passed": true,
+          "seconds": 0.345225
+        },
+        "numeric_cli": {
+          "passed": true,
+          "seconds": 11.9547
+        }
+      }
+    },
+    "debug": {
+      "tests": 26,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": "399",
+      "cases": {
+        "toolchain_stop_token": {
+          "passed": true,
+          "seconds": 0.0032021
+        },
+        "json_preservation": {
+          "passed": true,
+          "seconds": 1.01429
+        },
+        "runtime_console_transfers": {
+          "passed": true,
+          "seconds": 0.0163877
+        },
+        "math_frontend": {
+          "passed": true,
+          "seconds": 17.3893
+        },
+        "math_errors": {
+          "passed": true,
+          "seconds": 5.21609
+        },
+        "math_preservation": {
+          "passed": true,
+          "seconds": 0.95588
+        },
+        "os_errors": {
+          "passed": true,
+          "seconds": 17.291
+        },
+        "lsp_os": {
+          "passed": true,
+          "seconds": 7.06468
+        },
+        "random_errors": {
+          "passed": true,
+          "seconds": 16.2563
+        },
+        "random_preservation": {
+          "passed": true,
+          "seconds": 0.30256
+        },
+        "lsp_const_recovery_stack": {
+          "passed": true,
+          "seconds": 4.34992
+        },
+        "text_encoding_crash_preservation": {
+          "passed": true,
+          "seconds": 1.24531
+        },
+        "lsp_text_encoding_stack": {
+          "passed": true,
+          "seconds": 3.94886
+        },
+        "log_cache": {
+          "passed": true,
+          "seconds": 48.7504
+        },
+        "log_install": {
+          "passed": true,
+          "seconds": 113.434
+        },
+        "log_console": {
+          "passed": true,
+          "seconds": 82.5017
+        },
+        "lsp_log": {
+          "passed": true,
+          "seconds": 15.6224
+        },
+        "collections_stdlib_host": {
+          "passed": true,
+          "seconds": 218.386
+        },
+        "lsp_collections_stdlib": {
+          "passed": true,
+          "seconds": 0.857763
+        },
+        "collections_stdlib_install": {
+          "passed": true,
+          "seconds": 8.64116
+        },
+        "collections_stdlib_cache": {
+          "passed": true,
+          "seconds": 2.05728
+        },
+        "channel_execution": {
+          "passed": true,
+          "seconds": 175.452
+        },
+        "io_execution": {
+          "passed": true,
+          "seconds": 52.7656
+        },
+        "io_crash_preservation": {
+          "passed": true,
+          "seconds": 0.257451
+        },
+        "lsp_io_stack": {
+          "passed": true,
+          "seconds": 5.78199
+        },
+        "io_kernel": {
+          "passed": true,
+          "seconds": 0.124681
+        }
+      }
+    },
+    "strict": {
+      "tests": 11,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": "165",
+      "cases": {
+        "toolchain_stop_token": {
+          "passed": true,
+          "seconds": 0.0191092
+        },
+        "json_preservation": {
+          "passed": true,
+          "seconds": 1.17275
+        },
+        "runtime_console_transfers": {
+          "passed": true,
+          "seconds": 0.0407838
+        },
+        "text_encoding_crash_preservation": {
+          "passed": true,
+          "seconds": 1.45752
+        },
+        "log_cache": {
+          "passed": true,
+          "seconds": 52.5421
+        },
+        "log_console": {
+          "passed": true,
+          "seconds": 90.1304
+        },
+        "collections_stdlib_host": {
+          "passed": true,
+          "seconds": 113.087
+        },
+        "collections_stdlib_cache": {
+          "passed": true,
+          "seconds": 3.19467
+        },
+        "io_execution": {
+          "passed": true,
+          "seconds": 63.6225
+        },
+        "io_crash_preservation": {
+          "passed": true,
+          "seconds": 0.285533
+        },
+        "io_kernel": {
+          "passed": true,
+          "seconds": 0.0848624
+        }
+      }
+    },
+    "stack-final": {
+      "tests": 7,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": "26",
+      "cases": {
+        "lsp_stage8": {
+          "passed": true,
+          "seconds": 0.340962
+        },
+        "lsp_const_recovery_stack": {
+          "passed": true,
+          "seconds": 0.677965
+        },
+        "lsp_text_encoding_stack": {
+          "passed": true,
+          "seconds": 0.612427
+        },
+        "log_install": {
+          "passed": true,
+          "seconds": 26.1658
+        },
+        "lsp_log": {
+          "passed": true,
+          "seconds": 2.13039
+        },
+        "collections_stdlib_install": {
+          "passed": true,
+          "seconds": 4.09308
+        },
+        "lsp_io_stack": {
+          "passed": true,
+          "seconds": 0.823853
+        }
+      }
+    },
+    "stack-final-debug": {
+      "tests": 7,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": "91",
+      "cases": {
+        "lsp_stage8": {
+          "passed": true,
+          "seconds": 0.406071
+        },
+        "lsp_const_recovery_stack": {
+          "passed": true,
+          "seconds": 4.34169
+        },
+        "lsp_text_encoding_stack": {
+          "passed": true,
+          "seconds": 3.90739
+        },
+        "log_install": {
+          "passed": true,
+          "seconds": 91.8945
+        },
+        "lsp_log": {
+          "passed": true,
+          "seconds": 15.5396
+        },
+        "collections_stdlib_install": {
+          "passed": true,
+          "seconds": 8.53894
+        },
+        "lsp_io_stack": {
+          "passed": true,
+          "seconds": 5.78542
+        }
+      }
+    }
+  },
+  "original_native_failures_reconciled": [
+    {
+      "test": "math_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "math_frontend",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "math_errors",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "math_worker",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "math_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "math_preservation",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "os_errors",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "lsp_os",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "os_owner",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "os_examples",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "os_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "random_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "random_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "random_errors",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "random_preservation",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "random_worker",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "binary_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "combined_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "memory_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_text",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_hex",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_base64",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_ascii",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_oracles",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_interop",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_large",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_errors",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_crash_preservation",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F5"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "lsp_text_encoding",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "log_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "log_oracles",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F6"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "log_cache",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F8"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "log_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "log_console",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F9"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "lsp_log",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "collections_stdlib_host",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F8"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "collections_stdlib_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "collections_stdlib_failures",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "lsp_collections_stdlib",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "collections_stdlib_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "collections_stdlib_cache",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F8"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "channel_host",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "channel_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F3",
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "io_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "io_crash_preservation",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "io_async_execution",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "io_examples_install",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F1"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_values_normal",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_values_optimized",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_errors_normal",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_errors_optimized",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_cancelled_normal",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_cancelled_optimized",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_failure_normal",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_failure_optimized",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_spawn_normal",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "async_syntax_aot_spawn_optimized",
+      "platform": "Windows-X64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F2"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "not selected",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "json_preservation",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F11",
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "math_preservation",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "random_preservation",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "lsp_const_recovery_stack",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F7"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "text_encoding_crash_preservation",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F5"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "lsp_text_encoding_stack",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F7"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "log_install",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F7"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "lsp_log",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F7"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "collections_stdlib_install",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "io_crash_preservation",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F4"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    },
+    {
+      "test": "lsp_io_stack",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F7"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "not selected"
+    },
+    {
+      "test": "io_kernel",
+      "platform": "macOS-ARM64",
+      "original_configurations": [
+        "Debug",
+        "Release"
+      ],
+      "families": [
+        "F10"
+      ],
+      "linux_release": "passed",
+      "native_after_repair": "pending",
+      "linux_debug": "passed",
+      "linux_strict": "passed"
+    }
+  ],
+  "distinct_original_failed_names": 63,
+  "native_execution_claimed": false
+}

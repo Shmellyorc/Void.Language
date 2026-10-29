@@ -1,5 +1,17 @@
 # LLVM 23.1.4 migration — engineering record
 
+**Current continuation, baseline `5198c7ac9c256fd05f53ff5ba594c38dc0093b7f`:**
+[CI 40861888611 native failure inventory and repairs](NATIVE_CI_TRIAGE.md)
+supersede the pending native-build status in the historical notes below. All four
+native builds now succeeded in that baseline run; Windows had 58 failed tests
+per configuration and macOS had 12. The complete inventory is reconciled against
+eleven cause families. Feasible repairs are implemented, Linux Release passes
+369/369, focused Debug passes 26/26, and focused ASan/UBSan passes 11/11.
+Native confirmation of these new changes remains required. Windows persistent
+caching remains deliberately unavailable; native macOS filename creation/errno
+and stack-limit observations are explicit acceptance gates. Stop for independent
+Golden Wrench review after the documented local verification; Boss owns Git/CI.
+
 The [CI 40844952491 native build continuation](NATIVE_BUILD_REPAIR.md), against
 `cb54dcc40cf2da712ab480bd7dbc4b49e898df1b`, records successful native configuration
 followed by cp1252 fixture-generation and missing Apple `getentropy` declaration

@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 196: log_oracles
+1/1 Test #196: log_oracles ......................   Passed   38.13 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  38.15 sec

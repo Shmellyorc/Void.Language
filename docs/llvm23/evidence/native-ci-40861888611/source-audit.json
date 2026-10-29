@@ -1,0 +1,492 @@
+{
+  "baseline": "5198c7ac9c256fd05f53ff5ba594c38dc0093b7f",
+  "head": "5198c7ac9c256fd05f53ff5ba594c38dc0093b7f",
+  "protected_inputs": [
+    {
+      "path": "README.md",
+      "baseline_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+      "current_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+      "identical": true
+    },
+    {
+      "path": "cmake/LLVMPlatform.cmake",
+      "baseline_sha256": "cbb9905a7d2a84748f6a3a42e10bdb5258e53857843619da3024c8d96c6542d1",
+      "current_sha256": "cbb9905a7d2a84748f6a3a42e10bdb5258e53857843619da3024c8d96c6542d1",
+      "identical": true
+    },
+    {
+      "path": "cmake/dependencies/CMakeLists.txt",
+      "baseline_sha256": "1229aec6612b9c2026faabed0b66114eed8dbf32cc58bb67c64b4d3eaeeeb5bc",
+      "current_sha256": "1229aec6612b9c2026faabed0b66114eed8dbf32cc58bb67c64b4d3eaeeeb5bc",
+      "identical": true
+    },
+    {
+      "path": "tools/ci/llvm_sdk.py",
+      "baseline_sha256": "fe46fcc151529e310af95888711eb03b229f67fcc2565d5841f03f6428b0dfdb",
+      "current_sha256": "fe46fcc151529e310af95888711eb03b229f67fcc2565d5841f03f6428b0dfdb",
+      "identical": true
+    },
+    {
+      "path": "cmake/probes/StopToken.cpp",
+      "baseline_sha256": "2ba542b9e2fb7a959d16be0b3f28869e410512f73f41cc45d4117221f1c89876",
+      "current_sha256": "2ba542b9e2fb7a959d16be0b3f28869e410512f73f41cc45d4117221f1c89876",
+      "identical": true
+    },
+    {
+      "path": "src/backend/llvm/backend.cpp",
+      "baseline_sha256": "15fcbba73e2909acbe8b70f44abb551fab934a91ce297b87b4dccefa9fcd0594",
+      "current_sha256": "15fcbba73e2909acbe8b70f44abb551fab934a91ce297b87b4dccefa9fcd0594",
+      "identical": true
+    },
+    {
+      "path": "src/backend/llvm/native_cache.cpp",
+      "baseline_sha256": "89074f43ea6efa50639e2740b578035d4f8d557b2f9ad63008a3a57c2c0a9085",
+      "current_sha256": "89074f43ea6efa50639e2740b578035d4f8d557b2f9ad63008a3a57c2c0a9085",
+      "identical": true
+    },
+    {
+      "path": "src/runtime/random.cpp",
+      "baseline_sha256": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d",
+      "current_sha256": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d",
+      "identical": true
+    }
+  ],
+  "changed_production_paths": [
+    "src/runtime/console.cpp"
+  ],
+  "tracked_modified_paths": [
+    "CMakeLists.txt",
+    "cmake/NativeBuild.cmake",
+    "docs/llvm23/ACCEPTANCE.md",
+    "docs/llvm23/COMPATIBILITY.md",
+    "docs/llvm23/IMPLEMENTATION.md",
+    "src/runtime/console.cpp",
+    "tests/async/syntax_aot.py",
+    "tests/channel/execution.py",
+    "tests/channel/host.py",
+    "tests/channel/support.py",
+    "tests/collections_stdlib/cache.py",
+    "tests/collections_stdlib/execution.py",
+    "tests/collections_stdlib/failures.py",
+    "tests/collections_stdlib/frontend.py",
+    "tests/collections_stdlib/host.cpp",
+    "tests/collections_stdlib/lsp.py",
+    "tests/collections_stdlib/support.py",
+    "tests/io/execution.py",
+    "tests/io/kernel.cpp",
+    "tests/io/lsp.py",
+    "tests/io/preservation.py",
+    "tests/log/cache.py",
+    "tests/log/execution.py",
+    "tests/log/install.py",
+    "tests/log/lsp.py",
+    "tests/log/oracles.py",
+    "tests/log/support.py",
+    "tests/math/bootstrap.py",
+    "tests/math/errors.py",
+    "tests/math/frontend.py",
+    "tests/math/install.py",
+    "tests/math/preservation.py",
+    "tests/math/worker.py",
+    "tests/os/errors.py",
+    "tests/os/install.py",
+    "tests/os/lsp.py",
+    "tests/os/owner.py",
+    "tests/random/errors.py",
+    "tests/random/harness.py",
+    "tests/random/preservation.py",
+    "tests/random/worker.py",
+    "tests/runtime/console_transfers.cpp",
+    "tests/runtime/console_windows_native.cpp",
+    "tests/runtime/console_windows_native.hpp",
+    "tests/stage11/lsp_const_recovery.py",
+    "tests/text_encoding/crash.py",
+    "tests/text_encoding/crash_test.py",
+    "tests/text_encoding/lsp.py",
+    "tools/lsp_client.py"
+  ],
+  "new_source_paths": [
+    "tools/test_platform.py",
+    "tests/json/preservation.py"
+  ],
+  "staged_diff_empty": true,
+  "host": "Linux gamedev 7.2.11-pikaos #101pika1 SMP PREEMPT_DYNAMIC Sat Oct 17 21:28:05 UTC 2026 x86_64 GNU/Linux",
+  "python": "Python 3.14.8",
+  "cmake": "cmake version 4.3.4",
+  "clang": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)",
+  "lld": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)",
+  "native_platform_execution_available": [
+    "Linux x86-64"
+  ],
+  "tracked_changes": [
+    {
+      "path": "CMakeLists.txt",
+      "baseline_sha256": "f6ba5fa8ec1558b2e777e45c9f638ea4a779f3e7a08a61fc9322b598f2cd5732",
+      "current_sha256": "570d343ff16d2e1b8cb6d5fa2a15d9e3db7fb8e141e59e6eafb2bd9b7927da9b"
+    },
+    {
+      "path": "cmake/NativeBuild.cmake",
+      "baseline_sha256": "fed1e58ca1ef8f93722b33ba78ba4220da83a5224fcb46dbcc5ff3a997e47497",
+      "current_sha256": "e036c133266efe780bfe9bf1f20498b1c7a869929210baddb2ff5f63c457e5d1"
+    },
+    {
+      "path": "docs/llvm23/ACCEPTANCE.md",
+      "baseline_sha256": "6061b83fb057196215fe82cf1e165a8d3d6a3cc8daf5a035c7582f157421e430",
+      "current_sha256": "dfc6ad62fc05e24855e22cd5bc62188edf2388de0c55072147f0382ef8539c97"
+    },
+    {
+      "path": "docs/llvm23/COMPATIBILITY.md",
+      "baseline_sha256": "51dd555e8305107fb1d44d78761b28f25590cae7348336f3212616bdcc018e8d",
+      "current_sha256": "592193a7dae71ed7c7a8ce2f09a68c6a5e14538570d227debbf31571159af035"
+    },
+    {
+      "path": "docs/llvm23/IMPLEMENTATION.md",
+      "baseline_sha256": "f86558790736317c09c3265a3acd079df0a2c88c7f51967a9735216e981c0be5",
+      "current_sha256": "9244825be976d9989d55ffe6eda6c1c9983757a17afb36a5db7b263ecd400622"
+    },
+    {
+      "path": "src/runtime/console.cpp",
+      "baseline_sha256": "c994908428fb22b47c618d1e6e310f205ba3bc7494374b84116bba4c3f303312",
+      "current_sha256": "363909154a553103127b7410a4d43d9e08aa9acd3fbdae3197e9d033cb895e2f"
+    },
+    {
+      "path": "tests/async/syntax_aot.py",
+      "baseline_sha256": "f5258b78b144bdd18342479ae9159e38bff3641dc194a9fb535851585ea80d29",
+      "current_sha256": "4629bbb465ac84bd25e45dfe77edf6ab1ee4cdde5d0fe5d08ddbe3a32b3f403d"
+    },
+    {
+      "path": "tests/channel/execution.py",
+      "baseline_sha256": "82f565dcc0235c5bc20e84e6881f95f88905cf1034dbc9232b24064df440c912",
+      "current_sha256": "4cd7ffb52c8d859250c8ce75900fe90794677eba907f8eca30a722dc687cf0fa"
+    },
+    {
+      "path": "tests/channel/host.py",
+      "baseline_sha256": "d98299847076f9438416319bd265cef114469847bd394f755b281586966935db",
+      "current_sha256": "863e7c6609ec64337e641eb3bfb5a0e302ca6153295fb58974917eaffed14c6d"
+    },
+    {
+      "path": "tests/channel/support.py",
+      "baseline_sha256": "383917adaf5077d3dc5035ba4d276010ecd3a85d912c6e66f4c0008178722428",
+      "current_sha256": "b72de65f091c5e641413d279e69eb9487df2f35d984b6a5918327c4d28631edf"
+    },
+    {
+      "path": "tests/collections_stdlib/cache.py",
+      "baseline_sha256": "c7d72cb8c3bcacb91631f6f5030ad144a52c10b2e90070159a264566c88905e7",
+      "current_sha256": "9cb5c17567f0ebeba5d5c92b53c155935e7fc6eec0047e04b774808080c967bf"
+    },
+    {
+      "path": "tests/collections_stdlib/execution.py",
+      "baseline_sha256": "63362bbbeb46606f43cabad123cdee34dc4f7cecbae2778d102667945a191e9d",
+      "current_sha256": "6627f329778ea2a650a95ca050bf44f4389925dc9a639e517280908fffb440c5"
+    },
+    {
+      "path": "tests/collections_stdlib/failures.py",
+      "baseline_sha256": "bb2c393996177da371107cb811a7fcbba1fce4d1d3a2543728a1c9035ab5cdd7",
+      "current_sha256": "42c0b1f77a61202307b915c456e13e64d0a26953c0aaff99f7e75d88cc1e3c8b"
+    },
+    {
+      "path": "tests/collections_stdlib/frontend.py",
+      "baseline_sha256": "81d79839b4d639dd42fdbbf9650020fd60d6cc7606b5cb3785b345f58d4367b9",
+      "current_sha256": "b2c180c01d9f8d520929dd934494fddd44c0f3a65d334a75450d8f4b8485ceb0"
+    },
+    {
+      "path": "tests/collections_stdlib/host.cpp",
+      "baseline_sha256": "ecd0a1abd654f31818c08f5cd627180abbcb50629d13b406435fbe8e46f14d03",
+      "current_sha256": "d83098013f8f2fb722b1d040e6310ffc5f52c118ef3558bb5fd3ffcbc62a10d8"
+    },
+    {
+      "path": "tests/collections_stdlib/lsp.py",
+      "baseline_sha256": "d65fb965e69affb75356ff8171038c3e5b49f45e1ad93a6950d4bedae29ab850",
+      "current_sha256": "5425fac5b8da59ec972d4ca30847b4e2682121ed825f7fda50e8dc74cb42108c"
+    },
+    {
+      "path": "tests/collections_stdlib/support.py",
+      "baseline_sha256": "68ef11897f6e66f9944f690565aab5f47c126a9d12e12441e982a66ef783e961",
+      "current_sha256": "12e8525a3d9f031dbc415780520be18b0ed71b2be15b9953f0ce6c8932d13f7e"
+    },
+    {
+      "path": "tests/io/execution.py",
+      "baseline_sha256": "a677f6b105ca2597ec6f90f65f529682b9f081b81f186d56a213cf2f7a27360e",
+      "current_sha256": "0eb482f26937248b3e6557af35ab514a18ab0633096317e65c844f7499110c70"
+    },
+    {
+      "path": "tests/io/kernel.cpp",
+      "baseline_sha256": "36232ce6936735749c5fb2e1c3b93b3321b6178954a5a0d1c7044de672c2a603",
+      "current_sha256": "9503c0ba567e2a0109583248a887f167cd57e83494d7146000e60f14498486f8"
+    },
+    {
+      "path": "tests/io/lsp.py",
+      "baseline_sha256": "9ab89c7ccf1cdca645c61b2a36f4e452623ebf879156c30d3f3e58716e4fbad2",
+      "current_sha256": "7d885c03bcb87d6a5793173d6c8d644c10ca174a04fe0ce7e8b510f698e1ced2"
+    },
+    {
+      "path": "tests/io/preservation.py",
+      "baseline_sha256": "305ec5c7c3b1dd270a703b7df2afc06de6028eac5e56bfed42abba5222561d1b",
+      "current_sha256": "36c04e65e532239002ee9d7bb120a26d3c0797a1841cf0e8b025697b277ca828"
+    },
+    {
+      "path": "tests/log/cache.py",
+      "baseline_sha256": "565ffe0b315634b089f5fe9ccd5a837e46f59ead6c4cd9cf2cffdda02783c199",
+      "current_sha256": "6c86e9548ca4d1b8207f442122fc0ba5dfce9da298ed02367fc7b37419f686e8"
+    },
+    {
+      "path": "tests/log/execution.py",
+      "baseline_sha256": "dbac3fc0690ba5facaa056e97f8432d8a279c51991e862a9e9a2a4675a33bfe5",
+      "current_sha256": "30c5736a46300e7ca8fb5357f573e64fef0f35deba67fbc7c18a0ec9cdc16ee3"
+    },
+    {
+      "path": "tests/log/install.py",
+      "baseline_sha256": "aa6ca9da49c7767b304d1f330ce1677af5b5de6550b176bdb23b827b110f70e6",
+      "current_sha256": "ba3dfaab0b8c8130f0b15f41d8b02cf53dd54ae7a0e207ccd35847e4483118b3"
+    },
+    {
+      "path": "tests/log/lsp.py",
+      "baseline_sha256": "86582f69ac54d531234dca2bade5d0c679b60942657960b86cd88a42c8d35388",
+      "current_sha256": "c4853e5d2b67244812d5ddaf43754a89a8ad4ecabc052595a749b861588c720b"
+    },
+    {
+      "path": "tests/log/oracles.py",
+      "baseline_sha256": "b233c1bc09a3a3c8d12167c4abd21a5ba44883e6aadd79453555334c05606b1f",
+      "current_sha256": "df60be033025eec33ccfa95bd1a0c284fe5b95c76db77a1a4febbd0237e6135b"
+    },
+    {
+      "path": "tests/log/support.py",
+      "baseline_sha256": "098574b89f946a5b1f1a359a9fa9d1c849ac28b97fc905790e597abca56424dc",
+      "current_sha256": "b94e706a526396624ab359dde5a91acaf8cff904912b72078601cccc526e5ebb"
+    },
+    {
+      "path": "tests/math/bootstrap.py",
+      "baseline_sha256": "cc7663605b30dd96906955c59baa61c572cb5318f9b27ba298b8630d3e9455ac",
+      "current_sha256": "796f32f8282759206a6336e3331849d75e5127687f4641dc8eef75f3927f0e85"
+    },
+    {
+      "path": "tests/math/errors.py",
+      "baseline_sha256": "83634c9dd318b80632ce18ce6542425337a58e1ea19612720a38b2b5a5af54e2",
+      "current_sha256": "fb6d9232fef5711447cc98f9a3c020b90cb0b36c95735740b2c6318f13ba9e4e"
+    },
+    {
+      "path": "tests/math/frontend.py",
+      "baseline_sha256": "1e1b34e416eae0efd5a7380cc7ba38f6c3ab434a890fa3bf8fefac76156f5cae",
+      "current_sha256": "d931fbeca2ea4d9ef55f16640d496ff0a36a663e8a8f4ace216399d4fc2d3005"
+    },
+    {
+      "path": "tests/math/install.py",
+      "baseline_sha256": "fd7437bbea8936d8fae2754e91dfc0ac4beb137dbb9dc1fb64074324b88e4ffe",
+      "current_sha256": "03e684f9dd03dadea09c6575df588056d1ce4f79254ba200183dfa2a6dd32935"
+    },
+    {
+      "path": "tests/math/preservation.py",
+      "baseline_sha256": "9876fb60bdc5fd10dba50a8a795c8118970032efe72226e7c2ed3f743f624ec8",
+      "current_sha256": "b414a71396beb82e511988a6dc294448f31cc4c7ed63b5d9d2236aafeb783986"
+    },
+    {
+      "path": "tests/math/worker.py",
+      "baseline_sha256": "f9ec26628a83536ee5fbca33e305a903d59bdfaa3e9e78d039a3a0ff5ae3e45e",
+      "current_sha256": "31263ace27af01d4b39780e6acbc129dc064910b273141cc0d040374529652de"
+    },
+    {
+      "path": "tests/os/errors.py",
+      "baseline_sha256": "4565a77c6da44b1bb13687a380898cad52d6fc64ce6b7a7af62bbbb04dbb7d5e",
+      "current_sha256": "b25bb8d39b7a033c68a0120ec0d6db23479320902a94b83b523b26dbc7affdab"
+    },
+    {
+      "path": "tests/os/install.py",
+      "baseline_sha256": "d83468dd8609e625fca74e6a3a68661d6008f079e0cf35c0deac533a98094829",
+      "current_sha256": "1aacf06a4edb436b620252fe6ee33efb9e286d70f72f9510ec1f5f16ae39ecf8"
+    },
+    {
+      "path": "tests/os/lsp.py",
+      "baseline_sha256": "2f251ef18c721ef33189e42e679636e3f007fda772ce01169f9cdde87941f7a1",
+      "current_sha256": "87bd5e45c987af4fd3c64d03ad6ebad637ba606cae5a8e763b616efb9652418b"
+    },
+    {
+      "path": "tests/os/owner.py",
+      "baseline_sha256": "082e706c53cebdb0f98b3751b2e79a4c37de79848bd434a9235034d8923cafe7",
+      "current_sha256": "e46a4d65c3d41612e1995ce619dcf08f0445c1a244460b4b71f184ac190aac0e"
+    },
+    {
+      "path": "tests/random/errors.py",
+      "baseline_sha256": "2116dc1717990c685ee07be50750781a7092ed85c98753b461c9562bf8639f8e",
+      "current_sha256": "19d4beee36d5a1ef3bd6a7b651f7c0cb564432c2cbd43afd36f7ff2e11e0ab8c"
+    },
+    {
+      "path": "tests/random/harness.py",
+      "baseline_sha256": "a4afb8c26ce4a0e4073f2d1d6c28d4166535c8c29e14ef32eda366cb52239950",
+      "current_sha256": "5a2e477f54ffb49981953805d82aa48fdb552c0b5383a11ac3afa039b380d0c3"
+    },
+    {
+      "path": "tests/random/preservation.py",
+      "baseline_sha256": "6c409a3da3f7788f2b6fb3217709852b60f619d44400b09358b3ecfc5d4b41a7",
+      "current_sha256": "9dffcb384cca0fef87996d442213a7888f96fa440cc8add27843a6cfa90f0f20"
+    },
+    {
+      "path": "tests/random/worker.py",
+      "baseline_sha256": "45582bda17b9c02ac88788dc74f4b899c679679878637df742a834fe263fb6c0",
+      "current_sha256": "da481d96d2d611fb920c183b05fc6ff2d83a8fb654730cacfc9a77cb673bbb7d"
+    },
+    {
+      "path": "tests/runtime/console_transfers.cpp",
+      "baseline_sha256": "cedb4ee3f105a7fdc33b85d8bdffdc174de2c89543b9365edc7cd28fc6f6c501",
+      "current_sha256": "7e8a6333590e8c8f9b1a19f09ba2c83c42bcd6c1997a2840a75a157ccd6e59a9"
+    },
+    {
+      "path": "tests/runtime/console_windows_native.cpp",
+      "baseline_sha256": "56ddb834f0b5655383301aa69ce9f997517241b905453211a684e53653acfbf7",
+      "current_sha256": "2fbbc790c0a5120850e0d5eb69bb541f7dc37d2c049e8ece7da8300820a36a5f"
+    },
+    {
+      "path": "tests/runtime/console_windows_native.hpp",
+      "baseline_sha256": "71906d6ae29a961fa5f0de7221020560f433582525d1d6008449461958b83d89",
+      "current_sha256": "901f4d7ca1e112697efae7de428806cb525f75acd223537625db849f9b350b53"
+    },
+    {
+      "path": "tests/stage11/lsp_const_recovery.py",
+      "baseline_sha256": "cc9c22a55a263578004fcba47ff47ab16cc89b509cb6ecb1361c5b34800ef7bc",
+      "current_sha256": "002d3e95ce1eae773871e3ef9e73bf0e4ef7b0797497584744096ed009358b17"
+    },
+    {
+      "path": "tests/text_encoding/crash.py",
+      "baseline_sha256": "084b84e40ef209128efd435203a392511efabc2386cf74044936b8d8123d91eb",
+      "current_sha256": "8684b5ef10e6e40fb7add49b6bc832e96a8ecb72966b752b73bdf0ef71ad90b1"
+    },
+    {
+      "path": "tests/text_encoding/crash_test.py",
+      "baseline_sha256": "48b7a9bd586e055b0a9df197a14518f011fc744010c7309707500d53cac7a96c",
+      "current_sha256": "9f459b8a168bfa3fe91ebf58a17d0a4c018c848eb17258495e35e11b6553f67c"
+    },
+    {
+      "path": "tests/text_encoding/lsp.py",
+      "baseline_sha256": "f4adcdb1ab39478c0c41e0f8fc1e2b75cc9ae946ff3830798f9d67512cd1a1b9",
+      "current_sha256": "ab6abb4cc2da68179a4c978af80fea50d2dd66c0c84573aa7c3a4f59540f8cf4"
+    },
+    {
+      "path": "tools/lsp_client.py",
+      "baseline_sha256": "2af14be822d8e5555d2d39ad5b475e8c529fbab6dfc09d8961f50324842c42c0",
+      "current_sha256": "36f54726c6ba9e4c52f1cd278c5fe1ff0ac209428a9783a60137579b218d0b3a"
+    }
+  ],
+  "new_source_hashes": {
+    "tools/test_platform.py": "d144d80e95414ac1d52d6e76dcbc85f929195d6c695a5baa18690a072e937fb5",
+    "tests/json/preservation.py": "81aacc759f3e84c18bbae59db6636feb1c48d3c2aa56c9dc2d2a45450854d063"
+  },
+  "new_reviewable_paths": [
+    "docs/llvm23/NATIVE_CI_TRIAGE.md",
+    "docs/llvm23/evidence/native-ci-40861888611/Windows-X64-Debug.md",
+    "docs/llvm23/evidence/native-ci-40861888611/Windows-X64-Release.md",
+    "docs/llvm23/evidence/native-ci-40861888611/configure-debug.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/configure-final.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/configure-strict.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f10.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f11.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f2.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f3.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f4.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f5.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f6.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f7.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f8.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/focused-f9.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/local-debug.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/local-debug.xml",
+    "docs/llvm23/evidence/native-ci-40861888611/local-release.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/local-release.xml",
+    "docs/llvm23/evidence/native-ci-40861888611/local-stack-final-debug.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/local-stack-final-debug.xml",
+    "docs/llvm23/evidence/native-ci-40861888611/local-stack-final.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/local-stack-final.xml",
+    "docs/llvm23/evidence/native-ci-40861888611/local-strict.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/local-strict.xml",
+    "docs/llvm23/evidence/native-ci-40861888611/macOS-ARM64-Debug.md",
+    "docs/llvm23/evidence/native-ci-40861888611/macOS-ARM64-Release.md",
+    "docs/llvm23/evidence/native-ci-40861888611/platform-checks-final.txt",
+    "docs/llvm23/evidence/native-ci-40861888611/platform_checks.py",
+    "docs/llvm23/evidence/native-ci-40861888611/source-audit.json",
+    "docs/llvm23/evidence/native-ci-40861888611/verification.json",
+    "tests/json/preservation.py",
+    "tools/test_platform.py"
+  ],
+  "accepted_local_binaries": {
+    "release": {
+      "voidc": {
+        "bytes": 69872600,
+        "sha256": "32f2fc6a6a780b908e1dc8bfd1a90d22ac39fd8cf77d1e3854ef87df4f10e8cf"
+      },
+      "voidls": {
+        "bytes": 7647808,
+        "sha256": "0342e138d7d295963986d073bd626e41845e686f4881f09243baf13e3e879105"
+      },
+      "void_stop_token_probe": {
+        "bytes": 22408,
+        "sha256": "d1239490e0708d4da02f63ba49d6c1f496e6713d83a2a88b9001ac5ba2e1b7ff"
+      },
+      "void_io_kernel": {
+        "bytes": 203928,
+        "sha256": "2d7ca430a89d2f915c48ee95b5daf09340b613df8d2c864210b0217bd376659e"
+      },
+      "void_runtime_console_transfers": {
+        "bytes": 1993944,
+        "sha256": "f5138fb03954d1087637a8abe823deeb18a71c5a0abf2ab2779d1a74da575c3a"
+      },
+      "void_collections_stdlib_host": {
+        "bytes": 69864760,
+        "sha256": "ec64c6b501441d1b38e07977705a4955af5b1771d9568df805e329e5f6757611"
+      }
+    },
+    "debug": {
+      "voidc": {
+        "bytes": 106092120,
+        "sha256": "b41bdec8ae7de6588829b575070d26b2e0abfa4b72e17fcb0c3eb0d1affabb40"
+      },
+      "voidls": {
+        "bytes": 27079792,
+        "sha256": "6512a604187827f89c84192410bca682f2cd5130e36a188456b6274fa99a93e0"
+      },
+      "void_stop_token_probe": {
+        "bytes": 236088,
+        "sha256": "878f034b1cb2464772b58172209c4808bf923763841914b2a0b7e2e369e8c4a2"
+      },
+      "void_io_kernel": {
+        "bytes": 991280,
+        "sha256": "e7024460220536544525c719889fcc0b2e7ee49a45c80a4c5e3d9e3b4eac57e2"
+      },
+      "void_runtime_console_transfers": {
+        "bytes": 11983512,
+        "sha256": "ef3b3da58984411cbd45cde454f257a1e09d64173a729172023e324911f66086"
+      },
+      "void_collections_stdlib_host": {
+        "bytes": 105884192,
+        "sha256": "3fbcaa2bf986ac08ad62ba6c2cbd34444f743beb323e92bd283dd66b06a8bca1"
+      }
+    },
+    "strict": {
+      "voidc": {
+        "bytes": 135723256,
+        "sha256": "37b14bcc56081fb5b5b6c39b6d6d3f0795f3e80fe1e03071f3206832987e8ad8"
+      },
+      "voidls": {
+        "bytes": 57862192,
+        "sha256": "4928a2489bfab42340be43a0e5a881b7be05709357d254e8c0f0988231dabc2c"
+      },
+      "void_stop_token_probe": {
+        "bytes": 3434104,
+        "sha256": "08a39a165d340762b6a92f30e5169da848d87d66a7b64265b7b8b9bc5e60a9ee"
+      },
+      "void_io_kernel": {
+        "bytes": 4851616,
+        "sha256": "ed1f8e88c355510222494057dde063d15b3b3e7ab2ce79fbd969fa8419bbc4e7"
+      },
+      "void_runtime_console_transfers": {
+        "bytes": 17382080,
+        "sha256": "9c78ba119b56261dcc3d9b6781ac5e63d8d4532be4b69f2ff4663447e5b568aa"
+      },
+      "void_collections_stdlib_host": {
+        "bytes": 135407248,
+        "sha256": "a3cc84e6c114eadfdde71461b853e7e93b8f163ed8fb888421e16c5a22e08b04"
+      }
+    }
+  },
+  "native_runtime_confirmation_pending": [
+    "Windows x64 Debug/Release: new native console test body, UTF-8/newline/path/cache contracts",
+    "macOS ARM64 Debug/Release: actual stack limits and raw invalid-name creation/errno; all original failures"
+  ]
+}

@@ -10,7 +10,7 @@ h.crash.install()
 sys.path.insert(0, str(h.ROOT / 'tools'))
 from lsp_client import Client
 server = Path(sys.argv[1]).resolve()
-library = Path(os.environ.get('VOID_TEST_STDLIB', os.environ.get('VOID_STDLIB_ROOT', h.ROOT / 'stdlib')))
+library = Path(os.environ.get('VOID_TEST_STDLIB', os.environ.get('VOID_STDLIB_ROOT', h.ROOT / 'stdlib'))).resolve()
 checks = 0
 public = set('reversed sorted is_sorted numeric_less text_less lower_bound upper_bound binary_search find find_index index_of contains any all count_if filter map fold min max sum keys values copy_dictionary'.split())
 def check(ok, detail):
@@ -25,7 +25,7 @@ def point(text, needle, delta=0):
 with tempfile.TemporaryDirectory(prefix='VOID-collections-lsp-') as directory:
     work = Path(directory); entry = work / 'main.void'
     base = 'use collections as c\nfunc main():\n    var label = "🔥"\n    var input = [3, 1, 2]\n    var ordered = c.sorted(input, c.numeric_less<i32>)\n    var copied = c.copy_dictionary({"a": 1})\n'
-    entry.write_text(base)
+    entry.write_text(base, encoding='utf-8')
     previous = Path.cwd(); os.chdir(work)
     client = None
     try:
@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-lsp-') as directory:
                 check(result and result['activeParameter'] == active and phrase in str(result), result)
             custom = 'use collections as c\nvalue struct marker:\n    number: i32\n    operator ==(const left: marker, const right: marker) -> bool:\n        return left.number == right.number\nfunc main():\n    var found = c.index_of([marker(number = 1)], marker(number = 1))\n    var present = c.contains([marker(number = 1)], marker(number = 1))\n'
             notes = replace(custom); check(all(not item['diagnostics'] for item in notes), notes)
-            library_text = (library / 'collections.void').read_text()
+            library_text = (library / 'collections.void').read_text(encoding='utf-8')
             response = client.request('textDocument/definition', {'textDocument': {'uri': (library / 'collections.void').as_uri()}, 'position': point(library_text, 'if item == value', 8)})[0]
             check('error' not in response and 'main.void' in str(response.get('result')), response)
             for fragment in ('u', prefix + 'c.', prefix + 'c.sorted(input, ', prefix + 'c.map<'):
@@ -91,5 +91,5 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-lsp-') as directory:
     finally:
         os.chdir(previous)
     target = Path(tempfile.mkdtemp(prefix='lsp-' + server.parent.name + '-', dir=h.EVIDENCE)) / 'receipt.json'
-    target.write_text(json.dumps({'server': str(server), 'server_sha256': h.crash.digest(server), 'checks': checks}, indent=2) + '\n')
+    target.write_text(json.dumps({'server': str(server), 'server_sha256': h.crash.digest(server), 'checks': checks}, indent=2) + '\n', encoding='utf-8')
 print(f'Collections LSP: {checks} checks passed')

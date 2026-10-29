@@ -3,14 +3,14 @@ from pathlib import Path
 import sys, tempfile, json
 import support as h
 compiler=Path(sys.argv[1]).resolve()
-runner=compiler.with_name('void_io_runner')
+runner=compiler.with_name('void_io_runner.exe' if sys.platform == 'win32' else 'void_io_runner')
 small='--small-stack' in sys.argv
 checks=0
 with tempfile.TemporaryDirectory(prefix='VOID-log-execution-') as d:
     work=Path(d)
-    for name,expected in [('smoke', 'INFO "" "hello\\n雪"\n7\n'.encode()),
-                          ('semantics', b'WARN "" "independent"\nINFO "" "once"\nERROR "" "new default"\n7\n'),
-                          ('defaults', b'7\n'), ('async', b'7\n')]:
+    for name,expected in [('smoke', 'INFO "" "hello\\n雪"\n'.encode('utf-8') + h.native_text('7\n')),
+                          ('semantics', b'WARN "" "independent"\nINFO "" "once"\nERROR "" "new default"\n' + h.native_text('7\n')),
+                          ('defaults', h.native_text('7\n')), ('async', h.native_text('7\n'))]:
         source=Path(__file__).with_name(name+'.void').resolve()
         h.run([compiler,'check',source],small=small)
         for optimized in (False,True):

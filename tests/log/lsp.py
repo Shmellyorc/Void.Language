@@ -7,12 +7,11 @@ import sys
 import tempfile
 import support as h
 h.crash.install()
-if os.name == 'posix':
-    h.stack()
 sys.path.insert(0, str(h.ROOT / 'tools'))
 from lsp_client import Client
+from test_platform import small_stack, report_stack
 server = Path(sys.argv[1]).resolve()
-library = Path(os.environ.get('VOID_TEST_STDLIB', os.environ.get('VOID_STDLIB_ROOT', h.ROOT / 'stdlib')))
+library = Path(os.environ.get('VOID_TEST_STDLIB', os.environ.get('VOID_STDLIB_ROOT', h.ROOT / 'stdlib'))).resolve()
 checks = 0
 public = set('open open_async configure configure_async enabled write trace debug info warn error write_lazy write_async flush flush_async shutdown shutdown_async'.split())
 def check(ok, detail):
@@ -27,11 +26,11 @@ def point(text, needle, delta=0):
 with tempfile.TemporaryDirectory(prefix='VOID-log-lsp-') as directory:
     work = Path(directory); entry = work / 'main.void'
     base = 'use log as c\nuse convert\nfunc main():\n    var label = "🔥"\n    var instance = convert.unwrap(c.open(c.config(name = label)))\n    c.write(c.level.info, "hello")\n    c.configure(c.config())\n'
-    entry.write_text(base)
+    entry.write_text(base, encoding='utf-8')
     previous = Path.cwd(); os.chdir(work)
     client = None
     try:
-        with Client(server, entry) as client:
+        with Client(server, entry, preexec_fn=small_stack if os.name == 'posix' else None) as client:
             client.initialize()
             text = base; version = 0
             def replace(content):
@@ -73,6 +72,8 @@ with tempfile.TemporaryDirectory(prefix='VOID-log-lsp-') as directory:
             notes = replace(base); check(all(not item['diagnostics'] for item in notes), notes)
             check(bool(query('definition', 'c.write', 2)), 'navigation after unsaved recovery')
             client.shutdown()
+            if os.name == 'posix':
+                report_stack(client.logs)
     except BaseException as error:
         if client is not None and not getattr(client.process, '_incident_preserved', False):
             process = client.process
@@ -88,5 +89,5 @@ with tempfile.TemporaryDirectory(prefix='VOID-log-lsp-') as directory:
     finally:
         os.chdir(previous)
     target = Path(tempfile.mkdtemp(prefix='lsp-' + server.parent.name + '-', dir=h.EVIDENCE)) / 'receipt.json'
-    target.write_text(json.dumps({'server': str(server), 'server_sha256': h.crash.digest(server), 'checks': checks}, indent=2) + '\n')
+    target.write_text(json.dumps({'server': str(server), 'server_sha256': h.crash.digest(server), 'checks': checks}, indent=2) + '\n', encoding='utf-8')
 print(f'Logging LSP: {checks} checks passed')

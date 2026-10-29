@@ -7,6 +7,8 @@ import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'text_encoding'))
 from crash import run as run_preserving
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from test_platform import native_text
 
 compiler = None
 small = '--small-stack' in sys.argv
@@ -214,7 +216,7 @@ def main():
             root = Path(directory)
             fixture = root / 'main.void'
             fixture.write_text(async_fixture(), encoding='utf-8')
-            run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n',
+            run([compiler, 'check', fixture], root, expected=native_text('Source checked successfully\n'),
                 source_inputs=(fixture,))
             run([runner, '--async', fixture], root, expected=None, source_inputs=(fixture,))
             for endian in ('little', 'big'):
@@ -227,7 +229,7 @@ def main():
         root = Path(directory)
         fixture = root / 'main.void'
         fixture.write_text('\n'.join(source), encoding='utf-8')
-        run([compiler, 'check', fixture], root, expected=b'Source checked successfully\n',
+        run([compiler, 'check', fixture], root, expected=native_text('Source checked successfully\n'),
             source_inputs=(fixture,))
         for mode in ('jit', 'optimized', 'native', 'native-optimized'):
             cwd = root / mode

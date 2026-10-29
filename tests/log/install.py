@@ -15,7 +15,7 @@ func main():
     convert.unwrap(log.configure(log.config(timestamps = false, console = log.console_sink.stdout)))
     convert.unwrap(log.info("installed"))
     convert.unwrap(log.shutdown())
-''')
+''', encoding='utf-8')
     for name in ('log.void','io.void','console.void','time.void'):
         assert (library/name).read_bytes()==(h.ROOT/'stdlib'/name).read_bytes(),name
     env=dict(os.environ);env.pop('VOID_STDLIB_ROOT',None)

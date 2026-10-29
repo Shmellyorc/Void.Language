@@ -1,6 +1,6 @@
 """Miss/hit/bypass preserve code only; each Runtime initializes its own default."""
 from pathlib import Path
-import sys,tempfile
+import os,sys,tempfile
 import support as h
 compiler=Path(sys.argv[1]).resolve();checks=0
 with tempfile.TemporaryDirectory(prefix='VOID-log-cache-') as d:
@@ -18,12 +18,19 @@ func main():
         before=set(cache.iterdir()) if cache.exists() else set()
         result=h.run([compiler,'run',source,*flags],expected=b'INFO "" "fresh"\n',small=True);checks+=1
         try:
-            artifacts=set(cache.iterdir());assert len(artifacts-before)==1,'miss did not publish code'
+            artifacts=set(cache.iterdir()) if cache.exists() else set()
+            if os.name == 'nt':
+                # NativeCache deliberately fails closed until ACL-safe publication exists.
+                assert not (work/'.void').exists(), 'unavailable cache created persistent state'
+            else:
+                assert len(artifacts-before)==1,'miss did not publish code'
             frozen={p:(p.stat().st_mtime_ns,p.read_bytes()) for p in artifacts}
             h.run([compiler,'run',source,*flags],expected=b'INFO "" "fresh"\n',small=True);checks+=1
             assert all((p.stat().st_mtime_ns,p.read_bytes())==value for p,value in frozen.items()),'hit republished cache'
             h.run([compiler,'run',source,'--no-cache',*flags],expected=b'INFO "" "fresh"\n',small=True);checks+=1
-            assert set(cache.iterdir())==artifacts,'bypass published cache'
+            assert (set(cache.iterdir()) if cache.exists() else set())==artifacts,'bypass published cache'
+            if os.name == 'nt':
+                assert not (work/'.void').exists(), 'fallback/retry/bypass created persistent state'
             assert not (work/'.void/logs').exists(),'default logger implicitly created a log directory'
         except AssertionError as error:
             h.crash.preserve(result.args,h.ROOT,result,source_inputs=[work],provenance_inputs=[Path(__file__)],failure_kind='test_assertion',evidence_context={'cache_assertion':str(error)})

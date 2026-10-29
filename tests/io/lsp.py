@@ -5,11 +5,10 @@ import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
 from lsp_client import Client
+from test_platform import small_stack, report_stack
 
 server = Path(sys.argv[1]).resolve()
-if '--small-stack' in sys.argv:
-    import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
+stack = small_stack if '--small-stack' in sys.argv else None
 checks = 0
 
 
@@ -39,7 +38,7 @@ func main():
         var changed = path.change_extension("save.dat", "bin")
 '''
     entry.write_text(base)
-    with Client(server, entry) as client:
+    with Client(server, entry, preexec_fn=stack) as client:
         client.request('initialize', {'capabilities': {'textDocument': {
             'signatureHelp': {'signatureInformation': {'documentationFormat': ['plaintext']}}}}})
         client.notify('initialized', {})
@@ -105,4 +104,6 @@ func main():
         replace(base)
         hover = query('hover', 'handle.read_exact', 9)['contents']['value']
         check('Read exactly' in hover, hover)
+    if stack:
+        report_stack(client.logs)
 print(f'{checks} io/path LSP documentation, completion and persistent recovery checks passed')

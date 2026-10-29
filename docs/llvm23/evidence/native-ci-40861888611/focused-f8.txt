@@ -1,0 +1,11 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 197: log_cache
+1/3 Test #197: log_cache ........................   Passed   11.73 sec
+    Start 203: collections_stdlib_host
+2/3 Test #203: collections_stdlib_host ..........   Passed   20.98 sec
+    Start 210: collections_stdlib_cache
+3/3 Test #210: collections_stdlib_cache .........   Passed    1.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  33.72 sec

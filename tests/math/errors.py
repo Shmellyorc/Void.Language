@@ -16,7 +16,7 @@ with tempfile.TemporaryDirectory(prefix='VOID math checked errors ') as director
         source=work/f'checked{serial}.void';source.write_text('use math\nfunc finish():\n    print("cleanup")\nfunc main():\n    defer finish()\n'+''.join('    '+line+'\n' for line in body.splitlines()))
         for mode,flags in [('O0',['--no-opt']),('O2',[])]:
             result=h.run([compiler,'run',source,*flags],work,b'cleanup\n',status=1)
-            assert b'runtime error:' in result.stderr and str(source).encode() in result.stderr and b'Called from' in result.stderr,result.stderr
+            assert b'runtime error:' in result.stderr and source.resolve().as_posix().encode('utf-8') in result.stderr and b'Called from' in result.stderr,result.stderr
             exe=work/f'checked{serial}{mode}';exe=exe.with_suffix('.exe') if os.name=='nt' else exe
             h.run([compiler,'build',source,'-o',exe,*flags],work)
             result=h.run([exe],work,b'cleanup\n',status=1,sources=(source,))

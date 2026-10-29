@@ -22,5 +22,5 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-failures-') as directo
                     raise AssertionError(result.stderr)
             for command in (7, 10, 20):
                 arguments = [executable, str(command)] if native else [compiler, 'run', source, str(command), '--no-cache', *mode]
-                h.run(arguments, expected=b'7\n', sources=[source], small=True)
+                h.run(arguments, expected=h.native_text('7\n'), sources=[source], small=True)
 print('Collections expected invalidation and early-return execution passed in JIT/O2/linked AOT/O2')

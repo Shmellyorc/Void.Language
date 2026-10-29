@@ -1,5 +1,15 @@
 # LLVM 23.1.4 local acceptance
 
+**CI 40861888611 stabilization:** [complete native triage](NATIVE_CI_TRIAGE.md)
+records every original Windows/macOS failure, all feasible corrections and the
+remaining native gates. Linux full Release **369/369**, focused Debug **26/26**
+and focused fatal ASan/UBSan **11/11** pass. The Release selection includes all
+**63 distinct test names** failed by the two native platforms. Controlled cp1252
+and ancestor-alias probes reproduce the baseline failures and pass after repair.
+These results do not constitute native Windows/macOS acceptance. The exact
+recommended Boss-controlled checks are at the end of the triage record. Earlier
+continuation notes below describe their original points in time.
+
 **CI 40844952491 continuation:** the prior configuration repairs passed Windows
 ORC and macOS stop-token/ORC checks in both native configurations. The subsequent
 UTF-8 fixture and Apple entropy-header build fixes are ready for source review.

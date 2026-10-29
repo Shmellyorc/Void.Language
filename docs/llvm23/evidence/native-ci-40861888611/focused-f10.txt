@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 241: io_execution
+1/4 Test #241: io_execution .....................   Passed   21.44 sec
+    Start 242: io_crash_preservation
+2/4 Test #242: io_crash_preservation ............   Passed    0.24 sec
+    Start 260: io_errors_source
+3/4 Test #260: io_errors_source .................   Passed    5.24 sec
+    Start 267: io_kernel
+4/4 Test #267: io_kernel ........................   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  26.98 sec

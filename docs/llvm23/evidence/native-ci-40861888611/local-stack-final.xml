@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="7"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="26"
+	timestamp="2026-10-29T06:55:00"
+	>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="0.340962" status="run">
+		<properties/>
+		<system-out>Debug cache: hit
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery_stack" classname="lsp_const_recovery_stack" time="0.677965" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+Const/global completion recovery: 472 assertions passed with actual 1 MiB server stack
+</system-out>
+	</testcase>
+	<testcase name="lsp_text_encoding_stack" classname="lsp_text_encoding_stack" time="0.612427" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+54 persistent LSP documentation/completion/recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="log_install" classname="log_install" time="26.1658" status="run">
+		<properties/>
+		<system-out>Logging installation: 15 relocated check/JIT/O2/build/independent-AOT/LSP checks
+</system-out>
+	</testcase>
+	<testcase name="lsp_log" classname="lsp_log" time="2.13039" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+Logging LSP: 38 checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_install" classname="collections_stdlib_install" time="4.09308" status="run">
+		<properties/>
+		<system-out>Collections installed/relocated check, JIT/O2, build, independent AOT and LSP passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_io_stack" classname="lsp_io_stack" time="0.823853" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+</testsuite>

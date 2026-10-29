@@ -9,6 +9,8 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools'))
+from test_platform import native_text
 EVIDENCE = ROOT / 'docs/channel/evidence/implementation'
 EVIDENCE.mkdir(parents=True, exist_ok=True)
 os.environ['VOID_CRASH_EVIDENCE'] = str(EVIDENCE / 'crashes')
@@ -24,7 +26,7 @@ def stack():
 
 def link(compiler, obj, executable):
     compiler = Path(compiler)
-    manifest = (compiler.parent / 'void-native.txt').read_text().splitlines()
+    manifest = (compiler.parent / 'void-native.txt').read_text(encoding='utf-8').splitlines()
     clang, linker, *resources = manifest[1:5]
     resources = [str((compiler.parent / path).resolve()) if not Path(path).is_absolute() else path
                  for path in resources]
@@ -67,7 +69,7 @@ def run(args, cwd=None, status=0, expected=None, small=False, timeout=180, **kwa
                           if Path(arg).suffix in ('.o', '.a', '.obj', '.lib') and Path(arg).is_file()},
         'output_hashes': {args[i + 1]: hashlib.sha256(Path(args[i + 1]).read_bytes()).hexdigest()
                          for i, arg in enumerate(args[:-1]) if arg == '-o' and Path(args[i + 1]).is_file()},
-    }, indent=2) + '\n')
+    }, indent=2) + '\n', encoding='utf-8')
     assert result.returncode == status, (receipt, args, result.returncode, result.stderr.decode(errors='replace'))
     if expected is not None:
         assert result.stdout == expected, (receipt, result.stdout, expected)

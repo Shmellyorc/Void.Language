@@ -1,0 +1,17 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 121: math_frontend
+1/6 Test #121: math_frontend ....................   Passed    9.10 sec
+    Start 122: math_errors
+2/6 Test #122: math_errors ......................   Passed    3.07 sec
+    Start 126: math_preservation
+3/6 Test #126: math_preservation ................   Passed    0.92 sec
+    Start 148: random_errors
+4/6 Test #148: random_errors ....................   Passed    4.04 sec
+    Start 149: random_preservation
+5/6 Test #149: random_preservation ..............   Passed    0.28 sec
+    Start 242: io_crash_preservation
+6/6 Test #242: io_crash_preservation ............   Passed    0.25 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  17.67 sec

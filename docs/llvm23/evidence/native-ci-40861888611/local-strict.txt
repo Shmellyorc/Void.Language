@@ -1,0 +1,27 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 197: collections_stdlib_host
+      Start 193: log_console
+ 1/11 Test #193: log_console ........................   Passed   90.13 sec
+      Start 234: io_execution
+ 2/11 Test #197: collections_stdlib_host ............   Passed  113.09 sec
+      Start 191: log_cache
+ 3/11 Test #234: io_execution .......................   Passed   63.62 sec
+      Start 204: collections_stdlib_cache
+ 4/11 Test #204: collections_stdlib_cache ...........   Passed    3.19 sec
+      Start 173: text_encoding_crash_preservation
+ 5/11 Test #173: text_encoding_crash_preservation ...   Passed    1.46 sec
+      Start  35: json_preservation
+ 6/11 Test  #35: json_preservation ..................   Passed    1.17 sec
+      Start 235: io_crash_preservation
+ 7/11 Test #235: io_crash_preservation ..............   Passed    0.29 sec
+      Start 257: io_kernel
+ 8/11 Test #257: io_kernel ..........................   Passed    0.08 sec
+      Start  45: runtime_console_transfers
+ 9/11 Test  #45: runtime_console_transfers ..........   Passed    0.04 sec
+      Start   1: toolchain_stop_token
+10/11 Test   #1: toolchain_stop_token ...............   Passed    0.02 sec
+11/11 Test #191: log_cache ..........................   Passed   52.54 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) = 165.64 sec

@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix='VOID random synthetic preservation ') a
     records=[json.loads(p.read_text()) for p in evidence.glob('*/receipt.json')]
     assert len(records)==3
     for record in records:
-        preserved=next(x for x in record['sources'] if x['original']==str(source))
+        preserved=next(x for x in record['sources'] if x['original']==str(source.resolve()))
         assert Path(preserved['copy']).read_bytes()==raw
         assert preserved['sha256']==hashlib.sha256(raw).hexdigest()
     assert sum(x['timed_out'] for x in records)==1

@@ -61,7 +61,7 @@ def _sources(command, cwd, source_inputs, environment):
     if configured:
         sources.update(Path(configured).rglob('*.void'))
     evidence = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes')).resolve()
-    return {path for path in sources if path.is_file() and
+    return {path.resolve() for path in sources if path.is_file() and
             (path in explicit or not path.resolve().is_relative_to(evidence))}
 
 

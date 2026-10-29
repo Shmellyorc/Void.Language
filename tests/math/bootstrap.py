@@ -32,7 +32,7 @@ if len(sys.argv) > 1:
         manifest = compiler.parent / 'void-native.txt'
         context = {'compiler': str(compiler), 'compiler_sha256': digest,
                    'native_manifest_sha256': hashlib.sha256(manifest.read_bytes()).hexdigest() if manifest.is_file() else None,
-                   'native_manifest': manifest.read_text() if manifest.is_file() else None}
+                   'native_manifest': manifest.read_text(encoding='utf-8') if manifest.is_file() else None}
         IDENTITY = ROOT / 'docs/math/evidence' / ('compiler-identity-' + digest + '.json')
         IDENTITY.parent.mkdir(parents=True, exist_ok=True)
         raw = (json.dumps(context, indent=2) + '\n').encode()

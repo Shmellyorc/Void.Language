@@ -1,0 +1,19 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 211: log_install
+    Start 213: lsp_log
+1/7 Test #213: lsp_log ..........................   Passed   15.54 sec
+    Start 222: collections_stdlib_install
+2/7 Test #222: collections_stdlib_install .......   Passed    8.54 sec
+    Start 262: lsp_io_stack
+3/7 Test #262: lsp_io_stack .....................   Passed    5.79 sec
+    Start 172: lsp_const_recovery_stack
+4/7 Test #172: lsp_const_recovery_stack .........   Passed    4.34 sec
+    Start 193: lsp_text_encoding_stack
+5/7 Test #193: lsp_text_encoding_stack ..........   Passed    3.91 sec
+    Start 128: lsp_stage8
+6/7 Test #128: lsp_stage8 .......................   Passed    0.41 sec
+7/7 Test #211: log_install ......................   Passed   91.89 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  91.90 sec

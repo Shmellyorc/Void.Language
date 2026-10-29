@@ -5,11 +5,10 @@ import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
 from lsp_client import Client
+from test_platform import small_stack, report_stack
 
 server = Path(sys.argv[1]).resolve()
-if "--small-stack" in sys.argv:
-    import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (1024 * 1024, 1024 * 1024))
+stack = small_stack if '--small-stack' in sys.argv else None
 
 checks = 0
 
@@ -26,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix="VOID const recovery é🎮 ") as direct
     (root / "game.void").write_text("var shared = 9\n")
     valid = "var score = 7\nconst limit = 4\nfunc main() -> i32:\n    return score\n"
     entry.write_text(valid)
-    with Client(server, entry) as client:
+    with Client(server, entry, preexec_fn=stack) as client:
         client.initialize()
         version = 0
         current = valid
@@ -119,6 +118,8 @@ with tempfile.TemporaryDirectory(prefix="VOID const recovery é🎮 ") as direct
         check("score" in labels, labels)
         check(not replace(valid), "final recovery diagnostics")
         client.shutdown()
+        if stack:
+            report_stack(client.logs)
         check("bad_function_call" not in client.logs.decode() and
               "Internal language server failure" not in client.logs.decode(), client.logs.decode())
 

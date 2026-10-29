@@ -19,7 +19,7 @@ with tempfile.TemporaryDirectory(prefix='VOID OS errors ') as directory:
         for role in ('data','config','cache','state'):
             s += [f'        checked += inspect(os.{role}_dir(token), "os.{role}_dir", {code})']
     s += ['    print(checked)']
-    fixture.write_text('\n'.join(s)+'\n')
+    fixture.write_text('\n'.join(s)+'\n', encoding='utf-8')
     env=dict(os.environ,HOME='relative',XDG_DATA_HOME='',XDG_CONFIG_HOME='',XDG_CACHE_HOME='',XDG_STATE_HOME='')
     expected=f'{4*(len(valid)+len(invalid))}\n'.encode()
     for flags in (['--no-opt','--no-cache'],['--no-cache']):
@@ -37,7 +37,7 @@ func main():
             print(reason.code, reason.operation, reason.os_code, reason.native_domain)
     if os.data_dir("a" + zero + "b") is Err(var reason):
         print(reason.code, reason.operation, reason.os_code, reason.native_domain)
-''')
+''', encoding='utf-8')
     expected=b'2 os.env 0 \n'*4+b'2 os.data_dir 0 \n'
     for flags in (['--no-opt','--no-cache'],['--no-cache']):
         h.run([compiler,'run',fixture,*flags],work,expected,env=env,small=small)

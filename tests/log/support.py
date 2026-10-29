@@ -8,6 +8,8 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools'))
+from test_platform import native_text
 EVIDENCE = ROOT / 'docs/log/evidence'
 EVIDENCE.mkdir(parents=True, exist_ok=True)
 os.environ['VOID_CRASH_EVIDENCE'] = str(EVIDENCE / 'crashes')
@@ -22,7 +24,7 @@ def stack():
 
 def link(compiler, obj, executable, **kwargs):
     compiler = Path(compiler)
-    manifest = (compiler.parent / 'void-native.txt').read_text().splitlines()
+    manifest = (compiler.parent / 'void-native.txt').read_text(encoding='utf-8').splitlines()
     clang, linker, *resources = manifest[1:5]
     resources = [str((compiler.parent / path).resolve()) if not Path(path).is_absolute() else path
                  for path in resources]
@@ -69,6 +71,6 @@ def run(args, cwd=None, status=0, expected=None, small=False, timeout=600,
                     seconds=time.perf_counter() - started,
                     source_hashes={str(p): crash.digest(p) for p in inputs},
                     executable_sha256=crash.digest(Path(args[0])) if Path(args[0]).is_file() else None)
-    (receipt / 'receipt.json').write_text(json.dumps(metadata, indent=2) + '\n')
+    (receipt / 'receipt.json').write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     assert not result.expectation_failed, (receipt, args, result.returncode, result.stdout, result.stderr.decode(errors='replace'))
     return result

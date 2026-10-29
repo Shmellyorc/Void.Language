@@ -80,24 +80,24 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-negative-') as directo
     work = Path(directory)
     for name, body in cases.items():
         source = work / (name + '.void')
-        source.write_text(base + 'func main():\n' + ''.join('    ' + line + '\n' for line in body.splitlines()))
+        source.write_text(base + 'func main():\n' + ''.join('    ' + line + '\n' for line in body.splitlines()), encoding='utf-8')
         result = h.run([compiler, 'check', source], status=1, sources=[work], context={'mode': 'expected_source_diagnostic'})
         diagnostic(result, [work])
     # A project spelling never acquires canonical guard authority.
     source = work / 'collections.void'
-    source.write_text('func main():\n    var token = _collections_version([1])\n')
+    source.write_text('func main():\n    var token = _collections_version([1])\n', encoding='utf-8')
     diagnostic(h.run([compiler, 'check', source], status=1), [work])
-    source.write_text('func _collections_version(const items: [i32]) -> i32:\n    return 7\nfunc main():\n    print(_collections_version([1]))\n')
+    source.write_text('func _collections_version(const items: [i32]) -> i32:\n    return 7\nfunc main():\n    print(_collections_version([1]))\n', encoding='utf-8')
     h.run([compiler, 'run', source, '--no-cache'], expected=b'7\n')
     # Malformed canonical hooks are still type/arity checked, not a raw IR escape.
     library = work / 'stdlib'; library.mkdir()
     (library / 'error.void').write_bytes((h.ROOT / 'stdlib/error.void').read_bytes())
-    main = work / 'guard.void'; main.write_text('use collections as c\nfunc main():\n    c.probe()\n')
-    original = (h.ROOT / 'stdlib/collections.void').read_text()
+    main = work / 'guard.void'; main.write_text('use collections as c\nfunc main():\n    c.probe()\n', encoding='utf-8')
+    original = (h.ROOT / 'stdlib/collections.void').read_text(encoding='utf-8')
     for body in ('_collections_version(1)', '_collections_version([1], 2)',
                  '_collections_check([1], true)', '_collections_check([1])',
                  '_collections_check({1: 2}, 0)', '_collections_version<i32>([1])'):
-        (library / 'collections.void').write_text(original + '\nfunc probe():\n    ' + body + '\n')
+        (library / 'collections.void').write_text(original + '\nfunc probe():\n    ' + body + '\n', encoding='utf-8')
         result = h.run([compiler, 'check', main], status=1, sources=[work],
                        env=dict(os.environ, VOID_STDLIB_ROOT=str(library)), context={'mode':'expected_guard_diagnostic'})
         diagnostic(result, [work])

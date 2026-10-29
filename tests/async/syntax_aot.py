@@ -9,7 +9,7 @@ import harness as h
 
 compiler, native, source = map(lambda x: Path(x).resolve(), sys.argv[1:4])
 small = sys.platform == 'linux'
-h.run([compiler, 'check', source], ROOT, expected=b'Source checked successfully\n', sources=[source], small=small)
+h.run([compiler, 'check', source], ROOT, expected=h.native_text('Source checked successfully\n'), sources=[source], small=small)
 # Re-emit under the actual restricted stack and prove that the linked object
 # has the same bytes. The native target links this object with Runtime only.
 with tempfile.TemporaryDirectory(prefix='void-await-aot-') as temporary:
@@ -21,5 +21,5 @@ if expected.startswith('failure:'):
     result = h.run([native, '7'], ROOT, status=1, sources=[source], small=small)
     assert expected[8:].encode() in result.stderr, result
 else:
-    h.run([native, '7'], ROOT, expected=(expected + '\n').encode(), sources=[source], small=small)
+    h.run([native, '7'], ROOT, expected=h.native_text(expected + '\n'), sources=[source], small=small)
 print(f'await syntax: independent source check and linked AOT passed; actual 1 MiB stack={small}')

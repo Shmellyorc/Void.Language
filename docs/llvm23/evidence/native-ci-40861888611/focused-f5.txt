@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 176: text_encoding_crash_preservation
+1/1 Test #176: text_encoding_crash_preservation ...   Passed    1.26 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.27 sec

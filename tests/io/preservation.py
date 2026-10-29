@@ -14,7 +14,7 @@ def digest(path):
 
 
 def verify_source(record, original, expected):
-    entry = next(item for item in record['sources'] if item['original'] == str(original))
+    entry = next(item for item in record['sources'] if item['original'] == str(original.resolve()))
     preserved = Path(entry['copy'])
     assert preserved.name == original.stem + '_crash.void', preserved
     assert preserved.read_bytes() == expected
@@ -92,7 +92,7 @@ else:
                 assert len(receipts) == serial, receipts
                 records = [json.loads(receipt.read_text()) for receipt in receipts]
                 record = next(item for item in records if item['command'] == list(map(str, command)))
-                assert record['cwd'] == str(working)
+                assert record['cwd'] == str(working.resolve())
                 assert record['returncode'] == status
                 if os.name != 'nt':
                     assert record['signal'] == 'SIGSEGV'

@@ -1,0 +1,27 @@
+{"generated_flags_only": "Windows", "flags": ["-fms-runtime-lib=static", "-llegacy_stdio_definitions", "-lbcrypt", "-lshell32", "-lole32", "-luuid"]}
+{"generated_flags_only": "Darwin", "flags": ["-pthread", "-stdlib=libc++", "-nostdinc++", "-isystem", "/fixture/Apple SDK/c++/v1", "-framework", "Foundation", "-lobjc", "-isysroot", "/fixture/Apple SDK"]}
+{"generated_flags_only": "Linux", "flags": ["-pthread"]}
+CRASH EVIDENCE: /tmp/void-platform-contracts-d6vhsz29/incidents/incident-60jeeynh
+Canonical ancestor alias: exact argv, launch bytes, edited hash, unique source identities and colliding basenames passed
+{"stdlib_ancestor_alias": "stdlib-alias-baseline", "returncode": 1, "expected_definition_result_verified": true}
+{"stdlib_ancestor_alias": "stdlib-alias-fixed", "returncode": 0, "expected_definition_result_verified": true}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+{"baseline": "os/errors.py", "reproduced": "'charmap' codec can't encode character '\\u96ea' in position 1321: character maps to <undefined>"}
+OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+{"fixed": "os/errors.py", "explicit_utf8_accesses": 2}
+{"baseline": "os/lsp.py", "reproduced": "'charmap' codec can't encode character '\\U0001f600' in position 46: character maps to <undefined>"}
+OS LSP: 44 checks passed
+{"fixed": "os/lsp.py", "explicit_utf8_accesses": 1}
+{"baseline": "text_encoding/lsp.py", "reproduced": "'charmap' codec can't encode character '\\u96ea' in position 335: character maps to <undefined>"}
+54 persistent LSP documentation/completion/recovery checks passed
+{"fixed": "text_encoding/lsp.py", "explicit_utf8_accesses": 13}
+{"baseline": "log/lsp.py", "reproduced": "'charmap' codec can't encode character '\\U0001f525' in position 55: character maps to <undefined>"}
+Logging LSP: 38 checks passed
+{"fixed": "log/lsp.py", "explicit_utf8_accesses": 1}
+{"baseline": "collections_stdlib/lsp.py", "reproduced": "'charmap' codec can't encode character '\\U0001f525' in position 51: character maps to <undefined>"}
+Collections LSP: 40 checks passed
+{"fixed": "collections_stdlib/lsp.py", "explicit_utf8_accesses": 2}
+{"baseline": "channel/execution.py", "reproduced": "'charmap' codec can't decode byte 0x81 in position 1313: character maps to <undefined>"}
+Channel execution: 56 JIT/link/native/cache checks; hard stack=default
+{"fixed": "channel/execution.py", "explicit_utf8_accesses": 22}
+All platform contract checks passed; native Windows/macOS execution remains pending
