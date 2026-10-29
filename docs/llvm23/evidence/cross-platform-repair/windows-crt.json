@@ -1,0 +1,7 @@
+{
+  "members_with_runtime_directives": 168,
+  "runtime_directives": {
+    "MT_StaticRelease": 168
+  },
+  "first_member": "File: .toolchains/wrench-inspection/windows-sdk/lib/LLVMSupport.lib(lib/Support/CMakeFiles/LLVMSupport.dir/Watchdog.cpp.obj)\nFormat: COFF-x86-64\nArch: x86_64\nAddressSize: 64bit\nDirective(s):  /DEFAULTLIB:libcmt.lib /DEFAULTLIB:oldnames.lib /FAILIFMISMATCH:\"_MSC_VER=1900\" /FAILIFMISMATCH:\"_ITERATOR_DEBUG_LEVEL=0\" /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\" /DEFAULTLIB:libcpmt.lib /FAILIFMISMATCH:\"_CRT_STDIO_ISO_WIDE_SPECIFIERS=0\" /alternatename:_Avx2WmemEnabled=_Avx2WmemEnabledWeakValue /FAILIFMISMATCH:\"annotate_string=0\" /FAILIFMISMATCH:\"annotate_vector=0\" /FAILIFMISMATCH:\"LLVM_ENABLE_ABI_BREAKING_CHECKS=0\""
+}

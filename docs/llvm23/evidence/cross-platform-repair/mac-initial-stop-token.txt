@@ -1,0 +1,50 @@
+Source: tests-macOS-ARM64-Debug artifact 12870970569 (CMakeConfigureLog.yaml)
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:81 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "cmake/LLVMPlatform.cmake:57 (check_cxx_source_compiles)"
+      - "CMakeLists.txt:33 (void_enable_libcxx_stop_token)"
+    checks:
+      - "Performing Test VOID_HAS_STANDARD_STOP_TOKEN"
+    directories:
+      source: "/Users/runner/work/Void.Language/Void.Language/build/Debug/CMakeFiles/CMakeScratch/TryCompile-l71pco"
+      binary: "/Users/runner/work/Void.Language/Void.Language/build/Debug/CMakeFiles/CMakeScratch/TryCompile-l71pco"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang-scan-deps"
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm"
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+    buildResult:
+      variable: "VOID_HAS_STANDARD_STOP_TOKEN"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/runner/work/Void.Language/Void.Language/build/Debug/CMakeFiles/CMakeScratch/TryCompile-l71pco'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_5b7e1
+        [1/2] /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -DVOID_HAS_STANDARD_STOP_TOKEN  -std=c++20 -arch arm64 -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -MD -MT CMakeFiles/cmTC_5b7e1.dir/src.cxx.o -MF CMakeFiles/cmTC_5b7e1.dir/src.cxx.o.d -o CMakeFiles/cmTC_5b7e1.dir/src.cxx.o -c /Users/runner/work/Void.Language/Void.Language/build/Debug/CMakeFiles/CMakeScratch/TryCompile-l71pco/src.cxx
+        [2/2] : && /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -arch arm64 -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_5b7e1.dir/src.cxx.o -o cmTC_5b7e1   && :
+        FAILED: [code=1] cmTC_5b7e1 
+        : && /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -arch arm64 -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_5b7e1.dir/src.cxx.o -o cmTC_5b7e1   && :
+        Undefined symbols for architecture arm64:
+          "std::__1::__atomic_monitor_global(void const*)", referenced from:
+              std::__1::__atomic_wait_backoff_impl<std::__1::__atomic_base<unsigned int, false>, void std::__1::__atomic_wait[abi:nqe230104]<std::__1::__atomic_base<unsigned int, false> const, unsigned int>(std::__1::__atomic_base<unsigned int, false> const&, unsigned int, std::__1::memory_order)::'lambda'(unsigned int const&)>::operator()[abi:nqe230104](std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l>>) const in src.cxx.o
+              std::__1::__atomic_wait_backoff_impl<std::__1::__atomic_base<bool, false>, void std::__1::__atomic_wait[abi:nqe230104]<std::__1::__atomic_base<bool, false> const, bool>(std::__1::__atomic_base<bool, false> const&, bool, std::__1::memory_order)::'lambda'(bool const&)>::operator()[abi:nqe230104](std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l>>) const in src.cxx.o
+          "std::__1::__atomic_wait_global_table(void const*, long long)", referenced from:
+              std::__1::__atomic_wait_backoff_impl<std::__1::__atomic_base<unsigned int, false>, void std::__1::__atomic_wait[abi:nqe230104]<std::__1::__atomic_base<unsigned int, false> const, unsigned int>(std::__1::__atomic_base<unsigned int, false> const&, unsigned int, std::__1::memory_order)::'lambda'(unsigned int const&)>::operator()[abi:nqe230104](std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l>>) const in src.cxx.o
+              std::__1::__atomic_wait_backoff_impl<std::__1::__atomic_base<bool, false>, void std::__1::__atomic_wait[abi:nqe230104]<std::__1::__atomic_base<bool, false> const, bool>(std::__1::__atomic_base<bool, false> const&, bool, std::__1::memory_order)::'lambda'(bool const&)>::operator()[abi:nqe230104](std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000000000l>>) const in src.cxx.o
+          "std::__1::__atomic_notify_all_global_table(void const*)", referenced from:
+              void std::__1::__atomic_notify_all[abi:nqe230104]<std::__1::__atomic_base<unsigned int, false>>(std::__1::__atomic_base<unsigned int, false> const&) in src.cxx.o
+              void std::__1::__atomic_notify_all[abi:nqe230104]<std::__1::__atomic_base<bool, false>>(std::__1::__atomic_base<bool, false> const&) in src.cxx.o
+        ld: symbol(s) not found for architecture arm64
+        clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+...

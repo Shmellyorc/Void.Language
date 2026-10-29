@@ -1,0 +1,11 @@
+Source: failing run job 123241817521
+2026-10-29T03:16:58.6623410Z Image: macos-26-arm64
+2026-10-29T03:16:58.6623790Z Version: 20261013.0424.1
+2026-10-29T03:21:18.1019690Z clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+2026-10-29T03:21:18.3578350Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-10-29T03:21:23.2014640Z -- The C compiler identification is Clang 23.1.4
+2026-10-29T03:21:24.4189840Z -- The CXX compiler identification is Clang 23.1.4
+2026-10-29T03:21:28.6417580Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN
+2026-10-29T03:21:29.3035140Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN - Failed
+2026-10-29T03:21:29.3036650Z CMake Error at cmake/LLVMPlatform.cmake:59 (message):
+2026-10-29T03:21:29.3555970Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk

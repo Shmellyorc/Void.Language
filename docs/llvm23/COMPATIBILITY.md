@@ -5,6 +5,14 @@ Consolidated local acceptance is tracked separately. Official source authority:
 [LLVM 23.1.4 release](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.4).
 The complete development archives are required, not compiler-only installers.
 
+The [2026-10-29 cross-platform repair](CROSS_PLATFORM_REPAIR.md) records actual
+Windows/macOS SDK inspection and corrects the initial runtime assumptions.
+Both repairs are implemented; native acceptance remains pending. Windows now
+requires real static zlib 1.3.2, zstd 1.5.7 and LibXml2 2.15.4 development packages
+built with the SDK's release `/MT` CRT. macOS uses Xcode 26+ vendor libc++ headers
+with Apple's system runtime while retaining the LLVM/Clang/LLD 23.1.4 toolchain.
+No redistributed C++ runtime is introduced.
+
 No changes to VOID language syntax, source/VFS identities, Runtime ABI/GC,
 readonly/ownership, generation leases or platform path protections are introduced.
 Shared pre/post `verifyModule` and standard O2 remain required.
@@ -26,8 +34,8 @@ Historical LLVM 19 reports and unresolved incidents remain historical evidence.
 | Native build | Manifest producer/consumer pinned to 23.1.4; same staging/publication | Linux Unicode/percent/deep-path suites pass; native Windows pending |
 | Optional machine research | MC register/subtarget reference APIs, TargetMachine consolidation, optional alignment and iterator insertion | Four source syntax checks and all 13 Debug native research cases pass |
 | C++ ABI | SDK `LLVM_ENABLE_RTTI=OFF`, `LLVM_ENABLE_EH=OFF`, CXX11 libstdc++ ABI 1; project exceptions retained | CMake linked ORC probe and consolidated local profile selections pass |
-| Apple cancellation | libc++ 23 exposes standard stop-token support without libc++19 opt-in; actual compile/link probe remains mandatory | Pinned source inspected; native macOS execution pending |
-| Windows ABI/DIA | Same dynamic release CRT, iterator level zero and real dependency resolution | No local native Windows execution claimed |
+| Apple cancellation | Apple vendor libc++ headers paired with the system runtime; mandatory compile/link/run probe and CTest cancellation | LLVM 23 archive's new atomic symbols/provider inspected; native macOS execution pending |
+| Windows ABI/DIA | Actual SDK release `/MT` CRT, iterator zero, real static development dependencies and required DIA resolution | 168 COFF member directives inspected; dependency discovery/link/run tested on Linux only; native Windows pending |
 | SDK supply chain | Official platform SHA-256 before extraction; cached provenance identity | Linux actual hash/install, cache and corrupt-download checks pass |
 
 Official versioned API references:

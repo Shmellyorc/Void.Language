@@ -8,7 +8,7 @@ compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
 flags = ["--driver-mode=g++", "-pthread"]
 if linker: flags.append("--ld-path=" + linker)
 if sanitizer == "ON": flags.append("-fsanitize=address,undefined")
-if os.name == "nt": flags.extend(["-fms-runtime-lib=dll", "-llegacy_stdio_definitions"])
+if os.name == "nt": flags.extend(["-fms-runtime-lib=static", "-llegacy_stdio_definitions"])
 checks = 0
 def execute(args, success=True):
     global checks

@@ -1,0 +1,7 @@
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (5.3s)
+-- Generating done (1.2s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/wrench-linux-release

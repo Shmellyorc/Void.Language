@@ -90,6 +90,17 @@ def main() -> None:
     cc = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang")
     cxx = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang++")
     values = {"LLVM_DIR": destination / "lib/cmake/llvm", "CC": cc, "CXX": cxx, "VOID_CLANG": clang}
+    if platform.system() == "Windows":
+        # Keep dependency installation outside the verified, immutable SDK cache.
+        # All three are real static development libraries built with the SDK's /MT ABI.
+        dependencies = destination.with_name(destination.name + "-deps")
+        build = destination.with_name(destination.name + "-deps-build")
+        subprocess.run(["cmake", "-S", "cmake/dependencies", "-B", str(build), "-G", "Ninja",
+                        "-DCMAKE_BUILD_TYPE=Release", f"-DCMAKE_C_COMPILER={cc}",
+                        f"-DCMAKE_CXX_COMPILER={cxx}", f"-DCMAKE_INSTALL_PREFIX={dependencies}"], check=True)
+        subprocess.run(["cmake", "--build", str(build), "--parallel", "3"], check=True)
+        subprocess.run(["cmake", "--install", str(build)], check=True)
+        values["CMAKE_PREFIX_PATH"] = os.pathsep.join(filter(None, [str(dependencies), os.environ.get("CMAKE_PREFIX_PATH", "")]))
     values["VOID_LINKER"] = ""
     linker_name = {"Linux": "ld.lld", "Windows": "lld-link.exe", "Darwin": "ld64.lld"}[platform.system()]
     linker = destination / "bin" / linker_name

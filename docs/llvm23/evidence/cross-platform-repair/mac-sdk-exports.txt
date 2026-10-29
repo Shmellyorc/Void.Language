@@ -1,0 +1,19 @@
+Exact official SDK excerpts; the SDK exports were not edited.
+
+LLVMConfig.cmake
+295: set(LLVM_ENABLE_ZLIB 1)
+296: if(LLVM_ENABLE_ZLIB)
+298:   find_package(ZLIB)
+301: set(LLVM_ENABLE_ZSTD TRUE)
+302: if(LLVM_ENABLE_ZSTD)
+303:   find_package(zstd)
+306: set(LLVM_ENABLE_LIBXML2 1)
+307: if(LLVM_ENABLE_LIBXML2)
+308:   find_package(LibXml2)
+323: set(LLVM_ENABLE_DIA_SDK 0)
+324: if(LLVM_ENABLE_DIA_SDK)
+325:   find_package(DIASDK)
+
+LLVMExports.cmake
+65:   INTERFACE_LINK_LIBRARIES "m;ZLIB::ZLIB;zstd::libzstd_static;LLVMDemangle"
+1475:   INTERFACE_LINK_LIBRARIES "LibXml2::LibXml2;LLVMSupport"

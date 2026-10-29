@@ -1,0 +1,200 @@
+{
+  "execution_host": "Linux x86-64; no Windows/macOS execution",
+  "commands": [
+    {
+      "purpose": "Fresh Linux root configure; actual ORC link/run",
+      "command": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build/wrench-linux-release",
+        "-G",
+        "Unix Makefiles",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "-DCMAKE_EXE_LINKER_FLAGS=--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld"
+      ],
+      "exit_code": 0,
+      "evidence": "linux-configure.txt"
+    },
+    {
+      "purpose": "Final dependency packages configure with retained compiler/generator settings",
+      "command": [
+        "cmake",
+        "-S",
+        "cmake/dependencies",
+        "-B",
+        "build/wrench-deps-make"
+      ],
+      "exit_code": 0,
+      "evidence": "dependencies-configure-policy-final.txt"
+    },
+    {
+      "purpose": "Final pinned development libraries build",
+      "command": [
+        "cmake",
+        "--build",
+        "build/wrench-deps-make",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0,
+      "evidence": "dependencies-build-policy-final.txt"
+    },
+    {
+      "purpose": "Final pinned development libraries install",
+      "command": [
+        "cmake",
+        "--install",
+        "build/wrench-deps-make"
+      ],
+      "exit_code": 0,
+      "evidence": "dependencies-install-policy-final.txt"
+    },
+    {
+      "purpose": "Real imported target discovery",
+      "command": [
+        "cmake",
+        "-S",
+        "tests/toolchain",
+        "-B",
+        "build/wrench-dependency-probe",
+        "-G",
+        "Unix Makefiles",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_PREFIX_PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps"
+      ],
+      "exit_code": 0,
+      "evidence": "dependency-probe-configure-final.txt"
+    },
+    {
+      "purpose": "Final dependency APIs compile/link/run",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/wrench-dependency-probe",
+        "-V"
+      ],
+      "exit_code": 0,
+      "evidence": "dependency-probe-policy-final.txt"
+    },
+    {
+      "purpose": "Fresh Linux cancellation probe",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/wrench-linux-release",
+        "-R",
+        "^toolchain_stop_token$",
+        "--output-on-failure"
+      ],
+      "exit_code": 0,
+      "evidence": "stop-token-test-final.txt"
+    },
+    {
+      "purpose": "Corrected aggregate target build",
+      "command": [
+        "cmake",
+        "--build",
+        "build/llvm23-release",
+        "--target",
+        "void_stop_token_probe",
+        "void_async_tests",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0,
+      "evidence": "focused-build-corrected.txt"
+    },
+    {
+      "purpose": "Focused source/JIT/AOT/cancellation checks",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-release",
+        "-R",
+        "^(toolchain_stop_token|async_ir|async_lifecycle|async_parallel|source_cli|stage9_workflow|channel_execution|stage10_fields_aot|stage11_globals_aot)$",
+        "--output-on-failure",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "tests_passed": 8,
+      "evidence": "focused-ctest.txt"
+    },
+    {
+      "purpose": "Native/path/reload/cache preservation",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-release",
+        "-R",
+        "^(application_workflow_stage9|native_output_paths_ci88|reload|native|debug_cache)$",
+        "--output-on-failure",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "tests_passed": 5,
+      "evidence": "native-preservation-ctest.txt"
+    },
+    {
+      "purpose": "Required dependency negative check",
+      "command": [
+        "cmake",
+        "-S",
+        "tests/toolchain",
+        "-B",
+        "build/wrench-missing-ZLIB",
+        "-G",
+        "Unix Makefiles",
+        "-DCMAKE_PREFIX_PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps",
+        "-DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE"
+      ],
+      "exit_code": 1,
+      "expected_failure": true,
+      "evidence": "negative-ZLIB.txt"
+    },
+    {
+      "purpose": "Required dependency negative check",
+      "command": [
+        "cmake",
+        "-S",
+        "tests/toolchain",
+        "-B",
+        "build/wrench-missing-zstd",
+        "-G",
+        "Unix Makefiles",
+        "-DCMAKE_PREFIX_PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps",
+        "-DCMAKE_DISABLE_FIND_PACKAGE_zstd=TRUE"
+      ],
+      "exit_code": 1,
+      "expected_failure": true,
+      "evidence": "negative-zstd.txt"
+    },
+    {
+      "purpose": "Required dependency negative check",
+      "command": [
+        "cmake",
+        "-S",
+        "tests/toolchain",
+        "-B",
+        "build/wrench-missing-LibXml2",
+        "-G",
+        "Unix Makefiles",
+        "-DCMAKE_PREFIX_PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps",
+        "-DCMAKE_DISABLE_FIND_PACKAGE_LibXml2=TRUE"
+      ],
+      "exit_code": 1,
+      "expected_failure": true,
+      "evidence": "negative-LibXml2.txt"
+    }
+  ]
+}

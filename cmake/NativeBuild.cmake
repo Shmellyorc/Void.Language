@@ -6,30 +6,14 @@ if(NOT native_status EQUAL 0 OR NOT native_version MATCHES "clang version 23\\.1
 endif()
 set(native_flags "-pthread\n")
 if(WIN32)
-  string(APPEND native_flags "-fms-runtime-lib=dll\n-llegacy_stdio_definitions\n-lbcrypt\n-lshell32\n-lole32\n-luuid\n")
+  string(APPEND native_flags "-fms-runtime-lib=static\n-llegacy_stdio_definitions\n-lbcrypt\n-lshell32\n-lole32\n-luuid\n")
 elseif(APPLE)
+  # Keep independently compiled native hosts on the same vendor C++ ABI too.
+  string(APPEND native_flags "-stdlib=libc++\n-nostdinc++\n-isystem\n${VOID_APPLE_LIBCXX_INCLUDE_DIR}\n")
   string(APPEND native_flags "-framework\nFoundation\n-lobjc\n")
-  # Xcode may retain an SDK name where other generators resolve a physical
-  # directory. Clang's stage working directory must never reinterpret that name.
-  set(native_sysroot "${CMAKE_OSX_SYSROOT}")
-  if(NOT native_sysroot OR NOT IS_ABSOLUTE "${native_sysroot}")
-    set(native_sdk_selection)
-    if(native_sysroot)
-      list(APPEND native_sdk_selection --sdk "${native_sysroot}")
-    endif()
-    execute_process(COMMAND xcrun ${native_sdk_selection} --show-sdk-path
-      OUTPUT_VARIABLE native_sysroot OUTPUT_STRIP_TRAILING_WHITESPACE
-      RESULT_VARIABLE native_sdk_status)
-    if(NOT native_sdk_status EQUAL 0)
-      message(FATAL_ERROR "Cannot resolve the configured native macOS SDK")
-    endif()
-  endif()
-  if(native_sysroot)
-    if(NOT IS_DIRECTORY "${native_sysroot}")
-      message(FATAL_ERROR "Native macOS SDK directory is unavailable: ${native_sysroot}")
-    endif()
-    string(APPEND native_flags "-isysroot\n${native_sysroot}\n")
-  endif()
+  # Reuse the physical SDK resolved with the vendor C++ headers. The native
+  # staging working directory must never reinterpret an SDK name or relative path.
+  string(APPEND native_flags "-isysroot\n${VOID_APPLE_SYSROOT}\n")
   foreach(arch IN LISTS CMAKE_OSX_ARCHITECTURES)
     string(APPEND native_flags "-arch\n${arch}\n")
   endforeach()

@@ -1,0 +1,266 @@
+{
+  "lib/libLLVMCFGuard.a": {
+    "bytes": 71384,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMGlobalISel.a": {
+    "bytes": 5412120,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAnalysis.a": {
+    "bytes": 21044936,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAArch64AsmParser.a": {
+    "bytes": 1612520,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAArch64Utils.a": {
+    "bytes": 262144,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoDWARF.a": {
+    "bytes": 3563336,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMSandboxIR.a": {
+    "bytes": 1478968,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMVectorize.a": {
+    "bytes": 13900120,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMSupport.a": {
+    "bytes": 8377648,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoDWARFLowLevel.a": {
+    "bytes": 154720,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMFrontendAtomic.a": {
+    "bytes": 48168,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAggressiveInstCombine.a": {
+    "bytes": 402240,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMInstCombine.a": {
+    "bytes": 6409224,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMHipStdPar.a": {
+    "bytes": 118432,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMIRPrinter.a": {
+    "bytes": 23640,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMScalarOpts.a": {
+    "bytes": 14332632,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMTextAPI.a": {
+    "bytes": 1291000,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMPasses.a": {
+    "bytes": 10545496,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMLinker.a": {
+    "bytes": 386216,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMObject.a": {
+    "bytes": 5935376,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMCore.a": {
+    "bytes": 14698520,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMipo.a": {
+    "bytes": 15715912,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAArch64Info.a": {
+    "bytes": 15616,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMMC.a": {
+    "bytes": 5589280,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMObjCARCOpts.a": {
+    "bytes": 561128,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMCodeGen.a": {
+    "bytes": 36164168,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMTarget.a": {
+    "bytes": 282784,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoPDB.a": {
+    "bytes": 5482144,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoGSYM.a": {
+    "bytes": 1338560,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMJITLink.a": {
+    "bytes": 5281280,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMBitReader.a": {
+    "bytes": 1651416,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMExecutionEngine.a": {
+    "bytes": 412424,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMTargetParser.a": {
+    "bytes": 1447600,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMRemarks.a": {
+    "bytes": 686768,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMOption.a": {
+    "bytes": 298624,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMOrcTargetProcess.a": {
+    "bytes": 1087792,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMIRReader.a": {
+    "bytes": 75384,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMFrontendOpenMP.a": {
+    "bytes": 1940696,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAArch64Desc.a": {
+    "bytes": 3484816,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMTransformUtils.a": {
+    "bytes": 11278736,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMFrontendHLSL.a": {
+    "bytes": 254912,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMRuntimeDyld.a": {
+    "bytes": 1485984,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMProfileData.a": {
+    "bytes": 4862304,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMSymbolize.a": {
+    "bytes": 641736,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMSelectionDAG.a": {
+    "bytes": 11275904,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMFrontendDirective.a": {
+    "bytes": 6000,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMBitWriter.a": {
+    "bytes": 990480,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMObjectYAML.a": {
+    "bytes": 7466848,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMBinaryFormat.a": {
+    "bytes": 640240,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMMCParser.a": {
+    "bytes": 1719792,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDemangle.a": {
+    "bytes": 799800,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMCGData.a": {
+    "bytes": 629632,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMOrcJIT.a": {
+    "bytes": 9807256,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMCodeGenTypes.a": {
+    "bytes": 19544,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAsmPrinter.a": {
+    "bytes": 4837248,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMFrontendOffloading.a": {
+    "bytes": 274512,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAArch64CodeGen.a": {
+    "bytes": 16933568,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMCoroutines.a": {
+    "bytes": 1247128,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoCodeView.a": {
+    "bytes": 2776496,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoBTF.a": {
+    "bytes": 187088,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMAsmParser.a": {
+    "bytes": 1537656,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMDebugInfoMSF.a": {
+    "bytes": 250624,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMOrcShared.a": {
+    "bytes": 186144,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMBitstreamReader.a": {
+    "bytes": 152520,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMWindowsDriver.a": {
+    "bytes": 48176,
+    "new_atomic_wait_imports": []
+  },
+  "lib/libLLVMInstrumentation.a": {
+    "bytes": 5671760,
+    "new_atomic_wait_imports": []
+  }
+}

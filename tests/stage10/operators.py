@@ -14,7 +14,7 @@ if linker:
 if sanitizer == "ON":
     flags.append("-fsanitize=address,undefined")
 if os.name == "nt":
-    flags.extend(["-fms-runtime-lib=dll", "-llegacy_stdio_definitions"])
+    flags.extend(["-fms-runtime-lib=static", "-llegacy_stdio_definitions"])
 checks = 0
 measurements = []
 

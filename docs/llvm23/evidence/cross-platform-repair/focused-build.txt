@@ -1,0 +1,22 @@
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (4.9s)
+-- Generating done (1.6s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+[ 33%] Built target void_native_fixture
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 33%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[  0%] Built target void_lsp
+[100%] Built target voidls
+gmake: *** No rule to make target 'void_stop_token_probe'.  Stop.

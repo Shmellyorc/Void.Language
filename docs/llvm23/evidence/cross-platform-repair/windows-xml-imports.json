@@ -1,0 +1,8 @@
+{
+  "SDK_XML_zstd_zlib_files": [
+    "include/clang/Index/CommentToXML.h",
+    "lib/cmake/llvm/FindLibXml2.cmake",
+    "lib/cmake/llvm/Findzstd.cmake"
+  ],
+  "LLVMWindowsDriver_xml_imports": []
+}

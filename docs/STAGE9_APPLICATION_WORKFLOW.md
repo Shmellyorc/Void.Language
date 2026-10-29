@@ -49,7 +49,8 @@ main is never selected. No source scanning or separate parser chooses the mode.
 Build emits the existing source object and links the existing static Runtime and
 fixture/sink archive through configured Clang **19.1.7**, using argv process
 execution. Linux's configured matching LLD retains its version gate. Windows uses
-the active SDK/MSVC/UCRT environment and dynamic CRT policy; macOS receives the
+the active SDK/MSVC/UCRT environment and the selected LLVM SDK's CRT policy
+(LLVM 23.1.4 requires release `/MT`; see [the repair record](llvm23/CROSS_PLATFORM_REPAIR.md)); macOS receives the
 configured SDK, architecture and deployment target. This is host compilation.
 Source imports never grant native binding or linker permissions.
 

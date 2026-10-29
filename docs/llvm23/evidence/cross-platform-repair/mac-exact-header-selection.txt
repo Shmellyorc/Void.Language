@@ -1,0 +1,28 @@
+__config SHA256=ed88319f95806f612b39c43d9553e0c0cec0d624fe672a19ef72a83d7fcb43c3
+36: // _LIBCPP_VERSION represents the version of libc++, which matches the version of LLVM.
+37: // Given a LLVM release LLVM XX.YY.ZZ (e.g. LLVM 17.0.1 == 17.00.01), _LIBCPP_VERSION is
+39: #  define _LIBCPP_VERSION 230104
+__config_site SHA256=b2390ef3fc9b74ee8aa730c0b612b00cddc9346208098b2a245500706805956d
+24: #define _LIBCPP_HAS_VENDOR_AVAILABILITY_ANNOTATIONS 0
+__configuration/availability.h SHA256=543a73479d1fb9d0fdc33c846c99a29b0a8872e3afa6c175c92f241dddd1d6f5
+35: #  define _LIBCPP_HAS_VENDOR_AVAILABILITY_ANNOTATIONS 0
+47: #  define _LIBCPP_INTRODUCED_IN_LLVM_22 1
+48: #  define _LIBCPP_INTRODUCED_IN_LLVM_22_ATTRIBUTE /* nothing */
+85: #  define _LIBCPP_INTRODUCED_IN_LLVM_22 0
+86: #  define _LIBCPP_INTRODUCED_IN_LLVM_22_ATTRIBUTE __attribute__((unavailable))
+248: #define _LIBCPP_AVAILABILITY_HAS_NEW_SYNC _LIBCPP_INTRODUCED_IN_LLVM_22
+249: #define _LIBCPP_AVAILABILITY_NEW_SYNC _LIBCPP_INTRODUCED_IN_LLVM_22_ATTRIBUTE
+__atomic/atomic_sync.h SHA256=08f960b4a0c0acac41d0707fdad9411021ae822b83cd5e0a6397a0ec24f6bdcf
+34: #    if !_LIBCPP_AVAILABILITY_HAS_NEW_SYNC
+48: #    endif // !_LIBCPP_AVAILABILITY_HAS_NEW_SYNC
+54: __atomic_monitor_global(void const* __address) _NOEXCEPT;
+58: __atomic_wait_global_table(void const* __address, __cxx_contention_t __monitor_value) _NOEXCEPT;
+64: _LIBCPP_AVAILABILITY_NEW_SYNC _LIBCPP_EXPORTED_FROM_ABI void __atomic_notify_all_global_table(void const*) _NOEXCEPT;
+81: #    if _LIBCPP_AVAILABILITY_HAS_NEW_SYNC
+103:         __cxx_contention_t __monitor_val = std::__atomic_monitor_global(__contention_address);
+107:         std::__atomic_wait_global_table(__contention_address, __monitor_val);
+115: #    else // _LIBCPP_AVAILABILITY_HAS_NEW_SYNC
+159: #    endif // _LIBCPP_AVAILABILITY_HAS_NEW_SYNC
+182: #    if _LIBCPP_AVAILABILITY_HAS_NEW_SYNC
+208:     std::__atomic_notify_all_global_table(__contention_address);
+212: #    else // _LIBCPP_AVAILABILITY_HAS_NEW_SYNC

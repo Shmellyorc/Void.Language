@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  37: application_workflow_stage9
+    Start  66: debug_cache
+1/5 Test  #66: debug_cache ......................   Passed    1.08 sec
+    Start  38: native_output_paths_ci88
+2/5 Test  #38: native_output_paths_ci88 .........   Passed    0.39 sec
+    Start 323: reload
+3/5 Test #323: reload ...........................   Passed    0.45 sec
+    Start 325: native
+4/5 Test #325: native ...........................   Passed    0.02 sec
+5/5 Test  #37: application_workflow_stage9 ......   Passed    2.03 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   2.04 sec

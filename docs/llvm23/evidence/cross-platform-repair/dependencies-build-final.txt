@@ -1,0 +1,44 @@
+[ 17%] Built target zlibstatic
+[ 50%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/chvalid.c.o
+[ 60%] Built target libzstd_static
+[ 61%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/buf.c.o
+[ 63%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/dict.c.o
+[ 64%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/encoding.c.o
+/home/shmellyorc/Documents/Void.Language/build/wrench-deps-make/_deps/libxml2-src/encoding.c:67:12: warning: variable 'xmlLittleEndian' set but not used [-Wunused-but-set-global]
+   67 | static int xmlLittleEndian = 1;
+      |            ^
+[ 65%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/entities.c.o
+[ 66%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/error.c.o
+[ 67%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/globals.c.o
+[ 68%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/hash.c.o
+1 warning generated.
+[ 70%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/parser.c.o
+[ 70%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/list.c.o
+[ 71%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/parserInternals.c.o
+[ 72%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/SAX2.c.o
+[ 73%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/threads.c.o
+[ 75%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/tree.c.o
+[ 76%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/uri.c.o
+[ 77%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/valid.c.o
+[ 78%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlIO.c.o
+[ 79%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlmemory.c.o
+[ 80%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlstring.c.o
+[ 81%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/c14n.c.o
+[ 82%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/catalog.c.o
+[ 83%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/debugXML.c.o
+[ 84%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/HTMLparser.c.o
+[ 85%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/HTMLtree.c.o
+[ 86%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlsave.c.o
+[ 88%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/pattern.c.o
+[ 89%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlreader.c.o
+[ 90%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlregexp.c.o
+[ 91%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/relaxng.c.o
+[ 92%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlschemas.c.o
+[ 93%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlschemastypes.c.o
+[ 94%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xmlwriter.c.o
+[ 95%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xinclude.c.o
+[ 96%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xpath.c.o
+[ 97%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xlink.c.o
+[ 98%] Building C object _deps/libxml2-build/CMakeFiles/LibXml2.dir/xpointer.c.o
+[100%] Linking C static library libxml2.a
+[100%] Built target LibXml2

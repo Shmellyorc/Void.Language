@@ -1,0 +1,20 @@
+Exact official SDK excerpts; the SDK exports were not edited.
+
+LLVMConfig.cmake
+228: set(LLVM_ENABLE_ZLIB 1)
+229: if(LLVM_ENABLE_ZLIB)
+231:   find_package(ZLIB)
+234: set(LLVM_ENABLE_ZSTD TRUE)
+235: if(LLVM_ENABLE_ZSTD)
+236:   find_package(zstd)
+239: set(LLVM_ENABLE_LIBXML2 1)
+240: if(LLVM_ENABLE_LIBXML2)
+241:   find_package(LibXml2)
+256: set(LLVM_ENABLE_DIA_SDK ON)
+257: if(LLVM_ENABLE_DIA_SDK)
+258:   find_package(DIASDK)
+
+LLVMExports.cmake
+65:   INTERFACE_LINK_LIBRARIES "psapi;shell32;ole32;uuid;advapi32;ws2_32;ntdll;ZLIB::ZLIB;zstd::libzstd_static;\$<\$<NOT:\$<LINK_LANGUAGE:Swift>>:delayimp;\$<\$<OR:\$<LINK_LANG_AND_ID:C,IntelLLVM>,\$<LINK_LANG_AND_ID:CXX,IntelLLVM>,\$<LINK_LANG_AND_ID:Fortran,IntelLLVM>>:-Qoption,link,>-delayload:shell32.dll;\$<\$<OR:\$<LINK_LANG_AND_ID:C,IntelLLVM>,\$<LINK_LANG_AND_ID:CXX,IntelLLVM>,\$<LINK_LANG_AND_ID:Fortran,IntelLLVM>>:-Qoption,link,>-delayload:ole32.dll>;\$<\$<OR:\$<LINK_LANG_AND_ID:C,IntelLLVM>,\$<LINK_LANG_AND_ID:CXX,IntelLLVM>,\$<LINK_LANG_AND_ID:Fortran,IntelLLVM>>:-Qoption,link,>-INCLUDE:malloc;LLVMDemangle"
+544:   INTERFACE_LINK_LIBRARIES "DIASDK::Diaguids;LLVMBinaryFormat;LLVMObject;LLVMSupport;LLVMDebugInfoCodeView;LLVMDebugInfoMSF"
+1020:   INTERFACE_LINK_LIBRARIES "LibXml2::LibXml2;LLVMSupport"

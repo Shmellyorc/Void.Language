@@ -1,0 +1,4 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/wrench-dependency-probe
+[100%] Built target void_llvm_dependency_probe

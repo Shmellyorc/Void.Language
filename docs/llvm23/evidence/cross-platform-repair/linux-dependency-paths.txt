@@ -1,0 +1,4 @@
+zlib=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps/lib/libzlibstatic.a
+zstd=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps/lib/libzstd.a
+LibXml2=/home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps/lib/libxml2.a
+MSVC runtime=MultiThreaded

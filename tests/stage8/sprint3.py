@@ -3,7 +3,7 @@ import os, pathlib, subprocess, sys, tempfile
 compiler=pathlib.Path(sys.argv[1]).resolve();clang=sys.argv[2];linker=sys.argv[3] if len(sys.argv)>3 else ''
 runtime=pathlib.Path(sys.argv[4]).resolve();fixture=pathlib.Path(sys.argv[5]).resolve();sanitizers=sys.argv[6]=='ON'
 link_flags=['--driver-mode=g++',*(['--ld-path='+linker] if linker else []),*(['-fsanitize=address,undefined'] if sanitizers else [])]
-if os.name=='nt':link_flags += ['-fms-runtime-lib=dll','-llegacy_stdio_definitions']
+if os.name=='nt':link_flags += ['-fms-runtime-lib=static','-llegacy_stdio_definitions']
 checks=0
 
 def run(args,ok=True):

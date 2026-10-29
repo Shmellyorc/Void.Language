@@ -3,7 +3,7 @@ import os, pathlib, subprocess, sys, tempfile
 compiler, host, clang, linker, runtime, fixture = sys.argv[1:7]
 sanitizers=sys.argv[7]=='ON'
 flags=['--driver-mode=g++', *(['--ld-path='+linker] if linker else []), *(['-fsanitize=address,undefined'] if sanitizers else [])]
-if os.name=='nt': flags+=['-fms-runtime-lib=dll','-llegacy_stdio_definitions']
+if os.name=='nt': flags+=['-fms-runtime-lib=static','-llegacy_stdio_definitions']
 checks=0
 
 def run(args, status=0, output=None, diagnostic=None):

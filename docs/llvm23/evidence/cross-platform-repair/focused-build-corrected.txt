@@ -1,0 +1,13 @@
+Building CXX object CMakeFiles/void_stop_token_probe.dir/cmake/probes/StopToken.cpp.o
+Linking CXX executable void_stop_token_probe
+Built target void_stop_token_probe
+[  0%] Built target void_format_objects
+[ 20%] Built target void_managed_test_abi
+[ 20%] Built target void_zone_objects
+[ 40%] Built target void_native_fixture
+[ 40%] Built target void_core
+[ 80%] Built target void_runtime
+[ 80%] Built target void_llvm
+[ 80%] Built target voidc_objects
+[ 80%] Built target void_cache_identity
+[100%] Built target void_async_tests

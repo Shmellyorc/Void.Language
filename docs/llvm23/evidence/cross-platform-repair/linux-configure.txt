@@ -1,0 +1,26 @@
+-- The C compiler identification is Clang 23.1.4
+-- The CXX compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3.2")
+-- Found zstd: /usr/lib/x86_64-linux-gnu/libzstd.so
+-- Found LibXml2: /usr/lib/x86_64-linux-gnu/libxml2.so (found version "2.15.4")
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Found Python3: /usr/bin/python3 (found version "3.14.8") found components: Interpreter
+-- Configuring done (6.1s)
+-- Generating done (1.1s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/wrench-linux-release

@@ -5,7 +5,7 @@ from lsp_client import Client
 compiler=pathlib.Path(sys.argv[1]).resolve();server=pathlib.Path(sys.argv[2]).resolve();clang=sys.argv[3];linker=sys.argv[4]
 runtime=pathlib.Path(sys.argv[5]).resolve();fixture=pathlib.Path(sys.argv[6]).resolve();sanitizers=sys.argv[7]=='ON'
 flags=['--driver-mode=g++',*(['--ld-path='+linker] if linker else []),*(['-fsanitize=address,undefined'] if sanitizers else [])]
-if os.name=='nt':flags+=['-fms-runtime-lib=dll','-llegacy_stdio_definitions']
+if os.name=='nt':flags+=['-fms-runtime-lib=static','-llegacy_stdio_definitions']
 checks=0
 with tempfile.TemporaryDirectory(prefix='VOID local libs é😀 # % ') as temporary, tempfile.TemporaryDirectory(prefix='VOID local artifacts ') as artifacts:
     root=pathlib.Path(temporary).resolve();project=root/'project';other=root/'unrelated';standard=root/'standard'

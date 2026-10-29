@@ -1,0 +1,22 @@
+Source: failing run job 123241817564
+2026-10-29T03:16:58.2739678Z Image: windows-2022
+2026-10-29T03:16:58.2740474Z Version: 20261025.346.1
+2026-10-29T03:17:50.1100222Z   UCRTVersion: 10.0.26100.0
+2026-10-29T03:17:50.1103694Z   VCToolsVersion: 14.44.35207
+2026-10-29T03:17:50.8661341Z   UCRTVersion: 10.0.26100.0
+2026-10-29T03:17:50.8664830Z   VCToolsVersion: 14.44.35207
+2026-10-29T03:19:10.7367704Z clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+2026-10-29T03:19:10.8923202Z   UCRTVersion: 10.0.26100.0
+2026-10-29T03:19:10.8926683Z   VCToolsVersion: 14.44.35207
+2026-10-29T03:19:20.0227289Z -- The C compiler identification is Clang 23.1.4 with MSVC-like command-line
+2026-10-29T03:19:20.4752094Z -- The CXX compiler identification is Clang 23.1.4 with MSVC-like command-line
+2026-10-29T03:19:27.0137532Z -- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR) 
+2026-10-29T03:19:27.0339685Z -- Could NOT find zstd (missing: zstd_LIBRARY zstd_INCLUDE_DIR) 
+2026-10-29T03:19:30.0530563Z -- Could NOT find LibXml2 (missing: LIBXML2_LIBRARY LIBXML2_INCLUDE_DIR) 
+2026-10-29T03:19:30.0561880Z -- Found DIASDK: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/DIA SDK/include
+2026-10-29T03:19:30.9506995Z -- Performing Test VOID_LLVM_ORC_RUNS
+2026-10-29T03:19:31.0668444Z CMake Error at D:/a/Void.Language/Void.Language/build/Debug/CMakeFiles/CMakeScratch/TryCompile-rmkq2b/cmTC_72d16Targets.cmake:32 (set_target_properties):
+2026-10-29T03:19:31.0669974Z     ZLIB::ZLIB
+2026-10-29T03:19:31.0992062Z CMake Error at C:/Program Files/CMake/share/cmake-3.31/Modules/Internal/CheckSourceRuns.cmake:99 (try_run):
+2026-10-29T03:19:31.2331883Z   UCRTVersion: 10.0.26100.0
+2026-10-29T03:19:31.2335313Z   VCToolsVersion: 14.44.35207

@@ -1,5 +1,13 @@
 # LLVM 23.1.4 local acceptance
 
+**2026-10-29 cross-platform follow-up:** configuration repairs against
+`a4ca3e585db945570b22c890b086fa6a53692a5f` are implemented and ready for independent
+Golden Wrench review. [Repair evidence and hosted acceptance commands](CROSS_PLATFORM_REPAIR.md)
+record the missing Windows development dependencies, corrected `/MT` SDK ABI,
+and Apple libc++ header/runtime pairing. Linux focused verification passes;
+native Windows/macOS builds and executed probes remain pending. No hosted CI
+was triggered. The migration-only acceptance below is retained as history.
+
 **Locally complete — ready for independent Golden Wrench review.**
 
 Local acceptance covers the migrated working tree, including retained failures and

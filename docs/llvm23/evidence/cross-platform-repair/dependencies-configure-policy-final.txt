@@ -1,0 +1,9 @@
+-- ZSTD VERSION: 1.5.7
+-- CMAKE_INSTALL_PREFIX: /home/shmellyorc/Documents/Void.Language/.toolchains/wrench-deps
+-- CMAKE_INSTALL_LIBDIR: lib
+-- ZSTD_LEGACY_SUPPORT defined!
+-- ZSTD_MULTITHREAD_SUPPORT is enabled
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Configuring done (0.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/wrench-deps-make

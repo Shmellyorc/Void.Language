@@ -152,13 +152,17 @@ argument count. They are not substitutes for the source commands above.
 The [CI workflow](../.github/workflows/ci.yml) downloads complete official
 LLVM 23.1.4 development archives, including headers and static libraries.
 Windows uses the MSVC/Windows SDK environment and `clang-cl`, with the release
-MSVC dynamic runtime and iterator ABI matching the prebuilt LLVM libraries in
+MSVC static runtime (`/MT`) and iterator ABI matching the actual LLVM 23 libraries in
 both build configurations. The native AOT link uses the SDK's `clang` driver,
 with `-llegacy_stdio_definitions` to resolve the direct native `printf` symbol
 through the active MSVC library search paths. Use a Visual Studio developer
 environment (CI initializes it before configuration and testing).
 macOS selects the official ARM64 archive matching the supported runner and uses
-the Xcode SDK. Linux installs development dependencies explicitly and selects
+the Xcode SDK's vendor libc++ headers with Apple's system runtime (Xcode 26+).
+The SDK helper supplies pinned Windows zlib, zstd and LibXml2 development
+libraries; [the cross-platform repair record](llvm23/CROSS_PLATFORM_REPAIR.md)
+contains setup, ABI evidence and pending native acceptance.
+Linux installs development dependencies explicitly and selects
 the same archive's LLD 23.1.4. Inspected LLVM23 Linux library members are native
 ELF, whereas inspected LLVM19 members were bitcode; this is not an exhaustive
 cross-platform archive-format claim.

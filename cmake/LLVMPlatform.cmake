@@ -1,8 +1,64 @@
+# Configure the consumer before LLVMConfig's optional dependency lookups create
+# imported targets. Use upstream package exports for static transitive libraries.
+macro(void_find_llvm_windows_dependencies)
+  set(ZLIB_USE_STATIC_LIBS ON)
+  find_package(ZLIB REQUIRED MODULE)
+  find_package(zstd REQUIRED CONFIG)
+  find_package(LibXml2 REQUIRED CONFIG)
+  if(NOT TARGET ZLIB::ZLIB OR NOT TARGET zstd::libzstd_static OR NOT TARGET LibXml2::LibXml2)
+    message(FATAL_ERROR "LLVM 23.1.4 requires real zlib, static zstd and LibXml2 development targets; run tools/ci/llvm_sdk.py in the Visual Studio x64 environment")
+  endif()
+  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/void-llvm-dependencies-$<CONFIG>.txt"
+    CONTENT "zlib=$<TARGET_FILE:ZLIB::ZLIB>\nzstd=$<TARGET_FILE:zstd::libzstd_static>\nLibXml2=$<TARGET_FILE:LibXml2::LibXml2>\nMSVC runtime=${CMAKE_MSVC_RUNTIME_LIBRARY}\n")
+endmacro()
+
+macro(void_configure_llvm_platform)
+  if(WIN32)
+    void_find_llvm_windows_dependencies()
+  elseif(APPLE)
+    # The upstream archive's libc++ headers disable Apple availability and call
+    # LLVM 22+ atomic-wait symbols absent from Apple's system libc++. Pair the
+    # selected Xcode SDK's vendor headers with its system runtime instead.
+    set(apple_sdk "${CMAKE_OSX_SYSROOT}")
+    if(NOT IS_ABSOLUTE "${apple_sdk}")
+      set(apple_sdk_selection)
+      if(apple_sdk)
+        list(APPEND apple_sdk_selection --sdk "${apple_sdk}")
+      endif()
+      execute_process(COMMAND xcrun ${apple_sdk_selection} --show-sdk-path
+        OUTPUT_VARIABLE apple_sdk OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND_ERROR_IS_FATAL ANY)
+    endif()
+    if(NOT IS_DIRECTORY "${apple_sdk}")
+      message(FATAL_ERROR "Selected macOS SDK directory is unavailable: ${apple_sdk}")
+    endif()
+    set(VOID_APPLE_SYSROOT "${apple_sdk}")
+    execute_process(COMMAND xcrun --find clang++
+      OUTPUT_VARIABLE apple_clang OUTPUT_STRIP_TRAILING_WHITESPACE
+      COMMAND_ERROR_IS_FATAL ANY)
+    get_filename_component(apple_bin "${apple_clang}" DIRECTORY)
+    find_path(apple_libcxx_include __config
+      HINTS "${apple_sdk}/usr/include/c++/v1" "${apple_bin}/../include/c++/v1"
+      NO_DEFAULT_PATH NO_CACHE REQUIRED)
+    set(VOID_APPLE_LIBCXX_INCLUDE_DIR "${apple_libcxx_include}")
+    if(NOT EXISTS "${VOID_APPLE_LIBCXX_INCLUDE_DIR}/stop_token")
+      message(FATAL_ERROR "Selected Apple libc++ headers lack stop_token; use Xcode 26 or newer")
+    endif()
+    set(VOID_APPLE_LIBCXX_FLAGS "-stdlib=libc++ -nostdinc++ -isystem \"${VOID_APPLE_LIBCXX_INCLUDE_DIR}\"")
+    string(APPEND CMAKE_CXX_FLAGS " ${VOID_APPLE_LIBCXX_FLAGS}")
+    string(APPEND CMAKE_OBJCXX_FLAGS " ${VOID_APPLE_LIBCXX_FLAGS}")
+    message(STATUS "VOID Apple libc++ headers: ${VOID_APPLE_LIBCXX_INCLUDE_DIR}; runtime: selected Apple SDK/system libc++")
+  endif()
+endmacro()
+
 # Windows LLVM releases may export the producer's absolute DIA SDK path.
 # Resolve that dependency to the real consumer SDK; never drop the library.
 function(void_resolve_llvm_dia)
   if(NOT WIN32)
     return()
+  endif()
+  if(LLVM_ENABLE_DIA_SDK)
+    find_package(DIASDK REQUIRED)
   endif()
   get_property(imported_targets DIRECTORY PROPERTY IMPORTED_TARGETS)
   foreach(imported IN LISTS imported_targets)
@@ -43,20 +99,22 @@ function(void_resolve_llvm_dia)
   endforeach()
 endfunction()
 
-# libc++ 23 exposes C++20 cancellation without the libc++ 19 experimental opt-in.
-# Keep an actual compile/link check against the selected Apple SDK and library.
-function(void_enable_libcxx_stop_token target)
+# Compile, link AND execute with the same headers/runtime used by production.
+function(void_enable_libcxx_stop_token)
   if(NOT APPLE)
     return()
   endif()
-  include(CheckCXXSourceCompiles)
+  include(CheckCXXSourceRuns)
   include(CMakePushCheckState)
   cmake_push_check_state(RESET)
   set(CMAKE_REQUIRED_LIBRARIES Threads::Threads)
+  # Archive the actual linker inputs in CMakeConfigureLog.yaml for native review.
+  set(CMAKE_REQUIRED_LINK_OPTIONS -Wl,-t)
   file(READ "${PROJECT_SOURCE_DIR}/cmake/probes/StopToken.cpp" stop_token_probe)
-  check_cxx_source_compiles("${stop_token_probe}" VOID_HAS_STANDARD_STOP_TOKEN)
+  unset(VOID_HAS_STANDARD_STOP_TOKEN CACHE)
+  check_cxx_source_runs("${stop_token_probe}" VOID_HAS_STANDARD_STOP_TOKEN)
   if(NOT VOID_HAS_STANDARD_STOP_TOKEN)
-    message(FATAL_ERROR "The native C++20 stop-token compile/link probe failed; inspect CMakeConfigureLog.yaml. VOID requires real cancellation support with LLVM 23.1.4.")
+    message(FATAL_ERROR "The native C++20 stop-token compile/link/run probe failed; inspect CMakeConfigureLog.yaml. VOID requires real cancellation support with LLVM 23.1.4 and matching Apple libc++ headers/runtime.")
   endif()
   cmake_pop_check_state()
 endfunction()

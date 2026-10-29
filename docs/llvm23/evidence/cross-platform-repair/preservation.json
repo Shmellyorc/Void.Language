@@ -1,0 +1,13 @@
+{
+  "baseline": "a4ca3e585db945570b22c890b086fa6a53692a5f",
+  "unchanged_scopes": {
+    "README.md": true,
+    "src": true,
+    "include": true,
+    "stdlib": true
+  },
+  "SDK_versions": "LLVM/Clang/LLD 23.1.4",
+  "staged_paths": [],
+  "native_windows": "not available; pending hosted acceptance",
+  "native_macos": "not available; pending hosted acceptance"
+}

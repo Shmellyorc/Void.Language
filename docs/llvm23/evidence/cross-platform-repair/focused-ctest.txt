@@ -1,0 +1,21 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 215: channel_execution
+    Start 346: stage11_globals_aot
+1/8 Test #346: stage11_globals_aot ..............   Passed    3.45 sec
+    Start 363: source_cli
+2/8 Test #363: source_cli .......................   Passed    2.72 sec
+    Start 275: async_lifecycle
+3/8 Test #275: async_lifecycle ..................   Passed    1.83 sec
+    Start 274: async_parallel
+4/8 Test #274: async_parallel ...................   Passed    0.88 sec
+    Start 342: stage10_fields_aot
+5/8 Test #342: stage10_fields_aot ...............   Passed    0.31 sec
+    Start 273: async_ir
+6/8 Test #273: async_ir .........................   Passed    0.04 sec
+    Start   1: toolchain_stop_token
+7/8 Test   #1: toolchain_stop_token .............   Passed    0.00 sec
+8/8 Test #215: channel_execution ................   Passed   26.56 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  26.57 sec

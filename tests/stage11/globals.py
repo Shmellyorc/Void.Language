@@ -16,7 +16,7 @@ if linker:
 if sanitizer == "ON":
     flags.append("-fsanitize=address,undefined")
 if os.name == "nt":
-    flags += ["-fms-runtime-lib=dll", "-llegacy_stdio_definitions"]
+    flags += ["-fms-runtime-lib=static", "-llegacy_stdio_definitions"]
 checks = 0
 
 def run(args, expected=0):

@@ -1,5 +1,13 @@
 # LLVM 23.1.4 migration — engineering record
 
+2026-10-29 follow-up against `a4ca3e585db945570b22c890b086fa6a53692a5f`:
+the [cross-platform configuration repair](CROSS_PLATFORM_REPAIR.md) supersedes
+the initial Windows CRT and Apple standard-library assumptions below. It records
+inspection of both actual official SDK archives, pinned Windows dependencies,
+Apple vendor-header selection, executed Linux checks, native acceptance commands
+and remaining platform uncertainty. Repairs stop for independent Golden Wrench
+review; hosted native success is not claimed.
+
 28 October 2026. Boss authorizes the complete toolchain migration, local checks
 and internal documentation. The migration is locally complete and stops for
 independent Golden Wrench review; no hosted/platform release lock is claimed.

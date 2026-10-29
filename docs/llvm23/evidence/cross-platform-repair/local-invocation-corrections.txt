@@ -1,0 +1,13 @@
+Source: local tool-call transcript (initial Ninja attempt; no native-platform claim).
+Command: cmake -S cmake/dependencies -B build/wrench-deps -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=<SDK>/bin/clang -DCMAKE_CXX_COMPILER=<SDK>/bin/clang++ -DCMAKE_INSTALL_PREFIX=<workspace>/.toolchains/wrench-deps
+Exit: 1
+CMake Error: CMake was unable to find a build program corresponding to "Ninja".  CMAKE_MAKE_PROGRAM is not set.  You probably need to select a different build tool.
+-- Configuring incomplete, errors occurred!
+
+Correction: use the installed Unix Makefiles generator in fresh build/wrench-deps-make.
+See dependencies-configure-final.txt, dependencies-build-final.txt and dependencies-install-final.txt.
+
+Initial existing-tree build command requested voidc, voidls, the newly added void_stop_token_probe, and nonexistent separate void_async_lifecycle/void_async_lifetime targets.
+The first two targets built after CMake regeneration; the previously loaded Makefile did not know the new target.
+Correction: invoke the regenerated build with void_stop_token_probe and the actual aggregate void_async_tests target.
+See focused-build.txt (initial) and focused-build-corrected.txt (passing correction).
