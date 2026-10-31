@@ -1,0 +1,13 @@
+{
+  "args": [
+    "/tmp/VOID-channel-execution-rdpzf8m0/app"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+  "status": 0,
+  "seconds": 0.045620436998433433,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "0100d9696d8a33fcc244e208896e389058a56c29fd8c363172d3bc5111d81023",
+  "object_hashes": {},
+  "output_hashes": {}
+}

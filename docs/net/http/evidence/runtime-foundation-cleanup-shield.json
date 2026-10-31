@@ -1,0 +1,32 @@
+[
+  {
+    "profile": "Release",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_async_external_tests"
+    ],
+    "exit_code": 0,
+    "binary_sha256": "15984ccf18df28f032c9a5edd14aa4d08f71be5322dff1e2a116ef609797cf86",
+    "stdout": "runtime-foundation-Release-cleanup-shield.stdout",
+    "stderr": "runtime-foundation-Release-cleanup-shield.stderr"
+  },
+  {
+    "profile": "Debug",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_async_external_tests"
+    ],
+    "exit_code": 0,
+    "binary_sha256": "ce21568793111bbff54bca104e60016a686da90fb3c0e7526db2a47f020d6a09",
+    "stdout": "runtime-foundation-Debug-cleanup-shield.stdout",
+    "stderr": "runtime-foundation-Debug-cleanup-shield.stderr"
+  },
+  {
+    "profile": "strict",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_async_external_tests"
+    ],
+    "exit_code": 0,
+    "binary_sha256": "d7eff1a7b5393aef1e3322ba200f119ab583f3742ffd02f24cbd7720d038b968",
+    "stdout": "runtime-foundation-strict-cleanup-shield.stdout",
+    "stderr": "runtime-foundation-strict-cleanup-shield.stderr"
+  }
+]

@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-hkoz8utx/inference.void:7:23: error: Cannot infer generic parameter 't'; supply explicit type arguments.
+    code: VOID2001
+
+ 7 |     var bus = channel.router()
+   |                       ^^^^^^
+    Module: /inference.void
+

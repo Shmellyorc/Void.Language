@@ -1,0 +1,42 @@
+use channel
+
+struct counter:
+    amount: i32
+    destroyed: i32
+
+struct observer:
+    state: counter
+    bus: channel.router<i32>
+
+func (self observer) receive(const amount: i32):
+    self.state.amount += amount
+
+func (self observer) deinit():
+    self.state.destroyed += 1
+
+func attach(bus: channel.router<i32>, state: counter) -> channel.subscription:
+    var owner = observer(state = state, bus = bus)
+    return bus.subscribe("bound", owner.receive)
+
+func garbage():
+    for index in 0..<600:
+        var discarded = observer(state = counter(), bus = channel.router<i32>())
+
+func main():
+    var state = counter()
+    var bus = channel.router<i32>()
+    const token = attach(bus, state)
+    garbage()
+    const readonly = bus
+    readonly.emit("bound", 7)
+    if state.amount != 7 or state.destroyed != 0 or not bus.unsubscribe(token):
+        print(-1)
+        return
+    garbage()
+    bus.emit("bound", 100)
+    bus.clear()
+    garbage()
+    if state.amount != 7 or state.destroyed != 0:
+        print(-2)
+        return
+    print(7)

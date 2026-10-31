@@ -1,0 +1,68 @@
+{
+  "profile": "strict",
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_curl_source.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.13266726400070183,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008520110999597819,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/provider",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-strict-20261030T142846283644Z",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DVOID_CURL_PROFILE=HTTP",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DVOID_SANITIZERS=ON"
+      ],
+      "exit_code": 0,
+      "seconds": 25.078073267000036,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-strict-20261030T142846283644Z",
+        "--parallel",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 6.8478376690000005,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-strict-20261030T142846283644Z/provider_probe"
+      ],
+      "exit_code": 1,
+      "seconds": 0.11178626699984306,
+      "stack_1mib": true
+    }
+  ],
+  "source": "third_party/curl (tracked source; no patch application)",
+  "provenance_sha256": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+  "scope": "full provider/URL and cookie regression; no network transport acceptance",
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  }
+}

@@ -1,0 +1,7 @@
+/tmp/VOID HTTP rejection k95hqno7/worker_network.void:6:19: error: Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.
+    code: VOID1103
+
+ 6 |     var pending = spawn work()
+   |                   ^^^^^
+    Module: /worker_network.void
+

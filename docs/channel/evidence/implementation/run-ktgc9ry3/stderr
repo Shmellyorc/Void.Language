@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-xfuur_xt/payload-width.void:9:19: error: Type mismatch: expected readonly i32, received i64.
+    code: VOID2001
+
+ 9 |     bus.emit("t", amount)
+   |                   ^^^^^^
+    Module: /payload-width.void
+    Expected: readonly i32
+    Received: i64
+

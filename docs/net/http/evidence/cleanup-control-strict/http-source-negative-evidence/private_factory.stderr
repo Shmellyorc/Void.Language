@@ -1,0 +1,7 @@
+/tmp/VOID HTTP rejection k95hqno7/private_factory.void:2:18: error: Initializer is private to /@stdlib/net/http.void.
+    code: VOID3003
+
+ 2 | var owner = http.client()
+   |                  ^^^^^^
+    Module: /private_factory.void
+

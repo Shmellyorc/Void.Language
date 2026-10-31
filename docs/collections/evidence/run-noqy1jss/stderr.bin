@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-0ihuake3/private-version.void:31:20: error: Unknown imported function 'c._collections_version'.
+    code: VOID2003
+
+ 31 |     var output = c._collections_version([1])
+    |                    ^^^^^^^^^^^^^^^^^^^^
+    Module: /private-version.void
+

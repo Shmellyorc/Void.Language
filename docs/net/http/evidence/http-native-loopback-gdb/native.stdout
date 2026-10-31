@@ -1,0 +1,31 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7ffff75ff6c0 (LWP 368574)]
+
+Thread 1 "void_http_nativ" received signal SIGINT, Interrupt.
+0x00007ffff769ec62 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+
+Thread 2 (Thread 0x7ffff75ff6c0 (LWP 368574) "void_http_nativ"):
+#0  0x00007ffff7693970 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007ffff7699ee5 in pthread_mutex_lock () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#2  0x000055555589e6bc in vd::http::(anonymous namespace)::progress_callback(void*, long, long, long, long) ()
+#3  0x000055555597de27 in pgrs_update ()
+#4  0x000055555597d894 in Curl_pgrsDone ()
+#5  0x0000555555974d81 in multi_done ()
+#6  0x0000555555974a00 in Curl_multi_remove_handle ()
+#7  0x0000555555975123 in curl_multi_remove_handle ()
+#8  0x000055555589ee86 in vd::http::DriverState::detach(vd::http::TransferState&, CURLcode) ()
+#9  0x00005555558a1ce3 in vd::http::DriverState::service(std::shared_ptr<vd::http::TransferState> const&) ()
+#10 0x00005555558a68d0 in vd::http::DriverState::run() ()
+#11 0x00007ffff7aecf46 in ?? () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#12 0x00007ffff7696960 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#13 0x00007ffff7719aec in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+
+Thread 1 (Thread 0x7ffff7d46ec0 (LWP 368571) "void_http_nativ"):
+#0  0x00007ffff769ec62 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007ffff76936e0 in ?? () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007ffff7695ec8 in pthread_cond_wait () from /usr/lib/x86_64-linux-gnu/libc.so.6
+#3  0x000055555589b4ab in vd::http::Operation::wait() ()
+#4  0x000055555589b526 in vd::http::Operation::take() ()
+#5  0x0000555555898952 in main::$_1::operator()(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::http::RequestOptions) const ()
+#6  0x000055555589600e in main ()

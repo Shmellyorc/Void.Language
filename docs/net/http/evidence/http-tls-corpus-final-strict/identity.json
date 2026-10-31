@@ -1,0 +1,13 @@
+{
+  "scope": "Completed corpus binary/runtime/provider identities captured before final frontend-only strict rebuild; corpus does not link the frontend",
+  "sha256": {
+    "build/llvm23-strict/void_http_tls_memory": "abe781a472ab0fea1f17e47c968c5d6f6ede26fdc50b491908d39559d7b1ac1a",
+    "build/llvm23-strict/libvoid_runtime.a": "2dae69000f0ea9f126db40462cc14882b0e712587bfa1cc3ee6768bc69f3be2a",
+    "build/llvm23-strict/curl/lib/libcurl.a": "202b8a98868c7ad0568ae7bfb11bb2f125ad43bec13f6805f5fa541e777f29e5",
+    "src/runtime/http.cpp": "3f1b2904623bc75e9836aa1bab36a5324207d6664aa94d352585e43f1760dc47",
+    "src/runtime/http_file.cpp": "66cdea5e72a3460849aaf61f9fcab4386476890b612e3d8c5f6545e04164ea40",
+    "tests/net/http/tls_memory.cpp": "c75554e663110f015454d4ec07a213ca0b23cbe20888b1fbc85af643994745d5",
+    "tests/net/http/tls_memory.py": "10aed95c747b64d9410a0da2909f35c2e42cc0d010bbcbb528a145e588a7b636",
+    "third_party/http-versions.json": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb"
+  }
+}

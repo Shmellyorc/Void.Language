@@ -1,0 +1,94 @@
+--- a/lib/cookie.c
++++ b/lib/cookie.c
+@@ -1612,15 +1612,17 @@
+   return result;
+ }
+ 
+-static struct curl_slist *cookie_list(const struct Curl_easy *data)
++static CURLcode cookie_list(const struct Curl_easy *data,
++                            struct curl_slist **output)
+ {
+   struct curl_slist *list = NULL;
+   struct curl_slist *beg;
+   unsigned int i;
+   struct Curl_llist_node *n;
+ 
++  *output = NULL;
+   if(!data->cookies || (data->cookies->numcookies == 0))
+-    return NULL;
++    return CURLE_OK;
+ 
+   /* at first, remove expired cookies */
+   remove_expired(data->cookies);
+@@ -1635,28 +1637,29 @@
+       line = get_netscape_format(c);
+       if(!line) {
+         curl_slist_free_all(list);
+-        return NULL;
++        return CURLE_OUT_OF_MEMORY;
+       }
+       beg = Curl_slist_append_nodup(list, line);
+       if(!beg) {
+         curlx_free(line);
+         curl_slist_free_all(list);
+-        return NULL;
++        return CURLE_OUT_OF_MEMORY;
+       }
+       list = beg;
+     }
+   }
+ 
+-  return list;
+-}
+-
+-struct curl_slist *Curl_cookie_list(struct Curl_easy *data)
+-{
+-  struct curl_slist *list;
++  *output = list;
++  return CURLE_OK;
++}
++
++CURLcode Curl_cookie_list(struct Curl_easy *data, struct curl_slist **output)
++{
++  CURLcode result;
+   Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
+-  list = cookie_list(data);
++  result = cookie_list(data, output);
+   Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
+-  return list;
++  return result;
+ }
+ 
+ void Curl_flush_cookies(struct Curl_easy *data, bool cleanup)
+--- a/lib/cookie.h
++++ b/lib/cookie.h
+@@ -130,7 +130,7 @@
+ void Curl_cookie_clearsess(struct CookieInfo *ci);
+ 
+ #if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_COOKIES)
+-#define Curl_cookie_list(x)      NULL
++#define Curl_cookie_list(x, y)  (*(y) = NULL, CURLE_OK)
+ #define Curl_cookie_loadfiles(x, y) CURLE_OK
+ #define Curl_cookie_init()       NULL
+ #define Curl_cookie_run(x)       Curl_nop_stmt
+@@ -140,7 +140,7 @@
+ void Curl_flush_cookies(struct Curl_easy *data, bool cleanup);
+ void Curl_cookie_cleanup(struct CookieInfo *ci);
+ struct CookieInfo *Curl_cookie_init(void);
+-struct curl_slist *Curl_cookie_list(struct Curl_easy *data);
++CURLcode Curl_cookie_list(struct Curl_easy *data, struct curl_slist **output);
+ CURLcode Curl_cookie_loadfiles(struct Curl_easy *data,
+                                int flags) WARN_UNUSED_RESULT;
+ void Curl_cookie_run(struct Curl_easy *data);
+--- a/lib/getinfo.c
++++ b/lib/getinfo.c
+@@ -603,8 +603,7 @@
+     *param_slistp = Curl_ssl_engines_list(data);
+     break;
+   case CURLINFO_COOKIELIST:
+-    *param_slistp = Curl_cookie_list(data);
+-    break;
++    return Curl_cookie_list(data, param_slistp);
+   case CURLINFO_CERTINFO:
+     /* Return the a pointer to the certinfo struct. Not really an slist
+        pointer but we can pretend it is here */

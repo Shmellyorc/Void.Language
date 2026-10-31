@@ -1,0 +1,2 @@
+DNS retained live allocations: 0; steady 0..0 bytes
+Native c-ares UDP/TCP, IPv4/IPv6, IDN, cache pressure, negative cache, cancellation and timeout passed

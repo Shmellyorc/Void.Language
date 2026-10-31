@@ -1,0 +1,10 @@
+Creating experiment directory .toolchains/http-io-profile/current.er (Process ID: 1123223) ...
+{"mode":0,"repeat":0,"bytes":16777216,"writes":256,"workers":1,"seconds":1.35023,"process_cpu_seconds":1.2934}
+{"mode":0,"repeat":1,"bytes":16777216,"writes":256,"workers":1,"seconds":1.4078,"process_cpu_seconds":1.35187}
+{"mode":0,"repeat":2,"bytes":16777216,"writes":256,"workers":1,"seconds":1.64214,"process_cpu_seconds":1.56996}
+{"mode":1,"repeat":0,"bytes":16777216,"writes":256,"workers":1,"seconds":1.33841,"process_cpu_seconds":1.28692}
+{"mode":1,"repeat":1,"bytes":16777216,"writes":256,"workers":1,"seconds":1.30957,"process_cpu_seconds":1.22832}
+{"mode":1,"repeat":2,"bytes":16777216,"writes":256,"workers":1,"seconds":1.46447,"process_cpu_seconds":1.41312}
+{"mode":2,"repeat":0,"bytes":16777216,"writes":256,"workers":1,"seconds":1.43351,"process_cpu_seconds":1.35932}
+{"mode":2,"repeat":1,"bytes":16777216,"writes":256,"workers":1,"seconds":1.20122,"process_cpu_seconds":1.19151}
+{"mode":2,"repeat":2,"bytes":16777216,"writes":256,"workers":1,"seconds":1.38567,"process_cpu_seconds":1.347}

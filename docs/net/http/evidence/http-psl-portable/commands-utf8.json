@@ -1,0 +1,71 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "-I/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/include",
+      "-I/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control",
+      "-DHAVE_CONFIG_H=1",
+      "-DPSL_FILE=\"/home/shmellyorc/Documents/Void.Language/third_party/publicsuffix/public_suffix_list.dat\"",
+      "-DPSL_TESTFILE=\"/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/list/tests/tests.txt\"",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-is-cookie-domain-acceptable.c",
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/libpsl.a",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/test-is-cookie-domain-acceptable"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/test-is-cookie-domain-acceptable"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "-I/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/include",
+      "-I/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control",
+      "-DHAVE_CONFIG_H=1",
+      "-DPSL_FILE=\"/home/shmellyorc/Documents/Void.Language/third_party/publicsuffix/public_suffix_list.dat\"",
+      "-DPSL_TESTFILE=\"/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/list/tests/tests.txt\"",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-registrable-domain.c",
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/libpsl.a",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/test-registrable-domain"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/test-registrable-domain"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "-I/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/include",
+      "-I/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control",
+      "-DHAVE_CONFIG_H=1",
+      "-DPSL_FILE=\"/home/shmellyorc/Documents/Void.Language/third_party/publicsuffix/public_suffix_list.dat\"",
+      "-DPSL_TESTFILE=\"/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/list/tests/tests.txt\"",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-is-public-builtin.c",
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/libpsl.a",
+      "-o",
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/test-is-public-builtin"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/http-psl-portable-control/test-is-public-builtin"
+    ],
+    "exit_code": 0
+  }
+]

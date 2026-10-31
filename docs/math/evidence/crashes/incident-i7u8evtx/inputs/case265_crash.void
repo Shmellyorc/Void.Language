@@ -1,0 +1,3 @@
+use math
+func main():
+    var wrong: i32 = math.acos(1.0)

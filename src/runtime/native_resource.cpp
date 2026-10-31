@@ -67,12 +67,12 @@ void* NativeLibrary::identity(const void* kind) {
     return result;
 }
 
-void NativeLibrary::erase(void* key) {
+void NativeLibrary::erase(void* key, const NativeResource* expected) {
     std::shared_ptr<NativeResource> retired;
     {
         std::lock_guard lock(mutex_);
         auto found = resources_.find(key);
-        if (found != resources_.end()) {
+        if (found != resources_.end() && (!expected || found->second.get() == expected)) {
             retired = std::move(found->second);
             resources_.erase(found);
         }
@@ -89,6 +89,13 @@ std::error_code NativeLibrary::shutdown() {
     std::exception_ptr failure;
     std::error_code first_error;
     for (auto& [key, resource] : retired) {
+        (void)key;
+        try {
+            auto error = resource->quiesce();
+            if (!first_error && error) first_error = error;
+        } catch (...) { if (!failure) failure = std::current_exception(); }
+    }
+    for (auto& [key, resource] : retired) {
         try {
             auto error = resource->close();
             if (!first_error && error) first_error = error;
@@ -102,6 +109,18 @@ std::error_code NativeLibrary::shutdown() {
         std::rethrow_exception(failure);
     }
     return first_error;
+}
+
+void NativeLibrary::request_stop() noexcept {
+    std::lock_guard lock(mutex_);
+    for (auto& [key, resource] : resources_) {
+        (void)key;
+        resource->request_stop();
+    }
+}
+
+void native_request_stop(Runtime& runtime) {
+    if (auto library = NativeLibrary::existing(runtime)) library->request_stop();
 }
 
 std::error_code native_shutdown(Runtime& runtime) {

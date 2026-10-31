@@ -1,0 +1,16 @@
+--- a/lib/http2.c
++++ b/lib/http2.c
+@@ -343,13 +343,6 @@
+       if(rv) {
+         failf(data, "[%d] nghttp2 set_local_window_size(%d) failed: "
+               "%s(%d)", stream->id, dwsize, nghttp2_strerror(rv), rv);
+-        return CURLE_HTTP2;
+-      }
+-      rv = nghttp2_submit_window_update(ctx->h2, NGHTTP2_FLAG_NONE,
+-                                        stream->id, dwsize - wsize);
+-      if(rv) {
+-        failf(data, "[%d] nghttp2_submit_window_update() failed: "
+-              "%s(%d)", stream->id, nghttp2_strerror(rv), rv);
+         return CURLE_HTTP2;
+       }
+       stream->local_window_size = dwsize;

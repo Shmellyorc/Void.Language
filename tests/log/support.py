@@ -9,7 +9,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
-from test_platform import native_text
+from test_platform import native_text, native_manifest
 EVIDENCE = ROOT / 'docs/log/evidence'
 EVIDENCE.mkdir(parents=True, exist_ok=True)
 os.environ['VOID_CRASH_EVIDENCE'] = str(EVIDENCE / 'crashes')
@@ -24,7 +24,7 @@ def stack():
 
 def link(compiler, obj, executable, **kwargs):
     compiler = Path(compiler)
-    manifest = (compiler.parent / 'void-native.txt').read_text(encoding='utf-8').splitlines()
+    manifest = native_manifest(compiler)
     clang, linker, *resources = manifest[1:5]
     resources = [str((compiler.parent / path).resolve()) if not Path(path).is_absolute() else path
                  for path in resources]

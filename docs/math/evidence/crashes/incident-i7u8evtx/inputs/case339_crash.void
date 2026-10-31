@@ -1,0 +1,4 @@
+use math as m
+func main():
+    var a: f64 = m.atan2<f64>(x = -1.0, y = 1.0)
+    var b: f64 = m.clamp<f64>(upper = 1.0, value = 0.5, lower = 0.0)

@@ -1,0 +1,4 @@
+/home/shmellyorc/Documents/Void.Language/tests/net/http/runtime.cpp:473:51: warning: missing field 'client' initializer [-Wmissing-field-initializers]
+  473 |         Context context{runtime, base, mode, count}; current = &context;
+      |                                                   ^
+1 warning generated.

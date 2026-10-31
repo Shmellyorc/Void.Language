@@ -4,7 +4,9 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Path.h>
 #include <llvm/Support/Program.h>
+#include <llvm/Support/SHA256.h>
 #include <fstream>
+#include <algorithm>
 #include <cctype>
 #include <stdexcept>
 #ifdef _WIN32
@@ -112,12 +114,56 @@ struct Resources {
     fs::path driver,linker,runtime,fixture;
     std::vector<std::string> flags;
 };
+void verify_resources(const fs::path& config, const Resources& resources) {
+    const auto inventory = config.parent_path()/"void-native-resources.txt";
+    std::ifstream file(inventory);
+    std::string line;
+    if(!std::getline(file,line) || line!="VOID native resources 1")
+        throw std::runtime_error("Native resource inventory missing or invalid: "+path_utf8(inventory));
+    std::vector<fs::path> checked;
+    while(std::getline(file,line)) {
+        if(!line.empty() && line.back()=='\r')line.pop_back();
+        if(line.size()<66 || line[64]!='\t' || checked.size()>=64)
+            throw std::runtime_error("Invalid native resource inventory entry");
+        auto name=line.substr(65);
+        const std::string marker="@VOID_NATIVE_DIR@";
+        if(name.starts_with(marker))name.replace(0,marker.size(),path_utf8(config.parent_path()));
+        const auto path=utf8_path(name).lexically_normal();
+        std::ifstream input(path,std::ios::binary);
+        if(!input || !fs::is_regular_file(path))
+            throw std::runtime_error("Native link resource missing: "+path_utf8(path));
+        llvm::SHA256 digest;
+        std::array<char,65536> buffer;
+        while(input.read(buffer.data(),buffer.size()) || input.gcount())
+            digest.update(llvm::StringRef(buffer.data(),static_cast<std::size_t>(input.gcount())));
+        if(!input.eof())throw std::runtime_error("Cannot read native link resource: "+path_utf8(path));
+        constexpr char hex[]="0123456789abcdef";
+        std::string actual;
+        for(auto byte:digest.final()){actual+=hex[byte>>4];actual+=hex[byte&15];}
+        if(actual!=line.substr(0,64))
+            throw std::runtime_error("Native link resource checksum mismatch: "+path_utf8(path));
+        if(std::find(checked.begin(),checked.end(),path)!=checked.end())
+            throw std::runtime_error("Duplicate native resource inventory entry");
+        checked.push_back(path);
+    }
+    if(!file.eof())throw std::runtime_error("Cannot read native resource inventory");
+    auto require=[&](const fs::path& path){
+        if(std::find(checked.begin(),checked.end(),path.lexically_normal())==checked.end())
+            throw std::runtime_error("Native link resource absent from inventory: "+path_utf8(path));
+    };
+    require(resources.runtime);require(resources.fixture);
+    for(const auto& flag:resources.flags) {
+        const auto path=utf8_path(flag);
+        const auto extension=path.extension();
+        if(path.is_absolute() && (extension==".a" || extension==".lib" || extension==".so" || extension==".dylib"))require(path);
+    }
+}
 Resources resources(const char* argv0) {
     auto executable=utf8_path(llvm::sys::fs::getMainExecutable(argv0,reinterpret_cast<void*>(&resources)));
     const auto config=executable.parent_path()/"void-native.txt";
     std::ifstream file(config);std::vector<std::string> lines;std::string line;
     while(std::getline(file,line)){if(!line.empty() && line.back()=='\r')line.pop_back();lines.push_back(line);}
-    if(!file.eof() || lines.size()<5 || lines[0]!="VOID native 23.1.4 v1")
+    if(!file.eof() || lines.size()<5 || (lines[0]!="VOID native 23.1.4 v1" && lines[0]!="VOID native 23.1.4 v2"))
         throw std::runtime_error("Native toolchain resources missing or invalid: "+path_utf8(config));
     auto path=[&](const std::string& text){auto p=utf8_path(text);return p.is_absolute()?p:(config.parent_path()/p).lexically_normal();};
     Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{}};
@@ -130,7 +176,18 @@ Resources resources(const char* argv0) {
         exact_path(result.linker);
     }
     if(!llvm::sys::fs::can_execute(path_utf8(result.driver)))throw std::runtime_error("Native Clang driver is not executable: "+path_utf8(result.driver));
-    result.flags.assign(lines.begin()+5,lines.end());return result;
+    result.flags.assign(lines.begin()+5,lines.end());
+    if(lines[0]=="VOID native 23.1.4 v2") {
+        const std::string marker="@VOID_NATIVE_DIR@";
+        for(auto& flag:result.flags) {
+            auto position=flag.find(marker);
+            if(position!=std::string::npos) {
+                flag.replace(position,marker.size(),path_utf8(config.parent_path()));
+            }
+        }
+        verify_resources(config,result);
+    }
+    return result;
 }
 int execute(const std::vector<std::string>& arguments,const fs::path& capture={}) {
     std::vector<llvm::StringRef> refs(arguments.begin(),arguments.end());
@@ -177,7 +234,6 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     emit_object(analysis.lower(ir::Emission::entry),object,optimize,true);
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
-    args.insert(args.end(),config.flags.begin(),config.flags.end());
     // LLD interprets '%' in absolute output paths. The driver's child working
     // directory gives the linker a relative name. Windows uses a short private
     // workspace because Clang cannot chdir to a genuine long project path.
@@ -187,6 +243,9 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     const auto& object_argument=object;
 #endif
     args.insert(args.end(),{"-working-directory",path_utf8(work),path_utf8(object_argument),path_utf8(config.runtime),path_utf8(config.fixture),"-o",path_utf8(executable.filename())});
+    // Dependency archives follow the program/runtime objects that reference
+    // them. Driver options in this list apply to the whole invocation.
+    args.insert(args.end(),config.flags.begin(),config.flags.end());
 #if defined(__linux__)
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif

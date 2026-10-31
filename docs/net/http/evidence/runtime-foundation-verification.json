@@ -1,0 +1,64 @@
+{
+  "baseline": "15f7868b0af177f8f7d49c548392c79c7bd921d2",
+  "recorded_at_utc": "2026-10-30T13:30:19.030434+00:00",
+  "scope": "unfinished HTTP mission; Runtime foundations locally implemented; curl exact source approval pending",
+  "patch_sha256": "6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920",
+  "protected_root_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "root_readme_matches_HEAD": true,
+  "index_clean": true,
+  "diff_check_passed": true,
+  "latest_native_checks": [
+    {
+      "profile": "Release",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_async_external_tests"
+      ],
+      "exit_code": 0,
+      "binary_sha256": "15984ccf18df28f032c9a5edd14aa4d08f71be5322dff1e2a116ef609797cf86",
+      "stdout": "runtime-foundation-Release-cleanup-shield.stdout",
+      "stderr": "runtime-foundation-Release-cleanup-shield.stderr"
+    },
+    {
+      "profile": "Debug",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_async_external_tests"
+      ],
+      "exit_code": 0,
+      "binary_sha256": "ce21568793111bbff54bca104e60016a686da90fb3c0e7526db2a47f020d6a09",
+      "stdout": "runtime-foundation-Debug-cleanup-shield.stdout",
+      "stderr": "runtime-foundation-Debug-cleanup-shield.stderr"
+    },
+    {
+      "profile": "strict",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_async_external_tests"
+      ],
+      "exit_code": 0,
+      "binary_sha256": "d7eff1a7b5393aef1e3322ba200f119ab583f3742ffd02f24cbd7720d038b968",
+      "stdout": "runtime-foundation-strict-cleanup-shield.stdout",
+      "stderr": "runtime-foundation-strict-cleanup-shield.stderr"
+    }
+  ],
+  "release_adjacent_ctests": 10,
+  "source_retention_processes": 16,
+  "no_full_http_acceptance": true,
+  "current_source_files": {
+    "CMakeLists.txt": "5b94b168f7edc37f83eefb35f3fc4da826e328f48d2a6dd79be612d7d0823509",
+    "docs/ASYNC.md": "c27ba83680226e5af98f7ce170746066d81ff809557ffb819eaca7fa006e7708",
+    "docs/README.md": "f27197e00a2c0eaf3e647ff1491b2825c1511153124541ac78bf6047862a0b9f",
+    "docs/STAGE8_ASYNC_RETENTION.md": "686355d79f92ae462ac9ebd758a7998effd702c2b52db99342b26842f2b689e3",
+    "docs/VOID_STDLIB_BACKLOG_2026-10-27.md": "819795e731e34ce64cbf756f7467211d513dfd6f586e28aaf2faf12726c83d13",
+    "docs/WRENCH_CLANKER.md": "94ed20e33496439fa76d1eada629796962caa39d11e30c28714198087ceca5b6",
+    "docs/net/http/IMPLEMENTATION.md": "81facb2d636b5aabbfa63da2a28781940d0713271b4ae9d57fc980f5f620898f",
+    "docs/net/http/PATCH_REVIEW.md": "73df2b30cc01d4b42eca7ac663e8df8eacf936e9c58653ddcbaa0657e5ca7eca",
+    "docs/net/http/RUNTIME_FOUNDATION.md": "a9476969f626bab0139625abf4c7203f16ef2c0a3c669ec17a6d6d8eeb819757",
+    "include/void/async.hpp": "4081f50d8c800258b902c60266038dcf27f43ba529124196c07094e49b39f83a",
+    "include/void/native_resource.hpp": "dbd5b8849d2b389392221e8da5f9572b899a2f1a6613040b431a715f73166312",
+    "src/runtime/async.cpp": "f0caea496ad41914a1c0e3e2874ce2984694f23daa05b715681047c974d888c6",
+    "src/runtime/coordination.cpp": "304b7acaadb7dfd184eb0e1f9214dcf8188d7e451c32c7979f965d1ef360b085",
+    "src/runtime/native_resource.cpp": "6401fda2140f3b3833b417c5e46229eda65ada51c8ce738e7551f01095ade0ca",
+    "tests/async/external.cpp": "31a655350030c26c0747ddb29766890cdfbd7e158de5c861ea979a616e4771b4",
+    "tests/stage8/sprint5/measure.py": "72d8e0fee2bb1da4756ac3732a91b9e73fbeefb159fdbb14bdf36cef7cf6fb8c",
+    "tests/stage8/sprint5/retention.cpp": "729f2828b1378c9964b5b75fbc15aa9c6dde659466c72af22f46bc880d00834b"
+  }
+}

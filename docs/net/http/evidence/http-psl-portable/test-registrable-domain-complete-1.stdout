@@ -1,0 +1,7 @@
+have 10389 suffixes and 8 exceptions
+psl_registrable_domain(www.øyer.no)=øyer.no (expected www.øyer.no)
+psl_registrable_domain(食狮.公司.cn)=公司.cn (expected 食狮.公司.cn)
+psl_registrable_domain(www.食狮.公司.cn)=公司.cn (expected 食狮.公司.cn)
+psl_registrable_domain(shishi.公司.cn)=公司.cn (expected shishi.公司.cn)
+psl_registrable_domain(公司.cn)=公司.cn (expected NULL)
+Summary: 5 out of 93 tests failed

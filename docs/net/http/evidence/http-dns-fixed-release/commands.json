@@ -1,0 +1,743 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_dns",
+    "44019",
+    "127.0.0.1:37455",
+    "38591"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "seconds": 0.4679117660052725,
+  "stack_bytes": [
+    1048576,
+    1048576
+  ],
+  "binary_sha256": "5ed7ff3c8b40b597100da1c809f712860671883a8f07009902f14ad6addc6bbf",
+  "source_sha256": {
+    "src/runtime/http.cpp": "d045eb6c747f8b49e7178e01e10ddeb3b32c731142826446399ef998e604e9ee",
+    "include/void/detail/http_hooks.hpp": "3aa36be46acfab1ced1b54cb19fc6fb8ac491462cda34b3a2fd716bb0923406e",
+    "tests/net/http/dns.cpp": "35375aac50d08073f4369fc594240bf3ca67b1517015455fa485cd8af8483a9c",
+    "tests/net/http/dns_fixture.py": "3d529f8ab6585c76a6eba9a2fae622c11d92ebc47842319be09897ace353b91a"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  },
+  "dns_events": [
+    {
+      "name": "warm.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold0.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold1.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold2.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold3.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold4.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold5.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "warm.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "nx.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "tcp.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "tcp.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "xn--bcher-kva.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "v6.void.test",
+      "type": 28,
+      "transport": "udp"
+    },
+    {
+      "name": "stall.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "stall.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n0.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n0.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n1.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n1.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n2.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n2.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n3.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n3.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n4.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n4.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n5.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n5.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n6.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n6.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n7.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n7.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n8.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n8.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n9.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n9.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n10.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n10.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n11.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n11.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n12.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n12.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n13.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n13.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n14.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n14.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n15.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n15.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n16.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n16.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n17.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n17.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n18.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n18.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n19.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n19.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n20.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n20.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n21.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n21.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n22.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n22.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n23.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n23.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n24.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n24.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n25.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n25.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n26.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n26.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n27.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n27.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n28.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n28.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n29.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n29.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n30.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n30.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n31.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n31.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n32.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n32.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n33.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n33.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n34.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n34.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n35.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n35.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n36.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n36.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n37.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n37.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n38.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n38.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n39.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n39.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n40.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n40.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n41.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n41.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n42.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n42.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n43.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n43.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n44.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n44.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n45.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n45.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n46.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n46.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n47.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n47.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n48.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n48.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n49.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n49.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n50.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n50.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n51.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n51.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n52.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n52.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n53.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n53.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n54.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n54.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n55.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n55.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n56.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n56.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n57.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n57.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n58.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n58.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n59.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n59.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n60.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n60.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n61.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n61.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n62.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n62.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "fanout.n63.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "fanout.n63.void.test",
+      "type": 1,
+      "transport": "tcp"
+    }
+  ]
+}

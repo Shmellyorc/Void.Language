@@ -1,0 +1,47 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/http-tls-review-aws-lc/candidate_native",
+    "http://127.0.0.1:41149",
+    "https://127.0.0.1:42729",
+    "/tmp/VOID HTTP native 8vrwah5t/cert.pem",
+    "https://127.0.0.1:52821",
+    "https://127.0.0.1:34213",
+    "/tmp/VOID HTTP native 8vrwah5t/cert.pem",
+    "/tmp/VOID HTTP native 8vrwah5t/key.pem",
+    "/tmp/VOID HTTP native 8vrwah5t/identity.p12",
+    "/tmp/VOID HTTP native 8vrwah5t",
+    "http://127.0.0.1:44315",
+    "https://127.0.0.1:34881",
+    "50883"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 14.294345140002406,
+  "binary_sha256": "93ec9a682be5886021176d9d147e8cc7c868cb11df8a184ea112015a05808698",
+  "source_sha256": {
+    "src/runtime/http.cpp": "18f28dad28c614e4c5bb8cd235cc043de959fc1bbd3e087342c78a83e7d00f54",
+    "src/runtime/http_bulk.cpp": "2aa6bafc100b6922d2ca0414c5c4aec3c33a560eafc11df551d80d775294df36",
+    "src/runtime/http_resource.cpp": "d0367326f4f9ba2680a9619062b9ff12f595166c8751da1fb60aa7aa3907397e",
+    "include/void/http.hpp": "02f210ec0f6cdd37c2a025317ff14f12cb526b1703abb6bea947d493b88c1e7c",
+    "tests/net/http/native.cpp": "59500725cc29c526e29dc2527d51f2933130404f5f747573995efa2d6ba48ebf",
+    "tests/net/http/runtime.cpp": "1b8d9aae2af18a06fb432088787afe28b93a112a344fa9764a7c9fa89f06a47d",
+    "tests/net/http/fixture.py": "1e27483bebbdee7bd6fcbaf06b140e470681bc0de6ea281915f44e7102188b27",
+    "third_party/curl/VOID-PROVENANCE.json": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+    "third_party/http-versions.json": "061c7073ec1657825cf31a1a0a3ec6bb717738e3a7fa65fd15b328ac6ac0f3da"
+  },
+  "soft_hard_stack_bytes": [
+    1048576,
+    1048576
+  ],
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "http2_fixture": true,
+  "socks_address_types": [
+    1,
+    3
+  ],
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

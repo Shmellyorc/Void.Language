@@ -1,0 +1,1850 @@
+{
+  "failure_kind": "unexpected_exit",
+  "context": {
+    "profile": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin",
+    "mode": "/tmp/VOID-log-installed-nf77881k/emitted.o",
+    "expected_status": 0,
+    "expected_stdout_hex": null,
+    "hard_stack_bytes": null
+  },
+  "timed_out": false,
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "/tmp/VOID-log-installed-nf77881k/emitted.o",
+    "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/lib/void/libvoid_runtime.a",
+    "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/lib/void/libvoid_native_fixture.a",
+    "--driver-mode=g++",
+    "@VOID_NATIVE_DIR@/../lib/void/libcurl.a",
+    "@VOID_NATIVE_DIR@/../lib/void/libpsl.a",
+    "@VOID_NATIVE_DIR@/../lib/void/libnghttp2.a",
+    "@VOID_NATIVE_DIR@/../lib/void/libssl.a",
+    "@VOID_NATIVE_DIR@/../lib/void/libcrypto.a",
+    "@VOID_NATIVE_DIR@/../lib/void/libcares.a",
+    "@VOID_NATIVE_DIR@/../lib/void/libidn2.so",
+    "@VOID_NATIVE_DIR@/../lib/void/libunistring.so",
+    "@VOID_NATIVE_DIR@/../lib/void/libz.a",
+    "-Xlinker",
+    "-rpath",
+    "-Xlinker",
+    "@VOID_NATIVE_DIR@/../lib/void",
+    "-pthread",
+    "-Xlinker",
+    "--exclude-libs",
+    "-Xlinker",
+    "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+    "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "-ldl",
+    "-o",
+    "/tmp/VOID-log-installed-nf77881k/linked.app"
+  ],
+  "cwd": "/tmp/VOID-log-installed-nf77881k",
+  "returncode": 1,
+  "signal": null,
+  "executable": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+  "executable_sha256": "c336d48383874cffaab0dc4c5c359456d871f21380b746520dde5c7f4c125a67",
+  "sources": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/async.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/async_crash.void",
+      "sha256": "2dc7f45706f5430d20b6ab785b93184b94b1270541547a5b7336dac4aec3b395",
+      "original_sha256": "2dc7f45706f5430d20b6ab785b93184b94b1270541547a5b7336dac4aec3b395",
+      "preserved_sha256": "2dc7f45706f5430d20b6ab785b93184b94b1270541547a5b7336dac4aec3b395",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2dc7f45706f5430d20b6ab785b93184b94b1270541547a5b7336dac4aec3b395"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/checked_shutdown.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/checked_shutdown_crash.void",
+      "sha256": "8ee6cd077d36f172fad7683f049741664a1a83b2707206b04c2b09dfcb9435fb",
+      "original_sha256": "8ee6cd077d36f172fad7683f049741664a1a83b2707206b04c2b09dfcb9435fb",
+      "preserved_sha256": "8ee6cd077d36f172fad7683f049741664a1a83b2707206b04c2b09dfcb9435fb",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "8ee6cd077d36f172fad7683f049741664a1a83b2707206b04c2b09dfcb9435fb"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/development.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/development_crash.void",
+      "sha256": "5efb6cbd55422d9a2ed992ad74e332a0fbe8eba91f29a49fbfe4c404c32dea13",
+      "original_sha256": "5efb6cbd55422d9a2ed992ad74e332a0fbe8eba91f29a49fbfe4c404c32dea13",
+      "preserved_sha256": "5efb6cbd55422d9a2ed992ad74e332a0fbe8eba91f29a49fbfe4c404c32dea13",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "5efb6cbd55422d9a2ed992ad74e332a0fbe8eba91f29a49fbfe4c404c32dea13"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/lazy.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/lazy_crash.void",
+      "sha256": "2a6c7f5ffc00aeb05e722c487ed5fa951acd835122e3dcf08ec5a70756921e4e",
+      "original_sha256": "2a6c7f5ffc00aeb05e722c487ed5fa951acd835122e3dcf08ec5a70756921e4e",
+      "preserved_sha256": "2a6c7f5ffc00aeb05e722c487ed5fa951acd835122e3dcf08ec5a70756921e4e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2a6c7f5ffc00aeb05e722c487ed5fa951acd835122e3dcf08ec5a70756921e4e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/main.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/main_crash.void",
+      "sha256": "08bb75dc8d5e311e746e6a46507963e410ead564d1a98d209af0265aec1ebe24",
+      "original_sha256": "08bb75dc8d5e311e746e6a46507963e410ead564d1a98d209af0265aec1ebe24",
+      "preserved_sha256": "08bb75dc8d5e311e746e6a46507963e410ead564d1a98d209af0265aec1ebe24",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "08bb75dc8d5e311e746e6a46507963e410ead564d1a98d209af0265aec1ebe24"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/released_game.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/released_game_crash.void",
+      "sha256": "f9dd3d8d554063dd5bf4f3fceee7a9cd9addbb8726c4fce18dbc16a910262563",
+      "original_sha256": "f9dd3d8d554063dd5bf4f3fceee7a9cd9addbb8726c4fce18dbc16a910262563",
+      "preserved_sha256": "f9dd3d8d554063dd5bf4f3fceee7a9cd9addbb8726c4fce18dbc16a910262563",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "f9dd3d8d554063dd5bf4f3fceee7a9cd9addbb8726c4fce18dbc16a910262563"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/examples/log/rotation.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/rotation_crash.void",
+      "sha256": "0b61226edd4ad7a7a1c4644c1fc3f5a26667e0da8f566378a33f619069dced0b",
+      "original_sha256": "0b61226edd4ad7a7a1c4644c1fc3f5a26667e0da8f566378a33f619069dced0b",
+      "preserved_sha256": "0b61226edd4ad7a7a1c4644c1fc3f5a26667e0da8f566378a33f619069dced0b",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "0b61226edd4ad7a7a1c4644c1fc3f5a26667e0da8f566378a33f619069dced0b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/backend_crash.cpp",
+      "sha256": "24a57908fed1e8a3f0fb010e15002c1b539877e013031f8f9b442d5d075279a3",
+      "original_sha256": "24a57908fed1e8a3f0fb010e15002c1b539877e013031f8f9b442d5d075279a3",
+      "preserved_sha256": "24a57908fed1e8a3f0fb010e15002c1b539877e013031f8f9b442d5d075279a3",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "24a57908fed1e8a3f0fb010e15002c1b539877e013031f8f9b442d5d075279a3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/compiler_crash.cpp",
+      "sha256": "c111f8fcb7562bbe2bae22ac448ece5d20cce84bffd46517a025e2b796623f0c",
+      "original_sha256": "c111f8fcb7562bbe2bae22ac448ece5d20cce84bffd46517a025e2b796623f0c",
+      "preserved_sha256": "c111f8fcb7562bbe2bae22ac448ece5d20cce84bffd46517a025e2b796623f0c",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "c111f8fcb7562bbe2bae22ac448ece5d20cce84bffd46517a025e2b796623f0c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/channel.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/channel_crash.void",
+      "sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "original_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "preserved_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/collections.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/collections_crash.void",
+      "sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "original_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "preserved_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/console.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/console_crash.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "original_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "preserved_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/convert.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/convert_crash.void",
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "original_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "preserved_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/encoding/ascii_crash.void",
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "original_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "preserved_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/base64.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/encoding/base64_crash.void",
+      "sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "original_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "preserved_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/binary.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/encoding/binary_crash.void",
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "original_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "preserved_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/encoding/hex.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/encoding/hex_crash.void",
+      "sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "original_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "preserved_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/error.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/error_crash.void",
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "original_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "preserved_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io/memory.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/io/memory_crash.void",
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "original_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "preserved_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/io.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/io_crash.void",
+      "sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "original_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "preserved_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/json.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/json_crash.void",
+      "sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "original_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "preserved_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/log.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/log_crash.void",
+      "sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "original_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "preserved_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/math.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/math_crash.void",
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "original_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "preserved_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/net/http.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/net/http_crash.void",
+      "sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "original_sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "preserved_sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/os.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/os_crash.void",
+      "sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "original_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "preserved_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/path.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/path_crash.void",
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "original_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "preserved_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/random.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/random_crash.void",
+      "sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "original_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "preserved_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/text.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/text_crash.void",
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "original_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "preserved_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/time.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/time_crash.void",
+      "sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "original_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "preserved_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/stdlib/url.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/stdlib/url_crash.void",
+      "sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "original_sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "preserved_sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/aot.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/aot_crash.void",
+      "sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be",
+      "original_sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be",
+      "preserved_sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "df6436a61e694c1097399e4e0f0bda19afb68366d7bcc3e8d07e7073b30d84be"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/async.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/async_crash_2.void",
+      "sha256": "d2d5b776595d4bfcdc4dfab3be1bc63dbc1c4c774550f1414837fee5b9d7e8e9",
+      "original_sha256": "d2d5b776595d4bfcdc4dfab3be1bc63dbc1c4c774550f1414837fee5b9d7e8e9",
+      "preserved_sha256": "d2d5b776595d4bfcdc4dfab3be1bc63dbc1c4c774550f1414837fee5b9d7e8e9",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "d2d5b776595d4bfcdc4dfab3be1bc63dbc1c4c774550f1414837fee5b9d7e8e9"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/benchmark.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/benchmark_crash.void",
+      "sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480",
+      "original_sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480",
+      "preserved_sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "3bf8d4af9f01bc602d2638f9f62378a8445a557c2f77b85baef867ebbdc78480"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/cancel.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/cancel_crash.void",
+      "sha256": "9e9252bb6122a2f92f20a2487f204813f056a46d9e7089a27bff43d489c00aff",
+      "original_sha256": "9e9252bb6122a2f92f20a2487f204813f056a46d9e7089a27bff43d489c00aff",
+      "preserved_sha256": "9e9252bb6122a2f92f20a2487f204813f056a46d9e7089a27bff43d489c00aff",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "9e9252bb6122a2f92f20a2487f204813f056a46d9e7089a27bff43d489c00aff"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/defaults.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/defaults_crash.void",
+      "sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc",
+      "original_sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc",
+      "preserved_sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2175871ce7d87b8e3cf5e79e619657c4c66c1f19c4aaf0e5c80a7b942caf84cc"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/native.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/native_crash.void",
+      "sha256": "7eeb254e529ee1ea421ebfe1b673fe482edd68c0a78aac029a9825dc15785a97",
+      "original_sha256": "7eeb254e529ee1ea421ebfe1b673fe482edd68c0a78aac029a9825dc15785a97",
+      "preserved_sha256": "7eeb254e529ee1ea421ebfe1b673fe482edd68c0a78aac029a9825dc15785a97",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7eeb254e529ee1ea421ebfe1b673fe482edd68c0a78aac029a9825dc15785a97"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_async.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/performance_async_crash.void",
+      "sha256": "a1fbfac655c1fcfbaea2e41a216ecaf7b471354b13c514511d6592bb6b9ba892",
+      "original_sha256": "a1fbfac655c1fcfbaea2e41a216ecaf7b471354b13c514511d6592bb6b9ba892",
+      "preserved_sha256": "a1fbfac655c1fcfbaea2e41a216ecaf7b471354b13c514511d6592bb6b9ba892",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "a1fbfac655c1fcfbaea2e41a216ecaf7b471354b13c514511d6592bb6b9ba892"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_framing.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/performance_framing_crash.void",
+      "sha256": "5ff9305fb5365733b860f455bec3e1710ffac8ef5914d95c088b4b5d9146e8cd",
+      "original_sha256": "5ff9305fb5365733b860f455bec3e1710ffac8ef5914d95c088b4b5d9146e8cd",
+      "preserved_sha256": "5ff9305fb5365733b860f455bec3e1710ffac8ef5914d95c088b4b5d9146e8cd",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "5ff9305fb5365733b860f455bec3e1710ffac8ef5914d95c088b4b5d9146e8cd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/publication.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/publication_crash.void",
+      "sha256": "67aabd13b9b414fc7ad67cc8f95984cedabae3de2e1a169eb2c346405c78b604",
+      "original_sha256": "67aabd13b9b414fc7ad67cc8f95984cedabae3de2e1a169eb2c346405c78b604",
+      "preserved_sha256": "67aabd13b9b414fc7ad67cc8f95984cedabae3de2e1a169eb2c346405c78b604",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "67aabd13b9b414fc7ad67cc8f95984cedabae3de2e1a169eb2c346405c78b604"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/reload.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/reload_crash.void",
+      "sha256": "e1e662f2cf2b09264a18a475341736c77b367302b1535ea45a944d9e7f208c76",
+      "original_sha256": "e1e662f2cf2b09264a18a475341736c77b367302b1535ea45a944d9e7f208c76",
+      "preserved_sha256": "e1e662f2cf2b09264a18a475341736c77b367302b1535ea45a944d9e7f208c76",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "e1e662f2cf2b09264a18a475341736c77b367302b1535ea45a944d9e7f208c76"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/semantics.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/semantics_crash.void",
+      "sha256": "f3c4d392e959867bca38838ebd87ecd20096b6a005cdcc41c8bdd099e312a384",
+      "original_sha256": "f3c4d392e959867bca38838ebd87ecd20096b6a005cdcc41c8bdd099e312a384",
+      "preserved_sha256": "f3c4d392e959867bca38838ebd87ecd20096b6a005cdcc41c8bdd099e312a384",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "f3c4d392e959867bca38838ebd87ecd20096b6a005cdcc41c8bdd099e312a384"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/smoke.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/smoke_crash.void",
+      "sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625",
+      "original_sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625",
+      "preserved_sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "819aefad73d2108c21dff1ef8f6c4965ad2517a2fa25dbdcd9b925bb66381625"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/startup.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/startup_crash.void",
+      "sha256": "74e7b6059df70d7c3e05947853b20609b366406d10b94706f11723c383ed3702",
+      "original_sha256": "74e7b6059df70d7c3e05947853b20609b366406d10b94706f11723c383ed3702",
+      "preserved_sha256": "74e7b6059df70d7c3e05947853b20609b366406d10b94706f11723c383ed3702",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "74e7b6059df70d7c3e05947853b20609b366406d10b94706f11723c383ed3702"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/main.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/main_crash_2.void",
+      "sha256": "e9aac9b03a536c852bd0851bf3eafd8dd608d4434f77c4f6d864b365293182df",
+      "original_sha256": "e9aac9b03a536c852bd0851bf3eafd8dd608d4434f77c4f6d864b365293182df",
+      "preserved_sha256": "e9aac9b03a536c852bd0851bf3eafd8dd608d4434f77c4f6d864b365293182df",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "e9aac9b03a536c852bd0851bf3eafd8dd608d4434f77c4f6d864b365293182df"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/channel.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/channel_crash.void",
+      "sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "original_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "preserved_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/collections.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/collections_crash.void",
+      "sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "original_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "preserved_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/console.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/console_crash.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "original_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "preserved_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/convert.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/convert_crash.void",
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "original_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "preserved_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/encoding/ascii.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/ascii_crash.void",
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "original_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "preserved_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/encoding/base64.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/base64_crash.void",
+      "sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "original_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "preserved_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/encoding/binary.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/binary_crash.void",
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "original_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "preserved_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/encoding/hex.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/hex_crash.void",
+      "sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "original_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "preserved_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/error.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/error_crash.void",
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "original_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "preserved_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/io/memory.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/memory_crash.void",
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "original_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "preserved_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/io.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/io_crash.void",
+      "sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "original_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "preserved_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/json.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/json_crash.void",
+      "sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "original_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "preserved_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/log.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/log_crash.void",
+      "sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "original_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "preserved_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/math.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/math_crash.void",
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "original_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "preserved_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/net/http.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/http_crash.void",
+      "sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "original_sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "preserved_sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/os.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/os_crash.void",
+      "sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "original_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "preserved_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/path.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/path_crash.void",
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "original_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "preserved_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/random.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/random_crash.void",
+      "sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "original_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "preserved_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/text.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/text_crash.void",
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "original_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "preserved_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/time.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/time_crash.void",
+      "sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "original_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "preserved_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b"
+    },
+    {
+      "original": "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/share/void/stdlib/url.void",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/inputs/url_crash.void",
+      "sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "original_sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "preserved_sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "captured_at": "subprocess_launch",
+      "current_sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152"
+    }
+  ],
+  "build_inputs": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-gnu/CMakeCache.txt",
+      "sha256": "30fcf758fc2b547032431899ad55a0c555b2f09cfe174ed02118f228ee2327fc",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-debug/CMakeCache.txt",
+      "sha256": "4b13d820d5a459533a2377b80d82e65c880b422cb1193713b77b3e4e5422d940",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-sanitizers/CMakeCache.txt",
+      "sha256": "05bad7ad190fbdbea3afdc7a700542adc7e7e147c8df85fd1aeace72158fdedb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-san/CMakeCache.txt",
+      "sha256": "83869a9951d81c07c5579c88bf8f2f603afa7e09b197f00838e167729a650580",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=ON",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/CMakeCache.txt",
+      "sha256": "307560c6524997db32509df0aab09ddb639a4b1b6aa5d5be4e014ce2fdf7a5cb",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-official-release-step41/CMakeCache.txt",
+      "sha256": "bdb7b3bc0484036366e9ffbd79fc86e0e09658f1eefb17b7a52f4e532faf727b",
+      "flags": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++",
+        "CMAKE_CXX_FLAGS:STRING=",
+        "CMAKE_CXX_FLAGS_DEBUG:STRING=-g",
+        "CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG",
+        "LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm",
+        "VOID_SANITIZERS:BOOL=OFF",
+        "CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1"
+      ]
+    }
+  ],
+  "provenance_inputs": [
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/CMakeLists.txt",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/CMakeLists.txt",
+      "sha256": "7a4e2010ec02c1f623eff2262e4a27e588a3eda77b468ce34a1db8f9a970828e",
+      "original_sha256": "7a4e2010ec02c1f623eff2262e4a27e588a3eda77b468ce34a1db8f9a970828e",
+      "preserved_sha256": "7a4e2010ec02c1f623eff2262e4a27e588a3eda77b468ce34a1db8f9a970828e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/async.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/async.hpp",
+      "sha256": "0bb84c2cc0b72356cfc7a87db8c006d36d9aa3b23724ee2a5257d6c330e2cbb0",
+      "original_sha256": "0bb84c2cc0b72356cfc7a87db8c006d36d9aa3b23724ee2a5257d6c330e2cbb0",
+      "preserved_sha256": "0bb84c2cc0b72356cfc7a87db8c006d36d9aa3b23724ee2a5257d6c330e2cbb0"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/backend.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/backend.hpp",
+      "sha256": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2",
+      "original_sha256": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2",
+      "preserved_sha256": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/buffer.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/buffer.hpp",
+      "sha256": "cf4da707545dcab5d37882c80dd19f7bea16626d43deb2613dbfae1bb9f57131",
+      "original_sha256": "cf4da707545dcab5d37882c80dd19f7bea16626d43deb2613dbfae1bb9f57131",
+      "preserved_sha256": "cf4da707545dcab5d37882c80dd19f7bea16626d43deb2613dbfae1bb9f57131"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/cache.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/cache.hpp",
+      "sha256": "745062f95d56ecd3ec42a208882be3d285260f81de6e108ce9f56acee8fe4545",
+      "original_sha256": "745062f95d56ecd3ec42a208882be3d285260f81de6e108ce9f56acee8fe4545",
+      "preserved_sha256": "745062f95d56ecd3ec42a208882be3d285260f81de6e108ce9f56acee8fe4545"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/callback.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/callback.hpp",
+      "sha256": "b53e04e5b782c5930e6c35aea7f57b41dacf2b487ae3fa90fc01fc87f6f981cd",
+      "original_sha256": "b53e04e5b782c5930e6c35aea7f57b41dacf2b487ae3fa90fc01fc87f6f981cd",
+      "preserved_sha256": "b53e04e5b782c5930e6c35aea7f57b41dacf2b487ae3fa90fc01fc87f6f981cd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/console.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/console.hpp",
+      "sha256": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb",
+      "original_sha256": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb",
+      "preserved_sha256": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/console_ops.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/console_ops.hpp",
+      "sha256": "2afbea6d8eee7f97e536eacb138a79133f3c496d87197350d2e7c0d61b89abd2",
+      "original_sha256": "2afbea6d8eee7f97e536eacb138a79133f3c496d87197350d2e7c0d61b89abd2",
+      "preserved_sha256": "2afbea6d8eee7f97e536eacb138a79133f3c496d87197350d2e7c0d61b89abd2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/detail/console_wide.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/console_wide.hpp",
+      "sha256": "a4b47d68931579159e1e9b5cfbf8984727267acef6ffd253d7053e40476b3840",
+      "original_sha256": "a4b47d68931579159e1e9b5cfbf8984727267acef6ffd253d7053e40476b3840",
+      "preserved_sha256": "a4b47d68931579159e1e9b5cfbf8984727267acef6ffd253d7053e40476b3840"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/detail/filesystem_hooks.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/filesystem_hooks.hpp",
+      "sha256": "c5e1ae8fa3befcdf20776cbf4982ee7100d87a9ee08e2af810fdb0c86d52064f",
+      "original_sha256": "c5e1ae8fa3befcdf20776cbf4982ee7100d87a9ee08e2af810fdb0c86d52064f",
+      "preserved_sha256": "c5e1ae8fa3befcdf20776cbf4982ee7100d87a9ee08e2af810fdb0c86d52064f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/detail/http_hooks.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_hooks.hpp",
+      "sha256": "3aa36be46acfab1ced1b54cb19fc6fb8ac491462cda34b3a2fd716bb0923406e",
+      "original_sha256": "3aa36be46acfab1ced1b54cb19fc6fb8ac491462cda34b3a2fd716bb0923406e",
+      "preserved_sha256": "3aa36be46acfab1ced1b54cb19fc6fb8ac491462cda34b3a2fd716bb0923406e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/detail/os_integer.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/os_integer.hpp",
+      "sha256": "4e3aa12708f55bb91ef7149ef4018554f9de9305b1d82782db972fca2bd1fa0f",
+      "original_sha256": "4e3aa12708f55bb91ef7149ef4018554f9de9305b1d82782db972fca2bd1fa0f",
+      "preserved_sha256": "4e3aa12708f55bb91ef7149ef4018554f9de9305b1d82782db972fca2bd1fa0f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/diagnostic.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/diagnostic.hpp",
+      "sha256": "6ea5519568506664afdd91d4b0ac04b7a06d7757fca34d767bc769335619acb1",
+      "original_sha256": "6ea5519568506664afdd91d4b0ac04b7a06d7757fca34d767bc769335619acb1",
+      "preserved_sha256": "6ea5519568506664afdd91d4b0ac04b7a06d7757fca34d767bc769335619acb1"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/execution.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/execution.hpp",
+      "sha256": "8db29e5a6441474405a7c2a4130658260e404fce8c0a681df64702b2e9705630",
+      "original_sha256": "8db29e5a6441474405a7c2a4130658260e404fce8c0a681df64702b2e9705630",
+      "preserved_sha256": "8db29e5a6441474405a7c2a4130658260e404fce8c0a681df64702b2e9705630"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/filesystem.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/filesystem.hpp",
+      "sha256": "aa68df4eaeee3df581171f82447ee51c480392e4d7858f7c2df4772985de5174",
+      "original_sha256": "aa68df4eaeee3df581171f82447ee51c480392e4d7858f7c2df4772985de5174",
+      "preserved_sha256": "aa68df4eaeee3df581171f82447ee51c480392e4d7858f7c2df4772985de5174"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/filesystem_abi.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/filesystem_abi.hpp",
+      "sha256": "c0e5364472343b8489549a2ff57feee673968f59c8fb83dfec9b505539cd2427",
+      "original_sha256": "c0e5364472343b8489549a2ff57feee673968f59c8fb83dfec9b505539cd2427",
+      "preserved_sha256": "c0e5364472343b8489549a2ff57feee673968f59c8fb83dfec9b505539cd2427"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/filesystem_ops.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/filesystem_ops.hpp",
+      "sha256": "5b86d2e0fda6fd18cccc9aa2ba7c5410d2bf714e50fdb53271c8e4137b4fb08f",
+      "original_sha256": "5b86d2e0fda6fd18cccc9aa2ba7c5410d2bf714e50fdb53271c8e4137b4fb08f",
+      "preserved_sha256": "5b86d2e0fda6fd18cccc9aa2ba7c5410d2bf714e50fdb53271c8e4137b4fb08f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/format.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/format.hpp",
+      "sha256": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b",
+      "original_sha256": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b",
+      "preserved_sha256": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/frontend.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/frontend.hpp",
+      "sha256": "1906dba160f0a3bd02bb0087fcbbb01872f520b54e83feebbff68e54456ac346",
+      "original_sha256": "1906dba160f0a3bd02bb0087fcbbb01872f520b54e83feebbff68e54456ac346",
+      "preserved_sha256": "1906dba160f0a3bd02bb0087fcbbb01872f520b54e83feebbff68e54456ac346"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/gc_schema.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/gc_schema.hpp",
+      "sha256": "a00705aa14c9bd8c96655e96fe91fe9ad0bc8915675b59d868e6670db9f94098",
+      "original_sha256": "a00705aa14c9bd8c96655e96fe91fe9ad0bc8915675b59d868e6670db9f94098",
+      "preserved_sha256": "a00705aa14c9bd8c96655e96fe91fe9ad0bc8915675b59d868e6670db9f94098"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/heap.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/heap.hpp",
+      "sha256": "b1007c96eeac288fbb0f26db1f82bfc046380772a24ff3cddbbb895a9292f969",
+      "original_sha256": "b1007c96eeac288fbb0f26db1f82bfc046380772a24ff3cddbbb895a9292f969",
+      "preserved_sha256": "b1007c96eeac288fbb0f26db1f82bfc046380772a24ff3cddbbb895a9292f969"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http.hpp",
+      "sha256": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4",
+      "original_sha256": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4",
+      "preserved_sha256": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http_abi.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_abi.hpp",
+      "sha256": "bf58fd4e17ad037ef68fc137585ab4dfb06b3a591542bdc4554ac5f1721c6e86",
+      "original_sha256": "bf58fd4e17ad037ef68fc137585ab4dfb06b3a591542bdc4554ac5f1721c6e86",
+      "preserved_sha256": "bf58fd4e17ad037ef68fc137585ab4dfb06b3a591542bdc4554ac5f1721c6e86"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http_bulk.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_bulk.hpp",
+      "sha256": "93f7d1ceedbad13cb3107bfef04107fe72835328ea412e8f17dd7cb0e2347af3",
+      "original_sha256": "93f7d1ceedbad13cb3107bfef04107fe72835328ea412e8f17dd7cb0e2347af3",
+      "preserved_sha256": "93f7d1ceedbad13cb3107bfef04107fe72835328ea412e8f17dd7cb0e2347af3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http_file.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_file.hpp",
+      "sha256": "28c0fa19bf5fffbc6b55dc31b892ccd9d3f7b61e1b560e080b079518f9cc3b8a",
+      "original_sha256": "28c0fa19bf5fffbc6b55dc31b892ccd9d3f7b61e1b560e080b079518f9cc3b8a",
+      "preserved_sha256": "28c0fa19bf5fffbc6b55dc31b892ccd9d3f7b61e1b560e080b079518f9cc3b8a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http_ops.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_ops.hpp",
+      "sha256": "48f9ccbe6bc5ab9fd33f1e500e55e19bb61f18c1c6ff87bed9029b6195fccc19",
+      "original_sha256": "48f9ccbe6bc5ab9fd33f1e500e55e19bb61f18c1c6ff87bed9029b6195fccc19",
+      "preserved_sha256": "48f9ccbe6bc5ab9fd33f1e500e55e19bb61f18c1c6ff87bed9029b6195fccc19"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http_provider.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_provider.hpp",
+      "sha256": "97d0ccf8fb444ae042c521d15c2c25498dc46dd5f12ed5603361ffe21390b51e",
+      "original_sha256": "97d0ccf8fb444ae042c521d15c2c25498dc46dd5f12ed5603361ffe21390b51e",
+      "preserved_sha256": "97d0ccf8fb444ae042c521d15c2c25498dc46dd5f12ed5603361ffe21390b51e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/http_resource.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_resource.hpp",
+      "sha256": "cd703d39cbffc474925db3e4f9abc7a55461edeac764824025d13d0b4c12dbd3",
+      "original_sha256": "cd703d39cbffc474925db3e4f9abc7a55461edeac764824025d13d0b4c12dbd3",
+      "preserved_sha256": "cd703d39cbffc474925db3e4f9abc7a55461edeac764824025d13d0b4c12dbd3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/ir.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/ir.hpp",
+      "sha256": "f228387cecc469c3e14bec5a1e014682c67eed1160a2d7d674ddb0979c018e05",
+      "original_sha256": "f228387cecc469c3e14bec5a1e014682c67eed1160a2d7d674ddb0979c018e05",
+      "preserved_sha256": "f228387cecc469c3e14bec5a1e014682c67eed1160a2d7d674ddb0979c018e05"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/llvm_storage_audit.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/llvm_storage_audit.hpp",
+      "sha256": "c1738800a245a438c3c52570197ef59ef068eb84fbe873242ddfa22bd5e627e5",
+      "original_sha256": "c1738800a245a438c3c52570197ef59ef068eb84fbe873242ddfa22bd5e627e5",
+      "preserved_sha256": "c1738800a245a438c3c52570197ef59ef068eb84fbe873242ddfa22bd5e627e5"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/lsp.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/lsp.hpp",
+      "sha256": "100e7b1139a08f9687edbaa0cf9573818c1f7797ae78dde7818969d9f41d6ec8",
+      "original_sha256": "100e7b1139a08f9687edbaa0cf9573818c1f7797ae78dde7818969d9f41d6ec8",
+      "preserved_sha256": "100e7b1139a08f9687edbaa0cf9573818c1f7797ae78dde7818969d9f41d6ec8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/math_ops.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/math_ops.hpp",
+      "sha256": "da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb",
+      "original_sha256": "da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb",
+      "preserved_sha256": "da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native.hpp",
+      "sha256": "ea42b49cd0f1b41e8317ccccb1238278a171408de2ef8f1b3fdce1f3c2fcfd69",
+      "original_sha256": "ea42b49cd0f1b41e8317ccccb1238278a171408de2ef8f1b3fdce1f3c2fcfd69",
+      "preserved_sha256": "ea42b49cd0f1b41e8317ccccb1238278a171408de2ef8f1b3fdce1f3c2fcfd69"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native_binding.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_binding.hpp",
+      "sha256": "308b0af5b8ade15195cf399813bc2c214a386148a2a28854aebc3ca95ea44147",
+      "original_sha256": "308b0af5b8ade15195cf399813bc2c214a386148a2a28854aebc3ca95ea44147",
+      "preserved_sha256": "308b0af5b8ade15195cf399813bc2c214a386148a2a28854aebc3ca95ea44147"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native_build.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_build.hpp",
+      "sha256": "30bed0079880aef602fed26ad318980b10d90be5a9265119cfa3bf6adca089b0",
+      "original_sha256": "30bed0079880aef602fed26ad318980b10d90be5a9265119cfa3bf6adca089b0",
+      "preserved_sha256": "30bed0079880aef602fed26ad318980b10d90be5a9265119cfa3bf6adca089b0"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native_resource.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_resource.hpp",
+      "sha256": "215d14e7829b563fa0594f8d0284bc2951b7d9e2872c8aa08266eed370831081",
+      "original_sha256": "215d14e7829b563fa0594f8d0284bc2951b7d9e2872c8aa08266eed370831081",
+      "preserved_sha256": "215d14e7829b563fa0594f8d0284bc2951b7d9e2872c8aa08266eed370831081"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native_runtime.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_runtime.hpp",
+      "sha256": "45dc4c3d243dca40c6ac9130a14c20ca73991970fa21e412b704282c126c7b8a",
+      "original_sha256": "45dc4c3d243dca40c6ac9130a14c20ca73991970fa21e412b704282c126c7b8a",
+      "preserved_sha256": "45dc4c3d243dca40c6ac9130a14c20ca73991970fa21e412b704282c126c7b8a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native_storage.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_storage.hpp",
+      "sha256": "79f9afcd2e0240dc859f516905fc7503615ed98687e7582da00728eec15d6ac7",
+      "original_sha256": "79f9afcd2e0240dc859f516905fc7503615ed98687e7582da00728eec15d6ac7",
+      "preserved_sha256": "79f9afcd2e0240dc859f516905fc7503615ed98687e7582da00728eec15d6ac7"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/native_work.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_work.hpp",
+      "sha256": "6d92bd0ed3a8b817b125c867442b67b4be6647f950fa288e129d09360534fcb6",
+      "original_sha256": "6d92bd0ed3a8b817b125c867442b67b4be6647f950fa288e129d09360534fcb6",
+      "preserved_sha256": "6d92bd0ed3a8b817b125c867442b67b4be6647f950fa288e129d09360534fcb6"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/numeric.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/numeric.hpp",
+      "sha256": "5397fb41d912e07f5ab983611a99920d2af806c515e3e4c9a06d708735576d3d",
+      "original_sha256": "5397fb41d912e07f5ab983611a99920d2af806c515e3e4c9a06d708735576d3d",
+      "preserved_sha256": "5397fb41d912e07f5ab983611a99920d2af806c515e3e4c9a06d708735576d3d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/os.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/os.hpp",
+      "sha256": "6fb4bfc4d4545ab6668ec8c51ed69e2680b511467166232c06c4c4a541d6b77b",
+      "original_sha256": "6fb4bfc4d4545ab6668ec8c51ed69e2680b511467166232c06c4c4a541d6b77b",
+      "preserved_sha256": "6fb4bfc4d4545ab6668ec8c51ed69e2680b511467166232c06c4c4a541d6b77b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/os_abi.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/os_abi.hpp",
+      "sha256": "c4b82a9fa80ebecc6d28107cd1725ca3254b08c4c6db6414fc8102db89c9fb17",
+      "original_sha256": "c4b82a9fa80ebecc6d28107cd1725ca3254b08c4c6db6414fc8102db89c9fb17",
+      "preserved_sha256": "c4b82a9fa80ebecc6d28107cd1725ca3254b08c4c6db6414fc8102db89c9fb17"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/path.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/path.hpp",
+      "sha256": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98",
+      "original_sha256": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98",
+      "preserved_sha256": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/private_fixed_call_research.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/private_fixed_call_research.hpp",
+      "sha256": "1f7d158771e2c3b5fe07ca377011b21d962bfc16e66a5d873c67892aea151626",
+      "original_sha256": "1f7d158771e2c3b5fe07ca377011b21d962bfc16e66a5d873c67892aea151626",
+      "preserved_sha256": "1f7d158771e2c3b5fe07ca377011b21d962bfc16e66a5d873c67892aea151626"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/reference_capabilities.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/reference_capabilities.hpp",
+      "sha256": "d84d04a6817f67c0b6b112bd5148daf5dbf14bec567045a3c3f01428734a5fd8",
+      "original_sha256": "d84d04a6817f67c0b6b112bd5148daf5dbf14bec567045a3c3f01428734a5fd8",
+      "preserved_sha256": "d84d04a6817f67c0b6b112bd5148daf5dbf14bec567045a3c3f01428734a5fd8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/runtime.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/runtime.hpp",
+      "sha256": "d4c5f95c6533df1148bafa14371c74e31a92393ddde8c0f6563591bb896542b1",
+      "original_sha256": "d4c5f95c6533df1148bafa14371c74e31a92393ddde8c0f6563591bb896542b1",
+      "preserved_sha256": "d4c5f95c6533df1148bafa14371c74e31a92393ddde8c0f6563591bb896542b1"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/runtime_abi.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/runtime_abi.hpp",
+      "sha256": "ad93415e5c481d2416c02999786fb4495d4e094635f0f89873f55b9999af180a",
+      "original_sha256": "ad93415e5c481d2416c02999786fb4495d4e094635f0f89873f55b9999af180a",
+      "preserved_sha256": "ad93415e5c481d2416c02999786fb4495d4e094635f0f89873f55b9999af180a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/source.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/source.hpp",
+      "sha256": "197bdd88e6cb464acffd5c5b478aee3b4d401cbd8177a4dd447573472f213a51",
+      "original_sha256": "197bdd88e6cb464acffd5c5b478aee3b4d401cbd8177a4dd447573472f213a51",
+      "preserved_sha256": "197bdd88e6cb464acffd5c5b478aee3b4d401cbd8177a4dd447573472f213a51"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/temporal.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/temporal.hpp",
+      "sha256": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9",
+      "original_sha256": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9",
+      "preserved_sha256": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/temporal_ops.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/temporal_ops.hpp",
+      "sha256": "42a253ba5f55e5235c4492e6f548b5a1af43c082e48fa1c1742120e4a87e19e9",
+      "original_sha256": "42a253ba5f55e5235c4492e6f548b5a1af43c082e48fa1c1742120e4a87e19e9",
+      "preserved_sha256": "42a253ba5f55e5235c4492e6f548b5a1af43c082e48fa1c1742120e4a87e19e9"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/tooling.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/tooling.hpp",
+      "sha256": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba",
+      "original_sha256": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba",
+      "preserved_sha256": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/url.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/url.hpp",
+      "sha256": "eb07866950e2a81ad183b1f5594db0d8c2a8540a37f0014c10babef3b1985d20",
+      "original_sha256": "eb07866950e2a81ad183b1f5594db0d8c2a8540a37f0014c10babef3b1985d20",
+      "preserved_sha256": "eb07866950e2a81ad183b1f5594db0d8c2a8540a37f0014c10babef3b1985d20"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/url_abi.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/url_abi.hpp",
+      "sha256": "117f9944c06a8414cea2c569493ef08222573b9e85e2d0b6d572da1609c5bef2",
+      "original_sha256": "117f9944c06a8414cea2c569493ef08222573b9e85e2d0b6d572da1609c5bef2",
+      "preserved_sha256": "117f9944c06a8414cea2c569493ef08222573b9e85e2d0b6d572da1609c5bef2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/url_ops.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/url_ops.hpp",
+      "sha256": "b542dd0c80ed39116be6dd9dbf2b88c5d53b25c77b7e7f264287baec7ec1f89f",
+      "original_sha256": "b542dd0c80ed39116be6dd9dbf2b88c5d53b25c77b7e7f264287baec7ec1f89f",
+      "preserved_sha256": "b542dd0c80ed39116be6dd9dbf2b88c5d53b25c77b7e7f264287baec7ec1f89f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/include/void/utf8.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/utf8.hpp",
+      "sha256": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773",
+      "original_sha256": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773",
+      "preserved_sha256": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/abi.cpp",
+      "sha256": "f0ce4b13c99b78ecd7c6c316dc0f3e33bbf66d4a099b133aa15329a0467e5468",
+      "original_sha256": "f0ce4b13c99b78ecd7c6c316dc0f3e33bbf66d4a099b133aa15329a0467e5468",
+      "preserved_sha256": "f0ce4b13c99b78ecd7c6c316dc0f3e33bbf66d4a099b133aa15329a0467e5468"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/array.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/array.cpp",
+      "sha256": "807848a104157e696614e1ebf01ea8191a5937976cedf32155208ae3ede5d4b8",
+      "original_sha256": "807848a104157e696614e1ebf01ea8191a5937976cedf32155208ae3ede5d4b8",
+      "preserved_sha256": "807848a104157e696614e1ebf01ea8191a5937976cedf32155208ae3ede5d4b8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/async.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/async.cpp",
+      "sha256": "aa16386d7f2b78db267c0a0bd174af65c209ae11797f7ad05f43136ca405f389",
+      "original_sha256": "aa16386d7f2b78db267c0a0bd174af65c209ae11797f7ad05f43136ca405f389",
+      "preserved_sha256": "aa16386d7f2b78db267c0a0bd174af65c209ae11797f7ad05f43136ca405f389"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/buffer.cpp",
+      "sha256": "1efdcbc0c981307fbf5ea4236838f7b2d4f552c2e623586e77d8d8f056e939fc",
+      "original_sha256": "1efdcbc0c981307fbf5ea4236838f7b2d4f552c2e623586e77d8d8f056e939fc",
+      "preserved_sha256": "1efdcbc0c981307fbf5ea4236838f7b2d4f552c2e623586e77d8d8f056e939fc"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/callback.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/callback.cpp",
+      "sha256": "510e56937cd24f17dfb7699648b59a1df1db0b052baae380a74210909b1fcda2",
+      "original_sha256": "510e56937cd24f17dfb7699648b59a1df1db0b052baae380a74210909b1fcda2",
+      "preserved_sha256": "510e56937cd24f17dfb7699648b59a1df1db0b052baae380a74210909b1fcda2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/console.cpp",
+      "sha256": "363909154a553103127b7410a4d43d9e08aa9acd3fbdae3197e9d033cb895e2f",
+      "original_sha256": "363909154a553103127b7410a4d43d9e08aa9acd3fbdae3197e9d033cb895e2f",
+      "preserved_sha256": "363909154a553103127b7410a4d43d9e08aa9acd3fbdae3197e9d033cb895e2f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/console_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/console_abi.cpp",
+      "sha256": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c",
+      "original_sha256": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c",
+      "preserved_sha256": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/conversion.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/conversion.cpp",
+      "sha256": "1365fffa2445850571c1b5d630f9138701fe19ede743e9be201cacf6e9dc5771",
+      "original_sha256": "1365fffa2445850571c1b5d630f9138701fe19ede743e9be201cacf6e9dc5771",
+      "preserved_sha256": "1365fffa2445850571c1b5d630f9138701fe19ede743e9be201cacf6e9dc5771"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/coordination.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/coordination.cpp",
+      "sha256": "5f88462fd43ebaec4a5be6fbac439ade66fb92e5a3dca31b6cf84ce441718e4c",
+      "original_sha256": "5f88462fd43ebaec4a5be6fbac439ade66fb92e5a3dca31b6cf84ce441718e4c",
+      "preserved_sha256": "5f88462fd43ebaec4a5be6fbac439ade66fb92e5a3dca31b6cf84ce441718e4c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/curl_keylog_disabled.c",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/curl_keylog_disabled.c",
+      "sha256": "4a7e0a8397376c2249ae0a252fe6dc36bf7395ca81583c730f9c1a37e85460fa",
+      "original_sha256": "4a7e0a8397376c2249ae0a252fe6dc36bf7395ca81583c730f9c1a37e85460fa",
+      "preserved_sha256": "4a7e0a8397376c2249ae0a252fe6dc36bf7395ca81583c730f9c1a37e85460fa"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/dictionary.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/dictionary.cpp",
+      "sha256": "baeebadbe9dea5664740fde3e0c5c44b7977dd0242f69fd7b98e137e1fe3b80f",
+      "original_sha256": "baeebadbe9dea5664740fde3e0c5c44b7977dd0242f69fd7b98e137e1fe3b80f",
+      "preserved_sha256": "baeebadbe9dea5664740fde3e0c5c44b7977dd0242f69fd7b98e137e1fe3b80f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/filesystem.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/filesystem.cpp",
+      "sha256": "ef64021a43885f75ca5abc2e35afa30acd0abec8ee7cdd07857dae775e2d9e95",
+      "original_sha256": "ef64021a43885f75ca5abc2e35afa30acd0abec8ee7cdd07857dae775e2d9e95",
+      "preserved_sha256": "ef64021a43885f75ca5abc2e35afa30acd0abec8ee7cdd07857dae775e2d9e95"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/filesystem_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/filesystem_abi.cpp",
+      "sha256": "44e2a56414d354a41ac27e1b998870c50dda2bf9c36d1771d7bd57dcde783377",
+      "original_sha256": "44e2a56414d354a41ac27e1b998870c50dda2bf9c36d1771d7bd57dcde783377",
+      "preserved_sha256": "44e2a56414d354a41ac27e1b998870c50dda2bf9c36d1771d7bd57dcde783377"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/fixed_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/fixed_abi.cpp",
+      "sha256": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4",
+      "original_sha256": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4",
+      "preserved_sha256": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/gc_schema.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/gc_schema.cpp",
+      "sha256": "bcf1c26134b73eb4387737354bb536f04f2c177bab0db67be075b0559fcee9c4",
+      "original_sha256": "bcf1c26134b73eb4387737354bb536f04f2c177bab0db67be075b0559fcee9c4",
+      "preserved_sha256": "bcf1c26134b73eb4387737354bb536f04f2c177bab0db67be075b0559fcee9c4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/heap.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/heap.cpp",
+      "sha256": "609f0080dcc9f72f46b30072a03056d065f4889a7dbe68e690f238cdcfdd61a2",
+      "original_sha256": "609f0080dcc9f72f46b30072a03056d065f4889a7dbe68e690f238cdcfdd61a2",
+      "preserved_sha256": "609f0080dcc9f72f46b30072a03056d065f4889a7dbe68e690f238cdcfdd61a2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/http.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http.cpp",
+      "sha256": "4c5c72f2847d6b7e61cd1d95b556f98f15a385911b10a394bfec5352c7c53b4d",
+      "original_sha256": "4c5c72f2847d6b7e61cd1d95b556f98f15a385911b10a394bfec5352c7c53b4d",
+      "preserved_sha256": "4c5c72f2847d6b7e61cd1d95b556f98f15a385911b10a394bfec5352c7c53b4d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/http_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_abi.cpp",
+      "sha256": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992",
+      "original_sha256": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992",
+      "preserved_sha256": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/http_bulk.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_bulk.cpp",
+      "sha256": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+      "original_sha256": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+      "preserved_sha256": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/http_file.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_file.cpp",
+      "sha256": "e395830aac32a55bffb64f89b2f335f2e80988fa441700d81f0b9c2f808f63dd",
+      "original_sha256": "e395830aac32a55bffb64f89b2f335f2e80988fa441700d81f0b9c2f808f63dd",
+      "preserved_sha256": "e395830aac32a55bffb64f89b2f335f2e80988fa441700d81f0b9c2f808f63dd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/http_provider.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_provider.cpp",
+      "sha256": "fd1183b434aa9edcf9cea4e8cec9ccf389f6a782518028dff6afe5a2eda6a4af",
+      "original_sha256": "fd1183b434aa9edcf9cea4e8cec9ccf389f6a782518028dff6afe5a2eda6a4af",
+      "preserved_sha256": "fd1183b434aa9edcf9cea4e8cec9ccf389f6a782518028dff6afe5a2eda6a4af"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/http_resource.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/http_resource.cpp",
+      "sha256": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+      "original_sha256": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+      "preserved_sha256": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/list.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/list.cpp",
+      "sha256": "d77090772e5c6b74ef32ebc9ac9e56e5b183b2975b4b591062386abafefba1e8",
+      "original_sha256": "d77090772e5c6b74ef32ebc9ac9e56e5b183b2975b4b591062386abafefba1e8",
+      "preserved_sha256": "d77090772e5c6b74ef32ebc9ac9e56e5b183b2975b4b591062386abafefba1e8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/native.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native.cpp",
+      "sha256": "00a3f814cfa4f9a0eeaa2887ccbe82894f7c6c787f55d74e57c8291b1430ba81",
+      "original_sha256": "00a3f814cfa4f9a0eeaa2887ccbe82894f7c6c787f55d74e57c8291b1430ba81",
+      "preserved_sha256": "00a3f814cfa4f9a0eeaa2887ccbe82894f7c6c787f55d74e57c8291b1430ba81"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/native_binding.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_binding.cpp",
+      "sha256": "8c11a2c4b0d4b2bf7953984e01360ea7bf26dc3ee7aefa08eb0a969552b8171d",
+      "original_sha256": "8c11a2c4b0d4b2bf7953984e01360ea7bf26dc3ee7aefa08eb0a969552b8171d",
+      "preserved_sha256": "8c11a2c4b0d4b2bf7953984e01360ea7bf26dc3ee7aefa08eb0a969552b8171d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/native_resource.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_resource.cpp",
+      "sha256": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+      "original_sha256": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+      "preserved_sha256": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/native_work.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/native_work.cpp",
+      "sha256": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4",
+      "original_sha256": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4",
+      "preserved_sha256": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/os.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/os.cpp",
+      "sha256": "a40b923d132a7b671c3895009cad71381a5d317b4d5338e366d7c2af045c2004",
+      "original_sha256": "a40b923d132a7b671c3895009cad71381a5d317b4d5338e366d7c2af045c2004",
+      "preserved_sha256": "a40b923d132a7b671c3895009cad71381a5d317b4d5338e366d7c2af045c2004"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/os_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/os_abi.cpp",
+      "sha256": "cb1ba10195333171408d2c61fceec257a0d8da89a211784485c8fe5ae65ded5a",
+      "original_sha256": "cb1ba10195333171408d2c61fceec257a0d8da89a211784485c8fe5ae65ded5a",
+      "preserved_sha256": "cb1ba10195333171408d2c61fceec257a0d8da89a211784485c8fe5ae65ded5a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/random.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/random.cpp",
+      "sha256": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d",
+      "original_sha256": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d",
+      "preserved_sha256": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/reload.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/reload.cpp",
+      "sha256": "a7e48d4025d4eedad456214946080151b899747fcea7f2b943ce1e4973e791f5",
+      "original_sha256": "a7e48d4025d4eedad456214946080151b899747fcea7f2b943ce1e4973e791f5",
+      "preserved_sha256": "a7e48d4025d4eedad456214946080151b899747fcea7f2b943ce1e4973e791f5"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/temporal_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/temporal_abi.cpp",
+      "sha256": "ede0161d7eba5a300829319f179cf0b2d63c3ed3a5577b5d38546b842e3e0874",
+      "original_sha256": "ede0161d7eba5a300829319f179cf0b2d63c3ed3a5577b5d38546b842e3e0874",
+      "preserved_sha256": "ede0161d7eba5a300829319f179cf0b2d63c3ed3a5577b5d38546b842e3e0874"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/text_case.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/text_case.cpp",
+      "sha256": "bd7b0f973a5671c66cd792286bed3a77d3f797ae506fdb02dd1b5c6b60e31abd",
+      "original_sha256": "bd7b0f973a5671c66cd792286bed3a77d3f797ae506fdb02dd1b5c6b60e31abd",
+      "preserved_sha256": "bd7b0f973a5671c66cd792286bed3a77d3f797ae506fdb02dd1b5c6b60e31abd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/url.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/url.cpp",
+      "sha256": "fee3a98466337b4f8d9e66ced239da938e3e6c36d6a189d6b7e2714e8949373b",
+      "original_sha256": "fee3a98466337b4f8d9e66ced239da938e3e6c36d6a189d6b7e2714e8949373b",
+      "preserved_sha256": "fee3a98466337b4f8d9e66ced239da938e3e6c36d6a189d6b7e2714e8949373b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/src/runtime/url_abi.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/url_abi.cpp",
+      "sha256": "608310a2e3eb502be0f770c2e41e75b5fb6408c9073cf2d2db23aacdd598a38d",
+      "original_sha256": "608310a2e3eb502be0f770c2e41e75b5fb6408c9073cf2d2db23aacdd598a38d",
+      "preserved_sha256": "608310a2e3eb502be0f770c2e41e75b5fb6408c9073cf2d2db23aacdd598a38d"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/growable_arrays/tests.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/tests.cpp",
+      "sha256": "908ddc34d4764ac788ba9f13d27e9a3df682246b4343683705973761e92bf0d3",
+      "original_sha256": "908ddc34d4764ac788ba9f13d27e9a3df682246b4343683705973761e92bf0d3",
+      "preserved_sha256": "908ddc34d4764ac788ba9f13d27e9a3df682246b4343683705973761e92bf0d3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/benchmarks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/benchmarks.py",
+      "sha256": "de5eb4ac3644bded187037aa1e2f5e9cce2bfaa697f021520e38ddfebd6b2c76",
+      "original_sha256": "de5eb4ac3644bded187037aa1e2f5e9cce2bfaa697f021520e38ddfebd6b2c76",
+      "preserved_sha256": "de5eb4ac3644bded187037aa1e2f5e9cce2bfaa697f021520e38ddfebd6b2c76"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/benchmarks_default.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/benchmarks_default.py",
+      "sha256": "1b9bd56383f66b45bcc0fd80ac451c7b292201dbf9137af248a832663e73180c",
+      "original_sha256": "1b9bd56383f66b45bcc0fd80ac451c7b292201dbf9137af248a832663e73180c",
+      "preserved_sha256": "1b9bd56383f66b45bcc0fd80ac451c7b292201dbf9137af248a832663e73180c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/cache.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/cache.py",
+      "sha256": "6c86e9548ca4d1b8207f442122fc0ba5dfce9da298ed02367fc7b37419f686e8",
+      "original_sha256": "6c86e9548ca4d1b8207f442122fc0ba5dfce9da298ed02367fc7b37419f686e8",
+      "preserved_sha256": "6c86e9548ca4d1b8207f442122fc0ba5dfce9da298ed02367fc7b37419f686e8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/check.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/check.py",
+      "sha256": "3ff91f514d3216cd6e4e93091771efcc3cc6419679b436d9c7d71ec8e1b8de50",
+      "original_sha256": "3ff91f514d3216cd6e4e93091771efcc3cc6419679b436d9c7d71ec8e1b8de50",
+      "preserved_sha256": "3ff91f514d3216cd6e4e93091771efcc3cc6419679b436d9c7d71ec8e1b8de50"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/console.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/console.py",
+      "sha256": "97d9eca4c06e60ba47c91e8a9ff6f151cbd0e9fdbeaa1f6c90c60c1bf90be858",
+      "original_sha256": "97d9eca4c06e60ba47c91e8a9ff6f151cbd0e9fdbeaa1f6c90c60c1bf90be858",
+      "preserved_sha256": "97d9eca4c06e60ba47c91e8a9ff6f151cbd0e9fdbeaa1f6c90c60c1bf90be858"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/evidence.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/evidence.py",
+      "sha256": "9aa82da16862d7b22707875e5c0e247ce3a48da27777f759b5e09ca90e1bcd01",
+      "original_sha256": "9aa82da16862d7b22707875e5c0e247ce3a48da27777f759b5e09ca90e1bcd01",
+      "preserved_sha256": "9aa82da16862d7b22707875e5c0e247ce3a48da27777f759b5e09ca90e1bcd01"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/examples.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/examples.py",
+      "sha256": "6f91b96f16ef75e1c506a74c2da29899fa6b9ce1ebc18f26310c1fc98a8e9ca8",
+      "original_sha256": "6f91b96f16ef75e1c506a74c2da29899fa6b9ce1ebc18f26310c1fc98a8e9ca8",
+      "preserved_sha256": "6f91b96f16ef75e1c506a74c2da29899fa6b9ce1ebc18f26310c1fc98a8e9ca8"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/execution.py",
+      "sha256": "30c5736a46300e7ca8fb5357f573e64fef0f35deba67fbc7c18a0ec9cdc16ee3",
+      "original_sha256": "30c5736a46300e7ca8fb5357f573e64fef0f35deba67fbc7c18a0ec9cdc16ee3",
+      "preserved_sha256": "30c5736a46300e7ca8fb5357f573e64fef0f35deba67fbc7c18a0ec9cdc16ee3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/expand_io.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/expand_io.py",
+      "sha256": "dea89693e49367d89c435a8c53942f910819c867d81a72ffe1ecac9d189d209c",
+      "original_sha256": "dea89693e49367d89c435a8c53942f910819c867d81a72ffe1ecac9d189d209c",
+      "preserved_sha256": "dea89693e49367d89c435a8c53942f910819c867d81a72ffe1ecac9d189d209c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/files.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/files.py",
+      "sha256": "929d39fee321f0220dad2fe2431494397d38853b7695b901318b1a1bdc1c1d8b",
+      "original_sha256": "929d39fee321f0220dad2fe2431494397d38853b7695b901318b1a1bdc1c1d8b",
+      "preserved_sha256": "929d39fee321f0220dad2fe2431494397d38853b7695b901318b1a1bdc1c1d8b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/frontend.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/frontend.py",
+      "sha256": "1bba937c249e2ecc4a40c67219f73579ae8b125ed3c93f2b7f49e1c86e92b575",
+      "original_sha256": "1bba937c249e2ecc4a40c67219f73579ae8b125ed3c93f2b7f49e1c86e92b575",
+      "preserved_sha256": "1bba937c249e2ecc4a40c67219f73579ae8b125ed3c93f2b7f49e1c86e92b575"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/host.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/host.cpp",
+      "sha256": "eb9bb4b9af3bdc1dc4853d041a1d694bdbaf5562db34c6a5ddcff3c288a35431",
+      "original_sha256": "eb9bb4b9af3bdc1dc4853d041a1d694bdbaf5562db34c6a5ddcff3c288a35431",
+      "preserved_sha256": "eb9bb4b9af3bdc1dc4853d041a1d694bdbaf5562db34c6a5ddcff3c288a35431"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/host.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/host.py",
+      "sha256": "8fbf349d758c087b1134ca55dc9c647d350ed75908e55a361313ab42b841a5e5",
+      "original_sha256": "8fbf349d758c087b1134ca55dc9c647d350ed75908e55a361313ab42b841a5e5",
+      "preserved_sha256": "8fbf349d758c087b1134ca55dc9c647d350ed75908e55a361313ab42b841a5e5"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/install.py",
+      "sha256": "ba3dfaab0b8c8130f0b15f41d8b02cf53dd54ae7a0e207ccd35847e4483118b3",
+      "original_sha256": "ba3dfaab0b8c8130f0b15f41d8b02cf53dd54ae7a0e207ccd35847e4483118b3",
+      "preserved_sha256": "ba3dfaab0b8c8130f0b15f41d8b02cf53dd54ae7a0e207ccd35847e4483118b3"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/lsp.py",
+      "sha256": "c4853e5d2b67244812d5ddaf43754a89a8ad4ecabc052595a749b861588c720b",
+      "original_sha256": "c4853e5d2b67244812d5ddaf43754a89a8ad4ecabc052595a749b861588c720b",
+      "preserved_sha256": "c4853e5d2b67244812d5ddaf43754a89a8ad4ecabc052595a749b861588c720b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/oracles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/oracles.py",
+      "sha256": "df60be033025eec33ccfa95bd1a0c284fe5b95c76db77a1a4febbd0237e6135b",
+      "original_sha256": "df60be033025eec33ccfa95bd1a0c284fe5b95c76db77a1a4febbd0237e6135b",
+      "preserved_sha256": "df60be033025eec33ccfa95bd1a0c284fe5b95c76db77a1a4febbd0237e6135b"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_async_host.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_async_host.cpp",
+      "sha256": "960d2d585329dfbf0bc714aa2fd7cd3a360da1b86191b5215a62ed0c2d3ea7fd",
+      "original_sha256": "960d2d585329dfbf0bc714aa2fd7cd3a360da1b86191b5215a62ed0c2d3ea7fd",
+      "preserved_sha256": "960d2d585329dfbf0bc714aa2fd7cd3a360da1b86191b5215a62ed0c2d3ea7fd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_baseline.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_baseline.py",
+      "sha256": "f45c8756e29813d44da70fa48d2f9ca8f98ba9f7d7a73ec584827fc4f0580f93",
+      "original_sha256": "f45c8756e29813d44da70fa48d2f9ca8f98ba9f7d7a73ec584827fc4f0580f93",
+      "preserved_sha256": "f45c8756e29813d44da70fa48d2f9ca8f98ba9f7d7a73ec584827fc4f0580f93"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_build.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_build.py",
+      "sha256": "b35bdea03d5f39f06f425956d500712e2f6128d2897b02dd0b2a589b6bcd1f90",
+      "original_sha256": "b35bdea03d5f39f06f425956d500712e2f6128d2897b02dd0b2a589b6bcd1f90",
+      "preserved_sha256": "b35bdea03d5f39f06f425956d500712e2f6128d2897b02dd0b2a589b6bcd1f90"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_host.cpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_host.cpp",
+      "sha256": "d0da73e1ae3bf671f9f15c4814b0d1629563ebad825b42c1f718cf60c8de113a",
+      "original_sha256": "d0da73e1ae3bf671f9f15c4814b0d1629563ebad825b42c1f718cf60c8de113a",
+      "preserved_sha256": "d0da73e1ae3bf671f9f15c4814b0d1629563ebad825b42c1f718cf60c8de113a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_metrics.hpp",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_metrics.hpp",
+      "sha256": "c0433cce377dc56b8caeeafbf09ad489726cc757030f56bdc0f4a73fc4f9430a",
+      "original_sha256": "c0433cce377dc56b8caeeafbf09ad489726cc757030f56bdc0f4a73fc4f9430a",
+      "preserved_sha256": "c0433cce377dc56b8caeeafbf09ad489726cc757030f56bdc0f4a73fc4f9430a"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_original.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_original.py",
+      "sha256": "200f25e7b55edb62e3bc71b8c713bb8242a96df285531405bb67f3ab6a028ade",
+      "original_sha256": "200f25e7b55edb62e3bc71b8c713bb8242a96df285531405bb67f3ab6a028ade",
+      "preserved_sha256": "200f25e7b55edb62e3bc71b8c713bb8242a96df285531405bb67f3ab6a028ade"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_original_build.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_original_build.py",
+      "sha256": "61b0fdb7680769d8334b23fa1525fefea71f6248e3874bd7a28b31f32a417ca1",
+      "original_sha256": "61b0fdb7680769d8334b23fa1525fefea71f6248e3874bd7a28b31f32a417ca1",
+      "preserved_sha256": "61b0fdb7680769d8334b23fa1525fefea71f6248e3874bd7a28b31f32a417ca1"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_run.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_run.py",
+      "sha256": "bb6a68894ed50a2d73d3139b31c75ca9af414e7d4a189c93ca5c8e3f1a34a313",
+      "original_sha256": "bb6a68894ed50a2d73d3139b31c75ca9af414e7d4a189c93ca5c8e3f1a34a313",
+      "preserved_sha256": "bb6a68894ed50a2d73d3139b31c75ca9af414e7d4a189c93ca5c8e3f1a34a313"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/performance_validate.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/performance_validate.py",
+      "sha256": "8fbaa454ff46ba6958d3b0ab7560798bc7f764ef50e37221408df0999424b215",
+      "original_sha256": "8fbaa454ff46ba6958d3b0ab7560798bc7f764ef50e37221408df0999424b215",
+      "preserved_sha256": "8fbaa454ff46ba6958d3b0ab7560798bc7f764ef50e37221408df0999424b215"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/process.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/process.py",
+      "sha256": "1d5348724ac5a9aa123f8cef9d2f40e228b21d4a28220763870bdea88c7d4afd",
+      "original_sha256": "1d5348724ac5a9aa123f8cef9d2f40e228b21d4a28220763870bdea88c7d4afd",
+      "preserved_sha256": "1d5348724ac5a9aa123f8cef9d2f40e228b21d4a28220763870bdea88c7d4afd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/profiles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/profiles.py",
+      "sha256": "c63392c9bda859a5624c60458d44110521b9301b66411ccd12aa9eb0dc23a11e",
+      "original_sha256": "c63392c9bda859a5624c60458d44110521b9301b66411ccd12aa9eb0dc23a11e",
+      "preserved_sha256": "c63392c9bda859a5624c60458d44110521b9301b66411ccd12aa9eb0dc23a11e"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/summarize_benchmarks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/summarize_benchmarks.py",
+      "sha256": "f2595d043fe73a72838a3310c86515dfc0b1818a64d1e65fce33f6e0acb81a23",
+      "original_sha256": "f2595d043fe73a72838a3310c86515dfc0b1818a64d1e65fce33f6e0acb81a23",
+      "preserved_sha256": "f2595d043fe73a72838a3310c86515dfc0b1818a64d1e65fce33f6e0acb81a23"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/log/support.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/support.py",
+      "sha256": "b94e706a526396624ab359dde5a91acaf8cff904912b72078601cccc526e5ebb",
+      "original_sha256": "b94e706a526396624ab359dde5a91acaf8cff904912b72078601cccc526e5ebb",
+      "preserved_sha256": "b94e706a526396624ab359dde5a91acaf8cff904912b72078601cccc526e5ebb"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/acceptance.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/acceptance.py",
+      "sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "original_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761",
+      "preserved_sha256": "6195c4a79d05f933447b51114235108f9ff93f47124fdca77f1eee5403c5a761"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/crash.py",
+      "sha256": "8684b5ef10e6e40fb7add49b6bc832e96a8ecb72966b752b73bdf0ef71ad90b1",
+      "original_sha256": "8684b5ef10e6e40fb7add49b6bc832e96a8ecb72966b752b73bdf0ef71ad90b1",
+      "preserved_sha256": "8684b5ef10e6e40fb7add49b6bc832e96a8ecb72966b752b73bdf0ef71ad90b1"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/crash_test.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/crash_test.py",
+      "sha256": "9f459b8a168bfa3fe91ebf58a17d0a4c018c848eb17258495e35e11b6553f67c",
+      "original_sha256": "9f459b8a168bfa3fe91ebf58a17d0a4c018c848eb17258495e35e11b6553f67c",
+      "preserved_sha256": "9f459b8a168bfa3fe91ebf58a17d0a4c018c848eb17258495e35e11b6553f67c"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/depth.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/depth.py",
+      "sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "original_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd",
+      "preserved_sha256": "358b52b3275c69753ba1ef8db148291ce717290cc1c3179136a1b1c131b7bebd"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/execution_2.py",
+      "sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "original_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab",
+      "preserved_sha256": "008dc106924df351d48b3b26991e276cb32ea3583abbc3fdc07fb963ea772cab"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/final_checks.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/final_checks.py",
+      "sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "original_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade",
+      "preserved_sha256": "aaf59a633a9c4f0bace94172e7e907ae883528fa8b2491abee4cea3025516ade"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/focused.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/focused.py",
+      "sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "original_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51",
+      "preserved_sha256": "54dd47fe6708ee836833ee694b55e8a4c3a10800a624b7521caf99951e922a51"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/install.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/install_2.py",
+      "sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "original_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2",
+      "preserved_sha256": "e7d06fcf437cc5dd28aa5f1f8543c7d4efd404b3dd0994ca06c0acef2f81b1c2"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/lsp.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/lsp_2.py",
+      "sha256": "ab6abb4cc2da68179a4c978af80fea50d2dd66c0c84573aa7c3a4f59540f8cf4",
+      "original_sha256": "ab6abb4cc2da68179a4c978af80fea50d2dd66c0c84573aa7c3a4f59540f8cf4",
+      "preserved_sha256": "ab6abb4cc2da68179a4c978af80fea50d2dd66c0c84573aa7c3a4f59540f8cf4"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/oracles_2.py",
+      "sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "original_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55",
+      "preserved_sha256": "b7eca028cb817fc9e368ec9515c122e7c1b42a1ab1e8466dd1f55ea2a8fcbb55"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/process_2.py",
+      "sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "original_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72",
+      "preserved_sha256": "c3885cb7e11061fd799b66a9bd81814f14ec8aeb0e50671d0a78d547ce68ca72"
+    },
+    {
+      "original": "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/sitecustomize.py",
+      "copy": "/home/shmellyorc/Documents/Void.Language/docs/log/evidence/crashes/incident-suu8tt60/provenance/sitecustomize.py",
+      "sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "original_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc",
+      "preserved_sha256": "b9a1b51dbdcf2c712ddd54cf5e3a5c6249eb72571fbe74d80964fccde680e2fc"
+    }
+  ],
+  "trigger": "Sources come from argv and explicit source_inputs; working-directory companions and canonical stdlib are retained conservatively. The exact causal subset is not inferred.",
+  "build": "/home/shmellyorc/Documents/Void.Language/build",
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "compiler_source_hashes": {
+    "src/backend/llvm/async_start.inc": "56203cf0c4081bcb46adc1bd57d98b6eab84e398bb8dec22470752705b4a899f",
+    "src/backend/llvm/backend.cpp": "24a57908fed1e8a3f0fb010e15002c1b539877e013031f8f9b442d5d075279a3",
+    "src/backend/llvm/encoded_cfg.cpp": "e05a63e84397d871d09f3daa8ba43d0ae72dbd41f57d8c9cb9bb30a108bd7bc3",
+    "src/backend/llvm/encoded_cfg.hpp": "19669525012fae8d91a2d9652142e979ad854e62b11fa92b9416d449b8239ecc",
+    "src/backend/llvm/filesystem.inc": "c9f3a126ceaf9edd603eea8abd391b81db23d27c4bc2c0cf74701b6ddc6f7d48",
+    "src/backend/llvm/http.inc": "afe298b6179e0079b31ed6389e1ecf6c9a643c1ee6d981c2f7714b1294c46839",
+    "src/backend/llvm/native_cache.cpp": "89074f43ea6efa50639e2740b578035d4f8d557b2f9ad63008a3a57c2c0a9085",
+    "src/backend/llvm/native_cache.hpp": "3756e700ac36d641a27bb45b4677c62b42433de58565c7d6231545c9e14378e6",
+    "src/backend/llvm/os.inc": "4fe2d817e5e5afac01f794cc5bdb4401f6caa86001403a10d8d8a155d76f9502",
+    "src/backend/llvm/private_fixed_call_fixture.inc": "00199c92cd8d76c8191116a3ef224678936695058c2894856c80b084581330d5",
+    "src/backend/llvm/storage_audit.cpp": "b4c601a2448673a3f62c5e0e870fa28f1e8091c6e97bd86e1e5a54814c2669e4",
+    "src/backend/llvm/url.inc": "a461dc1029105932511ba4b5c1f9f894c57edc0a86722557ab0798666354b910",
+    "src/format.cpp": "65aa6172548c494462e993b8ad0f5bbd7e22736b22bbc3eb4e831b424085d57d",
+    "src/frontend/binary_codec.inc": "16fe0bcde0c7aacf6c2536f17a118498dbcef3f880f33efe42b299fb95b094ca",
+    "src/frontend/capabilities.inc": "bcb00a131f17eecf10f276dd9f0697a0c5da8945663d67366c97fc30bcf1ecfa",
+    "src/frontend/collection_display.inc": "bc118b9767343dd3f05abe650e4118624c8b724886f4a867af722e9e97fa1697",
+    "src/frontend/compiler.cpp": "c111f8fcb7562bbe2bae22ac448ece5d20cce84bffd46517a025e2b796623f0c",
+    "src/frontend/construction.inc": "11dd4ab49feff3c1b428cb8cd5d957ba41d56351fb7154f3b62ae318392935d0",
+    "src/frontend/display_semantics.inc": "ab2614138c5a0c39f4f964cefab88a023ffc3d92025bf27d5ba186a636e83915",
+    "src/frontend/filesystem.inc": "a509841949985bfe5038ff28908cc5aefa84531762b12b72ca3b877577b90ed0",
+    "src/frontend/generic_declarations.inc": "38c18207bb3f60883165451e47e9db21ab5c42ad397dc919442c4fef58d78b12",
+    "src/frontend/generic_inference.inc": "cb209b877bf7b2005b1e0535195208e03ef586b84dbf3c35efcf2fe75e5f7652",
+    "src/frontend/generic_tooling.inc": "8e1cc9c63abd20869ae79c90069c1f4aed6e6c4e738fec2f11d76df5e3f55cc2",
+    "src/frontend/generics.inc": "f2e58b54a6489c2932cf6f269e8681e261b7a78f47157f99444490f398dbc7f7",
+    "src/frontend/http.inc": "de203f2a1c1216c54c039e1c8d66df9c8b3573e8d7b03cd84db6a5672854e396",
+    "src/frontend/inheritance.inc": "fddcd9b411bd8c2716c700faf388f0433db8e2813f3757f2952ffc18272d0f4a",
+    "src/frontend/json.inc": "e7b9fbf95b897b386417d1b12abe4351e7036032c8d6da57eec5668d7aaacb22",
+    "src/frontend/math.inc": "e316847a1bde10702da9b72f1af0f075f04071cbfb3b07c78052f7a6107ae239",
+    "src/frontend/os.inc": "83666cc31ec9af7dff002507102b5f7f19cc33e6b6e7709c1e7d0aebe07717b7",
+    "src/frontend/pattern_lowering.inc": "a411efc0316296a995f8ca00a5e73e243a0ffc5491b98468e909b22f5bf51fcf",
+    "src/frontend/pattern_parser.inc": "5b9a0af017b9702e82fbebc0bd0799c620174d23a7cf6296141f96d67c0f8951",
+    "src/frontend/pattern_semantics.inc": "fda278c4fdcf77713473c262922075921d8c44365720d070b99189822c9c57b3",
+    "src/frontend/random.inc": "a6ba73da1da337aa31ca47966fa5bd03c892083afc13b89f74956fb67792fc54",
+    "src/frontend/source.cpp": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+    "src/frontend/stdlib_conversion.inc": "39b6a3b02a2e4f657b68069e68f28e7c73cd53c2f9e66d4fbc8fcbf82570721c",
+    "src/frontend/strings.inc": "1ca4225da42b4bb14ce1a4579fa70be84463b71f1ba8811f1c5d4f257ccc71bc",
+    "src/frontend/tooling.cpp": "7bae9162ea7aab48d88447e978f8d309e3779f6149c276de3f42ac3906d8fdbb",
+    "src/frontend/url.inc": "0c63d2db9f649b09351885a97ae948d5945fdd011b80ec43f16b0f38e23fa844",
+    "src/ir/async_validation.inc": "fe458a91f7b16b2789e199d0afd3093570aab818cde14b5f998a84e7f47f3c0e",
+    "src/ir/construction.inc": "fdc058bf17e3a05b46a7d2751894b86884ded7ffdd30d9af6757aea9b97b5a05",
+    "src/ir/filesystem.inc": "d60db0ca432f1d5266cfbcdcf5232e93787322de791e3ac4151f4401d91984fd",
+    "src/ir/fixed_ownership.inc": "9a76a436afd2952564475fa4734addc275694e197dc2ecb547891bc7827c0c0b",
+    "src/ir/http.inc": "06f3dd349993f7509b55f1408b7172c747182d079a71e9f88f53884af309cc53",
+    "src/ir/interfaces.inc": "e66943dd9c1ab0245bf0cda04e69278724ba98eb133ad12fd06f3face5d626c2",
+    "src/ir/module.cpp": "2812151cea8ab1374c38d82de4e9d2ae4a27d9a45da24c3693a0abe0fb068a78",
+    "src/ir/native_binding.cpp": "ac975b25e8c646d448732e924b725b0ce60eb54cbc2414693246aa1026aebe4f",
+    "src/ir/native_storage.cpp": "8a4ace75c0e14525f05269a505818e429349f4a2891b72a3dae15189b050458c",
+    "src/ir/os.inc": "1aeab1311887356050a6656209f6b4d89bd65ad213a4773090aff98010e2dd58",
+    "src/ir/reference_capabilities.inc": "971c174d621227179bba975a98981b2db77c828ff8032ee8aafb8ca5a2310dfc",
+    "src/ir/url.inc": "35afa431c682fc00cb28f2b10075314b13f0ab45274bc34f5aede73784e13fe1",
+    "src/lsp/main.cpp": "e725f9a854a930a367390bcd5597227ee4eca6f969e8907a9f4eb6bf6a0158c2",
+    "src/lsp/positions.cpp": "ffd16fcb0863b1b2689fbbc5d7eb42ed3a1bfa7dafe87a67dbbc341b9ecc0aab",
+    "src/main.cpp": "a21aa1630db01ddb50eb80f1bb1cc91d9994231eba69ca4631ce7db933f45d07",
+    "src/native/fixture.c": "23a0ea4f50f900e5711aaff9661bb2bbfcb2bd3b85b93a9825b0b94b943950ba",
+    "src/native/fixture.h": "e2885f539910ddff220f8d10acdef40fd965c3af283bc88de9ef668123827135",
+    "src/native/sink.c": "78c175e94c600fa41a445a6144906dea3db9df8e4b69aace30fa7610002d34b2",
+    "src/native/sink.h": "158f8341f61682b4608758d2b841e7f626ef53801e230365a4bf7c85c2e2ae2b",
+    "src/native_build.cpp": "6ab8b0a3a4ae4ee34e72f2e8b37314ff152fa9e7d5932cf42b1e6d7cabd30229",
+    "src/native_windows.hpp": "f63d92220f790e4e10fe2119984d45eca66e2977f78fa8b6f13b7997df8a1e4c",
+    "src/numeric.cpp": "2c687512907e74a345dd49e9f9417eb5edfeb2687454875717b400e2160041c6",
+    "src/runtime/abi.cpp": "f0ce4b13c99b78ecd7c6c316dc0f3e33bbf66d4a099b133aa15329a0467e5468",
+    "src/runtime/array.cpp": "807848a104157e696614e1ebf01ea8191a5937976cedf32155208ae3ede5d4b8",
+    "src/runtime/async.cpp": "aa16386d7f2b78db267c0a0bd174af65c209ae11797f7ad05f43136ca405f389",
+    "src/runtime/buffer.cpp": "1efdcbc0c981307fbf5ea4236838f7b2d4f552c2e623586e77d8d8f056e939fc",
+    "src/runtime/callback.cpp": "510e56937cd24f17dfb7699648b59a1df1db0b052baae380a74210909b1fcda2",
+    "src/runtime/console.cpp": "363909154a553103127b7410a4d43d9e08aa9acd3fbdae3197e9d033cb895e2f",
+    "src/runtime/console_abi.cpp": "9077cc949e76ddb8773087d51c40de127cc097cf0167aaa619dc023cc9b5ac4c",
+    "src/runtime/console_keyboard.inc": "ecddacc7625c6834353af025529464f08af3cc53d9cb40b9548ab73a44b0d0d2",
+    "src/runtime/console_presentation.inc": "45c87f1ff65919cf1e388527a57230389ef1c9156972fc175a8c1e6a1b329124",
+    "src/runtime/console_terminfo.inc": "1a664e9813fd97d7124318a1f1107981adf8de1c98c88a1feadb156391e107e1",
+    "src/runtime/conversion.cpp": "1365fffa2445850571c1b5d630f9138701fe19ede743e9be201cacf6e9dc5771",
+    "src/runtime/coordination.cpp": "5f88462fd43ebaec4a5be6fbac439ade66fb92e5a3dca31b6cf84ce441718e4c",
+    "src/runtime/curl_keylog_disabled.c": "4a7e0a8397376c2249ae0a252fe6dc36bf7395ca81583c730f9c1a37e85460fa",
+    "src/runtime/dictionary.cpp": "baeebadbe9dea5664740fde3e0c5c44b7977dd0242f69fd7b98e137e1fe3b80f",
+    "src/runtime/filesystem.cpp": "ef64021a43885f75ca5abc2e35afa30acd0abec8ee7cdd07857dae775e2d9e95",
+    "src/runtime/filesystem_abi.cpp": "44e2a56414d354a41ac27e1b998870c50dda2bf9c36d1771d7bd57dcde783377",
+    "src/runtime/fixed_abi.cpp": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4",
+    "src/runtime/gc_schema.cpp": "bcf1c26134b73eb4387737354bb536f04f2c177bab0db67be075b0559fcee9c4",
+    "src/runtime/heap.cpp": "609f0080dcc9f72f46b30072a03056d065f4889a7dbe68e690f238cdcfdd61a2",
+    "src/runtime/http.cpp": "4c5c72f2847d6b7e61cd1d95b556f98f15a385911b10a394bfec5352c7c53b4d",
+    "src/runtime/http_abi.cpp": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992",
+    "src/runtime/http_bulk.cpp": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+    "src/runtime/http_file.cpp": "e395830aac32a55bffb64f89b2f335f2e80988fa441700d81f0b9c2f808f63dd",
+    "src/runtime/http_provider.cpp": "fd1183b434aa9edcf9cea4e8cec9ccf389f6a782518028dff6afe5a2eda6a4af",
+    "src/runtime/http_resource.cpp": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+    "src/runtime/list.cpp": "d77090772e5c6b74ef32ebc9ac9e56e5b183b2975b4b591062386abafefba1e8",
+    "src/runtime/native.cpp": "00a3f814cfa4f9a0eeaa2887ccbe82894f7c6c787f55d74e57c8291b1430ba81",
+    "src/runtime/native_binding.cpp": "8c11a2c4b0d4b2bf7953984e01360ea7bf26dc3ee7aefa08eb0a969552b8171d",
+    "src/runtime/native_resource.cpp": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+    "src/runtime/native_work.cpp": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4",
+    "src/runtime/os.cpp": "a40b923d132a7b671c3895009cad71381a5d317b4d5338e366d7c2af045c2004",
+    "src/runtime/os_abi.cpp": "cb1ba10195333171408d2c61fceec257a0d8da89a211784485c8fe5ae65ded5a",
+    "src/runtime/os_apple.mm": "2106be6aea6efcb556e5c9358592cc124175dae90e877b1d200ddf4bab50e2fa",
+    "src/runtime/random.cpp": "e20ad150699872243fd5be74b886c2333373f489ab5952488e2d63c26c18094d",
+    "src/runtime/reload.cpp": "a7e48d4025d4eedad456214946080151b899747fcea7f2b943ce1e4973e791f5",
+    "src/runtime/temporal_abi.cpp": "ede0161d7eba5a300829319f179cf0b2d63c3ed3a5577b5d38546b842e3e0874",
+    "src/runtime/text_case.cpp": "bd7b0f973a5671c66cd792286bed3a77d3f797ae506fdb02dd1b5c6b60e31abd",
+    "src/runtime/unicode_case_tables.inc": "fae60f77cc2101e9266bdbf60ea136945b30c9a5f1288b4cb8d4d7be543141fe",
+    "src/runtime/url.cpp": "fee3a98466337b4f8d9e66ced239da938e3e6c36d6a189d6b7e2714e8949373b",
+    "src/runtime/url_abi.cpp": "608310a2e3eb502be0f770c2e41e75b5fb6408c9073cf2d2db23aacdd598a38d",
+    "src/temporal.cpp": "b17a8f180eb99e20bdd4ae7d126466f7418b6fe2dfadf2da1e0e21a2e9e6584a",
+    "include/void/async.hpp": "0bb84c2cc0b72356cfc7a87db8c006d36d9aa3b23724ee2a5257d6c330e2cbb0",
+    "include/void/backend.hpp": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2",
+    "include/void/buffer.hpp": "cf4da707545dcab5d37882c80dd19f7bea16626d43deb2613dbfae1bb9f57131",
+    "include/void/cache.hpp": "745062f95d56ecd3ec42a208882be3d285260f81de6e108ce9f56acee8fe4545",
+    "include/void/callback.hpp": "b53e04e5b782c5930e6c35aea7f57b41dacf2b487ae3fa90fc01fc87f6f981cd",
+    "include/void/console.hpp": "86cab03285033999d01cb30a76c05bb7ba1daeec4368fa901026a9411a73b7eb",
+    "include/void/console_ops.hpp": "2afbea6d8eee7f97e536eacb138a79133f3c496d87197350d2e7c0d61b89abd2",
+    "include/void/detail/console_wide.hpp": "a4b47d68931579159e1e9b5cfbf8984727267acef6ffd253d7053e40476b3840",
+    "include/void/detail/filesystem_hooks.hpp": "c5e1ae8fa3befcdf20776cbf4982ee7100d87a9ee08e2af810fdb0c86d52064f",
+    "include/void/detail/http_hooks.hpp": "3aa36be46acfab1ced1b54cb19fc6fb8ac491462cda34b3a2fd716bb0923406e",
+    "include/void/detail/os_integer.hpp": "4e3aa12708f55bb91ef7149ef4018554f9de9305b1d82782db972fca2bd1fa0f",
+    "include/void/diagnostic.hpp": "6ea5519568506664afdd91d4b0ac04b7a06d7757fca34d767bc769335619acb1",
+    "include/void/execution.hpp": "8db29e5a6441474405a7c2a4130658260e404fce8c0a681df64702b2e9705630",
+    "include/void/filesystem.hpp": "aa68df4eaeee3df581171f82447ee51c480392e4d7858f7c2df4772985de5174",
+    "include/void/filesystem_abi.hpp": "c0e5364472343b8489549a2ff57feee673968f59c8fb83dfec9b505539cd2427",
+    "include/void/filesystem_ops.hpp": "5b86d2e0fda6fd18cccc9aa2ba7c5410d2bf714e50fdb53271c8e4137b4fb08f",
+    "include/void/format.hpp": "e317dcc93a5f4492bb995d9f66add3c407ea857a600a29f50d7dc23050771f7b",
+    "include/void/frontend.hpp": "1906dba160f0a3bd02bb0087fcbbb01872f520b54e83feebbff68e54456ac346",
+    "include/void/gc_schema.hpp": "a00705aa14c9bd8c96655e96fe91fe9ad0bc8915675b59d868e6670db9f94098",
+    "include/void/heap.hpp": "b1007c96eeac288fbb0f26db1f82bfc046380772a24ff3cddbbb895a9292f969",
+    "include/void/http.hpp": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4",
+    "include/void/http_abi.hpp": "bf58fd4e17ad037ef68fc137585ab4dfb06b3a591542bdc4554ac5f1721c6e86",
+    "include/void/http_bulk.hpp": "93f7d1ceedbad13cb3107bfef04107fe72835328ea412e8f17dd7cb0e2347af3",
+    "include/void/http_file.hpp": "28c0fa19bf5fffbc6b55dc31b892ccd9d3f7b61e1b560e080b079518f9cc3b8a",
+    "include/void/http_ops.hpp": "48f9ccbe6bc5ab9fd33f1e500e55e19bb61f18c1c6ff87bed9029b6195fccc19",
+    "include/void/http_provider.hpp": "97d0ccf8fb444ae042c521d15c2c25498dc46dd5f12ed5603361ffe21390b51e",
+    "include/void/http_resource.hpp": "cd703d39cbffc474925db3e4f9abc7a55461edeac764824025d13d0b4c12dbd3",
+    "include/void/ir.hpp": "f228387cecc469c3e14bec5a1e014682c67eed1160a2d7d674ddb0979c018e05",
+    "include/void/llvm_storage_audit.hpp": "c1738800a245a438c3c52570197ef59ef068eb84fbe873242ddfa22bd5e627e5",
+    "include/void/lsp.hpp": "100e7b1139a08f9687edbaa0cf9573818c1f7797ae78dde7818969d9f41d6ec8",
+    "include/void/math_ops.hpp": "da725e94a9373930e2b36a4c530faf1405fcb7b7675e30fda228a0835d30d0bb",
+    "include/void/native.hpp": "ea42b49cd0f1b41e8317ccccb1238278a171408de2ef8f1b3fdce1f3c2fcfd69",
+    "include/void/native_binding.hpp": "308b0af5b8ade15195cf399813bc2c214a386148a2a28854aebc3ca95ea44147",
+    "include/void/native_build.hpp": "30bed0079880aef602fed26ad318980b10d90be5a9265119cfa3bf6adca089b0",
+    "include/void/native_resource.hpp": "215d14e7829b563fa0594f8d0284bc2951b7d9e2872c8aa08266eed370831081",
+    "include/void/native_runtime.hpp": "45dc4c3d243dca40c6ac9130a14c20ca73991970fa21e412b704282c126c7b8a",
+    "include/void/native_storage.hpp": "79f9afcd2e0240dc859f516905fc7503615ed98687e7582da00728eec15d6ac7",
+    "include/void/native_work.hpp": "6d92bd0ed3a8b817b125c867442b67b4be6647f950fa288e129d09360534fcb6",
+    "include/void/numeric.hpp": "5397fb41d912e07f5ab983611a99920d2af806c515e3e4c9a06d708735576d3d",
+    "include/void/os.hpp": "6fb4bfc4d4545ab6668ec8c51ed69e2680b511467166232c06c4c4a541d6b77b",
+    "include/void/os_abi.hpp": "c4b82a9fa80ebecc6d28107cd1725ca3254b08c4c6db6414fc8102db89c9fb17",
+    "include/void/path.hpp": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98",
+    "include/void/private_fixed_call_research.hpp": "1f7d158771e2c3b5fe07ca377011b21d962bfc16e66a5d873c67892aea151626",
+    "include/void/reference_capabilities.hpp": "d84d04a6817f67c0b6b112bd5148daf5dbf14bec567045a3c3f01428734a5fd8",
+    "include/void/runtime.hpp": "d4c5f95c6533df1148bafa14371c74e31a92393ddde8c0f6563591bb896542b1",
+    "include/void/runtime_abi.hpp": "ad93415e5c481d2416c02999786fb4495d4e094635f0f89873f55b9999af180a",
+    "include/void/source.hpp": "197bdd88e6cb464acffd5c5b478aee3b4d401cbd8177a4dd447573472f213a51",
+    "include/void/temporal.hpp": "f2468e74d9419262907d9ac0328812a13f819badb6821355ec5b0e38855a0ce9",
+    "include/void/temporal_ops.hpp": "42a253ba5f55e5235c4492e6f548b5a1af43c082e48fa1c1742120e4a87e19e9",
+    "include/void/tooling.hpp": "4ae0ffb464a03eb989a2cf2b7d3392adcf2623f19503d467e399840a84c72fba",
+    "include/void/url.hpp": "eb07866950e2a81ad183b1f5594db0d8c2a8540a37f0014c10babef3b1985d20",
+    "include/void/url_abi.hpp": "117f9944c06a8414cea2c569493ef08222573b9e85e2d0b6d572da1609c5bef2",
+    "include/void/url_ops.hpp": "b542dd0c80ed39116be6dd9dbf2b88c5d53b25c77b7e7f264287baec7ec1f89f",
+    "include/void/utf8.hpp": "e8aa89e68bd273aa100da2ca254e5becab7de6680fd6b73ffb40661dc2ecd773"
+  },
+  "tool_input_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23": "c336d48383874cffaab0dc4c5c359456d871f21380b746520dde5c7f4c125a67",
+    "/tmp/VOID-log-installed-nf77881k/emitted.o": "b8854d7e176d3c13ac24827a62d9e189e63c97de872dff747e4f2bb5157d9980",
+    "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/lib/void/libvoid_runtime.a": "0f8f64063eef38c886f345c7129cc2df6e014de6c22a65e753889fcbd5d10b80",
+    "/tmp/VOID-log-installed-nf77881k/relocated \u96ea # %/lib/void/libvoid_native_fixture.a": "4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/lld": "0f8d53acaf6ff4990506a26739c12fb90315fdcc0430ec4c305ca75115774d4b"
+  }
+}

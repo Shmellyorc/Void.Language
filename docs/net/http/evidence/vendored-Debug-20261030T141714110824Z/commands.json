@@ -1,0 +1,76 @@
+{
+  "profile": "Debug",
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_curl_source.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.12603954400037765,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008273317999737628,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/provider",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-Debug-20261030T141714110824Z",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DVOID_CURL_PROFILE=COOKIE",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DVOID_SANITIZERS=OFF"
+      ],
+      "exit_code": 0,
+      "seconds": 15.030058547000408,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-Debug-20261030T141714110824Z",
+        "--parallel",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 4.862521914000354,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-Debug-20261030T141714110824Z/provider_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07617787700019107,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-Debug-20261030T141714110824Z/provider_probe",
+        "--embedding-host"
+      ],
+      "exit_code": 0,
+      "seconds": 0.00501718899977277,
+      "stack_1mib": true
+    }
+  ],
+  "source": "third_party/curl (tracked source; no patch application)",
+  "provenance_sha256": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+  "scope": "cookie/OOM regression; not full transport or native Windows/macOS acceptance",
+  "result": "PASS",
+  "binary_sha256": "929a3f24714cdd74046629670b45e6c411dbfda4ea2431db053aaedc9931a1a9",
+  "archive_sha256": "ce01c2bbc6e8c1eafb48e1e0e8338e21c3b352bdc2b64b5a0f6fe27ad8eb9f7d",
+  "archive_bytes": 6132874
+}

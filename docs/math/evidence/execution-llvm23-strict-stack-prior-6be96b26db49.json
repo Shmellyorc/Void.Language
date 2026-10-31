@@ -1,0 +1,1396 @@
+{
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+  "compiler_sha256": "9b60a17a0ae127d0006df213ba84cd239565eb8a1a87504d55f824cc43510b5b",
+  "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
+  "vectors_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0",
+  "source_artifact": "docs/math/evidence/math_test-llvm23-strict-stack.void",
+  "expectations_artifact": "docs/math/evidence/expectations-llvm23-strict-stack.json",
+  "reference_artifact": "docs/math/evidence/vectors-697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0.json",
+  "vectors": 1372,
+  "independent_mpfr_vectors": 224,
+  "independent_mpfr_interpolation_vectors": 44,
+  "processes": 7,
+  "small_stack": true,
+  "observations": [
+    {
+      "mode": "JIT O0",
+      "worst_ulp": {
+        "native_max_ulp": {
+          "math.atan2_f32": 0,
+          "math.atan2_f64": 0,
+          "math.sin_f32": 0,
+          "math.cos_f32": 0,
+          "math.tan_f32": 0,
+          "math.asin_f32": 0,
+          "math.acos_f32": 0,
+          "math.atan_f32": 0,
+          "math.sqrt_f32": 0,
+          "math.pow_f32": 0,
+          "math.exp_f32": 0,
+          "math.exp2_f32": 0,
+          "math.log_f32": 0,
+          "math.log2_f32": 0,
+          "math.sin_f64": 0,
+          "math.cos_f64": 1,
+          "math.tan_f64": 0,
+          "math.asin_f64": 0,
+          "math.acos_f64": 0,
+          "math.atan_f64": 0,
+          "math.sqrt_f64": 0,
+          "math.pow_f64": 0,
+          "math.exp_f64": 0,
+          "math.exp2_f64": 0,
+          "math.log_f64": 0,
+          "math.log2_f64": 0,
+          "dynamic sin(input as f64)_f64": 0
+        },
+        "interpolation_mathematical_error": [
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1075838976,
+            "correctly_rounded_mathematical_bits": 1075838976,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1092616192), stored_f32(0), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1089470464,
+            "correctly_rounded_mathematical_bits": 1089470464,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 4278190078,
+            "correctly_rounded_mathematical_bits": 4278190079,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 2130706430,
+            "correctly_rounded_mathematical_bits": 2130706431,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3212836864))",
+            "precision": 32,
+            "actual_bits": 3240099840,
+            "correctly_rounded_mathematical_bits": 3240099840,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1073741824))",
+            "precision": 32,
+            "actual_bits": 1101004800,
+            "correctly_rounded_mathematical_bits": 1101004800,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353217), stored_f32(1065353216), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 3156465416,
+            "correctly_rounded_mathematical_bits": 3156465415,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095038), stored_f32(2139095039), stored_f32(1061158912))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1075838976))",
+            "precision": 32,
+            "actual_bits": 1048576000,
+            "correctly_rounded_mathematical_bits": 1048576000,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(2139095038), stored_f32(4286578687))",
+            "precision": 32,
+            "actual_bits": 1275068415,
+            "correctly_rounded_mathematical_bits": 1275068415,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3240099840))",
+            "precision": 32,
+            "actual_bits": 3212836864,
+            "correctly_rounded_mathematical_bits": 3212836864,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 1068149418,
+            "correctly_rounded_mathematical_bits": 1068149419,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1065353218))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4612811918334230528,
+            "correctly_rounded_mathematical_bits": 4612811918334230528,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4621819117588971520), stored_f64(0), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4620130267728707584,
+            "correctly_rounded_mathematical_bits": 4620130267728707584,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 18437736874454810622,
+            "correctly_rounded_mathematical_bits": 18437736874454810623,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 9214364837600034814,
+            "correctly_rounded_mathematical_bits": 9214364837600034815,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13830554455654793216))",
+            "precision": 64,
+            "actual_bits": 13845191154443747328,
+            "correctly_rounded_mathematical_bits": 13845191154443747328,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4611686018427387904))",
+            "precision": 64,
+            "actual_bits": 4626322717216342016,
+            "correctly_rounded_mathematical_bits": 4626322717216342016,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017409), stored_f64(4607182418800017408), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 13800290266158863480,
+            "correctly_rounded_mathematical_bits": 13800290266158863485,
+            "ulp_distance": 5
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405310), stored_f64(9218868437227405311), stored_f64(4604930618986332160))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4612811918334230528))",
+            "precision": 64,
+            "actual_bits": 4598175219545276416,
+            "correctly_rounded_mathematical_bits": 4598175219545276416,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405310), stored_f64(18442240474082181119))",
+            "precision": 64,
+            "actual_bits": 4850376798678024191,
+            "correctly_rounded_mathematical_bits": 4850376798678024191,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(1), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13845191154443747328))",
+            "precision": 64,
+            "actual_bits": 13830554455654793216,
+            "correctly_rounded_mathematical_bits": 13830554455654793216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 4608683618675807573,
+            "correctly_rounded_mathematical_bits": 4608683618675807573,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4607182418800017410))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          }
+        ]
+      },
+      "stdout_sha256": "efecbaf333ba2a6a15d9e868bdb1889b90d4be6725011d3196462ad6e4895f15"
+    },
+    {
+      "mode": "AOT O0",
+      "worst_ulp": {
+        "native_max_ulp": {
+          "math.atan2_f32": 0,
+          "math.atan2_f64": 0,
+          "math.sin_f32": 0,
+          "math.cos_f32": 0,
+          "math.tan_f32": 0,
+          "math.asin_f32": 0,
+          "math.acos_f32": 0,
+          "math.atan_f32": 0,
+          "math.sqrt_f32": 0,
+          "math.pow_f32": 0,
+          "math.exp_f32": 0,
+          "math.exp2_f32": 0,
+          "math.log_f32": 0,
+          "math.log2_f32": 0,
+          "math.sin_f64": 0,
+          "math.cos_f64": 1,
+          "math.tan_f64": 0,
+          "math.asin_f64": 0,
+          "math.acos_f64": 0,
+          "math.atan_f64": 0,
+          "math.sqrt_f64": 0,
+          "math.pow_f64": 0,
+          "math.exp_f64": 0,
+          "math.exp2_f64": 0,
+          "math.log_f64": 0,
+          "math.log2_f64": 0,
+          "dynamic sin(input as f64)_f64": 0
+        },
+        "interpolation_mathematical_error": [
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1075838976,
+            "correctly_rounded_mathematical_bits": 1075838976,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1092616192), stored_f32(0), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1089470464,
+            "correctly_rounded_mathematical_bits": 1089470464,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 4278190078,
+            "correctly_rounded_mathematical_bits": 4278190079,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 2130706430,
+            "correctly_rounded_mathematical_bits": 2130706431,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3212836864))",
+            "precision": 32,
+            "actual_bits": 3240099840,
+            "correctly_rounded_mathematical_bits": 3240099840,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1073741824))",
+            "precision": 32,
+            "actual_bits": 1101004800,
+            "correctly_rounded_mathematical_bits": 1101004800,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353217), stored_f32(1065353216), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 3156465416,
+            "correctly_rounded_mathematical_bits": 3156465415,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095038), stored_f32(2139095039), stored_f32(1061158912))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1075838976))",
+            "precision": 32,
+            "actual_bits": 1048576000,
+            "correctly_rounded_mathematical_bits": 1048576000,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(2139095038), stored_f32(4286578687))",
+            "precision": 32,
+            "actual_bits": 1275068415,
+            "correctly_rounded_mathematical_bits": 1275068415,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3240099840))",
+            "precision": 32,
+            "actual_bits": 3212836864,
+            "correctly_rounded_mathematical_bits": 3212836864,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 1068149418,
+            "correctly_rounded_mathematical_bits": 1068149419,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1065353218))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4612811918334230528,
+            "correctly_rounded_mathematical_bits": 4612811918334230528,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4621819117588971520), stored_f64(0), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4620130267728707584,
+            "correctly_rounded_mathematical_bits": 4620130267728707584,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 18437736874454810622,
+            "correctly_rounded_mathematical_bits": 18437736874454810623,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 9214364837600034814,
+            "correctly_rounded_mathematical_bits": 9214364837600034815,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13830554455654793216))",
+            "precision": 64,
+            "actual_bits": 13845191154443747328,
+            "correctly_rounded_mathematical_bits": 13845191154443747328,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4611686018427387904))",
+            "precision": 64,
+            "actual_bits": 4626322717216342016,
+            "correctly_rounded_mathematical_bits": 4626322717216342016,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017409), stored_f64(4607182418800017408), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 13800290266158863480,
+            "correctly_rounded_mathematical_bits": 13800290266158863485,
+            "ulp_distance": 5
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405310), stored_f64(9218868437227405311), stored_f64(4604930618986332160))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4612811918334230528))",
+            "precision": 64,
+            "actual_bits": 4598175219545276416,
+            "correctly_rounded_mathematical_bits": 4598175219545276416,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405310), stored_f64(18442240474082181119))",
+            "precision": 64,
+            "actual_bits": 4850376798678024191,
+            "correctly_rounded_mathematical_bits": 4850376798678024191,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(1), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13845191154443747328))",
+            "precision": 64,
+            "actual_bits": 13830554455654793216,
+            "correctly_rounded_mathematical_bits": 13830554455654793216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 4608683618675807573,
+            "correctly_rounded_mathematical_bits": 4608683618675807573,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4607182418800017410))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          }
+        ]
+      },
+      "stdout_sha256": "efecbaf333ba2a6a15d9e868bdb1889b90d4be6725011d3196462ad6e4895f15"
+    },
+    {
+      "mode": "JIT O2",
+      "worst_ulp": {
+        "native_max_ulp": {
+          "math.atan2_f32": 0,
+          "math.atan2_f64": 0,
+          "math.sin_f32": 0,
+          "math.cos_f32": 0,
+          "math.tan_f32": 0,
+          "math.asin_f32": 0,
+          "math.acos_f32": 0,
+          "math.atan_f32": 0,
+          "math.sqrt_f32": 0,
+          "math.pow_f32": 0,
+          "math.exp_f32": 0,
+          "math.exp2_f32": 0,
+          "math.log_f32": 0,
+          "math.log2_f32": 0,
+          "math.sin_f64": 0,
+          "math.cos_f64": 1,
+          "math.tan_f64": 0,
+          "math.asin_f64": 0,
+          "math.acos_f64": 0,
+          "math.atan_f64": 0,
+          "math.sqrt_f64": 0,
+          "math.pow_f64": 0,
+          "math.exp_f64": 0,
+          "math.exp2_f64": 0,
+          "math.log_f64": 0,
+          "math.log2_f64": 0,
+          "dynamic sin(input as f64)_f64": 0
+        },
+        "interpolation_mathematical_error": [
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1075838976,
+            "correctly_rounded_mathematical_bits": 1075838976,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1092616192), stored_f32(0), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1089470464,
+            "correctly_rounded_mathematical_bits": 1089470464,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 4278190078,
+            "correctly_rounded_mathematical_bits": 4278190079,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 2130706430,
+            "correctly_rounded_mathematical_bits": 2130706431,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3212836864))",
+            "precision": 32,
+            "actual_bits": 3240099840,
+            "correctly_rounded_mathematical_bits": 3240099840,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1073741824))",
+            "precision": 32,
+            "actual_bits": 1101004800,
+            "correctly_rounded_mathematical_bits": 1101004800,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353217), stored_f32(1065353216), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 3156465416,
+            "correctly_rounded_mathematical_bits": 3156465415,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095038), stored_f32(2139095039), stored_f32(1061158912))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1075838976))",
+            "precision": 32,
+            "actual_bits": 1048576000,
+            "correctly_rounded_mathematical_bits": 1048576000,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(2139095038), stored_f32(4286578687))",
+            "precision": 32,
+            "actual_bits": 1275068415,
+            "correctly_rounded_mathematical_bits": 1275068415,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3240099840))",
+            "precision": 32,
+            "actual_bits": 3212836864,
+            "correctly_rounded_mathematical_bits": 3212836864,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 1068149418,
+            "correctly_rounded_mathematical_bits": 1068149419,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1065353218))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4612811918334230528,
+            "correctly_rounded_mathematical_bits": 4612811918334230528,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4621819117588971520), stored_f64(0), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4620130267728707584,
+            "correctly_rounded_mathematical_bits": 4620130267728707584,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 18437736874454810622,
+            "correctly_rounded_mathematical_bits": 18437736874454810623,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 9214364837600034814,
+            "correctly_rounded_mathematical_bits": 9214364837600034815,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13830554455654793216))",
+            "precision": 64,
+            "actual_bits": 13845191154443747328,
+            "correctly_rounded_mathematical_bits": 13845191154443747328,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4611686018427387904))",
+            "precision": 64,
+            "actual_bits": 4626322717216342016,
+            "correctly_rounded_mathematical_bits": 4626322717216342016,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017409), stored_f64(4607182418800017408), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 13800290266158863480,
+            "correctly_rounded_mathematical_bits": 13800290266158863485,
+            "ulp_distance": 5
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405310), stored_f64(9218868437227405311), stored_f64(4604930618986332160))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4612811918334230528))",
+            "precision": 64,
+            "actual_bits": 4598175219545276416,
+            "correctly_rounded_mathematical_bits": 4598175219545276416,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405310), stored_f64(18442240474082181119))",
+            "precision": 64,
+            "actual_bits": 4850376798678024191,
+            "correctly_rounded_mathematical_bits": 4850376798678024191,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(1), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13845191154443747328))",
+            "precision": 64,
+            "actual_bits": 13830554455654793216,
+            "correctly_rounded_mathematical_bits": 13830554455654793216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 4608683618675807573,
+            "correctly_rounded_mathematical_bits": 4608683618675807573,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4607182418800017410))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          }
+        ]
+      },
+      "stdout_sha256": "efecbaf333ba2a6a15d9e868bdb1889b90d4be6725011d3196462ad6e4895f15"
+    },
+    {
+      "mode": "AOT O2",
+      "worst_ulp": {
+        "native_max_ulp": {
+          "math.atan2_f32": 0,
+          "math.atan2_f64": 0,
+          "math.sin_f32": 0,
+          "math.cos_f32": 0,
+          "math.tan_f32": 0,
+          "math.asin_f32": 0,
+          "math.acos_f32": 0,
+          "math.atan_f32": 0,
+          "math.sqrt_f32": 0,
+          "math.pow_f32": 0,
+          "math.exp_f32": 0,
+          "math.exp2_f32": 0,
+          "math.log_f32": 0,
+          "math.log2_f32": 0,
+          "math.sin_f64": 0,
+          "math.cos_f64": 1,
+          "math.tan_f64": 0,
+          "math.asin_f64": 0,
+          "math.acos_f64": 0,
+          "math.atan_f64": 0,
+          "math.sqrt_f64": 0,
+          "math.pow_f64": 0,
+          "math.exp_f64": 0,
+          "math.exp2_f64": 0,
+          "math.log_f64": 0,
+          "math.log2_f64": 0,
+          "dynamic sin(input as f64)_f64": 0
+        },
+        "interpolation_mathematical_error": [
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1075838976,
+            "correctly_rounded_mathematical_bits": 1075838976,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1092616192), stored_f32(0), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 1089470464,
+            "correctly_rounded_mathematical_bits": 1089470464,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 4278190078,
+            "correctly_rounded_mathematical_bits": 4278190079,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(1048576000))",
+            "precision": 32,
+            "actual_bits": 2130706430,
+            "correctly_rounded_mathematical_bits": 2130706431,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095039), stored_f32(2139095039), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3212836864))",
+            "precision": 32,
+            "actual_bits": 3240099840,
+            "correctly_rounded_mathematical_bits": 3240099840,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1073741824))",
+            "precision": 32,
+            "actual_bits": 1101004800,
+            "correctly_rounded_mathematical_bits": 1101004800,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(1065353217), stored_f32(1065353216), stored_f32(1056964608))",
+            "precision": 32,
+            "actual_bits": 1065353216,
+            "correctly_rounded_mathematical_bits": 1065353216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 3156465416,
+            "correctly_rounded_mathematical_bits": 3156465415,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f32>(stored_f32(2139095038), stored_f32(2139095039), stored_f32(1061158912))",
+            "precision": 32,
+            "actual_bits": 2139095039,
+            "correctly_rounded_mathematical_bits": 2139095039,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(1075838976))",
+            "precision": 32,
+            "actual_bits": 1048576000,
+            "correctly_rounded_mathematical_bits": 1048576000,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(4286578687), stored_f32(2139095039), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(4286578687), stored_f32(0))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(2139095039), stored_f32(2139095038), stored_f32(4286578687))",
+            "precision": 32,
+            "actual_bits": 1275068415,
+            "correctly_rounded_mathematical_bits": 1275068415,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1), stored_f32(3), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1056964608,
+            "correctly_rounded_mathematical_bits": 1056964608,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1), stored_f32(2))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(0), stored_f32(1092616192), stored_f32(3240099840))",
+            "precision": 32,
+            "actual_bits": 3212836864,
+            "correctly_rounded_mathematical_bits": 3212836864,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(3184315597), stored_f32(1045220557), stored_f32(1050253722))",
+            "precision": 32,
+            "actual_bits": 1068149418,
+            "correctly_rounded_mathematical_bits": 1068149419,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.inverse_lerp<f32>(stored_f32(1065353216), stored_f32(1065353217), stored_f32(1065353218))",
+            "precision": 32,
+            "actual_bits": 1073741824,
+            "correctly_rounded_mathematical_bits": 1073741824,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4612811918334230528,
+            "correctly_rounded_mathematical_bits": 4612811918334230528,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4621819117588971520), stored_f64(0), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 4620130267728707584,
+            "correctly_rounded_mathematical_bits": 4620130267728707584,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 0,
+            "correctly_rounded_mathematical_bits": 0,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 18437736874454810622,
+            "correctly_rounded_mathematical_bits": 18437736874454810623,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(4598175219545276416))",
+            "precision": 64,
+            "actual_bits": 9214364837600034814,
+            "correctly_rounded_mathematical_bits": 9214364837600034815,
+            "ulp_distance": 1
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405311), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13830554455654793216))",
+            "precision": 64,
+            "actual_bits": 13845191154443747328,
+            "correctly_rounded_mathematical_bits": 13845191154443747328,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4611686018427387904))",
+            "precision": 64,
+            "actual_bits": 4626322717216342016,
+            "correctly_rounded_mathematical_bits": 4626322717216342016,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 2,
+            "correctly_rounded_mathematical_bits": 2,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(4607182418800017409), stored_f64(4607182418800017408), stored_f64(4602678819172646912))",
+            "precision": 64,
+            "actual_bits": 4607182418800017408,
+            "correctly_rounded_mathematical_bits": 4607182418800017408,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 13800290266158863480,
+            "correctly_rounded_mathematical_bits": 13800290266158863485,
+            "ulp_distance": 5
+          },
+          {
+            "label": "math.lerp<f64>(stored_f64(9218868437227405310), stored_f64(9218868437227405311), stored_f64(4604930618986332160))",
+            "precision": 64,
+            "actual_bits": 9218868437227405311,
+            "correctly_rounded_mathematical_bits": 9218868437227405311,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(4612811918334230528))",
+            "precision": 64,
+            "actual_bits": 4598175219545276416,
+            "correctly_rounded_mathematical_bits": 4598175219545276416,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(18442240474082181119), stored_f64(9218868437227405311), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(18442240474082181119), stored_f64(0))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(9218868437227405311), stored_f64(9218868437227405310), stored_f64(18442240474082181119))",
+            "precision": 64,
+            "actual_bits": 4850376798678024191,
+            "correctly_rounded_mathematical_bits": 4850376798678024191,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(1), stored_f64(3), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4602678819172646912,
+            "correctly_rounded_mathematical_bits": 4602678819172646912,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(1), stored_f64(2))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(0), stored_f64(4621819117588971520), stored_f64(13845191154443747328))",
+            "precision": 64,
+            "actual_bits": 13830554455654793216,
+            "correctly_rounded_mathematical_bits": 13830554455654793216,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(13815242216921733530), stored_f64(4596373779694328218), stored_f64(4599075939470750515))",
+            "precision": 64,
+            "actual_bits": 4608683618675807573,
+            "correctly_rounded_mathematical_bits": 4608683618675807573,
+            "ulp_distance": 0
+          },
+          {
+            "label": "math.inverse_lerp<f64>(stored_f64(4607182418800017408), stored_f64(4607182418800017409), stored_f64(4607182418800017410))",
+            "precision": 64,
+            "actual_bits": 4611686018427387904,
+            "correctly_rounded_mathematical_bits": 4611686018427387904,
+            "ulp_distance": 0
+          }
+        ]
+      },
+      "stdout_sha256": "efecbaf333ba2a6a15d9e868bdb1889b90d4be6725011d3196462ad6e4895f15"
+    }
+  ]
+}

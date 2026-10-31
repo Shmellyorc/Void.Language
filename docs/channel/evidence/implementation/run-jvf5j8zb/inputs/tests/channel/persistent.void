@@ -1,0 +1,93 @@
+use channel
+use convert
+
+struct marker:
+    a: i64
+    b: i64
+    c: i64
+
+var bus = channel.router<i32>()
+var saved: channel.subscription? = null
+var candidate: channel.subscription? = null
+var total = 0
+var cleaned = 0
+
+func original(const amount: i32):
+    total += amount
+
+func install(topic: string):
+    var witness = marker(a = 1234567, b = 23, c = 45)
+    var listener = func(const amount: i32):
+        total += (witness.a as i32) + amount
+    candidate = bus.subscribe(topic, listener)
+
+func fail_handler(const amount: i32):
+    defer cleanup()
+    total += 10
+    var zero = amount - amount
+    var failed = 1 / zero
+
+func cleanup():
+    cleaned += 1
+
+func entry(command: i32) -> i32:
+    if command == 0:
+        bus.clear()
+        saved = bus.subscribe("topic", original)
+        candidate = null
+        total = 0
+        return 0
+    if command == 1:
+        install("topic")
+        return 1
+    if command == 2:
+        if saved is Ok(var token):
+            if bus.unsubscribe(token):
+                return 1
+        return 0
+    if command == 3:
+        total = 0
+        bus.emit("topic", 1)
+        return total
+    if command == 4:
+        bus.clear()
+        return 0
+    if command == 5:
+        candidate = bus.subscribe("topic", original)
+        return 0
+    if command == 6:
+        bus.clear()
+        bus.subscribe("topic", fail_handler)
+        bus.subscribe("topic", original)
+        total = 0
+        bus.emit("topic", 1)
+        return -1
+    if command == 7:
+        return total * 10 + cleaned
+    if command == 8:
+        if candidate is Ok(var token):
+            if bus.unsubscribe(token):
+                return 1
+        return 0
+    if command == 9:
+        saved = null
+        candidate = null
+        return 0
+    if command == 10:
+        bus.subscribe("topic", original)
+        return 0
+    if command == 11:
+        return total
+    if command == 12:
+        install("other")
+        return 1
+    if command == 13:
+        total = 0
+        bus.emit("other", 1)
+        return total
+    if command == 14:
+        for index in 0..<128:
+            const token = bus.subscribe(convert.to_string(index), original)
+            bus.unsubscribe(token)
+        return 0
+    return -99

@@ -1,0 +1,10 @@
+use channel
+struct message:
+    amount: i32
+func receive(const amount: i32):
+    pass
+func main():
+    var bus = channel.router<message>()
+    bus.subscribe("t", func(payload: message):
+        payload.amount += 1
+    )

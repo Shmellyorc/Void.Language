@@ -1,0 +1,13 @@
+/tmp/VOID-log-frontend-ar4okd1w/main.void:3:13: error: Cannot mutate a const stored field outside its direct declaring initializer.
+    code: VOID2007
+
+ 3 |     problem.file_bytes = 1
+   |             ^^^^^^^^^^
+    Module: /main.void
+    Const field declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/log.void:112:11
+
+ 112 |     const file_bytes: i64
+     |           ^^^^^^^^^^
+    Module: /@stdlib/log.void
+    Hint: Prepare mutable child state before assigning the field in its owner's initializer.
+

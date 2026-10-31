@@ -1,0 +1,7 @@
+/tmp/VOID-log-frontend-uv9nnyi7/main.void:6:18: error: Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.
+    code: VOID1103
+
+ 6 |     return await spawn worker()
+   |                  ^^^^^
+    Module: /main.void
+

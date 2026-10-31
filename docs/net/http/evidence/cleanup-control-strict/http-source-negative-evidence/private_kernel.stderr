@@ -1,0 +1,8 @@
+/tmp/VOID HTTP rejection k95hqno7/private_kernel.void:2:1: error: Unknown function '_http_capabilities'.
+    code: VOID2003
+
+ 2 | _http_capabilities()
+   | ^^^^^^^^^^^^^^^^^^
+    Module: /private_kernel.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+

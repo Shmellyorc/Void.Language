@@ -1,0 +1,23 @@
+{
+  "scope": "Read-only in-memory comparison; production binaries/cache identities are unchanged",
+  "ignored_fields": [
+    "one required cache-build identity string",
+    "ELF .note.gnu.build-id"
+  ],
+  "otherwise_identical": false,
+  "binaries": [
+    {
+      "binary": "build/llvm23-release/voidc",
+      "cache_identity": "6e4c62f53522e940fe9bf2e293955885f0dbe41a51d3eae2b364760b02b48d54",
+      "embedded_occurrences": 1,
+      "normalized_sha256": "8019902f1b2596950a7fe14429d72cff2ce497ec287deefda5e15dd8542d366c"
+    },
+    {
+      "binary": ".toolchains/HTTP final output \u96ea #/voidc",
+      "cache_identity": "be24ec19a022400193835f94b80c69ec7e05d14eed52393e639fba3ec03fb85e",
+      "embedded_occurrences": 1,
+      "normalized_sha256": "eb495167c5980a7653a9f0e0501408cb26f1f0fa12777b393979ed590b0528f7"
+    }
+  ],
+  "follow_up": "Byte-zeroing is not a link reproduction; http-final-clean-identity-link.json proves byte-identical reproduction by substituting only the cache-identity archive."
+}

@@ -1,0 +1,3 @@
+use math
+func main():
+    var result = math.atan2<bool>(true, true)

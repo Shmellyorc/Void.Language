@@ -1,0 +1,4 @@
+use math
+func main():
+    var input: i64 = 1
+    var bad = math.round(input)

@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-mtl7eu7d/callback-arity.void:8:24: error: Type mismatch: expected func(readonly i32), received func().
+    code: VOID2001
+
+ 8 |     bus.subscribe("t", func():
+   |                        ^^^^
+    Module: /callback-arity.void
+    Expected: func(readonly i32)
+    Received: func()
+

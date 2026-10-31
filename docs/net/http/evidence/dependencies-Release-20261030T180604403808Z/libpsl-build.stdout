@@ -1,0 +1,7 @@
+/usr/bin/python3 /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/src/psl-make-dafsa --output-format=cxx+ "/home/shmellyorc/Documents/Void.Language/third_party/publicsuffix/public_suffix_list.dat" suffixes_dafsa.h
+make  all-am
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl/src'
+  CC       libpsl_la-psl.lo
+  CC       libpsl_la-lookup_string_in_fixed_set.lo
+  CCLD     libpsl.la
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl/src'

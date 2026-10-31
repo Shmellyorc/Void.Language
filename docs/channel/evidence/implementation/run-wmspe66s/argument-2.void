@@ -1,0 +1,10 @@
+use channel
+struct message:
+    amount: i32
+func receive(const amount: i32):
+    pass
+async func listener(const amount: i32):
+    pass
+func main():
+    var bus = channel.router<i32>()
+    bus.subscribe("t", listener)

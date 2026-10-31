@@ -1,0 +1,29 @@
+Unknown flag: -set_serial
+-help               Display option summary
+-in                 Certificate input, or CSR input file with -req
+-req                Input is a CSR file (rather than a certificate)
+-signkey            Causes input file to be self signed using supplied private key
+-inform             This specifies the input format normally the command will expect an X509 certificate but this can change if other options such as -req are present. The DER format is the DER encoding of the certificate and PEM is the base64 encoding of the DER encoding with header and footer lines added. The default format is PEM.
+-out                Filepath to write all output to, if not set write to stdout
+-outform            Output format (DER or PEM) - default PEM
+-passin             Private key pass-phrase source
+-CA                 Use the given CA certificate to sign certificates. Cannot be used with -signkey
+-CAkey              The corresponding CA key. If not specified, the private key is assumed to be in the CA file
+-noout              Prevents output of the encoded version of the certificate
+-dates              Print the start and expiry dates of a certificate
+-modulus            Prints out value of the modulus of the public key contained in the certificate
+-subject            Prints the subject name
+-nameopt            Subject/issuer name printing format for -subject and -text. One of: compat, oneline, RFC2253, multiline. Default matches modern OpenSSL for -subject; -text's rendering is unchanged unless -nameopt is given
+-subject_hash       Prints subject hash value
+-subject_hash_old   Prints old OpenSSL style (MD5) subject hash value
+-fingerprint        Prints the certificate fingerprint
+-pubkey             Print the public key in PEM format
+-text               Pretty print the contents of the certificate
+-enddate            Prints out the expiry date of the certificate, that is the notAfter date.
+-checkend           Check whether cert expires in the next arg seconds
+-days               Number of days until newly generated certificate expires - default 30
+-extfile            Config file with X509V3 extensions to add
+-extensions         Section of extfile to use - default: unnamed section
+-serial             Print the certificate serial number
+-addtrust           Add a trusted use (e.g. clientAuth, serverAuth) to the certificate
+-trustout           Output the certificate as a trusted certificate

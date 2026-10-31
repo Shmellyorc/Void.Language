@@ -1,0 +1,19 @@
+use net/http
+
+async func exercise() -> result<i32, http.error>:
+    with http.open_client()? as owner:
+        var reply = (await owner.get_async("http://127.0.0.1:32885/plain"))?
+        if reply.bytes.count != 11:
+            return Ok(1)
+        with owner.start(http.request(target = "http://127.0.0.1:32885/plain"))? as exchange:
+            var info = (await exchange.response_async())?
+            var first = (await exchange.read_bytes_async(3))?
+            if info.status != 200 or first.bytes.count == 0:
+                return Ok(1)
+            var closed = (await exchange.close_async())?
+    return Ok(7)
+
+async func entry(input: i32) -> i32:
+    if (await exercise()) is Ok(var answer):
+        return answer
+    return 1

@@ -1,0 +1,10 @@
+{
+  "scope": "review candidate only; approved dependency pins unchanged",
+  "name": "AWS-LC",
+  "version": "5.12.0",
+  "revision": "cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+  "archive_url": "https://codeload.github.com/aws/aws-lc/tar.gz/cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+  "archive_sha256": "1de549ad9ac709d08a7e26ac5aa77dc90d55811c5c5c54b4ec3e442b00e98e68",
+  "bytes": 154548427,
+  "source_path": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8"
+}

@@ -1,0 +1,13 @@
+use net/http
+
+async func entry(value: i32) -> i32:
+    if http.open_client() is Ok(var owner):
+        with owner:
+            if owner.start(http.request(target = "http://127.0.0.1:36703/held")) is Ok(var exchange):
+                with exchange:
+                    var first = exchange.read_bytes_async()
+                    if (await first) is Ok(var block):
+                        if (await first) is Ok(var again):
+                            if block.bytes.count > 0 and block.bytes.count == again.bytes.count:
+                                return value + 2
+    return -1

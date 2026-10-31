@@ -1,0 +1,591 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/tmp/VOID HTTP measurements x5f0emca/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/tmp/VOID HTTP measurements x5f0emca/key.pem",
+      "-out",
+      "/tmp/VOID HTTP measurements x5f0emca/cert.pem"
+    ],
+    "label": "certificate",
+    "exit_code": 0,
+    "seconds": 0.11273418400378432,
+    "child_cpu_seconds": 0.1
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http-timer-final-release/void_http_performance",
+      "http://127.0.0.1:33707",
+      "https://127.0.0.1:35853",
+      "https://127.0.0.1:44693",
+      "/tmp/VOID HTTP measurements x5f0emca/cert.pem"
+    ],
+    "label": "network",
+    "exit_code": 0,
+    "seconds": 1.6655061400015256,
+    "child_cpu_seconds": 0.31999999999999995
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void"
+    ],
+    "label": "plain-normal-check-0",
+    "exit_code": 0,
+    "seconds": 0.005338512004527729,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "label": "plain-normal-jit-0",
+    "exit_code": 0,
+    "seconds": 0.017353847004415,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/plain-normal",
+      "--no-opt"
+    ],
+    "label": "plain-normal-aot-0",
+    "exit_code": 0,
+    "seconds": 0.15150704600091558,
+    "child_cpu_seconds": 0.15999999999999998
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/plain-normal"
+    ],
+    "label": "plain-normal-run-0",
+    "exit_code": 0,
+    "seconds": 0.003565831000742037,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void"
+    ],
+    "label": "plain-normal-check-1",
+    "exit_code": 0,
+    "seconds": 0.005570460001763422,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "label": "plain-normal-jit-1",
+    "exit_code": 0,
+    "seconds": 0.017235847997653764,
+    "child_cpu_seconds": 0.020000000000000018
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/plain-normal",
+      "--no-opt"
+    ],
+    "label": "plain-normal-aot-1",
+    "exit_code": 0,
+    "seconds": 0.16393532900110586,
+    "child_cpu_seconds": 0.17000000000000004
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/plain-normal"
+    ],
+    "label": "plain-normal-run-1",
+    "exit_code": 0,
+    "seconds": 0.0034864319968619384,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void"
+    ],
+    "label": "plain-normal-check-2",
+    "exit_code": 0,
+    "seconds": 0.006371885996486526,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "label": "plain-normal-jit-2",
+    "exit_code": 0,
+    "seconds": 0.020703018999483902,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/plain-normal",
+      "--no-opt"
+    ],
+    "label": "plain-normal-aot-2",
+    "exit_code": 0,
+    "seconds": 0.1888605349959107,
+    "child_cpu_seconds": 0.20999999999999996
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/plain-normal"
+    ],
+    "label": "plain-normal-run-2",
+    "exit_code": 0,
+    "seconds": 0.004411866997543257,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void"
+    ],
+    "label": "plain-optimized-check-0",
+    "exit_code": 0,
+    "seconds": 0.007979326997883618,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "--no-cache"
+    ],
+    "label": "plain-optimized-jit-0",
+    "exit_code": 0,
+    "seconds": 0.02303001599648269,
+    "child_cpu_seconds": 0.030000000000000027
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/plain-optimized"
+    ],
+    "label": "plain-optimized-aot-0",
+    "exit_code": 0,
+    "seconds": 0.1840343509975355,
+    "child_cpu_seconds": 0.17999999999999994
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/plain-optimized"
+    ],
+    "label": "plain-optimized-run-0",
+    "exit_code": 0,
+    "seconds": 0.0029005149990553036,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void"
+    ],
+    "label": "plain-optimized-check-1",
+    "exit_code": 0,
+    "seconds": 0.005982126996968873,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "--no-cache"
+    ],
+    "label": "plain-optimized-jit-1",
+    "exit_code": 0,
+    "seconds": 0.018812909002008382,
+    "child_cpu_seconds": 0.020000000000000018
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/plain-optimized"
+    ],
+    "label": "plain-optimized-aot-1",
+    "exit_code": 0,
+    "seconds": 0.14875631000177236,
+    "child_cpu_seconds": 0.16000000000000014
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/plain-optimized"
+    ],
+    "label": "plain-optimized-run-1",
+    "exit_code": 0,
+    "seconds": 0.0025125869942712598,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void"
+    ],
+    "label": "plain-optimized-check-2",
+    "exit_code": 0,
+    "seconds": 0.0056648190002306364,
+    "child_cpu_seconds": 0.009999999999999787
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "--no-cache"
+    ],
+    "label": "plain-optimized-jit-2",
+    "exit_code": 0,
+    "seconds": 0.021423404999950435,
+    "child_cpu_seconds": 0.020000000000000018
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/plain.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/plain-optimized"
+    ],
+    "label": "plain-optimized-aot-2",
+    "exit_code": 0,
+    "seconds": 0.14992563399573555,
+    "child_cpu_seconds": 0.1499999999999999
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/plain-optimized"
+    ],
+    "label": "plain-optimized-run-2",
+    "exit_code": 0,
+    "seconds": 0.002652226001373492,
+    "child_cpu_seconds": 0.010000000000000009
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void"
+    ],
+    "label": "imported-normal-check-0",
+    "exit_code": 0,
+    "seconds": 0.2514734190044692,
+    "child_cpu_seconds": 0.25
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "label": "imported-normal-jit-0",
+    "exit_code": 0,
+    "seconds": 0.7323825750063406,
+    "child_cpu_seconds": 0.72
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/imported-normal",
+      "--no-opt"
+    ],
+    "label": "imported-normal-aot-0",
+    "exit_code": 0,
+    "seconds": 0.8408379430038622,
+    "child_cpu_seconds": 0.8400000000000003
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/imported-normal"
+    ],
+    "label": "imported-normal-run-0",
+    "exit_code": 0,
+    "seconds": 0.004107957996893674,
+    "child_cpu_seconds": 0.009999999999999787
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void"
+    ],
+    "label": "imported-normal-check-1",
+    "exit_code": 0,
+    "seconds": 0.36754912499600323,
+    "child_cpu_seconds": 0.3599999999999999
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "label": "imported-normal-jit-1",
+    "exit_code": 0,
+    "seconds": 0.8507921089985757,
+    "child_cpu_seconds": 0.8400000000000007
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/imported-normal",
+      "--no-opt"
+    ],
+    "label": "imported-normal-aot-1",
+    "exit_code": 0,
+    "seconds": 0.9270910489940434,
+    "child_cpu_seconds": 0.9299999999999997
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/imported-normal"
+    ],
+    "label": "imported-normal-run-1",
+    "exit_code": 0,
+    "seconds": 0.003351731997099705,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void"
+    ],
+    "label": "imported-normal-check-2",
+    "exit_code": 0,
+    "seconds": 0.24699688300461276,
+    "child_cpu_seconds": 0.25
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "label": "imported-normal-jit-2",
+    "exit_code": 0,
+    "seconds": 1.0110592489945702,
+    "child_cpu_seconds": 1.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/imported-normal",
+      "--no-opt"
+    ],
+    "label": "imported-normal-aot-2",
+    "exit_code": 0,
+    "seconds": 0.903734474995872,
+    "child_cpu_seconds": 0.9000000000000004
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/imported-normal"
+    ],
+    "label": "imported-normal-run-2",
+    "exit_code": 0,
+    "seconds": 0.004243837000103667,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void"
+    ],
+    "label": "imported-optimized-check-0",
+    "exit_code": 0,
+    "seconds": 0.24325473299541045,
+    "child_cpu_seconds": 0.23999999999999932
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "--no-cache"
+    ],
+    "label": "imported-optimized-jit-0",
+    "exit_code": 0,
+    "seconds": 0.8892893939992064,
+    "child_cpu_seconds": 0.8799999999999999
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/imported-optimized"
+    ],
+    "label": "imported-optimized-aot-0",
+    "exit_code": 0,
+    "seconds": 0.800613630002772,
+    "child_cpu_seconds": 0.8099999999999987
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/imported-optimized"
+    ],
+    "label": "imported-optimized-run-0",
+    "exit_code": 0,
+    "seconds": 0.003556900999683421,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void"
+    ],
+    "label": "imported-optimized-check-1",
+    "exit_code": 0,
+    "seconds": 0.2559214159991825,
+    "child_cpu_seconds": 0.26000000000000156
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "--no-cache"
+    ],
+    "label": "imported-optimized-jit-1",
+    "exit_code": 0,
+    "seconds": 0.6818098579969956,
+    "child_cpu_seconds": 0.6699999999999999
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/imported-optimized"
+    ],
+    "label": "imported-optimized-aot-1",
+    "exit_code": 0,
+    "seconds": 0.8132734610044281,
+    "child_cpu_seconds": 0.8200000000000003
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/imported-optimized"
+    ],
+    "label": "imported-optimized-run-1",
+    "exit_code": 0,
+    "seconds": 0.0029076949940645136,
+    "child_cpu_seconds": 0.0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void"
+    ],
+    "label": "imported-optimized-check-2",
+    "exit_code": 0,
+    "seconds": 0.23036754300119355,
+    "child_cpu_seconds": 0.23999999999999844
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "--no-cache"
+    ],
+    "label": "imported-optimized-jit-2",
+    "exit_code": 0,
+    "seconds": 0.6790655730001163,
+    "child_cpu_seconds": 0.6699999999999999
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP measurements x5f0emca/imported.void",
+      "-o",
+      "/tmp/VOID HTTP measurements x5f0emca/imported-optimized"
+    ],
+    "label": "imported-optimized-aot-2",
+    "exit_code": 0,
+    "seconds": 0.8529436280005029,
+    "child_cpu_seconds": 0.8600000000000012
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP measurements x5f0emca/imported-optimized"
+    ],
+    "label": "imported-optimized-run-2",
+    "exit_code": 0,
+    "seconds": 0.0029416040051728487,
+    "child_cpu_seconds": 0.0
+  }
+]

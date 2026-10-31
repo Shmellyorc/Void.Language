@@ -1,0 +1,57 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_native",
+    "http://127.0.0.1:33037",
+    "https://127.0.0.1:33799",
+    "/tmp/VOID HTTP native 44femf52/cert.pem",
+    "https://127.0.0.1:56163",
+    "https://127.0.0.1:38441",
+    "/tmp/VOID HTTP native 44femf52/cert.pem",
+    "/tmp/VOID HTTP native 44femf52/key.pem",
+    "/tmp/VOID HTTP native 44femf52/identity.p12",
+    "/tmp/VOID HTTP native 44femf52",
+    "http://127.0.0.1:33873",
+    "https://127.0.0.1:39713",
+    "48653"
+  ],
+  "exit_code": 1,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 2.5707001660011883,
+  "binary_sha256": "0ccac268ef56d4ef18b66e9f2e2f8a78baa972b912906c3757476f0b445b925f",
+  "source_sha256": {
+    "src/runtime/http.cpp": "bf74c1fd1455641fc1ea81ba9f137b33bbc238e7643b33e5b3489c66f209fcc4",
+    "src/runtime/http_bulk.cpp": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+    "src/runtime/http_resource.cpp": "d0367326f4f9ba2680a9619062b9ff12f595166c8751da1fb60aa7aa3907397e",
+    "include/void/http.hpp": "d4e076d57f8ba95653078ce4f2759542985b2340859618bafa1d45801624fe0d",
+    "tests/net/http/native.cpp": "ebee9351a300edaee3966a98505f2c6a89cc5786b64306a411f3e2e6e8bd7a9b",
+    "tests/net/http/runtime.cpp": "162f9e75ec8a0e166258b4161b8e75f1fcf8c57e89c8c8f0f6cb478b8620f39d",
+    "tests/net/http/fixture.py": "e98ddc30f7b27e0483330c94f81d11a23d51512480a48905035979c25ea1c4c2",
+    "third_party/curl/VOID-PROVENANCE.json": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+    "third_party/http-versions.json": "061c7073ec1657825cf31a1a0a3ec6bb717738e3a7fa65fd15b328ac6ac0f3da"
+  },
+  "soft_hard_stack_bytes": [
+    8388608,
+    -1
+  ],
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  },
+  "http2_fixture": true,
+  "socks_address_types": [
+    1,
+    3
+  ],
+  "async_pull_bytes": 134217728,
+  "runtime_samples": [],
+  "proxy_digest_events": [
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:33037/plain",
+      "digest_uri": "/plain",
+      "valid": false
+    }
+  ],
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

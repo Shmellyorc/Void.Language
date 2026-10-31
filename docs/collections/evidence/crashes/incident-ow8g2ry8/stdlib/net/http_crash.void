@@ -1,0 +1,1387 @@
+use error as core
+use url
+use io
+use text as textlib
+
+## Portable categories of recoverable HTTP preparation, transport and file failures.
+enum error_kind:
+    ## An argument, range, method or configuration is invalid.
+    invalid_argument
+    ## Shared URL preparation failed; inspect url_cause.
+    invalid_url
+    ## A name/value or transport-owned header violates the field contract.
+    invalid_header
+    ## Text, charset or representation decoding is invalid or unsupported.
+    invalid_encoding
+    ## The selected backend feature is unavailable.
+    unsupported
+    ## The resource is closed or the operation was cancelled.
+    closed
+    ## A conflicting operation or finite admission slot is unavailable.
+    busy
+    ## A byte, metadata, cookie, TLS-input or native budget would be exceeded.
+    limit_exceeded
+    ## Native asynchronous resolution failed.
+    resolve_failed
+    ## The endpoint connection failed.
+    connect_failed
+    ## TLS chain or hostname verification failed.
+    tls_verification
+    ## Another TLS handshake/identity operation failed.
+    tls_failure
+    ## Proxy negotiation or authentication failed.
+    proxy_failed
+    ## The indicated phase or total deadline expired.
+    timeout
+    ## Response framing or stream metadata is invalid.
+    protocol_error
+    ## Origin, downgrade or credential policy denied a redirect.
+    redirect_denied
+    ## The redirect hop limit was exceeded.
+    redirect_limit
+    ## A consumed stream/file would need to be replayed.
+    body_not_replayable
+    ## A final response or redirect stopped the original producer.
+    upload_stopped
+    ## Declared response/file bytes ended early.
+    unexpected_eof
+    ## The borrowed file operation failed; inspect io_cause.
+    io_failure
+    ## A status/convenience check rejected the response while retaining metadata.
+    http_status
+    ## Another native transport operation failed.
+    transport_failure
+
+
+## Stage of the primary failure; failure or cancellation does not imply remote rollback.
+enum failure_phase:
+    ## Input validation or owned snapshot construction.
+    prepare
+    ## Bounded native admission/registration.
+    queue
+    ## Native hostname resolution.
+    dns
+    ## Endpoint connection establishment.
+    connect
+    ## Proxy connection/tunnel/authentication.
+    proxy
+    ## Verified TLS negotiation or identity setup.
+    tls
+    ## Response/interim headers, redirects or cookies.
+    headers
+    ## Producer/framing or request bytes sent.
+    upload
+    ## Response transport or consumer deadline.
+    download
+    ## Incremental representation decoding.
+    decode
+    ## Borrowed current-cursor file IO.
+    file
+    ## Cancellation, close and native quiescence.
+    cleanup
+
+
+## Request protocol policy. Required HTTP/2 checks verified origin ALPN before request bytes.
+enum protocol:
+    ## Prefer h2 over HTTPS with HTTP/1.1 fallback; plain HTTP uses HTTP/1.1.
+    negotiate
+    ## Use HTTP/1.1 request framing.
+    http1
+    ## Require verified HTTPS h2 ALPN before request bytes.
+    http2_required
+
+
+## Actual response protocol, independently of the request preference.
+enum http_version:
+    ## The peer replied using HTTP/1.0.
+    http1_0
+    ## The peer replied using HTTP/1.1.
+    http1_1
+    ## Verified origin ALPN selected actual HTTP/2.
+    http2
+
+
+## Redirect origin/credential policy. HTTPS downgrade is always denied.
+enum redirect_policy:
+    ## Return Location/status without following.
+    none
+    ## Follow only the same scheme, host and effective port.
+    same_origin
+    ## Permit cross-origin GET/HEAD after dropping caller fields; credentials still forbid migration.
+    safe
+
+
+## Address-family selection for native asynchronous resolution and connection attempts.
+enum ip_family:
+    ## Allow native IPv4/IPv6 selection.
+    any
+    ## Use IPv4 only.
+    v4
+    ## Use IPv6 only.
+    v6
+
+
+## Choose bounded incremental gzip/deflate decoding or encoded representation bytes.
+enum content_decoding:
+    ## Advertise and incrementally validate gzip/deflate.
+    decoded
+    ## Preserve representation bytes and original headers.
+    raw
+
+
+## Routing policy; ambient proxy configuration is ignored unless explicitly selected.
+enum proxy_mode:
+    ## Ignore ambient proxy variables.
+    direct
+    ## Own an environment snapshot at client creation, with CGI-safe HTTP proxy rules.
+    environment
+    ## Use endpoint/no_proxy without environment fallback.
+    explicit
+
+
+## Transport-owned origin credentials, permitted only for HTTPS.
+enum authentication:
+    ## No configured origin authentication.
+    none
+    ## HTTPS bearer token, excluding invalid field controls.
+    bearer(token: string)
+    ## HTTPS Basic username/password.
+    basic(user: string, password: string)
+    ## HTTPS Digest username/password challenge exchange; consumed bodies cannot be silently replayed.
+    digest(user: string, password: string)
+
+
+## Verified server trust; custom roots replace system roots without disabling hostname checks.
+enum trust_source:
+    ## Use native/distribution trust with hostname verification.
+    system
+    ## Replace system roots with a regular PEM bundle, owned at client creation.
+    pem_bundle(path: string)
+
+
+## Explicit mutual-TLS identity; unsupported backend forms fail before sending.
+enum client_identity:
+    ## Send no client certificate.
+    none
+    ## Regular PEM certificate chain/key paths and explicit key password.
+    pem(certificate: string, key: string, password: string)
+    ## Regular PKCS#12 identity path and import password.
+    pkcs12(path: string, password: string)
+    ## Native Windows location\store\40-hex-thumbprint reference; other backends return unsupported.
+    windows_store(reference: string)
+
+
+## One ordered field with an ASCII token name and independent byte value.
+value struct header:
+    ## ASCII field/parameter name, preserved in the owned snapshot.
+    name: string
+    ## Owned bytes excluding NUL, CR/LF, DEL and disallowed controls; HTAB and obs-text remain permitted.
+    value: [u8]
+    ## Treat as credentials: cross-origin redirects are denied.
+    sensitive: bool = false
+
+
+## Multipart payload, including caller-owned files borrowed at their current cursor.
+enum part_data:
+    ## Snapshot arbitrary part bytes.
+    bytes(value: [u8])
+    ## Encode the source string once as UTF-8.
+    text(value: string)
+    ## Borrow source at its current cursor for count bytes, or -1 through EOF; never close it.
+    file(source: io.file, count: i64)
+
+
+## One multipart field. Filename is metadata, not an implicit file-open operation.
+struct part:
+    ## ASCII field/parameter name, preserved in the owned snapshot.
+    name: string
+    ## Optional multipart filename metadata, never a local input path.
+    filename: string
+    ## Optional media type; empty uses the provider default.
+    content_type: string
+    ## Owned ordered fields; duplicate names remain separate.
+    headers: [header]
+    ## Bytes, UTF-8 text or an exclusively borrowed current-cursor file.
+    data: part_data
+
+
+## Request payload description, snapshotted before transport use.
+enum body:
+    ## No request body.
+    empty
+    ## Snapshot arbitrary bytes within the request graph budget.
+    bytes(value: [u8])
+    ## Encode once as UTF-8 with the default text content type if absent.
+    text(value: string)
+    ## Encode ordered url.query_item pairs once, retaining duplicates, bare flags and form-space rules.
+    form(items: [url.query_item])
+    ## At most 128 bounded fields, with worker-driven borrowed file parts.
+    multipart(parts: [part])
+    ## Declared producer length, or -1 for unknown; use write_bytes and finish_upload.
+    stream(length: i64)
+
+
+## Mutable request description. Submission owns a snapshot before asynchronous native use.
+struct request:
+    ## Exact ASCII method token, default GET. CONNECT and TRACE are unsupported.
+    method: string = "GET"
+    ## Explicit HTTP(S) URL, at most 16 KiB, without userinfo or scoped IPv6 zones.
+    target: string
+    ## Owned ordered fields; duplicate names remain separate.
+    headers: [header]
+    ## Payload description; GET and HEAD require body.empty.
+    body: body = body.empty
+    ## Explicit authentication. Origin credentials require HTTPS; proxy credentials require an HTTPS proxy.
+    auth: authentication = authentication.none
+
+
+## Value TLS configuration. Explicit input files are snapshotted at client creation; their combined limit is 1 MiB.
+value struct tls_options:
+    ## System trust or a replacement regular PEM bundle; verification remains enabled.
+    trust: trust_source = trust_source.system
+    ## Explicit supported client identity; no ambient identity discovery.
+    identity: client_identity = client_identity.none
+
+
+## Value routing configuration, snapshotted at client creation.
+value struct proxy_options:
+    ## Direct by default; environment routing requires explicit opt-in.
+    mode: proxy_mode = proxy_mode.direct
+    ## HTTP/HTTPS/SOCKS5/SOCKS5H proxy URL without embedded credentials.
+    endpoint: string
+    ## Explicit authentication. Origin credentials require HTTPS; proxy credentials require an HTTPS proxy.
+    auth: authentication = authentication.none
+    ## Explicit bypass patterns, at most 1024 entries; each entry excludes commas.
+    no_proxy: [string]
+
+
+## Value pool/TLS/proxy/session configuration. Finite caps and native admission both apply.
+value struct client_options:
+    ## Verified trust and explicit client identity policy.
+    tls: tls_options = tls_options()
+    ## Owned routing/environment snapshot policy.
+    proxy: proxy_options = proxy_options()
+    ## Enable this client's in-memory session, off by default; 1024 cookies/1 MiB serialized.
+    cookies: bool = false
+    ## Concurrent transfers for this client, 1..4, subject to Runtime admission.
+    max_active: i64 = 4
+    ## Connection cap, 1..4, subject to the Runtime connection and memory budgets.
+    max_connections: i64 = 4
+    ## Connections per origin, 1..max_connections.
+    max_per_origin: i64 = 2
+    ## Concurrent HTTP/2 streams per connection, 1..4.
+    max_http2_streams: i64 = 4
+    ## Retained idle connections, 1..max_connections.
+    max_idle: i64 = 4
+    ## Positive reusable idle-connection age, rounded up to provider seconds.
+    idle_timeout_ms: i64 = 60000
+    ## Positive maximum reusable connection lifetime, rounded up to provider seconds.
+    connection_lifetime_ms: i64 = 300000
+    ## Positive native DNS cache age, rounded up to seconds; bounded capacity may evict earlier.
+    dns_cache_ms: i64 = 60000
+    ## Default User-Agent, at most 16 KiB; a valid caller field may replace it.
+    user_agent: string = "VOID"
+
+
+## Per-operation value policy. Positive byte limits apply independently of Content-Length.
+value struct request_options:
+    ## Negotiation policy; default negotiate.
+    protocol: protocol = protocol.negotiate
+    ## Native IPv4/IPv6 selection policy; default any.
+    ip_family: ip_family = ip_family.any
+    ## Bounded redirect policy; default safe. No automatic application retries.
+    redirects: redirect_policy = redirect_policy.safe
+    ## Maximum followed hops, 0..64; zero rejects the first followed redirect.
+    max_redirects: i64 = 10
+    ## Incremental decoded or raw representation bytes.
+    decoding: content_decoding = content_decoding.decoded
+    ## Positive maximum total representation bytes before decoding.
+    max_encoded_bytes: i64 = 67108864
+    ## Positive maximum total bytes after decoding.
+    max_decoded_bytes: i64 = 67108864
+    ## Positive maximum buffered response bytes for send/get/upload.
+    max_buffer_bytes: i64 = 67108864
+    ## Positive per-connection deadline covering DNS, proxy, TCP and TLS.
+    connect_timeout_ms: i64 = 10000
+    ## Final-header deadline after request upload completes; zero disables this phase timer.
+    header_timeout_ms: i64 = 30000
+    ## Read inactivity deadline; application backpressure pauses it. Zero disables the phase timer.
+    read_timeout_ms: i64 = 30000
+    ## Upload inactivity deadline while producer bytes are available; zero disables it.
+    write_timeout_ms: i64 = 30000
+    ## Whole-operation deadline including application pause; zero disables it.
+    total_timeout_ms: i64 = 120000
+
+
+## Owned redirect-origin history without path/query secrets.
+struct redirect_info:
+    ## HTTP status when available, otherwise zero in errors.
+    const status: i32
+    ## Previous scheme, host and effective port without path/query.
+    const from_origin: string
+    ## Next scheme, host and effective port without path/query.
+    const to_origin: string
+    ## True when redirect rules changed the method and discarded its body.
+    const method_changed: bool
+
+
+## Owned final response metadata; lists preserve duplicate fields and arrival order.
+struct response_info:
+    ## HTTP status when available, otherwise zero in errors.
+    const status: i32
+    ## Actual response protocol.
+    const version: http_version
+    ## Final canonical URL; it may contain caller query data and is not generic diagnostic text.
+    const url: string
+    ## Owned ordered fields; duplicate names remain separate.
+    const headers: [header]
+    ## Bounded ordered redirect history.
+    const history: [redirect_info]
+    ## Original declared representation length, or -1 when absent.
+    const content_length: i64
+    ## True when returned body bytes passed through content decoding.
+    const content_decoded: bool
+
+
+## Owned buffered response. HTTP error status remains inspectable until require_success.
+struct response:
+    ## Owned available response metadata without duplicating its body.
+    const info: response_info
+    ## Owned independent body bytes.
+    bytes: [u8]
+    ## Owned validated trailing fields after body completion; 16 KiB/32 fields total, each H1 field below 4 KiB.
+    trailers: [header]
+
+
+## Independent body bytes. Chunk boundaries do not delimit messages or UTF-8 characters.
+struct chunk:
+    ## Owned independent body bytes.
+    bytes: [u8]
+    ## True only at clean framing/decoder completion.
+    eof: bool
+
+
+## Final metadata and actual transfer counters after native completion.
+struct transfer_info:
+    ## Owned available response metadata without duplicating its body.
+    const info: response_info
+    ## Owned validated trailing fields after body completion; 16 KiB/32 fields total, each H1 field below 4 KiB.
+    trailers: [header]
+    ## Actual request body bytes transmitted.
+    uploaded: i64
+    ## Actual received representation bytes before content decoding.
+    downloaded_encoded: i64
+    ## Actual decoded/raw bytes delivered; file progress is also retained in io_cause on failure.
+    downloaded: i64
+    ## Elapsed operation time in monotonic milliseconds.
+    elapsed_ms: i64
+
+
+## Safe managed failure retaining primary native diagnostics, response metadata and actual progress.
+struct error extends core.error:
+    ## Portable primary failure category.
+    const kind: error_kind
+    ## Public operation that reported the failure, without request secrets.
+    const operation: string
+    ## Stage of the primary failure.
+    const phase: failure_phase
+    ## Native code namespace: curl, curl_multi, zlib, filesystem, or empty.
+    const native_domain: string
+    ## Original native code, or zero for a policy/validation failure.
+    const native_code: i64
+    ## HTTP status when available, otherwise zero in errors.
+    const status: i32
+    ## Owned available response metadata without duplicating its body.
+    const info: response_info?
+    ## Actual request body bytes transmitted.
+    const uploaded: i64
+    ## Actual received representation bytes before content decoding.
+    const downloaded_encoded: i64
+    ## Actual decoded/raw bytes delivered; file progress is also retained in io_cause on failure.
+    const downloaded: i64
+    ## Underlying borrowed-file failure with native code, partial bytes and actual file progress.
+    const io_cause: io.error?
+    ## Shared URL parser/encoder cause, including an attributable input byte offset.
+    const url_cause: url.error?
+    ## Secondary native file cleanup code, or zero.
+    const cleanup_code: i64
+    ## The origin may have received request bytes; failure/cancellation does not undo their effects.
+    const remote_outcome_unknown: bool
+
+
+## Exact provider/version and available backend features; construction opens no connection.
+struct capabilities:
+    ## Exact linked libcurl version.
+    const transport_version: string
+    ## Exact TLS provider/version.
+    const tls_backend: string
+    ## Native asynchronous resolver provider/version.
+    const resolver: string
+    ## Internationalized-hostname provider/version.
+    const idn_provider: string
+    ## HTTP/1.1 transport is available.
+    const http1: bool
+    ## Actual nghttp2-backed HTTP/2 transport is available.
+    const http2: bool
+    ## HTTP/3 transport is available; false in this provider.
+    const http3: bool
+    ## Native IPv6 support is compiled in.
+    const ipv6: bool
+    ## System/platform trust loading is available.
+    const native_trust: bool
+    ## Bounded gzip decoding is available.
+    const gzip: bool
+    ## Bounded zlib-wrapped deflate decoding is available.
+    const deflate: bool
+    ## Cookie public-suffix checks are available.
+    const psl: bool
+    ## Supported explicit identity form names.
+    const client_identity_forms: [string]
+
+
+## Managed Runtime-owned pool/session. Obtain it through open_client and close it deterministically.
+struct client:
+    private _local: bool
+
+
+## Managed streaming exchange. Obtain it through client.start and close or use with.
+struct transfer:
+    private _local: bool
+
+
+private func (self client) init():
+    self._local = true
+
+
+private func (self transfer) init():
+    self._local = true
+
+
+private value struct _reply:
+    kind: i64
+    phase: i64
+    domain: i64
+    native_code: i64
+    unknown: bool
+    status: i64
+    version: i64
+    url: string
+    headers: [header]
+    history: [_history]
+    content_length: i64
+    decoded: bool
+    trailers: [header]
+    bytes: [u8]
+    number: i64
+    uploaded: i64
+    encoded: i64
+    downloaded: i64
+    elapsed: i64
+    eof: bool
+    file_completed: i64
+    io_kind: i64
+    io_code: i64
+    io_completed: i64
+    io_cleanup: i64
+    io_partial: [u8]
+    transport: string
+    tls: string
+    resolver: string
+    idn: string
+    features: i64
+    url_kind: i64
+    url_offset: i64 = -1
+
+
+private value struct _form_item:
+    name: string
+    value: string
+    has_value: bool
+
+
+private value struct _history:
+    status: i64
+    from_origin: string
+    to_origin: string
+    method_changed: bool
+
+
+private value struct _config:
+    ca: string
+    identity: i64
+    certificate: string
+    key: string
+    key_password: string
+    proxy_mode: i64
+    proxy_endpoint: string
+    proxy_auth: i64
+    proxy_user: string
+    proxy_password: string
+    no_proxy: [string]
+    cookies: bool
+    max_active: i64
+    max_connections: i64
+    max_per_origin: i64
+    max_http2_streams: i64
+    max_idle: i64
+    idle_timeout_ms: i64
+    connection_lifetime_ms: i64
+    dns_cache_ms: i64
+    user_agent: string
+
+
+private value struct _part:
+    name: string
+    filename: string
+    content_type: string
+    headers: [header]
+    data: [u8]
+    file: io.file?
+    count: i64 = -1
+
+
+private value struct _request:
+    method: string
+    target: string
+    headers: [header]
+    body_kind: i64
+    data: [u8]
+    parts: [_part]
+    length: i64 = -1
+    auth_kind: i64
+    auth_user: string
+    auth_password: string
+
+
+private value struct _options:
+    protocol: i64
+    ip_family: i64
+    redirects: i64
+    max_redirects: i64
+    decoding: i64
+    max_encoded_bytes: i64
+    max_decoded_bytes: i64
+    max_buffer_bytes: i64
+    connect_timeout_ms: i64
+    header_timeout_ms: i64
+    read_timeout_ms: i64
+    write_timeout_ms: i64
+    total_timeout_ms: i64
+
+
+private func _kind(value: i64) -> error_kind:
+    if value == 1:
+        return error_kind.invalid_argument
+    if value == 2:
+        return error_kind.invalid_url
+    if value == 3:
+        return error_kind.invalid_header
+    if value == 4:
+        return error_kind.invalid_encoding
+    if value == 5:
+        return error_kind.unsupported
+    if value == 6:
+        return error_kind.closed
+    if value == 7:
+        return error_kind.busy
+    if value == 8:
+        return error_kind.limit_exceeded
+    if value == 9:
+        return error_kind.resolve_failed
+    if value == 10:
+        return error_kind.connect_failed
+    if value == 11:
+        return error_kind.tls_verification
+    if value == 12:
+        return error_kind.tls_failure
+    if value == 13:
+        return error_kind.proxy_failed
+    if value == 14:
+        return error_kind.timeout
+    if value == 15:
+        return error_kind.protocol_error
+    if value == 16:
+        return error_kind.redirect_denied
+    if value == 17:
+        return error_kind.redirect_limit
+    if value == 18:
+        return error_kind.body_not_replayable
+    if value == 19:
+        return error_kind.upload_stopped
+    if value == 20:
+        return error_kind.unexpected_eof
+    if value == 21:
+        return error_kind.io_failure
+    if value == 22:
+        return error_kind.http_status
+    if value == 23:
+        return error_kind.transport_failure
+    return error_kind.transport_failure
+
+
+private func _phase(value: i64) -> failure_phase:
+    if value == 0:
+        return failure_phase.prepare
+    if value == 1:
+        return failure_phase.queue
+    if value == 2:
+        return failure_phase.dns
+    if value == 3:
+        return failure_phase.connect
+    if value == 4:
+        return failure_phase.proxy
+    if value == 5:
+        return failure_phase.tls
+    if value == 6:
+        return failure_phase.headers
+    if value == 7:
+        return failure_phase.upload
+    if value == 8:
+        return failure_phase.download
+    if value == 9:
+        return failure_phase.decode
+    if value == 10:
+        return failure_phase.file
+    if value == 11:
+        return failure_phase.cleanup
+    return failure_phase.cleanup
+
+
+private func _protocol(value: protocol) -> i64:
+    if value is protocol.negotiate:
+        return 0
+    if value is protocol.http1:
+        return 1
+    if value is protocol.http2_required:
+        return 2
+    return -1
+
+
+private func _ip_family(value: ip_family) -> i64:
+    if value is ip_family.any:
+        return 0
+    if value is ip_family.v4:
+        return 1
+    if value is ip_family.v6:
+        return 2
+    return -1
+
+
+private func _redirect_policy(value: redirect_policy) -> i64:
+    if value is redirect_policy.none:
+        return 0
+    if value is redirect_policy.same_origin:
+        return 1
+    if value is redirect_policy.safe:
+        return 2
+    return -1
+
+
+private func _content_decoding(value: content_decoding) -> i64:
+    if value is content_decoding.decoded:
+        return 0
+    if value is content_decoding.raw:
+        return 1
+    return -1
+
+
+private func _proxy_mode(value: proxy_mode) -> i64:
+    if value is proxy_mode.direct:
+        return 0
+    if value is proxy_mode.environment:
+        return 1
+    if value is proxy_mode.explicit:
+        return 2
+    return -1
+
+
+private func _options_of(value: request_options) -> _options:
+    return _options(
+        protocol = _protocol(value.protocol),
+        ip_family = _ip_family(value.ip_family),
+        redirects = _redirect_policy(value.redirects),
+        max_redirects = value.max_redirects,
+        decoding = _content_decoding(value.decoding),
+        max_encoded_bytes = value.max_encoded_bytes,
+        max_decoded_bytes = value.max_decoded_bytes,
+        max_buffer_bytes = value.max_buffer_bytes,
+        connect_timeout_ms = value.connect_timeout_ms,
+        header_timeout_ms = value.header_timeout_ms,
+        read_timeout_ms = value.read_timeout_ms,
+        write_timeout_ms = value.write_timeout_ms,
+        total_timeout_ms = value.total_timeout_ms
+    )
+
+
+private func _config_of(value: client_options) -> _config:
+    var result = _config(cookies = value.cookies, no_proxy = value.proxy.no_proxy,
+        proxy_mode = _proxy_mode(value.proxy.mode), proxy_endpoint = value.proxy.endpoint,
+        max_active = value.max_active, max_connections = value.max_connections,
+        max_per_origin = value.max_per_origin, max_http2_streams = value.max_http2_streams,
+        max_idle = value.max_idle, idle_timeout_ms = value.idle_timeout_ms,
+        connection_lifetime_ms = value.connection_lifetime_ms, dns_cache_ms = value.dns_cache_ms,
+        user_agent = value.user_agent)
+    if value.tls.trust is trust_source.pem_bundle(var path):
+        result.ca = path
+    if value.tls.identity is client_identity.pem(var certificate, var key, var password):
+        result.identity = 1
+        result.certificate = certificate
+        result.key = key
+        result.key_password = password
+    else if value.tls.identity is client_identity.pkcs12(var path, var password):
+        result.identity = 2
+        result.certificate = path
+        result.key_password = password
+    else if value.tls.identity is client_identity.windows_store(var reference):
+        result.identity = 3
+        result.certificate = reference
+    if value.proxy.auth is authentication.basic(var user, var password):
+        result.proxy_auth = 2
+        result.proxy_user = user
+        result.proxy_password = password
+    else if value.proxy.auth is authentication.digest(var user, var password):
+        result.proxy_auth = 3
+        result.proxy_user = user
+        result.proxy_password = password
+    else if value.proxy.auth is authentication.bearer(var token):
+        result.proxy_auth = 1
+        result.proxy_password = token
+    return result
+
+
+private func _request_of(value: request) -> result<_request, error>:
+    if value.headers.count > 128:
+        return Err(_error("prepare", _reply(kind = 8)))
+    var result = _request(method = value.method, target = value.target, headers = value.headers)
+    if value.auth is authentication.bearer(var token):
+        result.auth_kind = 1
+        result.auth_password = token
+    else if value.auth is authentication.basic(var user, var password):
+        result.auth_kind = 2
+        result.auth_user = user
+        result.auth_password = password
+    else if value.auth is authentication.digest(var user, var password):
+        result.auth_kind = 3
+        result.auth_user = user
+        result.auth_password = password
+    if value.body is body.bytes(var bytes):
+        result.body_kind = 1
+        result.data = bytes
+    else if value.body is body.text(var text):
+        if text.byte_length > 67108864:
+            return Err(_error("prepare", _reply(kind = 8)))
+        result.body_kind = 2
+        result.data = text.to_utf8()
+    else if value.body is body.form(var fields):
+        result.body_kind = 3
+        if fields.count > 1048576:
+            return Err(_error("prepare", _reply(kind = 8, url_kind = 5)))
+        var items: [_form_item]
+        var remaining: i64 = 67108864
+        for item in fields:
+            if item.name.byte_length > remaining:
+                return Err(_error("prepare", _reply(kind = 8, url_kind = 5)))
+            remaining -= item.name.byte_length
+            if item.has_value:
+                if item.value.byte_length > remaining:
+                    return Err(_error("prepare", _reply(kind = 8, url_kind = 5)))
+                remaining -= item.value.byte_length
+            items.push(_form_item(name = item.name, value = item.value, has_value = item.has_value))
+        var encoded = _http_form(items)
+        if encoded.kind != 0:
+            return Err(_error("prepare", encoded))
+        result.data = encoded.bytes
+    else if value.body is body.multipart(var parts):
+        if parts.count > 128:
+            return Err(_error("prepare", _reply(kind = 8)))
+        var remaining: i64 = 67108864
+        result.body_kind = 4
+        for item in parts:
+            if item.headers.count > 128:
+                return Err(_error("prepare", _reply(kind = 8)))
+            var packed = _part(name = item.name, filename = item.filename,
+                content_type = item.content_type, headers = item.headers)
+            if item.data is part_data.bytes(var bytes):
+                if bytes.count > remaining:
+                    return Err(_error("prepare", _reply(kind = 8)))
+                remaining -= bytes.count
+                packed.data = bytes
+            else if item.data is part_data.text(var text):
+                if text.byte_length > remaining:
+                    return Err(_error("prepare", _reply(kind = 8)))
+                remaining -= text.byte_length
+                packed.data = text.to_utf8()
+            else if item.data is part_data.file(var source_file, var count):
+                if count < -1:
+                    return Err(_error("prepare", _reply(kind = 1)))
+                packed.file = source_file
+                packed.count = count
+            result.parts.push(packed)
+    else if value.body is body.stream(var length):
+        result.body_kind = 5
+        result.length = length
+    return Ok(result)
+
+
+private func _info(reply: _reply) -> response_info:
+    var version = http_version.http1_1
+    if reply.version == 0:
+        version = http_version.http1_0
+    else if reply.version == 2:
+        version = http_version.http2
+    var history: [redirect_info]
+    for item in reply.history:
+        history.push(redirect_info(status = item.status as i32, from_origin = item.from_origin,
+            to_origin = item.to_origin, method_changed = item.method_changed))
+    return response_info(status = reply.status as i32, version = version, url = reply.url,
+        headers = reply.headers, history = history, content_length = reply.content_length,
+        content_decoded = reply.decoded)
+
+
+private func _io_kind(value: i64) -> io.error_kind:
+    if value == 1:
+        return io.error_kind.not_found
+    if value == 2:
+        return io.error_kind.permission_denied
+    if value == 3:
+        return io.error_kind.already_exists
+    if value == 4:
+        return io.error_kind.invalid_path
+    if value == 5:
+        return io.error_kind.invalid_mode
+    if value == 6:
+        return io.error_kind.invalid_range
+    if value == 7:
+        return io.error_kind.closed
+    if value == 8:
+        return io.error_kind.busy
+    if value == 9:
+        return io.error_kind.unexpected_eof
+    if value == 10:
+        return io.error_kind.invalid_utf8
+    if value == 11:
+        return io.error_kind.unsupported
+    if value == 12:
+        return io.error_kind.limit_exceeded
+    if value == 13:
+        return io.error_kind.cross_device
+    if value == 14:
+        return io.error_kind.not_directory
+    if value == 15:
+        return io.error_kind.is_directory
+    if value == 16:
+        return io.error_kind.not_empty
+    if value == 17:
+        return io.error_kind.io_failure
+    return io.error_kind.io_failure
+
+
+private func _error(operation: string, reply: _reply) -> error:
+    var domain = ""
+    if reply.domain == 1:
+        domain = "curl"
+    else if reply.domain == 2:
+        domain = "curl_multi"
+    else if reply.domain == 3:
+        domain = "zlib"
+    else if reply.domain == 4:
+        domain = "filesystem"
+    var info: response_info?
+    if reply.status != 0:
+        info = _info(reply)
+    var cause: url.error?
+    if reply.url_kind != 0:
+        var url_kind = url.error_kind.invalid_url
+        if reply.url_kind == 2:
+            url_kind = url.error_kind.invalid_encoding
+        else if reply.url_kind == 3:
+            url_kind = url.error_kind.invalid_utf8
+        else if reply.url_kind == 4:
+            url_kind = url.error_kind.unsupported_scheme
+        else if reply.url_kind == 5:
+            url_kind = url.error_kind.limit_exceeded
+        cause = url.error(message = "HTTP URL preparation failed", code = reply.url_kind as i32,
+            kind = url_kind, operation = operation, offset = reply.url_offset)
+    var io_cause: io.error?
+    if reply.io_kind != 0:
+        io_cause = io.error(message = "HTTP file operation failed", code = reply.io_kind as i32,
+            operation = operation, kind = _io_kind(reply.io_kind), os_code = reply.io_code,
+            bytes_transferred = reply.file_completed, partial = reply.io_partial, cleanup_code = reply.io_cleanup)
+    return error(message = "HTTP {operation} failed", code = reply.kind as i32,
+        kind = _kind(reply.kind), operation = operation, phase = _phase(reply.phase),
+        native_domain = domain, native_code = reply.native_code, status = reply.status as i32,
+        info = info, uploaded = reply.uploaded, downloaded_encoded = reply.encoded,
+        downloaded = reply.downloaded, io_cause = io_cause, cleanup_code = reply.io_cleanup, url_cause = cause, remote_outcome_unknown = reply.unknown)
+
+
+private func _response(operation: string, reply: _reply) -> result<response, error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(response(info = _info(reply), bytes = reply.bytes, trailers = reply.trailers))
+
+
+private func _finished(operation: string, reply: _reply) -> result<transfer_info, error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(transfer_info(info = _info(reply), trailers = reply.trailers,
+        uploaded = reply.uploaded, downloaded_encoded = reply.encoded,
+        downloaded = reply.downloaded, elapsed_ms = reply.elapsed))
+
+
+private func _boolean(operation: string, reply: _reply) -> result<bool, error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(true)
+
+
+private struct _client_acquisition:
+    owner: client
+    committed: bool = false
+
+
+private func (self _client_acquisition) deinit():
+    if not self.committed:
+        _http_cleanup_client(self.owner)
+
+
+private struct _transfer_acquisition:
+    owner: transfer
+    committed: bool = false
+
+
+private func (self _transfer_acquisition) deinit():
+    if not self.committed:
+        _http_cleanup_transfer(self.owner)
+
+
+## Acquire a client locally. Network activity starts at send/start.
+## @param config Client value configuration, owned at creation; referenced lists are copied into the native snapshot.
+## @return A managed client belonging to the current Runtime, or a safe configuration/admission error.
+func open_client(config: client_options = client_options()) -> result<client, error>:
+    var owner = client()
+    with _client_acquisition(owner = owner) as guard:
+        var reply = _http_open(owner, _config_of(config))
+        if reply.kind != 0:
+            return Err(_error("open_client", reply))
+        guard.committed = true
+        return Ok(owner)
+
+
+## Admit a bounded streaming exchange without waiting for headers or file consumption.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return A managed transfer requiring close/with cleanup, or an error before request admission.
+func (self client) start(req: request, options: request_options = request_options()) -> result<transfer, error>:
+    var owner = transfer()
+    with _transfer_acquisition(owner = owner) as guard:
+        var reply = _http_start(self, owner, _request_of(req)?, _options_of(options))
+        if reply.kind != 0:
+            return Err(_error("start", reply))
+        guard.committed = true
+        return Ok(owner)
+
+
+## Clear this client's in-memory cookie session; concurrent mutation returns busy.
+## @return True after clearing, or closed/busy/native failure.
+func (self client) clear_cookies() -> result<bool, error>:
+    return _boolean("clear_cookies", _http_clear_cookies(self))
+
+
+## Signal producer EOF; a declared length must match the bytes accepted.
+## @return True after accepting EOF, or invalid length/closed/upload-stopped failure.
+func (self transfer) finish_upload() -> result<bool, error>:
+    return _boolean("finish_upload", _http_finish_upload(self))
+
+
+## Close this resource deterministically through the allocation-free cleanup control.
+func (self client) deinit():
+    _http_cleanup_client(self)
+
+
+## Close this resource deterministically through the allocation-free cleanup control.
+func (self transfer) deinit():
+    _http_cleanup_transfer(self)
+
+
+## Send an owned request and collect a bounded buffered response, including inspectable 4xx/5xx bodies.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned metadata/body/trailers, or a typed failure with actual progress.
+func (self client) send(req: request, options: request_options = request_options()) -> result<response, error>:
+    var reply = _http_send(self, _request_of(req)?, _options_of(options))
+    return _response("send", reply)
+
+
+## Wait for final response headers without consuming response body bytes.
+## @return Owned final metadata, or a typed failure; repeated response calls remain inspectable.
+func (self transfer) response() -> result<response_info, error>:
+    var reply = _http_response(self)
+    if reply.kind != 0:
+        return Err(_error("response", reply))
+    return Ok(_info(reply))
+
+
+## Pull an owned body chunk with native backpressure; validate framing/decoding before clean EOF.
+## @param max_count Positive pull size, at most 65536 bytes; default 65536.
+## @return At most max_count bytes, or clean eof, or a typed failure after previously delivered progress.
+func (self transfer) read_bytes(max_count: i64 = 65536) -> result<chunk, error>:
+    var reply = _http_read(self, max_count)
+    if reply.kind != 0:
+        return Err(_error("read_bytes", reply))
+    return Ok(chunk(bytes = reply.bytes, eof = reply.eof))
+
+
+## Copy producer bytes into the bounded upload path, waiting for available space.
+## @param bytes Producer bytes; empty is a no-op, not EOF. Call finish_upload to end an unknown-length upload.
+## @return The accepted byte count, or a typed failure with actual transmission progress.
+func (self transfer) write_bytes(const bytes: [u8]) -> result<i64, error>:
+    var reply = _http_write(self, bytes)
+    if reply.kind != 0:
+        return Err(_error("write_bytes", reply))
+    return Ok(reply.number)
+
+
+## Wait for final transfer/file quiescence; unread response bytes return busy instead of being discarded.
+## @return Final metadata, trailers and actual counters, or busy/typed failure.
+func (self transfer) finish() -> result<transfer_info, error>:
+    var reply = _http_finish(self)
+    return _finished("finish", reply)
+
+
+## Close idempotently after native callback and entered file-IO quiescence; remote effects are not rolled back.
+## @return True when closed, including repeated close, or a typed cleanup failure.
+func (self transfer) close() -> result<bool, error>:
+    var reply = _http_close_transfer(self)
+    return _boolean("close", reply)
+
+
+## Close idempotently after native callback and entered file-IO quiescence; remote effects are not rolled back.
+## @return True when closed, including repeated close, or a typed cleanup failure.
+func (self client) close() -> result<bool, error>:
+    var reply = _http_close_client(self)
+    return _boolean("close", reply)
+
+
+## Stream a successful response into the existing file at its current cursor using the Runtime IO pool.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param destination Mutable caller-owned file, exclusively borrowed for the operation; no close/flush/seek/truncate.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Final transfer counters; non-2xx fails before writing any response bytes. File failures may leave partial output.
+func (self client) download(req: request, destination: io.file, options: request_options = request_options()) -> result<transfer_info, error>:
+    var reply = _http_download(self, _request_of(req)?, _options_of(options), destination)
+    return _finished("download", reply)
+
+
+## Borrow the existing file at its current cursor and return a bounded buffered response.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param source Mutable caller-owned file, exclusively borrowed through completion; cursor advances by actual reads.
+## @param count Required byte count, or -1 through EOF; a short known-length input returns unexpected_eof.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned buffered response, or a failure retaining file cause and actual consumed/transmitted counts.
+func (self client) upload(req: request, source: io.file, count: i64 = -1, options: request_options = request_options()) -> result<response, error>:
+    var reply = _http_upload(self, _request_of(req)?, _options_of(options), source, count)
+    return _response("upload", reply)
+
+
+## Send a GET with an empty request body and collect a bounded response.
+## @param target Explicit validated HTTP(S) URL; credentials and IPv6 zones are rejected.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned buffered response; non-2xx remains a successful transport result.
+func (self client) get(target: string, options: request_options = request_options()) -> result<response, error>:
+    return self.send(request(target = target), options)
+
+
+## Send a GET with an empty request body and collect a bounded response. A temporary client is closed before returning.
+## @param target Explicit validated HTTP(S) URL; credentials and IPv6 zones are rejected.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned buffered response; non-2xx remains a successful transport result.
+func get(target: string, options: request_options = request_options()) -> result<response, error>:
+    with open_client()? as owner:
+        return owner.get(target, options)
+
+
+## Send an owned request and collect a bounded buffered response, including inspectable 4xx/5xx bodies.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned metadata/body/trailers, or a typed failure with actual progress.
+async func (self client) send_async(req: request, options: request_options = request_options()) -> result<response, error>:
+    var reply = await _http_send_async(self, _request_of(req)?, _options_of(options))
+    return _response("send", reply)
+
+
+## Wait for final response headers without consuming response body bytes.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @return Owned final metadata, or a typed failure; repeated response calls remain inspectable.
+async func (self transfer) response_async() -> result<response_info, error>:
+    var reply = await _http_response_async(self)
+    if reply.kind != 0:
+        return Err(_error("response", reply))
+    return Ok(_info(reply))
+
+
+## Pull an owned body chunk with native backpressure; validate framing/decoding before clean EOF.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param max_count Positive pull size, at most 65536 bytes; default 65536.
+## @return At most max_count bytes, or clean eof, or a typed failure after previously delivered progress.
+async func (self transfer) read_bytes_async(max_count: i64 = 65536) -> result<chunk, error>:
+    var reply = await _http_read_async(self, max_count)
+    if reply.kind != 0:
+        return Err(_error("read_bytes", reply))
+    return Ok(chunk(bytes = reply.bytes, eof = reply.eof))
+
+
+## Copy producer bytes into the bounded upload path, waiting for available space.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param bytes Producer bytes; empty is a no-op, not EOF. Call finish_upload to end an unknown-length upload.
+## @return The accepted byte count, or a typed failure with actual transmission progress.
+async func (self transfer) write_bytes_async(const bytes: [u8]) -> result<i64, error>:
+    var reply = await _http_write_async(self, bytes)
+    if reply.kind != 0:
+        return Err(_error("write_bytes", reply))
+    return Ok(reply.number)
+
+
+## Wait for final transfer/file quiescence; unread response bytes return busy instead of being discarded.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @return Final metadata, trailers and actual counters, or busy/typed failure.
+async func (self transfer) finish_async() -> result<transfer_info, error>:
+    var reply = await _http_finish_async(self)
+    return _finished("finish", reply)
+
+
+## Close idempotently after native callback and entered file-IO quiescence; remote effects are not rolled back.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @return True when closed, including repeated close, or a typed cleanup failure.
+async func (self transfer) close_async() -> result<bool, error>:
+    var reply = await _http_close_transfer_async(self)
+    return _boolean("close", reply)
+
+
+## Close idempotently after native callback and entered file-IO quiescence; remote effects are not rolled back.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @return True when closed, including repeated close, or a typed cleanup failure.
+async func (self client) close_async() -> result<bool, error>:
+    var reply = await _http_close_client_async(self)
+    return _boolean("close", reply)
+
+
+## Stream a successful response into the existing file at its current cursor using the Runtime IO pool.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param destination Mutable caller-owned file, exclusively borrowed for the operation; no close/flush/seek/truncate.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Final transfer counters; non-2xx fails before writing any response bytes. File failures may leave partial output.
+async func (self client) download_async(req: request, destination: io.file, options: request_options = request_options()) -> result<transfer_info, error>:
+    var reply = await _http_download_async(self, _request_of(req)?, _options_of(options), destination)
+    return _finished("download", reply)
+
+
+## Borrow the existing file at its current cursor and return a bounded buffered response.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param req Request to validate and snapshot before transmission; streams/files cannot be silently replayed.
+## @param source Mutable caller-owned file, exclusively borrowed through completion; cursor advances by actual reads.
+## @param count Required byte count, or -1 through EOF; a short known-length input returns unexpected_eof.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned buffered response, or a failure retaining file cause and actual consumed/transmitted counts.
+async func (self client) upload_async(req: request, source: io.file, count: i64 = -1, options: request_options = request_options()) -> result<response, error>:
+    var reply = await _http_upload_async(self, _request_of(req)?, _options_of(options), source, count)
+    return _response("upload", reply)
+
+
+## Send a GET with an empty request body and collect a bounded response.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param target Explicit validated HTTP(S) URL; credentials and IPv6 zones are rejected.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned buffered response; non-2xx remains a successful transport result.
+async func (self client) get_async(target: string, options: request_options = request_options()) -> result<response, error>:
+    return await self.send_async(request(target = target), options)
+
+
+## Send a GET with an empty request body and collect a bounded response. A temporary client is closed before returning.
+## Await native completion without occupying an IO worker; task results support repeated await.
+## @param target Explicit validated HTTP(S) URL; credentials and IPv6 zones are rejected.
+## @param options Per-request protocol, redirect, size and timeout policy, copied at submission.
+## @return Owned buffered response; non-2xx remains a successful transport result.
+async func get_async(target: string, options: request_options = request_options()) -> result<response, error>:
+    with open_client()? as owner:
+        return await owner.get_async(target, options)
+
+
+## Accept HTTP status 200..299; retain metadata without copying body bytes into an error.
+## @return True for 2xx, otherwise http_status with the original response metadata.
+func (self response) require_success() -> result<bool, error>:
+    if self.info.status >= 200 and self.info.status < 300:
+        return Ok(true)
+    return Err(error(message = "HTTP status is outside 200..299", code = 22,
+        kind = error_kind.http_status, operation = "require_success", phase = failure_phase.headers,
+        status = self.info.status, info = self.info))
+
+
+## Decode owned bytes as strict UTF-8; reject invalid text instead of replacing it.
+## @return Owned UTF-8 text or invalid_encoding; response decoding removes one leading UTF-8 BOM.
+func (self header) text() -> result<string, error>:
+    if string.from_utf8(self.value) is Ok(var text):
+        return Ok(text)
+    return Err(_error("header.text", _reply(kind = 4)))
+
+
+## Decode owned bytes as strict UTF-8; reject invalid text instead of replacing it. Only an absent or explicit UTF-8 charset is accepted.
+## @return Owned UTF-8 text or invalid_encoding; response decoding removes one leading UTF-8 BOM.
+func (self response) text() -> result<string, error>:
+    for item in self.info.headers:
+        if _ascii_equal(item.name, "content-type") and not _charset(item.value):
+            return Err(_error("response.text", _reply(kind = 4)))
+    if string.from_utf8(self.bytes) is Ok(var decoded):
+        if textlib.starts_with(decoded, "\u{feff}"):
+            if textlib.substring(decoded, 1) is Ok(var without_bom):
+                return Ok(without_bom)
+            return Err(_error("response.text", _reply(kind = 4)))
+        return Ok(decoded)
+    return Err(_error("response.text", _reply(kind = 4)))
+
+
+private func _ascii_equal(left: string, right: string) -> bool:
+    var first = left.to_utf8()
+    var second = right.to_utf8()
+    if first.count != second.count:
+        return false
+    var index: i64 = 0
+    for index < first.count:
+        var a = first[index]
+        var b = second[index]
+        if a >= 65 and a <= 90:
+            a += 32
+        if b >= 65 and b <= 90:
+            b += 32
+        if a != b:
+            return false
+        index += 1
+    return true
+
+
+private func _token(value: u8) -> bool:
+    if (value >= 48 and value <= 57) or (value >= 65 and value <= 90) or (value >= 97 and value <= 122):
+        return true
+    return value == 33 or value == 35 or value == 36 or value == 37 or value == 38 or value == 39 or value == 42 or value == 43 or value == 45 or value == 46 or value == 94 or value == 95 or value == 96 or value == 124 or value == 126
+
+
+## Construct a validated header with an independent UTF-8 byte value.
+## @param name ASCII token field name; header_values matches ASCII case-insensitively.
+## @param value UTF-8 text to encode as field bytes, excluding invalid controls.
+## @param sensitive Treat this field as credentials; cross-origin redirects are denied.
+## @return Owned field bytes or invalid_header for invalid name/value controls.
+func field(name: string, value: string, sensitive: bool = false) -> result<header, error>:
+    var bytes = value.to_utf8()
+    var names = name.to_utf8()
+    if names.count == 0 or names.count > 65536 or bytes.count > 65536 - names.count:
+        return Err(_error("field", _reply(kind = 3)))
+    for byte in names:
+        if not _token(byte):
+            return Err(_error("field", _reply(kind = 3)))
+    for byte in bytes:
+        if byte == 127 or (byte < 32 and byte != 9):
+            return Err(_error("field", _reply(kind = 3)))
+    return Ok(header(name = name, value = bytes, sensitive = sensitive))
+
+
+## Copy matching values independently, preserving duplicate fields and arrival order.
+## @param fields Ordered headers to inspect without mutating their values.
+## @param name ASCII token field name; header_values matches ASCII case-insensitively.
+## @return Independent matching field/value snapshots, without comma folding.
+func header_values(const fields: [header], name: string) -> [header]:
+    var result: [header]
+    for item in fields:
+        if _ascii_equal(item.name, name):
+            var bytes: [u8]
+            for byte in item.value:
+                bytes.push(byte)
+            result.push(header(name = item.name, value = bytes, sensitive = item.sensitive))
+    return result
+
+
+private func _charset(const bytes: [u8]) -> bool:
+    var cursor: i64 = 0
+    # Media type precedes the parameter list. Quoted parameter values below
+    # consume embedded semicolons and quoted-pairs before another name is read.
+    for cursor < bytes.count and bytes[cursor] != 59:
+        cursor += 1
+    for cursor < bytes.count:
+        cursor += 1
+        for cursor < bytes.count and (bytes[cursor] == 32 or bytes[cursor] == 9):
+            cursor += 1
+        var name: [u8]
+        for cursor < bytes.count and _token(bytes[cursor]):
+            name.push(bytes[cursor])
+            cursor += 1
+        for cursor < bytes.count and (bytes[cursor] == 32 or bytes[cursor] == 9):
+            cursor += 1
+        if name.count == 0 or cursor >= bytes.count or bytes[cursor] != 61:
+            return false
+        cursor += 1
+        for cursor < bytes.count and (bytes[cursor] == 32 or bytes[cursor] == 9):
+            cursor += 1
+        var value: [u8]
+        if cursor < bytes.count and bytes[cursor] == 34:
+            cursor += 1
+            var ended = false
+            for cursor < bytes.count and not ended:
+                var byte = bytes[cursor]
+                cursor += 1
+                if byte == 34:
+                    ended = true
+                else:
+                    if byte == 92:
+                        if cursor >= bytes.count:
+                            return false
+                        byte = bytes[cursor]
+                        cursor += 1
+                    if byte == 127 or (byte < 32 and byte != 9):
+                        return false
+                    value.push(byte)
+            if not ended:
+                return false
+        else:
+            for cursor < bytes.count and _token(bytes[cursor]):
+                value.push(bytes[cursor])
+                cursor += 1
+            if value.count == 0:
+                return false
+        for cursor < bytes.count and (bytes[cursor] == 32 or bytes[cursor] == 9):
+            cursor += 1
+        if cursor < bytes.count and bytes[cursor] != 59:
+            return false
+        if string.from_utf8(name) is Ok(var parameter):
+            if _ascii_equal(parameter, "charset"):
+                if string.from_utf8(value) is Ok(var encoding):
+                    if not _ascii_equal(encoding, "utf-8"):
+                        return false
+                else:
+                    return false
+    return true
+
+
+## Inspect the exact provider/version and backend capabilities without opening a connection.
+## @return An initialized immutable capability snapshot.
+func (self capabilities) init():
+    var reply = _http_capabilities()
+    var forms: [string]
+    if (reply.features / 256) % 2 == 1:
+        forms.push("pem")
+    if (reply.features / 512) % 2 == 1:
+        forms.push("pkcs12")
+    if (reply.features / 1024) % 2 == 1:
+        forms.push("windows_store")
+    self.transport_version = reply.transport
+    self.tls_backend = reply.tls
+    self.resolver = reply.resolver
+    self.idn_provider = reply.idn
+    self.http1 = reply.features % 2 == 1
+    self.http2 = (reply.features / 2) % 2 == 1
+    self.http3 = (reply.features / 4) % 2 == 1
+    self.ipv6 = (reply.features / 8) % 2 == 1
+    self.native_trust = (reply.features / 16) % 2 == 1
+    self.gzip = (reply.features / 32) % 2 == 1
+    self.deflate = (reply.features / 64) % 2 == 1
+    self.psl = (reply.features / 128) % 2 == 1
+    self.client_identity_forms = forms

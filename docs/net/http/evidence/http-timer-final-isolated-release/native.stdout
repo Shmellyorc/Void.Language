@@ -1,0 +1,7 @@
+{"case":"tls","kind":"timeout","phase":"tls","unknown":false,"kind_code":14,"native_code":28,"elapsed_ms":50}
+{"case":"proxy","kind":"timeout","phase":"proxy","unknown":false,"kind_code":14,"native_code":28,"elapsed_ms":51}
+{"case":"producer-resume","kind":"success","phase":"other","unknown":false,"kind_code":0,"native_code":0,"elapsed_ms":0}
+{"case":"write","kind":"timeout","phase":"upload","unknown":true,"kind_code":14,"native_code":0,"elapsed_ms":31}
+{"case":"digest-upload","kind":"success","phase":"other","unknown":false,"kind_code":0,"native_code":0,"elapsed_ms":10}
+{"case":"file-wait-cpu","cpu_seconds":0.000832}
+{"case":"file-drain","kind":"timeout","phase":"file","unknown":true,"kind_code":14,"native_code":0,"elapsed_ms":161}

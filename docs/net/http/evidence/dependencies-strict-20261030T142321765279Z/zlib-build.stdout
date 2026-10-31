@@ -1,0 +1,17 @@
+[ 12%] Building C object CMakeFiles/zlibstatic.dir/compress.c.o
+[ 12%] Building C object CMakeFiles/zlibstatic.dir/adler32.c.o
+[ 18%] Building C object CMakeFiles/zlibstatic.dir/crc32.c.o
+[ 31%] Building C object CMakeFiles/zlibstatic.dir/deflate.c.o
+[ 31%] Building C object CMakeFiles/zlibstatic.dir/gzclose.c.o
+[ 37%] Building C object CMakeFiles/zlibstatic.dir/gzlib.c.o
+[ 50%] Building C object CMakeFiles/zlibstatic.dir/gzread.c.o
+[ 50%] Building C object CMakeFiles/zlibstatic.dir/gzwrite.c.o
+[ 56%] Building C object CMakeFiles/zlibstatic.dir/inflate.c.o
+[ 62%] Building C object CMakeFiles/zlibstatic.dir/infback.c.o
+[ 68%] Building C object CMakeFiles/zlibstatic.dir/inftrees.c.o
+[ 75%] Building C object CMakeFiles/zlibstatic.dir/inffast.c.o
+[ 81%] Building C object CMakeFiles/zlibstatic.dir/trees.c.o
+[ 87%] Building C object CMakeFiles/zlibstatic.dir/uncompr.c.o
+[ 93%] Building C object CMakeFiles/zlibstatic.dir/zutil.c.o
+[100%] Linking C static library libz.a
+[100%] Built target zlibstatic

@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-s6n61lnu/private-type.void:7:25: error: Unknown imported function 'channel._state'.
+    code: VOID2003
+
+ 7 |     var state = channel._state<i32>()
+   |                         ^^^^^^
+    Module: /private-type.void
+

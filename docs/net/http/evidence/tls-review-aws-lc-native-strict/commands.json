@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/http-tls-review-aws-lc/candidate_native",
+    "http://127.0.0.1:43265",
+    "https://127.0.0.1:44857",
+    "/tmp/VOID HTTP native 4b6fgdub/cert.pem",
+    "https://127.0.0.1:48215"
+  ],
+  "exit_code": 1,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 1.5176051920025202,
+  "binary_sha256": "d25a322393dbe025fc77b96c7fb89b6287f1c77169107f101c6c8d6674359564",
+  "http2_fixture": true,
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

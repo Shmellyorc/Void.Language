@@ -1,0 +1,15 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+    "check",
+    "/tmp/VOID-channel-rejections-hkoz8utx/payload-null.void"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+  "status": 1,
+  "seconds": 0.014025454001966864,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "ce73e57f8baadceddebc6167c966affff20a2ed0317d7376491f81d3b4ac4935",
+  "object_hashes": {},
+  "output_hashes": {}
+}

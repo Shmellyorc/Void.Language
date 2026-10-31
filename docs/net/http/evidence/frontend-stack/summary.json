@@ -1,0 +1,22 @@
+{
+  "original_incidents": [
+    "docs/math/evidence/crashes/incident-i7u8evtx",
+    "docs/math/evidence/crashes/incident-xi4h0rw7"
+  ],
+  "scope": "Debug ordinary-call semantic stack pressure; 32 accepted nested calls; original nesting/stack limits preserved",
+  "call_expression_before_bytes": 22312,
+  "baseline_call_expression_bytes": 22024,
+  "repair": "Dispatch builtin adapters in a separate existing-style noinline handler that returns before ordinary argument recursion; no semantic budget/compiler/sanitizer flag change",
+  "repaired_frames": {
+    "_ZN2vd12_GLOBAL__N_19Semantics15call_expressionERNS0_4ExprE": 2728,
+    "_ZN2vd12_GLOBAL__N_19Semantics23builtin_call_expressionERNS0_4ExprE": 22056
+  },
+  "focused_debug_tests": "http-frontend-stack-tests-debug.log",
+  "compiler_inputs": {
+    "src/frontend/compiler.cpp": "e1bbce064280824a0152ede96110c789293f6e2dee2d9b2da43a1da99efdeaf4",
+    "docs/net/http/evidence/frontend-stack/compiler-before.cpp": "c111f8fcb7562bbe2bae22ac448ece5d20cce84bffd46517a025e2b796623f0c",
+    ".toolchains/http-io-baseline/source/src/frontend/compiler.cpp": "62b3fdb1df2e1c1c7269d0796a17afd2f9aafe8d87faa9a922541dfcd91a37f1"
+  },
+  "debug_compilation_command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\" -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include -g -std=c++20 -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic -o CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o -c /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp",
+  "stack_usage_measurement": "Same Debug flags and headers, with -fstack-usage and isolated -o .toolchains/http-frontend-stack/{current,baseline,repaired}.o; no production compile flag change"
+}

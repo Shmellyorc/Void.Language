@@ -121,6 +121,15 @@ std::shared_ptr<FileResource> lookup(Runtime& runtime, void* identity) {
     return std::static_pointer_cast<FileResource>(resource);
 }
 
+class Borrow final : public FileBorrow {
+public:
+    std::shared_ptr<FileResource> resource;
+    bool admitted = false;
+    explicit Borrow(std::shared_ptr<FileResource> value) : resource(std::move(value)) {}
+    ~Borrow() override { if (admitted) resource->end(); }
+    std::shared_ptr<File> file() const noexcept override { return resource->file; }
+};
+
 class Reply {
 public:
     const ReplyLayout& layout;
@@ -367,6 +376,20 @@ std::shared_ptr<Job> prepare(Runtime& runtime, const ReplyLayout& layout, unsign
 }
 }
 } // namespace vd::filesystem
+
+namespace vd::filesystem {
+std::shared_ptr<FileBorrow> borrow_file(Runtime& runtime, void* identity, ErrorKind& error) {
+    auto resource = lookup(runtime, identity);
+    if (!resource) { error = ErrorKind::closed; return {}; }
+    // Allocate before incrementing the existing active-operation count, so an
+    // allocation failure cannot leak a file reservation.
+    auto borrow = std::make_shared<Borrow>(resource);
+    error = resource->begin();
+    if (error != ErrorKind::success) return {};
+    borrow->admitted = true;
+    return borrow;
+}
+}
 
 extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayout* layout,
     unsigned operation, void* const* references, const std::int64_t* numbers,

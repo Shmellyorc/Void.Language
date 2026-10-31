@@ -1,0 +1,50 @@
+[
+  {
+    "profile": "Release",
+    "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_async_external_tests",
+    "sha256": "baa19676c4a9ca5dee4b93de9fa65218c197f8f1f3975ae6ae698b5078bf4454",
+    "exit_code": 0,
+    "stdout": "runtime-foundation-Release-void_async_external_tests-stack.stdout",
+    "stderr": "runtime-foundation-Release-void_async_external_tests-stack.stderr"
+  },
+  {
+    "profile": "Release",
+    "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_native_jobs",
+    "sha256": "daa505266ae862e0027e549c01d6b741680ea24e87ebccd6c1b60dd511ee15ba",
+    "exit_code": 0,
+    "stdout": "runtime-foundation-Release-void_io_native_jobs-stack.stdout",
+    "stderr": "runtime-foundation-Release-void_io_native_jobs-stack.stderr"
+  },
+  {
+    "profile": "Debug",
+    "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_async_external_tests",
+    "sha256": "c309f81d91269b964b5e86252d7000ce7ba76769881943d9f215a438a739ef6f",
+    "exit_code": 0,
+    "stdout": "runtime-foundation-Debug-void_async_external_tests-stack.stdout",
+    "stderr": "runtime-foundation-Debug-void_async_external_tests-stack.stderr"
+  },
+  {
+    "profile": "Debug",
+    "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_io_native_jobs",
+    "sha256": "3baa82c06cf964be08b39fd95a021574c5f9595f67a8fc194f3cb7df8509b210",
+    "exit_code": 0,
+    "stdout": "runtime-foundation-Debug-void_io_native_jobs-stack.stdout",
+    "stderr": "runtime-foundation-Debug-void_io_native_jobs-stack.stderr"
+  },
+  {
+    "profile": "strict",
+    "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_async_external_tests",
+    "sha256": "3d6315ae971ae0d39fd29304cc46c9c690578deb08fa0f0847dedca673db064b",
+    "exit_code": 0,
+    "stdout": "runtime-foundation-strict-void_async_external_tests-stack.stdout",
+    "stderr": "runtime-foundation-strict-void_async_external_tests-stack.stderr"
+  },
+  {
+    "profile": "strict",
+    "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_io_native_jobs",
+    "sha256": "2aa9b41781042628a61e3dc6cfad9f53df9a4b34f06c673a9b1872ee15566b64",
+    "exit_code": 0,
+    "stdout": "runtime-foundation-strict-void_io_native_jobs-stack.stdout",
+    "stderr": "runtime-foundation-strict-void_io_native_jobs-stack.stderr"
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation ms2548ax/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11160455500066746
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation ms2548ax/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.024348328995984048
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation ms2548ax/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation ms2548ax/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 6.305828003998613
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation ms2548ax/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation ms2548ax/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation ms2548ax/built-False"
+    ],
+    "exit_code": 1,
+    "seconds": 0.44404487800056813
+  }
+]

@@ -1,0 +1,228 @@
+{
+  "profile": "Release",
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "archive_sha256": "8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "--version"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "compiler",
+      "exit_code": 0,
+      "seconds": 0.0083521459999929,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--version"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "cmake",
+      "exit_code": 0,
+      "seconds": 0.014027320000082,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/source/curl-8.23.0",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/build",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_STATIC_LIBS=ON",
+        "-DBUILD_CURL_EXE=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DCURL_DISABLE_INSTALL=ON",
+        "-DCURL_ENABLE_SSL=OFF",
+        "-DCURL_USE_LIBPSL=OFF",
+        "-DUSE_LIBIDN2=OFF",
+        "-DUSE_NGHTTP2=OFF",
+        "-DCURL_ZLIB=OFF",
+        "-DCURL_BROTLI=OFF",
+        "-DCURL_ZSTD=OFF",
+        "-DENABLE_THREADED_RESOLVER=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "original-configure",
+      "exit_code": 0,
+      "seconds": 14.907848699999931,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/build",
+        "--target",
+        "libcurl_static",
+        "--parallel",
+        "4"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "original-build",
+      "exit_code": 0,
+      "seconds": 5.479575698000076,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/source/curl-8.23.0/include",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/cookie_accounting_probe.c",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/build/lib/libcurl.a",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/build/cookie-accounting-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "original-compile",
+      "exit_code": 0,
+      "seconds": 0.09819637399994008,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/build/cookie-accounting-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "original-faults",
+      "exit_code": 0,
+      "seconds": 0.03201365900008568,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/original/build/cookie-accounting-probe",
+        "--embedding-host"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "original-embedding",
+      "exit_code": 0,
+      "seconds": 0.0033626830000912378,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "-p1",
+        "-i",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/source/curl-8.23.0",
+      "name": "apply-candidate",
+      "exit_code": 0,
+      "seconds": 0.004310412999984692,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/source/curl-8.23.0",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/build",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_STATIC_LIBS=ON",
+        "-DBUILD_CURL_EXE=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DCURL_DISABLE_INSTALL=ON",
+        "-DCURL_ENABLE_SSL=OFF",
+        "-DCURL_USE_LIBPSL=OFF",
+        "-DUSE_LIBIDN2=OFF",
+        "-DUSE_NGHTTP2=OFF",
+        "-DCURL_ZLIB=OFF",
+        "-DCURL_BROTLI=OFF",
+        "-DCURL_ZSTD=OFF",
+        "-DENABLE_THREADED_RESOLVER=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "candidate-configure",
+      "exit_code": 0,
+      "seconds": 15.243433148000008,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/build",
+        "--target",
+        "libcurl_static",
+        "--parallel",
+        "4"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "candidate-build",
+      "exit_code": 0,
+      "seconds": 5.125523666999925,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/source/curl-8.23.0/include",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/cookie_accounting_probe.c",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/build/lib/libcurl.a",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/build/cookie-accounting-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "candidate-compile",
+      "exit_code": 0,
+      "seconds": 0.08388184299997192,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/build/cookie-accounting-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "candidate-faults",
+      "exit_code": 0,
+      "seconds": 0.030330662999972446,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-gate/cookie-Release-20261030T122547143010Z/candidate/build/cookie-accounting-probe",
+        "--embedding-host"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "candidate-embedding",
+      "exit_code": 0,
+      "seconds": 0.0026721980000274925,
+      "stack_1mib": true
+    }
+  ],
+  "probe_sha256": "1fd3bfdb823d28c8ffe38a98402c50101ba6a1b314e7ccc8ee47fbb7f195f8bf",
+  "candidate_patch_sha256": "6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920",
+  "scope": "isolated cookie API; not the selected HTTP dependency profile",
+  "original": {
+    "binary_sha256": "55bda1b5b80b851574ed0ad1024fc3c779b99b3f8450dc664cb4a3346462299e",
+    "binary_bytes": 778976,
+    "provider_archive_bytes": 1604772
+  },
+  "candidate": {
+    "binary_sha256": "17051c887f95e2d100efeb7b5c3ad0a9d65b0a134f74d7b69784ab7ef8e270b6",
+    "binary_bytes": 778976,
+    "provider_archive_bytes": 1604772
+  },
+  "result": "original ambiguity reproduced; candidate checked OOM; embedding hooks not replaced"
+}

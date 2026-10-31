@@ -1,0 +1,291 @@
+{
+  "source_sha256": "8c436d1ed9e5ecac601b93bea41f84c42cbcc469813a16e5fd1adba75278c6c8",
+  "compiler": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n",
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "cases": [
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O0-default"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O0-default"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O0-no-strict-aliasing"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O0-no-strict-aliasing"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O2-default"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O2-default"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O2-no-strict-aliasing"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O2-no-strict-aliasing"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O0-default"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O0-default"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O0-no-strict-aliasing"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O0",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O0-no-strict-aliasing"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "16f8a0a81fff6506f57a8aaa33959a5fc5e779b52c7f6f2dcf3aa55b03a14d0c"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O2-default"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O2-default"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O2-no-strict-aliasing"
+      ],
+      "mode": "unsafe",
+      "exit_code": 1,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    },
+    {
+      "compile_argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c23",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-strict-aliasing",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c23-O2-no-strict-aliasing"
+      ],
+      "mode": "safe",
+      "exit_code": 0,
+      "soft_hard_stack": 1048576,
+      "binary_sha256": "d4ac53d8ba88768e968f686e752cd885d91ba1948b1dd3e9f793042bcc9650ee"
+    }
+  ],
+  "unavailable_control": "System clang link could not locate its ASan runtime; original compiler stderr retained. It is not counted as a pass."
+}

@@ -1,0 +1,7 @@
+{
+  "pem_bytes": 1047902,
+  "unique_roots": 983,
+  "peer_chain_pem_bytes": 219107,
+  "successful_requests": 256,
+  "oversized_chain_http_requests": 0
+}

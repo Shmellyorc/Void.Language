@@ -1,0 +1,16 @@
+make  all-am
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib'
+  CC       idna.lo
+  CC       lookup.lo
+  CC       decode.lo
+  CC       register.lo
+  CC       version.lo
+  CC       bidi.lo
+  CC       error.lo
+  CC       punycode.lo
+  CC       free.lo
+  CC       data.lo
+  CC       tr46map.lo
+  CC       tables.lo
+  CC       context.lo
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib'

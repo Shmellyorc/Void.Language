@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-strict-20261030T172051107995Z/curl/candidate_native",
+    "http://127.0.0.1:42125",
+    "https://127.0.0.1:44449",
+    "/tmp/VOID HTTP native 5mw8dx72/cert.pem",
+    "https://127.0.0.1:60729",
+    "https://127.0.0.1:33213",
+    "/tmp/VOID HTTP native 5mw8dx72/cert.pem",
+    "/tmp/VOID HTTP native 5mw8dx72/key.pem",
+    "/tmp/VOID HTTP native 5mw8dx72/identity.p12",
+    "/tmp/VOID HTTP native 5mw8dx72"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 3.020776675999514,
+  "binary_sha256": "1875488cca0a49e3d9cf12dd7b5a0f51f039c6b650a8d860575cd934e607cd24",
+  "source_sha256": {
+    "src/runtime/http.cpp": "d9c2140c958e1cfe7e797d229f89165ae89325058e3d525861bce4591227762d",
+    "src/runtime/http_bulk.cpp": "2aa6bafc100b6922d2ca0414c5c4aec3c33a560eafc11df551d80d775294df36",
+    "include/void/http.hpp": "d376c5fb24fdf52b823c901911febe0716d9928ee7d47300dc76beb4a11536f3",
+    "tests/net/http/native.cpp": "efdac8f662ca9b548049dda3fa14c077f4885922e5ad6ea4f4455583fa7d460f",
+    "tests/net/http/fixture.py": "25eb64c4cf63c5c032a88ee37b835950f39452266c4e2db367b49f97f195c4e6",
+    "third_party/curl/VOID-PROVENANCE.json": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+    "third_party/http-versions.json": "061c7073ec1657825cf31a1a0a3ec6bb717738e3a7fa65fd15b328ac6ac0f3da"
+  },
+  "soft_hard_stack_bytes": [
+    1048576,
+    1048576
+  ],
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "http2_fixture": true,
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

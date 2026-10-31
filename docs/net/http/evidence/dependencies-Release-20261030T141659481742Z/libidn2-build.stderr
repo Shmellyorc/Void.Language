@@ -1,0 +1,3 @@
+make[1]: *** No rule to make target '../unistring/libunistring.la', needed by 'libidn2.la'.  Stop.
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:1783: all] Error 2

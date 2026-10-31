@@ -1,0 +1,13 @@
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-registrable-domain.c:153:18: error: use of undeclared identifier 'PSL_TESTFILE'
+  153 |         if ((fp = fopen(PSL_TESTFILE, "r"))) {
+      |                         ^~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-registrable-domain.c:180:37: error: expected ')'
+  180 |                                         printf("Malformed line from '" PSL_TESTFILE "': %s", buf);
+      |                                                                        ^
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-registrable-domain.c:180:12: note: to match this '('
+  180 |                                         printf("Malformed line from '" PSL_TESTFILE "': %s", buf);
+      |                                               ^
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/tests/test-registrable-domain.c:190:33: error: use of undeclared identifier 'PSL_TESTFILE'
+  190 |                 printf("Failed to open %s\n", PSL_TESTFILE);
+      |                                               ^~~~~~~~~~~~
+3 errors generated.

@@ -1,0 +1,38 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/tmp/VOID TLS memory udsz6575/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/tmp/VOID TLS memory udsz6575/key.pem",
+      "-out",
+      "/tmp/VOID TLS memory udsz6575/cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 0.36028499600070063
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/bin/openssl",
+      "x509",
+      "-in",
+      "/tmp/VOID TLS memory udsz6575/cert.pem",
+      "-set_serial",
+      "1",
+      "-signkey",
+      "/tmp/VOID TLS memory udsz6575/key.pem"
+    ],
+    "exit_code": 1,
+    "seconds": 0.003191960000549443
+  }
+]

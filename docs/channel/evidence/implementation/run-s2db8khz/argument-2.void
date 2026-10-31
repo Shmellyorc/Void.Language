@@ -1,0 +1,7 @@
+use channel
+struct message:
+    amount: i32
+func receive(const amount: i32):
+    pass
+func main():
+    var state = channel._state<i32>()

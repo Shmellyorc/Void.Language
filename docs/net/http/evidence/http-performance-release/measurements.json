@@ -1,0 +1,138 @@
+{
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "machine": "x86_64",
+  "stack_bytes": 1048576,
+  "compiler_sha256": "ce73e57f8baadceddebc6167c966affff20a2ed0317d7376491f81d3b4ac4935",
+  "network": [
+    {
+      "mode": "h1",
+      "cold_ms": 1.27891,
+      "warm_samples": 64,
+      "warm_median_ms": 0.321238,
+      "warm_p95_ms": 1.39786,
+      "four_concurrent_batches": 16,
+      "batch_median_ms": 1.17444,
+      "client_cpu_seconds": 0.027931,
+      "close_median_ms": 0.098579,
+      "close_max_ms": 0.130019
+    },
+    {
+      "mode": "h1_tls",
+      "cold_ms": 4.68574,
+      "warm_samples": 64,
+      "warm_median_ms": 0.296788,
+      "warm_p95_ms": 0.581137,
+      "four_concurrent_batches": 16,
+      "batch_median_ms": 0.963174,
+      "client_cpu_seconds": 0.020937,
+      "close_median_ms": 0.14903,
+      "close_max_ms": 0.743146
+    },
+    {
+      "mode": "h2_tls",
+      "cold_ms": 33.8553,
+      "warm_samples": 64,
+      "warm_median_ms": 0.525817,
+      "warm_p95_ms": 0.697836,
+      "four_concurrent_batches": 16,
+      "batch_median_ms": 1.97863,
+      "client_cpu_seconds": 0.027486,
+      "close_median_ms": 0.0773,
+      "close_max_ms": 0.684876
+    }
+  ],
+  "connections": {
+    "h1": 16,
+    "h1_tls": 16,
+    "h2_tls": 1
+  },
+  "compilation": {
+    "plain-normal-check": {
+      "median_seconds": 0.00625802599824965,
+      "minimum": 0.00618812700122362,
+      "maximum": 0.00627106599858962
+    },
+    "plain-normal-jit": {
+      "median_seconds": 0.018125442999007646,
+      "minimum": 0.017619486003241036,
+      "maximum": 0.019000877997314092
+    },
+    "plain-normal-aot": {
+      "median_seconds": 0.20485993100010091,
+      "minimum": 0.18717440600448754,
+      "maximum": 0.21387900200352306
+    },
+    "plain-normal-run": {
+      "median_seconds": 0.003147782997984905,
+      "minimum": 0.0026731059988378547,
+      "maximum": 0.003216441997210495
+    },
+    "plain-optimized-check": {
+      "median_seconds": 0.00736530999711249,
+      "minimum": 0.006651994001003914,
+      "maximum": 0.008680564002133906
+    },
+    "plain-optimized-jit": {
+      "median_seconds": 0.027208374005567748,
+      "minimum": 0.023662373001570813,
+      "maximum": 0.028505697002401575
+    },
+    "plain-optimized-aot": {
+      "median_seconds": 0.30768673900456633,
+      "minimum": 0.21593231199949514,
+      "maximum": 0.4155717399989953
+    },
+    "plain-optimized-run": {
+      "median_seconds": 0.0033014820000971667,
+      "minimum": 0.0027719660065486096,
+      "maximum": 0.004299007006920874
+    },
+    "imported-normal-check": {
+      "median_seconds": 0.3780112319946056,
+      "minimum": 0.35781611099810107,
+      "maximum": 0.6501441820000764
+    },
+    "imported-normal-jit": {
+      "median_seconds": 0.8968435279966798,
+      "minimum": 0.8629281899993657,
+      "maximum": 1.0005432610050775
+    },
+    "imported-normal-aot": {
+      "median_seconds": 0.9524118600020302,
+      "minimum": 0.9170455299972673,
+      "maximum": 1.2480789039982483
+    },
+    "imported-normal-run": {
+      "median_seconds": 0.00365008000517264,
+      "minimum": 0.003495821001706645,
+      "maximum": 0.006534214997373056
+    },
+    "imported-optimized-check": {
+      "median_seconds": 0.2586180529979174,
+      "minimum": 0.24262167800043244,
+      "maximum": 0.26059055200312287
+    },
+    "imported-optimized-jit": {
+      "median_seconds": 0.7615178349951748,
+      "minimum": 0.7555336279983749,
+      "maximum": 0.8550256430025911
+    },
+    "imported-optimized-aot": {
+      "median_seconds": 0.8650111710012425,
+      "minimum": 0.8570292829972459,
+      "maximum": 1.2013954150024801
+    },
+    "imported-optimized-run": {
+      "median_seconds": 0.003112812999461312,
+      "minimum": 0.002949623994936701,
+      "maximum": 0.0032159620022866875
+    }
+  },
+  "executable_bytes": {
+    "plain-normal": 1844144,
+    "plain-optimized": 1844104,
+    "imported-normal": 1952032,
+    "imported-optimized": 1946448
+  },
+  "scope": "Local Release samples under concurrent validation load; no baseline compiler or native Windows/macOS comparison"
+}

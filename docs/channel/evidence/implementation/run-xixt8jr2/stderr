@@ -1,0 +1,26 @@
+/tmp/VOID-channel-rejections-mtl7eu7d/const-clear.void:8:9: error: A call may mutate readonly reference leaf '/@stdlib/channel.void::router<i32>'.
+    code: VOID2007
+
+ 8 |     bus.clear()
+   |         ^^^^^
+    Module: /const-clear.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/channel.void:36:8
+
+ 36 | struct router<t>:
+    |        ^^^^^^
+    Module: /@stdlib/channel.void
+    Reference authority enters this declaration here. at /home/shmellyorc/Documents/Void.Language/stdlib/channel.void:99:7
+
+ 99 | func (self router<t>) clear():
+    |       ^^^^
+    Module: /@stdlib/channel.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+
+/tmp/VOID-channel-rejections-mtl7eu7d/const-clear.void:8:9: error: Cannot call a mutating method through readonly receiver storage.
+    code: VOID2007
+
+ 8 |     bus.clear()
+   |         ^^^^^
+    Module: /const-clear.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

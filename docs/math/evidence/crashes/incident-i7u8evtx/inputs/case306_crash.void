@@ -1,0 +1,4 @@
+use math
+use math as m
+func main():
+    var a = math.pi

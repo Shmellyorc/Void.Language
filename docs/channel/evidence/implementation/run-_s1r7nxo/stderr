@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-mtl7eu7d/topic-type.void:8:14: error: Type mismatch: expected string, received i32.
+    code: VOID2001
+
+ 8 |     bus.emit(7, 7)
+   |              ^
+    Module: /topic-type.void
+    Expected: string
+    Received: i32
+

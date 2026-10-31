@@ -1,0 +1,13 @@
+use math
+func main():
+    var input: u16 = 1
+    var abs_inferred: u16 = math.abs(input)
+    var abs_explicit: u16 = math.abs<u16>(input)
+    var min_inferred: u16 = math.min(input, input)
+    var min_explicit: u16 = math.min<u16>(input, input)
+    var max_inferred: u16 = math.max(input, input)
+    var max_explicit: u16 = math.max<u16>(input, input)
+    var clamp_inferred: u16 = math.clamp(input, input, input)
+    var clamp_explicit: u16 = math.clamp<u16>(input, input, input)
+    var sign_inferred: u16 = math.sign(input)
+    var sign_explicit: u16 = math.sign<u16>(input)

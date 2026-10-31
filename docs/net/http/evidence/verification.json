@@ -1,0 +1,566 @@
+{
+  "status": "blocked; HTTP not implemented; isolated proposed provider correction only",
+  "baseline": "15f7868b0af177f8f7d49c548392c79c7bd921d2",
+  "verified_at_utc": "2026-10-30T12:32:03.466368+00:00",
+  "checks": {
+    "Release": {
+      "receipt": "cookie-Release-20261030T122547143010Z/commands.json",
+      "all_commands_exit_zero": true,
+      "native_invocations": 4,
+      "faults_per_provider": 12,
+      "actual_stack_soft": 1048576,
+      "actual_stack_hard": 1048576,
+      "native_stderr_empty": true
+    },
+    "Debug": {
+      "receipt": "cookie-Debug-20261030T122727912022Z/commands.json",
+      "all_commands_exit_zero": true,
+      "native_invocations": 4,
+      "faults_per_provider": 12,
+      "actual_stack_soft": 1048576,
+      "actual_stack_hard": 1048576,
+      "native_stderr_empty": true
+    },
+    "strict": {
+      "receipt": "cookie-strict-20261030T122727909757Z/commands.json",
+      "all_commands_exit_zero": true,
+      "native_invocations": 4,
+      "faults_per_provider": 12,
+      "actual_stack_soft": 1048576,
+      "actual_stack_hard": 1048576,
+      "native_stderr_empty": true
+    }
+  },
+  "protected_root_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "protected_root_matches_HEAD": true,
+  "index_unchanged_and_unstaged": true,
+  "tracked_edits_only_under_docs": true,
+  "diff_check_passed": true,
+  "source_modules_absent": true,
+  "failed_attempts_retained": [
+    "cookie-Debug-20261030T122558103393Z/commands.json",
+    "cookie-strict-20261030T122558104999Z/commands.json"
+  ],
+  "file_inventory": {
+    "docs/README.md": {
+      "bytes": 34896,
+      "sha256": "156d6e6aaf37c7c0e83c6b13532bb7a27e049a82d80055969f27da859bacf999"
+    },
+    "docs/VOID_STDLIB_BACKLOG_2026-10-27.md": {
+      "bytes": 7067,
+      "sha256": "99631cf08e9737dd55ca823f20a04e975737f442c9ea80dcf5debf0da025c1d4"
+    },
+    "docs/WRENCH_CLANKER.md": {
+      "bytes": 141193,
+      "sha256": "12e9c0f4cfd857c49f098b65cd77aba2b77f9bc868985f9c6286dc5fc002275e"
+    },
+    "docs/net/http/AUTHORIZATION.md": {
+      "bytes": 12521,
+      "sha256": "4f3d5027805a86a7b2a2843119f85c7ff4dcea617c3ac1d2985af1cf3dd82e89"
+    },
+    "docs/net/http/DESIGN.md": {
+      "bytes": 49220,
+      "sha256": "8ebcebe0ab775fc5cf379d55644d339087c2ae364c96dd1809d9f0b1318092a2"
+    },
+    "docs/net/http/IMPLEMENTATION.md": {
+      "bytes": 14017,
+      "sha256": "a2941da1adae4918c508861a6a247150002c2cfd98061290793185c264eda2fa"
+    },
+    "docs/net/http/RESEARCH.md": {
+      "bytes": 26739,
+      "sha256": "8b1f6737e2c1e9207920d348eb8459d388092d9e711685f0e20fdbe4bfab7ba5"
+    },
+    "docs/net/http/ROADMAP.md": {
+      "bytes": 23200,
+      "sha256": "af777d12f5469cca35d88c81f44a7db89d9ac99855a840edcb719da6b57011e4"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/cmake.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/cmake.stdout": {
+      "bytes": 90,
+      "sha256": "315e1daa4023afda33e316c6e2b57fa1fd67fffd2fc9cd86c5f47fab4ff746d6"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/commands.json": {
+      "bytes": 3478,
+      "sha256": "9e76b22033fa1fd1e6acdb20adf9f065483731977917a5d696815fa76a310f71"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/compiler.stdout": {
+      "bytes": 237,
+      "sha256": "3ee53c517641b504c9e8079877242227292ea9995c5a7cf4e81e679adf4e5953"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/original-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/original-build.stdout": {
+      "bytes": 14465,
+      "sha256": "d17bf9f1ffb634bb0227b76b8f6d8b148ba3e4bcb9d0411707fad6ae46c635f6"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/original-compile.stderr": {
+      "bytes": 175,
+      "sha256": "247e8c67fd1612ef5a76864cf2d4dde1939158f1e3a0269dc96da29ccf802948"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/original-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/original-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122558103393Z/original-configure.stdout": {
+      "bytes": 12654,
+      "sha256": "00087f5966d75b0c7ed3360e3a3a038dc5837d80334097b7722d383730d7b169"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/apply-candidate.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/apply-candidate.stdout": {
+      "bytes": 82,
+      "sha256": "bdca8e18799e6211cf65f9af31946e9fddf8c5ded96154a6e7e159d3aa72fab3"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-build.stdout": {
+      "bytes": 14463,
+      "sha256": "8412d5922c4743241e7dd17f01b7dc6c237a6ac03aeed4662068365be68b1518"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-configure.stdout": {
+      "bytes": 12655,
+      "sha256": "14f8f168f5beded00b887e48c2b2b7a0b693bb397a18ae960e60130b18886398"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-embedding.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-embedding.stdout": {
+      "bytes": 275,
+      "sha256": "ea293206a31ecd5582bdd311d2f41660f79a27826771848f851e3060ad336941"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-faults.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/candidate-faults.stdout": {
+      "bytes": 4470,
+      "sha256": "c2a034e55232dd7d03135ceca2223ca8cbf1199b10d09b3b408542c021a3a4d0"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/cmake.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/cmake.stdout": {
+      "bytes": 90,
+      "sha256": "315e1daa4023afda33e316c6e2b57fa1fd67fffd2fc9cd86c5f47fab4ff746d6"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/commands.json": {
+      "bytes": 8582,
+      "sha256": "a9a9e57c8892d6b1154e112174714e0904d5a7470da5d3e476869aae1060ecae"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/compiler.stdout": {
+      "bytes": 237,
+      "sha256": "3ee53c517641b504c9e8079877242227292ea9995c5a7cf4e81e679adf4e5953"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-build.stdout": {
+      "bytes": 14463,
+      "sha256": "3fe631121a6cf7954e22ead2d351a81c9229bc0542e37698a19fd028e1185576"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-configure.stdout": {
+      "bytes": 12654,
+      "sha256": "3bc1075ec2833557057eb5537bcb18305421b6cc637d1681d2fb62d439593ee9"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-embedding.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-embedding.stdout": {
+      "bytes": 275,
+      "sha256": "ea293206a31ecd5582bdd311d2f41660f79a27826771848f851e3060ad336941"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-faults.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/original-faults.stdout": {
+      "bytes": 4457,
+      "sha256": "979cc16611c5aadcf63ee47f6ae00f8e3f43810714ea6cfb69ca393a1d9c8f18"
+    },
+    "docs/net/http/evidence/cookie-Debug-repaired-driver.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Debug-repaired-driver.stdout": {
+      "bytes": 100,
+      "sha256": "3bf9b274660f9a5e26af31edec09c1a62483a6193cb311774f2ed032be144296"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/apply-candidate.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/apply-candidate.stdout": {
+      "bytes": 82,
+      "sha256": "bdca8e18799e6211cf65f9af31946e9fddf8c5ded96154a6e7e159d3aa72fab3"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-build.stdout": {
+      "bytes": 14463,
+      "sha256": "6a11d3051053d0f94f8b83d4785ea3cd4df9b952e69904b5cb9a765d2359fa72"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-configure.stdout": {
+      "bytes": 12657,
+      "sha256": "708fc1dc4e1e86a60a3790e542c1b9b178391a3e07221cf90d793589af253ce1"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-embedding.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-embedding.stdout": {
+      "bytes": 275,
+      "sha256": "ea293206a31ecd5582bdd311d2f41660f79a27826771848f851e3060ad336941"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-faults.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/candidate-faults.stdout": {
+      "bytes": 4470,
+      "sha256": "c2a034e55232dd7d03135ceca2223ca8cbf1199b10d09b3b408542c021a3a4d0"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/cmake.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/cmake.stdout": {
+      "bytes": 90,
+      "sha256": "315e1daa4023afda33e316c6e2b57fa1fd67fffd2fc9cd86c5f47fab4ff746d6"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/commands.json": {
+      "bytes": 8464,
+      "sha256": "d70bc7efbf317b2b42eca04dae26944bd43f9e503f2eb644db2535f6a4fcd21c"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/compiler.stdout": {
+      "bytes": 237,
+      "sha256": "3ee53c517641b504c9e8079877242227292ea9995c5a7cf4e81e679adf4e5953"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-build.stdout": {
+      "bytes": 14463,
+      "sha256": "95a273593c29941f51d85da64cccb8c47f88d4ec69136d03333ad82486a028ad"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-configure.stdout": {
+      "bytes": 12656,
+      "sha256": "d2e648e127c93660dab547017de13fb3b42e978420f2098d06fca64f130fc447"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-embedding.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-embedding.stdout": {
+      "bytes": 275,
+      "sha256": "ea293206a31ecd5582bdd311d2f41660f79a27826771848f851e3060ad336941"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-faults.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-Release-20261030T122547143010Z/original-faults.stdout": {
+      "bytes": 4457,
+      "sha256": "979cc16611c5aadcf63ee47f6ae00f8e3f43810714ea6cfb69ca393a1d9c8f18"
+    },
+    "docs/net/http/evidence/cookie-accounting-original-initial.jsonl": {
+      "bytes": 2754,
+      "sha256": "5c92bcfdc7c9e07686f1ddd9a74faf34ad4d2ba7dedfddc4b6a47bab160ca38e"
+    },
+    "docs/net/http/evidence/cookie-provider-build-original.log": {
+      "bytes": 14463,
+      "sha256": "1087dae73151546def710faf6014bc3c977bb0d2189638f7c9df179a57739cb6"
+    },
+    "docs/net/http/evidence/cookie-provider-build-patched.log": {
+      "bytes": 14463,
+      "sha256": "59d527375cb19e87d5afcbf6298103cd969fb99334ab407884df248266fd12e5"
+    },
+    "docs/net/http/evidence/cookie-provider-configure-original.log": {
+      "bytes": 12778,
+      "sha256": "3d6fc17772acf188b88e7a51bc4a2ed5d385151ae9498a377244adafe07b79fb"
+    },
+    "docs/net/http/evidence/cookie-provider-configure-patched.log": {
+      "bytes": 12786,
+      "sha256": "813a6d264145361cd6b65352103387c36ba038ca42415a6c15426e5b780fcf32"
+    },
+    "docs/net/http/evidence/cookie-provider-source-identity.json": {
+      "bytes": 1505,
+      "sha256": "4596899ce353afdf41f824a2c8914b2c99bf446bfa181ab29fd498c21c16c4ae"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/cmake.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/cmake.stdout": {
+      "bytes": 90,
+      "sha256": "315e1daa4023afda33e316c6e2b57fa1fd67fffd2fc9cd86c5f47fab4ff746d6"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/commands.json": {
+      "bytes": 3851,
+      "sha256": "3986da5a18835dd7e926cf62757b982ba68c03eb0d91c0bdd4161a4759cdf5c1"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/compiler.stdout": {
+      "bytes": 237,
+      "sha256": "3ee53c517641b504c9e8079877242227292ea9995c5a7cf4e81e679adf4e5953"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/original-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/original-build.stdout": {
+      "bytes": 14465,
+      "sha256": "f847f243cf27fa1fd39b1deb73f5a31bf5a68572b06e5b870df735877776eb34"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/original-compile.stderr": {
+      "bytes": 176,
+      "sha256": "3c1191918f254386aae5c5aec3d77232154218411bf6d8ea0103024859ed91be"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/original-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/original-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122558104999Z/original-configure.stdout": {
+      "bytes": 12655,
+      "sha256": "39966971f8fa419ee44ad3b6eefc6529aeac5698fc32f7c9a5964c89bd604cd1"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/apply-candidate.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/apply-candidate.stdout": {
+      "bytes": 82,
+      "sha256": "bdca8e18799e6211cf65f9af31946e9fddf8c5ded96154a6e7e159d3aa72fab3"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-build.stdout": {
+      "bytes": 14463,
+      "sha256": "d8b3a14b16a7f94fe29ee5bd51f550a3bbf7c233742c8d0b94be8837f95fb8b1"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-configure.stdout": {
+      "bytes": 12656,
+      "sha256": "21c24a8a9c0070f0cb114e8c79be8fdc58368dd51a63ba87355801ebf33bc7ad"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-embedding.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-embedding.stdout": {
+      "bytes": 275,
+      "sha256": "ea293206a31ecd5582bdd311d2f41660f79a27826771848f851e3060ad336941"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-faults.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/candidate-faults.stdout": {
+      "bytes": 4470,
+      "sha256": "c2a034e55232dd7d03135ceca2223ca8cbf1199b10d09b3b408542c021a3a4d0"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/cmake.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/cmake.stdout": {
+      "bytes": 90,
+      "sha256": "315e1daa4023afda33e316c6e2b57fa1fd67fffd2fc9cd86c5f47fab4ff746d6"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/commands.json": {
+      "bytes": 9190,
+      "sha256": "4a0b125373869ac4220cd19d3917023f81d17f3da8a5bff41ee2cfd05695ec78"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/compiler.stdout": {
+      "bytes": 237,
+      "sha256": "3ee53c517641b504c9e8079877242227292ea9995c5a7cf4e81e679adf4e5953"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-build.stdout": {
+      "bytes": 14463,
+      "sha256": "673d56c7fa051dcfd8ec0e0a5c6ad6ec8e983fa4cd8107ccbeda34c7732d657f"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-compile.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-compile.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-configure.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-configure.stdout": {
+      "bytes": 12655,
+      "sha256": "05f708228e1c05d8e2e364cb5bd269f684e55ceede02bb5375290dc29413b81c"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-embedding.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-embedding.stdout": {
+      "bytes": 275,
+      "sha256": "ea293206a31ecd5582bdd311d2f41660f79a27826771848f851e3060ad336941"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-faults.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-20261030T122727909757Z/original-faults.stdout": {
+      "bytes": 4457,
+      "sha256": "979cc16611c5aadcf63ee47f6ae00f8e3f43810714ea6cfb69ca393a1d9c8f18"
+    },
+    "docs/net/http/evidence/cookie-strict-repaired-driver.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/net/http/evidence/cookie-strict-repaired-driver.stdout": {
+      "bytes": 101,
+      "sha256": "3e5a4a1332a0f648fb5661edb73f78caf60609e9eb88e0fc6c1a521694b5ca21"
+    },
+    "docs/net/http/evidence/cookie_accounting_probe.c": {
+      "bytes": 7012,
+      "sha256": "1fd3bfdb823d28c8ffe38a98402c50101ba6a1b314e7ccc8ee47fbb7f195f8bf"
+    },
+    "docs/net/http/evidence/curl-8.23.0-COPYING.txt": {
+      "bytes": 1088,
+      "sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681"
+    },
+    "docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch": {
+      "bytes": 2851,
+      "sha256": "6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920"
+    },
+    "docs/net/http/evidence/curl-8.23.0.tar.xz.asc": {
+      "bytes": 488,
+      "sha256": "dba1562fec2bf698a1226054e6757940e4bf2ab87b3b222a5e7b91348f0b82e2"
+    },
+    "docs/net/http/evidence/curl-archive-signature.log": {
+      "bytes": 797,
+      "sha256": "422364aa5a70ab4f92b1d155abba7161f94ac5e2f8995f30864ccf1cfb495895"
+    },
+    "docs/net/http/evidence/curl-key-import.log": {
+      "bytes": 579,
+      "sha256": "c0392d104757fc78174f188a24003eece81215d58ede504334d7da6fc80338d1"
+    },
+    "docs/net/http/evidence/curl-release-key.asc": {
+      "bytes": 4741,
+      "sha256": "64619d3c1a2b68da837014b2ab02a049ed2c69aaebfa10a20a4f29dab003ecb8"
+    },
+    "docs/net/http/evidence/reproduce_cookie_accounting-initial.py": {
+      "bytes": 6197,
+      "sha256": "a38765c884af8e19f869d21b61e4a45b00c6152fdfa03d374cf85818ac99b095"
+    },
+    "docs/net/http/evidence/reproduce_cookie_accounting.py": {
+      "bytes": 6307,
+      "sha256": "4864fc86a1ac4a06e4ebd184bd9c905b43c4f41a301a8dcfb88e40271f1c060b"
+    }
+  }
+}

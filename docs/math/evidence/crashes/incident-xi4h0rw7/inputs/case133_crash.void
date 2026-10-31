@@ -1,0 +1,4 @@
+use math
+func main():
+    var input: u32 = 1
+    var bad = math.round(input)

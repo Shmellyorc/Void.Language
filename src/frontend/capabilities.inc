@@ -290,6 +290,20 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (e.target == "$convert.unwrap") {
                     view = ir::field_facts(e.parts[0]->type, arguments[0], 1);
                 }
+                if (e.target.starts_with("$http.")) {
+                    const bool asynchronous = e.target.starts_with("$http.async.");
+                    const auto operation = std::stoul(e.target.substr(asynchronous ? 12 : 11));
+                    const auto& contract = http::source_operations.at(operation);
+                    for (unsigned n = 0; n < arguments.size(); ++n) {
+                        const char code = contract.arguments[n];
+                        if (code != 'C' && code != 'T' && code != 'F' && code != 'r') continue;
+                        const ir::ReferencePath path = code == 'r' ? ir::ReferencePath{5, ir::array_element_path, 5} : ir::ReferencePath{};
+                        if (auto leaf = arguments[n].find(path); leaf != arguments[n].end()) {
+                            effect(f.reference_effects.mutations, leaf->second);
+                            if (report && leaf->second.readonly) issue(e.token, "Cannot mutate HTTP/file resources through readonly authority.");
+                        }
+                    }
+                }
                 if (e.target.starts_with("$io.")) {
                     bool asynchronous = e.target.starts_with("$io.async.");
                     auto operation = std::stoul(e.target.substr(asynchronous ? 10 : 9));

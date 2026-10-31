@@ -1,0 +1,6 @@
+/tmp/VOID-channel-rejections-4rzzrdv9/async-result.void:6:12: error: Callable-containing results cannot escape an async task in Delivery 1.
+    code: VOID1103
+
+ 6 | async func make() -> channel.router<i32>:
+   |            ^^^^
+

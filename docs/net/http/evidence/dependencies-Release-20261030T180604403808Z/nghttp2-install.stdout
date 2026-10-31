@@ -1,0 +1,10 @@
+-- Install configuration: "Release"
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/share/doc/nghttp2/README.rst
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include/nghttp2/nghttp2.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include/nghttp2/nghttp2ver.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/cmake/nghttp2/nghttp2Config.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/cmake/nghttp2/nghttp2ConfigVersion.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/cmake/nghttp2/nghttp2Targets.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/cmake/nghttp2/nghttp2Targets-release.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/libnghttp2.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/pkgconfig/libnghttp2.pc

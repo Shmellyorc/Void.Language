@@ -1,0 +1,11 @@
+struct tls:
+    enabled: bool = true
+
+struct options:
+    secure: tls
+
+func check(value: options = options()) -> bool:
+    return value.secure.enabled
+
+print(check())
+return 0

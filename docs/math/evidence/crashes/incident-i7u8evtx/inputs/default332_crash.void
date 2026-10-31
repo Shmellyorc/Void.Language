@@ -1,0 +1,3 @@
+use math
+func default(value: f64 = math.floor<f64>(1.5)):
+    pass

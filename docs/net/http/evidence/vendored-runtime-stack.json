@@ -1,0 +1,50 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_async_external_tests"
+    ],
+    "exit_code": 0,
+    "seconds": 0.30918935899899225,
+    "actual_soft_hard": 1048576
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_io_native_jobs"
+    ],
+    "exit_code": 0,
+    "seconds": 0.005377367999244598,
+    "actual_soft_hard": 1048576
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_async_external_tests"
+    ],
+    "exit_code": 0,
+    "seconds": 3.0864200390005863,
+    "actual_soft_hard": 1048576
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_io_native_jobs"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0068316119995870395,
+    "actual_soft_hard": 1048576
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_async_external_tests"
+    ],
+    "exit_code": 0,
+    "seconds": 1.1639706419991853,
+    "actual_soft_hard": 1048576
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_io_native_jobs"
+    ],
+    "exit_code": 0,
+    "seconds": 0.023378403999231523,
+    "actual_soft_hard": 1048576
+  }
+]

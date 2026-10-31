@@ -1,0 +1,3 @@
+patching file lib/cookie.c
+patching file lib/cookie.h
+patching file lib/getinfo.c

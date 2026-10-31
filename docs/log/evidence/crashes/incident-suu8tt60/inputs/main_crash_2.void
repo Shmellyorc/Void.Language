@@ -1,0 +1,6 @@
+use log
+use convert
+func main():
+    convert.unwrap(log.configure(log.config(timestamps = false, console = log.console_sink.stdout)))
+    convert.unwrap(log.info("installed"))
+    convert.unwrap(log.shutdown())

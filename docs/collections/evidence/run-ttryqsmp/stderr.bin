@@ -1,0 +1,8 @@
+/tmp/VOID-collections-negative-jh09z1mt/readonly-reverse.void:32:15: error: Cannot mutate storage through readonly array/reference authority.
+    code: VOID2007
+
+ 32 |     output[0].number = 9
+    |               ^^^^^^
+    Module: /readonly-reverse.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

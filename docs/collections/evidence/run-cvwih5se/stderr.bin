@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-l59b5bwa/bare-generic.void:31:37: error: A generic function value requires explicit concrete type arguments.
+    code: VOID1103
+
+ 31 |     var output = c.sorted([1, 2], c.numeric_less)
+    |                                     ^^^^^^^^^^^^
+    Module: /bare-generic.void
+

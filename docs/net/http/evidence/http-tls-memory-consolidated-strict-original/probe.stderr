@@ -1,0 +1,4 @@
+TLS rounds 16/64; current allocation measure 4569189
+TLS rounds 32/64; current allocation measure 4569189
+TLS failure kind=14 code=28
+TLS corpus verified handshake

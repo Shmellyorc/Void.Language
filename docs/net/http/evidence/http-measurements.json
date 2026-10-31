@@ -1,0 +1,49 @@
+{
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "architecture": "x86_64",
+  "cpu": "AMD Ryzen 7 1700X Eight-Core Processor",
+  "dependency_regular_bytes": 24585703,
+  "artifacts": {
+    "build/llvm23-release/voidc": 75992352,
+    "build/llvm23-release/voidls": 7728968,
+    "build/llvm23-release/libvoid_runtime.a": 4027504,
+    "build/llvm23-release/curl/lib/libcurl.a": 1451710
+  },
+  "bulk": [
+    {
+      "command": "voidc",
+      "seconds": 0.285534786999051,
+      "child_cpu_seconds": 0.26,
+      "rss_sampling_cutoff_seconds": 0.25,
+      "rss_kib_min_after_cutoff": 44520,
+      "rss_kib_max_after_cutoff": 44520
+    },
+    {
+      "command": "void_http_source_runner",
+      "seconds": 8.581450928999402,
+      "child_cpu_seconds": 8.5,
+      "rss_sampling_cutoff_seconds": 0.25,
+      "rss_kib_min_after_cutoff": 52260,
+      "rss_kib_max_after_cutoff": 168136
+    },
+    {
+      "command": "clang",
+      "seconds": 0.06161037099809619,
+      "child_cpu_seconds": 0.10000000000000142,
+      "rss_sampling_cutoff_seconds": 0.25,
+      "rss_kib_min_after_cutoff": null,
+      "rss_kib_max_after_cutoff": null
+    },
+    {
+      "command": "bulk",
+      "seconds": 6.4936726659943815,
+      "child_cpu_seconds": 8.56,
+      "rss_sampling_cutoff_seconds": 0.25,
+      "rss_kib_min_after_cutoff": 10580,
+      "rss_kib_max_after_cutoff": 11200
+    }
+  ],
+  "final_native_bulk": "http-reaping-public-bulk-4GiB-release",
+  "io_baseline_comparison": "http-io-comparison-summary.json",
+  "scope": "Artifact sizes from the final Release build; bulk receipt collected after Runtime retention-cost repair, before frontend-only stack split"
+}

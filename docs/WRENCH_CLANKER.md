@@ -1,5 +1,47 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Current Boss checkpoint and HTTP authorization, 30 October 2026
+
+Boss records LLVM/Clang/LLD 23.1.4 hosted acceptance at `15f7868b`,
+[CI #40982216303](https://github.com/Shmellyorc/Void.Language/actions/runs/40982216303):
+seven successful jobs, 2,454 passing CTests, zero failures and five documented
+cross-volume skips. This is the active toolchain baseline. It does not establish
+a causal repair of any historical optimizer incident, an independent source
+review or a new formal release lock.
+
+`os` implements all 13 public functions; registered native tests passed on Linux,
+Windows and macOS. `collections` implements all 24 approved public helpers and is
+feature-complete for that accepted API scope, with cross-platform CI passing.
+`log` implements its substantial approved API with cross-platform tests passing;
+the unexplained optimizer incident, performance OPEN and release HOLD remain
+unresolved. Preserve [logging history and holds](log/HANDOFF.md).
+
+The current Boss-authorized mission is the complete `url`/`net/http` contract.
+[Current engineering](net/http/CURRENT_ENGINEERING.md), [user guide/examples](net/http/README.md)
+and [acceptance roadmap](net/http/ROADMAP.md) now map the implemented source facade,
+compiler/Runtime bridge, multi driver, verified h1/h2/TLS/DNS, streaming and native
+bulk/multipart files, auth/proxies/cookies, redirects/deadlines and tooling.
+The four exact approved curl corrections are directly vendored and verified;
+`.toolchains/` is disposable. Boss approved the unmodified Linux AWS-LC pin,
+Runtime lifetime for the existing worker pool and four value configuration records.
+No settled decision needs reapproval. The original OpenSSL sanitizer failure
+remains preserved as upstream callback-type UB; strict checks are intact.
+
+Actual public-source 2 GiB streaming and 4 GiB+1 native bulk upload pass with
+separate source/provider/RSS measurements. Public declarations, five runnable
+examples, LSP inventory and hashed native link/install closure are implemented.
+All-target local Debug/Release/strict builds pass; final focused runs pass
+92/92 Release, 105/105 Debug and 92/92 strict checks. The
+[Golden Wrench handoff](net/http/HANDOFF.md) reconciles the original consolidated
+runs and focused repairs, preserving every original failure. Native Windows/macOS recipes are present but their
+execution acceptance is missing. [Provider memory review](net/http/MEMORY_REVIEW.md)
+retains the provisional reservation and remaining malformed-input/system-trust
+proof boundary. Full HTTP acceptance and independent review remain pending.
+Boss alone controls staging, commits, branches, pushes, hosted CI and releases;
+root README remains protected. [Chronological engineering history](net/http/ENGINEERING_HISTORY.md)
+keeps original failures and superseded checkpoints intact.
+Older dated checkpoints below retain their historical scope and evidence.
+
 ## LLVM 23.1.4 migration — Boss authorization, 28 October 2026
 
 Boss authorizes the complete compiler/toolchain migration and consolidated local
@@ -7,8 +49,9 @@ verification. [Engineering record](llvm23/IMPLEMENTATION.md),
 [compatibility](llvm23/COMPATIBILITY.md), [acceptance](llvm23/ACCEPTANCE.md).
 Local engineering completes with effective Release 368/368, Debug 381/381 and
 effective strict 358/358 plus hard-stack/editor/install/native and bounded metrics.
-Original failures/focused corrections remain separate. Independent review and
-native Windows/macOS/hosted acceptance are pending.
+Original failures/focused corrections remain separate. The 30 October checkpoint
+above supersedes the former pending native/hosted status. Independent source
+review and a formal release lock are not inferred from hosted acceptance.
 The active toolchain requirement is LLVM/Clang/LLD 23.1.4; older dated
 19.1.7 pins below are historical. Preserve one frontend/IR/backend, verified O2,
 GC/ABI/generation leases and platform protections. Git, hosted CI, publication

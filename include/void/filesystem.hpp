@@ -76,6 +76,9 @@ struct Request {
 // Run only with exclusive file-operation authority. Cancellation is observed
 // between native transfers/entries; an entered syscall is drained to completion.
 Result run(const Request&, const std::atomic<bool>* cancellation = nullptr);
+// Native configuration snapshots: regular files only, bounded before growth.
+// POSIX nonblocking open prevents a FIFO/device from trapping a transport owner.
+Result read_regular(const std::string&, std::int64_t max_bytes);
 std::shared_ptr<File> open(const std::string&, OpenMode, Result&,
                            std::shared_ptr<const testing::Hooks> = {});
 Result close(File&);

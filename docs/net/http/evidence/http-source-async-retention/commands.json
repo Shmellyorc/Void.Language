@@ -1,0 +1,26 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP source o_3u4mu0/sync.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP source o_3u4mu0/async.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_source_runner",
+      "--async",
+      "/tmp/VOID HTTP source o_3u4mu0/async.void"
+    ],
+    "exit_code": 1
+  }
+]

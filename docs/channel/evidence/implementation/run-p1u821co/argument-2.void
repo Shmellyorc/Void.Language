@@ -1,0 +1,18 @@
+use channel
+
+func observe(const amount: i32):
+    print(amount)
+
+func main():
+    var bus = channel.router<i32>()
+    var other = channel.router<i32>()
+    const first = bus.subscribe("score", observe)
+    const second = bus.subscribe("score", observe)
+    bus.emit("score", 7)
+    print(other.unsubscribe(first))
+    print(bus.unsubscribe(first))
+    print(bus.unsubscribe(first))
+    bus.emit("score", 8)
+    bus.clear()
+    print(bus.unsubscribe(second))
+    bus.emit("score", 9)

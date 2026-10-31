@@ -1,0 +1,4 @@
+use math
+func main():
+    var input: u16 = 1
+    var bad = math.tan(input)

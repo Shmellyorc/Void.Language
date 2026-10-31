@@ -1,0 +1,33 @@
+{
+  "archive": {
+    "url": "https://curl.se/download/curl-8.23.0.tar.xz",
+    "sha256": "8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5",
+    "bytes": 2990916,
+    "signature": "curl-archive-signature.log",
+    "signer_fingerprint": "27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2"
+  },
+  "original_source": {
+    "COPYING": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681",
+    "lib/cookie.c": "94072d0881d38d0266b18b7449ea6b19ccab72b97990581cd5ab41d58bd89fd6",
+    "lib/cookie.h": "0f675d531c5812d8bde59370643a0ddc2f356890ee949046fc32297844281c8a",
+    "lib/getinfo.c": "777826841812abcc9ed273aa30e2accd4f2cf9c667681c4eac7a559bf3966639",
+    "lib/http2.c": "6a9d36f79b772b18cea2d17707fc32fa5dd49493d4bc4e94363bc5cd8ef91fc9",
+    "lib/easy.c": "e9d54fb7ba65472a417ae6f04bfe1dccb168a3df0e36ad016851ee72c0058a31",
+    "include/curl/curl.h": "ad8989a81e79b407355e14d673410d51420bfec48287f4b890d0b211d9235ec3"
+  },
+  "acquisition_attempts": [
+    {
+      "url": "https://curl.se/download/curl-8.23.0.tar.xz.sha256",
+      "outcome": "HTTP 404; no upstream sha256 file claimed"
+    },
+    {
+      "url": "https://curl.se/download/curl-8.23.0.tar.xz.asc",
+      "outcome": "downloaded; gpg verification receipt retained"
+    },
+    {
+      "url": "https://daniel.haxx.se/mykey.asc",
+      "outcome": "key downloaded into isolated test-only keyring; no user keyring changes"
+    }
+  ],
+  "probe_source_sha256": "1fd3bfdb823d28c8ffe38a98402c50101ba6a1b314e7ccc8ee47fbb7f195f8bf"
+}

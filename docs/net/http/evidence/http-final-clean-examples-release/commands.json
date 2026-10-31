@@ -1,0 +1,173 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/tmp/VOID HTTP examples 2h8sw3e0/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/tmp/VOID HTTP examples 2h8sw3e0/key.pem",
+      "-out",
+      "/tmp/VOID HTTP examples 2h8sw3e0/cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08746535499813035
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3575702409943915
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.35214537900174037
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2557496300069033
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.26993716599827167
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2574984309976571
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 5.860092407994671
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/api_json.void",
+      "-o",
+      "/tmp/VOID HTTP examples 2h8sw3e0/api_json"
+    ],
+    "exit_code": 0,
+    "seconds": 5.537607115002174
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 2h8sw3e0/api_json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.052028899001015816
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 5.008522816999175
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/authenticated_post.void",
+      "-o",
+      "/tmp/VOID HTTP examples 2h8sw3e0/authenticated_post"
+    ],
+    "exit_code": 0,
+    "seconds": 4.618010477999633
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 2h8sw3e0/authenticated_post"
+    ],
+    "exit_code": 0,
+    "seconds": 0.09850605700194137
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 3.9738275579948095
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/files.void",
+      "-o",
+      "/tmp/VOID HTTP examples 2h8sw3e0/files"
+    ],
+    "exit_code": 0,
+    "seconds": 3.718487536003522
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 2h8sw3e0/files"
+    ],
+    "exit_code": 0,
+    "seconds": 0.15998179799498757
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 2h8sw3e0/api_json"
+    ],
+    "exit_code": 1,
+    "seconds": 0.05227071900299052
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/void_http_example_host",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 8.287489199996344
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/HTTP final output \u96ea #/void_http_example_host",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 1,
+    "seconds": 7.6596307159998105
+  }
+]

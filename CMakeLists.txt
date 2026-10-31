@@ -30,6 +30,7 @@ if(VOID_LINKER)
   endif()
 endif()
 option(VOID_SANITIZERS "Instrument compiler/runtime with ASan and UBSan" OFF)
+include(cmake/Sanitizers.cmake)
 add_library(void_options INTERFACE)
 void_enable_libcxx_stop_token()
 # C++ standard-library template objects cross the LLVM/backend/runtime boundary.
@@ -64,9 +65,22 @@ if(MSVC)
   target_compile_definitions(void_options INTERFACE _ITERATOR_DEBUG_LEVEL=0)
 else()
   target_compile_options(void_options INTERFACE -Wall -Wextra -Wpedantic)
-  if(VOID_SANITIZERS)
-    target_compile_options(void_options INTERFACE -fsanitize=address,undefined -fno-omit-frame-pointer)
-    target_link_options(void_options INTERFACE -fsanitize=address,undefined)
+endif()
+void_enable_sanitizers(void_options INTERFACE)
+if(VOID_SANITIZERS AND MSVC)
+  include(CheckCXXSourceRuns)
+  include(CMakePushCheckState)
+  cmake_push_check_state(RESET)
+  set(CMAKE_REQUIRED_FLAGS "/clang:-fsanitize=address,undefined /clang:-fno-omit-frame-pointer")
+  unset(VOID_WINDOWS_STRICT_RUNS CACHE)
+  check_cxx_source_runs("#if !__has_feature(address_sanitizer) || !__has_feature(undefined_behavior_sanitizer)
+#error Full strict instrumentation is required
+#endif
+int main(){volatile int count=1;int* data=new int[count];data[0]=count+1;int result=data[0];delete[] data;return result==2?0:1;}"
+    VOID_WINDOWS_STRICT_RUNS)
+  cmake_pop_check_state()
+  if(NOT VOID_WINDOWS_STRICT_RUNS)
+    message(FATAL_ERROR "The selected Windows SDK/Clang sanitizer runtimes cannot link and execute full ASan/UBSan")
   endif()
 endif()
 set(VOID_STDLIB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/stdlib" CACHE PATH "Matching standard-library sources")
@@ -91,6 +105,16 @@ target_link_libraries(void_native_fixture PRIVATE void_options)
 add_library(void_runtime STATIC src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
 target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
+include(cmake/CurlProvider.cmake)
+void_add_curl_provider(HTTP)
+target_link_libraries(void_runtime PUBLIC CURL::libcurl_static void_http_compression)
+target_sources(void_runtime PRIVATE src/runtime/http_provider.cpp src/runtime/url.cpp src/runtime/url_abi.cpp src/runtime/http.cpp src/runtime/http_bulk.cpp src/runtime/http_resource.cpp src/runtime/http_file.cpp src/runtime/http_abi.cpp src/runtime/native_work.cpp)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  # Keep bundled provider symbols local when VOID is embedded in a process that
+  # also loads another curl/TLS/DNS/decoder instance.
+  target_link_options(void_runtime INTERFACE
+    "LINKER:--exclude-libs,libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a")
+endif()
 if(WIN32)
   target_link_libraries(void_runtime PUBLIC shell32 ole32 uuid)
 elseif(APPLE)
@@ -217,6 +241,16 @@ target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_link_libraries(voidc_objects PRIVATE void_llvm)
 set(cache_identity_inputs "$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_llvm>;$<TARGET_FILE:void_core>;$<TARGET_FILE:void_runtime>;$<TARGET_FILE:void_native_fixture>")
 set(cache_identity_deps void_llvm void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
+list(APPEND cache_identity_inputs ${VOID_HTTP_LINK_FILES}
+  "${PROJECT_SOURCE_DIR}/third_party/curl/VOID-PROVENANCE.json"
+  "${PROJECT_SOURCE_DIR}/third_party/http-versions.json"
+  "${PROJECT_SOURCE_DIR}/third_party/publicsuffix/UPSTREAM.json"
+  "${PROJECT_SOURCE_DIR}/cmake/CurlProvider.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/NativeBuild.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/HttpDependencies.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/HttpNativeDependencies.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/http-psl/CMakeLists.txt")
+list(APPEND cache_identity_deps libcurl_static ${VOID_HTTP_LINK_FILES})
 foreach(library IN LISTS VOID_LLVM_LIBS)
   if(TARGET ${library})
     get_target_property(cache_library_type ${library} TYPE)
@@ -253,6 +287,83 @@ endif()
 include(cmake/NativeBuild.cmake)
 include(CTest)
 if(BUILD_TESTING)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_executable(void_http_native tests/net/http/native.cpp tests/net/http/runtime.cpp)
+  target_link_libraries(void_http_native PRIVATE void_runtime)
+  add_test(NAME http_native COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/fixture.py"
+    "$<TARGET_FILE:void_http_native>" --http2 --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-native-evidence")
+  set_tests_properties(http_native PROPERTIES TIMEOUT 180)
+  if(NOT WIN32)
+    # This corpus specifically audits the pinned AWS-LC parser and allocations.
+    # It cannot certify Schannel's OS-owned allocator/store behavior.
+    add_executable(void_http_tls_memory tests/net/http/tls_memory.cpp)
+    target_link_libraries(void_http_tls_memory PRIVATE void_runtime)
+    add_test(NAME http_tls_memory COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/tls_memory.py"
+      "$<TARGET_FILE:void_http_tls_memory>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-tls-memory-evidence")
+    set_tests_properties(http_tls_memory PROPERTIES TIMEOUT 1300)
+  endif()
+  add_executable(void_url_native tests/net/http/url.cpp)
+  add_executable(void_http_dns tests/net/http/dns.cpp)
+  # Opt-in measurement tool; no arbitrary throughput threshold in CTest.
+  add_executable(void_http_reload tests/net/http/reload.cpp)
+  target_link_libraries(void_http_reload PRIVATE void_llvm void_cache_identity)
+  add_test(NAME http_reload COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/reload.py"
+    "$<TARGET_FILE:void_http_reload>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-reload-evidence")
+  set_tests_properties(http_reload PROPERTIES TIMEOUT 240)
+  add_executable(void_http_io_performance tests/net/http/io_performance.cpp)
+  target_link_libraries(void_http_io_performance PRIVATE void_llvm void_cache_identity)
+  add_executable(void_http_performance tests/net/http/performance.cpp)
+  target_link_libraries(void_http_performance PRIVATE void_runtime)
+  add_executable(void_http_timeouts tests/net/http/timeouts.cpp)
+  target_link_libraries(void_http_timeouts PRIVATE void_runtime)
+  add_test(NAME http_timeouts COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/timeouts.py"
+    "$<TARGET_FILE:void_http_timeouts>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-timeouts-evidence")
+  set_tests_properties(http_timeouts PROPERTIES TIMEOUT 60)
+  add_executable(void_http_wire tests/net/http/wire.cpp)
+  target_link_libraries(void_http_wire PRIVATE void_runtime)
+  add_test(NAME http_wire COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/wire.py"
+    "$<TARGET_FILE:void_http_wire>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-wire-evidence")
+  set_tests_properties(http_wire PROPERTIES TIMEOUT 180)
+  target_link_libraries(void_http_dns PRIVATE void_runtime)
+  add_test(NAME http_dns COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/dns.py"
+    "$<TARGET_FILE:void_http_dns>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-dns-evidence")
+  set_tests_properties(http_dns PROPERTIES TIMEOUT 180)
+  target_link_libraries(void_url_native PRIVATE void_runtime)
+  add_test(NAME url_native COMMAND void_url_native)
+  add_executable(void_http_source_runner tests/net/http/source_runner.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_http_source_runner PRIVATE void_llvm void_cache_identity)
+  add_executable(void_http_example_host examples/net_http/host.cpp)
+  target_link_libraries(void_http_example_host PRIVATE void_llvm void_cache_identity)
+  add_test(NAME http_examples COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/examples.py"
+    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_example_host>"
+    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-examples-evidence")
+  set_tests_properties(http_examples PROPERTIES TIMEOUT 300)
+  add_test(NAME http_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/install.py"
+    "$<TARGET_FILE:voidc>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-install-evidence")
+  add_test(NAME http_bulk COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/bulk.py"
+    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_source_runner>"
+    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-bulk-evidence")
+  set_tests_properties(http_install http_bulk PROPERTIES TIMEOUT 300)
+  add_executable(void_http_ir tests/net/http/http_ir.cpp)
+  target_link_libraries(void_http_ir PRIVATE void_core)
+  add_test(NAME http_ir COMMAND void_http_ir "${PROJECT_SOURCE_DIR}/tests/net/http/source_sync.void")
+  add_test(NAME http_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source.py"
+    "$<TARGET_FILE:voidc>" --runner "$<TARGET_FILE:void_http_source_runner>"
+    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-source-evidence")
+  add_test(NAME http_source_negative COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source_negative.py"
+    "$<TARGET_FILE:voidc>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-source-negative-evidence")
+  add_test(NAME http_source_faults COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source.py"
+    "$<TARGET_FILE:voidc>" --runner "$<TARGET_FILE:void_http_source_runner>" --faults-only
+    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-source-faults-evidence")
+  set_tests_properties(http_source http_source_faults PROPERTIES TIMEOUT 600)
+  set_tests_properties(http_ir http_source_negative PROPERTIES TIMEOUT 180)
+  add_executable(void_url_ir tests/net/http/url_ir.cpp)
+  target_link_libraries(void_url_ir PRIVATE void_core)
+  add_test(NAME url_ir COMMAND void_url_ir "${PROJECT_SOURCE_DIR}/tests/net/http/url.void")
+  add_test(NAME url_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/url_source.py" "$<TARGET_FILE:voidc>")
+  add_test(NAME url_lsp COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/url_lsp.py" "$<TARGET_FILE:voidls>")
+  add_test(NAME http_lsp COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/http_lsp.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(url_native url_ir url_source url_lsp http_lsp PROPERTIES TIMEOUT 180)
   add_executable(void_stop_token_probe cmake/probes/StopToken.cpp)
   target_link_libraries(void_stop_token_probe PRIVATE void_options Threads::Threads)
   add_test(NAME toolchain_stop_token COMMAND void_stop_token_probe)
@@ -381,10 +492,14 @@ if(BUILD_TESTING)
         add_custom_command(OUTPUT "${object}"
           COMMAND void_private_fixed_generator "${object}" "${mode}" "${selected}" "${extent}"
           DEPENDS void_private_fixed_generator VERBATIM)
+        # Give the shared output one producer before either executable uses it.
+        # Otherwise Make can run the generator concurrently in both targets.
+        add_custom_target(void_${stem}_object DEPENDS "${object}")
         set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
         foreach(witness observed unobserved)
           set(test "${stem}_${witness}")
           add_executable(void_${test} tests/research/call_envelope/generated_runtime.cpp "${object}")
+          add_dependencies(void_${test} void_${stem}_object)
           target_link_libraries(void_${test} PRIVATE void_runtime)
           if(witness STREQUAL "observed")
             target_compile_definitions(void_${test} PRIVATE VD_FIXED_OBSERVE=1)
@@ -1180,6 +1295,14 @@ if(BUILD_TESTING)
   target_link_libraries(void_io_native_jobs PRIVATE void_runtime)
   add_test(NAME io_native_jobs COMMAND void_io_native_jobs)
   set_tests_properties(io_native_jobs PROPERTIES TIMEOUT 60)
+  add_executable(void_async_external_tests tests/async/external.cpp)
+  add_executable(void_native_workers_tests tests/async/native_workers.cpp)
+  target_link_libraries(void_native_workers_tests PRIVATE void_runtime)
+  add_test(NAME native_workers COMMAND void_native_workers_tests)
+  set_tests_properties(native_workers PROPERTIES TIMEOUT 60)
+  target_link_libraries(void_async_external_tests PRIVATE void_runtime)
+  add_test(NAME async_external COMMAND void_async_external_tests)
+  set_tests_properties(async_external PROPERTIES TIMEOUT 60)
 
   add_executable(void_io_kernel tests/io/kernel.cpp)
   target_link_libraries(void_io_kernel PRIVATE void_runtime)

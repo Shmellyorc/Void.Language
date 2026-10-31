@@ -1,0 +1,37 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation shzsla6v/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11068931499903556
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation shzsla6v/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.02126858500560047
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation shzsla6v/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation shzsla6v/api \u96ea # %.void"
+    ],
+    "exit_code": 1,
+    "seconds": 0.006149217006168328
+  }
+]

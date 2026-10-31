@@ -1,0 +1,15 @@
+/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/source-defaults/managed_defaults.void:7:29: error: Managed allocation is not a compile-time expression.
+    code: VOID2011
+
+ 7 | func check(value: options = options()) -> bool:
+   |                             ^^^^^^^
+    Module: /managed_defaults.void
+
+/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/source-defaults/managed_defaults.void:10:7: error: Incorrect argument count: missing required argument 'value'.
+    code: VOID2004
+
+ 10 | print(check())
+    |       ^^^^^
+    Module: /managed_defaults.void
+    Hint: Supply an explicit constructed value or every required argument.
+

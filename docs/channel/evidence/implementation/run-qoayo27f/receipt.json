@@ -1,0 +1,13 @@
+{
+  "args": [
+    "/tmp/VOID-channel-receiver-rmr9muuk/receiver"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+  "status": 0,
+  "seconds": 0.04753449900454143,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "bf6c9c04ec47ee19c7a2dce30be1c29810874c64c816efceb9f31e5dd7ca9213",
+  "object_hashes": {},
+  "output_hashes": {}
+}

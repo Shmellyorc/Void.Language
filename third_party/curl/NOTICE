@@ -1,0 +1,28 @@
+VOID retains the library/CMake subset of the official curl 8.23.0 release.
+Upstream copyright and permission notices are in COPYING and the source files.
+VOID-PROVENANCE.json records the archive URL, SHA-256, signature identity,
+retained upstream file hashes and the four corrected private file hashes.
+
+Local modifications: lib/cookie.c, lib/cookie.h and lib/getinfo.c distinguish
+failed cookie enumeration allocations (CURLE_OUT_OF_MEMORY) from successful
+empty enumeration. The existing share lock, partial-list cleanup, disabled
+cookie/HTTP behavior and public ABI are preserved. The exact review diff is
+docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch in the VOID tree.
+
+The additional correction in lib/http2.c removes a duplicated HTTP/2 window
+increment after the absolute nghttp2 window setter. Its setter error handling,
+public ABI and flow-control pause/resume policy remain intact. The exact diff is
+docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch. Approval and
+independent before/after receipts are in docs/net/http/HTTP2_WINDOW_REVIEW.md.
+
+Production CMake builds these files directly. No patch application or source
+from .toolchains is part of the curl build. .toolchains is disposable storage
+for independently pinned transitive dependencies and build tools.
+
+Retained: release top-level files, CMake/, include/, lib/, docs/, scripts/.
+Omitted: command-line tool src/, tests/, projects/, m4/. The retained configure
+script is provenance material; this subset is built through CMake only.
+See cmake/CurlProvider.cmake for the explicit library feature policy.
+
+Upstream follow-up: prepared locally, not submitted. No upstream acceptance
+is claimed. The detailed follow-up record is docs/net/http/PATCH_REVIEW.md.

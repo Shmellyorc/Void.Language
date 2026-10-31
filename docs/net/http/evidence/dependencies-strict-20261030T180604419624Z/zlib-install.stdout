@@ -1,0 +1,17 @@
+-- Install configuration: "Debug"
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libz.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/cmake/zlib/ZLIB-static.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/cmake/zlib/ZLIB-static-debug.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/cmake/zlib/ZLIBConfig.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/cmake/zlib/ZLIBConfigVersion.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/include/zconf.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/include/zlib.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/man/man3/zlib.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/algorithm.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/crc-doc.1.0.pdf
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/rfc1950.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/rfc1951.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/rfc1952.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/share/doc/zlib/zlib/txtvsbin.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/pkgconfig/zlib.pc

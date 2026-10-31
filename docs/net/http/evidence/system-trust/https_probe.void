@@ -1,0 +1,16 @@
+use net/http
+
+func probe() -> result<bool, http.error>:
+    with http.open_client()? as owner:
+        var reply = owner.get("https://curl.se/", http.request_options(
+            connect_timeout_ms = 5000, total_timeout_ms = 10000,
+            max_encoded_bytes = 1048576, max_decoded_bytes = 1048576, max_buffer_bytes = 1048576))?
+        print(reply.info.status, reply.info.version is http.http_version.http2)
+        return reply.require_success()
+
+if probe() is Ok(var trusted):
+    print(trusted)
+    return 0
+else:
+    print("Default distribution TLS probe failed")
+    return 1

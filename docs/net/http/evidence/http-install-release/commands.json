@@ -1,0 +1,216 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation 4k7g1i4h/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10344787999929395
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation 4k7g1i4h/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.02473369400104275
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 5.816039799996361
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 5.519655115000205
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05258206399594201
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 9.719109129000572
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 4k7g1i4h/program.o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.055218698995304294
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05281946099421475
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 5.141576308997173
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 4.478888263001863
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05350395699497312
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 7.9265753220024635
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 4k7g1i4h/program.o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0571988820011029
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0546089130002656
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 0.3767820569992182
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 4k7g1i4h/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 4k7g1i4h/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 5.46699762299977
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 4k7g1i4h/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05796783600089839
+  }
+]

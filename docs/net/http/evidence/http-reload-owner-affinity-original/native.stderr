@@ -1,0 +1,9 @@
+HTTP boundary invariant failedCalled from /@stdlib/net/http.void::open_client
+/home/shmellyorc/Documents/Void.Language/stdlib/net/http.void:963:21: source call
+        var reply = _http_open(owner, _config_of(config))
+                    ^
+Called from /main.void::entry
+/tmp/VOID HTTP reload ce5qgiv6/main.void:4:13: source call
+    if http.open_client() is Ok(var owner):
+            ^
+

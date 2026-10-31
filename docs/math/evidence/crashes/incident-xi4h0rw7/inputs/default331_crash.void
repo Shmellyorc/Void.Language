@@ -1,0 +1,2 @@
+use math
+const value: f64 = math.sqrt<f64>(4)

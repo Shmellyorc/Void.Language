@@ -1,0 +1,32 @@
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/src/idn2.c:57:22: warning: format string is not a string literal [-Wformat-nonliteral]
+   57 |     fprintf (stderr, _("Try `%s --help' for more information.\n"),
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/src/idn2.c:38:19: note: expanded from macro '_'
+   38 | #define _(String) dgettext (PACKAGE, String)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/gl/gettext.h:70:38: note: expanded from macro 'dgettext'
+   70 | # define dgettext(Domainname, Msgid) ((void) (Domainname), gettext (Msgid))
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/src/idn2.c:61:15: warning: format string is not a string literal [-Wformat-nonliteral]
+   61 |       printf (_("\
+      |               ^~~~
+   62 | Usage: %s [OPTION]... [STRINGS]...\n\
+      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   63 | "), program_name);
+      | ~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/src/idn2.c:38:19: note: expanded from macro '_'
+   38 | #define _(String) dgettext (PACKAGE, String)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/gl/gettext.h:70:38: note: expanded from macro 'dgettext'
+   70 | # define dgettext(Domainname, Msgid) ((void) (Domainname), gettext (Msgid))
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/src/idn2.c:208:22: warning: format string is not a string literal [-Wformat-nonliteral]
+  208 |     fprintf (stderr, _("Charset: %s\n"), locale_charset ());
+      |                      ^~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/src/idn2.c:38:19: note: expanded from macro '_'
+   38 | #define _(String) dgettext (PACKAGE, String)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/source/libidn2-2.3.8/gl/gettext.h:70:38: note: expanded from macro 'dgettext'
+   70 | # define dgettext(Domainname, Msgid) ((void) (Domainname), gettext (Msgid))
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3 warnings generated.

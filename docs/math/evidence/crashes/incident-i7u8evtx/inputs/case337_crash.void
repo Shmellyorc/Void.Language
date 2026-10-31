@@ -1,0 +1,5 @@
+use "./libs/math.void" as mine
+func stolen(value: f32) -> f32:
+    return _math_sin(value)
+func main():
+    var a = mine.sin(1.0)

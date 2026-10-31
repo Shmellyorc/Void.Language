@@ -1,0 +1,16 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+    "run",
+    "/tmp/VOID-channel-execution-v1h0d8gw/cached.void",
+    "--no-opt"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+  "status": 0,
+  "seconds": 0.02451735000067856,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "ce73e57f8baadceddebc6167c966affff20a2ed0317d7376491f81d3b4ac4935",
+  "object_hashes": {},
+  "output_hashes": {}
+}

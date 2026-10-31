@@ -180,6 +180,22 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     case Op::gc_construct:
                         for(unsigned field=0;field<i.arguments.size();++field)retain(values[i.arguments[field]],field_type(i.type,field));
                         break;
+                    case Op::http_control:
+                    case Op::http_native:
+                    case Op::http_async: {
+                        const auto& contract = http::source_operations.at(i.immediate);
+                        for (unsigned n = 0; n < i.arguments.size(); ++n) {
+                            const char code = contract.arguments[n];
+                            if (code != 'C' && code != 'T' && code != 'F' && code != 'r') continue;
+                            const auto& facts = values[i.arguments[n]];
+                            const ReferencePath path = code == 'r' ? ReferencePath{5, array_element_path, 5} : ReferencePath{};
+                            if (auto leaf = facts.find(path); leaf != facts.end()) {
+                                effect(summary.mutations, leaf->second);
+                                if (leaf->second.readonly) fail("mutation through readonly HTTP/file authority");
+                            }
+                        }
+                        break;
+                    }
                     case Op::filesystem_control:
                     case Op::filesystem_native:
                     case Op::filesystem_async: {

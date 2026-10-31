@@ -19,6 +19,12 @@ public:
     virtual ~NativeResource() = default;
     virtual const void* kind() const noexcept = 0;
     virtual std::error_code close() = 0;
+    // Drain dependent native operations/borrows before any ledger resource is
+    // closed. Default resources have no dependencies. No source callbacks.
+    virtual std::error_code quiesce() { return {}; }
+    // Called before Runtime waits for native jobs. Signal cancellation/wakeup
+    // only: no waits, managed allocation, source callbacks or ledger reentry.
+    virtual void request_stop() noexcept {}
     void own_thread() const;
 
 protected:
@@ -35,8 +41,9 @@ public:
     void publish(void*, std::shared_ptr<NativeResource>);
     std::shared_ptr<NativeResource> find(void*, bool cleanup = false);
     void* identity(const void* kind);
-    void erase(void*);
+    void erase(void*, const NativeResource* expected = nullptr);
     std::error_code shutdown();
+    void request_stop() noexcept;
 
 private:
     Runtime& runtime_;
@@ -44,5 +51,7 @@ private:
     std::mutex shutdown_mutex_;
     std::map<void*, std::shared_ptr<NativeResource>> resources_;
 };
+
+void native_request_stop(Runtime&);
 
 } // namespace vd

@@ -1,0 +1,1366 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_native",
+    "http://127.0.0.1:46653",
+    "https://127.0.0.1:45571",
+    "/tmp/VOID HTTP native i3yaqnws/cert.pem",
+    "https://127.0.0.1:34519",
+    "https://127.0.0.1:34661",
+    "/tmp/VOID HTTP native i3yaqnws/cert.pem",
+    "/tmp/VOID HTTP native i3yaqnws/key.pem",
+    "/tmp/VOID HTTP native i3yaqnws/identity.p12",
+    "/tmp/VOID HTTP native i3yaqnws",
+    "http://127.0.0.1:36307",
+    "https://127.0.0.1:37111",
+    "54101"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 6.730412926001009,
+  "binary_sha256": "0ccac268ef56d4ef18b66e9f2e2f8a78baa972b912906c3757476f0b445b925f",
+  "source_sha256": {
+    "src/runtime/http.cpp": "bf74c1fd1455641fc1ea81ba9f137b33bbc238e7643b33e5b3489c66f209fcc4",
+    "src/runtime/http_bulk.cpp": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+    "src/runtime/http_resource.cpp": "d0367326f4f9ba2680a9619062b9ff12f595166c8751da1fb60aa7aa3907397e",
+    "include/void/http.hpp": "d4e076d57f8ba95653078ce4f2759542985b2340859618bafa1d45801624fe0d",
+    "tests/net/http/native.cpp": "ebee9351a300edaee3966a98505f2c6a89cc5786b64306a411f3e2e6e8bd7a9b",
+    "tests/net/http/runtime.cpp": "162f9e75ec8a0e166258b4161b8e75f1fcf8c57e89c8c8f0f6cb478b8620f39d",
+    "tests/net/http/fixture.py": "09f32d87be91e2f4612a5e84946f2eebed9b16a5f3adac76650c6d8917ca7703",
+    "third_party/curl/VOID-PROVENANCE.json": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+    "third_party/http-versions.json": "061c7073ec1657825cf31a1a0a3ec6bb717738e3a7fa65fd15b328ac6ac0f3da"
+  },
+  "soft_hard_stack_bytes": [
+    8388608,
+    -1
+  ],
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  },
+  "http2_fixture": true,
+  "socks_address_types": [
+    1,
+    3
+  ],
+  "async_pull_bytes": 2147483648,
+  "runtime_samples": [
+    {
+      "received": 16275968,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 32524800,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 48779776,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 65034752,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 81283584,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 97538560,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 113793536,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 130042368,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 146297344,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 162552320,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 178801152,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 195056128,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 211311104,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 227981166,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 244749372,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 261517578,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 278285678,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 295053884,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 311822090,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 328590190,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 345358396,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 362126602,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 378894702,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 395662908,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 412431114,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 429199214,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 445967420,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 462735626,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 479503726,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 496271932,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 513040138,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 529808238,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 546576444,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 563344650,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 580112750,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 596880956,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 613649162,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 630417262,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 647185468,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 663953674,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 680721774,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 697489980,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 714258186,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 731026286,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 747794492,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 764562698,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 781330798,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 798099004,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 814867210,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 831635310,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 848403516,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 865171722,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 881939822,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 898708028,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 915476234,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 932244334,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 949012540,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 965780746,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 982548846,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 999317052,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1016085258,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1032853358,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1049621564,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1066389770,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1083157870,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1099926076,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1116694282,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1133462382,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1150230588,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1166998794,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1183766894,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1200535100,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1217303306,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1234071406,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1250839612,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1267607818,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1284375918,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1301144124,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1317912330,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1334680430,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1351448636,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1368216842,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1384984942,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1401753148,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1418521354,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1435289454,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1452057660,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1468825866,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1485593966,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1502362172,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1519130378,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1535898478,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1552666684,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1569434890,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1586202990,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1602971196,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1619739402,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1636507502,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1653275708,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1670043914,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1686812014,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1703580220,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1720348426,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1737116526,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1753884732,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1770652938,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1787421038,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1804189244,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1820957450,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1837725550,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1854493756,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1871261962,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1888030062,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1904798268,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1921566474,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1938334574,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1955102780,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1971870986,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 1988639086,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2005407292,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2022175498,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2038943598,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2055711804,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2072480010,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2089248110,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2106016316,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2122784522,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2139552622,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    },
+    {
+      "received": 2147483648,
+      "heap_payload": 65634,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 16404,
+      "network_reserved": 75497556
+    }
+  ],
+  "proxy_digest_events": [
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:46653/plain",
+      "digest_uri": "/plain",
+      "valid": true
+    },
+    {
+      "method": "CONNECT",
+      "request_target": "127.0.0.1:45571",
+      "digest_uri": "127.0.0.1:45571",
+      "valid": true
+    },
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:46653/plain",
+      "digest_uri": "/plain",
+      "valid": false
+    },
+    {
+      "method": "CONNECT",
+      "request_target": "127.0.0.1:45571",
+      "digest_uri": "127.0.0.1:45571",
+      "valid": false
+    }
+  ],
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

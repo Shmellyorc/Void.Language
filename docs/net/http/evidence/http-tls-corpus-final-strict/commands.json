@@ -1,0 +1,48 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/tmp/VOID TLS memory zgv3sgae/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/tmp/VOID TLS memory zgv3sgae/key.pem",
+      "-out",
+      "/tmp/VOID TLS memory zgv3sgae/cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 1.228627559998131
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_http_tls_memory",
+      "--make-roots",
+      "/tmp/VOID TLS memory zgv3sgae/cert.pem",
+      "/tmp/VOID TLS memory zgv3sgae/key.pem",
+      "/tmp/VOID TLS memory zgv3sgae/roots.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 1.95366349699907
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_http_tls_memory",
+      "https://127.0.0.1:45201/",
+      "https://127.0.0.1:40053/",
+      "/tmp/VOID TLS memory zgv3sgae/roots.pem",
+      "https://127.0.0.1:34277/",
+      "https://127.0.0.1:34373/",
+      "https://127.0.0.1:43943/"
+    ],
+    "exit_code": 0,
+    "seconds": 752.5439897690012
+  }
+]

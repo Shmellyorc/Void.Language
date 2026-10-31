@@ -1,0 +1,72 @@
+{
+  "profile": "no-cookies",
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_curl_source.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.15321198000310687,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.011745967996830586,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/provider",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-no-cookies-20261031T013001579020Z",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DVOID_CURL_PROFILE=NO_COOKIES",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DVOID_SANITIZERS=ON"
+      ],
+      "exit_code": 0,
+      "seconds": 15.39804820700374,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-no-cookies-20261031T013001579020Z",
+        "--parallel",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 7.606882674001099,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-no-cookies-20261031T013001579020Z/provider_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016586151999945287,
+      "stack_1mib": true
+    }
+  ],
+  "source": "third_party/curl (tracked source; no patch application)",
+  "provenance_sha256": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+  "scope": "cookie/OOM regression; not full transport or native Windows/macOS acceptance",
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "result": "PASS",
+  "binary_sha256": "036e7e49e6fc3fd832a0e02c18d1843fb8542b6bf1c4e362119d5dc3a20e1358",
+  "archive_sha256": "e355eb3f32e3d1fbb695a2b1028f3ef49d1a93292b6409e56ace0f46fc0d4392",
+  "archive_bytes": 15888540
+}

@@ -1,0 +1,1 @@
+native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback, nested cancellation drain and cleanup diagnostics passed (7 scenarios)

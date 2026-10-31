@@ -1,6 +1,6 @@
 {
   "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
-  "compiler_sha256": "9b60a17a0ae127d0006df213ba84cd239565eb8a1a87504d55f824cc43510b5b",
+  "compiler_sha256": "3be992a632e001cf2fd617b4f355f5cdfffaa0a046adad4b1284e99e977980b9",
   "source_sha256": "13f0331f5e59fc7462e4f7234366de663fa24f5269a94f66a4ad77294cc697ca",
   "oracle_sha256": "36e56674f9715a31baa2cfee1245056faca1ec27b5143c56200d063aa19fe8d1",
   "vectors": 792,

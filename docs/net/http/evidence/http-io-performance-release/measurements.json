@@ -1,0 +1,92 @@
+{
+  "binary_sha256": "eaaa86e2f5a1b05b0b0477beb59dfd9b56cc8a017e490570be7a33a3a94204b0",
+  "rows": [
+    {
+      "mode": 0,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.58681,
+      "process_cpu_seconds": 1.57498
+    },
+    {
+      "mode": 0,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.24049,
+      "process_cpu_seconds": 1.22641
+    },
+    {
+      "mode": 0,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.2501,
+      "process_cpu_seconds": 1.22606
+    },
+    {
+      "mode": 1,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.28344,
+      "process_cpu_seconds": 1.26941
+    },
+    {
+      "mode": 1,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.27385,
+      "process_cpu_seconds": 1.26305
+    },
+    {
+      "mode": 1,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.24053,
+      "process_cpu_seconds": 1.22262
+    },
+    {
+      "mode": 2,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.40941,
+      "process_cpu_seconds": 1.39975
+    },
+    {
+      "mode": 2,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.64517,
+      "process_cpu_seconds": 1.6104
+    },
+    {
+      "mode": 2,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.60467,
+      "process_cpu_seconds": 1.58828
+    }
+  ],
+  "medians": {
+    "no_http": 1.2501,
+    "idle_http": 1.27385,
+    "paused_http": 1.60467
+  },
+  "scope": "Same optimized source/Runtime, one worker, 256 async 64-KiB writes per invocation; JIT compilation excluded; no historical baseline comparison"
+}

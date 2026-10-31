@@ -1,0 +1,481 @@
+{
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "profile": "Release",
+  "pins_sha256": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.014436261000810191
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/nghttp2-1.70.0",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DENABLE_LIB_ONLY=ON",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_STATIC_LIBS=ON",
+        "-DBUILD_TESTING=OFF",
+        "-DENABLE_DOC=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.24058253499970306
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.09401462199457455
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.012778274998709094
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/c-ares-1.34.9",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DCARES_STATIC=ON",
+        "-DCARES_SHARED=OFF",
+        "-DCARES_BUILD_TESTS=OFF",
+        "-DCARES_BUILD_TOOLS=OFF",
+        "-DCARES_INSTALL=ON"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.09620236400223803
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.24860952400194947
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.01770483499421971
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/zlib-1.3.2",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/zlib",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DZLIB_BUILD_TESTING=OFF",
+        "-DZLIB_BUILD_SHARED=OFF",
+        "-DZLIB_BUILD_STATIC=ON"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.06804041400027927
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/zlib",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.10804333599662641
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/zlib"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.014182578001054935
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/aws-lc",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_LIBSSL=ON",
+        "-DDISABLE_GO=ON",
+        "-DENABLE_SOURCE_MODIFICATION=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.6794439160003094
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/aws-lc",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.6970449660002487
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/aws-lc"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.017454273001931142
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/configure",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "--libdir=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--enable-shared",
+        "--disable-static"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libunistring",
+      "exit_code": 0,
+      "seconds": 29.974849632002588
+    },
+    {
+      "argv": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libunistring/lib",
+      "exit_code": 0,
+      "seconds": 45.29450172000361
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libunistring/lib",
+      "exit_code": 0,
+      "seconds": 0.17976445800013607
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libidn2-2.3.8/configure",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "--libdir=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--enable-shared",
+        "--disable-static",
+        "--disable-nls",
+        "--disable-doc",
+        "--with-libunistring-prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 12.18751627200254
+    },
+    {
+      "argv": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 0.40104076900024666
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 0.4203870160054066
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/configure",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "--libdir=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--disable-shared",
+        "--enable-static",
+        "--disable-nls",
+        "--disable-man",
+        "--enable-runtime=libidn2",
+        "--enable-builtin",
+        "--with-psl-file=/home/shmellyorc/Documents/Void.Language/third_party/publicsuffix/public_suffix_list.dat",
+        "--with-psl-distfile=/dev/null"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl",
+      "exit_code": 0,
+      "seconds": 3.5288855229955516
+    },
+    {
+      "argv": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl/src",
+      "exit_code": 0,
+      "seconds": 0.007426094998663757
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl/src",
+      "exit_code": 0,
+      "seconds": 0.15222847100085346
+    }
+  ],
+  "result": "PASS (native Linux dependency build; transport acceptance separate)",
+  "files": {
+    "lib/cmake/c-ares/c-ares-config-version.cmake": "ad994acb768b9d5e01957bcc6ed50f169a1394dfe632627b58f8a12d43c1a6ef",
+    "lib/cmake/c-ares/c-ares-config.cmake": "4f6fdc79788131a5608deda299d8b8157052189677e7c1a9436dd6e78c4c3c14",
+    "lib/cmake/c-ares/c-ares-targets-release.cmake": "6b5bc337eecfa98a55bd3fa75e97c1331794e44c60c40f59bd850591457b274a",
+    "lib/cmake/c-ares/c-ares-targets.cmake": "6b48b2347328c1137ab1e3c2700ce8976212019a073080c660b51f61769e59ff",
+    "lib/cmake/nghttp2/nghttp2Config.cmake": "73e63bfc82b3eca329e1beafd81d475fe067c8b8abf7389e5ff7f28308449d0d",
+    "lib/cmake/nghttp2/nghttp2ConfigVersion.cmake": "531f2aa66be42a27f4128a4b64f39bfadb99740022174ec39874696fa0ec60d1",
+    "lib/cmake/nghttp2/nghttp2Targets-release.cmake": "05c513994abd682ba7a1e871d65efb2e16b6cb895497f4b07f732b46c3671de1",
+    "lib/cmake/nghttp2/nghttp2Targets.cmake": "87be2f8815ef5c3651113aa11907298e87e92eb55d04a0a6808b722ee85d8c5f",
+    "lib/cmake/zlib/ZLIB-static-release.cmake": "086f192d633ba9e7ee46a63e179c8190490f6c6abf3a0838611b891e4acff672",
+    "lib/cmake/zlib/ZLIB-static.cmake": "92cca94944e37fa4bb9da6a0cdb666fb6faa07f9b1df8e2a0cc2d3e07351406c",
+    "lib/cmake/zlib/ZLIBConfig.cmake": "09be0b4a1c8811295d64ba89cae870d3aa061db061ea850c48f5479becabff08",
+    "lib/cmake/zlib/ZLIBConfigVersion.cmake": "fadc5b5b23b4b63816de8f36864329e3e145632f389fa9249a7c54e3e5fd536d",
+    "lib/crypto/cmake/crypto-config.cmake": "b4cf451740522e14ecff3ebfbc8cd355d58ace3b69eaf8e458bfefe456b0b995",
+    "lib/crypto/cmake/static/crypto-targets-release.cmake": "4a1e53e1a0cccb2e3e6bb1ad42fad817bb0141583b3cfc763c51f00a57f533b5",
+    "lib/crypto/cmake/static/crypto-targets.cmake": "52207efae0dc67719114b307f7f01f78625eb79b6177a2402ff07eb1787a0333",
+    "lib/libcares.a": "6430ecf3ddd80e690f4198768623c781355340062baf57ed28adb8f7e6079011",
+    "lib/libcrypto.a": "60f3f6e46078909023e773a3528111286c3339702170d18679d004c01c2856a8",
+    "lib/libidn2.la": "2dd63b865758f0ef89380ee9d82e0ffc6a8461c0ab1cf487d8a48329165b82c3",
+    "lib/libidn2.so.0.4.0": "07bb96446557746b8d473c947d83452ebf9fac880a028a5516c2e9eb10783b0a",
+    "lib/libnghttp2.a": "0c91189f7477e35e4ca767d011b55893a3022ffa24083037529f7efce594b553",
+    "lib/libpsl.a": "9b734ae12ef8f69aabe3f6bd2522f67cd9e55494e5aaf9ab1fe879c14d537c63",
+    "lib/libpsl.la": "4d9f8d72d9b5695e7429eafa194cbdbc51f6eaf3336cc441de05662cb2a180c9",
+    "lib/libssl.a": "08232ccdf14ac2d0b63b5af402c888190ab9d488bd02fda032c31c5d36796ae1",
+    "lib/libunistring.la": "40e874e7cddf439017090d115665e8476df07a2b9dd8aae8f12d6feb2049c7a6",
+    "lib/libunistring.so.5.2.2": "b81d1e0a7a50efd52b9eb554097c672496e0f71daa3e7fe5d4aa255a3012776a",
+    "lib/libz.a": "da59c9da952cf3d6215e4d279e362d02fbc2b046407c62c5017d3d7e8a42c457",
+    "lib/pkgconfig/aws-lc.pc": "877f06c3754a0ea351560da23693b042f1792a00c9789f8fc5572bcd76965ffa",
+    "lib/pkgconfig/libcares.pc": "21182fc5eed805a0689f37dc035b7a75ee904d9defd7ddb7371a6cbfc77efe06",
+    "lib/pkgconfig/libcrypto.pc": "0ac4bf88965564958d57bce475ed02fef1090d8de3d9a75087c1ed5d649ae76d",
+    "lib/pkgconfig/libidn2.pc": "6892e9281c651e30295589ecd201b90c444f9f4644dd476a9574a1fbf977d4e6",
+    "lib/pkgconfig/libnghttp2.pc": "1940eb5f1389af548ad659c7b2c3a4e1471b95b7e2d2fe433dacb3cb1787f7ab",
+    "lib/pkgconfig/libssl.pc": "c7b59ef4c34a0cd0de7653cf652b50f8cc2a0d15623b7e64f729db8222c97692",
+    "lib/pkgconfig/openssl.pc": "877f06c3754a0ea351560da23693b042f1792a00c9789f8fc5572bcd76965ffa",
+    "lib/pkgconfig/zlib.pc": "629cbc5fe15cc98e1966ea7595144af7b2c8ac51750a10c511387291312852da",
+    "lib/ssl/cmake/ssl-config.cmake": "ddcdd9099727e3fa136c0fb2433d143230b68350f09905084f334e9c1f13b754",
+    "lib/ssl/cmake/static/ssl-targets-release.cmake": "1a726437cfde046c8d1130aafb4d54607b7f2636532d5bb721dc4cb1e064ecab",
+    "lib/ssl/cmake/static/ssl-targets.cmake": "59027f80df6e07e9bf48415f1b8c1ef1bf99dacab96d07d5785470b253fc9ae5",
+    "include/ares.h": "25a857a3ee9c683b6d1243df37704602cbc3a049808aa1d61a84594472433544",
+    "include/ares_build.h": "87b02ffc93afcdbb033d03bafb367e648a5bce6843aca4dad279f9037a7f39a4",
+    "include/ares_dns.h": "608b695de7b23dce0af356ca0cc3ea6f626a2d630de7444ead6e013c9b23aea2",
+    "include/ares_dns_record.h": "cc41de979a7aa4c976edf831b7f3ff3481c56486f597adff730af498ffa0a51e",
+    "include/ares_nameser.h": "cbfd9edb0bad63cf7ec9d763f20b72417a266e0c70c00991bf3d975bf187c2c3",
+    "include/ares_version.h": "730d52c204f13529c679310293ae1e292a99df4300b643df44ab30063831b5f4",
+    "include/idn2.h": "1f55fc1e02b0c4436c41ad7bb8977c64cf3bb61075a4cc412d996878fac93127",
+    "include/libpsl.h": "c18414f8fbcf2c16ce4cf4038dd27a0e8b64d8dc9c117d5b982016d830852f4e",
+    "include/nghttp2/nghttp2.h": "0bd0ee37b1b08fa38f9b773de201fe431846fda2bd0bed44f642c6c332e2e342",
+    "include/nghttp2/nghttp2ver.h": "53b46254a82c2075b28459e0f0cd8da7369afbd5632a71560ab75d6af920c5e1",
+    "include/openssl/aead.h": "6577c60465c7e6fd9d6c7f8ea57cff2b115c958bc9c97102fd62a6e891dd23ae",
+    "include/openssl/aes.h": "bb9d59b1a558b9c96c78edbbe04a4c57ce27519eff018e826ecf43f811885525",
+    "include/openssl/arm_arch.h": "e786fd950fdd4ecd8000285323963bfe4f7246ecc90322bd2553bf9bd90dfd8d",
+    "include/openssl/asm_base.h": "9bb3cdfce042cfcb0aa36bf6acaad081d6ffe3368253c9493308f76a95487ae2",
+    "include/openssl/asn1.h": "7a0db53f008a185f5480bd5ceb7a666d23faf90b48a879cfdf6a3dbe605151d2",
+    "include/openssl/asn1_mac.h": "3edb31cc79326d50870c6251ac5c1c9ce139fa71349da1e4852b2bb84ec65fe5",
+    "include/openssl/asn1t.h": "7c0e4e7be50d2c08c668a2821c47670e6d972825d1ef21b3aedf789d5aa52df5",
+    "include/openssl/base.h": "560c93ad94c636f930d8a3e7f9fd105a9e6cb90c0640e9c395acfc3b50cce2d7",
+    "include/openssl/base64.h": "754c3decfde1192fc85da5eaf470d5c57eb5b9867788d93fa1d4bebfe91d7961",
+    "include/openssl/bio.h": "48dbb62bbe009773a271353bff712fece6e91d15d4204831f433345e74845457",
+    "include/openssl/blake2.h": "338413424d1c010356ca28b876041274d2d675f57fba0d5909ed7a01aeb766f4",
+    "include/openssl/blowfish.h": "8d516dbf2c08c5ce35dd52d65fc0c51eb44b60fdb315a32e4331a9a34003df73",
+    "include/openssl/bn.h": "9c3b508aef0d12f5db09995106dc00b667c8194836e0db60bc752799ab0cf851",
+    "include/openssl/boringssl_prefix_symbols.h": "a7c8d488a5d8ca5cf728f10fabf14ab22d9acc1b240519b1dda897c86e440936",
+    "include/openssl/boringssl_prefix_symbols_asm.h": "a7c8d488a5d8ca5cf728f10fabf14ab22d9acc1b240519b1dda897c86e440936",
+    "include/openssl/boringssl_prefix_symbols_nasm.inc": "0223a874ced9f947ddcfd73b0f54142f81a7c41e24b2d0f60a163bb9b38b5a62",
+    "include/openssl/buf.h": "a1b4dceea84092ab46cc89beb8f6479928f1f2e2f557eb3dd052029e24eaadb3",
+    "include/openssl/buffer.h": "b48319b04ac43d64b25a98de1f755216dd73641154cb82d24287de98679769da",
+    "include/openssl/bytestring.h": "7229fc96c17d1449d0d1943d309734fc8af5bd0b26fe1fed0d62430a2a656235",
+    "include/openssl/chacha.h": "30ad9d5874b61b1871d914e6e4a44436b4610c1c0b13fb7105b84aa5ba0717d4",
+    "include/openssl/cipher.h": "54f7514dea11ad407a813056fc13bdad9afcd9edb7e85b2a6c67d9795507c6fc",
+    "include/openssl/cmac.h": "4a2d9f63214c304afa6809257116dc8f7e43cd3cbabc2cc3505ff78604faa964",
+    "include/openssl/conf.h": "a5c696f837f06c8340bef8981244b80f1fb3b76f3973132f0d829b5b3e960662",
+    "include/openssl/cpu.h": "6e620383a282406587f359e0227e6a74b6e8cb2e37319519c6fd13f7626b0f68",
+    "include/openssl/crypto.h": "72a4ddc8f511e1239c8a49c29dfc31942113387b77e20fd8196a8c2f0b14533a",
+    "include/openssl/ctrdrbg.h": "300c3a50ca0b2001ff66766c4fb1791613a098da394fa9dc28e004e367927d38",
+    "include/openssl/curve25519.h": "1bed253fc595b21082ccc1cb5925952bf885a2593e762fc4d685b15a3585ecba",
+    "include/openssl/des.h": "e8ce15d3573fdf46afce8993d5d53b917c69f35d84e2456d8c7ccc103f547b20",
+    "include/openssl/dh.h": "d5d92ef92fbba8add80abb93a8f39af9da6c58c07848cc660de019216105b1d8",
+    "include/openssl/digest.h": "5f822fc5dc71f9c440e272ea1cb77b3a8cc198d3482c1d936ba7ff72981fa573",
+    "include/openssl/dsa.h": "0b12931441a1043198d5e1510b8dd16237cbccf22520616dd91a9fc03c3db32e",
+    "include/openssl/dtls1.h": "d1dd0923ed2d29f3df672a9fe63d98a4770b5387f3d76aa8966600d09f6796b2",
+    "include/openssl/e_os2.h": "2cbe09e8901d43042e144231fb68676ee0ad4975d90c2ce6a282262934f2208e",
+    "include/openssl/ec.h": "61a21139ff648185b38663ca78d99a3b2684139f0aa2fb120fee2fe381a0a281",
+    "include/openssl/ec_key.h": "1b98f4ad924170ee145e0b24ef7f97088dc74b3ac7c97f5a22b863aba06f7a16",
+    "include/openssl/ecdh.h": "7ae91b68f37105f361b375a1ebeb0e369ceec03e698853fd95c2bdab438463c5",
+    "include/openssl/ecdsa.h": "c870509a8722b9ba4a87b9fe0f37606cc66881afb668aa9ee2f096ea6e12b825",
+    "include/openssl/engine.h": "783b5824987696dfb5323b324054638b84ecc194ac5ff0cddf2303dc5b1a1136",
+    "include/openssl/err.h": "42d057eedd1e2f68db1762ea9bd6e7f1b9fe15a5c7131afd3f04238e12db9449",
+    "include/openssl/evp.h": "05cf7335ec09d79c1cdc980bcb1235cd8d36df981d76b5e81544d97a7bfffb81",
+    "include/openssl/evp_errors.h": "abe2dd52b096d5e92c742dbf353272b77fd17ef59708082d45cd9d60f3e3d1a9",
+    "include/openssl/ex_data.h": "e5225b9c966330af4bfb8403e7a41dc2cd01fc0f6f6064e37c6bd09bb23d7074",
+    "include/openssl/experimental/kem_deterministic_api.h": "dbee5c4a86125205351dd44f483e1e9c00c96b06a7eb7b1cc41ad3790f55334e",
+    "include/openssl/hkdf.h": "cab2f8ee5f7e9174d331c8614bc3ab4f36482d06ac9a3422a0664ae6b37d5bf5",
+    "include/openssl/hmac.h": "30fac3e5422bc0b6ca0d9d6a33cff4038c712cb6b3d403a4de96b59413017207",
+    "include/openssl/hpke.h": "fce22498624e56dfd55c4d89cb9a7985403653379fe9214f06de4e64a8de2166",
+    "include/openssl/hrss.h": "8aa73f7f4bb27369e76e03682c49549b57ddd9b9f14c2256137dabc9a2e16c39",
+    "include/openssl/is_awslc.h": "a854bfe72a62eb1e901642e9b9732eedc78d84dde3d94bf957c71751ece4a250",
+    "include/openssl/kdf.h": "19f15e7616ca8ddb081b017f8d4bdecca29ff71159e8d587342af5af454f6632",
+    "include/openssl/lhash.h": "d2239e47525ebea564d3bd951a84e1ce6e3af52d985969ae02b06c66c8d44651",
+    "include/openssl/md4.h": "4abf973b9679ffce4aa769f7f34410acd39366caf2da1ac0bf705af5594dfbfd",
+    "include/openssl/md5.h": "8f2e2d2aef2da120c38a677ce0df223ba0e57874d1bb1aac4e90128b4070424c",
+    "include/openssl/mem.h": "b92d6404e2b12ff3b79fa525eb01885cf1706906ad14e146a3db136c8a6085af",
+    "include/openssl/modes.h": "70449ba43494ae258fc935f93966741436ab15e8c19b28e0af24520a2e4377e1",
+    "include/openssl/nid.h": "a87319e0528a2584100a054c91e4ba7b1e2382a58567ba79391316a4146514ae",
+    "include/openssl/obj.h": "30534a9ba611b84870327e999a2d9cc1fe903908cb56d4cbfa20e7b8bbc3a54a",
+    "include/openssl/obj_mac.h": "132239c2d0c0efbe3935abcd0d27fab00c6adae31a44270641d3f3e637552fea",
+    "include/openssl/objects.h": "ad5cbb3f922b9421955efc10eff1aa164a7c8f4ac52025f76bbd9009b000133c",
+    "include/openssl/ocsp.h": "0712c556f77dc85490e6f74ba4cfae8add045ec80f5c48f044771078c5e5af8d",
+    "include/openssl/opensslconf.h": "ee4c57773a48433c56870175841f7fd13893ff28776a0f6cf87c469b14a2143b",
+    "include/openssl/opensslv.h": "718d4e60e323a4a185fa99cae7300d065e09c9c8f7b2ff6aa725d6961d282a27",
+    "include/openssl/ossl_typ.h": "d67bb0c3bd759c29c2f7a060fe7c62b64dbdaf95732fc8542e55b1198223694e",
+    "include/openssl/pem.h": "3328ef07a99af9f7bbaa59831c05859f793ead0d6c05ebdf7385b79b811d9319",
+    "include/openssl/pkcs12.h": "b97dc9a8b7c5c73d058595eda2fd553ee839cf2e058c6ebd7f105debf1755787",
+    "include/openssl/pkcs7.h": "25a16c6ea35d4c48df002113a0b4fdd7989074eda2312277a3c11cf17d44ad49",
+    "include/openssl/pkcs8.h": "c3cd22b3ee6a1fde7fdb248f39e2c6bd370c5a084cc7abf4e561c8628c12d9a7",
+    "include/openssl/poly1305.h": "dbeb3f0bf67fb87700840b4ae881178c5bd4382e33d2e3a9f92d503635b268d9",
+    "include/openssl/pool.h": "ae1f939636c1642b1f8182e5ca9222cfd3cc2ee1ef227ebd14d2ad6f58652e21",
+    "include/openssl/posix_time.h": "b5543d2953bef412b3a50a38c2a8260adceda4a465e98a5339f40ab2831d7150",
+    "include/openssl/rand.h": "968775664d7e574b96a3c473e39a38f2173e9a8db1ee3decab165f236e85efc2",
+    "include/openssl/rc4.h": "b399fca21cb6ad82d9ddf41ba62048cff5b83a0f3876b10e0a03b0a8aeeaf537",
+    "include/openssl/ripemd.h": "9c197ed8bf88717acdc2a912fad167332cc84951042c73080c60326b28995be7",
+    "include/openssl/rsa.h": "1625ec4938a830c7916d5cb00cb2b4b847cd562022e968ed7631f39c93285486",
+    "include/openssl/safestack.h": "0d3bb76aefea51838b515850732edbc1b426cda5becbfd8f96708f89c84a96f8",
+    "include/openssl/service_indicator.h": "94ef94c94df6f58b426b0e07a6aa26c28d2a1f09741d94ebd90a646309e6147e",
+    "include/openssl/sha.h": "28618598b98652484826bb69c84fd2adba4d190e2bce6497fa614d58519cf200",
+    "include/openssl/siphash.h": "c4f7e6cda6db301f021ef309e217a0b97a2547c3e1110b2e3cf125373ecbf618",
+    "include/openssl/span.h": "fb009d1ba717800941aa7612488e145ffae05b062e1f32ecfbe44ebed094a94a",
+    "include/openssl/sshkdf.h": "f96dbe232be5fd747c849be9d88f6ead14887fa919b21d30a5df2b73b2886441",
+    "include/openssl/ssl.h": "8ca1595cffed7fada5073c8afb17a433e0f98b06a4ca8727c3d538d558544971",
+    "include/openssl/ssl3.h": "23c0abe2699b45d6930c5714bf9fccd614b88ebc6bf32232f363984ed9abca23",
+    "include/openssl/stack.h": "461722cbe13e371b49a81022b2812a00ff9ad865d1f8f9b359df987618e62bd8",
+    "include/openssl/target.h": "b4eb3eeeeb2da46043da60b81a961d031580ecd093d5980ffc627605eed9ef0e",
+    "include/openssl/thread.h": "7004fa9036da9678b59b793b7c18090de6ad415062cb75db73fdba53b187a893",
+    "include/openssl/time.h": "12f933adb35e51c809e27f4d05810d2d98674caf7dff4945de08cf5f1f6d45c3",
+    "include/openssl/tls1.h": "637e1a5319783e7a5999084e26e33479cc36aded59fb5c7a07177d37e8d16703",
+    "include/openssl/trust_token.h": "d9fcaa4635e759d465a3bde203005026aad68589593640890c85a88195b6b616",
+    "include/openssl/type_check.h": "ed59520457f1b98e2c8b5e20f543792f58d6767b1b77f192992de0636bd47fb5",
+    "include/openssl/ui.h": "76ac215c7b0c8d113cc10f31a58a024a220a6c13ed00dcadd3b3e36a5f83eadb",
+    "include/openssl/x509.h": "eb26792b2c68236fe6cfb3a207a0e150a0b7ebb2abf7afc49e4d77dffd6fcc4e",
+    "include/openssl/x509_vfy.h": "5b611878314ec9daefaf15981ed59116251c68d41f744fda2b1a3baf542fd597",
+    "include/openssl/x509v3.h": "f31140fdfed183ceeda071ff9fb24165c7fe9440a82f599f1b7ee569b45e54ae",
+    "include/openssl/x509v3_errors.h": "efd0139366b0e57ef3f901f36f9b4269a385dda2735b12d6f0fe4ae6b4ffb3f3",
+    "include/unicase.h": "4cc4cf2dcd2f2bf8940f6f3fd11decaf2e9c4e3b40abd7f997b658df8d1f0e0e",
+    "include/uniconv.h": "c9c3fc0fd7c4b2790f5ab74883bf1ec5084ef0ab326ddd115783fbb41571e5d5",
+    "include/unictype.h": "9916004806c4f7d3f4498c3ab735d6579274e1447e32f315617420a50077c60b",
+    "include/unigbrk.h": "55031eb782f934372005fa55f90fe6bc237627292f6fe117e6e181e7804b8f72",
+    "include/unilbrk.h": "51cfac5cf112356461faa556d351bf80dea9b334c6d42902c52113dfa0c1efe0",
+    "include/unimetadata.h": "0bc736d7255380ee974ed6727ec0f05bb39cf4023e1ec59482e3d52c7aeee9c9",
+    "include/uniname.h": "ba68b81755a9cd62262fa39925b8bf9aca8dabdbddc836f182ab87144592a0a0",
+    "include/uninorm.h": "2287d01d8d5585832232c12b472c9b4ec7097f95779df3cbdeb99464ecbf1fba",
+    "include/unistdio.h": "b8c8c5a775d05a6193cc4f5e324944218013d30441c6d5395a67dfb88544a9a4",
+    "include/unistr.h": "b7d7b767cebb9c361927b231e830dbee9387048a0d6bf99291986891f71e5d9c",
+    "include/unistring/cdefs.h": "4c389ac7d0ecba5da64df9548b5717d07e45fc5f3aab63da34a6fac6b01720ae",
+    "include/unistring/iconveh.h": "e58d0a329287846af7ab8ba4b2c330d67d084821609f0a30879860ae9403a00c",
+    "include/unistring/inline.h": "450becd366c4d2cf4062140bc5a5edab1bf9af0cdc951f8a82e653ad9dee1f94",
+    "include/unistring/localcharset.h": "7de77bbfd975f22ade5535e883672c74a78b279239cf0e661ac049272bfb30c4",
+    "include/unistring/stdint.h": "de5f728a35dfb3c9dc42c3df6c1824b78697f46b04decfa10c5b6a8b5b8e7c0e",
+    "include/unistring/version.h": "aad47119f36dfb43ef4c44556b898d43c051794c97d993eb277102a2ce3b6383",
+    "include/unistring/woe32dll.h": "51eeea733bce2639cd611a0c7f2eecd8c88f00e3e8238c4153ee29e5040093da",
+    "include/unitypes.h": "e6dd6b558d6b61c27ced3a8042eacf61fc6867bf2834eca9328a278ff1d3827d",
+    "include/uniwbrk.h": "b72d0ade60653263429178b1c9ca8922017c99ffe8cf83bfca7cf542159e5ccb",
+    "include/uniwidth.h": "48d5366d8de1d1a21ace20a55fc0bfc38fe2443cdccce17c8a1fe2661747d695",
+    "include/zconf.h": "f01d3d9b52603c88660ae89141f1e0ba61774c0718c8b3f77a2410d84b558421",
+    "include/zlib.h": "818667d6ab6a37fe7469cb06a7f0cb2c2cb2f2c948a03e5accf1a4a74bf3020a",
+    "bin/bssl": "befb6676ea4b4e06bee64d771ffd8a8ce58891b75d8a2acdc30f656c699b8a7c",
+    "bin/c_rehash": "58de349d8be1ee18db0580ef628368cc0bc2d1ad840a63f430bdf59fce920674",
+    "bin/idn2": "db462d9bea79d0f99b9a0c75e9cb8cd7ab3080cc08beb3974e1b26b33d567a1d",
+    "bin/openssl": "80132a61279db2ae6532997654f5c6fb576df61ce239a9da1cebecfdc7173aa2",
+    "bin/psl-make-dafsa": "252e22a3ad8e48542a71ae5625b3c2ca7e9b90ce5edbab68ecf4d0ccec82c604"
+  }
+}

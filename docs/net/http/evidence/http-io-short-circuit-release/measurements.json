@@ -1,0 +1,93 @@
+{
+  "binary_sha256": "a94f0221d72095a6794ce26efa21c2193ea8948292a535fb986edd601c7b1986",
+  "rows": [
+    {
+      "mode": 0,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.851435,
+      "process_cpu_seconds": 0.842995
+    },
+    {
+      "mode": 0,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.81152,
+      "process_cpu_seconds": 0.803523
+    },
+    {
+      "mode": 0,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.804864,
+      "process_cpu_seconds": 0.796284
+    },
+    {
+      "mode": 1,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.853547,
+      "process_cpu_seconds": 0.84718
+    },
+    {
+      "mode": 1,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.843478,
+      "process_cpu_seconds": 0.837287
+    },
+    {
+      "mode": 1,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.842531,
+      "process_cpu_seconds": 0.837199
+    },
+    {
+      "mode": 2,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.840627,
+      "process_cpu_seconds": 0.824726
+    },
+    {
+      "mode": 2,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.864364,
+      "process_cpu_seconds": 0.851882
+    },
+    {
+      "mode": 2,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.865308,
+      "process_cpu_seconds": 0.859473
+    }
+  ],
+  "medians": {
+    "no_http": 0.81152,
+    "idle_http": 0.843478,
+    "paused_http": 0.864364
+  },
+  "baseline": false,
+  "scope": "Same optimized source/Runtime, one worker, 256 async 64-KiB writes per invocation; JIT compilation excluded; compare the separate baseline receipt"
+}

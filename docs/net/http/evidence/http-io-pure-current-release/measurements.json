@@ -1,0 +1,93 @@
+{
+  "binary_sha256": "eaaa86e2f5a1b05b0b0477beb59dfd9b56cc8a017e490570be7a33a3a94204b0",
+  "rows": [
+    {
+      "mode": 0,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.41209,
+      "process_cpu_seconds": 1.39767
+    },
+    {
+      "mode": 0,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.29145,
+      "process_cpu_seconds": 1.27393
+    },
+    {
+      "mode": 0,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.2991,
+      "process_cpu_seconds": 1.28177
+    },
+    {
+      "mode": 1,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.23352,
+      "process_cpu_seconds": 1.21424
+    },
+    {
+      "mode": 1,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.3097,
+      "process_cpu_seconds": 1.28832
+    },
+    {
+      "mode": 1,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.25698,
+      "process_cpu_seconds": 1.24819
+    },
+    {
+      "mode": 2,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.35333,
+      "process_cpu_seconds": 1.32531
+    },
+    {
+      "mode": 2,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.37328,
+      "process_cpu_seconds": 1.35848
+    },
+    {
+      "mode": 2,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 1.2839,
+      "process_cpu_seconds": 1.25523
+    }
+  ],
+  "medians": {
+    "no_http": 1.2991,
+    "idle_http": 1.25698,
+    "paused_http": 1.35333
+  },
+  "baseline": true,
+  "scope": "Same IO loop, one worker, 256 async 64-KiB writes per invocation; JIT compilation excluded; all baseline modes omit HTTP"
+}

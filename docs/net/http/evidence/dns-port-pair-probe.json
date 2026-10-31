@@ -1,0 +1,20 @@
+[
+  {
+    "case": "retry",
+    "tcp_attempts": 2,
+    "udp_sockets_closed": 2,
+    "passed": true
+  },
+  {
+    "case": "bounded",
+    "tcp_attempts": 32,
+    "udp_sockets_closed": 32,
+    "passed": true
+  },
+  {
+    "case": "other-error",
+    "tcp_attempts": 1,
+    "udp_sockets_closed": 1,
+    "passed": true
+  }
+]

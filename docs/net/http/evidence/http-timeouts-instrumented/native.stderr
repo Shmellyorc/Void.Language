@@ -1,0 +1,143 @@
+*   Trying 127.0.0.1:43769...
+* ALPN: curl offers h2,http/1.1
+* SSL Trust Anchors:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+*   CApath: /etc/ssl/certs
+* Connection timed out after 50 milliseconds
+* closing connection #0
+*   Trying 127.0.0.1:43769...
+* CONNECT: no ALPN negotiated
+* Establishing HTTP proxy tunnel to 127.0.0.1:9
+> CONNECT 127.0.0.1:9 HTTP/1.1
+Host: 127.0.0.1:9
+User-Agent: VOID
+Proxy-Connection: Keep-Alive
+
+* Connection timed out after 50 milliseconds
+* closing connection #0
+*   Trying 127.0.0.1:39335...
+* Established connection to 127.0.0.1 (127.0.0.1 port 39335) from 127.0.0.1 port 47788 
+PREREQ at=0 status=0 marker=0
+* using HTTP/1.x
+> POST /producer-pause HTTP/1.1
+Host: 127.0.0.1:39335
+User-Agent: VOID
+Accept: */*
+Accept-Encoding: gzip, deflate
+Content-Length: 2048
+
+* Hostname 127.0.0.1 was found in DNS cache
+*   Trying 127.0.0.1:39335...
+* Established connection to 127.0.0.1 (127.0.0.1 port 39335) from 127.0.0.1 port 47798 
+PREREQ at=0 status=0 marker=0
+* using HTTP/1.x
+> GET /producer-seen HTTP/1.1
+Host: 127.0.0.1:39335
+User-Agent: VOID
+Accept: */*
+Accept-Encoding: gzip, deflate
+
+* Request completely sent off
+SENT at=0 post=198 marker=0
+< HTTP/1.1 200 OK
+HEADER at=1 HTTP/1.1 200 OK
+
+< Server: BaseHTTP/0.6 Python/3.14.8
+< Date: Sat, 31 Oct 2026 03:13:08 GMT
+< Content-Length: 2
+< 
+* Connection #2 to host 127.0.0.1:39335 left intact
+* upload completely sent off: 2048 bytes
+SENT at=62 post=61949 marker=0
+< HTTP/1.1 200 OK
+HEADER at=62 HTTP/1.1 200 OK
+
+< Server: BaseHTTP/0.6 Python/3.14.8
+< Date: Sat, 31 Oct 2026 03:13:08 GMT
+< Content-Length: 2
+< 
+* Connection #1 to host 127.0.0.1:39335 left intact
+* Reusing existing http: connection with host 127.0.0.1
+PREREQ at=0 status=0 marker=0
+> POST /write-stall HTTP/1.1
+Host: 127.0.0.1:39335
+User-Agent: VOID
+Accept: */*
+Accept-Encoding: gzip, deflate
+Content-Length: 33554432
+Expect: 100-continue
+
+< HTTP/1.1 100 Continue
+HEADER at=0 HTTP/1.1 100 Continue
+
+< 
+* closing connection #1
+*   Trying 127.0.0.1:43141...
+* Reusing existing http: connection with host 127.0.0.1
+PREREQ at=0 status=0 marker=0
+> GET /digest-seen HTTP/1.1
+Host: 127.0.0.1:39335
+User-Agent: VOID
+Accept: */*
+Accept-Encoding: gzip, deflate
+
+* Request completely sent off
+SENT at=0 post=57 marker=0
+* ALPN: curl offers h2,http/1.1
+* SSL Trust Anchors:
+*   CA Blob from configuration
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / [blank] / UNDEF
+* ALPN: server did not agree on a protocol. Uses default.
+* Server certificate:
+*   subject: CN=localhost
+*   start date: Oct 31 03:13:08 2026 GMT
+*   expire date: Nov  1 03:13:08 2026 GMT
+*   issuer: CN=localhost
+*   subjectAltName: "127.0.0.1" matches cert's IP address!
+* OpenSSL verify result: 0
+* SSL certificate verified via OpenSSL.
+* Established connection to 127.0.0.1 (127.0.0.1 port 43141) from 127.0.0.1 port 56608 
+PREREQ at=2 status=0 marker=0
+* using HTTP/1.x
+* Server auth using Digest with user 'user'
+> POST /digest-slow HTTP/1.1
+Host: 127.0.0.1:43141
+User-Agent: VOID
+Accept: */*
+Accept-Encoding: gzip, deflate
+Content-Type: application/octet-stream
+Content-Length: 0
+
+* Request completely sent off
+SENT at=3 post=2975 marker=0
+* closing connection #0
+* Connection died, retrying a fresh connect (retry count: 1)
+* shutting down connection #2
+* Issue another request to this URL: 'http://127.0.0.1:39335/digest-seen'
+* Hostname 127.0.0.1 was found in DNS cache
+*   Trying 127.0.0.1:39335...
+* Established connection to 127.0.0.1 (127.0.0.1 port 39335) from 127.0.0.1 port 47808 
+PREREQ at=3006 status=0 marker=0
+* operation aborted by pre-request callback
+* closing connection #3
+* Hostname 127.0.0.1 was found in DNS cache
+*   Trying 127.0.0.1:39335...
+* Established connection to 127.0.0.1 (127.0.0.1 port 39335) from 127.0.0.1 port 47820 
+PREREQ at=0 status=0 marker=0
+* using HTTP/1.x
+> GET /digest-release HTTP/1.1
+Host: 127.0.0.1:39335
+User-Agent: VOID
+Accept: */*
+Accept-Encoding: gzip, deflate
+
+* Request completely sent off
+SENT at=0 post=448 marker=0
+< HTTP/1.1 200 OK
+HEADER at=1 HTTP/1.1 200 OK
+
+< Server: BaseHTTP/0.6 Python/3.14.8
+< Date: Sat, 31 Oct 2026 03:13:11 GMT
+< Content-Length: 2
+< 
+* Connection #4 to host 127.0.0.1:39335 left intact

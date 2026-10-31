@@ -1,0 +1,27 @@
+stack_soft=1048576 stack_hard=1048576
+../source/openssl-3.5.9/crypto/stack/stack.c:440:13: runtime error: call to function pd_free through pointer to incorrect function type 'void (*)(void *)'
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property_parse.c:301: note: pd_free defined here
+    #0 0x55955624f31d in OPENSSL_sk_pop_free /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/stack/stack.c:440:13
+    #1 0x5595564af044 in sk_OSSL_PROPERTY_DEFINITION_pop_free /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property_parse.c:23:1
+    #2 0x5595564ac72f in ossl_parse_property /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property_parse.c:400:5
+    #3 0x5595564a59fd in ossl_method_store_add /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property.c:374:28
+    #4 0x55955637a088 in put_evp_method_in_store /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_fetch.c:201:12
+    #5 0x5595564022bc in ossl_method_construct_this /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_fetch.c:127:5
+    #6 0x5595564009a0 in algorithm_do_map /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_algorithm.c:77:13
+    #7 0x5595563ffd58 in algorithm_do_this /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_algorithm.c:122:15
+    #8 0x55955643bf10 in ossl_provider_doall_activated /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/provider_core.c:1603:14
+    #9 0x5595563ff964 in ossl_algorithm_do_all /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_algorithm.c:164:9
+    #10 0x5595564010fd in ossl_method_construct /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_fetch.c:157:5
+    #11 0x55955637712a in inner_evp_generic_fetch /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_fetch.c:333:23
+    #12 0x559556376324 in evp_generic_fetch /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_fetch.c:404:14
+    #13 0x55955638a0da in EVP_RAND_fetch /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_rand.c:285:12
+    #14 0x55955624291c in rand_new_seed /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:629:12
+    #15 0x55955623fc1c in rand_get0_primary /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:778:26
+    #16 0x55955623d8cc in RAND_get0_primary /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:833:34
+    #17 0x55955623de57 in RAND_status /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:420:17
+    #18 0x559556221d25 in main /home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/openssl_strict_init_probe.c:11:18
+    #19 0x7fdf2502a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #20 0x7fdf2502a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #21 0x559556131724 in _start (/home/shmellyorc/Documents/Void.Language/build/http-provider-full/openssl_strict_init_probe+0x8a5724)
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../source/openssl-3.5.9/crypto/stack/stack.c:440:13 

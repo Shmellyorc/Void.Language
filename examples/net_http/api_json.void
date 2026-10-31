@@ -1,0 +1,38 @@
+use net/http
+use url
+use json
+use os
+
+struct document:
+    message: string
+
+func fetch(target: string) -> i32:
+    # URL construction has its own error type and preserves ordered parameters.
+    var query = [url.query_item(name = "q", value = "two words + plus")]
+    var url_result = url.with_query(target, query)
+    if url_result is Ok(var target_url):
+        var response_result = http.get(target_url)
+        if response_result is Ok(var reply):
+            if reply.require_success() is Err(var status):
+                print("HTTP status {reply.info.status}; retained {reply.bytes.count} body bytes")
+                return 1
+            var text_result = reply.text()
+            if text_result is Ok(var text):
+                var json_result = json.parse_as<document>(text)
+                if json_result is Ok(var data):
+                    print(data.message)
+                    return 0
+                else if json_result is Err(var failure):
+                    print("JSON {failure.kind} at byte {failure.offset}")
+            else if text_result is Err(var failure):
+                print("HTTP text {failure.kind}")
+        else if response_result is Err(var failure):
+            print("HTTP {failure.kind}, phase {failure.phase}, remote outcome unknown {failure.remote_outcome_unknown}")
+    else if url_result is Err(var failure):
+        print("URL {failure.kind} at byte {failure.offset}")
+    return 1
+
+if os.env("VOID_HTTP_URL") is Ok(var target):
+    return fetch(target)
+print("Set VOID_HTTP_URL to an HTTP(S) JSON endpoint returning a message field")
+return 1

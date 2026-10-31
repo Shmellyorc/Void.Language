@@ -1,0 +1,53 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "/tmp/VOID-channel-execution-q4goaxkg/app.o",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_native_fixture.a",
+    "--driver-mode=g++",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/curl/lib/libcurl.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libpsl.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libnghttp2.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libssl.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcrypto.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcares.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libidn2.so",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libunistring.so",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libz.a",
+    "-Xlinker",
+    "-rpath",
+    "-Xlinker",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib",
+    "-pthread",
+    "-fsanitize=address,undefined",
+    "-Xlinker",
+    "--exclude-libs",
+    "-Xlinker",
+    "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+    "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "-ldl",
+    "-o",
+    "/tmp/VOID-channel-execution-q4goaxkg/app"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+  "status": 0,
+  "seconds": 0.0795070649983245,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "c336d48383874cffaab0dc4c5c359456d871f21380b746520dde5c7f4c125a67",
+  "object_hashes": {
+    "/tmp/VOID-channel-execution-q4goaxkg/app.o": "adfb5aa994b689236198d3c2e88b6e4fe234aa2c25e9536c0a39f48de4bda608",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_runtime.a": "a91c73f55ef1bc6614765114f0b35b85acdd6afc84db458b05248b7e1393af1b",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/libvoid_native_fixture.a": "4fd507e96e36ec9e9d14e36f6450b9ccd80d8152c7f6f6b7719cbf8dd70d434c",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/curl/lib/libcurl.a": "202b8a98868c7ad0568ae7bfb11bb2f125ad43bec13f6805f5fa541e777f29e5",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libpsl.a": "4761f87a77469aae3b6013a46e868b850ec430598e7e92625fe104320e63a216",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libnghttp2.a": "11a27f3024385942b1c3066bb8f0fd18f3e41fdcce9ebeedcabaac2e8aa2a507",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libssl.a": "8ea7c13578cead921447b5679a50f06cf2a67b78ecc6fe2e3b93554a6effbf38",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcrypto.a": "86d15e90fe08898da5cb46cf1eaafe28388e09a57ea3cf2a8d126635454723c2",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcares.a": "5b3ad85c8a0b18e587416a55637396664de240ff8b20d09dcad290da3db2704f",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libz.a": "79e67ee74f26632d95d3fbc2a06de91b214c8289c7fcdc54f0c7e470e30a7279"
+  },
+  "output_hashes": {
+    "/tmp/VOID-channel-execution-q4goaxkg/app": "93a6986ebca71958a34072425ffb44d70c9930f82ed83bcf5f66ac0f84c27c01"
+  }
+}

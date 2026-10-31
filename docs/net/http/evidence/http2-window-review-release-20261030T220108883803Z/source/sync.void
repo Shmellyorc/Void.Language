@@ -1,0 +1,125 @@
+use net/http
+use io
+use url
+
+func suite() -> result<bool, http.error>:
+    var caps = http.capabilities()
+    if not caps.http1 or not caps.http2 or caps.http3 or caps.transport_version != "8.23.0":
+        return Ok(false)
+    var ordinary = http.field("X-Empty", "")?
+    if ordinary.value.count != 0:
+        return Ok(false)
+    if http.field("bad name", "value") is Ok(var invalid):
+        return Ok(false)
+    var fields = [http.header(name = "X-Mixed", value = "a".to_utf8()), http.header(name = "x-mixed", value = "b".to_utf8())]
+    var selected = http.header_values(fields, "X-MIXED")
+    selected[0].value[0] = 122
+    if fields[0].value[0] != 97 or selected.count != 2:
+        return Ok(false)
+    var utf8_info = http.response_info(status = 200, version = http.http_version.http1_1, content_length = -1,
+        content_decoded = false, headers = [http.header(name = "Content-Type", value = "text/plain; note=\"a;charset=latin1\"; charset=\"UTF-8\"".to_utf8())])
+    var utf8_reply = http.response(info = utf8_info, bytes = "\u{feff}hello".to_utf8())
+    if utf8_reply.text()? != "hello":
+        return Ok(false)
+    var other_info = http.response_info(status = 200, version = http.http_version.http1_1, content_length = -1,
+        content_decoded = false, headers = [http.header(name = "Content-Type", value = "text/plain; charset=latin1".to_utf8())])
+    var other_reply = http.response(info = other_info, bytes = "hello".to_utf8())
+    if other_reply.text() is Ok(var invalid):
+        return Ok(false)
+    with http.open_client()? as owner:
+        var invalid_target = "http://127.0.0.1:43579/%Q1"
+        if owner.get(invalid_target) is Err(var failure):
+            if not (failure.kind is http.error_kind.invalid_url):
+                return Ok(false)
+            if failure.url_cause is null:
+                return Ok(false)
+            var cause = failure.url_cause as url.error
+            if not (cause.kind is url.error_kind.invalid_encoding) or cause.offset != invalid_target.byte_length - 3:
+                return Ok(false)
+        else:
+            return Ok(false)
+        var reply = owner.get("http://127.0.0.1:43579/plain")?
+        if reply.info.status != 200 or reply.bytes.count != 11 or reply.bytes[5] != 0:
+            return Ok(false)
+        if reply.text()? != "hello\0world":
+            return Ok(false)
+        var status_ok = reply.require_success()?
+        var echoed = owner.send(http.request(method = "PATCH", target = "http://127.0.0.1:43579/echo", body = http.body.text("packet")))?
+        if echoed.text()? != "PATCH:packet":
+            return Ok(false)
+        var form_text = "a"
+        for index in 0..<15:
+            form_text += form_text
+        var form = [url.query_item(name = "value", value = form_text)]
+        form.push(url.query_item(name = "flag", has_value = false))
+        form.push(url.query_item(name = "x y", value = "+&\u{e9}"))
+        form.push(url.query_item(name = "value", value = ""))
+        if url.encode_query(form, true) is Ok(var too_large):
+            return Ok(false)
+        var posted = owner.send(http.request(method = "POST", target = "http://127.0.0.1:43579/echo", body = http.body.form(form)))?
+        if posted.text()? != "POST:value=" + form_text + "&flag&x+y=%2B%26%C3%A9&value=":
+            return Ok(false)
+        with owner.start(http.request(target = "http://127.0.0.1:43579/plain"))? as exchange:
+            var info = exchange.response()?
+            if info.status != 200:
+                return Ok(false)
+            var received: i64 = 0
+            var done = false
+            for not done:
+                var block = exchange.read_bytes(3)?
+                received += block.bytes.count
+                done = block.eof
+            var finished = exchange.finish()?
+            if received != 11:
+                return Ok(false)
+        if io.open("/tmp/VOID HTTP source fuyctwqn/file.bin", io.open_mode.create) is Ok(var source_file):
+            with source_file:
+                source_file.write_bytes("payload".to_utf8())
+                source_file.seek(0)
+                var uploaded = owner.upload(http.request(method = "POST", target = "http://127.0.0.1:43579/echo"), source_file, 7)?
+                if uploaded.text()? != "POST:payload":
+                    return Ok(false)
+                if source_file.position() is Ok(var position):
+                    if position != 7:
+                        return Ok(false)
+                else:
+                    return Ok(false)
+                source_file.seek(0)
+                source_file.write_bytes("ppppppp".to_utf8())
+                source_file.seek(0)
+                var file_part = http.part(name = "file", filename = "payload.bin", data = http.part_data.file(source_file, 7))
+                var multipart = owner.send(http.request(method = "POST", target = "http://127.0.0.1:43579/multipart", body = http.body.multipart([file_part])))?
+                if multipart.text()? != "file:7:p":
+                    return Ok(false)
+                if io.open("/tmp/VOID HTTP source fuyctwqn/file.bin.download", io.open_mode.create) is Ok(var destination):
+                    with destination:
+                        destination.write_bytes("prefix".to_utf8())
+                        var saved = owner.download(http.request(target = "http://127.0.0.1:43579/plain"), destination)?
+                        if saved.downloaded != 11:
+                            return Ok(false)
+                        if destination.position() is Ok(var position):
+                            if position != 17:
+                                return Ok(false)
+                        else:
+                            return Ok(false)
+                        destination.seek(0)
+                        source_file.seek(0)
+                        # Both file directions progress through the sole existing IO pool.
+                        var copied = owner.download(http.request(method = "POST", target = "http://127.0.0.1:43579/multipart",
+                            body = http.body.multipart([file_part])), destination)?
+                        if copied.downloaded != 8:
+                            return Ok(false)
+                else:
+                    return Ok(false)
+        else:
+            return Ok(false)
+        var cleared = owner.clear_cookies()?
+        var closed = owner.close()?
+        var closed_again = owner.close()?
+    return Ok(true)
+
+if suite() is Ok(var passed):
+    print(passed)
+else:
+    print(false)
+return 0

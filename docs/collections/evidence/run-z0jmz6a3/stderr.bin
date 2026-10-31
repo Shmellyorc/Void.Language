@@ -1,0 +1,22 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:214:17: error: Exact operator '==' is not accessible; import its direct declaring owner and respect its visibility.
+    code: VOID3003
+
+ 214 |         if item == value:
+     |                 ^^
+    Module: /@stdlib/collections.void
+    Operator declared by /private-operator.void::hidden. at /tmp/VOID-collections-negative-0ihuake3/private-operator.void:16:22
+
+ 16 |     private operator ==(const left: hidden, const right: hidden) -> bool:
+    |                      ^^
+    Module: /private-operator.void
+    Generic specialization requested here. at /tmp/VOID-collections-negative-0ihuake3/private-operator.void:31:20
+
+ 31 |     var output = c.contains([hidden(number = 1)], hidden(number = 1))
+    |                    ^^^^^^^^
+    Module: /private-operator.void
+    Generic declaration. at /home/shmellyorc/Documents/Void.Language/stdlib/collections.void:212:6
+
+ 212 | func contains<t>(const items: [t], const value: t) -> bool:
+     |      ^^^^^^^^
+    Module: /@stdlib/collections.void
+

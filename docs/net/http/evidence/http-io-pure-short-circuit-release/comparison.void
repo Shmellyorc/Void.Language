@@ -1,0 +1,19 @@
+use io
+
+async func write_file() -> result<bool, io.error>:
+    var bytes = (await io.read_bytes_async("/tmp/VOID IO HTTP comparison vvmel3l5/input.bin"))?
+    with (await io.open_async("/tmp/VOID IO HTTP comparison vvmel3l5/output.bin", io.open_mode.create))? as output:
+        for i in 0..<256:
+            var count = (await output.write_bytes_async(bytes))?
+            if count != 65536:
+                return Ok(false)
+        return Ok((await output.position_async())? == 16777216)
+
+async func exercise_io() -> i32:
+    if (await write_file()) is Ok(var passed):
+        if passed:
+            return 0
+    return 1
+
+async func entry(mode: i32) -> i32:
+    return await exercise_io()

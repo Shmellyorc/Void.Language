@@ -1,0 +1,23 @@
+[
+  {
+    "name": "h2",
+    "version": "4.4.1",
+    "url": "https://files.pythonhosted.org/packages/7e/22/e85faf23bd72a92d1921e37d674ca56eb298a3c8be31fdecef0ff2b3aaac/h2-4.4.1-py3-none-any.whl",
+    "sha256": "0e25f1462b23c9cb82d9eb02e28bc706dac2a68cb457c6a0d74d63c8a2a5d0e6",
+    "scope": "loopback test server only; never compiler/runtime dependency"
+  },
+  {
+    "name": "hpack",
+    "version": "4.2.0",
+    "url": "https://files.pythonhosted.org/packages/71/b4/4a9fcfb2aef6ba44d9073ecd301443aa00b3dac95de5619f2a7de7ec8a91/hpack-4.2.0-py3-none-any.whl",
+    "sha256": "858ac0b02280fa582b5080d68db0899c62a80375e0e5413a74970c5e518b6986",
+    "scope": "loopback test server only; never compiler/runtime dependency"
+  },
+  {
+    "name": "hyperframe",
+    "version": "6.1.0",
+    "url": "https://files.pythonhosted.org/packages/48/30/47d0bf6072f7252e6521f3447ccfa40b421b6824517f82854703d0f5a98b/hyperframe-6.1.0-py3-none-any.whl",
+    "sha256": "b03380493a519fce58ea5af42e4a42317bf9bd425596f7a0835ffce80f1a42e5",
+    "scope": "loopback test server only; never compiler/runtime dependency"
+  }
+]

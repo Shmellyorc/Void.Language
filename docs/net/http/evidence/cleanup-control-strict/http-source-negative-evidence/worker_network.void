@@ -1,0 +1,7 @@
+use net/http
+func work() -> i32:
+    http.get("http://127.0.0.1:1/")
+    return 7
+async func entry(n: i32) -> i32:
+    var pending = spawn work()
+    return await pending

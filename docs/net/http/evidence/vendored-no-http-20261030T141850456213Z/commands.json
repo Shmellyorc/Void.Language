@@ -1,0 +1,71 @@
+{
+  "profile": "no-http",
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_curl_source.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1349568489995363,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008236307000515808,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/provider",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-no-http-20261030T141850456213Z",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DVOID_CURL_PROFILE=NO_HTTP",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DVOID_SANITIZERS=ON"
+      ],
+      "exit_code": 0,
+      "seconds": 14.344164367999838,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-no-http-20261030T141850456213Z",
+        "--parallel",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 5.070624836000206,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-no-http-20261030T141850456213Z/provider_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.014386657000613923,
+      "stack_1mib": true
+    }
+  ],
+  "source": "third_party/curl (tracked source; no patch application)",
+  "provenance_sha256": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+  "scope": "cookie/OOM regression; not full transport or native Windows/macOS acceptance",
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "result": "PASS",
+  "binary_sha256": "7a81f4f0c5e32e93a5633d1cbf0d2a5902c81bcc82902cb58bb6d65d5af0978a",
+  "archive_sha256": "ab9f005646533e03647e660e1d4cf98c0d0558c20387479953765095e2106d27",
+  "archive_bytes": 12364308
+}

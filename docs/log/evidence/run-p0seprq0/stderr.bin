@@ -1,0 +1,23 @@
+/tmp/VOID-log-frontend-58cyx4j3/main.void:5:12: error: await requires a non-null inferred task handle.
+    code: VOID2001
+
+ 5 |     return await spawn worker(l.open())
+   |            ^^^^^
+    Module: /main.void
+
+/tmp/VOID-log-frontend-58cyx4j3/main.void:5:18: error: spawn transfers only scalars, immutable strings and recursively safe fixed values.
+    code: VOID1103
+
+ 5 |     return await spawn worker(l.open())
+   |                  ^^^^^
+    Module: /main.void
+
+/tmp/VOID-log-frontend-58cyx4j3/main.void:5:33: error: Type mismatch: expected /@stdlib/log.void::logger, received result</@stdlib/log.void::logger, /@stdlib/log.void::failure>.
+    code: VOID2001
+
+ 5 |     return await spawn worker(l.open())
+   |                                 ^^^^
+    Module: /main.void
+    Expected: /@stdlib/log.void::logger
+    Received: result</@stdlib/log.void::logger, /@stdlib/log.void::failure>
+

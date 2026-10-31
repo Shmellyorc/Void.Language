@@ -1,0 +1,23 @@
+use math
+value struct number:
+    value: i32
+    operator +(const left: number, const right: number) -> number:
+        return number(value = left.value + right.value)
+    operator -(const left: number, const right: number) -> number:
+        return number(value = left.value - right.value)
+    operator -(const item: number) -> number:
+        return number(value = -item.value)
+    operator <(const left: number, const right: number) -> bool:
+        return left.value < right.value
+    operator >(const left: number, const right: number) -> bool:
+        return left.value > right.value
+    operator ==(const left: number, const right: number) -> bool:
+        return left.value == right.value
+enum flag:
+    first
+func main():
+    var a = number(value = 1)
+    var b = -a + a
+    var c = a < b
+    var d = a > b
+    var e = a == b

@@ -1,0 +1,51 @@
+[
+  {
+    "name": "nghttp2-1.70.0.tar.gz",
+    "url": "https://github.com/nghttp2/nghttp2/releases/download/v1.70.0/nghttp2-1.70.0.tar.gz",
+    "bytes": 3104002,
+    "sha256": "aa317e2cf9dca6afa0aed68f8fad6ff303ec6982e25a78c75c0b65e2b9b3ded5",
+    "seconds": 1.2213063890003468
+  },
+  {
+    "name": "c-ares-1.34.9.tar.gz",
+    "url": "https://github.com/c-ares/c-ares/releases/download/v1.34.9/c-ares-1.34.9.tar.gz",
+    "bytes": 1083895,
+    "sha256": "9364b70a12eb59a06830fb488d9357f90100dff0d98b23ea3593a183d43e6f2f",
+    "seconds": 0.6283314470001642
+  },
+  {
+    "name": "zlib-1.3.2.tar.gz",
+    "url": "https://zlib.net/zlib-1.3.2.tar.gz",
+    "bytes": 1502830,
+    "sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+    "seconds": 1.4161569159996361
+  },
+  {
+    "name": "openssl-3.5.9.tar.gz",
+    "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz",
+    "bytes": 53279637,
+    "sha256": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a",
+    "seconds": 6.896491339000022
+  },
+  {
+    "name": "libidn2-2.3.8.tar.gz",
+    "url": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz",
+    "bytes": 2234804,
+    "sha256": "f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a",
+    "seconds": 0.9514217539999663
+  },
+  {
+    "name": "libpsl-0.21.5.tar.gz",
+    "url": "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz",
+    "bytes": 7624251,
+    "sha256": "1dcc9ceae8b128f3c0b3f654decd0e1e891afc6ff81098f227ef260449dae208",
+    "seconds": 2.754447080999853
+  },
+  {
+    "name": "libunistring-1.5.tar.xz",
+    "url": "https://ftp.gnu.org/gnu/libunistring/libunistring-1.5.tar.xz",
+    "bytes": 2856424,
+    "sha256": "fe89007a8a414ae4790b816b86859e877d3ab135db3c37f06541ff7e85ac344b",
+    "seconds": 0.8835916939997333
+  }
+]

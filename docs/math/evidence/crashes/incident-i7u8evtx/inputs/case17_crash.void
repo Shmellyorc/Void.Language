@@ -1,0 +1,4 @@
+use math
+func main():
+    var input: i8 = 1
+    var bad = math.atan2(input, input)

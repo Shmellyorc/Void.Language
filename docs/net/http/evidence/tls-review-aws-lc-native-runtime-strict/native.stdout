@@ -1,0 +1,3 @@
+128 MiB actual HTTP async pulls: live payload 65515..65515; handles <= 7; retained first task repeatedly awaited
+Actual HTTP Runtime driver, single-worker file producer and activation cleanup passed
+Native HTTP/1.1/TLS, streaming, decoding, policy and backpressure checks passed

@@ -1,0 +1,4 @@
+func _math_sin<t>(value: t) -> t:
+    return value
+func exercise<t>(value: t) -> t:
+    return _math_sin<t>(value)

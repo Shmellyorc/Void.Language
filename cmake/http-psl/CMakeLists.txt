@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.24)
+project(VoidPinnedPSL C)
+set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+if(NOT EXISTS "${PSL_SOURCE}/src/psl.c" OR NOT EXISTS "${PSL_DATA}")
+  message(FATAL_ERROR "Supply verified PSL_SOURCE and PSL_DATA")
+endif()
+execute_process(COMMAND "${Python3_EXECUTABLE}" "${PSL_SOURCE}/src/psl-make-dafsa"
+  --output-format=cxx+ --encoding=utf-8 "${PSL_DATA}" "${CMAKE_CURRENT_BINARY_DIR}/suffixes_dafsa.h"
+  COMMAND_ERROR_IS_FATAL ANY)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config.h"
+  "#define ENABLE_BUILTIN 1\n#define PACKAGE_VERSION \"0.21.5\"\n")
+add_library(psl STATIC "${PSL_SOURCE}/src/psl.c" "${PSL_SOURCE}/src/lookup_string_in_fixed_set.c")
+target_include_directories(psl PRIVATE "${CMAKE_CURRENT_BINARY_DIR}" PUBLIC "${PSL_SOURCE}/include")
+target_compile_definitions(psl PRIVATE HAVE_CONFIG_H=1 BUILDING_PSL PUBLIC PSL_STATIC)
+set_target_properties(psl PROPERTIES POSITION_INDEPENDENT_CODE ON)
+if(WIN32)
+  target_compile_definitions(psl PRIVATE _CRT_SECURE_NO_WARNINGS strdup=_strdup)
+  target_link_libraries(psl PRIVATE ws2_32)
+endif()
+install(TARGETS psl ARCHIVE DESTINATION lib)
+install(FILES "${PSL_SOURCE}/include/libpsl.h" DESTINATION include)

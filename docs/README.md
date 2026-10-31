@@ -1,5 +1,31 @@
 # VOID documentation
 
+## HTTP client engineering authorized, 30 October 2026
+
+Boss authorizes the complete `url`/`net/http` mission at `15f7868b`, LLVM/Clang/LLD
+23.1.4. [User guide](net/http/README.md), [approved contract](net/http/DESIGN.md),
+[acceptance roadmap](net/http/ROADMAP.md) and [current evidence](net/http/CURRENT_ENGINEERING.md).
+The public source facade, private compiler/Runtime bridge, real HTTP/1.1/HTTP/2,
+verified TLS, DNS, streaming, native bulk/multipart files, auth/proxies/cookies,
+redirects, deadlines, docs/examples and LSP integration are implemented. The exact
+approved cookie and H2 corrections are directly in authoritative `third_party/curl/`;
+Boss has no manual patch or ZIP task. Linux selects the approved unmodified AWS-LC
+pin after isolating upstream OpenSSL callback-type UB, with strict checks preserved.
+
+The existing Runtime worker pool and precise async result/Task retirement preserve
+single-worker progress, repeated await, structured draining and generation leases.
+Actual public-source 2 GiB and native bulk 4 GiB+1 tests pass with separate memory
+observations. Native build/install checks include the full hashed link closure,
+notices and corresponding source. Native Windows/macOS recipes are implemented
+but unexecuted; provider worst-case allocation certification remains open. All-target
+Debug/Release/strict builds pass; consolidated tests and focused integration
+repairs are recorded in the [Golden Wrench handoff](net/http/HANDOFF.md). No full HTTP acceptance, independent review or RSS ceiling
+is claimed. [Earlier checkpoints](net/http/ENGINEERING_HISTORY.md) preserve failures.
+
+No staging, commits, branches, pushes, hosted CI, external upstream messages or
+protected root README edits. Stop for Golden Wrench implementation/evidence review
+after the full engineering handoff, or a genuine unresolved safety decision.
+
 ## LLVM 23.1.4 migration — authorized 28 October 2026
 
 Boss authorized the complete migration from LLVM/Clang/LLD 19.1.7 to 23.1.4.
@@ -7,8 +33,12 @@ The [engineering record](llvm23/IMPLEMENTATION.md), [compatibility notes](llvm23
 and [local acceptance](llvm23/ACCEPTANCE.md) record the locally completed migration: effective Release **368/368**, Debug
 **381/381**, effective strict **358/358**, actual 1 MiB, editor/install/AOT and
 bounded performance/reliability checks. Original failures and LLVM19 incidents
-remain intact. Independent Golden Wrench review, native Windows/macOS and hosted
-seven-job acceptance remain pending; no Git or hosted CI action was performed.
+remain intact. Boss records hosted acceptance at `15f7868b`,
+[CI #40982216303](https://github.com/Shmellyorc/Void.Language/actions/runs/40982216303):
+seven successful jobs, 2,454 passing CTests, zero failures and five documented
+cross-volume skips. This supersedes the former pending native/hosted checkpoint;
+it does not claim independent source review, a formal release lock or a causal
+repair of historical optimizer failures. This HTTP mission performed no hosted CI.
 
 
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
@@ -35,8 +65,11 @@ Boss approved the complete logging [contract](log/DESIGN.md) and
 The [API](log/API.md), [engineering history](log/IMPLEMENTATION.md),
 [acceptance](log/ACCEPTANCE.md), [measurements](log/BENCHMARKS.md) and
 [Golden Wrench handoff](log/HANDOFF.md) track source and local evidence.
-The original [research](log/RESEARCH.md) remains preserved. Independent review,
-hosted CI and native Windows/macOS verification are separate pending gates.
+The original [research](log/RESEARCH.md) remains preserved. Boss records
+cross-platform tests passing for the substantial approved logging API.
+The historical unexplained optimizer incident, unresolved performance gate and
+associated release HOLD remain intact; these tests do not establish a causal
+repair or performance acceptance. No new independent review or lock is inferred.
 
 ## Collections implementation, 28 October 2026
 
@@ -49,8 +82,10 @@ and [Golden Wrench handoff](collections/HANDOFF.md) record actual local evidence
 and remaining acceptance boundaries. The separately approved
 [generic operator amendment](collections/GENERIC_OPERATORS.md) preserves ordinary
 direct-import restrictions. The original [research](collections/RESEARCH.md) and
-[roadmap](collections/ROADMAP.md) remain preserved. Independent review, hosted CI
-and native Windows/macOS verification are not claimed.
+[roadmap](collections/ROADMAP.md) remain preserved. Boss records all 24 approved
+helpers implemented, feature-complete for the accepted API scope, with
+cross-platform CI passing. No new independent source review or formal release
+lock is inferred.
 
 ## OS module implementation, 27 October 2026
 
@@ -59,7 +94,9 @@ Boss approved the complete 13-function [contract](os/DESIGN.md) and
 source facade, guarded compiler/Runtime bridge and both native build routes
 are implemented. [API/examples](os/API.md), [engineering record](os/IMPLEMENTATION.md)
 and [Golden Wrench handoff](os/HANDOFF.md) record behavior and local evidence.
-Native Windows/macOS execution and independent acceptance remain unclaimed.
+Boss records all 13 public functions implemented and registered native tests
+passing on Linux, Windows and macOS. No new independent source review or formal
+release lock is inferred.
 The original [source/platform research](os/RESEARCH.md) remains historical evidence.
 
 ## Channel router implementation, 27 October 2026

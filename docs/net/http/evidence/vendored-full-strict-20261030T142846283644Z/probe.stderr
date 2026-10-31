@@ -1,0 +1,34 @@
+../source/openssl-3.5.9/crypto/stack/stack.c:440:13: runtime error: call to function pd_free through pointer to incorrect function type 'void (*)(void *)'
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property_parse.c:301: note: pd_free defined here
+    #0 0x5642f0a2d3ed in OPENSSL_sk_pop_free /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/stack/stack.c:440:13
+    #1 0x5642f098de14 in sk_OSSL_PROPERTY_DEFINITION_pop_free /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property_parse.c:23:1
+    #2 0x5642f098b4ff in ossl_parse_property /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property_parse.c:400:5
+    #3 0x5642f098481d in ossl_method_store_add /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/property/property.c:374:28
+    #4 0x5642f07ef958 in put_evp_method_in_store /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_fetch.c:201:12
+    #5 0x5642f08b9cfc in ossl_method_construct_this /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_fetch.c:127:5
+    #6 0x5642f08b83e0 in algorithm_do_map /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_algorithm.c:77:13
+    #7 0x5642f08b7798 in algorithm_do_this /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_algorithm.c:122:15
+    #8 0x5642f0911670 in ossl_provider_doall_activated /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/provider_core.c:1603:14
+    #9 0x5642f08b73a4 in ossl_algorithm_do_all /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_algorithm.c:164:9
+    #10 0x5642f08b8b3d in ossl_method_construct /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/core_fetch.c:157:5
+    #11 0x5642f07ec9fa in inner_evp_generic_fetch /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_fetch.c:333:23
+    #12 0x5642f07ebbf4 in evp_generic_fetch /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_fetch.c:404:14
+    #13 0x5642f118825a in EVP_RAND_fetch /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/evp/evp_rand.c:285:12
+    #14 0x5642f09a09bc in rand_new_seed /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:629:12
+    #15 0x5642f099dcbc in rand_get0_primary /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:778:26
+    #16 0x5642f099b96c in RAND_get0_primary /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:833:34
+    #17 0x5642f099bef7 in RAND_status /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/openssl/../source/openssl-3.5.9/crypto/rand/rand_lib.c:420:17
+    #18 0x5642eff964a0 in rand_enough /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/vtls/openssl.c:808:10
+    #19 0x5642eff8ba17 in ossl_random /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/vtls/openssl.c:5488:9
+    #20 0x5642efd9aa52 in Curl_ssl_random /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/vtls/vtls.c:372:12
+    #21 0x5642efcb27fe in randit /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/rand.c:118:10
+    #22 0x5642efcb25d9 in Curl_rand_bytes /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/rand.c:156:14
+    #23 0x5642efc2100d in Curl_hash_global_init /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/hash.c:70:12
+    #24 0x5642efc0cc0d in global_init /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/easy.c:180:6
+    #25 0x5642efc0cdaf in curl_global_init_mem /home/shmellyorc/Documents/Void.Language/third_party/curl/lib/easy.c:279:12
+    #26 0x5642efc0b285 in main /home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/cookie_accounting_probe.c:101:13
+    #27 0x7f4dc8a2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #28 0x7f4dc8a2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #29 0x5642efb1a9a4 in _start (/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-strict-20261030T142846283644Z/provider_probe+0xe6e9a4)
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../source/openssl-3.5.9/crypto/stack/stack.c:440:13 

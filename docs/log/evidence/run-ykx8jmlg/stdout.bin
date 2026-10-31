@@ -1,0 +1,2 @@
+VOID_TEST_STACK {"inherited": [1048576, 1048576], "observed": [1048576, 1048576]}
+Logging LSP: 38 checks passed

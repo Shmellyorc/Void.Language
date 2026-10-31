@@ -1,0 +1,34 @@
+use net/http
+use os
+
+async func receive(base: string) -> result<i64, http.error>:
+    with http.open_client()? as owner:
+        # Both tasks use the Runtime driver; neither occupies an IO worker waiting for a peer.
+        var first = owner.get_async(base + "/plain")
+        var second = owner.get_async(base + "/plain")
+        var reply = (await first)?
+        var other = (await second)?
+        var retained = (await first)?
+        if retained.bytes.count != reply.bytes.count:
+            return Ok(-1)
+        with owner.start(http.request(target = base + "/large?8388608"))? as exchange:
+            var info = (await exchange.response_async())?
+            var count: i64 = 0
+            var ended = false
+            for not ended:
+                var block = (await exchange.read_bytes_async())?
+                count += block.bytes.count
+                ended = block.eof
+            var finished = (await exchange.finish_async())?
+            return Ok(count)
+
+# Async entry requires an explicit host or async AOT adapter, as in host.cpp.
+async func entry(input: i32) -> i32:
+    if os.env("VOID_HTTP_URL") is Ok(var base):
+        var stream_result = await receive(base)
+        if stream_result is Ok(var count):
+            print("Streamed {count} bytes")
+            return 0
+        else if stream_result is Err(var failure):
+            print("HTTP {failure.kind}, phase {failure.phase}")
+    return 1

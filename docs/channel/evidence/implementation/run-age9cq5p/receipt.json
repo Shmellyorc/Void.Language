@@ -1,0 +1,15 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+    "check",
+    "/tmp/VOID-channel-rejections-r5j09tek/private-type.void"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+  "status": 1,
+  "seconds": 0.07388693199754925,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "59ded7bc5111441de1439a9cc6967acc59a08b55348520e1131049de40b97560",
+  "object_hashes": {},
+  "output_hashes": {}
+}

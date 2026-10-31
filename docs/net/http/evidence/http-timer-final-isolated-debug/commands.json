@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http-timer-final-debug/timeouts-fixed",
+    "http://127.0.0.1:38779",
+    "https://127.0.0.1:54979",
+    "http://127.0.0.1:54979",
+    "https://127.0.0.1:44691",
+    "/tmp/VOID timeout xcn2vsji/cert.pem",
+    "/tmp/VOID timeout xcn2vsji/input.bin"
+  ],
+  "exit_code": 0
+}

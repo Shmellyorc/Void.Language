@@ -6,7 +6,7 @@ import tempfile
 import bootstrap as h
 compiler=Path(sys.argv[1]).resolve();runner=Path(sys.argv[2]).resolve()
 manifest=(compiler.parent/'void-native.txt').read_text(encoding='utf-8').splitlines()
-assert manifest[0]=='VOID native 23.1.4 v1'
+assert manifest[0] in ('VOID native 23.1.4 v1', 'VOID native 23.1.4 v2')
 flags=['--driver-mode=g++',*manifest[5:]]
 if manifest[2]:flags+=['--ld-path='+manifest[2]]
 if sys.platform.startswith('linux'):flags+=['-ldl']

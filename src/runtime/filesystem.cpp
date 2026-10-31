@@ -555,8 +555,8 @@ void file_operation(const Request& request, Result& result, const std::atomic<bo
 }
 }
 
-std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& result,
-                           std::shared_ptr<const testing::Hooks> hooks) {
+static std::shared_ptr<File> open_native(const std::string& path, OpenMode mode, Result& result,
+                           std::shared_ptr<const testing::Hooks> hooks, bool regular_only) {
     if (!valid_path(path)) {
         fail(result, ErrorKind::invalid_path);
         return {};
@@ -594,6 +594,7 @@ std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& resul
     case OpenMode::open_or_create: flags = O_RDWR | O_CREAT | O_CLOEXEC; break;
     case OpenMode::create_new: flags = O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC; break;
     }
+    if (regular_only) flags |= O_NONBLOCK;
     do {
         file->handle = ::open(path.c_str(), flags, 0666);
     } while (file->handle < 0 && errno == EINTR);
@@ -604,12 +605,14 @@ std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& resul
     }
 #ifdef _WIN32
     BY_HANDLE_FILE_INFORMATION information{};
-    if (!GetFileInformationByHandle(file->handle, &information)) fail(result, native_error());
+    if (regular_only && GetFileType(file->handle) != FILE_TYPE_DISK) fail(result, ErrorKind::unsupported);
+    else if (!GetFileInformationByHandle(file->handle, &information)) fail(result, native_error());
     else if (information.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) fail(result, ErrorKind::is_directory);
 #else
     struct stat information{};
     if (::fstat(file->handle, &information) != 0) fail(result, native_error());
     else if (S_ISDIR(information.st_mode)) fail(result, ErrorKind::is_directory);
+    else if (regular_only && !S_ISREG(information.st_mode)) fail(result, ErrorKind::unsupported);
 #endif
     if (result.error != ErrorKind::success) {
         auto cleanup = close(*file);
@@ -617,6 +620,11 @@ std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& resul
         return {};
     }
     return file;
+}
+
+std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& result,
+                          std::shared_ptr<const testing::Hooks> hooks) {
+    return open_native(path, mode, result, std::move(hooks), false);
 }
 
 Result close(File& file) {
@@ -715,7 +723,7 @@ void finish_close(File& file, Result& result) {
     } else result.cleanup_code = cleanup.os_code;
 }
 
-void whole_file(const Request& request, Result& result, const std::atomic<bool>* cancellation) {
+void whole_file(const Request& request, Result& result, const std::atomic<bool>* cancellation, bool regular_only = false) {
     bool reading = request.operation == Operation::read_all;
     if (reading && request.first < 0) {
         fail(result, ErrorKind::invalid_range);
@@ -728,8 +736,13 @@ void whole_file(const Request& request, Result& result, const std::atomic<bool>*
         fail(result, ErrorKind::invalid_mode);
         return;
     }
-    auto file = open(request.path, mode, result, request.hooks);
+    auto file = open_native(request.path, mode, result, request.hooks, regular_only);
     if (!file) return;
+    if (regular_only) {
+        length(*file, result);
+        if (result.error == ErrorKind::success && result.number > request.first) fail(result, ErrorKind::limit_exceeded);
+        if (result.error != ErrorKind::success) { finish_close(*file, result); return; }
+    }
     if (reading) {
         while (!cancelled(cancellation) && fill(*file, result)) {
             auto available = file->last - file->first;
@@ -1306,6 +1319,13 @@ void filesystem_operation(const Request& request, Result& result,
     default: throw std::logic_error("Invalid filesystem operation");
     }
 }
+}
+
+Result read_regular(const std::string& path, std::int64_t max_bytes) {
+    Request request(Operation::read_all); request.path = path; request.first = max_bytes;
+    Result result;
+    whole_file(request, result, nullptr, true);
+    return result;
 }
 
 Result run(const Request& request, const std::atomic<bool>* cancellation) {

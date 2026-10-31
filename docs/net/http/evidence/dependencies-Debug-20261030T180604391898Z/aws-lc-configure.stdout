@@ -1,0 +1,47 @@
+-- Versioning name:awslc version:5.12.0 abi:1
+-- Libraries crypto:crypto ssl:ssl
+-- SET_LIB_SONAME: 0
+-- COHABITANT_HEADERS: 0
+-- COHABITANT_BINARIES: 0
+-- INSTALL_OPENSSL_SHIM: 1
+-- The C compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- ENABLE_SYMBOL_VERSIONING: OFF
+-- Entropy source configured: Dynamic (default: CPU Jitter)
+-- The CXX compiler identification is Clang 23.1.4
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Perl: /usr/bin/perl (found version "5.42.3")
+-- Go not found. Disabling some code generation and using pre-generated code in generated-src/
+-- Setting CMAKE_C_STANDARD=11
+-- Performing Test HAVE_C_FLAG__Wno_cast_function_type
+-- Performing Test HAVE_C_FLAG__Wno_cast_function_type - Success
+-- Compiler supports '-Wno-cast-function-type', adding to CMAKE_C_FLAGS
+-- Performing Test HAVE_C_FLAG__Wstring_concatenation
+-- Performing Test HAVE_C_FLAG__Wstring_concatenation - Success
+-- Compiler supports '-Wstring-concatenation', adding to C_CXX_FLAGS
+-- Performing Test HAVE_C_FLAG__Wimplicit_fallthrough
+-- Performing Test HAVE_C_FLAG__Wimplicit_fallthrough - Success
+-- Compiler supports '-Wimplicit-fallthrough', adding to C_CXX_FLAGS
+-- linux_random_h.c probe is positive, enabling HAVE_LINUX_RANDOM_H
+-- stdalign_check.c probe is positive, enabling AWS_LC_STDALIGN_AVAILABLE
+-- builtin_swap_check.c probe is positive, enabling AWS_LC_BUILTIN_SWAP_SUPPORTED
+-- Performing Test HAVE_C_FLAG__Wshadow
+-- Performing Test HAVE_C_FLAG__Wshadow - Success
+-- Compiler supports '-Wshadow', adding to C_CXX_FLAGS
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Debug/aws-lc/tool-openssl/c_rehash
+-- Configuring done (1.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Debug/aws-lc

@@ -1,0 +1,13 @@
+/tmp/VOID-channel-rejections-hkoz8utx/router-field.void:8:15: error: Member '_state' is not accessible from this lexical context.
+    code: VOID3003
+
+ 8 |     print(bus._state)
+   |               ^^^^^^
+    Module: /router-field.void
+    Stored field declared by /@stdlib/channel.void::router<2:0:>. at /home/shmellyorc/Documents/Void.Language/stdlib/channel.void:37:13
+
+ 37 |     private _state: _state<t>?
+    |             ^^^^^^
+    Module: /@stdlib/channel.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+

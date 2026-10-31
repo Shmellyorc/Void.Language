@@ -1,0 +1,15 @@
+use channel
+var held: channel.subscription? = null
+var destroyed = 0
+struct witness:
+    value: i32
+func (self witness) deinit():
+    destroyed += 1
+func entry(command: i32) -> i32:
+    if command == 0:
+        var bus = channel.router<i32>()
+        var marker = witness(value = 7)
+        held = bus.subscribe("topic", func(const amount: i32):
+            bus.emit("unknown", marker.value + amount)
+        )
+    return destroyed

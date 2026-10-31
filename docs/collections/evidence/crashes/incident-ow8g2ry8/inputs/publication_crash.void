@@ -1,0 +1,32 @@
+use collections as c
+var visited = 0
+var published = [99]
+var items = [1, 2, 3, 4, 5, 6, 7, 8]
+func entry(command: i32) -> i32:
+    if command == 0:
+        visited = 0
+        published = [99]
+        items = [1, 2, 3, 4, 5, 6, 7, 8]
+        return 0
+    if command == 99:
+        return visited
+    if command == 100:
+        if published.count == 1 and published[0] == 99:
+            return 1
+        return 0
+    if command == 101:
+        return items.count as i32
+    if command == 2:
+        published = c.sorted(items, func(const left: i32, const right: i32) -> bool:
+            visited += 1
+            items.push(9)
+            var zero = 0
+            var failed = 1 / zero
+            return failed == 0
+        )
+        return 7
+    published = c.map<i32, i32>(items, func(const item: i32) -> i32:
+        visited += 1
+        return item + 1
+    )
+    return 7

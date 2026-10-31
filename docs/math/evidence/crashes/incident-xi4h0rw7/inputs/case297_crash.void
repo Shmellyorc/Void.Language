@@ -1,0 +1,3 @@
+use math
+func main():
+    var wrong: i32 = math.degrees(1.0)

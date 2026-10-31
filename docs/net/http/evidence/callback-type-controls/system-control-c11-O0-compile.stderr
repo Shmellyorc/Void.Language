@@ -1,0 +1,3 @@
+/usr/bin/x86_64-linux-gnu-ld.bfd: cannot find /usr/lib/llvm-23/lib/clang/23/lib/x86_64-pc-linux-gnu/libclang_rt.asan_static.a: No such file or directory
+/usr/bin/x86_64-linux-gnu-ld.bfd: cannot find /usr/lib/llvm-23/lib/clang/23/lib/x86_64-pc-linux-gnu/libclang_rt.asan.a: No such file or directory
+clang: error: linker command failed with exit code 1 (use -v to see invocation)

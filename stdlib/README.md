@@ -1,5 +1,16 @@
 # Standard library
 
+`use url` supplies immutable HTTP(S) addresses, shared CURLU parsing/resolution,
+strict percent text/byte helpers and ordered query pairs. Its source/IR/JIT/AOT
+and tooling have local Linux evidence. `use net/http` provides explicit clients,
+verified HTTP/1.1/HTTP/2, buffered and streaming requests/responses, native file
+upload/download and multipart, auth, cookies, proxies, redirects and deadlines.
+See the [guide and runnable examples](../docs/net/http/README.md) and
+[current engineering evidence](../docs/net/http/CURRENT_ENGINEERING.md). The exact
+approved vendored curl fixes and Linux TLS pin are integrated. Native platform
+execution, provider worst-case memory certification and independent full HTTP
+acceptance remain pending.
+
 `use log` provides five checked severity functions, inclusive/off filtering,
 lazy messages, fixed UTC single-line UTF-8 framing, borrowed console destinations,
 persistent files, explicit adoption, bounded rotation, independent managed loggers,

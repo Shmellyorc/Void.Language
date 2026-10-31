@@ -1,0 +1,25 @@
+Unknown flag: -addext
+-help               Display option summary
+-md5                Supported digest function
+-ripemd160          Supported digest function
+-sha1               Supported digest function
+-sha256             Supported digest function (default)
+-sha224             Supported digest function
+-sha384             Supported digest function
+-sha512             Supported digest function
+-new                Generates a new certificate request.It will prompt the user for the relevant field values.If the -newkey option is not given it will generate a new private key with 2048 bits length
+-newkey             This option is used to generate a new private key. This option supports RSA keys in the format [rsa:]nbits. If nbits is not given, i.e. -newkey rsa is specified, 2048 bits length is used. This implies -new unless used with -x509.
+-days               When -x509 is in use this specifies the number of days from today to certify the certificate for, otherwise it is ignored. n should be a positive integer. The default is30 days.
+-nodes              If this option is specified then if a private key is created it will not be encrypted.
+-x509               This option outputs a certificate instead ofa certificate request. If the -newkey option is not given it will generate a new private key with 2048 bits length
+-batch              Do not prompt for DN/attributes: use config values/defaults, omitting unset fields. Without -config, use built-in DN defaults. Does not change -subj, prompt=no, or explicit password-source reads.
+-subj               Sets subject name for new request. The arg must be formatted as /type0=value0/type1=value1/type2=.... Keyword characters may be escaped by \ (backslash), and whitespace is retained.
+-config             This specifies the request template file
+-extensions         Certificate extension section, used when -x509 is given (overrides x509_extensions in the config file). It is not applied to certificate requests, but is still validated when -config is given.
+-reqexts            Certificate request extension section (overrides req_extensions in the config file). It is not applied when -x509 is given, but is still validated when -config is given.
+-key                This specifies the key file path to be used for signing.
+-passin             This specifies the input private key password source.
+-passout            This specifies the output private key password source.
+-keyout             This specifies the output filename for the  private key or writes to a file called privkey.pem in the current directory.
+-out                This specifies the output filename to write to or standard output by default.
+-outform            This specifies the output format. Valid options are -DER and -PEM

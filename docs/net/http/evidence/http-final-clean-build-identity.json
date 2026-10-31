@@ -1,0 +1,82 @@
+{
+  "scope": "Fresh final-source Release compile; explicit pinned LLD and Unicode/space/# CMake output. Direct external absolute-percent-output limitation retained separately.",
+  "source_sha256": {
+    "CMakeLists.txt": "b35dd11b698c2cb8d776762bcf123d9a01264601e62fd7c5aca5115d28446184",
+    "src/frontend/compiler.cpp": "e1bbce064280824a0152ede96110c789293f6e2dee2d9b2da43a1da99efdeaf4",
+    "src/runtime/http.cpp": "3f1b2904623bc75e9836aa1bab36a5324207d6664aa94d352585e43f1760dc47",
+    "src/runtime/http_file.cpp": "66cdea5e72a3460849aaf61f9fcab4386476890b612e3d8c5f6545e04164ea40",
+    "src/runtime/async.cpp": "e29616fc3c69306f700978052d2b8b1dc3bc1f6b286b87c62e54126f6b4974d0",
+    "tests/net/http/dns_fixture.py": "055b56ba2fc0fd4301d80edd6e60209c10a0882618fd589479c0d9c3f90307a0",
+    "third_party/http-versions.json": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb"
+  },
+  "linker": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+  "linker_version": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)",
+  "archive_and_compiler_object_comparisons": {
+    "curl/lib/libcurl.a": {
+      "main_sha256": "1526915123669110951425c89d1cf51e218aeb172f413149149094684b2c5837",
+      "fresh_sha256": "1526915123669110951425c89d1cf51e218aeb172f413149149094684b2c5837",
+      "identical": true
+    },
+    "libvoid_runtime.a": {
+      "main_sha256": "7a8fa8e3fa3ad9758387d9cf5d569bd42d1b095816a310f0c689cf3b050426f0",
+      "fresh_sha256": "7a8fa8e3fa3ad9758387d9cf5d569bd42d1b095816a310f0c689cf3b050426f0",
+      "identical": true
+    },
+    "libvoid_core.a": {
+      "main_sha256": "82e7c711f12745aab6d8a579bbc4b479cab52e41a1a7583c1696adda7b31ca35",
+      "fresh_sha256": "82e7c711f12745aab6d8a579bbc4b479cab52e41a1a7583c1696adda7b31ca35",
+      "identical": true
+    },
+    "libvoid_llvm.a": {
+      "main_sha256": "8dfbcd60393808e6a9f08bb8eb8c17136ab25f1e7370465bf016c3f773676332",
+      "fresh_sha256": "8dfbcd60393808e6a9f08bb8eb8c17136ab25f1e7370465bf016c3f773676332",
+      "identical": true
+    },
+    "libvoid_native_fixture.a": {
+      "main_sha256": "4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865",
+      "fresh_sha256": "4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865",
+      "identical": true
+    },
+    "CMakeFiles/voidc_objects.dir/src/main.cpp.o": {
+      "main_sha256": "a8452054435cce2e0d6aa0f3ba56fbdacfa4d707c60feb9355fe4c4f893cce1b",
+      "fresh_sha256": "a8452054435cce2e0d6aa0f3ba56fbdacfa4d707c60feb9355fe4c4f893cce1b",
+      "identical": true
+    },
+    "CMakeFiles/voidc_objects.dir/src/native_build.cpp.o": {
+      "main_sha256": "8fda6050a8404152ca1d8f2ae4361f12e99db8e83dac6ae3d8ffc6583fe08f05",
+      "fresh_sha256": "8fda6050a8404152ca1d8f2ae4361f12e99db8e83dac6ae3d8ffc6583fe08f05",
+      "identical": true
+    },
+    "CMakeFiles/voidc_objects.dir/examples/proof.cpp.o": {
+      "main_sha256": "f2ee79a68dd2304ebe5f5d0dd6e3cee70de7b9b6bd061c153a7cfc84b17042cd",
+      "fresh_sha256": "f2ee79a68dd2304ebe5f5d0dd6e3cee70de7b9b6bd061c153a7cfc84b17042cd",
+      "identical": true
+    }
+  },
+  "fresh_binaries_sha256": {
+    "voidc": "9a3cb53e2d255ffef2cff981076ccf1be5ff6d52513bb03a260f4236b4257ce9",
+    "voidls": "89d5998b65534389d10542e8b6f9c1ae6f74afcd04bb2f99d7753d423548b175",
+    "void_http_example_host": "0dabb19f005085435aee95b6e62e11f92d6549facbee26733c62474cd03a364b"
+  },
+  "voidls_identical": true,
+  "native_resources_verified": 11,
+  "native_manifest_sha256": "712bbc0344d5dfc824e351eafcb5e6a73ab51aa061e47b95b892f65aa4865998",
+  "native_inventory_sha256": "4065eedb0751200ef369e7a860c8db6e31b0150adca8af6fbd1bc46c28fabf91",
+  "example_process_checks": 18,
+  "example_ctests": {
+    "passed": 1,
+    "total": 1
+  },
+  "lsp_ctests": {
+    "passed": 2,
+    "total": 2
+  },
+  "compiler_binary_note": "Raw voidc embeds a different required cache-build identity because absolute input paths differ; an isolated relink substituting only the main cache-identity archive reproduces the main compiler byte for byte. Production cache identities and binaries are unchanged.",
+  "compiler_identity_control": "http-final-clean-identity-link.json",
+  "logs_sha256": {
+    "http-final-clean-configure-release.log": "83d3f55513ebe7dd5ec1831f8a1db3703547ab12c18ea094d8fb2d063f7de36f",
+    "http-final-clean-build-release.log": "d1f5e4a021cb9a733dfaf6f2a1b6be50a0563a1a210c8c29d53f86dd43c929c4",
+    "http-final-clean-examples-release.log": "f335fb5b4dfb3e65899ecf9d8f54cc6ffce4d8a8ef62b9271eb444d3aa2b9eae",
+    "http-final-clean-lsp-release.log": "0d522f0c04b594c95084489ed04a5449cec7b7c312059e10c1da4185a53f1a78"
+  }
+}

@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-mtl7eu7d/payload-type.void:8:19: error: Type mismatch: expected readonly i32, received string.
+    code: VOID2001
+
+ 8 |     bus.emit("t", "wrong")
+   |                   ^^^^^^^
+    Module: /payload-type.void
+    Expected: readonly i32
+    Received: string
+

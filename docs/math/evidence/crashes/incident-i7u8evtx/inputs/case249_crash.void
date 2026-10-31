@@ -1,0 +1,5 @@
+use math
+func main():
+    var single: f32 = 1
+    var wide: f64 = 1
+    var result = math.inverse_lerp(single, single, wide)

@@ -1,0 +1,22 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+    "emit",
+    "/home/shmellyorc/Documents/Void.Language/tests/channel/nested.void",
+    "-o",
+    "/tmp/VOID-channel-execution-rdpzf8m0/app.o",
+    "--no-opt"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+  "status": 0,
+  "seconds": 0.3358322640051483,
+  "hard_stack_bytes": 1048576,
+  "configured_standard_library": null,
+  "executable_sha256": "ae781e72f97bb9ea0923101b22611b44762aac132c191d143ab25d273660d5c7",
+  "object_hashes": {
+    "/tmp/VOID-channel-execution-rdpzf8m0/app.o": "f0ddd956e76d7b62caa667365ff4fb5c47931dcfccf8f0b01fddf3821d2995be"
+  },
+  "output_hashes": {
+    "/tmp/VOID-channel-execution-rdpzf8m0/app.o": "f0ddd956e76d7b62caa667365ff4fb5c47931dcfccf8f0b01fddf3821d2995be"
+  }
+}

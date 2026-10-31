@@ -1,0 +1,19 @@
+use net/http
+
+func exercise() -> result<i32, http.error>:
+    with http.open_client()? as owner:
+        var reply = (owner.get("http://127.0.0.1:43287/plain"))?
+        if reply.bytes.count != 11:
+            return Ok(1)
+        with owner.start(http.request(target = "http://127.0.0.1:43287/plain"))? as exchange:
+            var info = (exchange.response())?
+            var first = (exchange.read_bytes(3))?
+            if info.status != 200 or first.bytes.count == 0:
+                return Ok(1)
+            var closed = (exchange.close())?
+    return Ok(7)
+
+func entry(input: i32) -> i32:
+    if (exercise()) is Ok(var answer):
+        return answer
+    return 1

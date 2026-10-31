@@ -1,0 +1,76 @@
+make  all-recursive
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2'
+Making all in gl
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/gl'
+  GEN      alloca.h
+  GEN      assert.h
+  GEN      error.h
+  GEN      fcntl.h
+  GEN      limits.h
+  GEN      stddef.h
+  GEN      stdio.h
+  GEN      stdlib.h
+  GEN      string.h
+  GEN      sys/stat.h
+  GEN      sys/types.h
+  GEN      time.h
+  GEN      unistd.h
+make  all-recursive
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/gl'
+make[4]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/gl'
+make[4]: Nothing to be done for 'all-am'.
+make[4]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/gl'
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/gl'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/gl'
+Making all in unistring
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/unistring'
+  GEN      iconv.h
+  GEN      inttypes.h
+  GEN      limits.h
+  GEN      stddef.h
+  GEN      stdlib.h
+  GEN      string.h
+  GEN      sys/types.h
+  GEN      unistd.h
+  GEN      wchar.h
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/unistring'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/unistring'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/unistring'
+Making all in lib
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/lib'
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/lib'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/lib'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/lib'
+Making all in src
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/src'
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/src'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/src'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/src'
+Making all in examples
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/examples'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/examples'
+Making all in fuzz
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/fuzz'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/fuzz'
+Making all in po
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/po'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/po'
+Making all in tests
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/tests'
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/tests'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/tests'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2/tests'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libidn2'

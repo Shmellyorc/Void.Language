@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/http-provider-full/openssl_strict_init_probe"
+  ],
+  "exit_code": 1,
+  "seconds": 0.09213183599968033,
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "stack_soft_hard_bytes": 1048576,
+  "binary_sha256": "4527147ff406e491bfed842d9d9809f5645e83c63d7ba895a1b3f6e2fea3f237",
+  "crypto_sha256": "f0c72b12b31ada1c11e438b5dea475478b83a481e2c71f556495eaef9f180afc",
+  "result": "FAIL: original upstream typed cleanup callback triggers UBSan; no curl or VOID runtime linked"
+}

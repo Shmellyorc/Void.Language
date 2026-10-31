@@ -1,0 +1,1 @@
+VOID IR: non-mutating receiver has a referent mutation effect in /@stdlib/net/http.void::client::method::start

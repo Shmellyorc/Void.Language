@@ -1,0 +1,251 @@
+{
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "profile": "Release",
+  "pins_sha256": "061c7073ec1657825cf31a1a0a3ec6bb717738e3a7fa65fd15b328ac6ac0f3da",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 0.012590521000674926
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/source/nghttp2-1.70.0",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/nghttp2",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DENABLE_LIB_ONLY=ON",
+        "-DENABLE_SHARED_LIB=OFF",
+        "-DENABLE_STATIC_LIB=ON",
+        "-DBUILD_TESTING=OFF",
+        "-DENABLE_DOC=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 3.3148835110005166
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/nghttp2",
+        "--parallel",
+        "6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 0.8605049179996058
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/nghttp2"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 0.01658814500024164
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/source/c-ares-1.34.9",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/c-ares",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DCARES_STATIC=ON",
+        "-DCARES_SHARED=OFF",
+        "-DCARES_BUILD_TESTS=OFF",
+        "-DCARES_BUILD_TOOLS=OFF",
+        "-DCARES_INSTALL=ON"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 18.251073228999303
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/c-ares",
+        "--parallel",
+        "6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 1.969919354999547
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/c-ares"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 0.0457011809994583
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/source/zlib-1.3.2",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/zlib",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DZLIB_BUILD_TESTING=OFF",
+        "-DZLIB_BUILD_SHARED=OFF",
+        "-DZLIB_BUILD_STATIC=ON"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 1.2798082219997013
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/zlib",
+        "--parallel",
+        "6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 0.7873399509999217
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/zlib"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release",
+      "exit_code": 0,
+      "seconds": 0.0195537460003834
+    },
+    {
+      "argv": [
+        "perl",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/source/openssl-3.5.9/Configure",
+        "linux-x86_64",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "--libdir=lib",
+        "--openssldir=/usr/lib/ssl",
+        "no-shared",
+        "no-tests",
+        "no-engine",
+        "no-module",
+        "no-sslkeylog",
+        "-O2",
+        "-fPIC"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/openssl",
+      "exit_code": 0,
+      "seconds": 11.214465715999722
+    },
+    {
+      "argv": [
+        "make",
+        "-j6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/openssl",
+      "exit_code": 0,
+      "seconds": 26.461432080999657
+    },
+    {
+      "argv": [
+        "make",
+        "install_sw"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/openssl",
+      "exit_code": 0,
+      "seconds": 2.372875297000064
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/source/libunistring-1.5/configure",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "--libdir=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--enable-shared",
+        "--disable-static"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libunistring",
+      "exit_code": 0,
+      "seconds": 30.876748794999912
+    },
+    {
+      "argv": [
+        "make",
+        "-j6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libunistring/lib",
+      "exit_code": 0,
+      "seconds": 57.90615586000058
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libunistring/lib",
+      "exit_code": 0,
+      "seconds": 0.20033463500021753
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/source/libidn2-2.3.8/configure",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "--libdir=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--enable-shared",
+        "--disable-static",
+        "--disable-nls",
+        "--disable-doc",
+        "--with-libunistring-prefix=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 12.320873788999961
+    },
+    {
+      "argv": [
+        "make",
+        "-j6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib",
+      "exit_code": 2,
+      "seconds": 0.29635593599959975
+    }
+  ]
+}

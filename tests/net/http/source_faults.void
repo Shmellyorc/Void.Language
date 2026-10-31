@@ -1,0 +1,24 @@
+use net/http
+use url
+
+@ASYNC@func exercise() -> result<i32, http.error>:
+    with http.open_client()? as owner:
+        var fields = [url.query_item(name = "a b", value = "c+d"), url.query_item(name = "flag", has_value = false)]
+        var formed = (@AWAIT@owner.send@SUFFIX@(http.request(method = "POST", target = "@BASE@/echo", body = http.body.form(fields))))?
+        if formed.text()? != "POST:a+b=c%2Bd&flag":
+            return Ok(1)
+        var reply = (@AWAIT@owner.get@SUFFIX@("@BASE@/plain"))?
+        if reply.bytes.count != 11:
+            return Ok(1)
+        with owner.start(http.request(target = "@BASE@/plain"))? as exchange:
+            var info = (@AWAIT@exchange.response@SUFFIX@())?
+            var first = (@AWAIT@exchange.read_bytes@SUFFIX@(3))?
+            if info.status != 200 or first.bytes.count == 0:
+                return Ok(1)
+            var closed = (@AWAIT@exchange.close@SUFFIX@())?
+    return Ok(7)
+
+@ASYNC@func entry(input: i32) -> i32:
+    if (@AWAIT@exercise()) is Ok(var answer):
+        return answer
+    return 1

@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "timeout",
+    "--signal=INT",
+    "--preserve-status",
+    "5",
+    "gdb",
+    "-q",
+    "-batch",
+    "-ex",
+    "set pagination off",
+    "-ex",
+    "run",
+    "-ex",
+    "thread apply all bt",
+    "--args",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_native",
+    "http://127.0.0.1:35817",
+    "https://127.0.0.1:41223",
+    "/tmp/VOID HTTP native cvpkmyoy/cert.pem"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "seconds": 5.02565237700037,
+  "binary_sha256": "c424e91b6372316babba00c39043ba3cecbc184cd09e13d2efa6b7d7431efc88",
+  "scope": "loopback native HTTP/1.1 and TLS; not complete source/h2/platform acceptance"
+}

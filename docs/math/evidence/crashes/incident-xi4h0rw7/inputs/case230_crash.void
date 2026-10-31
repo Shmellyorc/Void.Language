@@ -1,0 +1,3 @@
+use math
+func main():
+    var wrong: i32 = math.is_finite(1.0)

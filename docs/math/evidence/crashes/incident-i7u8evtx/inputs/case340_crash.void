@@ -1,0 +1,5 @@
+use math
+func take(value: f32) -> f32:
+    return value
+func main():
+    var answer = take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(take(math.sin(0.5)))))))))))))))))))))))))))))))))

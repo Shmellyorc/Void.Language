@@ -1,0 +1,3 @@
+use math
+func main():
+    var result = math.inverse_lerp(true, true, true)

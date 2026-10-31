@@ -1,0 +1,57 @@
+{
+  "files": [
+    {
+      "path": "src/runtime/http.cpp",
+      "sha256": "3f1b2904623bc75e9836aa1bab36a5324207d6664aa94d352585e43f1760dc47"
+    },
+    {
+      "path": "src/runtime/http_file.cpp",
+      "sha256": "66cdea5e72a3460849aaf61f9fcab4386476890b612e3d8c5f6545e04164ea40"
+    },
+    {
+      "path": "src/runtime/async.cpp",
+      "sha256": "e29616fc3c69306f700978052d2b8b1dc3bc1f6b286b87c62e54126f6b4974d0"
+    },
+    {
+      "path": "third_party/curl/lib/http2.c",
+      "sha256": "6237bdfb17bcb6670be046520ab9170a21ef7e946e9149df17f7e56cf6313914"
+    },
+    {
+      "path": "third_party/curl/lib/multi.c",
+      "sha256": "515ac0f1295a3c0c74d59e08059e7a6a4195bc1fe3fcbc5a7c58846149979a8a"
+    },
+    {
+      "path": "third_party/curl/lib/vdns/asyn-ares.c",
+      "sha256": "29b7bf0ec8358635546d5d77257d9732da161bfa3643c24b898caeb685ff4952"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8/include/openssl/ssl.h",
+      "sha256": "8ca1595cffed7fada5073c8afb17a433e0f98b06a4ca8727c3d538d558544971"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8/ssl/handshake.cc",
+      "sha256": "4de3d13dd1e06b93676d2c1c5de8994d6d441deddd9a72e5012656013e107201"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8/crypto/asn1/tasn_dec.c",
+      "sha256": "b3da856bc19e60f5e3bda41f2700c5abacc13f435b8f12dbc34f6c51b22053cf"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8/crypto/pkcs8/p5_pbev2.c",
+      "sha256": "39fdc20dcd689e613d523a550416b2aa859ebc6ba96ea48c89a0e32d69c21e58"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8/crypto/pkcs8/pkcs8_x509.c",
+      "sha256": "ecef5fe17d2032ecc6dadecabfb87496017552fd9d47c6f5a5578980c3113e3d"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/nghttp2-1.70.0/lib/nghttp2_hd.h",
+      "sha256": "d664b88a1d18a98d13c787ac9db346c74c90aef122af71379fb30fb2590b5ae7"
+    },
+    {
+      "path": ".toolchains/http/build/linux-aws-lc-5.12.0/Release/source/nghttp2-1.70.0/lib/nghttp2_session.h",
+      "sha256": "ce3860932d80136944f6d4208f67b10cb4b490d61773bfba629286a1bfeb9d73"
+    }
+  ],
+  "scope": "Source identity for bounded component facts; not a complete malformed-input allocator proof"
+}

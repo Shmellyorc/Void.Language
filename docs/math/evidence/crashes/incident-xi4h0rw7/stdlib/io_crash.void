@@ -1,0 +1,1714 @@
+use encoding/binary
+use error as core
+
+
+## Portable categories of recoverable file, directory and host-path failures.
+enum error_kind:
+
+    ## The named file, directory or parent does not exist.
+    not_found
+
+    ## The host denied access to the requested operation.
+    permission_denied
+
+    ## An exclusive destination or creation name already exists.
+    already_exists
+
+    ## A path, filename pattern or collision target is invalid.
+    invalid_path
+
+    ## The file mode does not permit this operation.
+    invalid_mode
+
+    ## A count, length, seek origin or position is invalid or overflows.
+    invalid_range
+
+    ## The shared file resource is closed or was never opened.
+    closed
+
+    ## An unrelated operation currently reserves this shared file.
+    busy
+
+    ## An exact read ended before its required byte count.
+    unexpected_eof
+
+    ## Consumed bytes are not a complete strict UTF-8 sequence.
+    invalid_utf8
+
+    ## The host or resource does not support this operation.
+    unsupported
+
+    ## A byte or traversal budget would be exceeded.
+    limit_exceeded
+
+    ## A native rename cannot cross filesystem volumes.
+    cross_device
+
+    ## An operation requiring a real directory received another entry type.
+    not_directory
+
+    ## A file operation received a directory.
+    is_directory
+
+    ## An empty-only directory operation found children.
+    not_empty
+
+    ## Another native transfer or filesystem operation failed.
+    io_failure
+
+
+## Managed filesystem failure retaining native diagnostics and actual progress.
+## Writes and recursive mutations may leave partial changes; failures are not transactions.
+struct error extends core.error:
+
+    ## Public or underlying operation that failed.
+    operation: string
+
+    ## Portable category independent of native error numbers.
+    kind: error_kind
+
+    ## Original native platform error number, or zero for validation errors.
+    os_code: i64
+
+    ## Logical bytes consumed or written before failure, including a consumed Pascal prefix.
+    bytes_transferred: i64
+
+    ## Owned partial read bytes; changing these bytes cannot change the file.
+    partial: [u8]
+
+    ## Native close or restoration error accompanying the primary failure, or zero.
+    cleanup_code: i64
+
+    ## Relevant destination path for copy, move or link operations; empty otherwise.
+    target: string
+
+    ## Traversal entries inspected, or mutation entries completed before failure.
+    entries_processed: i64
+
+
+## Kind of a filesystem entry observed by metadata or directory enumeration.
+enum entry_kind:
+    ## An ordinary data file.
+    file
+
+    ## A real directory; recursive enumeration visits its children.
+    directory
+
+    ## A symbolic link or Windows reparse point; recursive operations do not descend through it.
+    symlink
+
+    ## Another native entry type, such as a FIFO or device.
+    other
+
+
+## Owned metadata snapshot; lexical paths and timestamps do not keep a native handle open.
+value struct entry:
+    ## Entry path in UTF-8, retaining the caller's relative or absolute root convention.
+    path: string
+
+    ## Final filename component, without its parent directory.
+    name: string
+
+    ## File, directory, link or other native entry category.
+    kind: entry_kind
+
+    ## Native size in bytes; non-file entry sizes are platform dependent.
+    size: i64
+
+    ## Modification timestamp's whole seconds since the Unix epoch; may be negative.
+    modified_seconds: i64
+
+    ## Nonnegative fractional modification nanoseconds, below one billion.
+    modified_nanoseconds: i64
+
+
+## Creation, truncation and access policy selected when opening a file.
+enum open_mode:
+    ## Read an existing file; writes fail with invalid_mode.
+    read
+
+    ## Create or truncate a file for writing; reading is prohibited.
+    write
+
+    ## Create or open for writing at EOF on every write, even after seeking.
+    append
+
+    ## Open an existing file for reading and writing without truncation.
+    read_write
+
+    ## Create or truncate a file for both reading and writing.
+    create
+
+    ## Create if absent, otherwise retain contents, with read/write access.
+    open_or_create
+
+    ## Exclusively create a new read/write file; an existing name fails.
+    create_new
+
+
+## Reference point for checked signed file seeks.
+enum seek_origin:
+    ## Absolute byte offset from the beginning.
+    start
+
+    ## Signed offset from the shared logical cursor, accounting for read-ahead.
+    current
+
+    ## Signed offset from the current native file length.
+    end
+
+
+## A decoded logical line or distinct end of input.
+enum text_read:
+    ## Strict UTF-8 text with LF, CRLF or CR removed; an empty line remains text.
+    ## @param value Owned decoded line, including an empty entered line.
+    ## @return A line result distinct from end of input.
+    text(value: string)
+
+    ## No further line data; a final unterminated nonempty line is returned first.
+    eof
+
+
+private value struct _reply:
+    kind: i64
+    os_code: i64
+    completed: i64
+    cleanup_code: i64
+    entries_processed: i64
+    number: i64
+    eof: bool
+    text: string
+    bytes: [u8]
+    entries: [entry]
+
+
+private func _kind(code: i64) -> error_kind:
+    if code == 1:
+        return error_kind.not_found
+
+    if code == 2:
+        return error_kind.permission_denied
+
+    if code == 3:
+        return error_kind.already_exists
+
+    if code == 4:
+        return error_kind.invalid_path
+
+    if code == 5:
+        return error_kind.invalid_mode
+
+    if code == 6:
+        return error_kind.invalid_range
+
+    if code == 7:
+        return error_kind.closed
+
+    if code == 8:
+        return error_kind.busy
+
+    if code == 9:
+        return error_kind.unexpected_eof
+
+    if code == 10:
+        return error_kind.invalid_utf8
+
+    if code == 11:
+        return error_kind.unsupported
+
+    if code == 12:
+        return error_kind.limit_exceeded
+
+    if code == 13:
+        return error_kind.cross_device
+
+    if code == 14:
+        return error_kind.not_directory
+
+    if code == 15:
+        return error_kind.is_directory
+
+    if code == 16:
+        return error_kind.not_empty
+
+    if code == 17:
+        return error_kind.io_failure
+
+    return error_kind.io_failure
+
+
+private func _error(operation: string, path: string, target: string, reply: _reply) -> error:
+    return error(
+        message = "Filesystem {operation} failed; native code {reply.os_code}",
+        path = path,
+        code = reply.kind as i32,
+        operation = operation,
+        kind = _kind(reply.kind),
+        os_code = reply.os_code,
+        bytes_transferred = reply.completed,
+        partial = reply.bytes,
+        cleanup_code = reply.cleanup_code,
+        target = target,
+        entries_processed = reply.entries_processed
+    )
+
+
+private func _code(kind: error_kind) -> i32:
+    match kind:
+        error_kind.not_found:
+            return 1
+        error_kind.permission_denied:
+            return 2
+        error_kind.already_exists:
+            return 3
+        error_kind.invalid_path:
+            return 4
+        error_kind.invalid_mode:
+            return 5
+        error_kind.invalid_range:
+            return 6
+        error_kind.closed:
+            return 7
+        error_kind.busy:
+            return 8
+        error_kind.unexpected_eof:
+            return 9
+        error_kind.invalid_utf8:
+            return 10
+        error_kind.unsupported:
+            return 11
+        error_kind.limit_exceeded:
+            return 12
+        error_kind.cross_device:
+            return 13
+        error_kind.not_directory:
+            return 14
+        error_kind.is_directory:
+            return 15
+        error_kind.not_empty:
+            return 16
+        error_kind.io_failure:
+            return 17
+    return 17
+
+
+private func _reason(operation: string, path: string, kind: error_kind, partial: [u8] = [], completed: i64 = 0) -> error:
+    return error(
+        message = "Filesystem {operation} validation failed",
+        path = path,
+        code = _code(kind),
+        operation = operation,
+        kind = kind,
+        partial = partial,
+        bytes_transferred = completed
+    )
+
+
+private func _flag(value: bool) -> i64:
+    if value:
+        return 1
+
+    return 0
+
+
+private func _mode(value: open_mode) -> i64:
+    match value:
+
+        open_mode.read:
+            return 0
+
+        open_mode.write:
+            return 1
+
+        open_mode.append:
+            return 2
+
+        open_mode.read_write:
+            return 3
+
+        open_mode.create:
+            return 4
+
+        open_mode.open_or_create:
+            return 5
+
+        open_mode.create_new:
+            return 6
+
+    return -1
+
+
+private func _origin(value: seek_origin) -> i64:
+    match value:
+
+        seek_origin.start:
+            return 0
+
+        seek_origin.current:
+            return 1
+
+        seek_origin.end:
+            return 2
+
+    return -1
+
+
+## Owned native file with shared cursor and closed state across aliases.
+## Open through io.open/open_async; direct construction is private. GC does not call deinit.
+## Forgotten resources remain Runtime-owned until explicit close, with/deinit or shutdown.
+## File operations require their creating Runtime owner thread; source workers cannot share handles.
+## Async operations use bounded native jobs; await close_async before leaving an async scope
+## when disposal itself must not block. Synchronous deinit may wait for the native close.
+struct file:
+    internal const _path: string
+    private _order: binary.byte_order
+
+
+private func (self file) init(value: string, order: binary.byte_order):
+    self._path = value
+    self._order = order
+
+
+## Numeric and Pascal-prefix byte order selected at opening.
+## @return The canonical encoding/binary byte_order retained by this file.
+property (self file) order: binary.byte_order:
+    get:
+        return self._order
+
+
+private struct _lease:
+    const owner: file
+    active: bool = false
+
+
+private func (self _lease) deinit():
+    if self.active:
+        _io_release(self.owner)
+
+
+private func _reserve(const owner: file, operation: string, allow_closed: bool = false) -> result<_lease, error>:
+    var guard = _lease(owner = owner)
+    var code = _io_claim(owner)
+
+    if allow_closed and code == (_code(error_kind.closed) as i64):
+        return Ok(guard)
+
+    if code != 0:
+        return Err(_error(operation, owner._path, "", _reply(kind = code)))
+
+    guard.active = true
+    return Ok(guard)
+
+
+private struct _acquisition:
+    owner: file
+    committed: bool = false
+
+
+private func (self _acquisition) deinit():
+    if not self.committed:
+        _io_cleanup(self.owner)
+
+
+## Open a shared file resource with explicit access, creation and endian policies.
+## Parents must exist. Native handles are noninheritable; publication failures close acquisitions.
+## This synchronous call may block until the host completes opening.
+## @param value Nonempty host filesystem path in strict UTF-8; embedded NUL is invalid.
+## @param mode Read, write/truncate, append or explicit read/write creation policy.
+## @param order Byte order for all numeric values and u32 Pascal length prefixes.
+## @return Ok with one shared managed file, or Err with path, mode or native failure details.
+func open(value: string, mode: open_mode = open_mode.read, order: binary.byte_order = binary.byte_order.little) -> result<file, error>:
+    var resource = file(value, order)
+
+    with _acquisition(owner = resource) as guard:
+        var reply = _io_open(resource, value, _mode(mode))
+
+        if reply.kind != 0:
+            return Err(_error("open", value, "", reply))
+
+        guard.committed = true
+        return Ok(resource)
+
+
+
+## Open a shared file resource with explicit access, creation and endian policies.
+## Parents must exist. Native handles are noninheritable; publication failures close acquisitions.
+## Runs native opening off the owner; cancellation drains entered opening and rolls back unpublished ownership.
+## @param value Nonempty host filesystem path in strict UTF-8; embedded NUL is invalid.
+## @param mode Read, write/truncate, append or explicit read/write creation policy.
+## @param order Byte order for all numeric values and u32 Pascal length prefixes.
+## @return Ok with one shared managed file, or Err with path, mode or native failure details.
+async func open_async(value: string, mode: open_mode = open_mode.read, order: binary.byte_order = binary.byte_order.little) -> result<file, error>:
+    var resource = file(value, order)
+    var reply = await _io_open_async(resource, value, _mode(mode))
+
+    if reply.kind != 0:
+        return Err(_error("open", value, "", reply))
+
+    return Ok(resource)
+
+
+# Source factories with outer ownership must publish the unopened managed identity
+# into their own reached cleanup guard before awaiting acquisition. Returning an
+# acquired file from a child task otherwise leaves a cancellation window before
+# the parent can observe that result. These helpers grant no native authority.
+## Prepare an unopened identity for another standard-library acquisition guard.
+## @param value Host path retained in the identity; native validation occurs on acquisition.
+## @return A fresh closed identity with no native resource or filesystem effects.
+internal func _prepare_open(value: string) -> file:
+    return file(value, binary.byte_order.little)
+
+## Acquire a fresh prepared identity already retained by the caller's cleanup guard.
+## @param mode Existing native opening policy; the identity must be fresh and unopened.
+## @return True after acquisition, or the original typed native failure.
+internal async func (self file) _complete_open_async(mode: open_mode) -> result<bool, error>:
+    var reply = await _io_open_async(self, self._path, _mode(mode))
+    if reply.kind != 0:
+        return Err(_error("open", self._path, "", reply))
+    return Ok(true)
+
+
+## Close this shared native handle when leaving with, including early failure.
+## Closing is idempotent; an actual native close failure becomes a checked Runtime failure.
+func (self file) deinit():
+    _io_cleanup(self)
+
+
+## Read up to max_count owned bytes; a short native chunk need not mean EOF.
+## This synchronous operation may block in the host filesystem.
+## @param max_count Nonnegative upper bound; zero succeeds without moving the shared cursor.
+## @return Ok with owned bytes; empty bytes signal EOF only for a positive request.
+func (self file) read_bytes(max_count: i64) -> result<[u8], error>:
+    with _reserve(self, "read_bytes")? as lease:
+        var reply = _io_read_bytes(self, max_count)
+
+        if reply.kind != 0:
+            return Err(_error("read_bytes", self._path, "", reply))
+
+        return Ok(reply.bytes)
+
+
+## Read up to max_count owned bytes; a short native chunk need not mean EOF.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @param max_count Nonnegative upper bound; zero succeeds without moving the shared cursor.
+## @return Ok with owned bytes; empty bytes signal EOF only for a positive request.
+async func (self file) read_bytes_async(max_count: i64) -> result<[u8], error>:
+    with _reserve(self, "read_bytes")? as lease:
+        var reply = await _io_read_bytes_async(self, max_count)
+
+        if reply.kind != 0:
+            return Err(_error("read_bytes", self._path, "", reply))
+
+        return Ok(reply.bytes)
+
+
+## Read exactly count bytes, looping through short transfers until complete or EOF.
+## This synchronous operation may block in the host filesystem.
+## @param count Required nonnegative byte count; a failed exact read retains actual consumed progress.
+## @return Ok with exactly count bytes, or Err(unexpected_eof) with owned partial bytes.
+func (self file) read_exact(count: i64) -> result<[u8], error>:
+    with _reserve(self, "read_exact")? as lease:
+        var reply = _io_read_exact(self, count)
+
+        if reply.kind != 0:
+            return Err(_error("read_exact", self._path, "", reply))
+
+        return Ok(reply.bytes)
+
+
+## Read exactly count bytes, looping through short transfers until complete or EOF.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @param count Required nonnegative byte count; a failed exact read retains actual consumed progress.
+## @return Ok with exactly count bytes, or Err(unexpected_eof) with owned partial bytes.
+async func (self file) read_exact_async(count: i64) -> result<[u8], error>:
+    with _reserve(self, "read_exact")? as lease:
+        var reply = await _io_read_exact_async(self, count)
+
+        if reply.kind != 0:
+            return Err(_error("read_exact", self._path, "", reply))
+
+        return Ok(reply.bytes)
+
+
+## Read one strict UTF-8 line, removing LF, CRLF or CR without losing empty lines.
+## This synchronous operation may block in the host filesystem.
+## @param max_bytes Nonnegative maximum payload bytes in one line; defaults to 64 MiB.
+## @return Ok(text/eof), or Err with consumed bytes and actual cursor progress.
+func (self file) read_line(max_bytes: i64 = 67108864) -> result<text_read, error>:
+    with _reserve(self, "read_line")? as lease:
+        var reply = _io_read_line(self, max_bytes)
+
+        if reply.kind != 0:
+            return Err(_error("read_line", self._path, "", reply))
+
+        if reply.eof:
+            return Ok(text_read.eof)
+
+        if string.from_utf8(reply.bytes) is Ok(var value):
+            return Ok(text_read.text(value))
+
+        return Err(_reason("read_line", self._path, error_kind.invalid_utf8, reply.bytes, reply.completed))
+
+
+## Read one strict UTF-8 line, removing LF, CRLF or CR without losing empty lines.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @param max_bytes Nonnegative maximum payload bytes in one line; defaults to 64 MiB.
+## @return Ok(text/eof), or Err with consumed bytes and actual cursor progress.
+async func (self file) read_line_async(max_bytes: i64 = 67108864) -> result<text_read, error>:
+    with _reserve(self, "read_line")? as lease:
+        var reply = await _io_read_line_async(self, max_bytes)
+
+        if reply.kind != 0:
+            return Err(_error("read_line", self._path, "", reply))
+
+        if reply.eof:
+            return Ok(text_read.eof)
+
+        if string.from_utf8(reply.bytes) is Ok(var value):
+            return Ok(text_read.text(value))
+
+        return Err(_reason("read_line", self._path, error_kind.invalid_utf8, reply.bytes, reply.completed))
+
+
+## Write owned input bytes at the shared cursor, looping over short native transfers.
+## This synchronous operation may block in the host filesystem.
+## @param bytes Readonly or mutable input copied before native waiting; caller storage is never retained.
+## @return Ok with bytes written, or Err with actual progress; earlier writes are not rolled back.
+func (self file) write_bytes(const bytes: [u8]) -> result<i64, error>:
+    with _reserve(self, "write_bytes")? as lease:
+        var reply = _io_write_bytes(self, bytes)
+
+        if reply.kind != 0:
+            return Err(_error("write_bytes", self._path, "", reply))
+
+        return Ok(reply.completed)
+
+
+## Write owned input bytes at the shared cursor, looping over short native transfers.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @param bytes Readonly or mutable input copied before native waiting; caller storage is never retained.
+## @return Ok with bytes written, or Err with actual progress; earlier writes are not rolled back.
+async func (self file) write_bytes_async(const bytes: [u8]) -> result<i64, error>:
+    with _reserve(self, "write_bytes")? as lease:
+        var reply = await _io_write_bytes_async(self, bytes)
+
+        if reply.kind != 0:
+            return Err(_error("write_bytes", self._path, "", reply))
+
+        return Ok(reply.completed)
+
+
+## Seek relative to start, logical current position or native EOF with checked arithmetic.
+## This synchronous operation may block in the host filesystem.
+## @param offset Signed byte offset; the resulting absolute position must be nonnegative and fit i64.
+## @param origin Reference point; append-mode writes still choose EOF after seeking.
+## @return Ok with the new absolute cursor; invalid or unsupported seeks preserve the logical cursor.
+func (self file) seek(offset: i64, origin: seek_origin = seek_origin.start) -> result<i64, error>:
+    with _reserve(self, "seek")? as lease:
+        var reply = _io_seek(self, offset, _origin(origin))
+
+        if reply.kind != 0:
+            return Err(_error("seek", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Seek relative to start, logical current position or native EOF with checked arithmetic.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @param offset Signed byte offset; the resulting absolute position must be nonnegative and fit i64.
+## @param origin Reference point; append-mode writes still choose EOF after seeking.
+## @return Ok with the new absolute cursor; invalid or unsupported seeks preserve the logical cursor.
+async func (self file) seek_async(offset: i64, origin: seek_origin = seek_origin.start) -> result<i64, error>:
+    with _reserve(self, "seek")? as lease:
+        var reply = await _io_seek_async(self, offset, _origin(origin))
+
+        if reply.kind != 0:
+            return Err(_error("seek", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Inspect the shared logical cursor, accounting for buffered read-ahead.
+## This synchronous operation may block in the host filesystem.
+## @return Ok with the nonnegative logical byte position, or Err(closed/busy).
+func (self file) position() -> result<i64, error>:
+    with _reserve(self, "position")? as lease:
+        var reply = _io_position(self)
+
+        if reply.kind != 0:
+            return Err(_error("position", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Inspect the shared logical cursor, accounting for buffered read-ahead.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @return Ok with the nonnegative logical byte position, or Err(closed/busy).
+async func (self file) position_async() -> result<i64, error>:
+    with _reserve(self, "position")? as lease:
+        var reply = await _io_position_async(self)
+
+        if reply.kind != 0:
+            return Err(_error("position", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Inspect the current native file length without moving the logical cursor.
+## This synchronous operation may block in the host filesystem.
+## @return Ok with byte length, or Err with native or closed-resource details.
+func (self file) length() -> result<i64, error>:
+    with _reserve(self, "length")? as lease:
+        var reply = _io_length(self)
+
+        if reply.kind != 0:
+            return Err(_error("length", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Inspect the current native file length without moving the logical cursor.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @return Ok with byte length, or Err with native or closed-resource details.
+async func (self file) length_async() -> result<i64, error>:
+    with _reserve(self, "length")? as lease:
+        var reply = await _io_length_async(self)
+
+        if reply.kind != 0:
+            return Err(_error("length", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Truncate or extend a writable file without moving its logical cursor.
+## This synchronous operation may block in the host filesystem.
+## @param length New nonnegative byte length; host extension yields zero bytes where supported.
+## @return Ok with the selected length, or Err with native progress and restoration details.
+func (self file) set_length(length: i64) -> result<i64, error>:
+    with _reserve(self, "set_length")? as lease:
+        var reply = _io_set_length(self, length)
+
+        if reply.kind != 0:
+            return Err(_error("set_length", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Truncate or extend a writable file without moving its logical cursor.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @param length New nonnegative byte length; host extension yields zero bytes where supported.
+## @return Ok with the selected length, or Err with native progress and restoration details.
+async func (self file) set_length_async(length: i64) -> result<i64, error>:
+    with _reserve(self, "set_length")? as lease:
+        var reply = await _io_set_length_async(self, length)
+
+        if reply.kind != 0:
+            return Err(_error("set_length", self._path, "", reply))
+
+        return Ok(reply.number)
+
+
+## Ask the host to flush regular-file data; this is not an unconditional media-durability guarantee.
+## This synchronous operation may block in the host filesystem.
+## @return Ok(0) after native flushing, or Err with the host failure.
+func (self file) flush() -> result<i64, error>:
+    with _reserve(self, "flush")? as lease:
+        var reply = _io_flush(self)
+
+        if reply.kind != 0:
+            return Err(_error("flush", self._path, "", reply))
+
+        return Ok(0)
+
+
+## Ask the host to flush regular-file data; this is not an unconditional media-durability guarantee.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @return Ok(0) after native flushing, or Err with the host failure.
+async func (self file) flush_async() -> result<i64, error>:
+    with _reserve(self, "flush")? as lease:
+        var reply = await _io_flush_async(self)
+
+        if reply.kind != 0:
+            return Err(_error("flush", self._path, "", reply))
+
+        return Ok(0)
+
+
+## Close the shared handle exactly once; all aliases subsequently observe closed.
+## This synchronous operation may block in the host filesystem.
+## @return Ok(0), including double close, or Err(busy/native failure); a busy close leaves the handle open.
+func (self file) close() -> result<i64, error>:
+    with _reserve(self, "close", true)? as lease:
+        if not lease.active:
+            return Ok(0)
+
+        var reply = _io_close(self)
+
+        if reply.kind != 0:
+            return Err(_error("close", self._path, "", reply))
+
+        return Ok(0)
+
+
+## Close the shared handle exactly once; all aliases subsequently observe closed.
+## Native work runs off the owner; cancellation drains entered syscalls before releasing this reservation.
+## @return Ok(0), including double close, or Err(busy/native failure); a busy close leaves the handle open.
+async func (self file) close_async() -> result<i64, error>:
+    with _reserve(self, "close", true)? as lease:
+        if not lease.active:
+            return Ok(0)
+
+        var reply = await _io_close_async(self)
+
+        if reply.kind != 0:
+            return Err(_error("close", self._path, "", reply))
+
+        return Ok(0)
+
+
+## Read an entire file into independent owned bytes, continuing until actual EOF.
+## This synchronous operation may block in the host filesystem.
+## @param value UTF-8 host file path; no missing parent is created.
+## @param max_bytes Nonnegative maximum bytes to return; defaults to 64 MiB.
+## @return Ok with owned bytes, or Err with a bounded partial read and actual progress.
+func read_bytes(value: string, max_bytes: i64 = 67108864) -> result<[u8], error>:
+    var reply = _io_read_all(value, max_bytes)
+
+    if reply.kind != 0:
+        return Err(_error("read_bytes", value, "", reply))
+
+    return Ok(reply.bytes)
+
+
+## Read an entire file into independent owned bytes, continuing until actual EOF.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value UTF-8 host file path; no missing parent is created.
+## @param max_bytes Nonnegative maximum bytes to return; defaults to 64 MiB.
+## @return Ok with owned bytes, or Err with a bounded partial read and actual progress.
+async func read_bytes_async(value: string, max_bytes: i64 = 67108864) -> result<[u8], error>:
+    var reply = await _io_read_all_async(value, max_bytes)
+
+    if reply.kind != 0:
+        return Err(_error("read_bytes", value, "", reply))
+
+    return Ok(reply.bytes)
+
+
+## Write bytes using explicit truncate, append, overwrite or exclusive-create policy.
+## This synchronous operation may block in the host filesystem.
+## @param value Destination path whose parent must already exist.
+## @param bytes Input bytes copied before native waiting; readonly arrays are accepted.
+## @param mode Writable open policy; default write creates or truncates, read mode is rejected.
+## @return Ok with bytes written, or Err with completed bytes and cleanup details; changes are not atomic.
+func write_bytes(value: string, const bytes: [u8], mode: open_mode = open_mode.write) -> result<i64, error>:
+    var reply = _io_write_all(value, bytes, _mode(mode))
+
+    if reply.kind != 0:
+        return Err(_error("write_bytes", value, "", reply))
+
+    return Ok(reply.completed)
+
+
+## Write bytes using explicit truncate, append, overwrite or exclusive-create policy.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Destination path whose parent must already exist.
+## @param bytes Input bytes copied before native waiting; readonly arrays are accepted.
+## @param mode Writable open policy; default write creates or truncates, read mode is rejected.
+## @return Ok with bytes written, or Err with completed bytes and cleanup details; changes are not atomic.
+async func write_bytes_async(value: string, const bytes: [u8], mode: open_mode = open_mode.write) -> result<i64, error>:
+    var reply = await _io_write_all_async(value, bytes, _mode(mode))
+
+    if reply.kind != 0:
+        return Err(_error("write_bytes", value, "", reply))
+
+    return Ok(reply.completed)
+
+
+## Inspect whether a file, directory or link entry exists, including dangling links.
+## This synchronous operation may block in the host filesystem.
+## @param value UTF-8 host entry path to inspect.
+## @return Ok(false) only for a missing path; permission and genuine native errors remain Err.
+func exists(value: string) -> result<bool, error>:
+    var reply = _io_exists(value)
+
+    if reply.kind != 0:
+        return Err(_error("exists", value, "", reply))
+
+    return Ok(reply.number != 0)
+
+
+## Inspect whether a file, directory or link entry exists, including dangling links.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value UTF-8 host entry path to inspect.
+## @return Ok(false) only for a missing path; permission and genuine native errors remain Err.
+async func exists_async(value: string) -> result<bool, error>:
+    var reply = await _io_exists_async(value)
+
+    if reply.kind != 0:
+        return Err(_error("exists", value, "", reply))
+
+    return Ok(reply.number != 0)
+
+
+## Read an owned metadata snapshot without retaining a native handle.
+## This synchronous operation may block in the host filesystem.
+## @param value UTF-8 entry path to inspect.
+## @param follow_links False inspects the link itself; true explicitly inspects its target.
+## @return Ok with kind, size and Unix modification timestamp, or Err with native diagnostics.
+func metadata(value: string, follow_links: bool = false) -> result<entry, error>:
+    var reply = _io_metadata(value, _flag(follow_links))
+
+    if reply.kind != 0:
+        return Err(_error("metadata", value, "", reply))
+
+    return Ok(reply.entries[0])
+
+
+## Read an owned metadata snapshot without retaining a native handle.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value UTF-8 entry path to inspect.
+## @param follow_links False inspects the link itself; true explicitly inspects its target.
+## @return Ok with kind, size and Unix modification timestamp, or Err with native diagnostics.
+async func metadata_async(value: string, follow_links: bool = false) -> result<entry, error>:
+    var reply = await _io_metadata_async(value, _flag(follow_links))
+
+    if reply.kind != 0:
+        return Err(_error("metadata", value, "", reply))
+
+    return Ok(reply.entries[0])
+
+
+## Copy file contents with checked progress, rejecting self-copy and destination links.
+## This synchronous operation may block in the host filesystem.
+## @param source Existing regular source file.
+## @param target Destination with an existing parent; links are not followed for replacement.
+## @param replace False creates exclusively; true overwrites an ordinary file without deleting unrelated entries.
+## @return Ok with bytes copied, or Err with partial destination progress and close details.
+func copy_file(source: string, target: string, replace: bool = false) -> result<i64, error>:
+    var reply = _io_copy_file(source, target, _flag(replace))
+
+    if reply.kind != 0:
+        return Err(_error("copy_file", source, target, reply))
+
+    return Ok(reply.completed)
+
+
+## Copy file contents with checked progress, rejecting self-copy and destination links.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param source Existing regular source file.
+## @param target Destination with an existing parent; links are not followed for replacement.
+## @param replace False creates exclusively; true overwrites an ordinary file without deleting unrelated entries.
+## @return Ok with bytes copied, or Err with partial destination progress and close details.
+async func copy_file_async(source: string, target: string, replace: bool = false) -> result<i64, error>:
+    var reply = await _io_copy_file_async(source, target, _flag(replace))
+
+    if reply.kind != 0:
+        return Err(_error("copy_file", source, target, reply))
+
+    return Ok(reply.completed)
+
+
+## Rename a file or link entry using a native exclusive rename unless replacement is requested.
+## This synchronous operation may block in the host filesystem.
+## @param source Existing file or link entry to rename.
+## @param target Destination path with an existing parent.
+## @param replace Permit native replacement; false never uses a racy existence-only check.
+## @return Ok(1), or Err including cross_device; moves never silently copy and delete.
+func move_file(source: string, target: string, replace: bool = false) -> result<i64, error>:
+    var reply = _io_move_file(source, target, _flag(replace))
+
+    if reply.kind != 0:
+        return Err(_error("move_file", source, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Rename a file or link entry using a native exclusive rename unless replacement is requested.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param source Existing file or link entry to rename.
+## @param target Destination path with an existing parent.
+## @param replace Permit native replacement; false never uses a racy existence-only check.
+## @return Ok(1), or Err including cross_device; moves never silently copy and delete.
+async func move_file_async(source: string, target: string, replace: bool = false) -> result<i64, error>:
+    var reply = await _io_move_file_async(source, target, _flag(replace))
+
+    if reply.kind != 0:
+        return Err(_error("move_file", source, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Remove a file or link itself; real directories are rejected.
+## This synchronous operation may block in the host filesystem.
+## @param value Entry to unlink without following a symbolic-link target.
+## @param missing_ok Whether an already missing entry succeeds with zero progress.
+## @return Ok with removed entries, or Err including permission and directory-kind failures.
+func remove_file(value: string, missing_ok: bool = false) -> result<i64, error>:
+    var reply = _io_remove_file(value, _flag(missing_ok))
+
+    if reply.kind != 0:
+        return Err(_error("remove_file", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Remove a file or link itself; real directories are rejected.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Entry to unlink without following a symbolic-link target.
+## @param missing_ok Whether an already missing entry succeeds with zero progress.
+## @return Ok with removed entries, or Err including permission and directory-kind failures.
+async func remove_file_async(value: string, missing_ok: bool = false) -> result<i64, error>:
+    var reply = await _io_remove_file_async(value, _flag(missing_ok))
+
+    if reply.kind != 0:
+        return Err(_error("remove_file", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Create one real directory; missing parents are not created.
+## This synchronous operation may block in the host filesystem.
+## @param value New directory path, or an existing real directory.
+## @return Ok(1) when created or Ok(0) for an existing real directory; other collisions return Err.
+func create_directory(value: string) -> result<i64, error>:
+    var reply = _io_create_directory(value)
+
+    if reply.kind != 0:
+        return Err(_error("create_directory", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Create one real directory; missing parents are not created.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value New directory path, or an existing real directory.
+## @return Ok(1) when created or Ok(0) for an existing real directory; other collisions return Err.
+async func create_directory_async(value: string) -> result<i64, error>:
+    var reply = await _io_create_directory_async(value)
+
+    if reply.kind != 0:
+        return Err(_error("create_directory", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Explicitly create all missing parents and the requested directory.
+## This synchronous operation may block in the host filesystem.
+## @param value Directory path whose missing parents may be created.
+## @return Ok with the number of directories created, or Err retaining actual completed parent creation.
+func create_directories(value: string) -> result<i64, error>:
+    var reply = _io_create_directories(value)
+
+    if reply.kind != 0:
+        return Err(_error("create_directories", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Explicitly create all missing parents and the requested directory.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Directory path whose missing parents may be created.
+## @return Ok with the number of directories created, or Err retaining actual completed parent creation.
+async func create_directories_async(value: string) -> result<i64, error>:
+    var reply = await _io_create_directories_async(value)
+
+    if reply.kind != 0:
+        return Err(_error("create_directories", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Remove one empty real directory without recursive deletion or link traversal.
+## This synchronous operation may block in the host filesystem.
+## @param value Empty real directory to remove.
+## @param missing_ok Whether an absent directory succeeds with zero progress.
+## @return Ok with removed entries, or Err(not_empty/not_directory/native failure).
+func remove_directory(value: string, missing_ok: bool = false) -> result<i64, error>:
+    var reply = _io_remove_directory(value, _flag(missing_ok))
+
+    if reply.kind != 0:
+        return Err(_error("remove_directory", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Remove one empty real directory without recursive deletion or link traversal.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Empty real directory to remove.
+## @param missing_ok Whether an absent directory succeeds with zero progress.
+## @return Ok with removed entries, or Err(not_empty/not_directory/native failure).
+async func remove_directory_async(value: string, missing_ok: bool = false) -> result<i64, error>:
+    var reply = await _io_remove_directory_async(value, _flag(missing_ok))
+
+    if reply.kind != 0:
+        return Err(_error("remove_directory", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Explicitly remove a bounded directory tree without following known symlink or reparse entries.
+## This synchronous operation may block in the host filesystem.
+## @param value Real directory root to delete, including its descendants.
+## @param missing_ok Whether an absent root succeeds with zero progress.
+## @param max_entries Positive root-inclusive entry budget checked before deletion; defaults to 100000.
+## @return Ok with removed entries, or Err with completed mutations; traversal is a snapshot, not an atomic transaction.
+func remove_tree(value: string, missing_ok: bool = false, max_entries: i64 = 100000) -> result<i64, error>:
+    var reply = _io_remove_tree(value, _flag(missing_ok), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("remove_tree", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Explicitly remove a bounded directory tree without following known symlink or reparse entries.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Real directory root to delete, including its descendants.
+## @param missing_ok Whether an absent root succeeds with zero progress.
+## @param max_entries Positive root-inclusive entry budget checked before deletion; defaults to 100000.
+## @return Ok with removed entries, or Err with completed mutations; traversal is a snapshot, not an atomic transaction.
+async func remove_tree_async(value: string, missing_ok: bool = false, max_entries: i64 = 100000) -> result<i64, error>:
+    var reply = await _io_remove_tree_async(value, _flag(missing_ok), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("remove_tree", value, "", reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Enumerate bounded owned metadata snapshots, optionally descending through real directories.
+## This synchronous operation may block in the host filesystem.
+## @param value Real directory root; symbolic links and reparse points are not descended.
+## @param pattern Filename-only pattern: * any sequence, ? one Unicode scalar; other characters are literal.
+## @param recursive Visit unmatched real directories too; matching uses native host case policy.
+## @param max_entries Nonnegative budget for all inspected entries, including unmatched names.
+## @return Ok with matching entries, or Err on limits, permission failures or other native errors.
+func entries(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[entry], error>:
+    var reply = _io_entries(value, pattern, _flag(recursive), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("entries", value, "", reply))
+
+    return Ok(reply.entries)
+
+
+## Enumerate bounded owned metadata snapshots, optionally descending through real directories.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Real directory root; symbolic links and reparse points are not descended.
+## @param pattern Filename-only pattern: * any sequence, ? one Unicode scalar; other characters are literal.
+## @param recursive Visit unmatched real directories too; matching uses native host case policy.
+## @param max_entries Nonnegative budget for all inspected entries, including unmatched names.
+## @return Ok with matching entries, or Err on limits, permission failures or other native errors.
+async func entries_async(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[entry], error>:
+    var reply = await _io_entries_async(value, pattern, _flag(recursive), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("entries", value, "", reply))
+
+    return Ok(reply.entries)
+
+
+## Enumerate matching regular-file paths, with optional recursive directory searching.
+## This synchronous operation may block in the host filesystem.
+## @param value Real directory root to search.
+## @param pattern Filename pattern with * and Unicode-scalar ?; separators are invalid.
+## @param recursive Search real descendants without following directory links or reparse points.
+## @param max_entries Nonnegative total inspection budget, including unmatched entries.
+## @return Ok with owned UTF-8 file paths, or Err with traversal diagnostics.
+func get_files(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[string], error>:
+    var reply = _io_get_files(value, pattern, _flag(recursive), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("get_files", value, "", reply))
+
+    var paths: [string] = []
+
+    for item in reply.entries:
+        paths.push(item.path)
+
+    return Ok(paths)
+
+
+## Enumerate matching regular-file paths, with optional recursive directory searching.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Real directory root to search.
+## @param pattern Filename pattern with * and Unicode-scalar ?; separators are invalid.
+## @param recursive Search real descendants without following directory links or reparse points.
+## @param max_entries Nonnegative total inspection budget, including unmatched entries.
+## @return Ok with owned UTF-8 file paths, or Err with traversal diagnostics.
+async func get_files_async(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[string], error>:
+    var reply = await _io_get_files_async(value, pattern, _flag(recursive), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("get_files", value, "", reply))
+
+    var paths: [string] = []
+
+    for item in reply.entries:
+        paths.push(item.path)
+
+    return Ok(paths)
+
+
+## Enumerate matching real-directory paths, with optional recursive searching.
+## This synchronous operation may block in the host filesystem.
+## @param value Real directory root to search; the root itself is not returned.
+## @param pattern Filename pattern with * and Unicode-scalar ?; separators are invalid.
+## @param recursive Search unmatched directories too; symbolic links and reparse points remain excluded.
+## @param max_entries Nonnegative total inspection budget, including unmatched entries.
+## @return Ok with owned UTF-8 directory paths, or Err with traversal diagnostics.
+func get_directories(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[string], error>:
+    var reply = _io_get_directories(value, pattern, _flag(recursive), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("get_directories", value, "", reply))
+
+    var paths: [string] = []
+
+    for item in reply.entries:
+        paths.push(item.path)
+
+    return Ok(paths)
+
+
+## Enumerate matching real-directory paths, with optional recursive searching.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Real directory root to search; the root itself is not returned.
+## @param pattern Filename pattern with * and Unicode-scalar ?; separators are invalid.
+## @param recursive Search unmatched directories too; symbolic links and reparse points remain excluded.
+## @param max_entries Nonnegative total inspection budget, including unmatched entries.
+## @return Ok with owned UTF-8 directory paths, or Err with traversal diagnostics.
+async func get_directories_async(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[string], error>:
+    var reply = await _io_get_directories_async(value, pattern, _flag(recursive), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("get_directories", value, "", reply))
+
+    var paths: [string] = []
+
+    for item in reply.entries:
+        paths.push(item.path)
+
+    return Ok(paths)
+
+
+## Copy a bounded directory tree, preserving links and rejecting a self or descendant target.
+## This synchronous operation may block in the host filesystem.
+## @param source Real directory root to copy.
+## @param target Destination root with an existing parent; destination links are rejected.
+## @param recursive True copies descendants; false rejects child directories before mutation.
+## @param replace False requires a new root; true merges real directories and replaces ordinary files.
+## @param max_entries Positive root-inclusive entry budget checked before copying.
+## @return Ok with copied or created entries, or Err retaining byte and entry progress and cleanup failures.
+func copy_directory(source: string, target: string, recursive: bool = true, replace: bool = false, max_entries: i64 = 100000) -> result<i64, error>:
+    var reply = _io_copy_directory(source, target, _flag(recursive), _flag(replace), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("copy_directory", source, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Copy a bounded directory tree, preserving links and rejecting a self or descendant target.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param source Real directory root to copy.
+## @param target Destination root with an existing parent; destination links are rejected.
+## @param recursive True copies descendants; false rejects child directories before mutation.
+## @param replace False requires a new root; true merges real directories and replaces ordinary files.
+## @param max_entries Positive root-inclusive entry budget checked before copying.
+## @return Ok with copied or created entries, or Err retaining byte and entry progress and cleanup failures.
+async func copy_directory_async(source: string, target: string, recursive: bool = true, replace: bool = false, max_entries: i64 = 100000) -> result<i64, error>:
+    var reply = await _io_copy_directory_async(source, target, _flag(recursive), _flag(replace), max_entries)
+
+    if reply.kind != 0:
+        return Err(_error("copy_directory", source, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Rename a directory tree using native same-filesystem move semantics.
+## This synchronous operation may block in the host filesystem.
+## @param source Existing real directory root to rename.
+## @param target Destination directory path with an existing parent.
+## @param replace Permit native empty-directory replacement where supported; nonempty destinations fail.
+## @return Ok(1), or Err including cross_device; contents are never implicitly copied and deleted.
+func move_directory(source: string, target: string, replace: bool = false) -> result<i64, error>:
+    var reply = _io_move_directory(source, target, _flag(replace))
+
+    if reply.kind != 0:
+        return Err(_error("move_directory", source, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Rename a directory tree using native same-filesystem move semantics.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param source Existing real directory root to rename.
+## @param target Destination directory path with an existing parent.
+## @param replace Permit native empty-directory replacement where supported; nonempty destinations fail.
+## @return Ok(1), or Err including cross_device; contents are never implicitly copied and deleted.
+async func move_directory_async(source: string, target: string, replace: bool = false) -> result<i64, error>:
+    var reply = await _io_move_directory_async(source, target, _flag(replace))
+
+    if reply.kind != 0:
+        return Err(_error("move_directory", source, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Read a symbolic link target as owned UTF-8 without resolving it.
+## This synchronous operation may block in the host filesystem.
+## @param value Existing symbolic link path.
+## @return Ok with the stored relative or absolute target, or Err for nonlinks or native failures.
+func read_link(value: string) -> result<string, error>:
+    var reply = _io_read_link(value)
+
+    if reply.kind != 0:
+        return Err(_error("read_link", value, "", reply))
+
+    return Ok(reply.text)
+
+
+## Read a symbolic link target as owned UTF-8 without resolving it.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param value Existing symbolic link path.
+## @return Ok with the stored relative or absolute target, or Err for nonlinks or native failures.
+async func read_link_async(value: string) -> result<string, error>:
+    var reply = await _io_read_link_async(value)
+
+    if reply.kind != 0:
+        return Err(_error("read_link", value, "", reply))
+
+    return Ok(reply.text)
+
+
+## Create a symbolic link without replacing an existing destination name.
+## This synchronous operation may block in the host filesystem.
+## @param target Stored relative or absolute target; it need not already exist.
+## @param value New link path whose parent must already exist.
+## @param directory Whether the target is a directory; required by Windows link creation policy.
+## @return Ok(1), or Err including unsupported or permission_denied on hosts without link privileges.
+func create_symlink(target: string, value: string, directory: bool = false) -> result<i64, error>:
+    var reply = _io_create_symlink(value, target, _flag(directory))
+
+    if reply.kind != 0:
+        return Err(_error("create_symlink", value, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Create a symbolic link without replacing an existing destination name.
+## Runs native filesystem work off the owner; cancellation drains entered native operations.
+## @param target Stored relative or absolute target; it need not already exist.
+## @param value New link path whose parent must already exist.
+## @param directory Whether the target is a directory; required by Windows link creation policy.
+## @return Ok(1), or Err including unsupported or permission_denied on hosts without link privileges.
+async func create_symlink_async(target: string, value: string, directory: bool = false) -> result<i64, error>:
+    var reply = await _io_create_symlink_async(value, target, _flag(directory))
+
+    if reply.kind != 0:
+        return Err(_error("create_symlink", value, target, reply))
+
+    return Ok(reply.entries_processed)
+
+
+## Read one fixed-width number with encoding/binary in this file's byte order.
+## Supports all ten integer and IEEE numeric primitives; truncation retains actual consumed bytes.
+## @return Ok with the decoded value, or Err with EOF, closed, busy or native progress details.
+func (self file) read<t>() -> result<t, error>:
+    with _reserve(self, "read")? as lease:
+        var width = binary.encode<t>(0).count
+        var bytes = (self.read_exact(width))?
+
+        if binary.decode<t>(bytes, self.order) is Ok(var value):
+            return Ok(value)
+
+        return Err(_reason("read", self._path, error_kind.unexpected_eof, bytes, bytes.count))
+
+
+## Write one fixed-width numeric representation through the existing binary codec.
+## Preserves all signed integer and IEEE bits, including NaN payloads, in the selected byte order.
+## @param value One of the ten numeric primitives, inferred or explicitly selected without narrowing.
+## @return Ok with bytes written, or Err retaining actual partial write progress.
+func (self file) write<t>(value: t) -> result<i64, error>:
+    return self.write_bytes(binary.encode(value, self.order))
+
+
+## Read an exact UTF-8 byte count with strict decoding and actual cursor progress on failure.
+## @param count Nonnegative number of bytes, including embedded NUL; no framing is assumed.
+## @return Ok with owned text, or Err including invalid_utf8 with all consumed bytes.
+func (self file) read_string(count: i64) -> result<string, error>:
+    var bytes = (self.read_exact(count))?
+
+    if string.from_utf8(bytes) is Ok(var value):
+        return Ok(value)
+
+    return Err(_reason("read_string", self._path, error_kind.invalid_utf8, bytes, bytes.count))
+
+
+## Write raw UTF-8 with no prefix, newline, terminator, BOM or normalization.
+## @param value Unicode text whose embedded NUL characters remain ordinary payload bytes.
+## @return Ok with UTF-8 bytes written, or Err with actual partial write progress.
+func (self file) write_string(value: string) -> result<i64, error>:
+    return self.write_bytes(value.to_utf8())
+
+
+## Read a u32 UTF-8 byte-length prefix and strict payload in this file's byte order.
+## One reservation spans prefix and payload, including nested awaits; aliases cannot interleave them.
+## @param max_bytes Nonnegative payload budget, checked before payload allocation; defaults to 64 MiB.
+## @return Ok with text, or Err with consumed framing and payload progress; no cursor rollback is promised.
+func (self file) read_pascal_string(max_bytes: i64 = 67108864) -> result<string, error>:
+    if max_bytes < 0:
+        return Err(_reason("read_pascal_string", self._path, error_kind.invalid_range))
+
+    with _reserve(self, "read_pascal_string")? as lease:
+        var prefix = (self.read_exact(4))?
+
+        if binary.decode<u32>(prefix, self.order) is Ok(var length):
+            var count = length as i64
+
+            if count > max_bytes:
+                return Err(_reason("read_pascal_string", self._path, error_kind.limit_exceeded, prefix, 4))
+
+            var payload = self.read_exact(count)
+
+            if payload is Err(var reason):
+                reason.operation = "read_pascal_string"
+                reason.bytes_transferred += 4
+                var partial = prefix[0..<4]
+
+                for byte in reason.partial:
+                    partial.push(byte)
+
+                reason.partial = partial
+                return Err(reason)
+
+            if payload is Ok(var bytes):
+                if string.from_utf8(bytes) is Ok(var value):
+                    return Ok(value)
+
+                for byte in bytes:
+                    prefix.push(byte)
+
+                return Err(_reason("read_pascal_string", self._path, error_kind.invalid_utf8, prefix, 4 + count))
+
+        return Err(_reason("read_pascal_string", self._path, error_kind.unexpected_eof, prefix, prefix.count))
+
+
+## Write the same u32 byte-length-prefixed UTF-8 representation as io/memory.
+## Prefix and payload are prepared before native writing and share one operation reservation.
+## @param value Text whose UTF-8 byte count fits u32; embedded NUL is payload, not a terminator.
+## @return Ok with total prefix and payload bytes written, or Err retaining actual progress.
+func (self file) write_pascal_string(value: string) -> result<i64, error>:
+    if value.byte_length > (u32.max_value as i64):
+        return Err(_reason("write_pascal_string", self._path, error_kind.invalid_range))
+
+    var frame = binary.encode(value.byte_length as u32, self.order)
+    var payload = value.to_utf8()
+
+    for byte in payload:
+        frame.push(byte)
+
+    return self.write_bytes(frame)
+
+
+## Read an entire bounded file and decode strict UTF-8 without adding or removing bytes.
+## @param value Host file path in strict UTF-8; embedded NUL in the path is invalid.
+## @param max_bytes Nonnegative input byte budget; defaults to 64 MiB.
+## @return Ok with owned Unicode text, or Err with native, size-limit or malformed-input details.
+func read_text(value: string, max_bytes: i64 = 67108864) -> result<string, error>:
+    var bytes = (read_bytes(value, max_bytes))?
+
+    if string.from_utf8(bytes) is Ok(var text):
+        return Ok(text)
+
+    return Err(_reason("read_text", value, error_kind.invalid_utf8, bytes, bytes.count))
+
+
+## Write raw UTF-8 text using an explicit writable creation policy.
+## @param value Destination file path whose parent already exists.
+## @param text Unicode text to write verbatim, including embedded NUL and explicit newlines.
+## @param mode Writable creation policy; default write creates or truncates existing contents.
+## @return Ok with UTF-8 bytes written, or Err with partial changes and close diagnostics.
+func write_text(value: string, text: string, mode: open_mode = open_mode.write) -> result<i64, error>:
+    return write_bytes(value, text.to_utf8(), mode)
+
+
+## Append bytes without truncating existing contents; every native write selects EOF.
+## @param value Destination path; an absent file is created, but parents must exist.
+## @param bytes Readonly or mutable input copied before native waiting.
+## @return Ok with bytes appended, or Err retaining partial changes and cleanup failures.
+func append_bytes(value: string, const bytes: [u8]) -> result<i64, error>:
+    return write_bytes(value, bytes, open_mode.append)
+
+
+## Append raw UTF-8 text without adding a newline or framing.
+## @param value Destination path; an absent file is created without implicit parents.
+## @param text Unicode text appended verbatim, including embedded NUL.
+## @return Ok with UTF-8 bytes appended, or Err retaining actual partial progress.
+func append_text(value: string, text: string) -> result<i64, error>:
+    return write_text(value, text, open_mode.append)
+
+
+## Read one fixed-width number with encoding/binary in this file's byte order.
+## Supports all ten integer and IEEE numeric primitives; truncation retains actual consumed bytes.
+## @return Ok with the decoded value, or Err with EOF, closed, busy or native progress details.
+async func (self file) read_async<t>() -> result<t, error>:
+    with _reserve(self, "read")? as lease:
+        var width = binary.encode<t>(0).count
+        var bytes = (await self.read_exact_async(width))?
+
+        if binary.decode<t>(bytes, self.order) is Ok(var value):
+            return Ok(value)
+
+        return Err(_reason("read", self._path, error_kind.unexpected_eof, bytes, bytes.count))
+
+
+## Write one fixed-width numeric representation through the existing binary codec.
+## Preserves all signed integer and IEEE bits, including NaN payloads, in the selected byte order.
+## @param value One of the ten numeric primitives, inferred or explicitly selected without narrowing.
+## @return Ok with bytes written, or Err retaining actual partial write progress.
+async func (self file) write_async<t>(value: t) -> result<i64, error>:
+    return await self.write_bytes_async(binary.encode(value, self.order))
+
+
+## Read an exact UTF-8 byte count with strict decoding and actual cursor progress on failure.
+## @param count Nonnegative number of bytes, including embedded NUL; no framing is assumed.
+## @return Ok with owned text, or Err including invalid_utf8 with all consumed bytes.
+async func (self file) read_string_async(count: i64) -> result<string, error>:
+    var bytes = (await self.read_exact_async(count))?
+
+    if string.from_utf8(bytes) is Ok(var value):
+        return Ok(value)
+
+    return Err(_reason("read_string", self._path, error_kind.invalid_utf8, bytes, bytes.count))
+
+
+## Write raw UTF-8 with no prefix, newline, terminator, BOM or normalization.
+## @param value Unicode text whose embedded NUL characters remain ordinary payload bytes.
+## @return Ok with UTF-8 bytes written, or Err with actual partial write progress.
+async func (self file) write_string_async(value: string) -> result<i64, error>:
+    return await self.write_bytes_async(value.to_utf8())
+
+
+## Read a u32 UTF-8 byte-length prefix and strict payload in this file's byte order.
+## One reservation spans prefix and payload, including nested awaits; aliases cannot interleave them.
+## @param max_bytes Nonnegative payload budget, checked before payload allocation; defaults to 64 MiB.
+## @return Ok with text, or Err with consumed framing and payload progress; no cursor rollback is promised.
+async func (self file) read_pascal_string_async(max_bytes: i64 = 67108864) -> result<string, error>:
+    if max_bytes < 0:
+        return Err(_reason("read_pascal_string", self._path, error_kind.invalid_range))
+
+    with _reserve(self, "read_pascal_string")? as lease:
+        var prefix = (await self.read_exact_async(4))?
+
+        if binary.decode<u32>(prefix, self.order) is Ok(var length):
+            var count = length as i64
+
+            if count > max_bytes:
+                return Err(_reason("read_pascal_string", self._path, error_kind.limit_exceeded, prefix, 4))
+
+            var payload = await self.read_exact_async(count)
+
+            if payload is Err(var reason):
+                reason.operation = "read_pascal_string"
+                reason.bytes_transferred += 4
+                var partial = prefix[0..<4]
+
+                for byte in reason.partial:
+                    partial.push(byte)
+
+                reason.partial = partial
+                return Err(reason)
+
+            if payload is Ok(var bytes):
+                if string.from_utf8(bytes) is Ok(var value):
+                    return Ok(value)
+
+                for byte in bytes:
+                    prefix.push(byte)
+
+                return Err(_reason("read_pascal_string", self._path, error_kind.invalid_utf8, prefix, 4 + count))
+
+        return Err(_reason("read_pascal_string", self._path, error_kind.unexpected_eof, prefix, prefix.count))
+
+
+## Write the same u32 byte-length-prefixed UTF-8 representation as io/memory.
+## Prefix and payload are prepared before native writing and share one operation reservation.
+## @param value Text whose UTF-8 byte count fits u32; embedded NUL is payload, not a terminator.
+## @return Ok with total prefix and payload bytes written, or Err retaining actual progress.
+async func (self file) write_pascal_string_async(value: string) -> result<i64, error>:
+    if value.byte_length > (u32.max_value as i64):
+        return Err(_reason("write_pascal_string", self._path, error_kind.invalid_range))
+
+    var frame = binary.encode(value.byte_length as u32, self.order)
+    var payload = value.to_utf8()
+
+    for byte in payload:
+        frame.push(byte)
+
+    return await self.write_bytes_async(frame)
+
+
+## Read an entire bounded file and decode strict UTF-8 without adding or removing bytes.
+## @param value Host file path in strict UTF-8; embedded NUL in the path is invalid.
+## @param max_bytes Nonnegative input byte budget; defaults to 64 MiB.
+## @return Ok with owned Unicode text, or Err with native, size-limit or malformed-input details.
+async func read_text_async(value: string, max_bytes: i64 = 67108864) -> result<string, error>:
+    var bytes = (await read_bytes_async(value, max_bytes))?
+
+    if string.from_utf8(bytes) is Ok(var text):
+        return Ok(text)
+
+    return Err(_reason("read_text", value, error_kind.invalid_utf8, bytes, bytes.count))
+
+
+## Write raw UTF-8 text using an explicit writable creation policy.
+## @param value Destination file path whose parent already exists.
+## @param text Unicode text to write verbatim, including embedded NUL and explicit newlines.
+## @param mode Writable creation policy; default write creates or truncates existing contents.
+## @return Ok with UTF-8 bytes written, or Err with partial changes and close diagnostics.
+async func write_text_async(value: string, text: string, mode: open_mode = open_mode.write) -> result<i64, error>:
+    return await write_bytes_async(value, text.to_utf8(), mode)
+
+
+## Append bytes without truncating existing contents; every native write selects EOF.
+## @param value Destination path; an absent file is created, but parents must exist.
+## @param bytes Readonly or mutable input copied before native waiting.
+## @return Ok with bytes appended, or Err retaining partial changes and cleanup failures.
+async func append_bytes_async(value: string, const bytes: [u8]) -> result<i64, error>:
+    return await write_bytes_async(value, bytes, open_mode.append)
+
+
+## Append raw UTF-8 text without adding a newline or framing.
+## @param value Destination path; an absent file is created without implicit parents.
+## @param text Unicode text appended verbatim, including embedded NUL.
+## @return Ok with UTF-8 bytes appended, or Err retaining actual partial progress.
+async func append_text_async(value: string, text: string) -> result<i64, error>:
+    return await write_text_async(value, text, open_mode.append)
+
+
+internal func _path_join(left: string, right: string) -> result<string, error>:
+    var reply = _io_path_join(left, right)
+
+    if reply.kind != 0:
+        return Err(_error("path.join", left, right, reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_normalize(value: string) -> result<string, error>:
+    var reply = _io_path_normalize(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.normalize", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_filename(value: string) -> result<string, error>:
+    var reply = _io_path_filename(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.filename", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_stem(value: string) -> result<string, error>:
+    var reply = _io_path_stem(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.stem", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_extension(value: string) -> result<string, error>:
+    var reply = _io_path_extension(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.extension", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_change_extension(value: string, extension: string) -> result<string, error>:
+    var reply = _io_path_change_extension(value, extension)
+
+    if reply.kind != 0:
+        return Err(_error("path.change_extension", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_parent(value: string) -> result<string, error>:
+    var reply = _io_path_parent(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.parent", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_root(value: string) -> result<string, error>:
+    var reply = _io_path_root(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.root", value, "", reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_is_absolute(value: string) -> result<bool, error>:
+    var reply = _io_path_is_absolute(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.is_absolute", value, "", reply))
+
+    return Ok(reply.number != 0)
+
+
+internal func _path_is_relative(value: string) -> result<bool, error>:
+    var reply = _io_path_is_relative(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.is_relative", value, "", reply))
+
+    return Ok(reply.number != 0)
+
+
+internal func _path_is_rooted(value: string) -> result<bool, error>:
+    var reply = _io_path_is_rooted(value)
+
+    if reply.kind != 0:
+        return Err(_error("path.is_rooted", value, "", reply))
+
+    return Ok(reply.number != 0)
+
+
+internal func _path_absolute(value: string, base: string) -> result<string, error>:
+    var reply = _io_path_absolute(value, base)
+
+    if reply.kind != 0:
+        return Err(_error("path.absolute", value, base, reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_relative(value: string, base: string) -> result<string, error>:
+    var reply = _io_path_relative(value, base)
+
+    if reply.kind != 0:
+        return Err(_error("path.relative", value, base, reply))
+
+    return Ok(reply.text)
+
+
+internal func _path_separator() -> result<string, error>:
+    var reply = _io_path_separator()
+
+    if reply.kind != 0:
+        return Err(_error("path.separator", "", "", reply))
+
+    return Ok(reply.text)

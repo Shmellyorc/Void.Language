@@ -1,0 +1,93 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_dns",
+    "37717",
+    "127.0.0.1:58331",
+    "43297"
+  ],
+  "exit_code": 1,
+  "timeout": false,
+  "seconds": 0.11711169800400967,
+  "stack_bytes": [
+    1048576,
+    1048576
+  ],
+  "binary_sha256": "c4d3b7bd6ba414cf55694fe25c7a0869687271e1b87a8717043b8aab96977b84",
+  "source_sha256": {
+    "src/runtime/http.cpp": "eec9df4189537013cf8112d517fea3780f6ad7d9b9a79d5b67a05833871d304b",
+    "include/void/detail/http_hooks.hpp": "3aa36be46acfab1ced1b54cb19fc6fb8ac491462cda34b3a2fd716bb0923406e",
+    "tests/net/http/dns.cpp": "35375aac50d08073f4369fc594240bf3ca67b1517015455fa485cd8af8483a9c",
+    "tests/net/http/dns_fixture.py": "3d529f8ab6585c76a6eba9a2fae622c11d92ebc47842319be09897ace353b91a"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  },
+  "dns_events": [
+    {
+      "name": "warm.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold0.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold1.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold2.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold3.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold4.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "cold5.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "nx.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "tcp.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "tcp.void.test",
+      "type": 1,
+      "transport": "tcp"
+    },
+    {
+      "name": "xn--bcher-kva.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "v6.void.test",
+      "type": 28,
+      "transport": "udp"
+    },
+    {
+      "name": "stall.void.test",
+      "type": 1,
+      "transport": "udp"
+    }
+  ]
+}

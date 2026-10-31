@@ -1,0 +1,15 @@
+{
+  "profile": "strict",
+  "scope": "isolated one-file candidate; production pins/source unchanged",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_curl_source.py"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "exit_code": 0,
+      "seconds": 0.16472141300619114
+    }
+  ]
+}

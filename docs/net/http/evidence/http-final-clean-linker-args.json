@@ -1,0 +1,10 @@
+[
+  "cmake",
+  "-S",
+  ".",
+  "-B",
+  ".toolchains/http-final-clean-build",
+  "-UVOID_LLVM_ORC_RUNS",
+  "-DVOID_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+  "-DCMAKE_EXE_LINKER_FLAGS:STRING=--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld -Wl,--thinlto-cache-dir=/home/shmellyorc/Documents/Void.Language/build/llvm23-thinlto-cache"
+]

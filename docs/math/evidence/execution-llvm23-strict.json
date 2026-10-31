@@ -1,6 +1,6 @@
 {
   "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
-  "compiler_sha256": "9b60a17a0ae127d0006df213ba84cd239565eb8a1a87504d55f824cc43510b5b",
+  "compiler_sha256": "3be992a632e001cf2fd617b4f355f5cdfffaa0a046adad4b1284e99e977980b9",
   "source_sha256": "ae3016071c5fe37ed81937f70c452b12099bd7d8fef1d4138cb0b0dac8acb027",
   "vectors_sha256": "697d1c97fcaaffabdc954614a90d7ae6467a21639e433df735d4624e5a961df0",
   "source_artifact": "docs/math/evidence/math_test-llvm23-strict.void",

@@ -16,6 +16,10 @@
 #include "void/filesystem_ops.hpp"
 #include "void/os.hpp"
 #include "void/filesystem_abi.hpp"
+#include "void/url_ops.hpp"
+#include "void/http_ops.hpp"
+#include "void/url_abi.hpp"
+#include "void/http_abi.hpp"
 #include "void/os_abi.hpp"
 #include "void/format.hpp"
 #include "void/temporal.hpp"
@@ -1307,6 +1311,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     selected_failure();v=llvm::UndefValue::get(b.getInt8Ty());break;
                 }
 #include "filesystem.inc"
+#include "url.inc"
+#include "http.inc"
 #include "os.inc"
                 case Op::console_native: {
                     auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
@@ -1879,6 +1885,9 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("powf",static_cast<float(*)(float,float)>(std::pow));
     bind("vd_random_seed", vd_random_seed);
     bind("vd_filesystem_call", vd_filesystem_call);
+    bind("vd_url_call", vd_url_call);
+    bind("vd_http_call", vd_http_call);
+    bind("vd_http_cleanup", vd_http_cleanup);
     bind("vd_os_call", vd_os_call);
     bind("vd_file_control", vd_file_control);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);

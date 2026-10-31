@@ -1,0 +1,26 @@
+/tmp/VOID HTTP rejection 7w_sfj_e/readonly_transfer.void:3:14: error: A call may mutate readonly reference leaf 'transfer'.
+    code: VOID2007
+
+ 3 |     exchange.read_bytes()
+   |              ^^^^^^^^^^
+    Module: /readonly_transfer.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/net/http.void:255:8
+
+ 255 | struct transfer:
+     |        ^^^^^^^^
+    Module: /@stdlib/net/http.void
+    Reference authority enters this declaration here. at /home/shmellyorc/Documents/Void.Language/stdlib/net/http.void:787:7
+
+ 787 | func (self transfer) read_bytes(max_count: i64 = 65536) -> result<chunk, error>:
+     |       ^^^^
+    Module: /@stdlib/net/http.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+
+/tmp/VOID HTTP rejection 7w_sfj_e/readonly_transfer.void:3:14: error: Cannot call a mutating method through readonly receiver storage.
+    code: VOID2007
+
+ 3 |     exchange.read_bytes()
+   |              ^^^^^^^^^^
+    Module: /readonly_transfer.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

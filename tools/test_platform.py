@@ -1,6 +1,16 @@
 """Platform contracts for native acceptance fixtures."""
 import os
 import json
+from pathlib import Path
+
+
+def native_manifest(compiler):
+    """Read the same v1/v2 link manifest used by the native CLI."""
+    directory = Path(compiler).resolve().parent
+    lines = (directory / 'void-native.txt').read_text(encoding='utf-8').splitlines()
+    if not lines or lines[0] not in ('VOID native 23.1.4 v1', 'VOID native 23.1.4 v2'):
+        raise ValueError('Unsupported native link manifest')
+    return [line.replace('@VOID_NATIVE_DIR@', str(directory)) for line in lines]
 
 
 def native_text(text):

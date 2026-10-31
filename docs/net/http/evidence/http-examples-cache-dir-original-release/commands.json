@@ -1,0 +1,33 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/tmp/VOID HTTP examples 7i_odz1a/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/tmp/VOID HTTP examples 7i_odz1a/key.pem",
+      "-out",
+      "/tmp/VOID HTTP examples 7i_odz1a/cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16745990100025665
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/.void"
+    ],
+    "exit_code": 1,
+    "seconds": 0.005274082999676466
+  }
+]

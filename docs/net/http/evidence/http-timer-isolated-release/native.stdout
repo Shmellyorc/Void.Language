@@ -1,0 +1,5 @@
+{"case":"tls","kind":"timeout","phase":"tls","unknown":false,"elapsed_ms":51}
+{"case":"proxy","kind":"timeout","phase":"proxy","unknown":false,"elapsed_ms":50}
+{"case":"producer-resume","kind":"success","phase":"other","unknown":false,"elapsed_ms":0}
+{"case":"write","kind":"timeout","phase":"upload","unknown":true,"elapsed_ms":31}
+{"case":"digest-upload","kind":"success","phase":"other","unknown":false,"elapsed_ms":13}

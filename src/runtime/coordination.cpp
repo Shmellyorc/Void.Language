@@ -1,4 +1,6 @@
 #include "void/runtime.hpp"
+#include "void/native_resource.hpp"
+#include "void/native_work.hpp"
 #include "void/console.hpp"
 #include "void/temporal.hpp"
 #include "void/native_runtime.hpp"
@@ -303,11 +305,22 @@ bool Runtime::wait_for_request(std::chrono::milliseconds timeout) {
 }
 void Runtime::async_worker_limit(unsigned count) {
     if(!count || count>64)throw std::invalid_argument("worker limit must be 1..64");
-    std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)throw std::logic_error("worker configuration requires an idle Runtime");async_worker_limit_=count;
+    std::shared_ptr<NativeWorkers> previous;
+    {
+        std::lock_guard lock(mutex_);
+        if(async_owner_!=std::thread::id{} || closing_ || native_jobs_)throw std::logic_error("worker configuration requires an idle Runtime");
+        if(async_worker_limit_==count)return;
+        previous=std::move(native_workers_);async_worker_limit_=count;
+    }
+    if(previous)previous->shutdown();
 }
 unsigned Runtime::async_worker_limit() const {std::lock_guard lock(mutex_);return async_worker_limit_;}
 bool Runtime::enter_async(){require_managed();std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)return false;async_owner_=std::this_thread::get_id();return true;}
-void Runtime::leave_async() noexcept {std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};}
+void Runtime::leave_async() noexcept {
+    bool closing;
+    { std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};closing=closing_; }
+    if(closing)NativeWorkers::shutdown_for(*this);
+}
 void Runtime::begin_native_job() {
     require_managed();
     std::lock_guard lock(mutex_);
@@ -346,11 +359,14 @@ console::Error Runtime::close() {
         context = console_context_;
         changed_.notify_all();
     }
+    native_request_stop(*this); // Drivers must wake before the native-job wait.
+    NativeWorkers::request_stop_for(*this);
     auto error=context?context->close():console::Error{}; // Wake/cancel/drain without the GC mutex.
     {
         std::unique_lock lock(mutex_);
         changed_.wait(lock, [&] { return native_jobs_ == 0; });
     }
+    NativeWorkers::shutdown_for(*this);
     auto native_error = native_shutdown(*this);
     if (native_error) {
         if (!error) error = {console::ErrorKind::io_failure, native_error.value()};

@@ -1,0 +1,27 @@
+subscribe O0 once=0 path=0 failures=423 released_markers=409
+subscribe O0 once=0 path=1 failures=185 released_markers=166
+subscribe O0 once=0 path=2 failures=369 released_markers=340
+subscribe O0 once=0 path=3 failures=303 released_markers=284
+unsubscribe O0 once=0 survivor=0 before=31 after=37
+unsubscribe O0 once=0 survivor=1 before=37 after=36
+subscribe O0 once=1 path=0 failures=423 released_markers=409
+subscribe O0 once=1 path=1 failures=185 released_markers=166
+subscribe O0 once=1 path=2 failures=369 released_markers=340
+subscribe O0 once=1 path=3 failures=303 released_markers=284
+unsubscribe O0 once=1 survivor=0 before=31 after=37
+unsubscribe O0 once=1 survivor=1 before=37 after=36
+emit O0 no_delivery_failures=255 partial_failures=90
+subscribe O2 once=0 path=0 failures=423 released_markers=409
+subscribe O2 once=0 path=1 failures=185 released_markers=166
+subscribe O2 once=0 path=2 failures=369 released_markers=340
+subscribe O2 once=0 path=3 failures=303 released_markers=284
+unsubscribe O2 once=0 survivor=0 before=31 after=37
+unsubscribe O2 once=0 survivor=1 before=37 after=36
+subscribe O2 once=1 path=0 failures=423 released_markers=409
+subscribe O2 once=1 path=1 failures=185 released_markers=166
+subscribe O2 once=1 path=2 failures=369 released_markers=340
+subscribe O2 once=1 path=3 failures=303 released_markers=284
+unsubscribe O2 once=1 survivor=0 before=31 after=37
+unsubscribe O2 once=1 survivor=1 before=37 after=36
+emit O2 no_delivery_failures=255 partial_failures=90
+49708 channel host checks passed

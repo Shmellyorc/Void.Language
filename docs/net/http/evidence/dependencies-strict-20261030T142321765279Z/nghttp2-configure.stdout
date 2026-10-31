@@ -1,0 +1,124 @@
+-- The C compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found Python3: /usr/bin/python3 (found version "3.14.8") found components: Interpreter
+-- Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY OPENSSL_INCLUDE_DIR) (Required is at least version "1.1.1")
+-- Could NOT find Libngtcp2 (missing: LIBNGTCP2_LIBRARY LIBNGTCP2_INCLUDE_DIR) (Required is at least version "1.23.0")
+-- Could NOT find Libnghttp3 (missing: LIBNGHTTP3_LIBRARY LIBNGHTTP3_INCLUDE_DIR) (Required is at least version "1.17.0")
+-- Could NOT find Systemd (missing: SYSTEMD_INCLUDE_DIRS SYSTEMD_LIBRARIES) (Required is at least version "209")
+-- Could NOT find Jansson (missing: JANSSON_LIBRARY JANSSON_INCLUDE_DIR) (Required is at least version "2.5")
+-- Could NOT find Libevent (missing: LIBEVENT_CORE_LIBRARY LIBEVENT_EXTRA_LIBRARY LIBEVENT_OPENSSL_LIBRARY LIBEVENT_INCLUDE_DIR core extra openssl) (Required is at least version "2.0.8")
+-- Found LibXml2: /usr/lib/x86_64-linux-gnu/libxml2.so (found suitable version "2.15.4", minimum required is "2.6.26")
+-- Could NOT find Jemalloc (missing: JEMALLOC_LIBRARY JEMALLOC_INCLUDE_DIR) 
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Looking for arpa/inet.h
+-- Looking for arpa/inet.h - found
+-- Looking for fcntl.h
+-- Looking for fcntl.h - found
+-- Looking for inttypes.h
+-- Looking for inttypes.h - found
+-- Looking for limits.h
+-- Looking for limits.h - found
+-- Looking for netdb.h
+-- Looking for netdb.h - found
+-- Looking for netinet/in.h
+-- Looking for netinet/in.h - found
+-- Looking for netinet/ip.h
+-- Looking for netinet/ip.h - found
+-- Looking for pwd.h
+-- Looking for pwd.h - found
+-- Looking for sys/socket.h
+-- Looking for sys/socket.h - found
+-- Looking for sys/time.h
+-- Looking for sys/time.h - found
+-- Looking for syslog.h
+-- Looking for syslog.h - found
+-- Looking for unistd.h
+-- Looking for unistd.h - found
+-- Looking for windows.h
+-- Looking for windows.h - not found
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Performing Test HAVE_STRUCT_TM_TM_GMTOFF
+-- Performing Test HAVE_STRUCT_TM_TM_GMTOFF - Success
+-- Looking for _Exit
+-- Looking for _Exit - found
+-- Looking for accept4
+-- Looking for accept4 - found
+-- Looking for clock_gettime
+-- Looking for clock_gettime - found
+-- Looking for mkostemp
+-- Looking for mkostemp - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for GetTickCount64
+-- Looking for GetTickCount64 - not found
+-- Looking for initgroups
+-- Looking for initgroups - found
+-- Looking for CLOCK_MONOTONIC
+-- Looking for CLOCK_MONOTONIC - found
+-- summary of build options:
+
+    Package version: 1.70.0
+    Library version: 43:5:29
+    Install prefix:  /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/strict
+    Target system:   Linux
+    Compiler:
+      Build type:     Debug
+      C compiler:     /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+      CFLAGS:         -g -O0 -g -fPIC -fsanitize=address,undefined -fno-omit-frame-pointer
+      C++ compiler:   /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+      CXXFLAGS:        
+      WARNCFLAGS:       -Wextra -Wall -Wconversion -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wpointer-arith -Wshadow -Wundef -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wmissing-field-initializers -Wmissing-noreturn -Wno-format-nonliteral -Wredundant-decls -Wsign-conversion -Wstrict-prototypes -Wunreachable-code -Wunused-parameter -Wvla -Wshorten-64-to-32 -Wlanguage-extension-token -Wpragmas -Wunreachable-code-break -Wheader-guard -Wmissing-variable-declarations
+      CXX1XCXXFLAGS:  
+      WARNCXXFLAGS:   
+    Python:
+      Python:          /usr/bin/python3
+      Python3_VERSION: 3.14.8
+    Test:
+      Failmalloc:     ON
+      Build Test:     OFF
+    Libs:
+      OpenSSL:        FALSE (LIBS='')
+      wolfSSL:         (LIBS='')
+      Libxml2:        TRUE (LIBS='/usr/lib/x86_64-linux-gnu/libxml2.so')
+      Libev:           (LIBS='')
+      Libc-ares:       (LIBS='')
+      Libngtcp2:       (LIBS='')
+      Libngtcp2_crypto_quictls:  (LIBS='')
+      Libngtcp2_crypto_libressl:  (LIBS='')
+      Libngtcp2_crypto_wolfssl:  (LIBS='')
+      Libnghttp3:      (LIBS='')
+      Libbpf:          (LIBS='')
+      Libevent(SSL):  FALSE (LIBS='')
+      Jansson:        FALSE (LIBS='')
+      Jemalloc:       FALSE (LIBS='')
+      Zlib:            (LIBS='')
+      Systemd:        FALSE (LIBS='SYSTEMD_LIBRARIES-NOTFOUND')
+      Libbrotlienc:    (LIBS='')
+      Libbrotlidec:    (LIBS='')
+    Third-party:
+      http-parser:    
+      MRuby:          0
+      Neverbleed:     0
+    Features:
+      Applications:   OFF
+      HPACK tools:    OFF
+      Examples:       OFF
+      Threading:      ON
+      HTTP/3(EXPERIMENTAL): OFF
+
+-- Configuring done (6.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/strict/nghttp2

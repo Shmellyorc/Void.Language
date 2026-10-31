@@ -1,0 +1,61 @@
+[  0%] Built target boringssl_prefix_symbols
+[  1%] Built target jitterentropy
+[ 28%] Built target fipsmodule
+[ 81%] Built target crypto_objects
+[ 81%] Built target crypto
+[ 90%] Built target ssl
+[ 90%] Building CXX object tool/CMakeFiles/bssl.dir/client.cc.o
+[ 90%] Building CXX object tool/CMakeFiles/bssl.dir/ciphers.cc.o
+[ 90%] Building CXX object tool/CMakeFiles/bssl.dir/const.cc.o
+[ 91%] Building CXX object tool/CMakeFiles/bssl.dir/args.cc.o
+[ 91%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/__/tool/args.cc.o
+[ 91%] Building CXX object tool/CMakeFiles/bssl.dir/digest.cc.o
+[ 91%] Building CXX object tool/CMakeFiles/bssl.dir/fd.cc.o
+[ 91%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/__/tool/file.cc.o
+[ 91%] Building CXX object tool/CMakeFiles/bssl.dir/file.cc.o
+[ 91%] Building CXX object tool/CMakeFiles/bssl.dir/generate_ech.cc.o
+[ 91%] Building CXX object tool/CMakeFiles/bssl.dir/generate_ed25519.cc.o
+[ 92%] Building CXX object tool/CMakeFiles/bssl.dir/genrsa.cc.o
+[ 92%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/__/tool/fd.cc.o
+[ 92%] Building CXX object tool/CMakeFiles/bssl.dir/pkcs12.cc.o
+[ 93%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/__/tool/client.cc.o
+[ 93%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/__/tool/transport_common.cc.o
+[ 93%] Building CXX object tool/CMakeFiles/bssl.dir/rand.cc.o
+[ 93%] Building CXX object tool/CMakeFiles/bssl.dir/server.cc.o
+[ 93%] Building CXX object tool/CMakeFiles/bssl.dir/sign.cc.o
+[ 94%] Building CXX object tool/CMakeFiles/bssl.dir/speed.cc.o
+[ 94%] Building CXX object tool/CMakeFiles/bssl.dir/tool.cc.o
+[ 94%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/txt_db/txt_db.cc.o
+[ 94%] Building CXX object tool/CMakeFiles/bssl.dir/transport_common.cc.o
+[ 94%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/asn1parse.cc.o
+[ 94%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/ca.cc.o
+[ 95%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/ca_req_common.cc.o
+[ 95%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/crl.cc.o
+[ 95%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/dgst.cc.o
+[ 95%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/dhparam.cc.o
+[ 95%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/ecparam.cc.o
+[ 96%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/ec.cc.o
+[ 96%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/enc.cc.o
+[ 96%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/genpkey.cc.o
+[ 96%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/genrsa.cc.o
+[ 96%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/ocsp.cc.o
+[ 97%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/pass_util.cc.o
+[ 97%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/pkcs8.cc.o
+[ 97%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/pkcs12.cc.o
+[ 97%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/pkey.cc.o
+[ 97%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/pkeyutl.cc.o
+[ 98%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/rand.cc.o
+[ 98%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/rehash.cc.o
+[ 98%] Linking CXX executable bssl
+[ 98%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/req.cc.o
+[ 98%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/ordered_args.cc.o
+[ 98%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/rsa.cc.o
+[ 99%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/s_client.cc.o
+[ 99%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/tool.cc.o
+[ 99%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/tool_util.cc.o
+[ 99%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/verify.cc.o
+[ 99%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/version.cc.o
+[100%] Building CXX object tool-openssl/CMakeFiles/openssl.dir/x509.cc.o
+[100%] Linking CXX executable openssl
+[100%] Built target bssl
+[100%] Built target openssl

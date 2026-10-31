@@ -1,0 +1,66 @@
+use net/http
+use io
+
+async func suite() -> result<bool, http.error>:
+    with http.open_client()? as owner:
+        var pending = owner.get_async("http://127.0.0.1:41685/plain")
+        var first = (await pending)?
+        var again = (await pending)?
+        if first.bytes.count != 11 or again.bytes[5] != 0:
+            return Ok(false)
+        with owner.start(http.request(target = "http://127.0.0.1:41685/large?134217728"), http.request_options(max_encoded_bytes = 134217728, max_decoded_bytes = 134217728, total_timeout_ms = 300000))? as exchange:
+            var info = (await exchange.response_async())?
+            if info.status != 200:
+                return Ok(false)
+            var first_read = exchange.read_bytes_async()
+            var block = (await first_read)?
+            var received = block.bytes.count
+            var ended = block.eof
+            var next_sample: i64 = 16777216
+            for not ended:
+                var next = (await exchange.read_bytes_async())?
+                received += next.bytes.count
+                ended = next.eof
+                if received >= next_sample:
+                    # A retained task must remain repeatable after later allocations/collections.
+                    var retained = (await first_read)?
+                    if retained.bytes.count != block.bytes.count:
+                        return Ok(false)
+                    next_sample += 16777216
+            var finished = (await exchange.finish_async())?
+            if received != 134217728 or finished.downloaded != received:
+                return Ok(false)
+        if io.open("/tmp/VOID HTTP source 9x46p6yh/file.bin", io.open_mode.create) is Ok(var source_file):
+            with source_file:
+                source_file.write_bytes("ppppppp".to_utf8())
+                source_file.seek(0)
+                var uploaded = (await owner.upload_async(http.request(method = "POST", target = "http://127.0.0.1:41685/echo"), source_file, 7))?
+                if uploaded.text()? != "POST:ppppppp":
+                    return Ok(false)
+                source_file.seek(0)
+                var file_part = http.part(name = "file", data = http.part_data.file(source_file, 7))
+                with owner.start(http.request(method = "POST", target = "http://127.0.0.1:41685/multipart", body = http.body.multipart([file_part])))? as exchange:
+                    # The owner borrow lasts through finish, even after the producer EOF.
+                    var info = (await exchange.response_async())?
+                    if source_file.position() is Err(var reason):
+                        if not (reason.kind is io.error_kind.busy):
+                            return Ok(false)
+                    else:
+                        return Ok(false)
+                    var done = false
+                    for not done:
+                        var next = (await exchange.read_bytes_async())?
+                        done = next.eof
+                    var finished = (await exchange.finish_async())?
+                    if source_file.position() is Err(var reason):
+                        return Ok(false)
+        else:
+            return Ok(false)
+        var closed = (await owner.close_async())?
+    return Ok(true)
+
+async func entry(input: i32) -> i32:
+    if (await suite()) is Ok(var passed):
+        if passed:
+            return input
+    return 1

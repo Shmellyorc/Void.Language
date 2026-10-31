@@ -1,5 +1,27 @@
 # Stage 6 Deliveries 1–5: async, lifecycle, workers and native integration
 
+## HTTP Runtime foundation ownership amendment, 30 October 2026
+
+The Boss-authorized HTTP mission now implements a working-tree
+[foundation amendment](net/http/RUNTIME_FOUNDATION.md): externally completed native
+Work with owner publication, shielded abandonment, activation/group lifetime
+drain and pre-wait native-provider shutdown notification. These private facilities
+do not add public task syntax or a second scheduler. Actual HTTP/source integration now exists;
+independent full implementation acceptance remains pending.
+
+After quiescent completion, scheduler result Handles and completed Work may retire.
+Ordinary precise source task references preserve reachable results and repeated
+awaits; uncommitted acquisitions and the adapter's root result keep their required
+roots. Empty scheduler Handles unregister. Quiescent native Task/group records may retire after the existing precise GC
+proves their task payload unobservable and no child, Work, failure or waiter still
+needs them. Creation sequence IDs remain monotonic; retained source handles keep
+both repeatable results and the necessary native ancestry. The existing worker
+pool has Runtime lifetime, while source Work remains Scope-owned and drained.
+Native-only file producers share that same bounded queue. Runtime close joins
+idle workers after scoped source work drains. No whole-Runtime RSS ceiling is claimed.
+This supersedes the historical blanket result/Work/null-Handle retention statements
+below; the original Stage 6/8 evidence and frame-retirement rules remain history.
+
 ## Stage 11 globals and owner execution
 
 Runtime-global access belongs to the initializing application's owner thread.

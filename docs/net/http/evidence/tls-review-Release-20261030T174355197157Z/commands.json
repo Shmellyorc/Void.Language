@@ -1,0 +1,168 @@
+{
+  "scope": "isolated review only; not an approved production dependency",
+  "pin": {
+    "scope": "isolated review only; not an approved production dependency",
+    "name": "AWS-LC",
+    "version": "5.12.0",
+    "revision": "cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+    "url": "https://codeload.github.com/aws/aws-lc/tar.gz/cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+    "sha256": "1de549ad9ac709d08a7e26ac5aa77dc90d55811c5c5c54b4ec3e442b00e98e68"
+  },
+  "profile": "Release",
+  "stack_bytes": 1048576,
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.01626706400202238,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_http_dependencies.py",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "Release"
+      ],
+      "exit_code": 0,
+      "seconds": 0.16460404100143933,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/tls",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=",
+        "-DCMAKE_CXX_FLAGS=",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/prefix",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_LIBSSL=ON",
+        "-DDISABLE_GO=ON",
+        "-DENABLE_SOURCE_MODIFICATION=OFF",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+      ],
+      "exit_code": 0,
+      "seconds": 1.7173616059990309,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/tls",
+        "--parallel",
+        "6"
+      ],
+      "exit_code": 0,
+      "seconds": 42.931806172000506,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/tls"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11462240100081544,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/tls-review",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/curl",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=",
+        "-DCMAKE_CXX_FLAGS=",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DVOID_TLS_REVIEW_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/prefix",
+        "-DVOID_TLS_REVIEW_RUNTIME=/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "-DVOID_HTTP_DEPS_ROOT=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release",
+        "-DVOID_SANITIZERS=OFF"
+      ],
+      "exit_code": 0,
+      "seconds": 18.362615360001655,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/curl",
+        "--parallel",
+        "6"
+      ],
+      "exit_code": 0,
+      "seconds": 8.98690770799658,
+      "soft_hard_stack_bytes": null
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/curl/provider/provider_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11842874799913261,
+      "soft_hard_stack_bytes": [
+        1048576,
+        1048576
+      ]
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/curl/provider/url_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06816232200071681,
+      "soft_hard_stack_bytes": [
+        1048576,
+        1048576
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/fixture.py",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/reproduce-Release-20261030T174355197157Z/curl/candidate_native",
+        "--http2",
+        "--evidence",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/tls-review-Release-20261030T174355197157Z/native"
+      ],
+      "exit_code": 0,
+      "seconds": 6.081936305999989,
+      "soft_hard_stack_bytes": [
+        1048576,
+        1048576
+      ]
+    }
+  ],
+  "result": "PASS (isolated Linux candidate only; not production or cross-platform acceptance)",
+  "runtime_files_sha256": {
+    "libvoid_runtime.a": "fea78e9430184cadf08e2b88f4281475c9140be54afcbcc54c6e378d3e8ef5b9",
+    "libvoid_native_fixture.a": "4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865",
+    "CMakeCache.txt": "49073ff3ffdd7e66d1af9a060666dc92babb55543ca0b96f0398fd5908d003bd"
+  },
+  "binaries": {
+    "prefix/lib/libssl.a": "2ea1b08d119bff7a7e922500b648a6a67b278ca7a5a8ce6f0bdab6741ff9930f",
+    "prefix/lib/libcrypto.a": "7e1acc00db86d0e16a7b3c6d9a8a8baa570884b01bc5b34fab9cf032ac069862",
+    "curl/candidate_native": "3c8c562414c318030256697294e682dd1cdb60be237841d6b71fafc154ad8921",
+    "curl/provider/provider_probe": "f7813808fa0f2748fa83c2f57e10aeedff698555df686c69db03a5b5afe261fd",
+    "curl/provider/url_probe": "20b60cf258cd24e409850bdbfd94b5608bdb8d0a3ec6c9eedd8b1187919542aa"
+  }
+}

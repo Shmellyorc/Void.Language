@@ -1,0 +1,20 @@
+[
+  {
+    "profile": "Release",
+    "exit_code": 0,
+    "stdout": "HTTP dependency prefix verified: Release; 167 files\n",
+    "stderr": ""
+  },
+  {
+    "profile": "Debug",
+    "exit_code": 0,
+    "stdout": "HTTP dependency prefix verified: Debug; 167 files\n",
+    "stderr": ""
+  },
+  {
+    "profile": "strict",
+    "exit_code": 0,
+    "stdout": "HTTP dependency prefix verified: strict; 167 files\n",
+    "stderr": ""
+  }
+]

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "void/runtime.hpp"
+#include "void/filesystem.hpp"
 
 #include <array>
 #include <cstddef>
@@ -19,6 +20,15 @@ struct ReplyLayout {
     std::size_t task_result;
     const char* task_key;
 };
+// Private typed native borrow for HTTP bulk/file parts. Acquisition repeats the
+// existing file identity, owner, activation-claim and busy checks. Its lifetime
+// keeps the ordinary file operation reservation; it never closes the file.
+class FileBorrow {
+public:
+    virtual ~FileBorrow() = default;
+    virtual std::shared_ptr<File> file() const noexcept = 0;
+};
+std::shared_ptr<FileBorrow> borrow_file(Runtime&, void*, ErrorKind&);
 }
 
 extern "C" void vd_filesystem_call(void*, const vd::filesystem::ReplyLayout*,

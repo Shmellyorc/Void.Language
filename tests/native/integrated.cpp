@@ -66,17 +66,19 @@ void native_integrated_tests(const std::filesystem::path& repository,const std::
         collector_owner=std::this_thread::get_id();foreign_collections=0;managed_test::concurrent_poll=collect;
         auto answer=code->invoke(7);managed_test::concurrent_poll=nullptr;
         require(answer==32 && foreign_collections>0,"combined native/task/worker/callback result or rendezvous");
-        require(!vd::native_fixture_live() && code->runtime_owner()->snapshot().threads==0,"combined owner did not drain");empty(*code->runtime_owner());
+        require(!vd::native_fixture_live() && code->runtime_owner()->snapshot().threads<=code->runtime_owner()->async_worker_limit(),"combined owner did not drain");empty(*code->runtime_owner());
+        require(!code->runtime_owner()->close() && code->runtime_owner()->snapshot().threads==0,"Runtime close did not join its worker pool");
     }
     for(auto name:{"integrated_cancel","integrated_failure"}){auto program=analyze(repository/"examples/native"/(std::string(name)+".void"));for(bool optimized:{false,true}){
         vd::Jit jit;auto code=jit.compile_async(*program,optimized);std::string failure;try{code->invoke(7);}catch(const std::runtime_error& error){failure=error.what();}
         if(std::string(name)=="integrated_cancel")require(failure.find("Async task cancelled")!=std::string::npos,"combined cancellation disappeared");
         else require(failure.starts_with("native text cannot contain NUL") && failure.find("Additional failure during defer")!=std::string::npos && failure.find("Native resource is closed or invalid")!=std::string::npos,"combined native parent/cleanup precedence");
-        require(!vd::native_fixture_live() && code->runtime_owner()->snapshot().threads==0,"combined failure leaked owner/worker");empty(*code->runtime_owner());
+        require(!vd::native_fixture_live() && code->runtime_owner()->snapshot().threads<=code->runtime_owner()->async_worker_limit(),"combined failure leaked owner/worker");empty(*code->runtime_owner());
+        require(!code->runtime_owner()->close() && code->runtime_owner()->snapshot().threads==0,"failed root Runtime close did not join its worker pool");
     }}
     // Caller allocation failures span task/worker publication, retained C storage,
     // callback registration, async cleanup and returned buffers in one Runtime.
-    {vd::Jit jit;auto code=jit.compile_async(*original,false);bool complete=false;unsigned failures=0;for(int budget=0;budget<1536 && !complete;++budget){try{managed_test::AllocationFailure fault(budget);require(code->invoke(7)==32,"combined allocation retry");complete=true;}catch(const std::bad_alloc&){++failures;}catch(const std::runtime_error&){++failures;}require(!vd::native_fixture_live() && code->runtime_owner()->snapshot().threads==0,"combined failed allocation leaked native owner/participant");empty(*code->runtime_owner());}require(complete && failures,"combined allocation sweep incomplete");}
+    {vd::Jit jit;auto code=jit.compile_async(*original,false);bool complete=false;unsigned failures=0;for(int budget=0;budget<1536 && !complete;++budget){try{managed_test::AllocationFailure fault(budget);require(code->invoke(7)==32,"combined allocation retry");complete=true;}catch(const std::bad_alloc&){++failures;}catch(const std::runtime_error&){++failures;}require(!vd::native_fixture_live() && code->runtime_owner()->snapshot().threads<=code->runtime_owner()->async_worker_limit(),"combined failed allocation leaked native owner/participant");empty(*code->runtime_owner());}require(complete && failures,"combined allocation sweep incomplete");require(!code->runtime_owner()->close() && code->runtime_owner()->snapshot().threads==0,"allocation sweep Runtime close did not join its worker pool");}
     // Owner requests cancellation only after the worker is inside its real loop;
     // the second compiled-C boundary releases it after the request is published.
     const std::string work="func work(value: i32) -> i32:\n    var total = 0\n    for i in 0..<value:\n        total += 1\n    return total\n";

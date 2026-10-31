@@ -1,0 +1,85 @@
+{
+  "profile": "Debug",
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_curl_source.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.13888422599848127,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.00958236899896292,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/tests/net/http/provider",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-Debug-20261031T032541548470Z",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DVOID_CURL_PROFILE=HTTP",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DVOID_SANITIZERS=OFF"
+      ],
+      "exit_code": 0,
+      "seconds": 17.60363839999627,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-Debug-20261031T032541548470Z",
+        "--parallel",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 7.362197620997904,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-Debug-20261031T032541548470Z/provider_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.09498330799397081,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-Debug-20261031T032541548470Z/provider_probe",
+        "--embedding-host"
+      ],
+      "exit_code": 0,
+      "seconds": 0.056033371001831256,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-vendored-provider/vendored-full-Debug-20261031T032541548470Z/url_probe"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07911994500318542,
+      "stack_1mib": true
+    }
+  ],
+  "source": "third_party/curl (tracked source; no patch application)",
+  "provenance_sha256": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+  "scope": "full provider/URL and cookie regression; no network transport acceptance",
+  "result": "PASS",
+  "binary_sha256": "596b29287421c45d06de65c6a5d6dc729d01c0d1eeb6dab65cce162c2a03e715",
+  "archive_sha256": "0c403b11efc877c1d51691c1101d71b8361df7791eb144019e6500c5a72104c8",
+  "archive_bytes": 7330614
+}

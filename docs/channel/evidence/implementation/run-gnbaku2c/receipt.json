@@ -1,0 +1,15 @@
+{
+  "args": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+    "check",
+    "/tmp/VOID-channel-rejections-xfuur_xt/const-unsubscribe.void"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+  "status": 1,
+  "seconds": 0.015514689002884552,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "832658350aec3e037fff09297294200dfbc5139326e6f0009edac4a67a0a774c",
+  "object_hashes": {},
+  "output_hashes": {}
+}

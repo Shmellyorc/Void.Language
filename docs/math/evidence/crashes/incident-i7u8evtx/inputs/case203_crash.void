@@ -1,0 +1,9 @@
+use math
+func main():
+    var small: f32 = math.sin(0.5)
+    var wide: f64 = math.sin<f64>(0.5)
+    var root: f32 = math.sqrt<f32>(9)
+    var grid: i32 = math.floor(3.75) as i32
+    const local = math.sqrt(9.0)
+    var callable = math.sin<f64>
+    var answer: f64 = callable(0.5)

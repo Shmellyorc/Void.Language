@@ -1,0 +1,110 @@
+make  all-recursive
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2'
+Making all in gl
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/gl'
+  GEN      alloca.h
+  GEN      assert.h
+  GEN      error.h
+  GEN      limits.h
+  GEN      fcntl.h
+  GEN      stddef.h
+  GEN      stdio.h
+  GEN      stdlib.h
+  GEN      string.h
+  GEN      sys/stat.h
+  GEN      sys/types.h
+  GEN      time.h
+  GEN      unistd.h
+make  all-recursive
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/gl'
+make[4]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/gl'
+  CC       libgnu_la-basename-lgpl.lo
+  CC       libgnu_la-cloexec.lo
+  CC       libgnu_la-fcntl.lo
+  CC       libgnu_la-fd-hook.lo
+  CC       libgnu_la-getprogname.lo
+  CC       libgnu_la-malloca.lo
+  CC       libgnu_la-progname.lo
+  CC       libgnu_la-stat-time.lo
+  CC       libgnu_la-stdlib.lo
+  CC       libgnu_la-unistd.lo
+  CC       libgnu_la-version-etc.lo
+  CCLD     libgnu.la
+make[4]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/gl'
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/gl'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/gl'
+Making all in unistring
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/unistring'
+  GEN      iconv.h
+  GEN      inttypes.h
+  GEN      limits.h
+  GEN      stddef.h
+  GEN      stdlib.h
+  GEN      string.h
+  GEN      sys/types.h
+  GEN      unistd.h
+  GEN      wchar.h
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/unistring'
+  CC       libunistring_la-c-ctype.lo
+  CC       libunistring_la-c-strcasecmp.lo
+  CC       libunistring_la-c-strncasecmp.lo
+  CC       libunistring_la-stdlib.lo
+  CC       libunistring_la-localcharset.lo
+  CC       libunistring_la-striconveh.lo
+  CC       libunistring_la-striconveha.lo
+  CC       libunistring_la-unistd.lo
+  CC       unictype/libunistring_la-categ_none.lo
+  CC       uninorm/libunistring_la-decompose-internal.lo
+  CC       uninorm/libunistring_la-decomposition-table.lo
+  CCLD     libunistring.la
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/unistring'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/unistring'
+Making all in lib
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib'
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib'
+  CCLD     libidn2.la
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/lib'
+Making all in src
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/src'
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/src'
+  CC       libidn2_cmd_la-idn2_cmd.lo
+  CC       idn2.o
+  CCLD     libidn2_cmd.la
+  CCLD     idn2
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/src'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/src'
+Making all in examples
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/examples'
+  CC       decode.o
+  CC       lookup.o
+  CC       register.o
+  CC       example-toascii.o
+  CC       example-tounicode.o
+  CCLD     decode
+  CCLD     register
+  CCLD     example-tounicode
+  CCLD     lookup
+  CCLD     example-toascii
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/examples'
+Making all in fuzz
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/fuzz'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/fuzz'
+Making all in po
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/po'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/po'
+Making all in tests
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/tests'
+make  all-am
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/tests'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/tests'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2/tests'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/Release/libidn2'

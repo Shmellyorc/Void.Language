@@ -1,0 +1,13 @@
+/tmp/VOID-channel-rejections-xfuur_xt/token-field.void:9:17: error: Member '_identity' is not accessible from this lexical context.
+    code: VOID3003
+
+ 9 |     print(token._identity)
+   |                 ^^^^^^^^^
+    Module: /token-field.void
+    Stored field declared by /@stdlib/channel.void::subscription. at /home/shmellyorc/Documents/Void.Language/stdlib/channel.void:4:19
+
+ 4 |     private const _identity: bool
+   |                   ^^^^^^^^^
+    Module: /@stdlib/channel.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+

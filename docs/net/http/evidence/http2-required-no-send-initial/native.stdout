@@ -1,0 +1,12 @@
+{"http_async_sample":{"received":16258048,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":32509952,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":48761856,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":65016832,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":81268736,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":97520640,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":113775616,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":130027520,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+{"http_async_sample":{"received":134217728,"heap_payload":65634,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":14252,"network_reserved":75497554}}
+134217728 bytes actual HTTP async pulls: live payload 65634..65634; handles <= 7; tasks/groups/work <= 3/0/1; retained first task repeatedly awaited
+Actual HTTP Runtime driver, single-worker file producer and activation cleanup passed
+Native HTTP/1.1/TLS, streaming, decoding, policy and backpressure checks passed

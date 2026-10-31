@@ -5,6 +5,8 @@
 #include "void/temporal_ops.hpp"
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
+#include "void/url_ops.hpp"
+#include "void/http_ops.hpp"
 #include "void/os.hpp"
 #include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
@@ -3051,6 +3053,8 @@ class Semantics {
         return e.type=call_arguments(e,target,0);
     }
 #include "filesystem.inc"
+#include "url.inc"
+#include "http.inc"
 #include "os.inc"
 #include "binary_codec.inc"
 #include "stdlib_conversion.inc"
@@ -3067,7 +3071,9 @@ class Semantics {
         return e.type = call_arguments(e, target, 0);
     }
 
-    VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+    // Builtin dispatch returns before ordinary argument recursion, keeping
+    // unrelated adapter temporaries out of every nested user-call frame.
+    VOID_SEMANTIC_HANDLER std::optional<Type> builtin_call_expression(Expr& e) {
         if (e.target == "$collections.version" || e.target == "$collections.check") return e.type;
         if (unit.identity == "/@stdlib/collections.void" && e.qualifier.empty() &&
             (e.token.text == "_collections_version" || e.token.text == "_collections_check")) {
@@ -3106,6 +3112,17 @@ class Semantics {
                     return filesystem_call(e, n, true);
                 }
             }
+        }
+        if (unit.identity == http::source_module && e.qualifier.empty()) {
+            for (unsigned n = 0; n < http::source_operations.size(); ++n) {
+                const auto& contract = http::source_operations[n];
+                if (e.token.text == contract.name) return http_call(e, n, false);
+                if (contract.asynchronous && e.token.text == std::string(contract.name) + "_async") return http_call(e, n, true);
+            }
+        }
+        if (unit.identity == url::source_module && e.qualifier.empty()) {
+            for (unsigned n = 0; n < url::source_operations.size(); ++n)
+                if (e.token.text == url::source_operations[n].name) return url_call(e, n);
         }
 
         if (unit.identity == "/@stdlib/convert.void" && e.qualifier.empty() &&
@@ -3218,6 +3235,10 @@ class Semantics {
         if(e.token.text=="$interpolation" || e.token.text=="$hole")return interpolation_call(e);
         if(e.target.starts_with("$display.") || display_prelude(e))return display_call(e);
         if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
+        return std::nullopt;
+    }
+    VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if (auto builtin = builtin_call_expression(e)) return *builtin;
         if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text)) {
             if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Type parameters are not generic constructors.");
             if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
@@ -3931,6 +3952,8 @@ class Lowering {
             i.op == ir::Op::collection_append ||
             i.op == ir::Op::collection_finish ||
             i.op == ir::Op::os_query ||
+            i.op == ir::Op::url_native ||
+            i.op == ir::Op::http_native || i.op == ir::Op::http_async || i.op == ir::Op::http_control ||
             i.op == ir::Op::filesystem_native ||
             i.op == ir::Op::filesystem_async ||
             i.op == ir::Op::filesystem_control ||
@@ -4413,6 +4436,26 @@ class Lowering {
                 operation.type = e.type;
                 operation.immediate = std::stoul(e.target.substr(4));
                 for (auto& part : e.parts) operation.arguments.push_back(expression(*part));
+                return emit(operation, e.token);
+            }
+            if (e.target.starts_with("$http.")) {
+                const bool asynchronous = e.target.starts_with("$http.async.");
+                std::vector<unsigned> slots(e.parts.size());
+                for (unsigned n = 0; n < e.parts.size(); ++n)
+                    slots[e.argument_indexes.at(n)] = snapshot(expression(*e.parts[n]), expression_type(*e.parts[n]), e.parts[n]->token);
+                ir::Instruction operation{asynchronous ? ir::Op::http_async : ir::Op::http_native};
+                operation.type = e.type; operation.immediate = std::stoul(e.target.substr(12 - !asynchronous));
+                if (operation.immediate >= static_cast<unsigned>(http::SourceOperation::cleanup_client)) operation.op = ir::Op::http_control;
+                for (auto slot : slots) operation.arguments.push_back(emit({ir::Op::load, slot}, e.token));
+                return emit(operation, e.token);
+            }
+            if (e.target.starts_with("$url.")) {
+                std::vector<unsigned> slots(e.parts.size());
+                for (unsigned n = 0; n < e.parts.size(); ++n)
+                    slots[e.argument_indexes.at(n)] = snapshot(expression(*e.parts[n]), expression_type(*e.parts[n]), e.parts[n]->token);
+                ir::Instruction operation{ir::Op::url_native};
+                operation.type = e.type; operation.immediate = std::stoul(e.target.substr(5));
+                for (auto slot : slots) operation.arguments.push_back(emit({ir::Op::load, slot}, e.token));
                 return emit(operation, e.token);
             }
             if (e.target.starts_with("$io.")) {

@@ -1,0 +1,4 @@
+make  all-am
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libpsl/src'
+make[1]: Nothing to be done for 'all-am'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/libpsl/src'

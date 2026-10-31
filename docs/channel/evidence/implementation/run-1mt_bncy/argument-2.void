@@ -1,0 +1,23 @@
+use channel
+struct callback_frame:
+    value: i64
+var bus = channel.router<i32>()
+var saved: channel.subscription? = null
+var score = 0
+func receive(const amount: i32):
+    var frame = callback_frame(value = amount as i64)
+    score += amount
+func exercise(command: i32) -> i32:
+    if command == 0:
+        saved = bus.subscribe("score", receive)
+    else if command == 2:
+        if saved is Ok(var token):
+            bus.unsubscribe(token)
+    else if command == 3:
+        bus.clear()
+    else:
+        bus.emit("score", 1)
+    return score
+func main():
+    exercise(0)
+    print(exercise(1))

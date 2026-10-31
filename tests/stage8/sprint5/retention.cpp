@@ -20,11 +20,18 @@
 #undef vd_async_new
 #undef vd_async_root
 namespace {
-struct Shape {std::size_t frame,task;};
+struct Shape {std::size_t frame,task,frame_references;};
 std::map<vd_async_resume_entry,Shape> shapes;
 std::size_t frame_allocations=0,frame_allocated_bytes=0;
 std::string label,mode;
 vd::Jit* jit_owner=nullptr;
+template<class T> std::size_t container_capacity(const T& value) {
+    if constexpr (requires { value.capacity(); }) return value.capacity();
+    else return value.size();
+}
+template<class T> void settle_native_records(T& executor) {
+    if constexpr (requires { executor.sweep_completed(); }) executor.sweep_completed();
+}
 void require(bool condition,const char* message){if(!condition)throw std::runtime_error(message);}
 std::size_t rss(){
 #if defined(__linux__)
@@ -34,15 +41,29 @@ std::size_t rss(){
 #endif
 }
 void sample(const char* phase,int batch,bool collect){
-    auto& runtime=vd::Runtime::current();if(collect)require(runtime.collect()==vd::Runtime::Collection::completed,"retention collection failed");
+    auto& runtime=vd::Runtime::current();if(collect){
+        require(runtime.collect()==vd::Runtime::Collection::completed,"retention collection failed");
+        // Observe the collector plus the same native bookkeeping maintenance
+        // used at executor checkpoints, rather than the interval before it.
+        if(active)settle_native_records(*active);
+    }
     std::size_t tasks=0,finished=0,frames=0,frame_bytes=0,work=0,task_bytes=0;
-    if(active)for(const auto& task:active->tasks){++tasks;task_bytes+=shapes.at(task->resume).task;finished+=task->state==Task::finished;if(task->frame.get()){++frames;frame_bytes+=shapes.at(task->resume).frame;}work+=bool(task->work);}
+    std::size_t rooted_results=0,rooted_result_bytes=0,frame_references=0,max_result_bytes=0;
+    if(active)for(const auto& task:active->tasks){
+        const auto& shape=shapes.at(task->resume);
+        ++tasks;task_bytes+=shape.task;max_result_bytes=std::max(max_result_bytes,shape.task);
+        finished+=task->state==Task::finished;
+        if(task->task.get()){++rooted_results;rooted_result_bytes+=shape.task;}
+        if(task->frame.get()){++frames;frame_bytes+=shape.frame;frame_references+=shape.frame_references;}
+        work+=bool(task->work);
+    }
     const auto memory=runtime.memory_snapshot();auto lease=vd::NativeCode::active_lease();
     std::cout<<"{\"variant\":\""<<VOID_RETENTION_VARIANT<<"\",\"mode\":\""<<mode<<"\",\"workload\":\""<<label<<"\",\"phase\":\""<<phase<<"\",\"batch\":"<<batch
-     <<",\"tasks\":"<<tasks<<",\"completed_records\":"<<finished<<",\"record_bytes\":"<<tasks*sizeof(Task)<<",\"task_capacity\":"<<(active?active->tasks.capacity():0)
-     <<",\"groups\":"<<(active?active->groups.size():0)<<",\"group_capacity\":"<<(active?active->groups.capacity():0)<<",\"worker_records\":"<<work
+     <<",\"tasks\":"<<tasks<<",\"completed_records\":"<<finished<<",\"record_bytes\":"<<tasks*sizeof(Task)<<",\"task_capacity\":"<<(active?container_capacity(active->tasks):0)
+     <<",\"groups\":"<<(active?active->groups.size():0)<<",\"group_capacity\":"<<(active?container_capacity(active->groups):0)<<",\"worker_records\":"<<work
      <<",\"rooted_frames\":"<<frames<<",\"rooted_frame_bytes\":"<<frame_bytes<<",\"frame_allocations\":"<<frame_allocations<<",\"frame_allocated_bytes\":"<<frame_allocated_bytes
      <<",\"task_payload_bytes\":"<<task_bytes<<",\"worker_record_bytes\":"<<work*sizeof(Task::Work)<<",\"group_record_bytes\":"<<(active?active->groups.size()*sizeof(Group):0)<<",\"native_heap_execution_frames\":0,\"objects\":"<<memory.heap.objects<<",\"payload_bytes\":"<<memory.heap.payload_bytes<<",\"heap_buckets\":"<<memory.heap.buckets
+     <<",\"rooted_task_results\":"<<rooted_results<<",\"rooted_task_payload_bytes\":"<<rooted_result_bytes<<",\"rooted_frame_references\":"<<frame_references<<",\"max_task_result_bytes\":"<<max_result_bytes
      <<",\"nominal_types\":"<<memory.types<<",\"schemas\":"<<memory.schemas<<",\"witnesses\":"<<memory.witnesses<<",\"persistent_handles\":"<<memory.handles
      <<",\"handle_capacity\":"<<memory.handle_capacity<<",\"participants\":"<<memory.participants<<",\"callbacks\":"<<memory.callbacks
      <<",\"generations\":"<<(jit_owner?jit_owner->live_generations():0)<<",\"active_lease_refs_including_observer\":"<<lease.use_count()<<",\"rss\":"<<rss()<<"}\n";
@@ -51,7 +72,7 @@ void marker(std::int32_t value){if(value>=0){sample("awaited",value,false);sampl
 }
 extern "C" void vd_async_new(void** task,void** frame,std::size_t size,const std::size_t* offsets,std::size_t count,std::size_t task_size,const std::size_t* task_offsets,std::size_t task_count,const char* key,const void* generation,vd_async_resume_entry resume,vd::RuntimeFailure* failure,std::int32_t worker) noexcept {
     measured_async_new(task,frame,size,offsets,count,task_size,task_offsets,task_count,key,generation,resume,failure,worker);
-    if(!failure->message){try{shapes[resume]={size,task_size};++frame_allocations;frame_allocated_bytes+=size;}catch(...){std::terminate();}}
+    if(!failure->message){try{shapes[resume]={size,task_size,count};++frame_allocations;frame_allocated_bytes+=size;}catch(...){std::terminate();}}
 }
 extern "C" std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::size_t offset,const void* generation,vd::RuntimeFailure* failure) noexcept {
     auto result=measured_async_root(start,input,offset,generation,failure);

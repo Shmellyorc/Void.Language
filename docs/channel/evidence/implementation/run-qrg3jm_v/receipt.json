@@ -1,0 +1,13 @@
+{
+  "args": [
+    "/tmp/VOID-channel-execution-q4goaxkg/app"
+  ],
+  "cwd": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+  "status": 0,
+  "seconds": 0.08789091799553717,
+  "hard_stack_bytes": null,
+  "configured_standard_library": null,
+  "executable_sha256": "66d8e20e3712e9e72afe5b869b324097e5478fcbe005a656a3f8d79cc4a13b4b",
+  "object_hashes": {},
+  "output_hashes": {}
+}

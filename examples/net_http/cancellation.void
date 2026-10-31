@@ -1,0 +1,18 @@
+use net/http
+use os
+
+async func cancel_request(base: string) -> result<i32, http.error>:
+    with http.open_client()? as owner:
+        var pending = owner.get_async(base + "/slow")
+        # Give the request a scheduler turn before cancelling its task.
+        var barrier = (await owner.get_async(base + "/plain"))?
+        pending.cancel()
+        # Cancellation propagates to the host; it is not an HTTP error result.
+        var reply = await pending
+    return Ok(1)
+
+async func entry(input: i32) -> i32:
+    if os.env("VOID_HTTP_URL") is Ok(var base):
+        if (await cancel_request(base)) is Err(var failure):
+            print("HTTP {failure.kind}")
+    return 1

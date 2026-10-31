@@ -1,0 +1,7 @@
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ENABLE_SHARED_LIB
+    ENABLE_STATIC_LIB
+
+

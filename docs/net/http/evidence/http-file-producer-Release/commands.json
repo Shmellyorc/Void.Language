@@ -1,0 +1,171 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_native",
+    "http://127.0.0.1:41191",
+    "https://127.0.0.1:42041",
+    "/tmp/VOID HTTP native 3_v_kmdc/cert.pem",
+    "https://127.0.0.1:36903",
+    "https://127.0.0.1:34443",
+    "/tmp/VOID HTTP native 3_v_kmdc/cert.pem",
+    "/tmp/VOID HTTP native 3_v_kmdc/key.pem",
+    "/tmp/VOID HTTP native 3_v_kmdc/identity.p12",
+    "/tmp/VOID HTTP native 3_v_kmdc",
+    "http://127.0.0.1:38605",
+    "https://127.0.0.1:33747",
+    "54177"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 3.632406220000121,
+  "binary_sha256": "fed5fed3b74774935e35243e375a230db2a3aee5418ce660b1aa259965089255",
+  "source_sha256": {
+    "src/runtime/http.cpp": "7c5250c6ad624fcdccf77ff4b76aa712f84cb1a584ff11666d6877b2151a7b4e",
+    "src/runtime/http_bulk.cpp": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+    "src/runtime/http_resource.cpp": "d0367326f4f9ba2680a9619062b9ff12f595166c8751da1fb60aa7aa3907397e",
+    "include/void/http.hpp": "b574c78dcdebd2431c90eb213c74caa40a7a5e82371fe3f072c7060a6e85b70d",
+    "tests/net/http/native.cpp": "df3b56caa6c299a21dc140ea06f15d835d3016bb2b290ed23dd295ad93b9d0e6",
+    "tests/net/http/runtime.cpp": "40113ccd82f952957cf539ad470de0f6d76fdcbe7b2e65ea7382fee877625171",
+    "tests/net/http/fixture.py": "b5ee4b711de629a286889e64b3ab8cff27ccd6e0057e078ada772ba4efb501e8",
+    "third_party/curl/VOID-PROVENANCE.json": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+    "third_party/http-versions.json": "7fc3a353dbaadbaa93b8d02aa94da02187320e952f27c2c07261998b8c24707f"
+  },
+  "soft_hard_stack_bytes": [
+    8388608,
+    -1
+  ],
+  "certificate_tool": {
+    "path": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+    "sha256": "80132a61279db2ae6532997654f5c6fb576df61ce239a9da1cebecfdc7173aa2"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  },
+  "http2_fixture": true,
+  "socks_address_types": [
+    1,
+    3
+  ],
+  "async_pull_bytes": 134217728,
+  "runtime_samples": [
+    {
+      "received": 15990784,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 32020480,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 48050176,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 64074752,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 80104448,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 96134144,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 112163840,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 128188416,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 134217728,
+      "heap_payload": 32866,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 13948,
+      "network_reserved": 75497554
+    }
+  ],
+  "proxy_digest_events": [
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:41191/plain",
+      "digest_uri": "/plain",
+      "valid": true
+    },
+    {
+      "method": "CONNECT",
+      "request_target": "127.0.0.1:42041",
+      "digest_uri": "127.0.0.1:42041",
+      "valid": true
+    },
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:41191/plain",
+      "digest_uri": "/plain",
+      "valid": false
+    },
+    {
+      "method": "CONNECT",
+      "request_target": "127.0.0.1:42041",
+      "digest_uri": "127.0.0.1:42041",
+      "valid": false
+    }
+  ],
+  "required_h2_incompatible_requests": [],
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

@@ -1,0 +1,26 @@
+/tmp/VOID HTTP rejection k95hqno7/readonly_client.void:3:11: error: A call may mutate readonly reference leaf 'client'.
+    code: VOID2007
+
+ 3 |     owner.close()
+   |           ^^^^^
+    Module: /readonly_client.void
+    Reference type declared here. at /home/shmellyorc/Documents/Void.Language/stdlib/net/http.void:251:8
+
+ 251 | struct client:
+     |        ^^^^^^
+    Module: /@stdlib/net/http.void
+    Reference authority enters this declaration here. at /home/shmellyorc/Documents/Void.Language/stdlib/net/http.void:811:7
+
+ 811 | func (self client) close() -> result<bool, error>:
+     |       ^^^^
+    Module: /@stdlib/net/http.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+
+/tmp/VOID HTTP rejection k95hqno7/readonly_client.void:3:11: error: Cannot call a mutating method through readonly receiver storage.
+    code: VOID2007
+
+ 3 |     owner.close()
+   |           ^^^^^
+    Module: /readonly_client.void
+    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.
+

@@ -1,0 +1,2 @@
+128 MiB logical pulls: post-GC payload 1048640..1048640, persistent handles <= 2; native Task records remain root-owned
+external native completion: ten lifecycle cases and pre-wait shutdown passed

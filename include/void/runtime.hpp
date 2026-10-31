@@ -26,6 +26,8 @@ class CallbackRegistration;
 // These are runtime embedding interfaces, not source-language thread features.
 struct NativeDictionary {const NativeArrayElement* entry;const NativeArrayElement* key;std::size_t value_offset,hash_offset;};
 class NativeLibrary;
+class NativeWorkers;
+struct NativeWake;
 class Runtime {
 public:
     enum class State { native_safe, managed, parked };
@@ -163,8 +165,10 @@ public:
 private:
     friend class CallbackRegistration;
     friend class NativeLibrary;
+    friend class NativeWorkers;
     friend std::error_code native_shutdown(Runtime&);
     std::shared_ptr<NativeLibrary> native_library_;
+    std::shared_ptr<NativeWorkers> native_workers_;
     std::shared_ptr<console::Context> console_context_;
     unsigned async_worker_limit_ = 4;
     static std::int64_t next_clock_identity();

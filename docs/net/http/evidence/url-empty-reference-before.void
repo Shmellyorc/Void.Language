@@ -1,0 +1,4 @@
+use url
+if url.resolve("https://example.com/a?old#old", "") is Ok(var parsed):
+    print(parsed.to_string())
+return 0

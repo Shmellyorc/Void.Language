@@ -1,0 +1,9 @@
+{"h2_paused_sample":{"sample":0,"rss_kib":706048,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":706064,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":706072,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":706080,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":706084,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":5,"rss_kib":706088,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":6,"rss_kib":706092,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":7,"rss_kib":706100,"live_native_bytes":69112759,"network_reserved":71303366,"decoded_queued":196608}}
+Three paused 32 MiB h2 responses and a fast sibling: RSS 556684..787348 KiB; live requested native allocations 1227131..102577479 bytes; one connection, actual HTTP/2

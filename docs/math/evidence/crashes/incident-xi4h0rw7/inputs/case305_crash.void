@@ -1,0 +1,4 @@
+use math
+use math as m
+func main():
+    var a = math.atan2(x = 1.0, wrong = 2.0)

@@ -1,0 +1,14 @@
+{"h2_paused_sample":{"sample":0,"rss_kib":708480,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":708496,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":708496,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":708500,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":708500,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":5,"rss_kib":708500,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":6,"rss_kib":708500,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":7,"rss_kib":708508,"live_native_bytes":69112748,"network_reserved":71303366,"decoded_queued":196608}}
+{"h2_resume_sample":{"round":0,"rss_kib":788636,"live_native_bytes":102577468}}
+{"h2_resume_sample":{"round":1,"rss_kib":789052,"live_native_bytes":102577468}}
+{"h2_resume_sample":{"round":2,"rss_kib":789496,"live_native_bytes":102577468}}
+{"h2_resume_sample":{"round":3,"rss_kib":789096,"live_native_bytes":102577468}}
+{"h2_resume_sample":{"round":4,"rss_kib":789332,"live_native_bytes":102577468}}
+Three paused 512 MiB h2 responses and fast siblings: RSS 564296..789496 KiB; live requested native allocations 1227131..102577468 bytes; one connection, actual HTTP/2

@@ -1,0 +1,8 @@
+/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c:15:5: runtime error: call to function typed_callback through pointer to incorrect function type 'void (*)(void *)'
+/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c:5: note: typed_callback defined here
+    #0 0x55d6ee4b2996 in main /home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c:15:5
+    #1 0x7fae0fa2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #2 0x7fae0fa2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #3 0x55d6ee3c2354 in _start (/home/shmellyorc/Documents/Void.Language/build/http-callback-controls/llvm23-c11-O2+0x2d354)
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/callback_type_probe.c:15:5 

@@ -1,0 +1,76 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP source owlxtgkp/sync.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP source owlxtgkp/sync.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP source owlxtgkp/sync.void",
+      "-o",
+      "/tmp/VOID HTTP source owlxtgkp/native-False"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source owlxtgkp/native-False"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP source owlxtgkp/sync.void",
+      "--no-opt"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/tmp/VOID HTTP source owlxtgkp/sync.void",
+      "-o",
+      "/tmp/VOID HTTP source owlxtgkp/native-True",
+      "--no-opt"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source owlxtgkp/native-True"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP source owlxtgkp/async.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_source_runner",
+      "--async",
+      "/tmp/VOID HTTP source owlxtgkp/async.void"
+    ],
+    "exit_code": 0
+  }
+]

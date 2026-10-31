@@ -1,0 +1,7 @@
+/tmp/VOID-collections-negative-0ihuake3/map-destination-only.void:31:27: error: Cannot infer generic parameter 'u'; supply explicit type arguments.
+    code: VOID2001
+
+ 31 |     var output: [i32] = c.map([1], func(const value: i32) -> i32:
+    |                           ^^^
+    Module: /map-destination-only.void
+

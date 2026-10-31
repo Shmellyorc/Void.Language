@@ -30,6 +30,8 @@ bool vd_async_drain(void*,vd::RuntimeFailure*) noexcept;
 namespace vd {
 const void* async_execution_context() noexcept;
 bool async_context_descends_from(const void*) noexcept;
+struct AsyncSnapshot { std::size_t tasks, groups, work; };
+AsyncSnapshot async_snapshot(); // private owner-side observation; no source API
 
 // Private native jobs share the source-worker pool. execute/abandon run in
 // NativeSafe state and must use only owned native memory. publish runs on the
@@ -45,6 +47,42 @@ public:
     virtual void commit() noexcept {}
 };
 
+// Private externally driven native completion. The ticket owns only native
+// completion/notification state, never a Task, Scope, Runtime or managed pointer.
+// complete() may run on a provider thread only after all access to its result
+// and callbacks has quiesced. Exactly one call wins; later calls return false,
+// including calls made after the root adapter has drained.
+class NativeCompletion {
+public:
+    struct State;
+    explicit NativeCompletion(std::shared_ptr<State> state) : state_(std::move(state)) {}
+    static NativeCompletion pending(std::shared_ptr<NativeWake>);
+    bool ready() const noexcept;
+    bool complete(const RuntimeFailure& = {}) const noexcept;
+    bool cancellation_requested() const noexcept;
+private:
+    std::shared_ptr<State> state_;
+};
+
+// start/cancel/abandon_external only signal owned native provider state. They
+// must not block the executor, allocate managed objects or invoke source code.
+// Provider admission/lifetime remains owned by the Runtime native-resource
+// ledger, including pre-wait shutdown notification and native-job accounting.
+class ExternalNativeJob : public NativeJob {
+public:
+    virtual void start(NativeCompletion) noexcept = 0;
+    virtual void cancel() noexcept = 0;
+    virtual void abandon_external(NativeCompletion) noexcept = 0;
+private:
+    void execute(const std::atomic<bool>&, RuntimeFailure*) noexcept final;
+};
+
 void async_submit_native(void**, const TypeLayout&, const void*,
                          std::shared_ptr<NativeJob>);
+// activation_lifetime associates an immediately acquired streaming resource
+// with the current activation/group: even normal scope exit cancels and drains
+// its private lifetime job. No task handle is exposed by the source factory.
+void async_submit_external(void**, const TypeLayout&, const void*,
+                           std::shared_ptr<ExternalNativeJob>,
+                           bool activation_lifetime = false);
 }

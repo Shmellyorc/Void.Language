@@ -1,0 +1,6029 @@
+{
+  "scope": "Registered test coverage from the original consolidated runs plus the named focused reruns; not a single fresh all-tests run or full HTTP acceptance",
+  "profiles": {
+    "release": {
+      "registered_tests": 389,
+      "latest_available_passes": 389,
+      "missing": [],
+      "failed": [],
+      "ordered_runs": [
+        {
+          "log": "http-consolidated-tests-release.log",
+          "sha256": "5b9ade6030fffe2ac1ef9c15290da9432aa6bda8e84bc5c45cb51e5bce7919b0",
+          "total": 387,
+          "passed": 382,
+          "failed": 5
+        },
+        {
+          "log": "http-final-tests-release.log",
+          "sha256": "8872e15ea6be1c0ac407db118fcf1c818c3de8313c6eee6b91110edabba59d5b",
+          "total": 25,
+          "passed": 25,
+          "failed": 0
+        },
+        {
+          "log": "http-reaping-final-tests-release.log",
+          "sha256": "ba493ea7a91d546e6b0c4cc30ac211dd1415a726c7fafcfa310acf0e2fbad5a8",
+          "total": 79,
+          "passed": 79,
+          "failed": 0
+        },
+        {
+          "log": "http-reload-owner-tests-release.log",
+          "sha256": "5da44ea126a0701f27d7cfcc515b58ab4cfa85cbcd7efee3e64983fd6fb583a3",
+          "total": 1,
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "log": "http-frontend-final-tests-release.log",
+          "sha256": "22df479e31423d13087dabc37accda9ab0d0e6e37f2fc28e3a76c58414ea8da0",
+          "total": 92,
+          "passed": 92,
+          "failed": 0
+        },
+        {
+          "log": "http-dns-port-final-release.log",
+          "sha256": "6d1b91523bad794893a7861fe07a687de1010ec016e342cb6fad50d8651e71a1",
+          "total": 1,
+          "passed": 1,
+          "failed": 0
+        },
+        {
+          "log": "http-frontend-channel-final-release.log",
+          "sha256": "002f83f96f31bd4776d95e70f99249d7cbe55bd19629a5a617d8552e05c8bb15",
+          "total": 1,
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "latest_result_per_test": {
+        "http_native": {
+          "result": "Passed",
+          "seconds": 17.73,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_tls_memory": {
+          "result": "Passed",
+          "seconds": 47.76,
+          "log": "http-final-tests-release.log"
+        },
+        "http_reload": {
+          "result": "Passed",
+          "seconds": 21.79,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_timeouts": {
+          "result": "Passed",
+          "seconds": 1.93,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_wire": {
+          "result": "Passed",
+          "seconds": 1.19,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_dns": {
+          "result": "Passed",
+          "seconds": 1.69,
+          "log": "http-dns-port-final-release.log"
+        },
+        "url_native": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_examples": {
+          "result": "Passed",
+          "seconds": 48.98,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_install": {
+          "result": "Passed",
+          "seconds": 46.22,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_bulk": {
+          "result": "Passed",
+          "seconds": 8.87,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_ir": {
+          "result": "Passed",
+          "seconds": 2.65,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_source": {
+          "result": "Passed",
+          "seconds": 46.21,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_source_negative": {
+          "result": "Passed",
+          "seconds": 0.86,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_source_faults": {
+          "result": "Passed",
+          "seconds": 220.51,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "url_ir": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "url_source": {
+          "result": "Passed",
+          "seconds": 2.5,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "url_lsp": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "http_lsp": {
+          "result": "Passed",
+          "seconds": 1.77,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "toolchain_stop_token": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_operator_reload": {
+          "result": "Passed",
+          "seconds": 18.28,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_operator_keys": {
+          "result": "Passed",
+          "seconds": 0.34,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_operator_resolution": {
+          "result": "Passed",
+          "seconds": 1.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "stage10_operator_declarations": {
+          "result": "Passed",
+          "seconds": 0.59,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_source_formatting": {
+          "result": "Passed",
+          "seconds": 0.4,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_tooling": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_display_reload": {
+          "result": "Passed",
+          "seconds": 1.63,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_temporal_ir": {
+          "result": "Passed",
+          "seconds": 1.7,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "format_temporal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_hooks": {
+          "result": "Passed",
+          "seconds": 1.84,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_interpolation": {
+          "result": "Passed",
+          "seconds": 0.65,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_conversion": {
+          "result": "Passed",
+          "seconds": 81.85,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_fields": {
+          "result": "Passed",
+          "seconds": 0.38,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "format_numeric": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "format_zones": {
+          "result": "Passed",
+          "seconds": 0.25,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_readonly": {
+          "result": "Passed",
+          "seconds": 3.58,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_dynamic": {
+          "result": "Passed",
+          "seconds": 7.95,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_numbers": {
+          "result": "Passed",
+          "seconds": 11.5,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_schema": {
+          "result": "Passed",
+          "seconds": 13.92,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_bounds": {
+          "result": "Passed",
+          "seconds": 18.58,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_install": {
+          "result": "Passed",
+          "seconds": 17.66,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_adversarial": {
+          "result": "Passed",
+          "seconds": 23.51,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_metering": {
+          "result": "Passed",
+          "seconds": 16.5,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_validated": {
+          "result": "Passed",
+          "seconds": 10.09,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_accessors": {
+          "result": "Passed",
+          "seconds": 8.33,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_dynamic_smoke": {
+          "result": "Passed",
+          "seconds": 6.68,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_typed_smoke": {
+          "result": "Passed",
+          "seconds": 19.55,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_shapes": {
+          "result": "Passed",
+          "seconds": 27.32,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_ownership": {
+          "result": "Passed",
+          "seconds": 10.8,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_execution_nested_inference": {
+          "result": "Passed",
+          "seconds": 10.6,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_stress_fixed": {
+          "result": "Passed",
+          "seconds": 31.95,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_stress_wide": {
+          "result": "Passed",
+          "seconds": 24.33,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_host": {
+          "result": "Passed",
+          "seconds": 61.5,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_preservation": {
+          "result": "Passed",
+          "seconds": 1.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "json_lsp": {
+          "result": "Passed",
+          "seconds": 0.9,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "application_workflow_stage9": {
+          "result": "Passed",
+          "seconds": 4.73,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_output_paths_ci88": {
+          "result": "Passed",
+          "seconds": 0.96,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "long_physical_paths_ci89": {
+          "result": "Passed",
+          "seconds": 0.86,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "gc_buffers": {
+          "result": "Passed",
+          "seconds": 0.84,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "gc_schemas": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "arrays_foundation": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_endpoints": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_transfers": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_native_transfers": {
+          "result": "Passed",
+          "seconds": 0.24,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_keyboard": {
+          "result": "Passed",
+          "seconds": 0.0,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_terminal": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_native_keyboard": {
+          "result": "Passed",
+          "seconds": 0.14,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_native_terminal": {
+          "result": "Passed",
+          "seconds": 0.73,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_wide": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_input": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_console_native_input": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_coordination": {
+          "result": "Passed",
+          "seconds": 2.45,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "runtime_generated": {
+          "result": "Passed",
+          "seconds": 0.75,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "fixed_arrays_source": {
+          "result": "Passed",
+          "seconds": 1.81,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "growable_arrays_source": {
+          "result": "Passed",
+          "seconds": 1.52,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "arrays_source": {
+          "result": "Passed",
+          "seconds": 2.75,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "generics_source": {
+          "result": "Passed",
+          "seconds": 2.14,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "generics_hint_execution": {
+          "result": "Passed",
+          "seconds": 4.35,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "generics_hint_lsp": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_source": {
+          "result": "Passed",
+          "seconds": 7.11,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "dictionaries_source": {
+          "result": "Passed",
+          "seconds": 5.39,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "properties_source": {
+          "result": "Passed",
+          "seconds": 2.08,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "patterns_source": {
+          "result": "Passed",
+          "seconds": 5.38,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "debug_cache": {
+          "result": "Passed",
+          "seconds": 1.21,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "debug_cache_processes": {
+          "result": "Passed",
+          "seconds": 2.47,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "automatic_cache_processes": {
+          "result": "Passed",
+          "seconds": 0.49,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "advanced_source": {
+          "result": "Passed",
+          "seconds": 3.0,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "fixed_arrays_cli": {
+          "result": "Passed",
+          "seconds": 2.47,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "growable_arrays_cli": {
+          "result": "Passed",
+          "seconds": 3.07,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "arrays_cli": {
+          "result": "Passed",
+          "seconds": 4.29,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "generics_cli": {
+          "result": "Passed",
+          "seconds": 2.13,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_cli": {
+          "result": "Passed",
+          "seconds": 5.08,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "dictionaries_cli": {
+          "result": "Passed",
+          "seconds": 2.8,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "properties_cli": {
+          "result": "Passed",
+          "seconds": 3.86,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "patterns_cli": {
+          "result": "Passed",
+          "seconds": 2.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "advanced_cli": {
+          "result": "Passed",
+          "seconds": 5.43,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_source": {
+          "result": "Passed",
+          "seconds": 1.17,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_cli": {
+          "result": "Passed",
+          "seconds": 0.94,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_initialization_source": {
+          "result": "Passed",
+          "seconds": 3.36,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_initialization_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_initialization_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "managed_initialization_cli": {
+          "result": "Passed",
+          "seconds": 1.29,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "reference_values_source": {
+          "result": "Passed",
+          "seconds": 1.27,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "reference_values_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "reference_values_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "reference_values_cli": {
+          "result": "Passed",
+          "seconds": 1.82,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "composition_source": {
+          "result": "Passed",
+          "seconds": 1.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "composition_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "composition_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "composition_cli": {
+          "result": "Passed",
+          "seconds": 1.07,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "inheritance_source": {
+          "result": "Passed",
+          "seconds": 1.35,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "inheritance_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "inheritance_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "inheritance_cli": {
+          "result": "Passed",
+          "seconds": 1.53,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "interfaces_source": {
+          "result": "Passed",
+          "seconds": 2.12,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "interfaces_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "interfaces_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "interfaces_cli": {
+          "result": "Passed",
+          "seconds": 1.32,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "strings_source": {
+          "result": "Passed",
+          "seconds": 1.57,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "strings_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "strings_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "strings_cli": {
+          "result": "Passed",
+          "seconds": 0.72,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_callbacks": {
+          "result": "Passed",
+          "seconds": 0.45,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_failures": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "runtime_invariants": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_positions": {
+          "result": "Passed",
+          "seconds": 0.0,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_protocol": {
+          "result": "Passed",
+          "seconds": 0.41,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage11_globals": {
+          "result": "Passed",
+          "seconds": 0.14,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage8": {
+          "result": "Passed",
+          "seconds": 0.45,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "documentation_execution": {
+          "result": "Passed",
+          "seconds": 0.86,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_documentation": {
+          "result": "Passed",
+          "seconds": 0.19,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_host": {
+          "result": "Passed",
+          "seconds": 0.85,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_ir": {
+          "result": "Passed",
+          "seconds": 0.29,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_execution": {
+          "result": "Passed",
+          "seconds": 17.8,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_frontend": {
+          "result": "Passed",
+          "seconds": 9.93,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "math_errors": {
+          "result": "Passed",
+          "seconds": 5.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_worker": {
+          "result": "Passed",
+          "seconds": 1.36,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_math": {
+          "result": "Passed",
+          "seconds": 0.38,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_install": {
+          "result": "Passed",
+          "seconds": 1.12,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_preservation": {
+          "result": "Passed",
+          "seconds": 0.99,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_stack": {
+          "result": "Passed",
+          "seconds": 17.71,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "math_frontend_stack": {
+          "result": "Passed",
+          "seconds": 10.32,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "os_execution": {
+          "result": "Passed",
+          "seconds": 21.51,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_stack": {
+          "result": "Passed",
+          "seconds": 22.21,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_edges": {
+          "result": "Passed",
+          "seconds": 3.08,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_edges_stack": {
+          "result": "Passed",
+          "seconds": 3.08,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_host": {
+          "result": "Passed",
+          "seconds": 5.12,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_errors": {
+          "result": "Passed",
+          "seconds": 4.38,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_frontend": {
+          "result": "Passed",
+          "seconds": 4.85,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "lsp_os": {
+          "result": "Passed",
+          "seconds": 1.22,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_cache": {
+          "result": "Passed",
+          "seconds": 3.27,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_owner": {
+          "result": "Passed",
+          "seconds": 11.16,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_examples": {
+          "result": "Passed",
+          "seconds": 3.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_install": {
+          "result": "Passed",
+          "seconds": 10.28,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "os_frontend_stack": {
+          "result": "Passed",
+          "seconds": 4.86,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "os_host_stack": {
+          "result": "Passed",
+          "seconds": 4.46,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_host": {
+          "result": "Passed",
+          "seconds": 19.81,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_execution": {
+          "result": "Passed",
+          "seconds": 21.56,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_frontend": {
+          "result": "Passed",
+          "seconds": 5.32,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "lsp_random": {
+          "result": "Passed",
+          "seconds": 0.87,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_install": {
+          "result": "Passed",
+          "seconds": 2.98,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_errors": {
+          "result": "Passed",
+          "seconds": 5.22,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_preservation": {
+          "result": "Passed",
+          "seconds": 0.33,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_worker": {
+          "result": "Passed",
+          "seconds": 3.45,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_reference": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_stack": {
+          "result": "Passed",
+          "seconds": 21.7,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "random_frontend_stack": {
+          "result": "Passed",
+          "seconds": 5.65,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "binary_execution": {
+          "result": "Passed",
+          "seconds": 11.58,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_binary": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "binary_ownership": {
+          "result": "Passed",
+          "seconds": 0.39,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "binary_stack": {
+          "result": "Passed",
+          "seconds": 0.69,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_const_recovery": {
+          "result": "Passed",
+          "seconds": 0.76,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_const_recovery_stack": {
+          "result": "Passed",
+          "seconds": 0.84,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "combined_ownership": {
+          "result": "Passed",
+          "seconds": 5.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "combined_async_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "combined_async_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "combined_execution": {
+          "result": "Passed",
+          "seconds": 15.58,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_combined": {
+          "result": "Passed",
+          "seconds": 1.07,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "combined_stack": {
+          "result": "Passed",
+          "seconds": 17.85,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "memory_execution": {
+          "result": "Passed",
+          "seconds": 36.56,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_memory": {
+          "result": "Passed",
+          "seconds": 0.38,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_text": {
+          "result": "Passed",
+          "seconds": 2.69,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_hex": {
+          "result": "Passed",
+          "seconds": 1.19,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_base64": {
+          "result": "Passed",
+          "seconds": 1.72,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_ascii": {
+          "result": "Passed",
+          "seconds": 1.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_oracles": {
+          "result": "Passed",
+          "seconds": 127.64,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_interop": {
+          "result": "Passed",
+          "seconds": 4.77,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_large": {
+          "result": "Passed",
+          "seconds": 21.25,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_errors": {
+          "result": "Passed",
+          "seconds": 2.95,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_crash_preservation": {
+          "result": "Passed",
+          "seconds": 1.57,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_text_encoding": {
+          "result": "Passed",
+          "seconds": 0.77,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_install": {
+          "result": "Passed",
+          "seconds": 3.75,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_stack": {
+          "result": "Passed",
+          "seconds": 1.76,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_text_encoding_stack": {
+          "result": "Passed",
+          "seconds": 0.67,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_depth": {
+          "result": "Passed",
+          "seconds": 0.14,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_semantic_depth": {
+          "result": "Passed",
+          "seconds": 0.63,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_ir": {
+          "result": "Passed",
+          "seconds": 0.31,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_inventory": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_encoding_ownership": {
+          "result": "Passed",
+          "seconds": 4.43,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "memory_ownership": {
+          "result": "Passed",
+          "seconds": 1.69,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "memory_stack": {
+          "result": "Passed",
+          "seconds": 1.86,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage7": {
+          "result": "Passed",
+          "seconds": 0.27,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_demo": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_operator_compounds": {
+          "result": "Passed",
+          "seconds": 2.43,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage11_globals": {
+          "result": "Passed",
+          "seconds": 0.92,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_native": {
+          "result": "Passed",
+          "seconds": 110.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_execution": {
+          "result": "Passed",
+          "seconds": 73.49,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_frontend": {
+          "result": "Passed",
+          "seconds": 4.27,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "log_files": {
+          "result": "Passed",
+          "seconds": 21.73,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_oracles": {
+          "result": "Passed",
+          "seconds": 40.22,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_cache": {
+          "result": "Passed",
+          "seconds": 13.52,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_install": {
+          "result": "Passed",
+          "seconds": 28.27,
+          "log": "http-final-tests-release.log"
+        },
+        "log_console": {
+          "result": "Passed",
+          "seconds": 24.57,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_log": {
+          "result": "Passed",
+          "seconds": 2.34,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_probe_normal": {
+          "result": "Passed",
+          "seconds": 0.24,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "log_probe_optimized": {
+          "result": "Passed",
+          "seconds": 0.28,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_host": {
+          "result": "Passed",
+          "seconds": 23.69,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_execution": {
+          "result": "Passed",
+          "seconds": 52.24,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_failures": {
+          "result": "Passed",
+          "seconds": 35.9,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_frontend": {
+          "result": "Passed",
+          "seconds": 3.88,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "lsp_collections_stdlib": {
+          "result": "Passed",
+          "seconds": 0.27,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_oracles": {
+          "result": "Passed",
+          "seconds": 11.51,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_install": {
+          "result": "Passed",
+          "seconds": 4.71,
+          "log": "http-final-tests-release.log"
+        },
+        "collections_stdlib_cache": {
+          "result": "Passed",
+          "seconds": 1.14,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_operators": {
+          "result": "Passed",
+          "seconds": 1.11,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "collections_stdlib_stack": {
+          "result": "Passed",
+          "seconds": 54.86,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "channel_host": {
+          "result": "Passed",
+          "seconds": 9.62,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "channel_frontend": {
+          "result": "Passed",
+          "seconds": 2.8,
+          "log": "http-frontend-channel-final-release.log"
+        },
+        "channel_execution": {
+          "result": "Passed",
+          "seconds": 29.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_channel": {
+          "result": "Passed",
+          "seconds": 0.18,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "channel_receiver": {
+          "result": "Passed",
+          "seconds": 1.51,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "channel_stack": {
+          "result": "Passed",
+          "seconds": 29.32,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_console_source": {
+          "result": "Passed",
+          "seconds": 38.73,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_operator_integration": {
+          "result": "Passed",
+          "seconds": 14.84,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_source": {
+          "result": "Passed",
+          "seconds": 2.46,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage6_integrated": {
+          "result": "Passed",
+          "seconds": 3.74,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "stage6_cache_processes": {
+          "result": "Passed",
+          "seconds": 3.88,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "native_aot_main_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_main_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_terminated_nul_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_terminated_nul_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_closed_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_closed_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_duplicate_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_duplicate_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_cleanup_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_cleanup_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_integrated_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_integrated_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_integrated_cancel_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_integrated_cancel_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_integrated_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native_aot_integrated_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_ownership": {
+          "result": "Passed",
+          "seconds": 11.93,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_execution": {
+          "result": "Passed",
+          "seconds": 23.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_crash_preservation": {
+          "result": "Passed",
+          "seconds": 0.29,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_async_execution": {
+          "result": "Passed",
+          "seconds": 18.25,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_wire_normal": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_wire_optimized": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_io": {
+          "result": "Passed",
+          "seconds": 0.88,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_stack": {
+          "result": "Passed",
+          "seconds": 21.48,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_async_stack": {
+          "result": "Passed",
+          "seconds": 17.24,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_io_stack": {
+          "result": "Passed",
+          "seconds": 0.92,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_responsiveness": {
+          "result": "Passed",
+          "seconds": 5.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_close_failure": {
+          "result": "Passed",
+          "seconds": 4.91,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_shutdown": {
+          "result": "Passed",
+          "seconds": 4.66,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_opening_shutdown": {
+          "result": "Passed",
+          "seconds": 5.25,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_whole_shutdown": {
+          "result": "Passed",
+          "seconds": 5.25,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_pending_close": {
+          "result": "Passed",
+          "seconds": 4.95,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_cancelled": {
+          "result": "Passed",
+          "seconds": 4.86,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_probe_normal": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_probe_optimized": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_async_source": {
+          "result": "Passed",
+          "seconds": 6.93,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "io_errors_source": {
+          "result": "Passed",
+          "seconds": 5.77,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_errors_async": {
+          "result": "Passed",
+          "seconds": 6.11,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_examples_install": {
+          "result": "Passed",
+          "seconds": 7.42,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_async_acquisition": {
+          "result": "Passed",
+          "seconds": 0.16,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "io_async_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_async_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_native_jobs": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "native_workers": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_external": {
+          "result": "Passed",
+          "seconds": 0.37,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "io_kernel": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_ir": {
+          "result": "Passed",
+          "seconds": 0.47,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "io_cross_volume": {
+          "result": "Passed",
+          "seconds": 1.24,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "async_source": {
+          "result": "Passed",
+          "seconds": 5.49,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_source": {
+          "result": "Passed",
+          "seconds": 2.72,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_stack": {
+          "result": "Passed",
+          "seconds": 3.17,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_ir": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_parallel": {
+          "result": "Passed",
+          "seconds": 1.43,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_lifecycle": {
+          "result": "Passed",
+          "seconds": 2.26,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_spawn_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_spawn_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_spawn_cancel_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_spawn_cancel_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_spawn_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_spawn_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_activation_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_activation_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_managed_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_managed_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_large_normal": {
+          "result": "Passed",
+          "seconds": 1.45,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_large_optimized": {
+          "result": "Passed",
+          "seconds": 1.64,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_closures_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_closures_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_loops_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_loops_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_values_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_methods_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_methods_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_exits_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_exits_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_cancelled_normal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_cancelled_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_failures_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_failures_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_primary_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_primary_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_resources_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_resources_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_values_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_aot_lifecycle_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_values_normal": {
+          "result": "Passed",
+          "seconds": 0.4,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.38,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_errors_normal": {
+          "result": "Passed",
+          "seconds": 0.26,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_errors_optimized": {
+          "result": "Passed",
+          "seconds": 0.29,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_cancelled_normal": {
+          "result": "Passed",
+          "seconds": 0.17,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_cancelled_optimized": {
+          "result": "Passed",
+          "seconds": 0.2,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.15,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.18,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_spawn_normal": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_syntax_aot_spawn_optimized": {
+          "result": "Passed",
+          "seconds": 0.16,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "lsp_async_syntax": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "core": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "jit": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "reload": {
+          "result": "Passed",
+          "seconds": 0.33,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "gc": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "native": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "sessions_demo": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "tooling_demo": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "sessions": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "tooling": {
+          "result": "Passed",
+          "seconds": 0.26,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "analysis": {
+          "result": "Passed",
+          "seconds": 0.45,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "numeric": {
+          "result": "Passed",
+          "seconds": 1.99,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "frontend": {
+          "result": "Passed",
+          "seconds": 4.61,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "modules": {
+          "result": "Passed",
+          "seconds": 0.83,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "numeric_sprint2": {
+          "result": "Passed",
+          "seconds": 1.31,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "async_retention_sprint5": {
+          "result": "Passed",
+          "seconds": 9.83,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_retention_aot_growth_normal": {
+          "result": "Passed",
+          "seconds": 0.47,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_retention_aot_growth_optimized": {
+          "result": "Passed",
+          "seconds": 0.41,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_retention_aot_workers_normal": {
+          "result": "Passed",
+          "seconds": 0.54,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "async_retention_aot_workers_optimized": {
+          "result": "Passed",
+          "seconds": 0.46,
+          "log": "http-frontend-final-tests-release.log"
+        },
+        "ergonomics_sprint6_host": {
+          "result": "Passed",
+          "seconds": 0.63,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "ergonomics_sprint6": {
+          "result": "Passed",
+          "seconds": 1.46,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_fields_aot": {
+          "result": "Passed",
+          "seconds": 0.39,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_temporal_install": {
+          "result": "Passed",
+          "seconds": 2.65,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_temporal_aot": {
+          "result": "Passed",
+          "seconds": 4.56,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage11_globals_stack": {
+          "result": "Passed",
+          "seconds": 0.36,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage11_globals_aot": {
+          "result": "Passed",
+          "seconds": 4.09,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_console_aot": {
+          "result": "Passed",
+          "seconds": 163.79,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_operators_aot": {
+          "result": "Passed",
+          "seconds": 64.27,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "stage10_conversion_aot": {
+          "result": "Passed",
+          "seconds": 0.48,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_sprint6": {
+          "result": "Passed",
+          "seconds": 0.29,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage10_fields": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage10_display": {
+          "result": "Passed",
+          "seconds": 1.92,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage10_intelligence": {
+          "result": "Passed",
+          "seconds": 0.23,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_stage10_source_formatting": {
+          "result": "Passed",
+          "seconds": 0.3,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "local_libraries": {
+          "result": "Passed",
+          "seconds": 0.38,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_sprint4": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "application_native_sprint4_host": {
+          "result": "Passed",
+          "seconds": 0.46,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "application_native_sprint4": {
+          "result": "Passed",
+          "seconds": 2.28,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "text_collections_sprint3": {
+          "result": "Passed",
+          "seconds": 14.48,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_sprint3": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "lsp_sprint2": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "aot": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "source_cli": {
+          "result": "Passed",
+          "seconds": 2.97,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "value_structs_cli": {
+          "result": "Passed",
+          "seconds": 0.77,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "receiver_methods_cli": {
+          "result": "Passed",
+          "seconds": 1.48,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "initialization_cli": {
+          "result": "Passed",
+          "seconds": 1.68,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "modules_cli": {
+          "result": "Passed",
+          "seconds": 14.95,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "analysis_cli": {
+          "result": "Passed",
+          "seconds": 0.54,
+          "log": "http-consolidated-tests-release.log"
+        },
+        "numeric_cli": {
+          "result": "Passed",
+          "seconds": 14.95,
+          "log": "http-consolidated-tests-release.log"
+        }
+      },
+      "artifacts_sha256": {
+        "voidc": "832658350aec3e037fff09297294200dfbc5139326e6f0009edac4a67a0a774c",
+        "voidls": "89d5998b65534389d10542e8b6f9c1ae6f74afcd04bb2f99d7753d423548b175",
+        "libvoid_runtime.a": "7a8fa8e3fa3ad9758387d9cf5d569bd42d1b095816a310f0c689cf3b050426f0",
+        "curl/lib/libcurl.a": "1526915123669110951425c89d1cf51e218aeb172f413149149094684b2c5837"
+      }
+    },
+    "debug": {
+      "registered_tests": 402,
+      "latest_available_passes": 402,
+      "missing": [],
+      "failed": [],
+      "ordered_runs": [
+        {
+          "log": "http-consolidated-tests-debug.log",
+          "sha256": "a20c28df003e50265ad5dd9fb9a86b1d751a9000ee814701562d9cbaf4041d2f",
+          "total": 400,
+          "passed": 396,
+          "failed": 4
+        },
+        {
+          "log": "http-frontend-stack-tests-debug.log",
+          "sha256": "f5c47d9acafc67271fba0539b6e0bdaf938e728dabd522472462c56b45cb14e2",
+          "total": 2,
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "log": "http-final-tests-debug-repaired.log",
+          "sha256": "26b131d2905ce63d7dcb24f9a30ea33283f55f2d9fcc0010560f46dc836060ae",
+          "total": 105,
+          "passed": 105,
+          "failed": 0
+        },
+        {
+          "log": "http-frontend-channel-final-debug.log",
+          "sha256": "23d11ae6d3885f3debe02aa09c7c63de6d87e0905207452bc693fa93b1bd4303",
+          "total": 1,
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "latest_result_per_test": {
+        "http_native": {
+          "result": "Passed",
+          "seconds": 22.07,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_tls_memory": {
+          "result": "Passed",
+          "seconds": 347.41,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_reload": {
+          "result": "Passed",
+          "seconds": 60.55,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_timeouts": {
+          "result": "Passed",
+          "seconds": 1.96,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_wire": {
+          "result": "Passed",
+          "seconds": 1.23,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_dns": {
+          "result": "Passed",
+          "seconds": 1.24,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "url_native": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_examples": {
+          "result": "Passed",
+          "seconds": 162.84,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_install": {
+          "result": "Passed",
+          "seconds": 145.82,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_bulk": {
+          "result": "Passed",
+          "seconds": 21.65,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_ir": {
+          "result": "Passed",
+          "seconds": 17.79,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_source": {
+          "result": "Passed",
+          "seconds": 138.75,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_source_negative": {
+          "result": "Passed",
+          "seconds": 5.7,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_source_faults": {
+          "result": "Passed",
+          "seconds": 312.4,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "url_ir": {
+          "result": "Passed",
+          "seconds": 0.63,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "url_source": {
+          "result": "Passed",
+          "seconds": 4.71,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "url_lsp": {
+          "result": "Passed",
+          "seconds": 0.22,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "http_lsp": {
+          "result": "Passed",
+          "seconds": 11.19,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "toolchain_stop_token": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_operator_reload": {
+          "result": "Passed",
+          "seconds": 38.97,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_operator_keys": {
+          "result": "Passed",
+          "seconds": 0.99,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_operator_resolution": {
+          "result": "Passed",
+          "seconds": 1.97,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "stage10_operator_declarations": {
+          "result": "Passed",
+          "seconds": 1.65,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_source_formatting": {
+          "result": "Passed",
+          "seconds": 1.51,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_tooling": {
+          "result": "Passed",
+          "seconds": 0.73,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_display_reload": {
+          "result": "Passed",
+          "seconds": 3.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_temporal_ir": {
+          "result": "Passed",
+          "seconds": 3.66,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "format_temporal": {
+          "result": "Passed",
+          "seconds": 0.26,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_hooks": {
+          "result": "Passed",
+          "seconds": 2.64,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_interpolation": {
+          "result": "Passed",
+          "seconds": 1.32,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_conversion": {
+          "result": "Passed",
+          "seconds": 352.91,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_fields": {
+          "result": "Passed",
+          "seconds": 1.0,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "format_numeric": {
+          "result": "Passed",
+          "seconds": 0.87,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "format_zones": {
+          "result": "Passed",
+          "seconds": 5.63,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_readonly": {
+          "result": "Passed",
+          "seconds": 7.74,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_dynamic": {
+          "result": "Passed",
+          "seconds": 19.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_numbers": {
+          "result": "Passed",
+          "seconds": 25.87,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_schema": {
+          "result": "Passed",
+          "seconds": 35.65,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_bounds": {
+          "result": "Passed",
+          "seconds": 38.89,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_install": {
+          "result": "Passed",
+          "seconds": 43.43,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_adversarial": {
+          "result": "Passed",
+          "seconds": 66.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_metering": {
+          "result": "Passed",
+          "seconds": 45.17,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_validated": {
+          "result": "Passed",
+          "seconds": 25.28,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_accessors": {
+          "result": "Passed",
+          "seconds": 20.32,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_dynamic_smoke": {
+          "result": "Passed",
+          "seconds": 17.96,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_typed_smoke": {
+          "result": "Passed",
+          "seconds": 43.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_shapes": {
+          "result": "Passed",
+          "seconds": 64.84,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_ownership": {
+          "result": "Passed",
+          "seconds": 28.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_execution_nested_inference": {
+          "result": "Passed",
+          "seconds": 23.77,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_stress_fixed": {
+          "result": "Passed",
+          "seconds": 331.02,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_stress_wide": {
+          "result": "Passed",
+          "seconds": 58.63,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_host": {
+          "result": "Passed",
+          "seconds": 415.5,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_preservation": {
+          "result": "Passed",
+          "seconds": 1.07,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "json_lsp": {
+          "result": "Passed",
+          "seconds": 6.02,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "application_workflow_stage9": {
+          "result": "Passed",
+          "seconds": 11.51,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_output_paths_ci88": {
+          "result": "Passed",
+          "seconds": 2.55,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "long_physical_paths_ci89": {
+          "result": "Passed",
+          "seconds": 2.23,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "arrays_storage_audit": {
+          "result": "Passed",
+          "seconds": 5.43,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "private_fixed_call_normal_0_2_observed": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_normal_0_2_unobserved": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_normal_3_2_observed": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_normal_3_2_unobserved": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_normal_7_16384_observed": {
+          "result": "Passed",
+          "seconds": 2.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_normal_7_16384_unobserved": {
+          "result": "Passed",
+          "seconds": 1.1,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_optimized_0_2_observed": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_optimized_0_2_unobserved": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_optimized_3_2_observed": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_optimized_3_2_unobserved": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_optimized_7_16384_observed": {
+          "result": "Passed",
+          "seconds": 2.08,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "private_fixed_call_optimized_7_16384_unobserved": {
+          "result": "Passed",
+          "seconds": 1.11,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "gc_buffers": {
+          "result": "Passed",
+          "seconds": 9.71,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "gc_schemas": {
+          "result": "Passed",
+          "seconds": 0.85,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "arrays_foundation": {
+          "result": "Passed",
+          "seconds": 0.27,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_endpoints": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_transfers": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_native_transfers": {
+          "result": "Passed",
+          "seconds": 0.45,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_keyboard": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_terminal": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_native_keyboard": {
+          "result": "Passed",
+          "seconds": 0.16,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_native_terminal": {
+          "result": "Passed",
+          "seconds": 0.74,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_wide": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_input": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_console_native_input": {
+          "result": "Passed",
+          "seconds": 0.15,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_coordination": {
+          "result": "Passed",
+          "seconds": 2.08,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "runtime_generated": {
+          "result": "Passed",
+          "seconds": 1.45,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "fixed_arrays_source": {
+          "result": "Passed",
+          "seconds": 3.21,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "growable_arrays_source": {
+          "result": "Passed",
+          "seconds": 7.83,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "arrays_source": {
+          "result": "Passed",
+          "seconds": 6.93,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "generics_source": {
+          "result": "Passed",
+          "seconds": 5.51,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "generics_hint_execution": {
+          "result": "Passed",
+          "seconds": 8.81,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "generics_hint_lsp": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_source": {
+          "result": "Passed",
+          "seconds": 53.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "dictionaries_source": {
+          "result": "Passed",
+          "seconds": 31.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "properties_source": {
+          "result": "Passed",
+          "seconds": 21.28,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "patterns_source": {
+          "result": "Passed",
+          "seconds": 8.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "debug_cache": {
+          "result": "Passed",
+          "seconds": 2.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "debug_cache_processes": {
+          "result": "Passed",
+          "seconds": 17.37,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "automatic_cache_processes": {
+          "result": "Passed",
+          "seconds": 0.58,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "advanced_source": {
+          "result": "Passed",
+          "seconds": 19.82,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "fixed_arrays_cli": {
+          "result": "Passed",
+          "seconds": 3.57,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "growable_arrays_cli": {
+          "result": "Passed",
+          "seconds": 21.46,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "arrays_cli": {
+          "result": "Passed",
+          "seconds": 7.74,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "generics_cli": {
+          "result": "Passed",
+          "seconds": 3.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_cli": {
+          "result": "Passed",
+          "seconds": 43.49,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "dictionaries_cli": {
+          "result": "Passed",
+          "seconds": 6.5,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "properties_cli": {
+          "result": "Passed",
+          "seconds": 42.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "patterns_cli": {
+          "result": "Passed",
+          "seconds": 3.32,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "advanced_cli": {
+          "result": "Passed",
+          "seconds": 36.17,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_source": {
+          "result": "Passed",
+          "seconds": 2.72,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_cli": {
+          "result": "Passed",
+          "seconds": 1.8,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_initialization_source": {
+          "result": "Passed",
+          "seconds": 5.95,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_initialization_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_initialization_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "managed_initialization_cli": {
+          "result": "Passed",
+          "seconds": 2.44,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "reference_values_source": {
+          "result": "Passed",
+          "seconds": 3.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "reference_values_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "reference_values_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "reference_values_cli": {
+          "result": "Passed",
+          "seconds": 3.27,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "composition_source": {
+          "result": "Passed",
+          "seconds": 2.75,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "composition_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "composition_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "composition_cli": {
+          "result": "Passed",
+          "seconds": 1.99,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "inheritance_source": {
+          "result": "Passed",
+          "seconds": 3.23,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "inheritance_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "inheritance_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.15,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "inheritance_cli": {
+          "result": "Passed",
+          "seconds": 2.63,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "interfaces_source": {
+          "result": "Passed",
+          "seconds": 5.33,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "interfaces_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "interfaces_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "interfaces_cli": {
+          "result": "Passed",
+          "seconds": 2.31,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "strings_source": {
+          "result": "Passed",
+          "seconds": 12.36,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "strings_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "strings_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.15,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "strings_cli": {
+          "result": "Passed",
+          "seconds": 1.15,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_callbacks": {
+          "result": "Passed",
+          "seconds": 1.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_failures": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "runtime_invariants": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_positions": {
+          "result": "Passed",
+          "seconds": 0.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_protocol": {
+          "result": "Passed",
+          "seconds": 0.59,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage11_globals": {
+          "result": "Passed",
+          "seconds": 0.18,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage8": {
+          "result": "Passed",
+          "seconds": 0.5,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "documentation_execution": {
+          "result": "Passed",
+          "seconds": 1.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_documentation": {
+          "result": "Passed",
+          "seconds": 0.35,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_host": {
+          "result": "Passed",
+          "seconds": 2.32,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_ir": {
+          "result": "Passed",
+          "seconds": 0.34,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_execution": {
+          "result": "Passed",
+          "seconds": 34.81,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_frontend": {
+          "result": "Passed",
+          "seconds": 17.95,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "math_errors": {
+          "result": "Passed",
+          "seconds": 11.74,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_worker": {
+          "result": "Passed",
+          "seconds": 2.71,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_math": {
+          "result": "Passed",
+          "seconds": 1.32,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_install": {
+          "result": "Passed",
+          "seconds": 2.15,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_preservation": {
+          "result": "Passed",
+          "seconds": 1.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_stack": {
+          "result": "Passed",
+          "seconds": 34.29,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "math_frontend_stack": {
+          "result": "Passed",
+          "seconds": 18.46,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "os_execution": {
+          "result": "Passed",
+          "seconds": 83.71,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_stack": {
+          "result": "Passed",
+          "seconds": 87.31,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_edges": {
+          "result": "Passed",
+          "seconds": 15.23,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_edges_stack": {
+          "result": "Passed",
+          "seconds": 15.17,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_host": {
+          "result": "Passed",
+          "seconds": 31.68,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_errors": {
+          "result": "Passed",
+          "seconds": 17.14,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_frontend": {
+          "result": "Passed",
+          "seconds": 33.22,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "lsp_os": {
+          "result": "Passed",
+          "seconds": 7.23,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_cache": {
+          "result": "Passed",
+          "seconds": 17.31,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_owner": {
+          "result": "Passed",
+          "seconds": 25.75,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_examples": {
+          "result": "Passed",
+          "seconds": 13.58,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_install": {
+          "result": "Passed",
+          "seconds": 29.78,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "os_frontend_stack": {
+          "result": "Passed",
+          "seconds": 34.14,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "os_host_stack": {
+          "result": "Passed",
+          "seconds": 31.49,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_host": {
+          "result": "Passed",
+          "seconds": 51.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_execution": {
+          "result": "Passed",
+          "seconds": 50.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_frontend": {
+          "result": "Passed",
+          "seconds": 24.43,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "lsp_random": {
+          "result": "Passed",
+          "seconds": 4.03,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_install": {
+          "result": "Passed",
+          "seconds": 9.88,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_errors": {
+          "result": "Passed",
+          "seconds": 18.56,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_preservation": {
+          "result": "Passed",
+          "seconds": 0.29,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_worker": {
+          "result": "Passed",
+          "seconds": 8.5,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_reference": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_stack": {
+          "result": "Passed",
+          "seconds": 49.64,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "random_frontend_stack": {
+          "result": "Passed",
+          "seconds": 24.91,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "binary_execution": {
+          "result": "Passed",
+          "seconds": 27.9,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_binary": {
+          "result": "Passed",
+          "seconds": 0.31,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "binary_ownership": {
+          "result": "Passed",
+          "seconds": 1.23,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "binary_stack": {
+          "result": "Passed",
+          "seconds": 1.7,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_const_recovery": {
+          "result": "Passed",
+          "seconds": 4.46,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_const_recovery_stack": {
+          "result": "Passed",
+          "seconds": 4.47,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "combined_ownership": {
+          "result": "Passed",
+          "seconds": 11.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "combined_async_normal": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "combined_async_optimized": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "combined_execution": {
+          "result": "Passed",
+          "seconds": 44.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_combined": {
+          "result": "Passed",
+          "seconds": 7.38,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "combined_stack": {
+          "result": "Passed",
+          "seconds": 39.55,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "memory_execution": {
+          "result": "Passed",
+          "seconds": 94.44,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_memory": {
+          "result": "Passed",
+          "seconds": 1.82,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_text": {
+          "result": "Passed",
+          "seconds": 6.5,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_hex": {
+          "result": "Passed",
+          "seconds": 2.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_base64": {
+          "result": "Passed",
+          "seconds": 4.03,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_ascii": {
+          "result": "Passed",
+          "seconds": 2.33,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_oracles": {
+          "result": "Passed",
+          "seconds": 226.83,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_interop": {
+          "result": "Passed",
+          "seconds": 17.72,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_large": {
+          "result": "Passed",
+          "seconds": 178.14,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_errors": {
+          "result": "Passed",
+          "seconds": 7.93,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_crash_preservation": {
+          "result": "Passed",
+          "seconds": 1.29,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_text_encoding": {
+          "result": "Passed",
+          "seconds": 4.0,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_install": {
+          "result": "Passed",
+          "seconds": 14.36,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_stack": {
+          "result": "Passed",
+          "seconds": 3.85,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_text_encoding_stack": {
+          "result": "Passed",
+          "seconds": 4.0,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_depth": {
+          "result": "Passed",
+          "seconds": 0.36,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_semantic_depth": {
+          "result": "Passed",
+          "seconds": 0.76,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_ir": {
+          "result": "Passed",
+          "seconds": 1.64,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_inventory": {
+          "result": "Passed",
+          "seconds": 0.36,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_encoding_ownership": {
+          "result": "Passed",
+          "seconds": 10.98,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "memory_ownership": {
+          "result": "Passed",
+          "seconds": 4.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "memory_stack": {
+          "result": "Passed",
+          "seconds": 4.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage7": {
+          "result": "Passed",
+          "seconds": 0.31,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_demo": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_operator_compounds": {
+          "result": "Passed",
+          "seconds": 5.64,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage11_globals": {
+          "result": "Passed",
+          "seconds": 1.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_native": {
+          "result": "Passed",
+          "seconds": 379.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_execution": {
+          "result": "Passed",
+          "seconds": 207.43,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_frontend": {
+          "result": "Passed",
+          "seconds": 21.78,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "log_files": {
+          "result": "Passed",
+          "seconds": 62.47,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_oracles": {
+          "result": "Passed",
+          "seconds": 122.9,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_cache": {
+          "result": "Passed",
+          "seconds": 46.22,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_install": {
+          "result": "Passed",
+          "seconds": 95.92,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_console": {
+          "result": "Passed",
+          "seconds": 77.31,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_log": {
+          "result": "Passed",
+          "seconds": 16.18,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_probe_normal": {
+          "result": "Passed",
+          "seconds": 1.18,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "log_probe_optimized": {
+          "result": "Passed",
+          "seconds": 1.19,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_host": {
+          "result": "Passed",
+          "seconds": 201.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_execution": {
+          "result": "Passed",
+          "seconds": 428.59,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_failures": {
+          "result": "Passed",
+          "seconds": 83.18,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_frontend": {
+          "result": "Passed",
+          "seconds": 5.81,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "lsp_collections_stdlib": {
+          "result": "Passed",
+          "seconds": 0.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_oracles": {
+          "result": "Passed",
+          "seconds": 25.68,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_install": {
+          "result": "Passed",
+          "seconds": 9.8,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_cache": {
+          "result": "Passed",
+          "seconds": 2.14,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_operators": {
+          "result": "Passed",
+          "seconds": 2.28,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "collections_stdlib_stack": {
+          "result": "Passed",
+          "seconds": 435.37,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "channel_host": {
+          "result": "Passed",
+          "seconds": 38.98,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "channel_frontend": {
+          "result": "Passed",
+          "seconds": 4.35,
+          "log": "http-frontend-channel-final-debug.log"
+        },
+        "channel_execution": {
+          "result": "Passed",
+          "seconds": 167.48,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_channel": {
+          "result": "Passed",
+          "seconds": 0.43,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "channel_receiver": {
+          "result": "Passed",
+          "seconds": 3.39,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "channel_stack": {
+          "result": "Passed",
+          "seconds": 168.73,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_console_source": {
+          "result": "Passed",
+          "seconds": 103.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_operator_integration": {
+          "result": "Passed",
+          "seconds": 37.88,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_source": {
+          "result": "Passed",
+          "seconds": 5.6,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage6_integrated": {
+          "result": "Passed",
+          "seconds": 7.03,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "stage6_cache_processes": {
+          "result": "Passed",
+          "seconds": 7.94,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "native_aot_main_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_main_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_terminated_nul_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_terminated_nul_optimized": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_closed_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_closed_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_duplicate_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_duplicate_optimized": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_cleanup_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_cleanup_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_integrated_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_integrated_optimized": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_integrated_cancel_normal": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_integrated_cancel_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_integrated_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native_aot_integrated_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_ownership": {
+          "result": "Passed",
+          "seconds": 29.81,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_execution": {
+          "result": "Passed",
+          "seconds": 49.33,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_crash_preservation": {
+          "result": "Passed",
+          "seconds": 0.26,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_async_execution": {
+          "result": "Passed",
+          "seconds": 39.15,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_wire_normal": {
+          "result": "Passed",
+          "seconds": 0.35,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_wire_optimized": {
+          "result": "Passed",
+          "seconds": 0.36,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_io": {
+          "result": "Passed",
+          "seconds": 5.93,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_stack": {
+          "result": "Passed",
+          "seconds": 49.49,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_async_stack": {
+          "result": "Passed",
+          "seconds": 39.25,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_io_stack": {
+          "result": "Passed",
+          "seconds": 5.85,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_responsiveness": {
+          "result": "Passed",
+          "seconds": 11.72,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_close_failure": {
+          "result": "Passed",
+          "seconds": 11.82,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_shutdown": {
+          "result": "Passed",
+          "seconds": 12.01,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_opening_shutdown": {
+          "result": "Passed",
+          "seconds": 12.25,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_whole_shutdown": {
+          "result": "Passed",
+          "seconds": 12.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_pending_close": {
+          "result": "Passed",
+          "seconds": 11.9,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_cancelled": {
+          "result": "Passed",
+          "seconds": 11.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_probe_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_probe_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_async_source": {
+          "result": "Passed",
+          "seconds": 14.77,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "io_errors_source": {
+          "result": "Passed",
+          "seconds": 13.35,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_errors_async": {
+          "result": "Passed",
+          "seconds": 14.53,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_examples_install": {
+          "result": "Passed",
+          "seconds": 24.2,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_async_acquisition": {
+          "result": "Passed",
+          "seconds": 0.31,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "io_async_normal": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_async_optimized": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_native_jobs": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "native_workers": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_external": {
+          "result": "Passed",
+          "seconds": 3.15,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "io_kernel": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_ir": {
+          "result": "Passed",
+          "seconds": 3.32,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "io_cross_volume": {
+          "result": "Passed",
+          "seconds": 5.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "async_source": {
+          "result": "Passed",
+          "seconds": 44.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_source": {
+          "result": "Passed",
+          "seconds": 6.85,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_stack": {
+          "result": "Passed",
+          "seconds": 6.78,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_ir": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_parallel": {
+          "result": "Passed",
+          "seconds": 2.2,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_lifecycle": {
+          "result": "Passed",
+          "seconds": 4.26,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_spawn_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_spawn_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_spawn_cancel_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_spawn_cancel_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_spawn_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_spawn_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_activation_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_activation_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_managed_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_managed_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_large_normal": {
+          "result": "Passed",
+          "seconds": 21.2,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_large_optimized": {
+          "result": "Passed",
+          "seconds": 20.09,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_closures_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_closures_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_loops_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_loops_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_values_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_methods_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_methods_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_exits_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_exits_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_cancelled_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_cancelled_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_failures_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_failures_optimized": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_primary_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_primary_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_resources_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_resources_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_values_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_aot_lifecycle_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_values_normal": {
+          "result": "Passed",
+          "seconds": 0.64,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.71,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_errors_normal": {
+          "result": "Passed",
+          "seconds": 0.45,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_errors_optimized": {
+          "result": "Passed",
+          "seconds": 0.51,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_cancelled_normal": {
+          "result": "Passed",
+          "seconds": 0.22,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_cancelled_optimized": {
+          "result": "Passed",
+          "seconds": 0.25,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.22,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.25,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_spawn_normal": {
+          "result": "Passed",
+          "seconds": 0.15,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_syntax_aot_spawn_optimized": {
+          "result": "Passed",
+          "seconds": 0.16,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "lsp_async_syntax": {
+          "result": "Passed",
+          "seconds": 0.19,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "core": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "jit": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "reload": {
+          "result": "Passed",
+          "seconds": 0.4,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "gc": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "native": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "sessions_demo": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "tooling_demo": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "sessions": {
+          "result": "Passed",
+          "seconds": 0.22,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "tooling": {
+          "result": "Passed",
+          "seconds": 0.48,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "analysis": {
+          "result": "Passed",
+          "seconds": 0.76,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "numeric": {
+          "result": "Passed",
+          "seconds": 4.68,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "frontend": {
+          "result": "Passed",
+          "seconds": 9.4,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "modules": {
+          "result": "Passed",
+          "seconds": 0.96,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "numeric_sprint2": {
+          "result": "Passed",
+          "seconds": 2.46,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "async_retention_sprint5": {
+          "result": "Passed",
+          "seconds": 85.38,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_retention_aot_growth_normal": {
+          "result": "Passed",
+          "seconds": 4.94,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_retention_aot_growth_optimized": {
+          "result": "Passed",
+          "seconds": 5.0,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_retention_aot_workers_normal": {
+          "result": "Passed",
+          "seconds": 5.52,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "async_retention_aot_workers_optimized": {
+          "result": "Passed",
+          "seconds": 5.3,
+          "log": "http-final-tests-debug-repaired.log"
+        },
+        "ergonomics_sprint6_host": {
+          "result": "Passed",
+          "seconds": 1.45,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "ergonomics_sprint6": {
+          "result": "Passed",
+          "seconds": 2.59,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_fields_aot": {
+          "result": "Passed",
+          "seconds": 0.54,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_temporal_install": {
+          "result": "Passed",
+          "seconds": 16.58,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_temporal_aot": {
+          "result": "Passed",
+          "seconds": 11.62,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage11_globals_stack": {
+          "result": "Passed",
+          "seconds": 1.87,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage11_globals_aot": {
+          "result": "Passed",
+          "seconds": 5.58,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_console_aot": {
+          "result": "Passed",
+          "seconds": 443.52,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_operators_aot": {
+          "result": "Passed",
+          "seconds": 159.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "stage10_conversion_aot": {
+          "result": "Passed",
+          "seconds": 0.85,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_sprint6": {
+          "result": "Passed",
+          "seconds": 0.81,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage10_fields": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage10_display": {
+          "result": "Passed",
+          "seconds": 14.27,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage10_intelligence": {
+          "result": "Passed",
+          "seconds": 0.68,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_stage10_source_formatting": {
+          "result": "Passed",
+          "seconds": 1.22,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "local_libraries": {
+          "result": "Passed",
+          "seconds": 0.43,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_sprint4": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "application_native_sprint4_host": {
+          "result": "Passed",
+          "seconds": 0.97,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "application_native_sprint4": {
+          "result": "Passed",
+          "seconds": 3.0,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "text_collections_sprint3": {
+          "result": "Passed",
+          "seconds": 21.8,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_sprint3": {
+          "result": "Passed",
+          "seconds": 0.19,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "lsp_sprint2": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "aot": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "source_cli": {
+          "result": "Passed",
+          "seconds": 3.36,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "value_structs_cli": {
+          "result": "Passed",
+          "seconds": 1.27,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "receiver_methods_cli": {
+          "result": "Passed",
+          "seconds": 2.05,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "initialization_cli": {
+          "result": "Passed",
+          "seconds": 2.33,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "modules_cli": {
+          "result": "Passed",
+          "seconds": 37.86,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "analysis_cli": {
+          "result": "Passed",
+          "seconds": 0.51,
+          "log": "http-consolidated-tests-debug.log"
+        },
+        "numeric_cli": {
+          "result": "Passed",
+          "seconds": 22.74,
+          "log": "http-consolidated-tests-debug.log"
+        }
+      },
+      "artifacts_sha256": {
+        "voidc": "4cf1ffb0cf2d663b7c6d6dcbbd1ac42f7fc74cccdd8fce6879c7ba3738dcbb00",
+        "voidls": "d48e7141bd4bb79350f66a91a5bcecab276b0bc91ddb3d45c3a059a63ddb4c28",
+        "libvoid_runtime.a": "2e651245f213a1742fdadb6be3e826afa2e03714048bea38af8666ba5387af7b",
+        "curl/lib/libcurl.a": "b774374e7395e4806952f14398679d6cc1aa4ba8a6dd22d906c53a71b67e0b3c"
+      }
+    },
+    "strict": {
+      "registered_tests": 379,
+      "latest_available_passes": 379,
+      "missing": [],
+      "failed": [],
+      "ordered_runs": [
+        {
+          "log": "http-consolidated-tests-strict.log",
+          "sha256": "49f220257b703d5ecc1b28237c878bb01650e822f07a3cb6d4294f3926074819",
+          "total": 377,
+          "passed": 374,
+          "failed": 3
+        },
+        {
+          "log": "http-final-tests-strict.log",
+          "sha256": "3d89050a2fb5168baddd60d0de244246dc2130d2b138359117a56b1cc8633e75",
+          "total": 81,
+          "passed": 80,
+          "failed": 1
+        },
+        {
+          "log": "http-frontend-final-tests-strict.log",
+          "sha256": "e9ae33f5d026e97650f95999a02a76ff2a67cd839d9e54eb6506b4284c7e493e",
+          "total": 92,
+          "passed": 92,
+          "failed": 0
+        },
+        {
+          "log": "http-frontend-channel-final-strict.log",
+          "sha256": "23f824225ce1ca770d28ffe792c8b0f2314604f11c5eaee47f8241ec0deb0f25",
+          "total": 1,
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "latest_result_per_test": {
+        "http_native": {
+          "result": "Passed",
+          "seconds": 20.37,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_tls_memory": {
+          "result": "Passed",
+          "seconds": 757.63,
+          "log": "http-final-tests-strict.log"
+        },
+        "http_reload": {
+          "result": "Passed",
+          "seconds": 61.94,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_timeouts": {
+          "result": "Passed",
+          "seconds": 3.02,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_wire": {
+          "result": "Passed",
+          "seconds": 1.55,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_dns": {
+          "result": "Passed",
+          "seconds": 2.47,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "url_native": {
+          "result": "Passed",
+          "seconds": 0.45,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_examples": {
+          "result": "Passed",
+          "seconds": 152.97,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_install": {
+          "result": "Passed",
+          "seconds": 137.07,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_bulk": {
+          "result": "Passed",
+          "seconds": 22.64,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_ir": {
+          "result": "Passed",
+          "seconds": 14.75,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_source": {
+          "result": "Passed",
+          "seconds": 141.54,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_source_negative": {
+          "result": "Passed",
+          "seconds": 5.11,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_source_faults": {
+          "result": "Passed",
+          "seconds": 304.27,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "url_ir": {
+          "result": "Passed",
+          "seconds": 0.55,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "url_source": {
+          "result": "Passed",
+          "seconds": 7.68,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "url_lsp": {
+          "result": "Passed",
+          "seconds": 0.24,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "http_lsp": {
+          "result": "Passed",
+          "seconds": 8.43,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "toolchain_stop_token": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_operator_reload": {
+          "result": "Passed",
+          "seconds": 43.3,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_operator_keys": {
+          "result": "Passed",
+          "seconds": 0.65,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_operator_resolution": {
+          "result": "Passed",
+          "seconds": 2.51,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "stage10_operator_declarations": {
+          "result": "Passed",
+          "seconds": 1.71,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_source_formatting": {
+          "result": "Passed",
+          "seconds": 1.17,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_tooling": {
+          "result": "Passed",
+          "seconds": 0.71,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_display_reload": {
+          "result": "Passed",
+          "seconds": 4.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_temporal_ir": {
+          "result": "Passed",
+          "seconds": 4.35,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "format_temporal": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_hooks": {
+          "result": "Passed",
+          "seconds": 3.43,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_interpolation": {
+          "result": "Passed",
+          "seconds": 1.29,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_conversion": {
+          "result": "Passed",
+          "seconds": 451.29,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_fields": {
+          "result": "Passed",
+          "seconds": 0.84,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "format_numeric": {
+          "result": "Passed",
+          "seconds": 0.17,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "format_zones": {
+          "result": "Passed",
+          "seconds": 0.57,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_readonly": {
+          "result": "Passed",
+          "seconds": 13.98,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_dynamic": {
+          "result": "Passed",
+          "seconds": 21.82,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_numbers": {
+          "result": "Passed",
+          "seconds": 28.58,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_schema": {
+          "result": "Passed",
+          "seconds": 40.11,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_bounds": {
+          "result": "Passed",
+          "seconds": 41.78,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_install": {
+          "result": "Passed",
+          "seconds": 46.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_adversarial": {
+          "result": "Passed",
+          "seconds": 71.91,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_metering": {
+          "result": "Passed",
+          "seconds": 54.23,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_validated": {
+          "result": "Passed",
+          "seconds": 28.31,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_accessors": {
+          "result": "Passed",
+          "seconds": 23.51,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_dynamic_smoke": {
+          "result": "Passed",
+          "seconds": 20.71,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_typed_smoke": {
+          "result": "Passed",
+          "seconds": 45.54,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_shapes": {
+          "result": "Passed",
+          "seconds": 80.62,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_ownership": {
+          "result": "Passed",
+          "seconds": 30.55,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_execution_nested_inference": {
+          "result": "Passed",
+          "seconds": 25.77,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_stress_fixed": {
+          "result": "Passed",
+          "seconds": 144.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_stress_wide": {
+          "result": "Passed",
+          "seconds": 74.03,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_host": {
+          "result": "Passed",
+          "seconds": 308.19,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_preservation": {
+          "result": "Passed",
+          "seconds": 1.2,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "json_lsp": {
+          "result": "Passed",
+          "seconds": 4.86,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "application_workflow_stage9": {
+          "result": "Passed",
+          "seconds": 25.16,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_output_paths_ci88": {
+          "result": "Passed",
+          "seconds": 5.69,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "long_physical_paths_ci89": {
+          "result": "Passed",
+          "seconds": 5.27,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "gc_buffers": {
+          "result": "Passed",
+          "seconds": 3.75,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "gc_schemas": {
+          "result": "Passed",
+          "seconds": 0.23,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "arrays_foundation": {
+          "result": "Passed",
+          "seconds": 0.33,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_endpoints": {
+          "result": "Passed",
+          "seconds": 0.16,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_transfers": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_native_transfers": {
+          "result": "Passed",
+          "seconds": 0.89,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_keyboard": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_terminal": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_native_keyboard": {
+          "result": "Passed",
+          "seconds": 0.3,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_native_terminal": {
+          "result": "Passed",
+          "seconds": 0.8,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_wide": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_input": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_console_native_input": {
+          "result": "Passed",
+          "seconds": 0.49,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_coordination": {
+          "result": "Passed",
+          "seconds": 2.08,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "runtime_generated": {
+          "result": "Passed",
+          "seconds": 1.47,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "fixed_arrays_source": {
+          "result": "Passed",
+          "seconds": 3.82,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "growable_arrays_source": {
+          "result": "Passed",
+          "seconds": 5.16,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "arrays_source": {
+          "result": "Passed",
+          "seconds": 7.55,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "generics_source": {
+          "result": "Passed",
+          "seconds": 5.68,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "generics_hint_execution": {
+          "result": "Passed",
+          "seconds": 16.94,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "generics_hint_lsp": {
+          "result": "Passed",
+          "seconds": 0.11,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_source": {
+          "result": "Passed",
+          "seconds": 33.75,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "dictionaries_source": {
+          "result": "Passed",
+          "seconds": 26.27,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "properties_source": {
+          "result": "Passed",
+          "seconds": 8.18,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "patterns_source": {
+          "result": "Passed",
+          "seconds": 10.81,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "debug_cache": {
+          "result": "Passed",
+          "seconds": 2.81,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "debug_cache_processes": {
+          "result": "Passed",
+          "seconds": 9.01,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "automatic_cache_processes": {
+          "result": "Passed",
+          "seconds": 1.45,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "advanced_source": {
+          "result": "Passed",
+          "seconds": 9.63,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "fixed_arrays_cli": {
+          "result": "Passed",
+          "seconds": 7.63,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "growable_arrays_cli": {
+          "result": "Passed",
+          "seconds": 14.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "arrays_cli": {
+          "result": "Passed",
+          "seconds": 14.37,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "generics_cli": {
+          "result": "Passed",
+          "seconds": 6.77,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_cli": {
+          "result": "Passed",
+          "seconds": 19.23,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "dictionaries_cli": {
+          "result": "Passed",
+          "seconds": 9.67,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "properties_cli": {
+          "result": "Passed",
+          "seconds": 17.44,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "patterns_cli": {
+          "result": "Passed",
+          "seconds": 6.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "advanced_cli": {
+          "result": "Passed",
+          "seconds": 19.03,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_source": {
+          "result": "Passed",
+          "seconds": 2.91,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_cli": {
+          "result": "Passed",
+          "seconds": 3.93,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_initialization_source": {
+          "result": "Passed",
+          "seconds": 6.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_initialization_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_initialization_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "managed_initialization_cli": {
+          "result": "Passed",
+          "seconds": 5.23,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "reference_values_source": {
+          "result": "Passed",
+          "seconds": 3.84,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "reference_values_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "reference_values_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "reference_values_cli": {
+          "result": "Passed",
+          "seconds": 7.35,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "composition_source": {
+          "result": "Passed",
+          "seconds": 2.68,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "composition_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "composition_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "composition_cli": {
+          "result": "Passed",
+          "seconds": 4.04,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "inheritance_source": {
+          "result": "Passed",
+          "seconds": 3.87,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "inheritance_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "inheritance_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.14,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "inheritance_cli": {
+          "result": "Passed",
+          "seconds": 5.96,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "interfaces_source": {
+          "result": "Passed",
+          "seconds": 7.14,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "interfaces_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "interfaces_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "interfaces_cli": {
+          "result": "Passed",
+          "seconds": 5.05,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "strings_source": {
+          "result": "Passed",
+          "seconds": 4.56,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "strings_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "strings_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "strings_cli": {
+          "result": "Passed",
+          "seconds": 2.57,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_callbacks": {
+          "result": "Passed",
+          "seconds": 0.86,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_failures": {
+          "result": "Passed",
+          "seconds": 0.03,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_aot_normal": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_aot_optimized": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "runtime_invariants": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_positions": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_protocol": {
+          "result": "Passed",
+          "seconds": 1.31,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage11_globals": {
+          "result": "Passed",
+          "seconds": 0.19,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage8": {
+          "result": "Passed",
+          "seconds": 2.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "documentation_execution": {
+          "result": "Passed",
+          "seconds": 3.78,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_documentation": {
+          "result": "Passed",
+          "seconds": 0.43,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_host": {
+          "result": "Passed",
+          "seconds": 2.39,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_ir": {
+          "result": "Passed",
+          "seconds": 0.43,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_execution": {
+          "result": "Passed",
+          "seconds": 37.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_frontend": {
+          "result": "Passed",
+          "seconds": 29.02,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "math_errors": {
+          "result": "Passed",
+          "seconds": 21.63,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_worker": {
+          "result": "Passed",
+          "seconds": 3.63,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_math": {
+          "result": "Passed",
+          "seconds": 1.25,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_install": {
+          "result": "Passed",
+          "seconds": 3.27,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_preservation": {
+          "result": "Passed",
+          "seconds": 1.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_stack": {
+          "result": "Passed",
+          "seconds": 37.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "math_frontend_stack": {
+          "result": "Passed",
+          "seconds": 30.16,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "os_execution": {
+          "result": "Passed",
+          "seconds": 97.83,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_stack": {
+          "result": "Passed",
+          "seconds": 98.35,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_edges": {
+          "result": "Passed",
+          "seconds": 16.14,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_edges_stack": {
+          "result": "Passed",
+          "seconds": 16.57,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_host": {
+          "result": "Passed",
+          "seconds": 27.36,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_errors": {
+          "result": "Passed",
+          "seconds": 18.61,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_frontend": {
+          "result": "Passed",
+          "seconds": 30.29,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "lsp_os": {
+          "result": "Passed",
+          "seconds": 5.42,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_cache": {
+          "result": "Passed",
+          "seconds": 16.11,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_owner": {
+          "result": "Passed",
+          "seconds": 28.25,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_examples": {
+          "result": "Passed",
+          "seconds": 14.41,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_install": {
+          "result": "Passed",
+          "seconds": 29.42,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "os_frontend_stack": {
+          "result": "Passed",
+          "seconds": 30.32,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "os_host_stack": {
+          "result": "Passed",
+          "seconds": 26.59,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_host": {
+          "result": "Passed",
+          "seconds": 51.5,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_execution": {
+          "result": "Passed",
+          "seconds": 50.33,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_frontend": {
+          "result": "Passed",
+          "seconds": 23.94,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "lsp_random": {
+          "result": "Passed",
+          "seconds": 3.11,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_install": {
+          "result": "Passed",
+          "seconds": 10.84,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_errors": {
+          "result": "Passed",
+          "seconds": 21.4,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_preservation": {
+          "result": "Passed",
+          "seconds": 0.29,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_worker": {
+          "result": "Passed",
+          "seconds": 9.63,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_reference": {
+          "result": "Passed",
+          "seconds": 0.02,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_stack": {
+          "result": "Passed",
+          "seconds": 50.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "random_frontend_stack": {
+          "result": "Passed",
+          "seconds": 24.26,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "binary_execution": {
+          "result": "Passed",
+          "seconds": 32.39,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_binary": {
+          "result": "Passed",
+          "seconds": 0.35,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "binary_ownership": {
+          "result": "Passed",
+          "seconds": 0.87,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_const_recovery": {
+          "result": "Passed",
+          "seconds": 3.77,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "combined_ownership": {
+          "result": "Passed",
+          "seconds": 12.74,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "combined_async_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "combined_async_optimized": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "combined_execution": {
+          "result": "Passed",
+          "seconds": 56.69,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_combined": {
+          "result": "Passed",
+          "seconds": 5.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "memory_execution": {
+          "result": "Passed",
+          "seconds": 98.17,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_memory": {
+          "result": "Passed",
+          "seconds": 1.56,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_text": {
+          "result": "Passed",
+          "seconds": 8.42,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_hex": {
+          "result": "Passed",
+          "seconds": 3.62,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_base64": {
+          "result": "Passed",
+          "seconds": 5.71,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_ascii": {
+          "result": "Passed",
+          "seconds": 3.63,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_oracles": {
+          "result": "Passed",
+          "seconds": 296.5,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_interop": {
+          "result": "Passed",
+          "seconds": 18.89,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_large": {
+          "result": "Passed",
+          "seconds": 126.62,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_errors": {
+          "result": "Passed",
+          "seconds": 9.59,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_crash_preservation": {
+          "result": "Passed",
+          "seconds": 1.32,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_text_encoding": {
+          "result": "Passed",
+          "seconds": 3.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_install": {
+          "result": "Passed",
+          "seconds": 14.4,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_depth": {
+          "result": "Passed",
+          "seconds": 0.48,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_semantic_depth": {
+          "result": "Passed",
+          "seconds": 1.92,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_ir": {
+          "result": "Passed",
+          "seconds": 1.53,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_inventory": {
+          "result": "Passed",
+          "seconds": 0.31,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_encoding_ownership": {
+          "result": "Passed",
+          "seconds": 10.27,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "memory_ownership": {
+          "result": "Passed",
+          "seconds": 4.68,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage7": {
+          "result": "Passed",
+          "seconds": 0.51,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_demo": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_operator_compounds": {
+          "result": "Passed",
+          "seconds": 5.79,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage11_globals": {
+          "result": "Passed",
+          "seconds": 1.99,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_native": {
+          "result": "Passed",
+          "seconds": 444.7,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_execution": {
+          "result": "Passed",
+          "seconds": 212.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_frontend": {
+          "result": "Passed",
+          "seconds": 19.34,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "log_files": {
+          "result": "Passed",
+          "seconds": 63.11,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_oracles": {
+          "result": "Passed",
+          "seconds": 126.01,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_cache": {
+          "result": "Passed",
+          "seconds": 43.35,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_install": {
+          "result": "Passed",
+          "seconds": 96.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_console": {
+          "result": "Passed",
+          "seconds": 82.7,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_log": {
+          "result": "Passed",
+          "seconds": 11.5,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_probe_normal": {
+          "result": "Passed",
+          "seconds": 0.98,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "log_probe_optimized": {
+          "result": "Passed",
+          "seconds": 1.01,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_host": {
+          "result": "Passed",
+          "seconds": 93.97,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_execution": {
+          "result": "Passed",
+          "seconds": 223.32,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_failures": {
+          "result": "Passed",
+          "seconds": 97.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_frontend": {
+          "result": "Passed",
+          "seconds": 9.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "lsp_collections_stdlib": {
+          "result": "Passed",
+          "seconds": 0.77,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_oracles": {
+          "result": "Passed",
+          "seconds": 27.53,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_install": {
+          "result": "Passed",
+          "seconds": 12.79,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_cache": {
+          "result": "Passed",
+          "seconds": 3.17,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_operators": {
+          "result": "Passed",
+          "seconds": 2.91,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "collections_stdlib_stack": {
+          "result": "Passed",
+          "seconds": 231.72,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "channel_host": {
+          "result": "Passed",
+          "seconds": 29.16,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "channel_frontend": {
+          "result": "Passed",
+          "seconds": 6.86,
+          "log": "http-frontend-channel-final-strict.log"
+        },
+        "channel_execution": {
+          "result": "Passed",
+          "seconds": 97.61,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_channel": {
+          "result": "Passed",
+          "seconds": 0.47,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "channel_receiver": {
+          "result": "Passed",
+          "seconds": 4.87,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_console_source": {
+          "result": "Passed",
+          "seconds": 119.42,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_operator_integration": {
+          "result": "Passed",
+          "seconds": 41.32,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_source": {
+          "result": "Passed",
+          "seconds": 6.16,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage6_integrated": {
+          "result": "Passed",
+          "seconds": 7.47,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "stage6_cache_processes": {
+          "result": "Passed",
+          "seconds": 9.84,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "native_aot_main_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_main_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_terminated_nul_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_terminated_nul_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_closed_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_closed_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_duplicate_normal": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_duplicate_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_cleanup_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_cleanup_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_integrated_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_integrated_optimized": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_integrated_cancel_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_integrated_cancel_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_integrated_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native_aot_integrated_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_ownership": {
+          "result": "Passed",
+          "seconds": 29.97,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_execution": {
+          "result": "Passed",
+          "seconds": 53.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_crash_preservation": {
+          "result": "Passed",
+          "seconds": 0.24,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_async_execution": {
+          "result": "Passed",
+          "seconds": 52.47,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_wire_normal": {
+          "result": "Passed",
+          "seconds": 0.24,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_wire_optimized": {
+          "result": "Passed",
+          "seconds": 0.24,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_io": {
+          "result": "Passed",
+          "seconds": 4.47,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_responsiveness": {
+          "result": "Passed",
+          "seconds": 12.73,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_close_failure": {
+          "result": "Passed",
+          "seconds": 12.58,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_shutdown": {
+          "result": "Passed",
+          "seconds": 12.46,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_opening_shutdown": {
+          "result": "Passed",
+          "seconds": 12.88,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_whole_shutdown": {
+          "result": "Passed",
+          "seconds": 12.5,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_pending_close": {
+          "result": "Passed",
+          "seconds": 13.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_cancelled": {
+          "result": "Passed",
+          "seconds": 12.8,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_probe_normal": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_probe_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_async_source": {
+          "result": "Passed",
+          "seconds": 15.79,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "io_errors_source": {
+          "result": "Passed",
+          "seconds": 14.68,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_errors_async": {
+          "result": "Passed",
+          "seconds": 16.52,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_examples_install": {
+          "result": "Passed",
+          "seconds": 26.57,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_async_acquisition": {
+          "result": "Passed",
+          "seconds": 0.41,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "io_async_normal": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_async_optimized": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_native_jobs": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "native_workers": {
+          "result": "Passed",
+          "seconds": 0.04,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_external": {
+          "result": "Passed",
+          "seconds": 1.19,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "io_kernel": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_ir": {
+          "result": "Passed",
+          "seconds": 3.36,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "io_cross_volume": {
+          "result": "Passed",
+          "seconds": 5.34,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "async_source": {
+          "result": "Passed",
+          "seconds": 18.09,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_source": {
+          "result": "Passed",
+          "seconds": 7.51,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_stack": {
+          "result": "Passed",
+          "seconds": 7.6,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_ir": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_parallel": {
+          "result": "Passed",
+          "seconds": 2.8,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_lifecycle": {
+          "result": "Passed",
+          "seconds": 4.87,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_spawn_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_spawn_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_spawn_cancel_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_spawn_cancel_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_spawn_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_spawn_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_activation_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_activation_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_managed_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_managed_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_large_normal": {
+          "result": "Passed",
+          "seconds": 6.48,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_large_optimized": {
+          "result": "Passed",
+          "seconds": 6.62,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_closures_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_closures_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_loops_normal": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_loops_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_values_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_methods_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_methods_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_exits_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_exits_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_cancelled_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_cancelled_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_failures_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_failures_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_primary_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_primary_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_resources_normal": {
+          "result": "Passed",
+          "seconds": 0.07,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_resources_optimized": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_values_normal": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_aot_lifecycle_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.05,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_values_normal": {
+          "result": "Passed",
+          "seconds": 0.86,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_values_optimized": {
+          "result": "Passed",
+          "seconds": 0.93,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_errors_normal": {
+          "result": "Passed",
+          "seconds": 0.62,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_errors_optimized": {
+          "result": "Passed",
+          "seconds": 0.71,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_cancelled_normal": {
+          "result": "Passed",
+          "seconds": 0.37,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_cancelled_optimized": {
+          "result": "Passed",
+          "seconds": 0.41,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_failure_normal": {
+          "result": "Passed",
+          "seconds": 0.33,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_failure_optimized": {
+          "result": "Passed",
+          "seconds": 0.4,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_spawn_normal": {
+          "result": "Passed",
+          "seconds": 0.26,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_syntax_aot_spawn_optimized": {
+          "result": "Passed",
+          "seconds": 0.28,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "lsp_async_syntax": {
+          "result": "Passed",
+          "seconds": 0.19,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "core": {
+          "result": "Passed",
+          "seconds": 0.06,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "jit": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "reload": {
+          "result": "Passed",
+          "seconds": 1.03,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "gc": {
+          "result": "Passed",
+          "seconds": 0.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "native": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "sessions_demo": {
+          "result": "Passed",
+          "seconds": 0.09,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "tooling_demo": {
+          "result": "Passed",
+          "seconds": 0.08,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "sessions": {
+          "result": "Passed",
+          "seconds": 0.28,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "tooling": {
+          "result": "Passed",
+          "seconds": 0.59,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "analysis": {
+          "result": "Passed",
+          "seconds": 1.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "numeric": {
+          "result": "Passed",
+          "seconds": 6.21,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "frontend": {
+          "result": "Passed",
+          "seconds": 11.56,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "modules": {
+          "result": "Passed",
+          "seconds": 1.53,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "numeric_sprint2": {
+          "result": "Passed",
+          "seconds": 5.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "async_retention_sprint5": {
+          "result": "Passed",
+          "seconds": 36.74,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_retention_aot_growth_normal": {
+          "result": "Passed",
+          "seconds": 1.79,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_retention_aot_growth_optimized": {
+          "result": "Passed",
+          "seconds": 1.77,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_retention_aot_workers_normal": {
+          "result": "Passed",
+          "seconds": 2.57,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "async_retention_aot_workers_optimized": {
+          "result": "Passed",
+          "seconds": 1.98,
+          "log": "http-frontend-final-tests-strict.log"
+        },
+        "ergonomics_sprint6_host": {
+          "result": "Passed",
+          "seconds": 1.3,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "ergonomics_sprint6": {
+          "result": "Passed",
+          "seconds": 5.0,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_fields_aot": {
+          "result": "Passed",
+          "seconds": 1.12,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_temporal_install": {
+          "result": "Passed",
+          "seconds": 15.22,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_temporal_aot": {
+          "result": "Passed",
+          "seconds": 12.5,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage11_globals_stack": {
+          "result": "Passed",
+          "seconds": 1.28,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage11_globals_aot": {
+          "result": "Passed",
+          "seconds": 10.79,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_console_aot": {
+          "result": "Passed",
+          "seconds": 497.44,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_operators_aot": {
+          "result": "Passed",
+          "seconds": 199.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "stage10_conversion_aot": {
+          "result": "Passed",
+          "seconds": 1.46,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_sprint6": {
+          "result": "Passed",
+          "seconds": 0.96,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage10_fields": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage10_display": {
+          "result": "Passed",
+          "seconds": 12.25,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage10_intelligence": {
+          "result": "Passed",
+          "seconds": 0.62,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_stage10_source_formatting": {
+          "result": "Passed",
+          "seconds": 1.12,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "local_libraries": {
+          "result": "Passed",
+          "seconds": 0.97,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_sprint4": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "application_native_sprint4_host": {
+          "result": "Passed",
+          "seconds": 1.3,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "application_native_sprint4": {
+          "result": "Passed",
+          "seconds": 7.48,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "text_collections_sprint3": {
+          "result": "Passed",
+          "seconds": 31.19,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_sprint3": {
+          "result": "Passed",
+          "seconds": 0.16,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "lsp_sprint2": {
+          "result": "Passed",
+          "seconds": 0.12,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "aot": {
+          "result": "Passed",
+          "seconds": 0.1,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "source_cli": {
+          "result": "Passed",
+          "seconds": 14.84,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "value_structs_cli": {
+          "result": "Passed",
+          "seconds": 2.58,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "receiver_methods_cli": {
+          "result": "Passed",
+          "seconds": 4.66,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "initialization_cli": {
+          "result": "Passed",
+          "seconds": 5.15,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "modules_cli": {
+          "result": "Passed",
+          "seconds": 52.13,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "analysis_cli": {
+          "result": "Passed",
+          "seconds": 1.29,
+          "log": "http-consolidated-tests-strict.log"
+        },
+        "numeric_cli": {
+          "result": "Passed",
+          "seconds": 40.03,
+          "log": "http-consolidated-tests-strict.log"
+        }
+      },
+      "artifacts_sha256": {
+        "voidc": "59ded7bc5111441de1439a9cc6967acc59a08b55348520e1131049de40b97560",
+        "voidls": "c8c99e2574069eb4b3f61b0da2bbc83fc68a1da5e798334980d7b859b3ec1e66",
+        "libvoid_runtime.a": "2dae69000f0ea9f126db40462cc14882b0e712587bfa1cc3ee6768bc69f3be2a",
+        "curl/lib/libcurl.a": "202b8a98868c7ad0568ae7bfb11bb2f125ad43bec13f6805f5fa541e777f29e5"
+      }
+    }
+  },
+  "tls_corpus_runtime_identities_unchanged": true,
+  "protected_root_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "source_sha256": {
+    "CMakeLists.txt": "b35dd11b698c2cb8d776762bcf123d9a01264601e62fd7c5aca5115d28446184",
+    "src/frontend/compiler.cpp": "e1bbce064280824a0152ede96110c789293f6e2dee2d9b2da43a1da99efdeaf4",
+    "src/runtime/http.cpp": "3f1b2904623bc75e9836aa1bab36a5324207d6664aa94d352585e43f1760dc47",
+    "src/runtime/http_file.cpp": "66cdea5e72a3460849aaf61f9fcab4386476890b612e3d8c5f6545e04164ea40",
+    "src/runtime/async.cpp": "e29616fc3c69306f700978052d2b8b1dc3bc1f6b286b87c62e54126f6b4974d0",
+    "tests/net/http/dns_fixture.py": "055b56ba2fc0fd4301d80edd6e60209c10a0882618fd589479c0d9c3f90307a0",
+    "third_party/http-versions.json": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb"
+  },
+  "final_source_clean_build": {
+    "identity_report": "http-final-clean-build-identity.json",
+    "identity_report_sha256": "3a442f5afe4b3191fcccabf37e9cb52474aa3985a55f6c73dffc1ac44b3e0ee3",
+    "identical_archives_and_compiler_objects": 8,
+    "example_process_checks": 18,
+    "example_ctests": 1,
+    "lsp_ctests": 2,
+    "explicit_linker": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)"
+  },
+  "generator_sha256": "7fbad6c0f2e339fb1ba9cc8eba5c816f4c8747aabae5925e8d400e1647e6a107"
+}

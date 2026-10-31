@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_wire",
+    "http://127.0.0.1:45713"
+  ],
+  "exit_code": 1,
+  "stack_bytes": [
+    1048576,
+    1048576
+  ],
+  "binary_sha256": "c8ee6c2a70d802ca692cb4b86d99fb44815cdf933f9436f2b4f32a20b543a0b8",
+  "source_sha256": {
+    "src/runtime/http.cpp": "6a71148203a5c1c80accd7554075f4082d1316d0851c7b89f8c9476adc4a1695",
+    "tests/net/http/wire.cpp": "c93e2612c75e4973810053d0173728c1eecda033c12df2763ad2651b9b1736e8",
+    "tests/net/http/wire.py": "795f11a17c7f712f9b4376c1e592d93dab7d8525e1b777b8310d4bd805704c3a"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  }
+}

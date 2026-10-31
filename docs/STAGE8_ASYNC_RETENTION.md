@@ -1,5 +1,13 @@
 # Stage 8 Sprint 5 — completed execution-frame retirement
 
+Subsequent 30 October 2026 HTTP engineering adds
+[completed result/Work/Handle retirement](net/http/RUNTIME_FOUNDATION.md) using
+the existing task and precise-root model. Authorized HTTP continuation also adds
+quiescent native Task/group record retirement, with focused measurements linked
+in [the current HTTP record](net/http/CURRENT_ENGINEERING.md). The original Sprint 5
+scope, measurements and remaining-limit statements below are historical. No
+whole-Runtime RSS ceiling is claimed.
+
 Status: implemented and locally verified; Wrench review pending; not hosted locked.
 Baseline: `726b34b658f0d939b1da065acb4e9c735ddfa39d`. Sprint 5 only is authorized;
 Sprint 6 and the hosted gate remain deferred. Root README stays unchanged.

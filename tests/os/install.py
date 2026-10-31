@@ -35,7 +35,7 @@ func main():
     lines=(relocated/'bin/void-native.txt').read_text(encoding='utf-8').splitlines()
     clang,linker=lines[1:3]
     resources=[(installed.parent/p).resolve() if not Path(p).is_absolute() else Path(p) for p in lines[3:5]]
-    flags=lines[5:]
+    flags=[line.replace('@VOID_NATIVE_DIR@', str(installed.parent)) for line in lines[5:]]
     if linker:flags+=['--ld-path='+linker]
     if sys.platform=='linux':flags+=['-ldl']
     for args in (['--no-opt'],[]):

@@ -1,0 +1,76 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "check",
+      "/tmp/VOID HTTP source _skn96yi/sync.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "run",
+      "/tmp/VOID HTTP source _skn96yi/sync.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "build",
+      "/tmp/VOID HTTP source _skn96yi/sync.void",
+      "-o",
+      "/tmp/VOID HTTP source _skn96yi/native-False"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source _skn96yi/native-False"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "run",
+      "/tmp/VOID HTTP source _skn96yi/sync.void",
+      "--no-opt"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "build",
+      "/tmp/VOID HTTP source _skn96yi/sync.void",
+      "-o",
+      "/tmp/VOID HTTP source _skn96yi/native-True",
+      "--no-opt"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source _skn96yi/native-True"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "check",
+      "/tmp/VOID HTTP source _skn96yi/async.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_http_source_runner",
+      "--async",
+      "/tmp/VOID HTTP source _skn96yi/async.void"
+    ],
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_native",
+    "http://127.0.0.1:44621",
+    "https://127.0.0.1:40663",
+    "/tmp/VOID HTTP native 7pdol5sd/cert.pem",
+    "https://127.0.0.1:54801",
+    "https://127.0.0.1:35333",
+    "/tmp/VOID HTTP native 7pdol5sd/cert.pem",
+    "/tmp/VOID HTTP native 7pdol5sd/key.pem",
+    "/tmp/VOID HTTP native 7pdol5sd/identity.p12"
+  ],
+  "exit_code": 1,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 1.417368082999019,
+  "binary_sha256": "10bcc7674ab84954a22e37f77abff268cd3ef7ad3cdd4c454cc29c55c39f0fe9",
+  "source_sha256": {
+    "src/runtime/http.cpp": "4fb52214abadd9313b15954b5422e96ed965e8e9b5fa3c279b5b630f5f6fe2ce",
+    "include/void/http.hpp": "388da0cf7b0191ebe60ae5c7221a0592ba0bf5bbdde7658a593a9afd543b066b",
+    "tests/net/http/native.cpp": "8bc6011d8ab8afc5d78e9952e05714e33893c3b30b4634d40bc64dfadcd7f709",
+    "tests/net/http/fixture.py": "7fd22d07e23990330d3c57e98fe08ac04e8bbd840392092235cd78cf6c3e96d2",
+    "third_party/curl/VOID-PROVENANCE.json": "e7f386d374bffe17c3507e346c1da5d3c3658940ce561afac4cbe639e21273d2",
+    "third_party/http-versions.json": "061c7073ec1657825cf31a1a0a3ec6bb717738e3a7fa65fd15b328ac6ac0f3da"
+  },
+  "soft_hard_stack_bytes": [
+    8388608,
+    -1
+  ],
+  "sanitizers": {
+    "ASAN_OPTIONS": "",
+    "UBSAN_OPTIONS": ""
+  },
+  "http2_fixture": true,
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

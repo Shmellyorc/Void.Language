@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-mtl7eu7d/scope-disposal.void:7:5: error: Unknown method 'deinit' in /@stdlib/channel.void::router<i32>.
+    code: VOID2019
+
+ 7 |     with channel.router<i32>() as bus:
+   |     ^^^^^^
+    Module: /scope-disposal.void
+

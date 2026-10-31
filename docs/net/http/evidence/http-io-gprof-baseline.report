@@ -1,0 +1,171 @@
+Functions sorted by metric: Exclusive Total CPU Time
+
+Excl. Total   Incl. Total    Name
+CPU           CPU
+ sec.      %   sec.      %
+1.181 100.00  1.181 100.00   <Total>
+0.270  22.88  0.270  22.88   vd::Heap::buffer_state(void*) const
+0.140  11.86  0.140  11.86   pthread_mutex_lock
+0.140  11.86  0.200  16.95   vd::Runtime::validate_buffer_layout(std::shared_ptr<vd::BufferLayout const> const&) const
+0.100   8.47  0.100   8.47   <static>@0x16f7eb (<libc.so.6>)
+0.070   5.93  0.070   5.93   <static>@0x9ec24 (<libc.so.6>)
+0.050   4.24  0.050   4.24   vd::BufferLayout::element_offset(unsigned long) const
+0.050   4.24  0.771  65.25   vd::Runtime::buffer_byte(void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long, unsigned long) const
+0.030   2.54  0.030   2.54   <static>@0x9b2be (<libc.so.6>)
+0.020   1.69  0.030   2.54   (anonymous namespace)::DAGCombiner::combine(llvm::SDNode*)
+0.020   1.69  0.020   1.69   <static>@0xa4063 (<libc.so.6>)
+0.020   1.69  0.020   1.69   vd::Runtime::require_managed() const
+0.010   0.85  0.010   0.85   (anonymous namespace)::CodeGenPrepare::optimizeMemoryInst(llvm::Instruction*, llvm::Value*, llvm::Type*, unsigned int)
+0.010   0.85  0.010   0.85   (anonymous namespace)::CopyConstrain::apply(llvm::ScheduleDAGInstrs*)
+0.010   0.85  0.010   0.85   (anonymous namespace)::PeepholeOptimizer::run(llvm::MachineFunction&)
+0.010   0.85  0.010   0.85   (anonymous namespace)::ScheduleDAGRRList::Schedule()
+0.010   0.85  0.010   0.85   (anonymous namespace)::X86ExpandPseudoImpl::runOnMachineFunction(llvm::MachineFunction&)
+0.010   0.85  0.010   0.85   free
+0.010   0.85  0.010   0.85   llvm::AssumptionCache::scanFunction()
+0.010   0.85  0.010   0.85   llvm::BranchProbabilityInfo::calculate(llvm::Function const&, llvm::LoopInfo const&, llvm::TargetLibraryInfo const*, llvm::DominatorTree*, llvm::PostDominatorTree*)
+0.010   0.85  0.010   0.85   llvm::CriticalAntiDepBreaker::PrescanInstruction(llvm::MachineInstr&)
+0.010   0.85  0.010   0.85   llvm::DataLayout::getTypeAllocSize(llvm::Type*) const
+0.010   0.85  0.010   0.85   llvm::DenseMapBase<llvm::DenseMap<llvm::SCEV const*, llvm::SmallPtrSet<llvm::PointerIntPair<llvm::Loop const*, 1u, bool, llvm::PointerLikeTypeTraits<llvm::Loop const*>, llvm::PointerIntPairInfo<llvm::Loop const*, 1u, llvm::PointerLikeTypeTraits<llvm::Loop const*> > >, 4u>, llvm::DenseMapInfo<llvm::SCEV const*, void>, llvm::detail::DenseMapPair<llvm::SCEV const*, llvm::SmallPtrSet<llvm::PointerIntPair<llvm::Loop const*, 1u, bool, llvm::PointerLikeTypeTraits<llvm::Loop const*>, llvm::PointerIntPairInfo<llvm::Loop const*, 1u, llvm::PointerLikeTypeTraits<llvm::Loop const*> > >, 4u> > >, llvm::SCEV const*, llvm::SmallPtrSet<llvm::PointerIntPair<llvm::Loop const*, 1u, bool, llvm::PointerLikeTypeTraits<llvm::Loop const*>, llvm::PointerIntPairInfo<llvm::Loop const*, 1u, llvm::PointerLikeTypeTraits<llvm::Loop const*> > >, 4u>, llvm::DenseMapInfo<llvm::SCEV const*, void>, llvm::detail::DenseMapPair<llvm::SCEV const*, llvm::SmallPtrSet<llvm::PointerIntPair<llvm::Loop const*, 1u, bool, llvm::PointerLikeTypeTraits<llvm::Loop const*>, llvm::PointerIntPairInfo<llvm::Loop const*, 1u, llvm::PointerLikeTypeTraits<llvm::Loop const*> > >, 4u> > >::grow(unsigned int)
+0.010   0.85  0.010   0.85   llvm::GenericScheduler::tryCandidate(llvm::GenericSchedulerBase::SchedCandidate&, llvm::GenericSchedulerBase::SchedCandidate&, llvm::SchedBoundary*) const
+0.010   0.85  0.010   0.85   llvm::InstCombinerImpl::visitInsertValueInst(llvm::InsertValueInst&)
+0.010   0.85  0.010   0.85   llvm::Instruction::getSuccessor(unsigned int) const
+0.010   0.85  0.010   0.85   llvm::LazyMachineBlockFrequencyInfoPass::releaseMemory()
+0.010   0.85  0.010   0.85   llvm::MachineInstr::mayAlias(llvm::BatchAAResults*, llvm::MachineInstr const&, bool) const
+0.010   0.85  0.010   0.85   llvm::ScalarEvolution::LoopGuards::collectFromBlock(llvm::ScalarEvolution&, llvm::ScalarEvolution::LoopGuards&, llvm::BasicBlock const*, llvm::BasicBlock const*, llvm::SmallPtrSetImpl<llvm::BasicBlock const*>&, unsigned int)
+0.010   0.85  0.010   0.85   llvm::SelectionDAG::getLoad(llvm::ISD::MemIndexedMode, llvm::ISD::LoadExtType, llvm::EVT, llvm::SDLoc const&, llvm::SDValue, llvm::SDValue, llvm::SDValue, llvm::EVT, llvm::MachineMemOperand*)
+0.010   0.85  0.050   4.24   llvm::SelectionDAGISel::CodeGenAndEmitDAG()
+0.010   0.85  0.010   0.85   llvm::TargetTransformInfoImplBase::getTgtMemIntrinsic(llvm::IntrinsicInst*, llvm::MemIntrinsicInfo&) const
+0.010   0.85  0.010   0.85   llvm::Use::zap(llvm::Use*, llvm::Use const*, bool)
+0.010   0.85  0.010   0.85   malloc
+0.010   0.85  0.010   0.85   pthread_cond_broadcast
+0.010   0.85  0.010   0.85   vd::BufferLayout::BufferLayout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long)
+0.010   0.85  0.010   0.85   vd::ElementSchema::bytes() const
+0.010   0.85  0.010   0.85   vd::ir::reference_paths(vd::ir::Type, bool)::Pending::Pending(Pending&&)
+0.010   0.85  0.010   0.85   void llvm::InstVisitor<(anonymous namespace)::Verifier, void>::visit<llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, false, false, void, true, llvm::BasicBlock>, false, false> >(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, false, false, void, true, llvm::BasicBlock>, false, false>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, false, false, void, true, llvm::BasicBlock>, false, false>)
+0.      0.    0.010   0.85   (anonymous namespace)::CallAnalyzer::analyze()
+0.      0.    0.010   0.85   (anonymous namespace)::CodeGenPrepare::_run(llvm::Function&)
+0.      0.    0.010   0.85   (anonymous namespace)::CodeGenPrepare::optimizeInst(llvm::Instruction*, (anonymous namespace)::ModifyDT&)
+0.      0.    0.010   0.85   (anonymous namespace)::EarlyCSE::run()
+0.      0.    0.020   1.69   (anonymous namespace)::MachineSchedulerLegacy::runOnMachineFunction(llvm::MachineFunction&)
+0.      0.    0.010   0.85   (anonymous namespace)::PeepholeOptimizerLegacy::runOnMachineFunction(llvm::MachineFunction&)
+0.      0.    0.020   1.69   (anonymous namespace)::PostRAScheduler::run(llvm::MachineFunction&)
+0.      0.    0.020   1.69   (anonymous namespace)::PostRASchedulerLegacy::runOnMachineFunction(llvm::MachineFunction&)
+0.      0.    0.020   1.69   (anonymous namespace)::SchedulePostRATDList::schedule()
+0.      0.    0.010   0.85   (anonymous namespace)::Scope::receive()
+0.      0.    0.010   0.85   (anonymous namespace)::Verifier::verify(llvm::Function const&)
+0.      0.    0.010   0.85   (anonymous namespace)::X86ExpandPseudoLegacy::runOnMachineFunction(llvm::MachineFunction&)
+0.      0.    0.190  16.10   <static>@0x2a375 (<libc.so.6>)
+0.      0.    0.080   6.78   <static>@0x56f56 (<libgp-collector.so>)
+0.      0.    0.010   0.85   <static>@0x93615 (<libc.so.6>)
+0.      0.    0.080   6.78   <static>@0x9639a (<libc.so.6>)
+0.      0.    0.080   6.78   <static>@0xecf27 (<libstdc++.so.6.0.36>)
+0.      0.    0.010   0.85   decltype(auto) llvm::orc::ThreadSafeContext::withContextDo<llvm::orc::ThreadSafeModule::operator=(llvm::orc::ThreadSafeModule&&)::{lambda(llvm::LLVMContext*)#1}>(llvm::orc::ThreadSafeModule::operator=(llvm::orc::ThreadSafeModule&&)::{lambda(llvm::LLVMContext*)#1}&&)
+0.      0.    0.120  10.17   decltype(auto) llvm::orc::ThreadSafeContext::withContextDo<llvm::orc::ThreadSafeModule::withModuleDo<llvm::orc::IRCompileLayer::IRCompiler&>(llvm::orc::IRCompileLayer::IRCompiler&)::{lambda(llvm::LLVMContext*)#1}>(llvm::orc::IRCompileLayer::IRCompiler&)
+0.      0.    0.010   0.85   llvm::AllocaInst::getAllocationSize(llvm::DataLayout const&) const
+0.      0.    0.010   0.85   llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&)
+0.      0.    0.010   0.85   llvm::BasicBlock::eraseFromParent()
+0.      0.    0.010   0.85   llvm::BasicBlock::~BasicBlock()
+0.      0.    0.020   1.69   llvm::CGSCCToFunctionPassAdaptor::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&)
+0.      0.    0.010   0.85   llvm::CriticalAntiDepBreaker::BreakAntiDependencies(std::vector<llvm::SUnit, std::allocator<llvm::SUnit> > const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, unsigned int, std::vector<std::pair<llvm::MachineInstr*, llvm::MachineInstr*>, std::allocator<std::pair<llvm::MachineInstr*, llvm::MachineInstr*> > >&)
+0.      0.    0.010   0.85   llvm::DefaultInlineAdvisor::getAdviceImpl(llvm::CallBase&)
+0.      0.    0.030   2.54   llvm::DevirtSCCRepeatedPass::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&)
+0.      0.    0.010   0.85   llvm::DropUnnecessaryAssumesPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&)
+0.      0.    0.120  10.17   llvm::FPPassManager::runOnFunction(llvm::Function&)
+0.      0.    0.120  10.17   llvm::FPPassManager::runOnModule(llvm::Module&)
+0.      0.    0.010   0.85   llvm::Function::deleteBodyImpl(bool)
+0.      0.    0.010   0.85   llvm::FunctionToLoopPassAdaptor::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&)
+0.      0.    0.010   0.85   llvm::GenericScheduler::pickNode(bool&)
+0.      0.    0.010   0.85   llvm::IPSCCPPass::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&)
+0.      0.    0.010   0.85   llvm::InlineAdvisor::getAdvice(llvm::CallBase&, bool)
+0.      0.    0.010   0.85   llvm::InlinerPass::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&)
+0.      0.    0.020   1.69   llvm::InstCombinePass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&)
+0.      0.    0.020   1.69   llvm::InstCombinerImpl::run()
+0.      0.    0.010   0.85   llvm::InstCombinerImpl::visitICmpInst(llvm::ICmpInst&)
+0.      0.    0.110   9.32   llvm::MachineFunctionPass::runOnFunction(llvm::Function&)
+0.      0.    0.010   0.85   llvm::MemorySSA::MemorySSA(llvm::Function&, llvm::AAResults*, llvm::DominatorTree*)
+0.      0.    0.010   0.85   llvm::MemorySSAAnalysis::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&)
+0.      0.    0.010   0.85   llvm::Module::dropAllReferences()
+0.      0.    0.010   0.85   llvm::Module::~Module()
+0.      0.    0.030   2.54   llvm::ModuleInlinerWrapperPass::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&)
+0.      0.    0.020   1.69   llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&)
+0.      0.    0.030   2.54   llvm::ModuleToPostOrderCGSCCPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&)
+0.      0.    0.040   3.39   llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&)
+0.      0.    0.030   2.54   llvm::PassManager<llvm::LazyCallGraph::SCC, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&>::run(llvm::LazyCallGraph::SCC&, llvm::AnalysisManager<llvm::LazyCallGraph::SCC, llvm::LazyCallGraph&>&, llvm::LazyCallGraph&, llvm::CGSCCUpdateResult&)
+0.      0.    0.040   3.39   llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&)
+0.      0.    0.010   0.85   llvm::SCCPInstVisitor::solve()
+0.      0.    0.010   0.85   llvm::SCCPInstVisitor::visitTerminator(llvm::Instruction&)
+0.      0.    0.010   0.85   llvm::SCCPSolver::solveWhileResolvedUndefsIn(llvm::Module&)
+0.      0.    0.020   1.69   llvm::ScalarEvolution::computeBackedgeTakenCount(llvm::Loop const*, bool)
+0.      0.    0.010   0.85   llvm::ScalarEvolution::computeExitLimitFromICmp(llvm::Loop const*, llvm::CmpPredicate, llvm::SCEVUseT<llvm::SCEV const*>, llvm::SCEVUseT<llvm::SCEV const*>, bool, bool)
+0.      0.    0.010   0.85   llvm::ScalarEvolution::getRangeRef(llvm::SCEV const*, llvm::ScalarEvolution::RangeSignHint, unsigned int)
+0.      0.    0.010   0.85   llvm::ScalarEvolution::howFarToZero(llvm::SCEV const*, llvm::Loop const*, bool, bool)
+0.      0.    0.010   0.85   llvm::ScheduleDAGInstrs::buildSchedGraph(llvm::AAResults*, llvm::RegPressureTracker*, llvm::PressureDiffs*, llvm::LiveIntervals*, bool)
+0.      0.    0.020   1.69   llvm::ScheduleDAGMILive::schedule()
+0.      0.    0.030   2.54   llvm::SelectionDAG::Combine(llvm::CombineLevel, llvm::BatchAAResults*, llvm::CodeGenOptLevel)
+0.      0.    0.010   0.85   llvm::SelectionDAG::getLoad(llvm::EVT, llvm::SDLoc const&, llvm::SDValue, llvm::SDValue, llvm::MachineMemOperand*)
+0.      0.    0.050   4.24   llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&)
+0.      0.    0.050   4.24   llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&)
+0.      0.    0.050   4.24   llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&)
+0.      0.    0.010   0.85   llvm::Twine::toVector(llvm::SmallVectorImpl<char>&) const
+0.      0.    0.010   0.85   llvm::User::operator new(unsigned long, llvm::User::IntrusiveOperandsAllocMarker)
+0.      0.    0.010   0.85   llvm::User::~User()
+0.      0.    0.010   0.85   llvm::Value::deleteValue()
+0.      0.    0.010   0.85   llvm::Value::setName(llvm::Twine const&)
+0.      0.    0.010   0.85   llvm::detail::AnalysisPassModel<llvm::Function, llvm::MemorySSAAnalysis, llvm::AnalysisManager<llvm::Function>::Invalidator>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&)
+0.      0.    0.010   0.85   llvm::getInlineCost(llvm::CallBase&, llvm::InlineParams const&, llvm::TargetTransformInfo&, llvm::function_ref<llvm::AssumptionCache& (llvm::Function&)>, llvm::function_ref<llvm::TargetLibraryInfo const& (llvm::Function&)>, llvm::function_ref<llvm::BlockFrequencyInfo& (llvm::Function&)>, llvm::ProfileSummaryInfo*, llvm::OptimizationRemarkEmitter*, llvm::function_ref<llvm::EphemeralValuesCache& (llvm::Function&)>)
+0.      0.    0.020   1.69   llvm::impl_detail::MachineSchedulerBase::scheduleRegions(llvm::ScheduleDAGInstrs&, bool)
+0.      0.    0.020   1.69   llvm::impl_detail::MachineSchedulerImpl::run(llvm::MachineFunction&, llvm::TargetMachine const&, llvm::impl_detail::MachineSchedulerImpl::RequiredAnalyses const&)
+0.      0.    0.120  10.17   llvm::legacy::PassManagerImpl::run(llvm::Module&)
+0.      0.    0.130  11.02   llvm::orc::BasicIRLayerMaterializationUnit::materialize(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >)
+0.      0.    0.130  11.02   llvm::orc::ExecutionSession::OL_applyQueryPhase1(std::unique_ptr<llvm::orc::InProgressLookupState, std::default_delete<llvm::orc::InProgressLookupState> >, llvm::Error)
+0.      0.    0.130  11.02   llvm::orc::ExecutionSession::OL_completeLookup(std::unique_ptr<llvm::orc::InProgressLookupState, std::default_delete<llvm::orc::InProgressLookupState> >, std::shared_ptr<llvm::orc::AsynchronousSymbolQuery>, std::function<void (llvm::DenseMap<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> >, llvm::DenseMapInfo<llvm::orc::JITDylib*, void>, llvm::detail::DenseMapPair<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> > > > const&)>)
+0.      0.    0.130  11.02   llvm::orc::ExecutionSession::dispatchOutstandingMUs()
+0.      0.    0.130  11.02   llvm::orc::ExecutionSession::lookup(llvm::orc::LookupKind, std::vector<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags>, std::allocator<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags> > > const&, llvm::orc::SymbolLookupSet, llvm::orc::SymbolState, llvm::unique_function<void (llvm::Expected<llvm::DenseMap<llvm::orc::SymbolStringPtr, llvm::orc::ExecutorSymbolDef, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void>, llvm::detail::DenseMapPair<llvm::orc::SymbolStringPtr, llvm::orc::ExecutorSymbolDef> > >)>, std::function<void (llvm::DenseMap<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> >, llvm::DenseMapInfo<llvm::orc::JITDylib*, void>, llvm::detail::DenseMapPair<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> > > > const&)>)
+0.      0.    0.130  11.02   llvm::orc::ExecutionSession::lookup(std::vector<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags>, std::allocator<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags> > > const&, llvm::orc::SymbolLookupSet, llvm::orc::LookupKind, llvm::orc::SymbolState, std::function<void (llvm::DenseMap<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> >, llvm::DenseMapInfo<llvm::orc::JITDylib*, void>, llvm::detail::DenseMapPair<llvm::orc::JITDylib*, llvm::DenseSet<llvm::orc::SymbolStringPtr, llvm::DenseMapInfo<llvm::orc::SymbolStringPtr, void> > > > const&)>)
+0.      0.    0.130  11.02   llvm::orc::ExecutionSession::lookup(std::vector<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags>, std::allocator<std::pair<llvm::orc::JITDylib*, llvm::orc::JITDylibLookupFlags> > > const&, llvm::orc::SymbolStringPtr, llvm::orc::SymbolState)
+0.      0.    0.130  11.02   llvm::orc::IRCompileLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule)
+0.      0.    0.130  11.02   llvm::orc::IRTransformLayer::emit(std::unique_ptr<llvm::orc::MaterializationResponsibility, std::default_delete<llvm::orc::MaterializationResponsibility> >, llvm::orc::ThreadSafeModule)
+0.      0.    0.130  11.02   llvm::orc::InProgressFullLookupState::complete(std::unique_ptr<llvm::orc::InProgressLookupState, std::default_delete<llvm::orc::InProgressLookupState> >)
+0.      0.    0.130  11.02   llvm::orc::LLJIT::lookup(llvm::orc::JITDylib&, llvm::StringRef)
+0.      0.    0.130  11.02   llvm::orc::LLJIT::lookupLinkerMangled(llvm::orc::JITDylib&, llvm::orc::SymbolStringPtr)
+0.      0.    0.130  11.02   llvm::orc::MaterializationTask::run()
+0.      0.    0.120  10.17   llvm::orc::SimpleCompiler::operator()(llvm::Module&)
+0.      0.    0.010   0.85   llvm::orc::ThreadSafeModule::operator=(llvm::orc::ThreadSafeModule&&)
+0.      0.    0.010   0.85   llvm::raw_ostream::write(char const*, unsigned long)
+0.      0.    0.010   0.85   llvm::raw_svector_ostream::write_impl(char const*, unsigned long)
+0.      0.    0.010   0.85   llvm::verifyModule(llvm::Module const&, llvm::raw_ostream*, bool*)
+0.      0.    0.190  16.10   main
+0.      0.    0.020   1.69   operator new(unsigned long)
+0.      0.    0.010   0.85   pthread_cond_wait
+0.      0.    0.010   0.85   std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+0.      0.    0.010   0.85   std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> > >::_M_emplace_hint_unique<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::ir::Function const*>(std::_Rb_tree_const_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::ir::Function const*&&)
+0.      0.    0.020   1.69   std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace_aux(unsigned long, unsigned long, unsigned long, char)
+0.      0.    0.010   0.85   std::pair<std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> >, bool> std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, vd::ir::Function const*, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::Function const*> > >::emplace<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::ir::Function const*>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::ir::Function const*&&)
+0.      0.    0.080   6.78   std::thread::_State_impl<std::thread::_Invoker<std::tuple<(anonymous namespace)::Scope::ensure_workers()::{lambda()#1}> > >::_M_run()
+0.      0.    0.010   0.85   std::vector<vd::ir::reference_paths(vd::ir::Type, bool)::Pending, std::allocator<vd::ir::reference_paths(vd::ir::Type, bool)::Pending> >::push_back(vd::ir::reference_paths(vd::ir::Type, bool)::Pending&&)
+0.      0.    0.050   4.24   vd::(anonymous namespace)::finish(llvm::Module&, bool)
+0.      0.    0.130  11.02   vd::Jit::Impl::load(std::unique_ptr<llvm::Module, std::default_delete<llvm::Module> >, std::unique_ptr<llvm::LLVMContext, std::default_delete<llvm::LLVMContext> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::Compatibility, std::shared_ptr<vd::Jit::Impl> const&, bool, std::shared_ptr<vd::Runtime>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer> >)
+0.      0.    0.180  15.25   vd::Jit::compile(vd::ir::Module const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool, vd::Compatibility, std::shared_ptr<vd::Runtime>)
+0.      0.    0.010   0.85   vd::NativeCode::invoke(int) const
+0.      0.    0.010   0.85   vd::Runtime::buffer_layout(std::shared_ptr<vd::ElementSchema const>, unsigned long, unsigned long, unsigned long) const
+0.      0.    0.791  66.95   vd::Runtime::byte_array_bytes[abi:cxx11](vd::Runtime::RegisteredRootWord)
+0.      0.    0.010   0.85   vd::Runtime::bytes_into(void**, std::basic_string_view<char, std::char_traits<char> >)
+0.      0.    0.010   0.85   vd::Runtime::fixed_scalar_layout(vd::ScalarEncoding, unsigned long)
+0.      0.    0.060   5.08   vd::filesystem::(anonymous namespace)::Job::execute(std::atomic<bool> const&, vd::RuntimeFailure*)
+0.      0.    0.010   0.85   vd::filesystem::(anonymous namespace)::Job::publish(vd::Runtime&, void*)
+0.      0.    0.010   0.85   vd::filesystem::(anonymous namespace)::Reply::build(vd::Runtime&, vd::filesystem::Result const&)
+0.      0.    0.060   5.08   vd::filesystem::(anonymous namespace)::write(vd::filesystem::File&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, vd::filesystem::Result&, std::atomic<bool> const*)
+0.      0.    0.060   5.08   vd::filesystem::run(vd::filesystem::Request const&, std::atomic<bool> const*)
+0.      0.    0.010   0.85   vd::ir::reference_facts(vd::ir::Type)
+0.      0.    0.030   2.54   vd::ir::reference_paths(vd::ir::Type, bool)
+0.      0.    0.020   1.69   vd::ir::reference_paths(vd::ir::Type, bool)::Pending::~Pending()
+0.      0.    0.010   0.85   vd::ir::validate(vd::ir::Module const&, std::vector<std::vector<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> >, std::allocator<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > > >, std::allocator<std::vector<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> >, std::allocator<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > > > > >*, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, vd::ir::ReferenceEffects, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::ReferenceEffects> > >*)
+0.      0.    0.010   0.85   vd::ir::validate_construction(vd::ir::Function const&, vd::ir::Module const&, std::vector<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> >, std::allocator<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > > > const&)
+0.      0.    0.030   2.54   vd::ir::validate_reference_capabilities(vd::ir::Module const&, std::vector<std::vector<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> >, std::allocator<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > > >, std::allocator<std::vector<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> >, std::allocator<std::vector<vd::ir::Type, std::allocator<vd::ir::Type> > > > > >&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, vd::ir::ReferenceEffects, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, vd::ir::ReferenceEffects> > >*)::$_0::operator()(unsigned int, bool, bool) const
+0.      0.    0.010   0.85   vd_async_new
+0.      0.    0.010   0.85   vd_async_root
+0.      0.    0.791  66.95   vd_filesystem_call
+0.      0.    0.010   0.85   void llvm::MemorySSA::buildMemorySSA<llvm::iterator_range<llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::BasicBlock, false, false, void, false, void>, false, false> > >(llvm::BatchAAResults&, llvm::iterator_range<llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::BasicBlock, false, false, void, false, void>, false, false> >)
+0.      0.    0.010   0.85   void std::vector<unsigned long, std::allocator<unsigned long> >::_M_assign_aux<unsigned long const*>(unsigned long const*, unsigned long const*, std::forward_iterator_tag)
+0.      0.    0.060   5.08   write
+

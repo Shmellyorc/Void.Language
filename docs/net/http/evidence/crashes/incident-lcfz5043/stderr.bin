@@ -1,0 +1,80 @@
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:3:72: error: Duplicate declaration or shadowing of 'address'.
+    code: VOID2005
+
+ 3 | if url.parse("HTTPS://EXAMPLE.COM:443/a/../b%2Fc?x=1&x=2#f") is Ok(var address):
+   |                                                                        ^^^^^^^
+    Module: /url.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:4:11: error: Unknown import qualifier 'address'.
+    code: VOID3003
+
+ 4 |     print(address.to_string() == "https://example.com/a/../b%2Fc?x=1&x=2#f")
+   |           ^^^^^^^
+    Module: /url.void
+    Hint: Import the module with this alias before calling it.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:5:11: error: Unknown identifier 'address'.
+    code: VOID2002
+
+ 5 |     print(address.scheme == "https" and address.host == "example.com" and address.port == 443)
+   |           ^^^^^^^
+    Module: /url.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:5:41: error: Unknown identifier 'address'.
+    code: VOID2002
+
+ 5 |     print(address.scheme == "https" and address.host == "example.com" and address.port == 443)
+   |                                         ^^^^^^^
+    Module: /url.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:5:75: error: Unknown identifier 'address'.
+    code: VOID2002
+
+ 5 |     print(address.scheme == "https" and address.host == "example.com" and address.port == 443)
+   |                                                                           ^^^^^^^
+    Module: /url.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:6:11: error: Unknown identifier 'address'.
+    code: VOID2002
+
+ 6 |     print(address.path == "/a/../b%2Fc" and address.query == "x=1&x=2" and address.fragment == "f")
+   |           ^^^^^^^
+    Module: /url.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:6:45: error: Unknown identifier 'address'.
+    code: VOID2002
+
+ 6 |     print(address.path == "/a/../b%2Fc" and address.query == "x=1&x=2" and address.fragment == "f")
+   |                                             ^^^^^^^
+    Module: /url.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:6:76: error: Unknown identifier 'address'.
+    code: VOID2002
+
+ 6 |     print(address.path == "/a/../b%2Fc" and address.query == "x=1&x=2" and address.fragment == "f")
+   |                                                                            ^^^^^^^
+    Module: /url.void
+    Hint: Declare it with var before use.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:10:61: error: Duplicate declaration or shadowing of 'address'.
+    code: VOID2005
+
+ 10 | if url.resolve("https://example.com/a/b", "../c") is Ok(var address):
+    |                                                             ^^^^^^^
+    Module: /url.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/tests/net/http/url.void:11:11: error: Unknown import qualifier 'address'.
+    code: VOID3003
+
+ 11 |     print(address.to_string() == "https://example.com/c")
+    |           ^^^^^^^
+    Module: /url.void
+    Hint: Import the module with this alias before calling it.
+

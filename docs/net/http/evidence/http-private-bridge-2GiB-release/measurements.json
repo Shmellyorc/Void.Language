@@ -1,0 +1,49 @@
+{
+  "source_gc": {
+    "samples": 262,
+    "heap_payload": [
+      212924,
+      215996
+    ],
+    "tasks_max": 10,
+    "groups_max": 2,
+    "handles_max": 11
+  },
+  "2": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_source_runner",
+      "--async",
+      "/tmp/VOID HTTP source 8ii6uxfm/async.void"
+    ],
+    "sample_count": 576,
+    "rss_after_0_3_seconds_kib": [
+      53696,
+      176180
+    ],
+    "last_sample_seconds": 28.96107990299788
+  },
+  "5": {
+    "argv": [
+      "/tmp/VOID HTTP source 8ii6uxfm/async-normal",
+      "7"
+    ],
+    "sample_count": 55,
+    "rss_after_0_3_seconds_kib": [
+      12404,
+      12708
+    ],
+    "last_sample_seconds": 2.7194608400022844
+  },
+  "8": {
+    "argv": [
+      "/tmp/VOID HTTP source 8ii6uxfm/async-optimized",
+      "7"
+    ],
+    "sample_count": 56,
+    "rss_after_0_3_seconds_kib": [
+      12292,
+      12540
+    ],
+    "last_sample_seconds": 2.7664030469968566
+  }
+}

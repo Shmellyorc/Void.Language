@@ -1,0 +1,37 @@
+use url
+
+if url.parse("HTTPS://EXAMPLE.COM:443/a/../b%2Fc?x=1&x=2#f") is Ok(var parsed_address):
+    print(parsed_address.to_string() == "https://example.com/a/../b%2Fc?x=1&x=2#f")
+    print(parsed_address.scheme == "https" and parsed_address.host == "example.com" and parsed_address.port == 443)
+    print(parsed_address.path == "/a/../b%2Fc" and parsed_address.query == "x=1&x=2" and parsed_address.fragment == "f")
+else:
+    print(false)
+
+if url.resolve("https://example.com/a/b", "../c") is Ok(var parsed_address):
+    print(parsed_address.to_string() == "https://example.com/c")
+
+if url.normalize("https://example.com/a/../b", true) is Ok(var normalized):
+    print(normalized == "https://example.com/b")
+
+print(url.encode_component("a b+é") == "a%20b%2B%C3%A9")
+if url.decode_component("a+b%00") is Ok(var decoded):
+    print(decoded == "a+b\0")
+if url.decode_component("%FF") is Err(var reason):
+    print(reason.kind is url.error_kind.invalid_utf8)
+if url.decode_bytes("%FF%00") is Ok(var bytes):
+    print(bytes.count == 2 and bytes[0] == 255 and bytes[1] == 0)
+
+if url.parse_query("x=1&x=2&flag&empty=&a%26b=c%3Dd") is Ok(var items):
+    print(items.count == 5 and not items[2].has_value and items[3].has_value)
+    if url.encode_query(items) is Ok(var encoded):
+        print(encoded == "x=1&x=2&flag&empty=&a%26b=c%3Dd")
+    if url.with_query("https://example.com/p?old#f", items) is Ok(var changed):
+        print(changed == "https://example.com/p?x=1&x=2&flag&empty=&a%26b=c%3Dd#f")
+
+if url.parse("https://u:p@example.com/?secret") is Err(var reason):
+    print(reason.message == "URL operation rejected its input" and reason.path == "")
+if url.parse("https://example.com/%Q1") is Err(var reason):
+    print(reason.kind is url.error_kind.invalid_encoding)
+if url.parse_query("x=1&y=2", false, 1) is Err(var reason):
+    print(reason.kind is url.error_kind.limit_exceeded)
+return 0

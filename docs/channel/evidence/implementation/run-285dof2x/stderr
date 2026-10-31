@@ -1,0 +1,9 @@
+/tmp/VOID-channel-rejections-r5j09tek/wrong-token.void:8:21: error: Type mismatch: expected readonly /@stdlib/channel.void::subscription, received i32.
+    code: VOID2001
+
+ 8 |     bus.unsubscribe(7)
+   |                     ^
+    Module: /wrong-token.void
+    Expected: readonly /@stdlib/channel.void::subscription
+    Received: i32
+

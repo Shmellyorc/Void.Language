@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_native",
+    "http://127.0.0.1:40523",
+    "https://127.0.0.1:42623",
+    "/tmp/VOID HTTP native 6377ov_0/cert.pem",
+    "https://127.0.0.1:47771"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 1.0746364509977866,
+  "binary_sha256": "0a1685ad7a746e147dfadead1ddc986d02520ee9fa2268908e1863ada9e9d259",
+  "scope": "loopback native HTTP/1.1 and TLS; not complete source/h2/platform acceptance"
+}

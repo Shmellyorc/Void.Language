@@ -1,0 +1,61 @@
+-- Found OpenSSL: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/libcrypto.a (found suitable version "1.1.1g", minimum required is "1.1.1")
+-- Could NOT find Libngtcp2 (missing: LIBNGTCP2_LIBRARY LIBNGTCP2_INCLUDE_DIR) (Required is at least version "1.23.0")
+-- Could NOT find Libnghttp3 (missing: LIBNGHTTP3_LIBRARY LIBNGHTTP3_INCLUDE_DIR) (Required is at least version "1.17.0")
+-- Could NOT find Systemd (missing: SYSTEMD_INCLUDE_DIRS SYSTEMD_LIBRARIES) (Required is at least version "209")
+-- Could NOT find Jansson (missing: JANSSON_LIBRARY JANSSON_INCLUDE_DIR) (Required is at least version "2.5")
+-- Could NOT find Libevent (missing: LIBEVENT_CORE_LIBRARY LIBEVENT_EXTRA_LIBRARY LIBEVENT_OPENSSL_LIBRARY LIBEVENT_INCLUDE_DIR core extra openssl) (Required is at least version "2.0.8")
+-- Could NOT find Jemalloc (missing: JEMALLOC_LIBRARY JEMALLOC_INCLUDE_DIR) 
+-- summary of build options:
+
+    Package version: 1.70.0
+    Library version: 43:5:29
+    Install prefix:  /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release
+    Target system:   Linux
+    Compiler:
+      Build type:     Release
+      C compiler:     /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+      CFLAGS:         -O3  -O2 -fPIC
+      C++ compiler:   /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+      CXXFLAGS:        -O2 -fPIC
+      WARNCFLAGS:       -Wextra -Wall -Wconversion -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wpointer-arith -Wshadow -Wundef -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wmissing-field-initializers -Wmissing-noreturn -Wno-format-nonliteral -Wredundant-decls -Wsign-conversion -Wstrict-prototypes -Wunreachable-code -Wunused-parameter -Wvla -Wshorten-64-to-32 -Wlanguage-extension-token -Wpragmas -Wunreachable-code-break -Wheader-guard -Wmissing-variable-declarations
+      CXX1XCXXFLAGS:  
+      WARNCXXFLAGS:   
+    Python:
+      Python:          /usr/bin/python3
+      Python3_VERSION: 3.14.8
+    Test:
+      Failmalloc:     ON
+      Build Test:     OFF
+    Libs:
+      OpenSSL:        TRUE (LIBS='')
+      wolfSSL:         (LIBS='')
+      Libxml2:        TRUE (LIBS='/usr/lib/x86_64-linux-gnu/libxml2.so')
+      Libev:           (LIBS='')
+      Libc-ares:       (LIBS='')
+      Libngtcp2:       (LIBS='')
+      Libngtcp2_crypto_quictls:  (LIBS='')
+      Libngtcp2_crypto_libressl:  (LIBS='')
+      Libngtcp2_crypto_wolfssl:  (LIBS='')
+      Libnghttp3:      (LIBS='')
+      Libbpf:          (LIBS='')
+      Libevent(SSL):  FALSE (LIBS='')
+      Jansson:        FALSE (LIBS='')
+      Jemalloc:       FALSE (LIBS='')
+      Zlib:            (LIBS='')
+      Systemd:        FALSE (LIBS='SYSTEMD_LIBRARIES-NOTFOUND')
+      Libbrotlienc:    (LIBS='')
+      Libbrotlidec:    (LIBS='')
+    Third-party:
+      http-parser:    
+      MRuby:          0
+      Neverbleed:     0
+    Features:
+      Applications:   OFF
+      HPACK tools:    OFF
+      Examples:       OFF
+      Threading:      ON
+      HTTP/3(EXPERIMENTAL): OFF
+
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2

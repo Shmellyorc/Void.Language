@@ -1,0 +1,22 @@
+{
+  "include/void/http.hpp": "117342f6d7240d1c12f7db03e261016600cf59ab5128255d913ee048fc4dcc33",
+  "include/void/http_abi.hpp": "d35235855bf4da894e75ac9f988f6660a9e7e851c833d9ef01e381eafcacd0cc",
+  "include/void/http_ops.hpp": "e30c2921b229dfddcc819fff8567ec7387aaeb1859e4fa2c07ee38c8edf3d7ed",
+  "include/void/http_file.hpp": "28c0fa19bf5fffbc6b55dc31b892ccd9d3f7b61e1b560e080b079518f9cc3b8a",
+  "include/void/http_resource.hpp": "cd703d39cbffc474925db3e4f9abc7a55461edeac764824025d13d0b4c12dbd3",
+  "include/void/native_work.hpp": "6d92bd0ed3a8b817b125c867442b67b4be6647f950fa288e129d09360534fcb6",
+  "src/runtime/http.cpp": "a955ac4a46c174ce933d94410c77254d836913ab2156ee835274975f17657569",
+  "src/runtime/http_abi.cpp": "a9df18c8598d793a83c65fb3fa702451db2920152c77c7382c37fadb695c8663",
+  "src/runtime/http_file.cpp": "cf891d107273a1a2e070a31a5f3797dd49b96b234a93eac21d0dd55941691407",
+  "src/runtime/http_resource.cpp": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+  "src/runtime/native_work.cpp": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4",
+  "src/runtime/native_resource.cpp": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+  "src/runtime/async.cpp": "aa16386d7f2b78db267c0a0bd174af65c209ae11797f7ad05f43136ca405f389",
+  "stdlib/net/http.void": "2f0bc3477f29fa0796e8fca94d5616bae1cd577e09268df879108e7c1d91c4ed",
+  "src/frontend/http.inc": "d1db571bdf4fb549d1a2d18eae95e24c59ffc54c24b6e4e92190b220d8d0887c",
+  "src/frontend/capabilities.inc": "bcb00a131f17eecf10f276dd9f0697a0c5da8945663d67366c97fc30bcf1ecfa",
+  "src/ir/http.inc": "ca8b6180a0e7ef2efd337d0c733a55a64102f8297c236e265e278025ab4ce6e0",
+  "src/ir/reference_capabilities.inc": "d857f9c11337c0064fda2dd761728a550de2d9ed2497923e9d3c5a7aec68871c",
+  "src/backend/llvm/http.inc": "fb38f8048372e40633e697e60be5443cec9fd6fbd2fc487c469c93b28ef1a11a",
+  "cmake/HttpDependencies.cmake": "70762b9f557fcdd8d985d18bd61c01a9f5c96ccb9bfc726cc58d32724f96cc0e"
+}

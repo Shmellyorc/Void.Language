@@ -2,17 +2,17 @@
 
 **Recorded:** 27 October 2026  
 **Project:** `Shmellyorc/Void.Language`  
-**Reference HEAD:** `0d014e851851203e30d3b376ca99606a67d36a7a` (channel implementation)  
+**Current checkpoint:** 30 October 2026, `15f7868b0af177f8f7d49c548392c79c7bd921d2`, LLVM/Clang/LLD 23.1.4. Original 27 October channel reference: `0d014e851851203e30d3b376ca99606a67d36a7a`.
 **Governance:** 👑 Boss decides and alone handles Git/hosted CI; 🏮 Research audits; 🔧 Golden Wrench reviews; ⌨️ Keyboard implements authorized scope. This is a planning record, **not blanket authorization** for subsequent modules.
 
 ## Delivery sequence
 
 | Priority | Module / area | State | Scope to research and deliver |
 |---|---|---|---|
-| **NOW** | **`os`** | **Final architecture GO; Boss authorizes engineering through the separate Keyboard mission** | **All 13 approved public functions**, exact Linux/Windows/macOS policies, checked private native bridge, installation/tooling, native JIT/O2/AOT, GC/errors, cache/reload, strict test evidence and documented native-platform limits. Local working-tree `docs/os/{RESEARCH,DESIGN,ROADMAP}.md` contains authoritative design; these may be uncommitted. |
-| **NEXT 1** | **`collections`** | Backlog; **research not yet authorized by this record** | Useful operations missing from built-in fixed/growable arrays and dictionaries: stable sorting, comparators, ordered searches, find/find-index, predicates, filtering/mapping, reverse/copy, fold/reduce and aggregations as justified. Audit existing builtin operations first; preserve readonly, value/reference semantics, callback effects, allocation limits, iteration invalidation and JIT/AOT. Avoid LINQ clones, mandatory containers or another collection engine. |
-| **NEXT 2** | **`log`** | Backlog; research/implementation separately approved | Practical configurable logging: severity filtering; clear messages/formatting, timestamps, console and file sinks, structured context if supported naturally, explicit flush/close, rotation/retention where appropriate, failure handling and bounded memory. Research captured-callback cost, eager interpolation, async/concurrent emission policy, file lifecycle and sharing using existing IO/time/OS state directories. Avoid a second formatter, log compiler or unbounded queue. |
-| **NEXT 3** | **`net/http` foundation** | Backlog; research/implementation separately approved | A complete **secure HTTP-client foundation**, not a pretend `get()` wrapper: URL validation, requests/methods, headers, status, redirects, body streaming and size limits, TLS verification, DNS, connect/read/overall timeouts, error model, real async cancellation/resource cleanup, HTTP protocol/version boundaries, proxies/auth/cookies where justified. Clarify dependency on `net/tcp`, TLS provider and separate `url`; preserve distinct protocol APIs and platform-native security. Start with a coherent supported client scope; do not claim the whole networking ecosystem is finished. |
+| Delivered | `os` | All 13 public functions implemented; registered native tests passed on Linux, Windows and macOS | [API and evidence](os/HANDOFF.md). No new independent source review or formal release lock claimed. |
+| Delivered | `collections` | All 24 approved public helpers implemented; feature-complete for the accepted API scope; cross-platform CI passing | [API and evidence](collections/HANDOFF.md). No broader collection-engine claim. |
+| Implemented; hold remains | `log` | Substantial approved logging API implemented; cross-platform tests passed | [Historical optimizer incident, performance OPEN and release HOLD](log/HANDOFF.md) remain unresolved. No causal repair is implied. |
+| **NOW** | **`url` and `net/http`** | **Linux implementation handoff ready; independent acceptance pending** | [Current engineering](net/http/CURRENT_ENGINEERING.md), [guide/examples](net/http/README.md), [contract](net/http/DESIGN.md). Direct authoritative curl with four exact approved fixes; approved unmodified Linux TLS pin; existing Runtime worker pool and bounded async retirement. Actual source 2 GiB and native bulk 4 GiB+1 probes pass. Source bridge, bulk/multipart, protocols/security/policies, tooling and install closure are implemented. Native Windows/macOS recipes are unexecuted; provider worst-case allocation proof remains open. Full all-target local builds pass; [consolidated results and focused repairs](net/http/HANDOFF.md) are recorded. No manual patch/ZIP, Git action, hosted CI or root README change. |
 
 ## `os` architecture now settled
 
@@ -55,8 +55,9 @@ The approved **13 public functions** in `docs/os/DESIGN.md` are:
 ## Current checkpoint
 
 - `channel` was independently reviewed and pushed at `0d014e85` with `[skip ci]`. Hosted cross-platform acceptance remains a separate Boss-controlled gate.
-- `os` research's revised 13-function contract and 25-capability matrix received **Golden Wrench architecture GO**; Boss approves beginning the complete engineering mission. No `os` implementation/verification is yet evidenced by this backlog.
+- Boss records LLVM 23.1.4 hosted acceptance at `15f7868b`, CI #40982216303: seven successful jobs, 2,454 passing CTests, zero failures and five documented cross-volume skips. No independent source review or formal release lock is inferred.
+- `os`, `collections` and `log` implementation/native status is synchronized in the delivery table above. Historical research, failed attempts and logging holds remain intact.
 - Earlier historical compiler/LLVM incident families H1–H7 must not be called resolved without direct causal evidence.
-- Prioritize **`collections` → `log` → `net/http` foundation** as Research missions after `os`, subject to Boss decisions. **Do not implement future backlog merely because it appears here.**
+- The current mission is Boss-authorized **`url`/`net/http` engineering**. Other backlog entries remain separately owned; listing them is not authorization.
 
 **THREE CLANKERS. ONE VOID. STRONG BOLTS. NO GHOST BOLTS!**

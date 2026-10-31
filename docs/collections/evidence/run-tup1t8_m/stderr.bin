@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/collections.void:203:5: runtime error: List structurally modified during iteration
+In function /@stdlib/collections.void::index_of
+Called from /mutation.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/collections_stdlib/mutation.void:29:11: source call
+        c.index_of(equality_items, marker(number = 99))
+          ^
+

@@ -1,0 +1,20 @@
+[
+  "cmake",
+  "-S",
+  "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+  "-B",
+  "/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/build-strict",
+  "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+  "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+  "-DCMAKE_BUILD_TYPE=Debug",
+  "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/.toolchains/http/tls-review/prefix-strict",
+  "-DCMAKE_INSTALL_LIBDIR=lib",
+  "-DBUILD_SHARED_LIBS=OFF",
+  "-DBUILD_TESTING=OFF",
+  "-DBUILD_LIBSSL=ON",
+  "-DDISABLE_GO=ON",
+  "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+  "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+  "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+  "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+]

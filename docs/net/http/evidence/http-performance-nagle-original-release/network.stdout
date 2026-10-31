@@ -1,0 +1,3 @@
+{"mode":"h1","cold_ms":1.64444,"warm_samples":64,"warm_median_ms":0.243198,"warm_p95_ms":0.289569,"four_concurrent_batches":16,"batch_median_ms":0.901245,"client_cpu_seconds":0.020917,"close_median_ms":0.09402,"close_max_ms":0.259748}
+{"mode":"h1_tls","cold_ms":3.89848,"warm_samples":64,"warm_median_ms":0.238229,"warm_p95_ms":0.286838,"four_concurrent_batches":16,"batch_median_ms":0.923695,"client_cpu_seconds":0.018215,"close_median_ms":0.12858,"close_max_ms":0.1598}
+{"mode":"h2_tls","cold_ms":61.918,"warm_samples":64,"warm_median_ms":0.510827,"warm_p95_ms":0.720986,"four_concurrent_batches":16,"batch_median_ms":42.0186,"client_cpu_seconds":0.03151,"close_median_ms":0.0548,"close_max_ms":0.111289}

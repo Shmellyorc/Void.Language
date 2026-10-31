@@ -1,0 +1,4 @@
+{
+  "stable_http_cpp_sha256": "c714b335158c3201f3c969faebdd796e3bb879ba46bdedafa6667db024db2831",
+  "classification": "source formatting changed concurrently with compiler input; lexer failure; stable retry required"
+}

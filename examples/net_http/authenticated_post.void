@@ -1,0 +1,39 @@
+use net/http
+use json
+use os
+
+struct update:
+    message: string
+
+func post(target: string, token: string) -> i32:
+    # Keep JSON encoding failures distinct from transport failures.
+    var encoded_result = json.stringify(update(message = "hello"))
+    if encoded_result is Ok(var encoded):
+        var settings = http.client_options()
+        if os.env("VOID_HTTP_CA") is Ok(var ca_path):
+            settings.tls.trust = http.trust_source.pem_bundle(ca_path)
+        var client_result = http.open_client(settings)
+        if client_result is Ok(var owner):
+            with owner:
+                if http.field("Content-Type", "application/json") is Ok(var content_type):
+                    var submission = http.request(method = "POST", target = target,
+                        headers = [content_type], body = http.body.text(encoded),
+                        auth = http.authentication.bearer(token))
+                    var response_result = owner.send(submission)
+                    if response_result is Ok(var reply):
+                        print("HTTP {reply.info.status}; {reply.bytes.count} response bytes")
+                        if reply.require_success() is Ok(var passed):
+                            return 0
+                    else if response_result is Err(var failure):
+                        print("HTTP {failure.kind}, phase {failure.phase}")
+        else if client_result is Err(var failure):
+            print("HTTP configuration {failure.kind}")
+    else if encoded_result is Err(var failure):
+        print("JSON {failure.kind} at byte {failure.offset}")
+    return 1
+
+if os.env("VOID_HTTP_URL") is Ok(var target):
+    if os.env("VOID_HTTP_TOKEN") is Ok(var token):
+        return post(target, token)
+print("Set VOID_HTTP_URL to an HTTPS endpoint and VOID_HTTP_TOKEN to its bearer token")
+return 1

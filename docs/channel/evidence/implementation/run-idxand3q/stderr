@@ -1,0 +1,7 @@
+/tmp/VOID-channel-rejections-xfuur_xt/async-handler.void:10:24: error: Async function values require a reviewed async callable contract; call the function directly.
+    code: VOID1103
+
+ 10 |     bus.subscribe("t", listener)
+    |                        ^^^^^^^^
+    Module: /async-handler.void
+

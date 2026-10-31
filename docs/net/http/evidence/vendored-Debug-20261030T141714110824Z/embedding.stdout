@@ -1,0 +1,3 @@
+{"stack_soft":1048576,"stack_hard":1048576}
+{"transport":"8.23.0","standalone_cookie_probe_only":true,"features":1140851209,"curl_off_t_bytes":8}
+{"case":"embedding_host_initialized_first","api_code":0,"list_null":false,"replacement_allocator_calls":0,"injected_failures":0}

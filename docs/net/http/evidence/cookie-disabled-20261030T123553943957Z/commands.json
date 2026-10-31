@@ -1,0 +1,186 @@
+{
+  "scope": "isolated strict disabled-feature controls; no VOID HTTP integration",
+  "commands": [
+    {
+      "argv": [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "-p1",
+        "-i",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/curl-8.23.0",
+      "name": "apply",
+      "seconds": 0.003111639000053401,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/curl-8.23.0",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-cookies",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_DEBUG_POSTFIX=",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_STATIC_LIBS=ON",
+        "-DBUILD_CURL_EXE=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DCURL_DISABLE_INSTALL=ON",
+        "-DCURL_ENABLE_SSL=OFF",
+        "-DCURL_USE_LIBPSL=OFF",
+        "-DUSE_LIBIDN2=OFF",
+        "-DUSE_NGHTTP2=OFF",
+        "-DCURL_ZLIB=OFF",
+        "-DCURL_BROTLI=OFF",
+        "-DCURL_ZSTD=OFF",
+        "-DENABLE_THREADED_RESOLVER=OFF",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-DCURL_DISABLE_COOKIES=ON"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-cookies-configure",
+      "seconds": 31.306149759999926,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-cookies",
+        "--target",
+        "libcurl_static",
+        "--parallel",
+        "4"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-cookies-build",
+      "seconds": 4.536064027000066,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/curl-8.23.0/include",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/cookie_disabled_probe.c",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-cookies/lib/libcurl.a",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-cookies/disabled-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-cookies-compile",
+      "seconds": 0.35958390399991913,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-cookies/disabled-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-cookies-probe",
+      "seconds": 0.016593883000041387,
+      "exit_code": 0,
+      "stack_1mib": true
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/curl-8.23.0",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-http",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_DEBUG_POSTFIX=",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_STATIC_LIBS=ON",
+        "-DBUILD_CURL_EXE=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DCURL_DISABLE_INSTALL=ON",
+        "-DCURL_ENABLE_SSL=OFF",
+        "-DCURL_USE_LIBPSL=OFF",
+        "-DUSE_LIBIDN2=OFF",
+        "-DUSE_NGHTTP2=OFF",
+        "-DCURL_ZLIB=OFF",
+        "-DCURL_BROTLI=OFF",
+        "-DCURL_ZSTD=OFF",
+        "-DENABLE_THREADED_RESOLVER=OFF",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-DCURL_DISABLE_HTTP=ON"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-http-configure",
+      "seconds": 29.024802501000067,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-http",
+        "--target",
+        "libcurl_static",
+        "--parallel",
+        "4"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-http-build",
+      "seconds": 4.089573468000026,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/curl-8.23.0/include",
+        "/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/cookie_disabled_probe.c",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-http/lib/libcurl.a",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-http/disabled-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-http-compile",
+      "seconds": 0.3630524590000732,
+      "exit_code": 0,
+      "stack_1mib": false
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/http-cookie-disabled/20261030T123553943957Z/no-http/disabled-probe"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "name": "no-http-probe",
+      "seconds": 0.015487880000137011,
+      "exit_code": 0,
+      "stack_1mib": true
+    }
+  ],
+  "patch_sha256": "6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920",
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "result": "both disabled-cookie and disabled-HTTP builds pass under strict sanitizers on actual 1 MiB stacks"
+}

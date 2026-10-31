@@ -1,0 +1,16 @@
+{"source_http_sample":{"constructions":512,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":768,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1024,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1280,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1536,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1792,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":2048,"heap_payload":214799,"tasks":10,"groups":2,"work":1,"handles":11}}
+normal HTTP source, one worker, forced GC and root retirement passed
+{"source_http_sample":{"constructions":512,"heap_payload":211727,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":768,"heap_payload":208655,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1024,"heap_payload":211727,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1280,"heap_payload":211727,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1536,"heap_payload":208655,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":1792,"heap_payload":211727,"tasks":10,"groups":2,"work":1,"handles":11}}
+{"source_http_sample":{"constructions":2048,"heap_payload":211727,"tasks":10,"groups":2,"work":1,"handles":11}}
+O2 HTTP source, one worker, forced GC and root retirement passed

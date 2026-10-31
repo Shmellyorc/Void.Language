@@ -1,0 +1,338 @@
+-- The C compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Performing Test HAVE__Wall
+-- Performing Test HAVE__Wall - Success
+-- Performing Test HAVE__Wextra
+-- Performing Test HAVE__Wextra - Success
+-- Performing Test HAVE__Waggregate_return
+-- Performing Test HAVE__Waggregate_return - Success
+-- Performing Test HAVE__Wcast_align
+-- Performing Test HAVE__Wcast_align - Success
+-- Performing Test HAVE__Wcast_qual
+-- Performing Test HAVE__Wcast_qual - Success
+-- Performing Test HAVE__Wconversion
+-- Performing Test HAVE__Wconversion - Success
+-- Performing Test HAVE__Wdeclaration_after_statement
+-- Performing Test HAVE__Wdeclaration_after_statement - Success
+-- Performing Test HAVE__Wdouble_promotion
+-- Performing Test HAVE__Wdouble_promotion - Success
+-- Performing Test HAVE__Wfloat_equal
+-- Performing Test HAVE__Wfloat_equal - Success
+-- Performing Test HAVE__Wformat_security
+-- Performing Test HAVE__Wformat_security - Success
+-- Performing Test HAVE__Winit_self
+-- Performing Test HAVE__Winit_self - Success
+-- Performing Test HAVE__Wjump_misses_init
+-- Performing Test HAVE__Wjump_misses_init - Success
+-- Performing Test HAVE__Wlogical_op
+-- Performing Test HAVE__Wlogical_op - Failed
+-- Performing Test HAVE__Wmissing_braces
+-- Performing Test HAVE__Wmissing_braces - Success
+-- Performing Test HAVE__Wmissing_declarations
+-- Performing Test HAVE__Wmissing_declarations - Success
+-- Performing Test HAVE__Wmissing_format_attribute
+-- Performing Test HAVE__Wmissing_format_attribute - Success
+-- Performing Test HAVE__Wmissing_include_dirs
+-- Performing Test HAVE__Wmissing_include_dirs - Success
+-- Performing Test HAVE__Wmissing_prototypes
+-- Performing Test HAVE__Wmissing_prototypes - Success
+-- Performing Test HAVE__Wnested_externs
+-- Performing Test HAVE__Wnested_externs - Success
+-- Performing Test HAVE__Wno_coverage_mismatch
+-- Performing Test HAVE__Wno_coverage_mismatch - Failed
+-- Performing Test HAVE__Wold_style_definition
+-- Performing Test HAVE__Wold_style_definition - Success
+-- Performing Test HAVE__Wpacked
+-- Performing Test HAVE__Wpacked - Success
+-- Performing Test HAVE__Wpedantic
+-- Performing Test HAVE__Wpedantic - Success
+-- Performing Test HAVE__Wpointer_arith
+-- Performing Test HAVE__Wpointer_arith - Success
+-- Performing Test HAVE__Wredundant_decls
+-- Performing Test HAVE__Wredundant_decls - Success
+-- Performing Test HAVE__Wshadow
+-- Performing Test HAVE__Wshadow - Success
+-- Performing Test HAVE__Wsign_conversion
+-- Performing Test HAVE__Wsign_conversion - Success
+-- Performing Test HAVE__Wstrict_overflow
+-- Performing Test HAVE__Wstrict_overflow - Success
+-- Performing Test HAVE__Wstrict_prototypes
+-- Performing Test HAVE__Wstrict_prototypes - Success
+-- Performing Test HAVE__Wtrampolines
+-- Performing Test HAVE__Wtrampolines - Failed
+-- Performing Test HAVE__Wundef
+-- Performing Test HAVE__Wundef - Success
+-- Performing Test HAVE__Wunreachable_code
+-- Performing Test HAVE__Wunreachable_code - Success
+-- Performing Test HAVE__Wunused
+-- Performing Test HAVE__Wunused - Success
+-- Performing Test HAVE__Wvariadic_macros
+-- Performing Test HAVE__Wvariadic_macros - Success
+-- Performing Test HAVE__Wvla
+-- Performing Test HAVE__Wvla - Success
+-- Performing Test HAVE__Wwrite_strings
+-- Performing Test HAVE__Wwrite_strings - Success
+-- Performing Test HAVE__Wimplicit_fallthrough_3
+-- Performing Test HAVE__Wimplicit_fallthrough_3 - Failed
+-- Performing Test HAVE__Werror_implicit_int
+-- Performing Test HAVE__Werror_implicit_int - Success
+-- Performing Test HAVE__Werror_implicit_function_declaration
+-- Performing Test HAVE__Werror_implicit_function_declaration - Success
+-- Performing Test HAVE__Werror_partial_availability
+-- Performing Test HAVE__Werror_partial_availability - Success
+-- Performing Test HAVE__Qunused_arguments
+-- Performing Test HAVE__Qunused_arguments - Success
+-- Performing Test HAVE__Wno_long_long
+-- Performing Test HAVE__Wno_long_long - Success
+-- Performing Test HAVE__fno_omit_frame_pointer
+-- Performing Test HAVE__fno_omit_frame_pointer - Success
+-- Performing Test HAVE__O0
+-- Performing Test HAVE__O0 - Success
+-- Looking for res_servicename
+-- Looking for res_servicename - not found
+-- Looking for res_servicename in resolv
+-- Looking for res_servicename in resolv - not found
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for socket
+-- Looking for socket - found
+-- Looking for clock_gettime
+-- Looking for clock_gettime - found
+-- Looking for include file AvailabilityMacros.h
+-- Looking for include file AvailabilityMacros.h - not found
+-- Looking for include file sys/types.h
+-- Looking for include file sys/types.h - found
+-- Looking for include file sys/random.h
+-- Looking for include file sys/random.h - found
+-- Looking for include file sys/socket.h
+-- Looking for include file sys/socket.h - found
+-- Looking for include file sys/sockio.h
+-- Looking for include file sys/sockio.h - not found
+-- Looking for include file arpa/inet.h
+-- Looking for include file arpa/inet.h - found
+-- Looking for include file arpa/nameser_compat.h
+-- Looking for include file arpa/nameser_compat.h - found
+-- Looking for include file arpa/nameser.h
+-- Looking for include file arpa/nameser.h - found
+-- Looking for include file assert.h
+-- Looking for include file assert.h - found
+-- Looking for include file errno.h
+-- Looking for include file errno.h - found
+-- Looking for include file fcntl.h
+-- Looking for include file fcntl.h - found
+-- Looking for include file inttypes.h
+-- Looking for include file inttypes.h - found
+-- Looking for include file limits.h
+-- Looking for include file limits.h - found
+-- Looking for include file malloc.h
+-- Looking for include file malloc.h - found
+-- Looking for include file memory.h
+-- Looking for include file memory.h - found
+-- Looking for include file netdb.h
+-- Looking for include file netdb.h - found
+-- Looking for include file netinet/in.h
+-- Looking for include file netinet/in.h - found
+-- Looking for include file netinet6/in6.h
+-- Looking for include file netinet6/in6.h - not found
+-- Looking for include files sys/socket.h, net/if.h
+-- Looking for include files sys/socket.h, net/if.h - found
+-- Looking for include file signal.h
+-- Looking for include file signal.h - found
+-- Looking for include file socket.h
+-- Looking for include file socket.h - not found
+-- Looking for include file stdbool.h
+-- Looking for include file stdbool.h - found
+-- Looking for include file stdint.h
+-- Looking for include file stdint.h - found
+-- Looking for include file stdlib.h
+-- Looking for include file stdlib.h - found
+-- Looking for include file strings.h
+-- Looking for include file strings.h - found
+-- Looking for include file string.h
+-- Looking for include file string.h - found
+-- Looking for include file stropts.h
+-- Looking for include file stropts.h - not found
+-- Looking for include file sys/ioctl.h
+-- Looking for include file sys/ioctl.h - found
+-- Looking for include file sys/param.h
+-- Looking for include file sys/param.h - found
+-- Looking for include file sys/select.h
+-- Looking for include file sys/select.h - found
+-- Looking for include file sys/stat.h
+-- Looking for include file sys/stat.h - found
+-- Looking for include file sys/time.h
+-- Looking for include file sys/time.h - found
+-- Looking for include file sys/uio.h
+-- Looking for include file sys/uio.h - found
+-- Looking for include file sys/event.h
+-- Looking for include file sys/event.h - not found
+-- Looking for include file sys/epoll.h
+-- Looking for include file sys/epoll.h - found
+-- Looking for include file ifaddrs.h
+-- Looking for include file ifaddrs.h - found
+-- Looking for include file time.h
+-- Looking for include file time.h - found
+-- Looking for include file poll.h
+-- Looking for include file poll.h - found
+-- Looking for include file dlfcn.h
+-- Looking for include file dlfcn.h - found
+-- Looking for include file unistd.h
+-- Looking for include file unistd.h - found
+-- Looking for include files sys/types.h, netinet/tcp.h
+-- Looking for include files sys/types.h, netinet/tcp.h - found
+-- Performing Test HAVE_SOCKLEN_T
+-- Performing Test HAVE_SOCKLEN_T - Success
+-- Performing Test HAVE_TYPE_SOCKET
+-- Performing Test HAVE_TYPE_SOCKET - Failed
+-- Performing Test HAVE_SSIZE_T
+-- Performing Test HAVE_SSIZE_T - Success
+-- Performing Test HAVE_LONGLONG
+-- Performing Test HAVE_LONGLONG - Success
+-- Performing Test HAVE_STRUCT_ADDRINFO
+-- Performing Test HAVE_STRUCT_ADDRINFO - Success
+-- Performing Test HAVE_STRUCT_IN6_ADDR
+-- Performing Test HAVE_STRUCT_IN6_ADDR - Success
+-- Performing Test HAVE_STRUCT_SOCKADDR_IN6
+-- Performing Test HAVE_STRUCT_SOCKADDR_IN6 - Success
+-- Performing Test HAVE_STRUCT_SOCKADDR_STORAGE
+-- Performing Test HAVE_STRUCT_SOCKADDR_STORAGE - Success
+-- Performing Test HAVE_STRUCT_TIMEVAL
+-- Performing Test HAVE_STRUCT_TIMEVAL - Success
+-- Looking for AF_INET6
+-- Looking for AF_INET6 - found
+-- Looking for O_NONBLOCK
+-- Looking for O_NONBLOCK - found
+-- Looking for FIONBIO
+-- Looking for FIONBIO - found
+-- Looking for SIOCGIFADDR
+-- Looking for SIOCGIFADDR - found
+-- Looking for MSG_NOSIGNAL
+-- Looking for MSG_NOSIGNAL - found
+-- Looking for PF_INET6
+-- Looking for PF_INET6 - found
+-- Looking for SO_NONBLOCK
+-- Looking for SO_NONBLOCK - not found
+-- Looking for CLOCK_MONOTONIC
+-- Looking for CLOCK_MONOTONIC - found
+-- Performing Test HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+-- Performing Test HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID - Success
+-- Looking for strnlen
+-- Looking for strnlen - found
+-- Looking for memmem
+-- Looking for memmem - found
+-- Looking for closesocket
+-- Looking for closesocket - not found
+-- Looking for CloseSocket
+-- Looking for CloseSocket - not found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for connectx
+-- Looking for connectx - not found
+-- Looking for fcntl
+-- Looking for fcntl - found
+-- Looking for freeaddrinfo
+-- Looking for freeaddrinfo - found
+-- Looking for getaddrinfo
+-- Looking for getaddrinfo - found
+-- Looking for getenv
+-- Looking for getenv - found
+-- Looking for gethostname
+-- Looking for gethostname - found
+-- Looking for getnameinfo
+-- Looking for getnameinfo - found
+-- Looking for getrandom
+-- Looking for getrandom - found
+-- Looking for getservbyport_r
+-- Looking for getservbyport_r - found
+-- Looking for getservbyname_r
+-- Looking for getservbyname_r - found
+-- Looking for gettimeofday
+-- Looking for gettimeofday - found
+-- Looking for if_indextoname
+-- Looking for if_indextoname - found
+-- Looking for if_nametoindex
+-- Looking for if_nametoindex - found
+-- Looking for GetBestRoute2
+-- Looking for GetBestRoute2 - not found
+-- Looking for ConvertInterfaceIndexToLuid
+-- Looking for ConvertInterfaceIndexToLuid - not found
+-- Looking for ConvertInterfaceLuidToNameA
+-- Looking for ConvertInterfaceLuidToNameA - not found
+-- Looking for NotifyIpInterfaceChange
+-- Looking for NotifyIpInterfaceChange - not found
+-- Looking for RegisterWaitForSingleObject
+-- Looking for RegisterWaitForSingleObject - not found
+-- Looking for inet_net_pton
+-- Looking for inet_net_pton - not found
+-- Looking for inet_ntop
+-- Looking for inet_ntop - found
+-- Looking for inet_pton
+-- Looking for inet_pton - found
+-- Looking for ioctl
+-- Looking for ioctl - found
+-- Looking for ioctlsocket
+-- Looking for ioctlsocket - not found
+-- Looking for IoctlSocket
+-- Looking for IoctlSocket - not found
+-- Looking for recv
+-- Looking for recv - found
+-- Looking for recvfrom
+-- Looking for recvfrom - found
+-- Looking for send
+-- Looking for send - found
+-- Looking for sendto
+-- Looking for sendto - found
+-- Looking for setsockopt
+-- Looking for setsockopt - found
+-- Looking for socket
+-- Looking for socket - found
+-- Looking for strcasecmp
+-- Looking for strcasecmp - found
+-- Looking for strcmpi
+-- Looking for strcmpi - not found
+-- Looking for strdup
+-- Looking for strdup - found
+-- Looking for stricmp
+-- Looking for stricmp - not found
+-- Looking for strncasecmp
+-- Looking for strncasecmp - found
+-- Looking for strncmpi
+-- Looking for strncmpi - not found
+-- Looking for strnicmp
+-- Looking for strnicmp - not found
+-- Looking for writev
+-- Looking for writev - found
+-- Looking for arc4random_buf
+-- Looking for arc4random_buf - found
+-- Looking for stat
+-- Looking for stat - found
+-- Looking for getifaddrs
+-- Looking for getifaddrs - found
+-- Looking for poll
+-- Looking for poll - found
+-- Looking for pipe
+-- Looking for pipe - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for kqueue
+-- Looking for kqueue - not found
+-- Looking for epoll_create1
+-- Looking for epoll_create1 - found
+-- Looking for __system_property_get
+-- Looking for __system_property_get - not found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Looking for include file pthread.h
+-- Looking for include file pthread.h - found
+-- Looking for include file pthread_np.h
+-- Looking for include file pthread_np.h - not found
+-- Looking for pthread_init
+-- Looking for pthread_init - not found
+-- Configuring done (17.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares

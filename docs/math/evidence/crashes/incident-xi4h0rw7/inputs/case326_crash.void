@@ -1,0 +1,20 @@
+use math
+value struct number:
+    value: i32
+    operator +(const left: number, const right: number) -> number:
+        return number(value = left.value + right.value)
+    operator -(const left: number, const right: number) -> number:
+        return number(value = left.value - right.value)
+    operator -(const item: number) -> number:
+        return number(value = -item.value)
+    operator <(const left: number, const right: number) -> bool:
+        return left.value < right.value
+    operator >(const left: number, const right: number) -> bool:
+        return left.value > right.value
+    operator ==(const left: number, const right: number) -> bool:
+        return left.value == right.value
+enum flag:
+    first
+func main():
+    var item = [1, 2]
+    var result = math.clamp(item, item, item)

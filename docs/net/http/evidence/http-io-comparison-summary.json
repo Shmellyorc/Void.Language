@@ -1,0 +1,63 @@
+{
+  "measurements": [
+    {
+      "receipt": "http-io-baseline-release",
+      "cpu_median": 0.836831,
+      "cpu_range": [
+        0.788263,
+        0.912179
+      ],
+      "wall_median": 0.853038,
+      "wall_range": [
+        0.796127,
+        0.925446
+      ]
+    },
+    {
+      "receipt": "http-io-pure-current-release",
+      "cpu_median": 1.28177,
+      "cpu_range": [
+        1.21424,
+        1.39767
+      ],
+      "wall_median": 1.2991,
+      "wall_range": [
+        1.23352,
+        1.41209
+      ]
+    },
+    {
+      "receipt": "http-io-pure-short-circuit-release",
+      "cpu_median": 0.890315,
+      "cpu_range": [
+        0.858393,
+        0.996001
+      ],
+      "wall_median": 0.900724,
+      "wall_range": [
+        0.869608,
+        1.00566
+      ]
+    },
+    {
+      "receipt": "http-io-short-circuit-release",
+      "cpu_median": 0.837287,
+      "cpu_range": [
+        0.796284,
+        0.859473
+      ],
+      "wall_median": 0.843478,
+      "wall_range": [
+        0.804864,
+        0.865308
+      ]
+    }
+  ],
+  "baseline_identity": {
+    "baseline_commit": "15f7868b0af177f8f7d49c548392c79c7bd921d2",
+    "archive_sha256": "8d69a1c6972afd385bb45a9291627233e149ba8c7b27dd4ae52744bbd06a54a6",
+    "harness_sha256": "e0dfddf97e16c10b1f07a3ce56cdc84990889c5b52c56286cfe355fc729fbf46",
+    "scope": "Read-only Git archive copied into disposable storage; no checkout, branch, index or protected README mutation"
+  },
+  "scope": "Separate unprofiled runs under concurrent test load; short-circuiting only skips dependency checks once retention is already established"
+}

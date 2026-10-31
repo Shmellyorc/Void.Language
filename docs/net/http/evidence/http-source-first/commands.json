@@ -1,0 +1,18 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/tmp/VOID HTTP source e00fdvlb/sync.void"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/tmp/VOID HTTP source e00fdvlb/sync.void"
+    ],
+    "exit_code": 1
+  }
+]

@@ -1,0 +1,8 @@
+/tmp/VOID-channel-rejections-mtl7eu7d/readonly-list.void:9:9: error: Cannot mutate readonly const or declaration 'payload'.
+    code: VOID2007
+
+ 9 |         payload[0].amount += 1
+   |         ^^^^^^^
+    Module: /readonly-list.void
+    Hint: Use var for a mutable local binding.
+

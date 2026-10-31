@@ -1,0 +1,12 @@
+-- Install configuration: "Release"
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/share/doc/nghttp2/README.rst
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/include/nghttp2/nghttp2.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/include/nghttp2/nghttp2ver.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/cmake/nghttp2/nghttp2Config.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/cmake/nghttp2/nghttp2ConfigVersion.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/cmake/nghttp2/nghttp2Targets.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/cmake/nghttp2/nghttp2Targets-release.cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/libnghttp2.so.14.29.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/libnghttp2.so.14
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/libnghttp2.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/Release/lib/pkgconfig/libnghttp2.pc

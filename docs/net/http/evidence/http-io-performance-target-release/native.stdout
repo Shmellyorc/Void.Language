@@ -1,0 +1,9 @@
+{"mode":0,"repeat":0,"bytes":16777216,"writes":256,"workers":1,"seconds":1.44704,"process_cpu_seconds":1.43624}
+{"mode":0,"repeat":1,"bytes":16777216,"writes":256,"workers":1,"seconds":1.19794,"process_cpu_seconds":1.18896}
+{"mode":0,"repeat":2,"bytes":16777216,"writes":256,"workers":1,"seconds":1.20449,"process_cpu_seconds":1.19627}
+{"mode":1,"repeat":0,"bytes":16777216,"writes":256,"workers":1,"seconds":1.30184,"process_cpu_seconds":1.29596}
+{"mode":1,"repeat":1,"bytes":16777216,"writes":256,"workers":1,"seconds":1.41982,"process_cpu_seconds":1.41302}
+{"mode":1,"repeat":2,"bytes":16777216,"writes":256,"workers":1,"seconds":1.28199,"process_cpu_seconds":1.27523}
+{"mode":2,"repeat":0,"bytes":16777216,"writes":256,"workers":1,"seconds":1.2386,"process_cpu_seconds":1.2324}
+{"mode":2,"repeat":1,"bytes":16777216,"writes":256,"workers":1,"seconds":1.22874,"process_cpu_seconds":1.21281}
+{"mode":2,"repeat":2,"bytes":16777216,"writes":256,"workers":1,"seconds":1.28211,"process_cpu_seconds":1.27378}

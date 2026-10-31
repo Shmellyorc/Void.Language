@@ -1,0 +1,21 @@
+-- Versioning name:awslc version:5.12.0 abi:1
+-- Libraries crypto:crypto ssl:ssl
+-- SET_LIB_SONAME: 0
+-- COHABITANT_HEADERS: 0
+-- COHABITANT_BINARIES: 0
+-- INSTALL_OPENSSL_SHIM: 1
+-- ENABLE_SYMBOL_VERSIONING: OFF
+-- Entropy source configured: Dynamic (default: CPU Jitter)
+-- Go not found. Disabling some code generation and using pre-generated code in generated-src/
+-- Setting CMAKE_C_STANDARD=11
+-- Compiler supports '-Wno-cast-function-type', adding to CMAKE_C_FLAGS
+-- Compiler supports '-Wstring-concatenation', adding to C_CXX_FLAGS
+-- Compiler supports '-Wimplicit-fallthrough', adding to C_CXX_FLAGS
+-- linux_random_h.c probe is positive, enabling HAVE_LINUX_RANDOM_H
+-- stdalign_check.c probe is positive, enabling AWS_LC_STDALIGN_AVAILABLE
+-- builtin_swap_check.c probe is positive, enabling AWS_LC_BUILTIN_SWAP_SUPPORTED
+-- Compiler supports '-Wshadow', adding to C_CXX_FLAGS
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/aws-lc/tool-openssl/c_rehash
+-- Configuring done (1.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/strict/aws-lc

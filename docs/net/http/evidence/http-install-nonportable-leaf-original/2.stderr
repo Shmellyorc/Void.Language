@@ -1,0 +1,8 @@
+/tmp/VOID HTTP installation shzsla6v/api 雪 # %.void:1:1: error: Non-portable module path component 'api 雪 # %.void'.
+    code: VOID3001
+
+ 1 | 
+   | ^
+    Module: /api 雪 # %.void
+    Hint: Use printable ASCII filenames without Windows-reserved characters/names or trailing dots/spaces; Unicode module filenames are deferred.
+
