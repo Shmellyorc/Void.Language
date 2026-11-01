@@ -1,0 +1,1 @@
+Error: could not find pasta, the network namespace can't be configured: exec: "pasta": executable file not found in $PATH

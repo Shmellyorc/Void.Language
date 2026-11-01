@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "cmake",
+    "-S",
+    ".",
+    "-B",
+    "build/Debug",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DVOID_SANITIZERS=OFF",
+    "-DLLVM_DIR=/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "-DVOID_CLANG=/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "-DVOID_LINKER=",
+    "--trace-format=json-v1",
+    "--trace-source=/Users/runner/work/Void.Language/Void.Language/CMakeLists.txt",
+    "--trace-redirect=/Users/runner/work/Void.Language/Void.Language/build/link-experiment/configure-trace.jsonl",
+    "-DCMAKE_OSX_ARCHITECTURES=arm64",
+    "-DCMAKE_OSX_SYSROOT=/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+    "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0",
+    "-DCMAKE_EXE_LINKER_FLAGS:STRING=-Wl,-cache_path_lto,\"/Users/runner/work/_temp/void-thinlto-izojym5o\""
+  ],
+  "cache_before": {
+    "directory": "/Users/runner/work/_temp/void-thinlto-izojym5o",
+    "files": 0,
+    "bytes": 0
+  },
+  "phase": "configure",
+  "exit_code": 1,
+  "wall_seconds": 51.081846041999995,
+  "cache_after": {
+    "directory": "/Users/runner/work/_temp/void-thinlto-izojym5o",
+    "files": 0,
+    "bytes": 0
+  },
+  "child_resources": {
+    "user_seconds": 24.436998,
+    "system_seconds": 18.355381,
+    "max_rss_bytes": 201539584,
+    "note": "Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak."
+  },
+  "orc_probe_seconds": null,
+  "orc_probe_note": "CMake trace call-to-return wall time; null means the probe did not return."
+}

@@ -1,0 +1,35 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  7%] Built target void_core
+[  7%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[ 14%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[ 14%] Linking C static library libcurl.a
+[ 78%] Built target libcurl_static
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url.cpp.o
+[ 85%] Linking CXX static library libvoid_runtime.a
+[ 92%] Built target void_runtime
+[ 92%] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[ 92%] Built target void_llvm
+[ 92%] Built target voidc_objects
+[ 92%] Generating cache-identity-Debug.cpp
+[ 92%] Built target void_native_inventory
+[ 92%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 83%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_url_native
+[100%] Built target void_url_native
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 83%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_http_native
+[100%] Built target void_http_native

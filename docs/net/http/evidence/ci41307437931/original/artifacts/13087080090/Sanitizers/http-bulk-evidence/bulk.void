@@ -1,0 +1,40 @@
+use net/http
+use io
+
+async func transfer_files(source_file: io.file, destination: io.file) -> result<bool, http.error>:
+    with http.open_client()? as owner:
+        var settings = http.request_options(max_encoded_bytes = 67108864, max_decoded_bytes = 67108864,
+            total_timeout_ms = 300000)
+        var downloaded = (await owner.download_async(http.request(target = "http://127.0.0.1:32979/download"), destination, settings))?
+        if downloaded.downloaded != 67108864:
+            return Ok(false)
+        var uploaded = (await owner.upload_async(http.request(method = "POST", target = "http://127.0.0.1:32979/upload"),
+            source_file, 67108865, settings))?
+        return Ok(uploaded.text()? == "67c93935aeb247ac244e23db4c28a099130f1ecff693a3260f7436c1ad59e4bc")
+
+async func entry(input: i32) -> i32:
+    var source_result = io.open("/tmp/VOID HTTP bulk vyogsccl/sparse.bin", io.open_mode.read)
+    if source_result is Ok(var source_file):
+        with source_file:
+            var destination_result = io.open("/tmp/VOID HTTP bulk vyogsccl/download.bin", io.open_mode.create)
+            if destination_result is Ok(var destination):
+                with destination:
+                    var outcome = await transfer_files(source_file, destination)
+                    if outcome is Ok(var passed):
+                        if not passed:
+                            return 1
+                        if source_file.position() is Ok(var position):
+                            if position != 67108865:
+                                return 2
+                        else:
+                            return 3
+                        if destination.length() is Ok(var extent):
+                            if extent == 67108864:
+                                return 0
+                    else if outcome is Err(var failure):
+                        print("HTTP {failure.kind}, {failure.phase}; sent {failure.uploaded}; received {failure.downloaded}")
+            else if destination_result is Err(var failure):
+                print("IO destination {failure.kind}")
+    else if source_result is Err(var failure):
+        print("IO source {failure.kind}")
+    return 4

@@ -1,0 +1,8 @@
+[  0%] Built target boringssl_prefix_symbols
+[  1%] Built target jitterentropy
+[ 28%] Built target fipsmodule
+[ 81%] Built target crypto_objects
+[ 81%] Built target crypto
+[ 90%] Built target ssl
+[ 93%] Built target bssl
+[100%] Built target openssl

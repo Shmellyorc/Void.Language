@@ -26,9 +26,9 @@ def main():
         work = Path(directory); prefix = work / 'original'; relocated = work / 'relocated 雪 # % installation'
         env = os.environ.copy(); env.pop('VOID_STDLIB_ROOT', None)
         env['VOID_HTTP_URL'] = f'http://127.0.0.1:{server.server_port}/json'
-        def run(argv, expected=None, code=0, diagnostic=''):
+        def run(argv, expected=None, code=0, diagnostic='', extra_env=None):
             start = time.monotonic()
-            result = subprocess.run(list(map(str, argv)), cwd=work, env=env, capture_output=True, timeout=180)
+            result = subprocess.run(list(map(str, argv)), cwd=work, env=env | (extra_env or {}), capture_output=True, timeout=180)
             number = len(commands)
             (evidence / f'{number}.stdout').write_bytes(result.stdout)
             (evidence / f'{number}.stderr').write_bytes(result.stderr)
@@ -38,6 +38,7 @@ def main():
             assert result.returncode == code, (argv, result.stderr.decode(errors='replace'))
             if expected is not None: assert result.stdout.decode() == expected
             assert diagnostic in result.stderr.decode(), result.stderr
+            return result
         try:
             for component in ('compiler', 'tooling'):
                 run(['cmake', '--install', compiler.parent, '--prefix', prefix, '--component', component])
@@ -58,6 +59,15 @@ def main():
             flags = [line.replace('@VOID_NATIVE_DIR@', str(installed.parent)) for line in lines[5:]]
             if lines[2]: flags += ['--ld-path=' + lines[2]]
             if __import__('sys').platform == 'linux': flags += ['-ldl']
+            if __import__('sys').platform == 'linux':
+                # Check the loader's actual resolution, including on hosts that
+                # already have ABI-compatible but unpinned IDN libraries.
+                loaded = run([installed], extra_env={'LD_TRACE_LOADED_OBJECTS': '1'}).stdout.decode()
+                for family in ('libidn2.so.', 'libunistring.so.'):
+                    rows = [line for line in loaded.splitlines() if line.strip().startswith(family)]
+                    assert len(rows) == 1 and ' => ' in rows[0], loaded
+                    path = Path(rows[0].split(' => ', 1)[1].rsplit(' (', 1)[0])
+                    assert path.resolve().is_relative_to((relocated / 'lib/void').resolve()), loaded
             for options in ([], ['--no-opt']):
                 run([installed, 'run', source, *options], 'Example JSON complete\n')
                 binary = work / ('built-' + str(bool(options)) + ('.exe' if os.name == 'nt' else ''))

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "readonly_client",
+    "status": 1,
+    "diagnostic": "readonly"
+  },
+  {
+    "name": "readonly_transfer",
+    "status": 1,
+    "diagnostic": "readonly"
+  },
+  {
+    "name": "private_factory",
+    "status": 1,
+    "diagnostic": "private"
+  },
+  {
+    "name": "private_kernel",
+    "status": 1,
+    "diagnostic": "Unknown function"
+  },
+  {
+    "name": "worker_network",
+    "status": 1,
+    "diagnostic": "worker"
+  }
+]

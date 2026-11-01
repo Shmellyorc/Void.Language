@@ -1,0 +1,16 @@
+test_corrupted_cache_rejected_without_replacement (__main__.AcquisitionTests.test_corrupted_cache_rejected_without_replacement) ... ok
+test_http_error_body_and_status_retained (__main__.AcquisitionTests.test_http_error_body_and_status_retained) ... ok
+test_network_failure_does_not_report_a_stale_partial_as_response (__main__.AcquisitionTests.test_network_failure_does_not_report_a_stale_partial_as_response) ... ok
+test_redirect_records_final_location_and_verifies_bytes (__main__.AcquisitionTests.test_redirect_records_final_location_and_verifies_bytes) ... ok
+test_successful_http_with_wrong_bytes_never_enters_cache (__main__.AcquisitionTests.test_successful_http_with_wrong_bytes_never_enters_cache) ... ok
+test_verified_bytes_promoted_and_cache_reverified (__main__.AcquisitionTests.test_verified_bytes_promoted_and_cache_reverified) ... ok
+test_every_reviewed_blob_survives_windows_checkout_filter (__main__.CheckoutTests.test_every_reviewed_blob_survives_windows_checkout_filter) ... ok
+test_each_missing_or_disabled_native_feature_is_rejected (__main__.FeatureTests.test_each_missing_or_disabled_native_feature_is_rejected) ... ok
+test_enabled_generated_features_pass_despite_parent_scope (__main__.FeatureTests.test_enabled_generated_features_pass_despite_parent_scope) ... ok
+test_missing_configuration_fails_closed (__main__.FeatureTests.test_missing_configuration_fails_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 3.581s
+
+OK
+Windows checkout filters: 1588 source/review blobs verified

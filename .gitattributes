@@ -1,0 +1,5 @@
+# Preserve the exact bytes covered by curl's upstream/provenance digests.
+# Keep ordinary text diffs; disable checkout/check-in newline conversion only.
+/third_party/curl/** -text
+/docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch -text
+/docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch -text

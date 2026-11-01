@@ -1,0 +1,81 @@
+[
+     {
+          "Id": "d9b8c34d61a9b9a3c44cab883d7d2f2619d674966ab520186f799cf32e3e0377",
+          "Digest": "sha256:78d4744ead1f5b19b04d0df558ab182a5300903900755e515b2ca4d10eb2044d",
+          "RepoTags": [
+               "docker.io/library/ubuntu:24.04"
+          ],
+          "RepoDigests": [
+               "docker.io/library/ubuntu@sha256:78d4744ead1f5b19b04d0df558ab182a5300903900755e515b2ca4d10eb2044d",
+               "docker.io/library/ubuntu@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852"
+          ],
+          "Parent": "",
+          "Comment": "",
+          "Created": "2026-10-25T14:17:47.841356155Z",
+          "Config": {
+               "Env": [
+                    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+               ],
+               "Cmd": [
+                    "/bin/bash"
+               ],
+               "Labels": {
+                    "org.opencontainers.image.version": "24.04"
+               }
+          },
+          "Version": "26.1.3",
+          "Author": "",
+          "Architecture": "amd64",
+          "Os": "linux",
+          "Size": 80703348,
+          "VirtualSize": 80703348,
+          "GraphDriver": {
+               "Name": "overlay",
+               "Data": {
+                    "UpperDir": "/home/shmellyorc/.local/share/containers/storage/overlay/bec87777bc2fb2edcdf9af11df1531469e7df911309c1413082b18fcb8610278/diff",
+                    "WorkDir": "/home/shmellyorc/.local/share/containers/storage/overlay/bec87777bc2fb2edcdf9af11df1531469e7df911309c1413082b18fcb8610278/work"
+               }
+          },
+          "RootFS": {
+               "Type": "layers",
+               "Layers": [
+                    "sha256:bec87777bc2fb2edcdf9af11df1531469e7df911309c1413082b18fcb8610278"
+               ]
+          },
+          "Labels": {
+               "org.opencontainers.image.version": "24.04"
+          },
+          "Annotations": {},
+          "ManifestType": "application/vnd.oci.image.manifest.v1+json",
+          "User": "",
+          "History": [
+               {
+                    "created": "2026-10-25T14:17:45.134994061Z",
+                    "created_by": "/bin/sh -c #(nop)  ARG RELEASE",
+                    "empty_layer": true
+               },
+               {
+                    "created": "2026-10-25T14:17:45.174235109Z",
+                    "created_by": "/bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH",
+                    "empty_layer": true
+               },
+               {
+                    "created": "2026-10-25T14:17:45.213100118Z",
+                    "created_by": "/bin/sh -c #(nop)  LABEL org.opencontainers.image.version=24.04",
+                    "empty_layer": true
+               },
+               {
+                    "created": "2026-10-25T14:17:47.432058459Z",
+                    "created_by": "/bin/sh -c #(nop) ADD file:eed88e94d6aa7c9da62836e137f889e03988c1a6b237b0cedb6ca666dfaa98ea in / "
+               },
+               {
+                    "created": "2026-10-25T14:17:47.841356155Z",
+                    "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/bash\"]",
+                    "empty_layer": true
+               }
+          ],
+          "NamesHistory": [
+               "docker.io/library/ubuntu:24.04"
+          ]
+     }
+]

@@ -1,0 +1,223 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "--prefix",
+      "/tmp/VOID HTTP installation xz11belt/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1811603770001966
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "--prefix",
+      "/tmp/VOID HTTP installation xz11belt/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.03627758500078926
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0018164989996876102
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 19.433124330000282
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 17.522929864000616
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07115146899741376
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 24.26674863900189
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation xz11belt/program.o",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11118509099833318
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07108106899977429
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 18.09724712100069
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 15.60104706600032
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0780171660007909
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 22.418422326998552
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation xz11belt/program.o",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10636644999976852
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06969032800043351
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 3.144704130001628
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation xz11belt/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation xz11belt/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 16.799944071997743
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation xz11belt/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07126224799867487
+  }
+]

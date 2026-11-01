@@ -1,0 +1,280 @@
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Hit:4 http://security.ubuntu.com/ubuntu noble-security InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+g++-14 is already the newest version (14.2.0-4ubuntu2~24.04.1).
+python3 is already the newest version (3.12.3-0ubuntu2.1).
+ninja-build is already the newest version (1.11.1-2).
+libffi-dev is already the newest version (3.4.6-1build1).
+libedit-dev is already the newest version (3.1-20230828-1build1).
+libxml2-dev is already the newest version (2.9.14+dfsg-1.3ubuntu3.10).
+libzstd-dev is already the newest version (1.5.5+dfsg2-2build1.1).
+zlib1g-dev is already the newest version (1:1.3.dfsg-3.1ubuntu2.3).
+libncurses-dev is already the newest version (6.4+20240113-1ubuntu2.2).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  openssl
+The following NEW packages will be installed:
+  ca-certificates openssl
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Need to get 1143 kB of archives.
+After this operation, 2268 kB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 openssl amd64 3.0.13-0ubuntu3.16 [1004 kB]
+Get:2 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 ca-certificates all 20260816ubuntu0.24.04.1 [139 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 1143 kB in 2s (716 kB/s)
+Selecting previously unselected package openssl.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 13365 files and directories currently installed.)
+Preparing to unpack .../openssl_3.0.13-0ubuntu3.16_amd64.deb ...
+Unpacking openssl (3.0.13-0ubuntu3.16) ...
+Selecting previously unselected package ca-certificates.
+Preparing to unpack .../ca-certificates_20260816ubuntu0.24.04.1_all.deb ...
+Unpacking ca-certificates (20260816ubuntu0.24.04.1) ...
+Setting up openssl (3.0.13-0ubuntu3.16) ...
+Setting up ca-certificates (20260816ubuntu0.24.04.1) ...
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.38.2 /usr/local/share/perl/5.38.2 /usr/lib/x86_64-linux-gnu/perl5/5.38 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.38 /usr/share/perl/5.38 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8.)
+debconf: falling back to frontend: Teletype
+Updating certificates in /etc/ssl/certs...
+120 added, 0 removed; done.
+Processing triggers for ca-certificates (20260816ubuntu0.24.04.1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Debug; 167 files
+
+-- Using CMake version 3.28.3
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (6.0s)
+-- Generating done (0.9s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build
+[0/2] Re-checking globbed directories...
+[1/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[2/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[3/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[4/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/api.c.o
+[5/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[6/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[7/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[8/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[9/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[10/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-ip-happy.c.o
+[11/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-recvbuf.c.o
+[12/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-setup.c.o
+[13/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[14/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[15/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[16/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[17/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[18/204] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url.cpp.o
+[19/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+[20/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/creds.c.o
+[21/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cshutdn.c.o
+[22/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[23/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[24/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[25/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[26/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fopen.c.o
+[27/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[28/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+[29/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[30/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[31/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[32/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[33/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[34/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[35/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_share.c.o
+[36/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[37/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[38/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-pause.c.o
+[39/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+[40/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[41/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[42/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[43/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[44/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[45/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fake_addrinfo.c.o
+[46/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[47/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[48/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[49/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[50/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[51/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[52/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+[53/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[54/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[55/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[56/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[57/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+[58/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[59/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[60/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+[61/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_httpsig.c.o
+[62/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[63/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http.c.o
+[64/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ed25519.c.o
+[65/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[66/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[67/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[68/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[69/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[70/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[71/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[72/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[73/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[74/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[75/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[76/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[77/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[78/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[79/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[80/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[81/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[82/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ntfy.c.o
+[83/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ev.c.o
+[84/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[85/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[86/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[87/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[88/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[89/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/peer.c.o
+[90/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[91/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/protocol.c.o
+[92/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[93/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/proxy.c.o
+[94/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ptrarray.c.o
+[95/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[96/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[97/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ratelimit.c.o
+[98/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[99/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[100/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[101/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[102/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[103/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[104/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[105/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[106/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[107/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[108/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[109/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[110/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[111/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strequal.c.o
+[112/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[113/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[114/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[115/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[116/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdpool.c.o
+[117/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdqueue.c.o
+[118/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u8_strset.c.o
+[119/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u32_ptrset.c.o
+[120/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[121/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-bset.c.o
+[122/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-spbset.c.o
+[123/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-table.c.o
+[124/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[125/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/url.c.o
+[126/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+[127/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[128/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[129/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[130/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[131/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+[132/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[133/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[134/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[135/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[136/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[137/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[138/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[139/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[140/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+[141/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-base.c.o
+[142/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-ares.c.o
+[143/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-thrdd.c.o
+[144/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/doh.c.o
+[145/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/cf-dns.c.o
+[146/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/dnscache.c.o
+[147/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip4.c.o
+[148/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip6.c.o
+[149/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip.c.o
+[150/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/httpsrr.c.o
+[151/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/apple.c.o
+[152/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[153/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[154/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[155/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[156/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[157/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[158/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[159/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_config.c.o
+[160/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[161/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+[162/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_scache.c.o
+[163/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_spack.c.o
+[164/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[165/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[166/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/capsule.c.o
+[167/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2.c.o
+[168/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-capsule.c.o
+[169/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-cmn.c.o
+[170/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-quiche.c.o
+[171/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-proxy.c.o
+[172/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[173/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[174/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[175/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[176/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/vssh.c.o
+[177/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/base64.c.o
+[178/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/basename.c.o
+[179/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/dynbuf.c.o
+[180/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/win32-fopen.c.o
+[181/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/multibyte.c.o
+[182/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_pton.c.o
+[183/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_ntop.c.o
+[184/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/snprintf.c.o
+[185/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/nonblock.c.o
+[186/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strcopy.c.o
+[187/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strdup.c.o
+[188/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strerr.c.o
+[189/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strparse.c.o
+[190/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timediff.c.o
+[191/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timeval.c.o
+[192/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/version_win32.c.o
+[193/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/wait.c.o
+[194/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/warnless.c.o
+[195/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/winapi.c.o
+[196/204] Building C object curl/lib/CMakeFiles/libcurl_static.dir/__/__/__/src/runtime/curl_keylog_disabled.c.o
+[197/204] Linking C static library curl/lib/libcurl.a
+[198/204] Linking CXX static library libvoid_runtime.a
+[199/204] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[200/204] cd /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build/void-native-resources.txt
+[201/204] Generating cache-identity-Debug.cpp
+[202/204] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[203/204] Linking CXX static library libvoid_cache_identity.a
+[204/204] Linking CXX executable voidc
+Installed HTTP/URL/JSON: 18 relocated native/JIT/link checks passed

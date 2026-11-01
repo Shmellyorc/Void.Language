@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start  1: http_native
+1/5 Test  #1: http_native ......................   Passed   20.59 sec
+    Start  7: url_native
+2/5 Test  #7: url_native .......................   Passed    0.42 sec
+    Start  9: http_ci_policy
+3/5 Test  #9: http_ci_policy ...................   Passed    3.20 sec
+    Start 10: http_install
+4/5 Test #10: http_install .....................   Passed  136.64 sec
+    Start 17: url_source
+5/5 Test #17: url_source .......................   Passed    7.74 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) = 168.60 sec

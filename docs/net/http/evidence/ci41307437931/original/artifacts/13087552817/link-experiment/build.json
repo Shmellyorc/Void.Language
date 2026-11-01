@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "cmake",
+    "--build",
+    "build/Debug",
+    "--parallel",
+    "3"
+  ],
+  "cache_before": {
+    "directory": "/home/runner/work/_temp/void-thinlto-_tgu5cvc",
+    "files": 1,
+    "bytes": 0
+  },
+  "phase": "build",
+  "exit_code": 0,
+  "wall_seconds": 233.60195458400005,
+  "cache_after": {
+    "directory": "/home/runner/work/_temp/void-thinlto-_tgu5cvc",
+    "files": 1,
+    "bytes": 0
+  },
+  "child_resources": {
+    "user_seconds": 593.425944,
+    "system_seconds": 78.136195,
+    "max_rss_bytes": 828604416,
+    "note": "Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak."
+  }
+}

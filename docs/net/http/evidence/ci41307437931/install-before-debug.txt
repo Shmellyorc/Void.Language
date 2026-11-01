@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 9: http_install
+1/1 Test #9: http_install .....................   Passed  136.99 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 137.00 sec

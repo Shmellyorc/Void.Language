@@ -1,0 +1,46 @@
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u16-casemap.c:47:
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u-casemap.h:387:29: warning: allocation of insufficient size '1' for type 'unistring_uint16_t' (aka 'unsigned short') with size '2' [-Walloc-size]
+  387 |           result = (UNIT *) malloc (1);
+      |                             ^
+1 warning generated.
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u16-ct-totitle.c:50:
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u-ct-totitle.h:467:29: warning: allocation of insufficient size '1' for type 'unistring_uint16_t' (aka 'unsigned short') with size '2' [-Walloc-size]
+  467 |           result = (UNIT *) malloc (1);
+      |                             ^
+1 warning generated.
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u32-casemap.c:47:
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u-casemap.h:387:29: warning: allocation of insufficient size '1' for type 'unistring_uint32_t' (aka 'unsigned int') with size '4' [-Walloc-size]
+  387 |           result = (UNIT *) malloc (1);
+      |                             ^
+1 warning generated.
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u32-ct-totitle.c:50:
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unicase/u-ct-totitle.h:467:29: warning: allocation of insufficient size '1' for type 'unistring_uint32_t' (aka 'unsigned int') with size '4' [-Walloc-size]
+  467 |           result = (UNIT *) malloc (1);
+      |                             ^
+1 warning generated.
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/uninorm/u16-normalize.c:46:
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/uninorm/u-normalize-internal.h:325:29: warning: allocation of insufficient size '1' for type 'unistring_uint16_t' (aka 'unsigned short') with size '2' [-Walloc-size]
+  325 |           result = (UNIT *) malloc (1);
+      |                             ^
+1 warning generated.
+In file included from /home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/uninorm/u32-normalize.c:38:
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/uninorm/u-normalize-internal.h:325:29: warning: allocation of insufficient size '1' for type 'unistring_uint32_t' (aka 'unsigned int') with size '4' [-Walloc-size]
+  325 |           result = (UNIT *) malloc (1);
+      |                             ^
+1 warning generated.
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unistr/u16-to-u32.c:102:33: warning: allocation of insufficient size '1' for type 'unistring_uint32_t' (aka 'unsigned int') with size '4' [-Walloc-size]
+  102 |           result = (DST_UNIT *) malloc (1);
+      |                                 ^
+1 warning generated.
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unistr/u32-to-u16.c:114:33: warning: allocation of insufficient size '1' for type 'unistring_uint16_t' (aka 'unsigned short') with size '2' [-Walloc-size]
+  114 |           result = (DST_UNIT *) malloc (1);
+      |                                 ^
+1 warning generated.
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unistr/u8-to-u16.c:121:33: warning: allocation of insufficient size '1' for type 'unistring_uint16_t' (aka 'unsigned short') with size '2' [-Walloc-size]
+  121 |           result = (DST_UNIT *) malloc (1);
+      |                                 ^
+1 warning generated.
+/home/shmellyorc/Documents/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/lib/unistr/u8-to-u32.c:102:33: warning: allocation of insufficient size '1' for type 'unistring_uint32_t' (aka 'unsigned int') with size '4' [-Walloc-size]
+  102 |           result = (DST_UNIT *) malloc (1);
+      |                                 ^
+1 warning generated.

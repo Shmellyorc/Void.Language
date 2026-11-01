@@ -1,0 +1,4 @@
+[ 33%] Building C object CMakeFiles/psl.dir/Users/runner/work/Void.Language/Void.Language/.toolchains/http/build/macos-aws-lc-5.12.0-arm64/Release/source/libpsl-0.21.5/src/psl.c.o
+[ 66%] Building C object CMakeFiles/psl.dir/Users/runner/work/Void.Language/Void.Language/.toolchains/http/build/macos-aws-lc-5.12.0-arm64/Release/source/libpsl-0.21.5/src/lookup_string_in_fixed_set.c.o
+[100%] Linking C static library libpsl.a
+[100%] Built target psl

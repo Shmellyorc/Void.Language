@@ -1,0 +1,37 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build",
+      "--prefix",
+      "/tmp/VOID HTTP installation 1ggs6ws5/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.18814225099959003
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build",
+      "--prefix",
+      "/tmp/VOID HTTP installation 1ggs6ws5/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0380409139997937
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 1ggs6ws5/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 1ggs6ws5/project \u96ea # %/main.void"
+    ],
+    "exit_code": 1,
+    "seconds": 19.276640128999134
+  }
+]

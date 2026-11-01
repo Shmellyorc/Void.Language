@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python",
+    "/home/runner/work/Void.Language/Void.Language/tools/verify_http_dependencies.py",
+    "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict",
+    "strict"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.3289105399999812
+}

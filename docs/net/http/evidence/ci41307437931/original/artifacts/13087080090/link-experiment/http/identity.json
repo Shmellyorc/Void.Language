@@ -1,0 +1,40 @@
+{
+  "configuration": "Sanitizers",
+  "profile": "strict",
+  "identity": {
+    "schema": 1,
+    "llvm": "23.1.4",
+    "host": {
+      "system": "Linux",
+      "architecture": "x86_64",
+      "image_os": "ubuntu24",
+      "cmake": "cmake version 3.31.6",
+      "sdk_sha256": "7db99b86a6b68f7f98ed5efadf134a4e08b032ca523e39c095e1443094c3b88a",
+      "libc": [
+        "glibc",
+        "2.39"
+      ]
+    },
+    "profile": "strict",
+    "files": {
+      "tools/ci/http_bootstrap.py": "2c22489247becb1d0055207837a283901367bab7569555df5ddf3fa64ceba0eb",
+      "tools/ci/llvm_sdk.py": "fe46fcc151529e310af95888711eb03b229f67fcc2565d5841f03f6428b0dfdb",
+      "tools/setup_http_deps.py": "4f5dae2358c9e757bf19747149faec7aca4cb3b03e2e7745a65a1e81e24151c6",
+      "tools/setup_http_deps_native.py": "ec73a9cc0093cf827d38749e685ea8dc322f6a9fad5c5de5ba271fc7101fdce6",
+      "tools/verify_http_dependencies.py": "ea211bdfe4640f86e46ea1a408a2b7c8b94838f78e1f8845043ecc4fd82350a7",
+      "cmake/HttpDependencies.cmake": "ef8a0e5334a38e2e54a71e756b91461009f399e133a62e440381063ec3159ab5",
+      "cmake/HttpNativeDependencies.cmake": "c03240c1e52defe9fa37bb0102ebbb839feb117be6490ce68cf0f79e18070bc1",
+      "cmake/CurlProvider.cmake": "18c53da59bd5c62f072c7f5c12aa9aa32d35bb484ad9c8a72888575ec557e608",
+      "cmake/http-psl/CMakeLists.txt": "b4ce49eb774ea579e7ec77b6e5fe71d8c70b15e6fe2c153743139ea7e1ec4645",
+      "third_party/http-versions.json": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb",
+      "third_party/publicsuffix/UPSTREAM.json": "49eca4a0c92d4ee58266821be4142e8f626d9a38e90345430af1468054af1533",
+      "third_party/publicsuffix/public_suffix_list.dat": "d3e6243b51695327984abb3e2a5aa7077096867f75121e031e6a5a3840ca8bcd",
+      "third_party/curl/VOID-PROVENANCE.json": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+      "tools/verify_curl_source.py": "f3c11213bdc5b5570c2cab0c0965896448604ff44a0d7d3032415de483aaf039"
+    }
+  },
+  "prefix": ".toolchains/http/prefix/linux-aws-lc-5.12.0/strict",
+  "deps-key": "http-deps-v1-llvm23.1.4-Linux-x86_64-strict-8c3f4c21f9d13f2aa44638984375916ba499f8323c6a83529f5360cf3577187a",
+  "sources-key": "http-sources-v1-Linux-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb",
+  "fixtures-key": "http-fixtures-v1-Linux-x86_64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c"
+}

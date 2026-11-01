@@ -1,0 +1,838 @@
+﻿2026-11-01T12:38:17.8918602Z Current runner version: '2.338.2'
+2026-11-01T12:38:17.8945417Z ##[group]Runner Image Provisioner
+2026-11-01T12:38:17.8946309Z Hosted Compute Agent
+2026-11-01T12:38:17.8947299Z Version: 20261021.618
+2026-11-01T12:38:17.8948163Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-11-01T12:38:17.8948906Z Build Date: 2026-10-21T00:45:21Z
+2026-11-01T12:38:17.8949691Z Worker ID: {3580fb31-219a-413c-8454-ca0e286a7028}
+2026-11-01T12:38:17.8950418Z Region: eastus
+2026-11-01T12:38:17.8951041Z Cloud: Azure
+2026-11-01T12:38:17.8951605Z ##[endgroup]
+2026-11-01T12:38:17.8953362Z ##[group]Operating System
+2026-11-01T12:38:17.8954147Z Ubuntu
+2026-11-01T12:38:17.8954695Z 24.04.5
+2026-11-01T12:38:17.8955197Z LTS
+2026-11-01T12:38:17.8955791Z ##[endgroup]
+2026-11-01T12:38:17.8956350Z ##[group]Runner Image
+2026-11-01T12:38:17.8957362Z Image: ubuntu-24.04
+2026-11-01T12:38:17.8958011Z Version: 20261025.353.1
+2026-11-01T12:38:17.8959396Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-01T12:38:17.8961023Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+2026-11-01T12:38:17.8962090Z ##[endgroup]
+2026-11-01T12:38:17.8963260Z ##[group]GITHUB_TOKEN Permissions
+2026-11-01T12:38:17.8965615Z Contents: read
+2026-11-01T12:38:17.8966339Z Metadata: read
+2026-11-01T12:38:17.8967393Z ##[endgroup]
+2026-11-01T12:38:17.8970149Z Secret source: Actions
+2026-11-01T12:38:17.8971108Z Cache mode: write
+2026-11-01T12:38:17.8971992Z Prepare workflow directory
+2026-11-01T12:38:17.9564093Z Prepare all required actions
+2026-11-01T12:38:17.9618335Z Getting action download info
+2026-11-01T12:38:18.2435190Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+2026-11-01T12:38:18.3556619Z Download action repository 'actions/setup-python@v6' (SHA:ece7cb06caefa5fff74198d8649806c4678c61a1)
+2026-11-01T12:38:18.4362204Z Download action repository 'ilammy/msvc-dev-cmd@v1' (SHA:0b201ec74fa43914dc39ae48a89fd1d8cb592756)
+2026-11-01T12:38:18.5724034Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+2026-11-01T12:38:18.6739269Z Download action repository 'actions/setup-node@v5' (SHA:a0853c24544627f65ddf259abe73b1d18a591444)
+2026-11-01T12:38:18.7686114Z Download action repository 'actions/upload-artifact@v6' (SHA:b7c566a772e6b6bfb58ed0dc250532a479d7789f)
+2026-11-01T12:38:19.0881665Z Complete job name: thinlto-cache / Ubuntu 24.04 / Release
+2026-11-01T12:38:19.2129753Z ##[group]Run actions/checkout@v5
+2026-11-01T12:38:19.2131205Z with:
+2026-11-01T12:38:19.2132182Z   repository: Shmellyorc/Void.Language
+2026-11-01T12:38:19.2141060Z   token: ***
+2026-11-01T12:38:19.2141897Z   ssh-strict: true
+2026-11-01T12:38:19.2142725Z   ssh-user: git
+2026-11-01T12:38:19.2143581Z   persist-credentials: true
+2026-11-01T12:38:19.2144508Z   clean: true
+2026-11-01T12:38:19.2145365Z   sparse-checkout-cone-mode: true
+2026-11-01T12:38:19.2146359Z   fetch-depth: 1
+2026-11-01T12:38:19.2147383Z   fetch-tags: false
+2026-11-01T12:38:19.2148255Z   show-progress: true
+2026-11-01T12:38:19.2149102Z   lfs: false
+2026-11-01T12:38:19.2149912Z   submodules: false
+2026-11-01T12:38:19.2150769Z   set-safe-directory: true
+2026-11-01T12:38:19.2151734Z   allow-unsafe-pr-checkout: false
+2026-11-01T12:38:19.2153075Z env:
+2026-11-01T12:38:19.2153892Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:19.2154918Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:19.2156501Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:19.2158423Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:19.2159887Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:19.2161130Z ##[endgroup]
+2026-11-01T12:38:19.5521433Z Syncing repository: Shmellyorc/Void.Language
+2026-11-01T12:38:19.5525987Z ##[group]Getting Git version info
+2026-11-01T12:38:19.5528715Z Working directory is '/home/runner/work/Void.Language/Void.Language'
+2026-11-01T12:38:19.5531496Z [command]/usr/bin/git version
+2026-11-01T12:38:19.5717909Z git version 2.56.0
+2026-11-01T12:38:19.5744144Z ##[endgroup]
+2026-11-01T12:38:19.5762303Z Temporarily overriding HOME='/home/runner/work/_temp/e1d1835f-3376-4dbb-9467-234dc216ca19' before making global git config changes
+2026-11-01T12:38:19.5767170Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-01T12:38:19.5771150Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Void.Language/Void.Language
+2026-11-01T12:38:19.5841211Z Deleting the contents of '/home/runner/work/Void.Language/Void.Language'
+2026-11-01T12:38:19.5846152Z ##[group]Initializing the repository
+2026-11-01T12:38:19.5851176Z [command]/usr/bin/git init /home/runner/work/Void.Language/Void.Language
+2026-11-01T12:38:19.5994906Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-01T12:38:19.5999236Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-01T12:38:19.6002869Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-01T12:38:19.6005600Z hint: call:
+2026-11-01T12:38:19.6007366Z hint:
+2026-11-01T12:38:19.6009384Z hint: 	git config --global init.defaultBranch <name>
+2026-11-01T12:38:19.6011754Z hint:
+2026-11-01T12:38:19.6013810Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-01T12:38:19.6017607Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-01T12:38:19.6020365Z hint:
+2026-11-01T12:38:19.6021781Z hint: 	git branch -m <name>
+2026-11-01T12:38:19.6023488Z hint:
+2026-11-01T12:38:19.6025723Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-01T12:38:19.6030011Z Initialized empty Git repository in /home/runner/work/Void.Language/Void.Language/.git/
+2026-11-01T12:38:19.6035557Z [command]/usr/bin/git remote add origin https://github.com/Shmellyorc/Void.Language
+2026-11-01T12:38:19.6093138Z ##[endgroup]
+2026-11-01T12:38:19.6095503Z ##[group]Disabling automatic garbage collection
+2026-11-01T12:38:19.6098193Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-01T12:38:19.6143908Z ##[endgroup]
+2026-11-01T12:38:19.6145254Z ##[group]Setting up auth
+2026-11-01T12:38:19.6154961Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-01T12:38:19.6207796Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-01T12:38:19.6683846Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-01T12:38:19.6736412Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-01T12:38:19.7006834Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-01T12:38:19.7067193Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-01T12:38:19.7358137Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-01T12:38:19.7426225Z ##[endgroup]
+2026-11-01T12:38:19.7428823Z ##[group]Fetching the repository
+2026-11-01T12:38:19.7447497Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +77d676d0fc1149e36dd8d19a0e1602e053653fa7:refs/remotes/origin/main
+2026-11-01T12:38:28.1017687Z From https://github.com/Shmellyorc/Void.Language
+2026-11-01T12:38:28.1018568Z  * [new ref]           77d676d0fc1149e36dd8d19a0e1602e053653fa7 -> origin/main
+2026-11-01T12:38:28.1033402Z ##[endgroup]
+2026-11-01T12:38:28.1050137Z ##[group]Determining the checkout info
+2026-11-01T12:38:28.1050709Z ##[endgroup]
+2026-11-01T12:38:28.1051073Z [command]/usr/bin/git sparse-checkout disable
+2026-11-01T12:38:28.1114829Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-01T12:38:28.1162153Z ##[group]Checking out the ref
+2026-11-01T12:38:28.1168682Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-01T12:38:29.1878733Z Updating files:  30% (19665/64595)
+2026-11-01T12:38:29.2175899Z Updating files:  31% (20025/64595)
+2026-11-01T12:38:29.2472379Z Updating files:  32% (20671/64595)
+2026-11-01T12:38:29.2767983Z Updating files:  33% (21317/64595)
+2026-11-01T12:38:29.3068114Z Updating files:  34% (21963/64595)
+2026-11-01T12:38:29.3365238Z Updating files:  35% (22609/64595)
+2026-11-01T12:38:29.3701051Z Updating files:  36% (23255/64595)
+2026-11-01T12:38:29.4007282Z Updating files:  37% (23901/64595)
+2026-11-01T12:38:29.4303343Z Updating files:  38% (24547/64595)
+2026-11-01T12:38:29.4603804Z Updating files:  39% (25193/64595)
+2026-11-01T12:38:29.4902566Z Updating files:  40% (25838/64595)
+2026-11-01T12:38:29.5254204Z Updating files:  41% (26484/64595)
+2026-11-01T12:38:29.5592731Z Updating files:  42% (27130/64595)
+2026-11-01T12:38:29.5937691Z Updating files:  43% (27776/64595)
+2026-11-01T12:38:29.6251023Z Updating files:  44% (28422/64595)
+2026-11-01T12:38:29.6630980Z Updating files:  45% (29068/64595)
+2026-11-01T12:38:29.6933255Z Updating files:  46% (29714/64595)
+2026-11-01T12:38:29.7229430Z Updating files:  47% (30360/64595)
+2026-11-01T12:38:29.7524979Z Updating files:  48% (31006/64595)
+2026-11-01T12:38:29.7824347Z Updating files:  49% (31652/64595)
+2026-11-01T12:38:29.8123992Z Updating files:  50% (32298/64595)
+2026-11-01T12:38:29.8417895Z Updating files:  51% (32944/64595)
+2026-11-01T12:38:29.8711700Z Updating files:  52% (33590/64595)
+2026-11-01T12:38:29.9144393Z Updating files:  53% (34236/64595)
+2026-11-01T12:38:29.9443690Z Updating files:  54% (34882/64595)
+2026-11-01T12:38:29.9738665Z Updating files:  55% (35528/64595)
+2026-11-01T12:38:30.0033661Z Updating files:  56% (36174/64595)
+2026-11-01T12:38:30.0328074Z Updating files:  57% (36820/64595)
+2026-11-01T12:38:30.0620823Z Updating files:  58% (37466/64595)
+2026-11-01T12:38:30.0918471Z Updating files:  59% (38112/64595)
+2026-11-01T12:38:30.1249573Z Updating files:  60% (38757/64595)
+2026-11-01T12:38:30.1767744Z Updating files:  61% (39403/64595)
+2026-11-01T12:38:30.2225375Z Updating files:  61% (39467/64595)
+2026-11-01T12:38:30.2581969Z Updating files:  62% (40049/64595)
+2026-11-01T12:38:30.3150754Z Updating files:  63% (40695/64595)
+2026-11-01T12:38:30.3568727Z Updating files:  64% (41341/64595)
+2026-11-01T12:38:30.3909801Z Updating files:  65% (41987/64595)
+2026-11-01T12:38:30.4238248Z Updating files:  66% (42633/64595)
+2026-11-01T12:38:30.4602427Z Updating files:  67% (43279/64595)
+2026-11-01T12:38:31.2289018Z Updating files:  68% (43925/64595)
+2026-11-01T12:38:32.1843404Z Updating files:  68% (44330/64595)
+2026-11-01T12:38:33.4074365Z Updating files:  68% (44378/64595)
+2026-11-01T12:38:34.3168439Z Updating files:  68% (44460/64595)
+2026-11-01T12:38:35.2902291Z Updating files:  68% (44522/64595)
+2026-11-01T12:38:35.8097402Z Updating files:  68% (44561/64595)
+2026-11-01T12:38:36.3260207Z Updating files:  69% (44571/64595)
+2026-11-01T12:38:37.4649697Z Updating files:  69% (44600/64595)
+2026-11-01T12:38:38.3884198Z Updating files:  69% (44642/64595)
+2026-11-01T12:38:39.0754949Z Updating files:  69% (44684/64595)
+2026-11-01T12:38:39.1102328Z Updating files:  70% (45217/64595)
+2026-11-01T12:38:39.1501189Z Updating files:  71% (45863/64595)
+2026-11-01T12:38:39.1710238Z Updating files:  72% (46509/64595)
+2026-11-01T12:38:39.1835213Z Updating files:  72% (46931/64595)
+2026-11-01T12:38:39.2137167Z Updating files:  73% (47155/64595)
+2026-11-01T12:38:39.2460401Z Updating files:  74% (47801/64595)
+2026-11-01T12:38:39.2774705Z Updating files:  75% (48447/64595)
+2026-11-01T12:38:39.3102091Z Updating files:  76% (49093/64595)
+2026-11-01T12:38:39.3428815Z Updating files:  77% (49739/64595)
+2026-11-01T12:38:39.3736264Z Updating files:  78% (50385/64595)
+2026-11-01T12:38:39.4057678Z Updating files:  79% (51031/64595)
+2026-11-01T12:38:39.4374013Z Updating files:  80% (51676/64595)
+2026-11-01T12:38:39.4761864Z Updating files:  81% (52322/64595)
+2026-11-01T12:38:39.5078998Z Updating files:  82% (52968/64595)
+2026-11-01T12:38:39.5377950Z Updating files:  83% (53614/64595)
+2026-11-01T12:38:39.5795980Z Updating files:  84% (54260/64595)
+2026-11-01T12:38:39.6240643Z Updating files:  85% (54906/64595)
+2026-11-01T12:38:39.6645625Z Updating files:  86% (55552/64595)
+2026-11-01T12:38:39.6863474Z Updating files:  87% (56198/64595)
+2026-11-01T12:38:39.7248742Z Updating files:  88% (56844/64595)
+2026-11-01T12:38:39.7517563Z Updating files:  89% (57490/64595)
+2026-11-01T12:38:39.7874917Z Updating files:  90% (58136/64595)
+2026-11-01T12:38:39.8350433Z Updating files:  91% (58782/64595)
+2026-11-01T12:38:39.8802768Z Updating files:  92% (59428/64595)
+2026-11-01T12:38:39.9217458Z Updating files:  93% (60074/64595)
+2026-11-01T12:38:39.9665194Z Updating files:  94% (60720/64595)
+2026-11-01T12:38:40.0259710Z Updating files:  95% (61366/64595)
+2026-11-01T12:38:40.0675785Z Updating files:  96% (62012/64595)
+2026-11-01T12:38:40.1018752Z Updating files:  97% (62658/64595)
+2026-11-01T12:38:40.1402887Z Updating files:  98% (63304/64595)
+2026-11-01T12:38:40.1856690Z Updating files:  99% (63950/64595)
+2026-11-01T12:38:40.2724450Z Updating files:  99% (64198/64595)
+2026-11-01T12:38:40.2725011Z Updating files: 100% (64595/64595)
+2026-11-01T12:38:40.2725506Z Updating files: 100% (64595/64595), done.
+2026-11-01T12:38:40.3441493Z Switched to a new branch 'main'
+2026-11-01T12:38:40.3443045Z branch 'main' set up to track 'origin/main'.
+2026-11-01T12:38:40.3578257Z ##[endgroup]
+2026-11-01T12:38:40.3632369Z [command]/usr/bin/git log -1 --format=%H
+2026-11-01T12:38:40.3672430Z 77d676d0fc1149e36dd8d19a0e1602e053653fa7
+2026-11-01T12:38:40.3986164Z ##[group]Run actions/setup-python@v6
+2026-11-01T12:38:40.3986489Z with:
+2026-11-01T12:38:40.3986696Z   python-version: 3.12
+2026-11-01T12:38:40.3987384Z   check-latest: false
+2026-11-01T12:38:40.3990061Z   token: ***
+2026-11-01T12:38:40.3990288Z   update-environment: true
+2026-11-01T12:38:40.3990536Z   allow-prereleases: false
+2026-11-01T12:38:40.3990772Z   freethreaded: false
+2026-11-01T12:38:40.3990987Z env:
+2026-11-01T12:38:40.3991191Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:40.3991454Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:40.3991870Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:40.3992343Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:40.3992736Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:40.3993082Z ##[endgroup]
+2026-11-01T12:38:40.5503115Z ##[group]Installed versions
+2026-11-01T12:38:40.5613480Z Successfully set up CPython (3.12.15)
+2026-11-01T12:38:40.5614425Z ##[endgroup]
+2026-11-01T12:38:40.5816050Z ##[group]Run import os
+2026-11-01T12:38:40.5817149Z [36;1mimport os[0m
+2026-11-01T12:38:40.5817454Z [36;1mfrom pathlib import Path[0m
+2026-11-01T12:38:40.5817753Z [36;1mimport tempfile[0m
+2026-11-01T12:38:40.5817988Z [36;1mimport textwrap[0m
+2026-11-01T12:38:40.5818207Z [36;1m[0m
+2026-11-01T12:38:40.5818626Z [36;1mcache = Path(tempfile.mkdtemp(prefix='void-thinlto-', dir=os.environ['RUNNER_TEMP'])).resolve()[0m
+2026-11-01T12:38:40.5819175Z [36;1mhelper = cache.parent / (cache.name + '.py')[0m
+2026-11-01T12:38:40.5819523Z [36;1mhelper.write_text(textwrap.dedent(r'''[0m
+2026-11-01T12:38:40.5819819Z [36;1mimport csv[0m
+2026-11-01T12:38:40.5820032Z [36;1mimport hashlib[0m
+2026-11-01T12:38:40.5820254Z [36;1mimport json[0m
+2026-11-01T12:38:40.5820462Z [36;1mimport os[0m
+2026-11-01T12:38:40.5820691Z [36;1mfrom pathlib import Path[0m
+2026-11-01T12:38:40.5820952Z [36;1mimport platform[0m
+2026-11-01T12:38:40.5821262Z [36;1mimport shutil[0m
+2026-11-01T12:38:40.5821565Z [36;1mimport subprocess[0m
+2026-11-01T12:38:40.5821799Z [36;1mimport sys[0m
+2026-11-01T12:38:40.5822010Z [36;1mimport time[0m
+2026-11-01T12:38:40.5822425Z [36;1m[0m
+2026-11-01T12:38:40.5822622Z [36;1mphase = sys.argv[1][0m
+2026-11-01T12:38:40.5822952Z [36;1mconfiguration = os.environ['EXPERIMENT_CONFIGURATION'][0m
+2026-11-01T12:38:40.5823332Z [36;1mmode = os.environ['EXPERIMENT_MODE'][0m
+2026-11-01T12:38:40.5823646Z [36;1mbuild = Path('build') / configuration[0m
+2026-11-01T12:38:40.5823978Z [36;1mevidence = Path(os.environ['EXPERIMENT_DIR'])[0m
+2026-11-01T12:38:40.5824326Z [36;1mcache = Path(os.environ['THINLTO_CACHE_DIR'])[0m
+2026-11-01T12:38:40.5824705Z [36;1mevidence.mkdir(parents=True, exist_ok=True)[0m
+2026-11-01T12:38:40.5824999Z [36;1m[0m
+2026-11-01T12:38:40.5825193Z [36;1mdef save(name, value):[0m
+2026-11-01T12:38:40.5825593Z [36;1m    (evidence / name).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')[0m
+2026-11-01T12:38:40.5826020Z [36;1m[0m
+2026-11-01T12:38:40.5826220Z [36;1mdef cache_size():[0m
+2026-11-01T12:38:40.5826524Z [36;1m    files = [p for p in cache.rglob('*') if p.is_file()][0m
+2026-11-01T12:38:40.5827189Z [36;1m    return {'directory': str(cache), 'files': len(files),[0m
+2026-11-01T12:38:40.5827585Z [36;1m            'bytes': sum(p.stat().st_size for p in files)}[0m
+2026-11-01T12:38:40.5827895Z [36;1m[0m
+2026-11-01T12:38:40.5828089Z [36;1mdef identity():[0m
+2026-11-01T12:38:40.5828418Z [36;1m    commands = [['git', 'rev-parse', 'HEAD'], ['git', 'status', '--short'],[0m
+2026-11-01T12:38:40.5828844Z [36;1m                ['cmake', '--version'], ['ninja', '--version']][0m
+2026-11-01T12:38:40.5829225Z [36;1m    for key in ('CC', 'CXX', 'VOID_CLANG', 'VOID_LINKER'):[0m
+2026-11-01T12:38:40.5829564Z [36;1m        if os.environ.get(key):[0m
+2026-11-01T12:38:40.5829886Z [36;1m            commands.append([os.environ[key], '--version'])[0m
+2026-11-01T12:38:40.5830231Z [36;1m    if platform.system() == 'Linux':[0m
+2026-11-01T12:38:40.5830578Z [36;1m        commands += [['lscpu'], ['cat', '/proc/meminfo']][0m
+2026-11-01T12:38:40.5830936Z [36;1m    elif platform.system() == 'Darwin':[0m
+2026-11-01T12:38:40.5831360Z [36;1m        commands += [['xcodebuild', '-version'], ['xcrun', '--show-sdk-path'],[0m
+2026-11-01T12:38:40.5831826Z [36;1m                     ['xcrun', 'ld', '-v'], ['sysctl', 'hw'], ['vm_stat']][0m
+2026-11-01T12:38:40.5832161Z [36;1m    else:[0m
+2026-11-01T12:38:40.5832425Z [36;1m        commands += [['where.exe', 'link'], ['link.exe'],[0m
+2026-11-01T12:38:40.5832799Z [36;1m                     ['powershell', '-NoProfile', '-Command',[0m
+2026-11-01T12:38:40.5833544Z [36;1m                      'Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; '[0m
+2026-11-01T12:38:40.5834540Z [36;1m                      'Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors | ConvertTo-Json']][0m
+2026-11-01T12:38:40.5835357Z [36;1m    records = [][0m
+2026-11-01T12:38:40.5835606Z [36;1m    for command in commands:[0m
+2026-11-01T12:38:40.5835863Z [36;1m        try:[0m
+2026-11-01T12:38:40.5836374Z [36;1m            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors='replace')[0m
+2026-11-01T12:38:40.5837452Z [36;1m            records.append({'argv': command, 'exit_code': result.returncode, 'output': result.stdout})[0m
+2026-11-01T12:38:40.5837952Z [36;1m        except OSError as error:[0m
+2026-11-01T12:38:40.5838308Z [36;1m            records.append({'argv': command, 'error': str(error)})[0m
+2026-11-01T12:38:40.5838669Z [36;1m    save('identity.json', {[0m
+2026-11-01T12:38:40.5839115Z [36;1m        'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),[0m
+2026-11-01T12:38:40.5839737Z [36;1m        'dispatch_sha': os.environ.get('GITHUB_SHA'), 'mode': mode, 'configuration': configuration,[0m
+2026-11-01T12:38:40.5840393Z [36;1m        'run_id': os.environ.get('GITHUB_RUN_ID'), 'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),[0m
+2026-11-01T12:38:40.5841022Z [36;1m        'runner_os': os.environ.get('RUNNER_OS'), 'runner_arch': os.environ.get('RUNNER_ARCH'),[0m
+2026-11-01T12:38:40.5841759Z [36;1m        'platform': platform.platform(), 'logical_cpus': os.cpu_count(),[0m
+2026-11-01T12:38:40.5842204Z [36;1m        'environment': {key: os.environ.get(key) for key in[0m
+2026-11-01T12:38:40.5842643Z [36;1m                        ('CC', 'CXX', 'LLVM_DIR', 'VOID_CLANG', 'VOID_LINKER', 'SDKROOT',[0m
+2026-11-01T12:38:40.5843175Z [36;1m                         'VCToolsVersion', 'WindowsSDKVersion', 'ASAN_OPTIONS', 'UBSAN_OPTIONS')},[0m
+2026-11-01T12:38:40.5843871Z [36;1m        'workflow_sha256': hashlib.sha256(Path('.github/workflows/ci-link-experiment.yml').read_bytes()).hexdigest(),[0m
+2026-11-01T12:38:40.5844427Z [36;1m        'tools_and_host': records,[0m
+2026-11-01T12:38:40.5844703Z [36;1m    })[0m
+2026-11-01T12:38:40.5844897Z [36;1m[0m
+2026-11-01T12:38:40.5845090Z [36;1mdef link_targets():[0m
+2026-11-01T12:38:40.5845459Z [36;1m    result = subprocess.run(['ninja', '-C', str(build), '-t', 'targets', 'all'],[0m
+2026-11-01T12:38:40.5845998Z [36;1m                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)[0m
+2026-11-01T12:38:40.5846535Z [36;1m    (evidence / 'ninja-targets.txt').write_text(result.stdout, encoding='utf-8')[0m
+2026-11-01T12:38:40.5847298Z [36;1m    result.check_returncode()[0m
+2026-11-01T12:38:40.5847691Z [36;1m    return {line.rsplit(': ', 1)[0] for line in result.stdout.splitlines()[0m
+2026-11-01T12:38:40.5848188Z [36;1m            if ': ' in line and 'EXECUTABLE_LINKER' in line.rsplit(': ', 1)[1]}[0m
+2026-11-01T12:38:40.5848575Z [36;1m[0m
+2026-11-01T12:38:40.5848784Z [36;1mdef link_times(label, previous):[0m
+2026-11-01T12:38:40.5849075Z [36;1m    log = build / '.ninja_log'[0m
+2026-11-01T12:38:40.5849347Z [36;1m    if not log.exists():[0m
+2026-11-01T12:38:40.5849602Z [36;1m        return[0m
+2026-11-01T12:38:40.5849888Z [36;1m    shutil.copy2(log, evidence / f'{label}.ninja_log')[0m
+2026-11-01T12:38:40.5850238Z [36;1m    targets = link_targets()[0m
+2026-11-01T12:38:40.5850664Z [36;1m    with (evidence / f'{label}-links.csv').open('w', newline='', encoding='utf-8') as output:[0m
+2026-11-01T12:38:40.5851120Z [36;1m        writer = csv.writer(output)[0m
+2026-11-01T12:38:40.5851504Z [36;1m        writer.writerow(['output', 'start_ms', 'end_ms', 'duration_ms'])[0m
+2026-11-01T12:38:40.5851964Z [36;1m        for line in log.read_text(encoding='utf-8').splitlines():[0m
+2026-11-01T12:38:40.5852333Z [36;1m            fields = line.split('\t')[0m
+2026-11-01T12:38:40.5852737Z [36;1m            if line not in previous and len(fields) == 5 and fields[3] in targets:[0m
+2026-11-01T12:38:40.5853308Z [36;1m                writer.writerow([fields[3], fields[0], fields[1], int(fields[1]) - int(fields[0])])[0m
+2026-11-01T12:38:40.5853942Z [36;1m[0m
+2026-11-01T12:38:40.5854144Z [36;1mprevious = set()[0m
+2026-11-01T12:38:40.5854388Z [36;1mif phase == 'configure':[0m
+2026-11-01T12:38:40.5854649Z [36;1m    identity()[0m
+2026-11-01T12:38:40.5855027Z [36;1m    # Fresh build and cache: the ORC probe may prime SDK entries before the full build.[0m
+2026-11-01T12:38:40.5855612Z [36;1m    assert not (build / 'CMakeCache.txt').exists() and not (build / '.ninja_log').exists()[0m
+2026-11-01T12:38:40.5856064Z [36;1m    assert cache_size()['files'] == 0[0m
+2026-11-01T12:38:40.5856430Z [36;1m    command = ['cmake', '-S', '.', '-B', str(build), '-G', 'Ninja',[0m
+2026-11-01T12:38:40.5857369Z [36;1m               '-DCMAKE_BUILD_TYPE=' + ('RelWithDebInfo' if configuration == 'Sanitizers' else configuration),[0m
+2026-11-01T12:38:40.5858034Z [36;1m               '-DVOID_SANITIZERS=' + ('ON' if configuration == 'Sanitizers' else 'OFF'),[0m
+2026-11-01T12:38:40.5858607Z [36;1m               '-DLLVM_DIR=' + os.environ['LLVM_DIR'], '-DVOID_CLANG=' + os.environ['VOID_CLANG'],[0m
+2026-11-01T12:38:40.5859109Z [36;1m               '-DVOID_LINKER=' + os.environ.get('VOID_LINKER', ''),[0m
+2026-11-01T12:38:40.5859874Z [36;1m               '--trace-format=json-v1', '--trace-source=' + str(Path('CMakeLists.txt').resolve()),[0m
+2026-11-01T12:38:40.5860438Z [36;1m               '--trace-redirect=' + str(evidence / 'configure-trace.jsonl')][0m
+2026-11-01T12:38:40.5860850Z [36;1m    if platform.system() == 'Darwin':[0m
+2026-11-01T12:38:40.5861185Z [36;1m        command += ['-DCMAKE_OSX_ARCHITECTURES=arm64',[0m
+2026-11-01T12:38:40.5861564Z [36;1m                    '-DCMAKE_OSX_SYSROOT=' + os.environ['SDKROOT'],[0m
+2026-11-01T12:38:40.5862051Z [36;1m                    '-DCMAKE_OSX_DEPLOYMENT_TARGET=' + os.environ['MACOSX_DEPLOYMENT_TARGET']][0m
+2026-11-01T12:38:40.5862558Z [36;1m    if mode == 'thinlto-cache' and platform.system() != 'Windows':[0m
+2026-11-01T12:38:40.5863115Z [36;1m        flag = ('-Wl,--thinlto-cache-dir=' if platform.system() == 'Linux' else '-Wl,-cache_path_lto,')[0m
+2026-11-01T12:38:40.5863757Z [36;1m        # CMake parses this string as linker flags; quote the directory for paths with spaces.[0m
+2026-11-01T12:38:40.5864253Z [36;1m        flags = flag + '"' + cache.as_posix() + '"'[0m
+2026-11-01T12:38:40.5864592Z [36;1m        if platform.system() == 'Linux':[0m
+2026-11-01T12:38:40.5865003Z [36;1m            # Compiler checks precede the project's LLD selection. Boss approved[0m
+2026-11-01T12:38:40.5865819Z [36;1m            # repeating that same pinned linker here so GNU ld never sees the cache flag.[0m
+2026-11-01T12:38:40.5866674Z [36;1m            flags = '--ld-path="' + os.environ['VOID_LINKER'] + '" ' + flags[0m
+2026-11-01T12:38:40.5867643Z [36;1m        command.append('-DCMAKE_EXE_LINKER_FLAGS:STRING=' + flags)[0m
+2026-11-01T12:38:40.5868282Z [36;1melif phase in ('build', 'relink'):[0m
+2026-11-01T12:38:40.5868749Z [36;1m    if phase == 'relink':[0m
+2026-11-01T12:38:40.5869414Z [36;1m        # Relink representative voidc after acceptance. Building only this target[0m
+2026-11-01T12:38:40.5870354Z [36;1m        # avoids regenerating its downstream AOT fixtures; objects/cache stay warm.[0m
+2026-11-01T12:38:40.5871273Z [36;1m        targets = {t for t in link_targets() if Path(t).name in ('voidc', 'voidc.exe')}[0m
+2026-11-01T12:38:40.5872062Z [36;1m        assert len(targets) == 1, 'Expected exactly one voidc executable'[0m
+2026-11-01T12:38:40.5872906Z [36;1m        previous = set((build / '.ninja_log').read_text(encoding='utf-8').splitlines())[0m
+2026-11-01T12:38:40.5873589Z [36;1m        save('relink-targets.json', sorted(targets))[0m
+2026-11-01T12:38:40.5873919Z [36;1m        for target in targets:[0m
+2026-11-01T12:38:40.5874226Z [36;1m            (build / target).unlink(missing_ok=True)[0m
+2026-11-01T12:38:40.5874615Z [36;1m    command = ['cmake', '--build', str(build), '--parallel', '3'][0m
+2026-11-01T12:38:40.5875223Z [36;1m    if phase == 'relink':[0m
+2026-11-01T12:38:40.5875699Z [36;1m        command += ['--target', 'voidc'][0m
+2026-11-01T12:38:40.5875995Z [36;1melse:[0m
+2026-11-01T12:38:40.5876209Z [36;1m    raise ValueError(phase)[0m
+2026-11-01T12:38:40.5876468Z [36;1m[0m
+2026-11-01T12:38:40.5876776Z [36;1mmetrics = {'argv': command, 'cache_before': cache_size(), 'phase': phase}[0m
+2026-11-01T12:38:40.5877602Z [36;1m# POSIX child CPU totals include reaped descendants; peak RSS is a maximum, not a sum.[0m
+2026-11-01T12:38:40.5878042Z [36;1mtry:[0m
+2026-11-01T12:38:40.5878247Z [36;1m    import resource[0m
+2026-11-01T12:38:40.5878613Z [36;1mexcept ImportError:[0m
+2026-11-01T12:38:40.5879050Z [36;1m    resource = None[0m
+2026-11-01T12:38:40.5879450Z [36;1mstart = time.perf_counter()[0m
+2026-11-01T12:38:40.5879863Z [36;1mtry:[0m
+2026-11-01T12:38:40.5880356Z [36;1m    with (evidence / f'{phase}.log').open('w', encoding='utf-8') as log:[0m
+2026-11-01T12:38:40.5881047Z [36;1m        print(json.dumps(command), flush=True)[0m
+2026-11-01T12:38:40.5881886Z [36;1m        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,[0m
+2026-11-01T12:38:40.5882759Z [36;1m                                   text=True, errors='replace', bufsize=1)[0m
+2026-11-01T12:38:40.5883660Z [36;1m        for line in process.stdout:[0m
+2026-11-01T12:38:40.5883967Z [36;1m            log.write(line)[0m
+2026-11-01T12:38:40.5884286Z [36;1m            log.flush()[0m
+2026-11-01T12:38:40.5884731Z [36;1m            print(line, end='', flush=True)[0m
+2026-11-01T12:38:40.5885269Z [36;1m        metrics['exit_code'] = process.wait()[0m
+2026-11-01T12:38:40.5885647Z [36;1mfinally:[0m
+2026-11-01T12:38:40.5885930Z [36;1m    metrics['wall_seconds'] = time.perf_counter() - start[0m
+2026-11-01T12:38:40.5886301Z [36;1m    metrics['cache_after'] = cache_size()[0m
+2026-11-01T12:38:40.5886588Z [36;1m    if resource:[0m
+2026-11-01T12:38:40.5887248Z [36;1m        usage = resource.getrusage(resource.RUSAGE_CHILDREN)[0m
+2026-11-01T12:38:40.5887988Z [36;1m        metrics['child_resources'] = {'user_seconds': usage.ru_utime, 'system_seconds': usage.ru_stime,[0m
+2026-11-01T12:38:40.5889027Z [36;1m                                     'max_rss_bytes': usage.ru_maxrss * (1 if platform.system() == 'Darwin' else 1024),[0m
+2026-11-01T12:38:40.5889795Z [36;1m                                     'note': 'Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak.'}[0m
+2026-11-01T12:38:40.5890345Z [36;1m    else:[0m
+2026-11-01T12:38:40.5890921Z [36;1m        metrics['child_resources'] = {'note': 'POSIX rusage unavailable on Windows; host CPU/memory is in identity.json.'}[0m
+2026-11-01T12:38:40.5891799Z [36;1m    if phase == 'configure':[0m
+2026-11-01T12:38:40.5892117Z [36;1m        trace = evidence / 'configure-trace.jsonl'[0m
+2026-11-01T12:38:40.5892597Z [36;1m        probe_start = None[0m
+2026-11-01T12:38:40.5893024Z [36;1m        metrics['orc_probe_seconds'] = None[0m
+2026-11-01T12:38:40.5893327Z [36;1m        if trace.exists():[0m
+2026-11-01T12:38:40.5893857Z [36;1m            for line in trace.read_text(encoding='utf-8').splitlines():[0m
+2026-11-01T12:38:40.5894289Z [36;1m                event = json.loads(line)[0m
+2026-11-01T12:38:40.5894675Z [36;1m                if probe_start is not None:[0m
+2026-11-01T12:38:40.5895063Z [36;1m                    metrics['orc_probe_seconds'] = event['time'] - probe_start[0m
+2026-11-01T12:38:40.5895435Z [36;1m                    break[0m
+2026-11-01T12:38:40.5895996Z [36;1m                if event.get('cmd') == 'check_cxx_source_runs' and 'VOID_LLVM_ORC_RUNS' in event.get('args', []):[0m
+2026-11-01T12:38:40.5896548Z [36;1m                    probe_start = event['time'][0m
+2026-11-01T12:38:40.5897407Z [36;1m        metrics['orc_probe_note'] = 'CMake trace call-to-return wall time; null means the probe did not return.'[0m
+2026-11-01T12:38:40.5897940Z [36;1m    save(f'{phase}.json', metrics)[0m
+2026-11-01T12:38:40.5898384Z [36;1m    if phase in ('build', 'relink'):[0m
+2026-11-01T12:38:40.5898869Z [36;1m        link_times(phase, previous)[0m
+2026-11-01T12:38:40.5899176Z [36;1msys.exit(metrics['exit_code'])[0m
+2026-11-01T12:38:40.5899463Z [36;1m''').lstrip(), encoding='utf-8')[0m
+2026-11-01T12:38:40.5899841Z [36;1mwith open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:[0m
+2026-11-01T12:38:40.5900431Z [36;1m    env.write(f'THINLTO_CACHE_DIR={cache.as_posix()}\nLINK_EXPERIMENT_HELPER={helper.as_posix()}\n')[0m
+2026-11-01T12:38:40.5923068Z shell: /opt/hostedtoolcache/Python/3.12.15/x64/bin/python {0}
+2026-11-01T12:38:40.5923493Z env:
+2026-11-01T12:38:40.5923763Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:40.5924069Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:40.5924511Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:40.5925133Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:40.5925829Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:40.5926773Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.5928046Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:38:40.5929619Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.5930425Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.5931255Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.5932107Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:38:40.5932952Z ##[endgroup]
+2026-11-01T12:38:40.6927222Z ##[group]Run sudo apt-get update
+2026-11-01T12:38:40.6927596Z [36;1msudo apt-get update[0m
+2026-11-01T12:38:40.6928123Z [36;1msudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev[0m
+2026-11-01T12:38:40.6952034Z shell: /usr/bin/bash -e {0}
+2026-11-01T12:38:40.6952322Z env:
+2026-11-01T12:38:40.6952553Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:40.6952846Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:40.6953268Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:40.6953789Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:40.6954187Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:40.6954600Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.6955032Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:38:40.6955539Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.6955934Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.6956332Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:40.6956728Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:38:40.6957354Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:38:40.6957845Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:38:40.6958239Z ##[endgroup]
+2026-11-01T12:38:40.7921340Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-11-01T12:38:40.8296761Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-11-01T12:38:40.8312265Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-11-01T12:38:40.8315840Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-11-01T12:38:40.8371976Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-11-01T12:38:40.8398979Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-11-01T12:38:40.9927505Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [682 kB]
+2026-11-01T12:38:41.0122214Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [617 kB]
+2026-11-01T12:38:41.0683860Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1408 kB]
+2026-11-01T12:38:41.0789128Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [311 kB]
+2026-11-01T12:38:41.0860841Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1708 kB]
+2026-11-01T12:38:41.0954383Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [343 kB]
+2026-11-01T12:38:41.0989897Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1813 kB]
+2026-11-01T12:38:41.1098338Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [412 kB]
+2026-11-01T12:38:41.1119892Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse Translation-en [14.3 kB]
+2026-11-01T12:38:41.1980385Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1146 kB]
+2026-11-01T12:38:41.2048922Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [231 kB]
+2026-11-01T12:38:41.2075486Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1223 kB]
+2026-11-01T12:38:41.2578700Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+2026-11-01T12:38:45.7320766Z Fetched 10.5 MB in 1s (9013 kB/s)
+2026-11-01T12:38:46.9305390Z Reading package lists...
+2026-11-01T12:38:46.9718056Z Reading package lists...
+2026-11-01T12:38:47.2469676Z Building dependency tree...
+2026-11-01T12:38:47.2478176Z Reading state information...
+2026-11-01T12:38:47.5261699Z libffi-dev is already the newest version (3.4.6-1build1).
+2026-11-01T12:38:47.5262252Z libffi-dev set to manually installed.
+2026-11-01T12:38:47.5262745Z libxml2-dev is already the newest version (2.9.14+dfsg-1.3ubuntu3.10).
+2026-11-01T12:38:47.5263247Z libxml2-dev set to manually installed.
+2026-11-01T12:38:47.5263682Z libzstd-dev is already the newest version (1.5.5+dfsg2-2build1.1).
+2026-11-01T12:38:47.5264135Z libzstd-dev set to manually installed.
+2026-11-01T12:38:47.5264568Z zlib1g-dev is already the newest version (1:1.3.dfsg-3.1ubuntu2.3).
+2026-11-01T12:38:47.5265123Z libncurses-dev is already the newest version (6.4+20240113-1ubuntu2.2).
+2026-11-01T12:38:47.5265614Z libncurses-dev set to manually installed.
+2026-11-01T12:38:47.5266030Z The following additional packages will be installed:
+2026-11-01T12:38:47.5272352Z   libbsd-dev libmd-dev
+2026-11-01T12:38:47.5537882Z The following NEW packages will be installed:
+2026-11-01T12:38:47.5549251Z   libbsd-dev libedit-dev libmd-dev ninja-build
+2026-11-01T12:38:47.5812716Z 0 upgraded, 4 newly installed, 0 to remove and 6 not upgraded.
+2026-11-01T12:38:47.5813157Z Need to get 463 kB of archives.
+2026-11-01T12:38:47.5824935Z After this operation, 1778 kB of additional disk space will be used.
+2026-11-01T12:38:47.5825702Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-11-01T12:38:47.6172213Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libmd-dev amd64 1.1.0-2build1.1 [45.5 kB]
+2026-11-01T12:38:47.6352661Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libbsd-dev amd64 0.12.1-1build1.1 [169 kB]
+2026-11-01T12:38:47.6525465Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libedit-dev amd64 3.1-20230828-1build1 [119 kB]
+2026-11-01T12:38:47.6696351Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 ninja-build amd64 1.11.1-2 [129 kB]
+2026-11-01T12:38:47.9717144Z Fetched 463 kB in 0s (4502 kB/s)
+2026-11-01T12:38:47.9972605Z Selecting previously unselected package libmd-dev:amd64.
+2026-11-01T12:38:48.0400981Z (Reading database ... 
+2026-11-01T12:38:48.0401322Z (Reading database ... 5%
+2026-11-01T12:38:48.0401580Z (Reading database ... 10%
+2026-11-01T12:38:48.0401821Z (Reading database ... 15%
+2026-11-01T12:38:48.0402059Z (Reading database ... 20%
+2026-11-01T12:38:48.0402283Z (Reading database ... 25%
+2026-11-01T12:38:48.0402506Z (Reading database ... 30%
+2026-11-01T12:38:48.0402728Z (Reading database ... 35%
+2026-11-01T12:38:48.0403397Z (Reading database ... 40%
+2026-11-01T12:38:48.0403799Z (Reading database ... 45%
+2026-11-01T12:38:48.0404195Z (Reading database ... 50%
+2026-11-01T12:38:48.0461749Z (Reading database ... 55%
+2026-11-01T12:38:48.1886255Z (Reading database ... 60%
+2026-11-01T12:38:48.3856510Z (Reading database ... 65%
+2026-11-01T12:38:48.5831216Z (Reading database ... 70%
+2026-11-01T12:38:48.7931736Z (Reading database ... 75%
+2026-11-01T12:38:48.9714749Z (Reading database ... 80%
+2026-11-01T12:38:49.1254750Z (Reading database ... 85%
+2026-11-01T12:38:49.2248285Z (Reading database ... 90%
+2026-11-01T12:38:49.4271792Z (Reading database ... 95%
+2026-11-01T12:38:49.4272137Z (Reading database ... 100%
+2026-11-01T12:38:49.4272526Z (Reading database ... 215504 files and directories currently installed.)
+2026-11-01T12:38:49.4318533Z Preparing to unpack .../libmd-dev_1.1.0-2build1.1_amd64.deb ...
+2026-11-01T12:38:49.4342537Z Unpacking libmd-dev:amd64 (1.1.0-2build1.1) ...
+2026-11-01T12:38:49.4821374Z Selecting previously unselected package libbsd-dev:amd64.
+2026-11-01T12:38:49.4967785Z Preparing to unpack .../libbsd-dev_0.12.1-1build1.1_amd64.deb ...
+2026-11-01T12:38:49.4973504Z Unpacking libbsd-dev:amd64 (0.12.1-1build1.1) ...
+2026-11-01T12:38:49.5509706Z Selecting previously unselected package libedit-dev:amd64.
+2026-11-01T12:38:49.5657582Z Preparing to unpack .../libedit-dev_3.1-20230828-1build1_amd64.deb ...
+2026-11-01T12:38:49.5666754Z Unpacking libedit-dev:amd64 (3.1-20230828-1build1) ...
+2026-11-01T12:38:49.5974780Z Selecting previously unselected package ninja-build.
+2026-11-01T12:38:49.6122595Z Preparing to unpack .../ninja-build_1.11.1-2_amd64.deb ...
+2026-11-01T12:38:49.6129738Z Unpacking ninja-build (1.11.1-2) ...
+2026-11-01T12:38:49.6743137Z Setting up ninja-build (1.11.1-2) ...
+2026-11-01T12:38:49.6771304Z Setting up libmd-dev:amd64 (1.1.0-2build1.1) ...
+2026-11-01T12:38:49.6793564Z Setting up libbsd-dev:amd64 (0.12.1-1build1.1) ...
+2026-11-01T12:38:49.6812382Z Setting up libedit-dev:amd64 (3.1-20230828-1build1) ...
+2026-11-01T12:38:49.6832893Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-11-01T12:38:49.6857677Z Not building database; man-db/auto-update is not 'true'.
+2026-11-01T12:38:50.4094581Z 
+2026-11-01T12:38:50.4095102Z Running kernel seems to be up-to-date.
+2026-11-01T12:38:50.4095390Z 
+2026-11-01T12:38:50.4095528Z No services need to be restarted.
+2026-11-01T12:38:50.4095781Z 
+2026-11-01T12:38:50.4097945Z No containers need to be restarted.
+2026-11-01T12:38:50.4098309Z 
+2026-11-01T12:38:50.4098535Z No user sessions are running outdated binaries.
+2026-11-01T12:38:50.4098883Z 
+2026-11-01T12:38:50.4099252Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-11-01T12:38:51.6471659Z ##[group]Run actions/cache@v5
+2026-11-01T12:38:51.6471951Z with:
+2026-11-01T12:38:51.6472168Z   path: .toolchains/llvm-23.1.4
+2026-11-01T12:38:51.6472437Z   key: llvm-sdk-23.1.4-Linux-X64-v1
+2026-11-01T12:38:51.6472715Z   enableCrossOsArchive: false
+2026-11-01T12:38:51.6472967Z   fail-on-cache-miss: false
+2026-11-01T12:38:51.6473201Z   lookup-only: false
+2026-11-01T12:38:51.6473415Z   save-always: false
+2026-11-01T12:38:51.6473617Z env:
+2026-11-01T12:38:51.6473811Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:51.6474083Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:51.6474496Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:51.6474976Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:51.6475365Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:51.6475768Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:51.6476236Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:38:51.6476664Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:51.6477400Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:51.6477793Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:38:51.6478176Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:38:51.6478585Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:38:51.6479056Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:38:51.6479431Z ##[endgroup]
+2026-11-01T12:38:51.8725090Z Cache hit for: llvm-sdk-23.1.4-Linux-X64-v1
+2026-11-01T12:38:52.9554747Z Received 209715200 of 2911003440 (7.2%), 199.4 MBs/sec
+2026-11-01T12:38:53.9589938Z Received 486539264 of 2911003440 (16.7%), 231.5 MBs/sec
+2026-11-01T12:38:54.9648264Z Received 767557632 of 2911003440 (26.4%), 243.4 MBs/sec
+2026-11-01T12:38:55.9612031Z Received 1069547520 of 2911003440 (36.7%), 254.5 MBs/sec
+2026-11-01T12:38:56.9658347Z Received 1337982976 of 2911003440 (46.0%), 254.7 MBs/sec
+2026-11-01T12:38:57.9645936Z Received 1602224128 of 2911003440 (55.0%), 254.2 MBs/sec
+2026-11-01T12:38:58.9712653Z Received 1853882368 of 2911003440 (63.7%), 252.0 MBs/sec
+2026-11-01T12:38:59.9798073Z Received 2147483648 of 2911003440 (73.8%), 255.2 MBs/sec
+2026-11-01T12:39:00.9779115Z Received 2415919104 of 2911003440 (83.0%), 255.3 MBs/sec
+2026-11-01T12:39:01.9793408Z Received 2684354560 of 2911003440 (92.2%), 255.3 MBs/sec
+2026-11-01T12:39:02.8445617Z Received 2911003440 of 2911003440 (100.0%), 254.9 MBs/sec
+2026-11-01T12:39:02.8447774Z Cache Size: ~2776 MB (2911003440 B)
+2026-11-01T12:39:02.8590777Z [command]/usr/bin/tar -xf /home/runner/work/_temp/1acd1b93-8016-4eec-bb1b-ed54d6437a79/cache.tzst -P -C /home/runner/work/Void.Language/Void.Language --use-compress-program unzstd
+2026-11-01T12:39:30.5115683Z Cache restored successfully
+2026-11-01T12:39:30.9259848Z Cache restored from key: llvm-sdk-23.1.4-Linux-X64-v1
+2026-11-01T12:39:32.0776478Z ##[group]Run python tools/ci/llvm_sdk.py
+2026-11-01T12:39:32.0777685Z [36;1mpython tools/ci/llvm_sdk.py[0m
+2026-11-01T12:39:33.2760424Z shell: /usr/bin/bash -e {0}
+2026-11-01T12:39:33.2760725Z env:
+2026-11-01T12:39:33.2760954Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:33.2761253Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:33.2761693Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:33.2762205Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:33.2762611Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:33.2763030Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:33.2763464Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:33.2763895Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:33.2764281Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:33.2764777Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:33.2765453Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:33.2766145Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:33.2767144Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:33.2767799Z ##[endgroup]
+2026-11-01T12:39:33.9862970Z clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+2026-11-01T12:39:33.9863730Z Target: x86_64-unknown-linux-gnu
+2026-11-01T12:39:33.9864009Z Thread model: posix
+2026-11-01T12:39:33.9864416Z InstalledDir: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin
+2026-11-01T12:39:33.9864911Z 
+2026-11-01T12:39:33.9865527Z LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)
+2026-11-01T12:39:33.9866277Z 
+2026-11-01T12:39:33.9987502Z ##[group]Run python tools/ci/http_bootstrap.py identity
+2026-11-01T12:39:33.9987972Z [36;1mpython tools/ci/http_bootstrap.py identity[0m
+2026-11-01T12:39:34.0011238Z shell: /usr/bin/bash -e {0}
+2026-11-01T12:39:34.0011497Z env:
+2026-11-01T12:39:34.0011715Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:34.0011999Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:34.0012427Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:34.0012931Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:34.0013349Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:34.0013762Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.0014197Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:34.0014635Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.0015059Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.0015458Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.0015847Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:34.0016266Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:34.0016734Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:34.0017462Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:34.0018216Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:34.0018762Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:34.0019342Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:34.0019938Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:34.0020377Z ##[endgroup]
+2026-11-01T12:39:34.9495118Z curl 8.23.0: 1586 files verified; four private corrections
+2026-11-01T12:39:34.9739680Z ##[group]Run actions/cache/restore@v5
+2026-11-01T12:39:34.9739989Z with:
+2026-11-01T12:39:34.9740211Z   path: .toolchains/http/downloads
+2026-11-01T12:39:34.9740696Z   key: http-sources-v1-Linux-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb
+2026-11-01T12:39:34.9741213Z   enableCrossOsArchive: false
+2026-11-01T12:39:34.9741479Z   fail-on-cache-miss: false
+2026-11-01T12:39:34.9741736Z   lookup-only: false
+2026-11-01T12:39:34.9741950Z env:
+2026-11-01T12:39:34.9742162Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:34.9742428Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:34.9742848Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:34.9743329Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:34.9743733Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:34.9744139Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.9744606Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:34.9745032Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.9745417Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.9745804Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:34.9746190Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:34.9746618Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:34.9747371Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:34.9747941Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:34.9748518Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:34.9749073Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:34.9749657Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:34.9750257Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:34.9750696Z ##[endgroup]
+2026-11-01T12:39:35.1865622Z Cache not found for input keys: http-sources-v1-Linux-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb
+2026-11-01T12:39:35.2135380Z ##[group]Run actions/cache/restore@v5
+2026-11-01T12:39:35.2135687Z with:
+2026-11-01T12:39:35.2135970Z   path: .toolchains/http/prefix/linux-aws-lc-5.12.0/Release
+2026-11-01T12:39:35.2136588Z   key: http-deps-v1-llvm23.1.4-Linux-x86_64-Release-76443206df91a6421384417efb226413417d39be6f879d23d1d9c013c70c14ff
+2026-11-01T12:39:35.2137495Z   enableCrossOsArchive: false
+2026-11-01T12:39:35.2137764Z   fail-on-cache-miss: false
+2026-11-01T12:39:35.2138008Z   lookup-only: false
+2026-11-01T12:39:35.2138219Z env:
+2026-11-01T12:39:35.2138429Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:35.2138710Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:35.2139146Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:35.2139634Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:35.2140039Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:35.2140523Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.2141153Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:35.2141585Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.2141980Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.2142364Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.2142754Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:35.2143175Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:35.2143649Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:35.2144206Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:35.2144795Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:35.2145356Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:35.2145939Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:35.2146537Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:35.2147239Z ##[endgroup]
+2026-11-01T12:39:35.4231028Z Cache not found for input keys: http-deps-v1-llvm23.1.4-Linux-x86_64-Release-76443206df91a6421384417efb226413417d39be6f879d23d1d9c013c70c14ff
+2026-11-01T12:39:35.4375759Z ##[group]Run actions/cache/restore@v5
+2026-11-01T12:39:35.4376151Z with:
+2026-11-01T12:39:35.4376625Z   path: .toolchains/http/test-python
+.toolchains/http/test-certificates
+.toolchains/http/test-certificates-tools
+
+2026-11-01T12:39:35.4378324Z   key: http-fixtures-v1-Linux-x86_64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c
+2026-11-01T12:39:35.4379249Z   enableCrossOsArchive: false
+2026-11-01T12:39:35.4379761Z   fail-on-cache-miss: false
+2026-11-01T12:39:35.4380236Z   lookup-only: false
+2026-11-01T12:39:35.4380690Z env:
+2026-11-01T12:39:35.4381107Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:35.4381615Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:35.4382393Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:35.4383272Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:35.4384020Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:35.4385066Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.4386147Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:35.4387423Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.4388377Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.4389377Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.4390272Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:35.4391196Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:35.4392234Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:35.4393450Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:35.4394457Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:35.4395408Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:35.4396410Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:35.4397663Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:35.4398413Z ##[endgroup]
+2026-11-01T12:39:35.6499879Z Cache not found for input keys: http-fixtures-v1-Linux-x86_64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c
+2026-11-01T12:39:35.6668669Z ##[group]Run python tools/ci/http_bootstrap.py bootstrap
+2026-11-01T12:39:35.6669646Z [36;1mpython tools/ci/http_bootstrap.py bootstrap[0m
+2026-11-01T12:39:35.6693471Z shell: /usr/bin/bash -e {0}
+2026-11-01T12:39:35.6693737Z env:
+2026-11-01T12:39:35.6693965Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:35.6694254Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:35.6694684Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:35.6695187Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:35.6695604Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:35.6696023Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.6696473Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:35.6697109Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.6697568Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.6697972Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:35.6698362Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:35.6698787Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:35.6699259Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:35.6699819Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:35.6700402Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:35.6700952Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:35.6701535Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:35.6702142Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:35.6702600Z   HTTP_DEPS_CACHE_HIT: 
+2026-11-01T12:39:35.6702838Z ##[endgroup]
+2026-11-01T12:39:35.7999668Z compiler: passed
+2026-11-01T12:39:37.1615300Z Archive digest mismatch: /home/runner/work/Void.Language/Void.Language/.toolchains/http/downloads/zlib-1.3.2.tar.gz
+2026-11-01T12:39:37.2294867Z Traceback (most recent call last):
+2026-11-01T12:39:37.2303275Z   File "/home/runner/work/Void.Language/Void.Language/tools/ci/http_bootstrap.py", line 244, in <module>
+2026-11-01T12:39:37.2303996Z     main()
+2026-11-01T12:39:37.2304591Z   File "/home/runner/work/Void.Language/Void.Language/tools/ci/http_bootstrap.py", line 214, in main
+2026-11-01T12:39:37.2305489Z     run(evidence, 'build-dependencies', [sys.executable, ROOT / 'tools/setup_http_deps.py', '--profile', plan['profile'], '--jobs', '3'])
+2026-11-01T12:39:37.2306387Z   File "/home/runner/work/Void.Language/Void.Language/tools/ci/http_bootstrap.py", line 111, in run
+2026-11-01T12:39:37.2307453Z     raise RuntimeError(f'HTTP {label} failed ({record["exit_code"]}); see {evidence}')
+2026-11-01T12:39:37.2308259Z RuntimeError: HTTP build-dependencies failed (1); see /home/runner/work/Void.Language/Void.Language/build/link-experiment/http
+2026-11-01T12:39:37.2396195Z ##[error]Process completed with exit code 1.
+2026-11-01T12:39:37.2534527Z ##[group]Run actions/upload-artifact@v6
+2026-11-01T12:39:37.2534861Z with:
+2026-11-01T12:39:37.2535317Z   name: link-experiment-thinlto-cache-Linux-X64-Release-77d676d0fc1149e36dd8d19a0e1602e053653fa7-1
+2026-11-01T12:39:37.2535857Z   include-hidden-files: true
+2026-11-01T12:39:37.2536692Z   path: build/link-experiment/
+build/**/CMakeCache.txt
+build/**/build.ninja
+build/**/CMakeFiles/rules.ninja
+build/**/.ninja_log
+build/**/ctest-results.xml
+build/**/Testing/
+build/**/http-*-evidence/
+build/**/url-*-evidence/
+
+2026-11-01T12:39:37.2537734Z   if-no-files-found: ignore
+2026-11-01T12:39:37.2537990Z   compression-level: 6
+2026-11-01T12:39:37.2538224Z   overwrite: false
+2026-11-01T12:39:37.2538471Z env:
+2026-11-01T12:39:37.2538679Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:37.2539142Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:37.2539566Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:37.2540097Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:37.2540639Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:37.2541070Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:37.2541515Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:37.2541938Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:37.2542322Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:37.2542709Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:37.2543106Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:37.2543522Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:37.2543997Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:37.2544555Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:37.2545154Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:37.2545703Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:37.2546282Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:37.2547018Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:37.2561631Z ##[endgroup]
+2026-11-01T12:39:37.4581613Z With the provided path, there will be 8 files uploaded
+2026-11-01T12:39:37.4582446Z Artifact name is valid!
+2026-11-01T12:39:37.4582832Z Root directory input is valid!
+2026-11-01T12:39:37.6611335Z Beginning upload of artifact content to blob storage
+2026-11-01T12:39:37.7520037Z Uploaded bytes 3976
+2026-11-01T12:39:37.7677300Z Finished uploading artifact content to blob storage!
+2026-11-01T12:39:37.7678172Z SHA256 digest of uploaded artifact zip is 9ef94438ee78ee6c24fec771e49539f9fcc5688472293ddf6c0f829bbf6d312f
+2026-11-01T12:39:37.7679683Z Finalizing artifact upload
+2026-11-01T12:39:38.1899149Z Artifact link-experiment-thinlto-cache-Linux-X64-Release-77d676d0fc1149e36dd8d19a0e1602e053653fa7-1.zip successfully finalized. Artifact ID 13083747647
+2026-11-01T12:39:38.1901745Z Artifact link-experiment-thinlto-cache-Linux-X64-Release-77d676d0fc1149e36dd8d19a0e1602e053653fa7-1 has been successfully uploaded! Final size is 3976 bytes. Artifact ID is 13083747647
+2026-11-01T12:39:38.1904625Z Artifact download URL: https://github.com/Shmellyorc/Void.Language/actions/runs/41307437931/artifacts/13083747647
+2026-11-01T12:39:38.2089326Z ##[group]Run actions/upload-artifact@v6
+2026-11-01T12:39:38.2089877Z with:
+2026-11-01T12:39:38.2090259Z   name: tests-Linux-X64-Release
+2026-11-01T12:39:38.2091449Z   path: build/**/Testing/Temporary/LastTest.log
+build/**/CMakeFiles/CMakeConfigureLog.yaml
+build/**/CMakeFiles/CMakeError.log
+build/**/CMakeFiles/CMakeOutput.log
+
+2026-11-01T12:39:38.2092695Z   if-no-files-found: ignore
+2026-11-01T12:39:38.2092979Z   compression-level: 6
+2026-11-01T12:39:38.2093220Z   overwrite: false
+2026-11-01T12:39:38.2093451Z   include-hidden-files: false
+2026-11-01T12:39:38.2093703Z env:
+2026-11-01T12:39:38.2093915Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:38.2094195Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:38.2094626Z   EXPERIMENT_DIR: /home/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:38.2095112Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:38.2095762Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:38.2096487Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:38.2097531Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-11-01T12:39:38.2098589Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:38.2099278Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:38.2099991Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-11-01T12:39:38.2100777Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-11-01T12:39:38.2101507Z   THINLTO_CACHE_DIR: /home/runner/work/_temp/void-thinlto-8j1blh8a
+2026-11-01T12:39:38.2102322Z   LINK_EXPERIMENT_HELPER: /home/runner/work/_temp/void-thinlto-8j1blh8a.py
+2026-11-01T12:39:38.2103332Z   LLVM_DIR: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:38.2104388Z   CC: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:38.2105403Z   CXX: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:38.2106502Z   VOID_CLANG: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:38.2107901Z   VOID_LINKER: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld
+2026-11-01T12:39:38.2108676Z ##[endgroup]
+2026-11-01T12:39:38.3949208Z No files were found with the provided path: build/**/Testing/Temporary/LastTest.log
+2026-11-01T12:39:38.3950117Z build/**/CMakeFiles/CMakeConfigureLog.yaml
+2026-11-01T12:39:38.3950674Z build/**/CMakeFiles/CMakeError.log
+2026-11-01T12:39:38.3951332Z build/**/CMakeFiles/CMakeOutput.log. No artifacts will be uploaded.
+2026-11-01T12:39:38.4211299Z Post job cleanup.
+2026-11-01T12:39:38.5231070Z [command]/usr/bin/git version
+2026-11-01T12:39:38.5289299Z git version 2.56.0
+2026-11-01T12:39:38.5336171Z Temporarily overriding HOME='/home/runner/work/_temp/a95b3369-72a6-4465-986d-40bd493f550d' before making global git config changes
+2026-11-01T12:39:38.5339218Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-01T12:39:38.5343456Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Void.Language/Void.Language
+2026-11-01T12:39:38.5400186Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-01T12:39:38.5448079Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-01T12:39:38.6060462Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-01T12:39:38.6116476Z http.https://github.com/.extraheader
+2026-11-01T12:39:38.6168595Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-01T12:39:38.6249143Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-01T12:39:38.6638527Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-01T12:39:38.6703856Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-01T12:39:38.7259205Z Cleaning up orphan processes

@@ -1,0 +1,20 @@
+[
+  {
+    "path": "third_party/curl/lib/cookie.c",
+    "blob_sha256": "a5e0bb2b5bf19a7723e47b3d67d1db13eb3bc821f4d4a750ef9b4b26794a8580",
+    "filtered_sha256": "3422b5c1871c74f465138a7d2eaf54ca3ed0abc528872cbd1e0ad483eaa5b8fd",
+    "exact_blob": false,
+    "lf": 1698,
+    "checkout_crlf": 1698,
+    "only_lf_to_crlf": true
+  },
+  {
+    "path": "docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch",
+    "blob_sha256": "6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920",
+    "filtered_sha256": "526e3c886f7a7081ea69e906d83d8bf2b1033b61881dc7104c2ad4efb927e831",
+    "exact_blob": false,
+    "lf": 94,
+    "checkout_crlf": 94,
+    "only_lf_to_crlf": true
+  }
+]

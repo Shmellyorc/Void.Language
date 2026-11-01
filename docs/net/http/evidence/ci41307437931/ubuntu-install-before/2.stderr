@@ -1,0 +1,15 @@
+URL boundary invariant failedCalled from /@stdlib/url.void::with_query
+/tmp/VOID HTTP installation 1ggs6ws5/relocated 雪 # % installation/share/void/stdlib/url.void:158:32: source call
+    return _text("with_query", _url_with_query(value, items))
+                               ^
+Called from /main.void::fetch
+/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void:12:26: source call
+    var url_result = url.with_query(target, query)
+                         ^
+Called from /main.void::$application
+/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void:36:12: source call
+    return fetch(target)
+           ^
+Called from /main.void::$app_adapter
+/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void:1:1: source call
+

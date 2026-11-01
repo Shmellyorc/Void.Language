@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "cmake",
+    "--build",
+    "build/Sanitizers",
+    "--parallel",
+    "3"
+  ],
+  "cache_before": {
+    "directory": "/home/runner/work/_temp/void-thinlto-6mhl_kdq",
+    "files": 1,
+    "bytes": 0
+  },
+  "phase": "build",
+  "exit_code": 0,
+  "wall_seconds": 442.12492586200005,
+  "cache_after": {
+    "directory": "/home/runner/work/_temp/void-thinlto-6mhl_kdq",
+    "files": 1,
+    "bytes": 0
+  },
+  "child_resources": {
+    "user_seconds": 1109.938297,
+    "system_seconds": 120.83896,
+    "max_rss_bytes": 2076225536,
+    "note": "Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak."
+  }
+}

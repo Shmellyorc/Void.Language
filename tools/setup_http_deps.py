@@ -15,7 +15,7 @@ import shutil
 import subprocess
 import tarfile
 import time
-import urllib.request
+from http_archive import acquire
 import sys
 
 if platform.system() in ("Windows", "Darwin"):
@@ -71,13 +71,7 @@ sources = {}
 for pin in pins:
     archive = base / "downloads" / pin["archive"]
     archive.parent.mkdir(parents=True, exist_ok=True)
-    if not archive.exists():
-        temp = archive.with_suffix(archive.suffix + ".part")
-        with urllib.request.urlopen(pin["url"], timeout=120) as response, temp.open("wb") as target:
-            shutil.copyfileobj(response, target)
-        temp.replace(archive)
-    if hashlib.sha256(archive.read_bytes()).hexdigest() != pin["sha256"]:
-        raise SystemExit(f"Archive digest mismatch: {archive}")
+    acquire(pin, archive, receipt)
     # Each profile gets its own pristine extraction, including configure inputs.
     source = build_root / "source" / pin.get("source_dir", pin["name"] + "-" + pin["version"])
     if not source.exists():

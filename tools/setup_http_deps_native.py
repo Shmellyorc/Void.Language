@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import tarfile
 import time
-import urllib.request
+from http_archive import acquire
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -45,7 +45,7 @@ def main():
                   profile=args.profile, pins_sha256=hashlib.sha256(policy_path.read_bytes()).hexdigest(),
                   selected_dependencies=selected, commands=[])
     report['recipe_sha256'] = {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-                              for name in ('tools/setup_http_deps_native.py', 'cmake/http-psl/CMakeLists.txt')}
+                              for name in ('tools/setup_http_deps_native.py', 'tools/http_archive.py', 'cmake/http-psl/CMakeLists.txt')}
     environment = os.environ.copy()
     if args.profile == 'strict':
         environment.update(ASAN_OPTIONS='detect_leaks=1:halt_on_error=1', UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
@@ -83,12 +83,7 @@ def main():
         if pin['name'] not in selected: continue
         if 'platforms' in pin and system not in pin['platforms']: raise SystemExit('TLS platform is absent from its pinned policy')
         archive = root / '.toolchains/http/downloads' / pin['archive']; archive.parent.mkdir(parents=True, exist_ok=True)
-        if not archive.exists():
-            temporary = archive.with_suffix(archive.suffix + '.part')
-            with urllib.request.urlopen(pin['url'], timeout=120) as response, temporary.open('wb') as output:
-                shutil.copyfileobj(response, output)
-            temporary.replace(archive)
-        if hashlib.sha256(archive.read_bytes()).hexdigest() != pin['sha256']: raise SystemExit(f'Archive checksum mismatch: {archive}')
+        acquire(pin, archive, receipt)
         source = build_root / 'source' / pin.get('source_dir', pin['name'] + '-' + pin['version'])
         if source.exists(): shutil.rmtree(source)
         source.parent.mkdir(parents=True, exist_ok=True)

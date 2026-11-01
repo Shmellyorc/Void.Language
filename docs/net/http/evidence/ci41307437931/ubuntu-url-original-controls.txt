@@ -1,0 +1,22 @@
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+g++-14 is already the newest version (14.2.0-4ubuntu2~24.04.1).
+python3 is already the newest version (3.12.3-0ubuntu2.1).
+ninja-build is already the newest version (1.11.1-2).
+libffi-dev is already the newest version (3.4.6-1build1).
+libedit-dev is already the newest version (3.1-20230828-1build1).
+libxml2-dev is already the newest version (2.9.14+dfsg-1.3ubuntu3.10).
+libzstd-dev is already the newest version (1.5.5+dfsg2-2build1.1).
+zlib1g-dev is already the newest version (1:1.3.dfsg-3.1ubuntu2.3).
+libncurses-dev is already the newest version (6.4+20240113-1ubuntu2.2).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+ORIGINAL CHECKSUM 05abec6e5960daf39ed438d52c3c9fd9bb416bd8e3d837ee7830758b306db072 49298957ecb2656e0b2d5fc16c4c9105fbaf206dcb2ac39f05b362eb0db7097e
+original 0 b'Example JSON complete\n' b''
+diagnostic 0 b'Example JSON complete\n' b''
+original-again 0 b'Example JSON complete\n' b''

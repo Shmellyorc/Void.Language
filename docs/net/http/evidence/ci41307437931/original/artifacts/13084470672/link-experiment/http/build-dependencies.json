@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.12/bin/python",
+    "/Users/runner/work/Void.Language/Void.Language/tools/setup_http_deps.py",
+    "--profile",
+    "Debug",
+    "--jobs",
+    "3"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 151.651470291
+}

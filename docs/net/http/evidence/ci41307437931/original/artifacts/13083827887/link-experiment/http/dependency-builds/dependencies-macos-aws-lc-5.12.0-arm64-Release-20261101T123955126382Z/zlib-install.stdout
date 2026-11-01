@@ -1,0 +1,17 @@
+-- Install configuration: "Release"
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/libz.a
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/zlib/ZLIB-static.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/zlib/ZLIB-static-release.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/zlib/ZLIBConfig.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/zlib/ZLIBConfigVersion.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include/zconf.h
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include/zlib.h
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/man/man3/zlib.3
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/LICENSE
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/algorithm.txt
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/crc-doc.1.0.pdf
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/rfc1950.txt
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/rfc1951.txt
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/rfc1952.txt
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/zlib/zlib/txtvsbin.txt
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/pkgconfig/zlib.pc

@@ -338,6 +338,8 @@ if(BUILD_TESTING)
     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_example_host>"
     --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-examples-evidence")
   set_tests_properties(http_examples PROPERTIES TIMEOUT 300)
+  add_test(NAME http_ci_policy COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/ci_triage_test.py")
+  set_tests_properties(http_ci_policy PROPERTIES TIMEOUT 60)
   add_test(NAME http_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/install.py"
     "$<TARGET_FILE:voidc>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-install-evidence")
   add_test(NAME http_bulk COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/bulk.py"

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_timeouts",
+    "http://127.0.0.1:40951",
+    "https://127.0.0.1:48055",
+    "http://127.0.0.1:48055",
+    "https://127.0.0.1:36391",
+    "/tmp/VOID timeout 8ev619gg/cert.pem",
+    "/tmp/VOID timeout 8ev619gg/input.bin"
+  ],
+  "exit_code": 0
+}

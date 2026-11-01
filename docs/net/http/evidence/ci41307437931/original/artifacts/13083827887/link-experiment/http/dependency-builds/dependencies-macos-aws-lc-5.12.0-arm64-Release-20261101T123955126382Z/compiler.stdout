@@ -1,0 +1,4 @@
+clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+Target: arm64-apple-darwin25.6.0
+Thread model: posix
+InstalledDir: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin

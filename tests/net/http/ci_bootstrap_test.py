@@ -65,7 +65,7 @@ class IdentityTests(unittest.TestCase):
 
     def test_recipe_and_fixture_pins_invalidate_respective_keys(self):
         a = plan(); actual = ci.digest
-        for name, field in [('tools/setup_http_deps_native.py', 'deps-key'), ('tests/net/http/python-versions.json', 'fixtures-key')]:
+        for name, field in [('tools/setup_http_deps_native.py', 'deps-key'), ('tools/http_archive.py', 'deps-key'), ('cmake/CurlProviderFeatures.cmake', 'deps-key'), ('cmake/NativeBuild.cmake', 'deps-key'), ('tests/net/http/python-versions.json', 'fixtures-key')]:
             with patch.object(ci, 'digest', side_effect=lambda p: 'changed' if str(p).endswith(name) else actual(p)):
                 self.assertNotEqual(a[field], plan()[field])
 

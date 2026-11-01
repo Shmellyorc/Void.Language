@@ -1,0 +1,125 @@
+{
+  "commit": "77d676d0fc1149e36dd8d19a0e1602e053653fa7",
+  "dispatch_sha": "77d676d0fc1149e36dd8d19a0e1602e053653fa7",
+  "mode": "thinlto-cache",
+  "configuration": "Debug",
+  "run_id": "41307437931",
+  "run_attempt": "1",
+  "runner_os": "macOS",
+  "runner_arch": "ARM64",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "logical_cpus": 3,
+  "environment": {
+    "CC": "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "CXX": "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "LLVM_DIR": "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "VOID_CLANG": "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "VOID_LINKER": "",
+    "SDKROOT": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+    "VCToolsVersion": null,
+    "WindowsSDKVersion": null,
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "workflow_sha256": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1",
+  "tools_and_host": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "output": "77d676d0fc1149e36dd8d19a0e1602e053653fa7\n"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "output": " M docs/json/evidence/implementation/readonly-Debug.json\n M docs/json/evidence/implementation/readonly-Release.json\n?? docs/net/http/evidence/dependencies-macos-aws-lc-5.12.0-arm64-Debug-20261101T123954477757Z/\n"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "cmake version 4.4.4\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n"
+    },
+    {
+      "argv": [
+        "ninja",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "1.13.2\n"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "xcodebuild",
+        "-version"
+      ],
+      "exit_code": 0,
+      "output": "Xcode 26.6\nBuild version 17F113\n"
+    },
+    {
+      "argv": [
+        "xcrun",
+        "--show-sdk-path"
+      ],
+      "exit_code": 0,
+      "output": "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk\n"
+    },
+    {
+      "argv": [
+        "xcrun",
+        "ld",
+        "-v"
+      ],
+      "exit_code": 0,
+      "output": "@(#)PROGRAM:ld PROJECT:ld-1267\nBUILD 16:38:58 Jun  8 2026\nconfigured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em armv8m.main armv8.1m.main\nwill use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em\nLTO support using: LLVM version 21.0.0 (static support for 30, runtime is 30)\nTAPI support using: Apple TAPI version 21.0.0 (tapi-2100.0.2.6)\n"
+    },
+    {
+      "argv": [
+        "sysctl",
+        "hw"
+      ],
+      "exit_code": 0,
+      "output": "hw.ncpu: 3\nhw.byteorder: 1234\nhw.memsize: 7516192768\nhw.activecpu: 3\nhw.perflevel0.physicalcpu: 3\nhw.perflevel0.physicalcpu_max: 3\nhw.perflevel0.logicalcpu: 3\nhw.perflevel0.logicalcpu_max: 3\nhw.perflevel0.l1icachesize: 196608\nhw.perflevel0.l1dcachesize: 131072\nhw.perflevel0.l2cachesize: 12582912\nhw.perflevel0.cpusperl2: 3\nhw.perflevel0.name: Standard\nhw.optional.arm.FEAT_CRC32: 1\nhw.optional.arm.FEAT_FlagM: 1\nhw.optional.arm.FEAT_FlagM2: 1\nhw.optional.arm.FEAT_FHM: 1\nhw.optional.arm.FEAT_DotProd: 1\nhw.optional.arm.FEAT_SHA3: 1\nhw.optional.arm.FEAT_RDM: 1\nhw.optional.arm.FEAT_LSE: 1\nhw.optional.arm.FEAT_SHA256: 1\nhw.optional.arm.FEAT_SHA512: 1\nhw.optional.arm.FEAT_SHA1: 1\nhw.optional.arm.FEAT_AES: 1\nhw.optional.arm.FEAT_PMULL: 1\nhw.optional.arm.FEAT_SPECRES: 0\nhw.optional.arm.FEAT_SPECRES2: 0\nhw.optional.arm.FEAT_SB: 1\nhw.optional.arm.FEAT_FRINTTS: 1\nhw.optional.arm.FEAT_PACIMP: 1\nhw.optional.arm.FEAT_LRCPC: 1\nhw.optional.arm.FEAT_LRCPC2: 1\nhw.optional.arm.FEAT_FCMA: 1\nhw.optional.arm.FEAT_JSCVT: 1\nhw.optional.arm.FEAT_PAuth: 1\nhw.optional.arm.FEAT_PAuth2: 0\nhw.optional.arm.FEAT_FPAC: 0\nhw.optional.arm.FEAT_FPACCOMBINE: 0\nhw.optional.arm.FEAT_DPB: 1\nhw.optional.arm.FEAT_DPB2: 1\nhw.optional.arm.FEAT_BF16: 0\nhw.optional.arm.FEAT_EBF16: 0\nhw.optional.arm.FEAT_I8MM: 0\nhw.optional.arm.FEAT_WFxT: 0\nhw.optional.arm.FEAT_RPRES: 0\nhw.optional.arm.FEAT_CSSC: 0\nhw.optional.arm.FEAT_HBC: 0\nhw.optional.arm.FEAT_ECV: 0\nhw.optional.arm.FEAT_AFP: 0\nhw.optional.arm.FEAT_LSE2: 1\nhw.optional.arm.FEAT_CSV2: 1\nhw.optional.arm.FEAT_CSV3: 1\nhw.optional.arm.FEAT_DIT: 1\nhw.optional.arm.AdvSIMD: 1\nhw.optional.arm.AdvSIMD_HPFPCvt: 1\nhw.optional.arm.FEAT_FP16: 1\nhw.optional.arm.FEAT_SSBS: 0\nhw.optional.arm.FEAT_BTI: 0\nhw.optional.arm.FEAT_SME: 0\nhw.optional.arm.FEAT_SME2: 0\nhw.optional.arm.FEAT_SME2p1: 0\nhw.optional.arm.FEAT_MTE: 0\nhw.optional.arm.FEAT_MTE2: 0\nhw.optional.arm.FEAT_MTE3: 0\nhw.optional.arm.FEAT_MTE4: 0\nhw.optional.arm.FEAT_MTE_ASYNC: 0\nhw.optional.arm.FEAT_MTE_STORE_ONLY: 0\nhw.optional.arm.SME_F32F32: 0\nhw.optional.arm.SME_BI32I32: 0\nhw.optional.arm.SME_B16F32: 0\nhw.optional.arm.SME_F16F32: 0\nhw.optional.arm.SME_I8I32: 0\nhw.optional.arm.SME_I16I32: 0\nhw.optional.arm.FEAT_SME_F64F64: 0\nhw.optional.arm.FEAT_SME_I16I64: 0\nhw.optional.arm.FEAT_SME_F16F16: 0\nhw.optional.arm.FEAT_SME_B16B16: 0\nhw.optional.arm.FEAT_SVE_B16B16: 0\nhw.optional.arm.FP_SyncExceptions: 1\nhw.optional.arm.FEAT_MTE_CANONICAL_TAGS: 0\nhw.optional.arm.FEAT_MTE_NO_ADDRESS_TAGS: 0\nhw.optional.arm.caps: 292171334003191807\nhw.optional.arm.sme_max_svl_b: 0\nhw.optional.floatingpoint: 1\nhw.optional.neon: 1\nhw.optional.neon_hpfp: 1\nhw.optional.neon_fp16: 1\nhw.optional.armv8_crc32: 1\nhw.optional.armv8_gpi: 1\nhw.optional.armv8_1_atomics: 1\nhw.optional.armv8_2_fhm: 1\nhw.optional.armv8_2_sha512: 1\nhw.optional.armv8_2_sha3: 1\nhw.optional.armv8_3_compnum: 1\nhw.optional.watchpoint: 4\nhw.optional.breakpoint: 6\nhw.optional.ucnormal_mem: 0\nhw.optional.arm64: 1\nhw.features.allows_security_research: 0\nhw.physicalcpu: 3\nhw.physicalcpu_max: 3\nhw.logicalcpu: 3\nhw.logicalcpu_max: 3\nhw.cputype: 16777228\nhw.cpusubtype: 2\nhw.cpu64bit_capable: 1\nhw.cpufamily: 0\nhw.cpusubfamily: 0\nhw.cacheconfig: 3 1 3 0 0 0 0 0 0 0\nhw.cachesize: 3209920512 131072 12582912 0 0 0 0 0 0 0\nhw.pagesize: 16384\nhw.pagesize32: 16384\nhw.cachelinesize: 128\nhw.l1icachesize: 196608\nhw.l1dcachesize: 131072\nhw.l2cachesize: 12582912\nhw.tbfrequency: 24000000\nhw.memsize_usable: 7504887808\nhw.packages: 1\nhw.osenvironment: \nhw.ephemeral_storage: 0\nhw.use_recovery_securityd: 0\nhw.use_kernelmanagerd: 1\nhw.serialdebugmode: 0\nhw.nperflevels: 1\nhw.engineering_sample: 0\nhw.targettype: VMA2MACOS\nhw.jetsam_properties_product_type: VMA2MACOS\n"
+    },
+    {
+      "argv": [
+        "vm_stat"
+      ],
+      "exit_code": 0,
+      "output": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    45953.\nPages active:                                 166721.\nPages inactive:                               135186.\nPages speculative:                             31334.\nPages throttled:                                   0.\nPages wired down:                              57812.\nPages purgeable:                                2771.\n\"Translation faults\":                       14581354.\nPages copy-on-write:                         1252555.\nPages zero filled:                           3955121.\nPages reactivated:                            157021.\nPages purged:                                   6903.\nFile-backed pages:                            178493.\nAnonymous pages:                              154748.\nPages stored in compressor:                    69142.\nPages occupied by compressor:                  20686.\nDecompressions:                                33250.\nCompressions:                                 135585.\nPageins:                                      714063.\nPageouts:                                       2961.\nSwapins:                                           0.\nSwapouts:                                          0.\n"
+    }
+  ]
+}

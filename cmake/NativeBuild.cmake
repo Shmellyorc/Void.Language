@@ -88,6 +88,9 @@ foreach(library IN LISTS VOID_HTTP_LINK_FILES)
   endif()
 endforeach()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  # The compiler executes HTTP/URL code in-process too. Its relocated JIT
+  # must load the same installed IDN closure as independently linked programs.
+  set_property(TARGET voidc APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../lib/void")
   install(DIRECTORY "${VOID_HTTP_DEPS_ROOT}/lib/" DESTINATION lib/void COMPONENT compiler
     FILES_MATCHING PATTERN "libidn2.so*" PATTERN "libunistring.so*")
 endif()
@@ -101,7 +104,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     "${PROJECT_SOURCE_DIR}/.toolchains/http/downloads/libunistring-1.5.tar.xz"
     DESTINATION share/void/licenses/http/corresponding-source COMPONENT compiler)
 endif()
-install(FILES "${PROJECT_SOURCE_DIR}/tools/setup_http_deps.py" "${PROJECT_SOURCE_DIR}/tools/setup_http_deps_native.py"
+install(FILES "${PROJECT_SOURCE_DIR}/tools/setup_http_deps.py" "${PROJECT_SOURCE_DIR}/tools/setup_http_deps_native.py" "${PROJECT_SOURCE_DIR}/tools/http_archive.py"
   DESTINATION share/void/licenses/http/corresponding-source COMPONENT compiler)
 install(FILES "${VOID_HTTP_DEPS_ROOT}/VOID-HTTP-DEPENDENCIES.json"
   DESTINATION share/void/licenses/http COMPONENT compiler)

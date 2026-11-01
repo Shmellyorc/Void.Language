@@ -1,0 +1,2 @@
+{"tls_memory":{"baseline":240494,"peak_sample":30429777,"steady_min":4569191,"steady_max":4569191,"client_reservation":356340600}}
+TLS corpus, certificate-flight limit, distribution roots and retained plateau passed

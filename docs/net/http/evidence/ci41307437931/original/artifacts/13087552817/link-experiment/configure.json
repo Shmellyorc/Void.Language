@@ -1,0 +1,41 @@
+{
+  "argv": [
+    "cmake",
+    "-S",
+    ".",
+    "-B",
+    "build/Debug",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DVOID_SANITIZERS=OFF",
+    "-DLLVM_DIR=/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "-DVOID_CLANG=/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "-DVOID_LINKER=/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "--trace-format=json-v1",
+    "--trace-source=/home/runner/work/Void.Language/Void.Language/CMakeLists.txt",
+    "--trace-redirect=/home/runner/work/Void.Language/Void.Language/build/link-experiment/configure-trace.jsonl",
+    "-DCMAKE_EXE_LINKER_FLAGS:STRING=--ld-path=\"/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\" -Wl,--thinlto-cache-dir=\"/home/runner/work/_temp/void-thinlto-_tgu5cvc\""
+  ],
+  "cache_before": {
+    "directory": "/home/runner/work/_temp/void-thinlto-_tgu5cvc",
+    "files": 0,
+    "bytes": 0
+  },
+  "phase": "configure",
+  "exit_code": 0,
+  "wall_seconds": 14.243957264000016,
+  "cache_after": {
+    "directory": "/home/runner/work/_temp/void-thinlto-_tgu5cvc",
+    "files": 1,
+    "bytes": 0
+  },
+  "child_resources": {
+    "user_seconds": 7.48235,
+    "system_seconds": 6.25168,
+    "max_rss_bytes": 398602240,
+    "note": "Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak."
+  },
+  "orc_probe_seconds": 3.597756862640381,
+  "orc_probe_note": "CMake trace call-to-return wall time; null means the probe did not return."
+}

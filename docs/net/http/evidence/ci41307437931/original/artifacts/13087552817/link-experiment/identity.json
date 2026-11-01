@@ -1,0 +1,108 @@
+{
+  "commit": "77d676d0fc1149e36dd8d19a0e1602e053653fa7",
+  "dispatch_sha": "77d676d0fc1149e36dd8d19a0e1602e053653fa7",
+  "mode": "thinlto-cache",
+  "configuration": "Debug",
+  "run_id": "41307437931",
+  "run_attempt": "1",
+  "runner_os": "Linux",
+  "runner_arch": "X64",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "logical_cpus": 4,
+  "environment": {
+    "CC": "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "CXX": "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "LLVM_DIR": "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "VOID_CLANG": "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "VOID_LINKER": "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "SDKROOT": null,
+    "VCToolsVersion": null,
+    "WindowsSDKVersion": null,
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "workflow_sha256": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1",
+  "tools_and_host": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "output": "77d676d0fc1149e36dd8d19a0e1602e053653fa7\n"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "output": "?? docs/net/http/evidence/dependencies-Debug-20261101T124018814810Z/\n"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "cmake version 3.31.6\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n"
+    },
+    {
+      "argv": [
+        "ninja",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "1.13.2\n"
+    },
+    {
+      "argv": [
+        "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)\n"
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "exit_code": 0,
+      "output": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 9V74 80-Core Processor\nCPU family:                              25\nModel:                                   17\nThread(s) per core:                      2\nCore(s) per socket:                      2\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5192.27\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx512_bf16 clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               64 KiB (2 instances)\nL1i cache:                               64 KiB (2 instances)\nL2 cache:                                2 MiB (2 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Vulnerable: Safe RET, no microcode\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Vulnerable: No microcode\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n"
+    },
+    {
+      "argv": [
+        "cat",
+        "/proc/meminfo"
+      ],
+      "exit_code": 0,
+      "output": "MemTotal:       16367524 kB\nMemFree:          786816 kB\nMemAvailable:   14977660 kB\nBuffers:          116336 kB\nCached:         13892380 kB\nSwapCached:           68 kB\nActive:           656580 kB\nInactive:       13651204 kB\nActive(anon):     231196 kB\nInactive(anon):   128152 kB\nActive(file):     425384 kB\nInactive(file): 13523052 kB\nUnevictable:       46728 kB\nMlocked:           43656 kB\nSwapTotal:       3145724 kB\nSwapFree:        3145656 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:             28420 kB\nWriteback:             0 kB\nAnonPages:        345856 kB\nMapped:           342036 kB\nShmem:             51476 kB\nKReclaimable:     588336 kB\nSlab:             728300 kB\nSReclaimable:     588336 kB\nSUnreclaim:       139964 kB\nKernelStack:        4320 kB\nPageTables:         7416 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    11329484 kB\nCommitted_AS:    2196876 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       42772 kB\nVmallocChunk:          0 kB\nPercpu:             2368 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:           32372 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nGPUActive:             0 kB\nGPUReclaim:            0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      121984 kB\nDirectMap2M:     4067328 kB\nDirectMap1G:    14680064 kB\n"
+    }
+  ]
+}

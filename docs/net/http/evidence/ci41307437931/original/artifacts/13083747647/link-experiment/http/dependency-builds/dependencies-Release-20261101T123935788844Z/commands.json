@@ -1,0 +1,16 @@
+{
+  "host": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "profile": "Release",
+  "pins_sha256": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb",
+  "commands": [
+    {
+      "argv": [
+        "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "cwd": "/home/runner/work/Void.Language/Void.Language/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.008347235999991653
+    }
+  ]
+}

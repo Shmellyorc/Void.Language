@@ -18,16 +18,16 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 RECIPES = ('tools/ci/http_bootstrap.py', 'tools/ci/llvm_sdk.py',
-           'tools/setup_http_deps.py', 'tools/setup_http_deps_native.py',
+           'tools/setup_http_deps.py', 'tools/setup_http_deps_native.py', 'tools/http_archive.py',
            'tools/verify_http_dependencies.py', 'cmake/HttpDependencies.cmake',
-           'cmake/HttpNativeDependencies.cmake', 'cmake/CurlProvider.cmake',
-           'cmake/http-psl/CMakeLists.txt', 'third_party/http-versions.json',
+           'cmake/HttpNativeDependencies.cmake', 'cmake/CurlProvider.cmake', 'cmake/CurlProviderFeatures.cmake',
+           'cmake/http-psl/CMakeLists.txt', 'cmake/NativeBuild.cmake', 'third_party/http-versions.json',
            'third_party/publicsuffix/UPSTREAM.json',
            'third_party/publicsuffix/public_suffix_list.dat',
            'third_party/curl/VOID-PROVENANCE.json', 'tools/verify_curl_source.py')
 FIXTURES = ('tools/setup_http_tests.py', 'tests/net/http/python-versions.json')
 REQUIRED_TESTS = {'http_native', 'http_reload', 'http_timeouts', 'http_wire', 'http_dns',
-                  'url_native', 'http_examples', 'http_install', 'http_bulk', 'http_ir',
+                  'url_native', 'http_examples', 'http_install', 'http_ci_policy', 'http_bulk', 'http_ir',
                   'http_source', 'http_source_negative', 'http_source_faults', 'url_ir',
                   'url_source', 'url_lsp', 'http_lsp'}
 

@@ -1,0 +1,2 @@
+DNS retained live allocations: 261087; steady 303679..419228 bytes
+Native c-ares UDP/TCP, IPv4/IPv6, IDN, cache pressure, negative cache, cancellation and timeout passed

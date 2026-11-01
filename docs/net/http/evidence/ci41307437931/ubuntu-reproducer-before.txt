@@ -1,0 +1,1262 @@
+Get:1 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:2 http://archive.ubuntu.com/ubuntu noble InRelease [256 kB]
+Get:3 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1550 kB]
+Get:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Get:6 http://archive.ubuntu.com/ubuntu noble/main amd64 Packages [1808 kB]
+Get:7 http://security.ubuntu.com/ubuntu noble-security/main amd64 Packages [1412 kB]
+Get:8 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [2122 kB]
+Get:9 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [55.6 kB]
+Get:10 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [19.3 MB]
+Get:11 http://archive.ubuntu.com/ubuntu noble/restricted amd64 Packages [117 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Packages [331 kB]
+Get:13 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [61.7 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [2172 kB]
+Get:15 http://archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [2240 kB]
+Get:16 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1741 kB]
+Get:17 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [49.0 kB]
+Get:18 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [36.0 kB]
+Get:19 http://archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Packages [669 B]
+Fetched 33.6 MB in 5s (6545 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  binutils binutils-common binutils-x86-64-linux-gnu cmake-data cpp-14
+  cpp-14-x86-64-linux-gnu g++-14-x86-64-linux-gnu gcc-14
+  gcc-14-x86-64-linux-gnu icu-devtools libarchive13t64 libasan8 libatomic1
+  libbinutils libbrotli1 libbsd-dev libbsd0 libc-dev-bin libc6-dev libcc1-0
+  libcrypt-dev libctf-nobfd0 libctf0 libcurl4t64 libedit2 libexpat1
+  libgcc-14-dev libgdbm-compat4t64 libgdbm6t64 libgomp1 libgprofng0
+  libgssapi-krb5-2 libhwasan0 libicu-dev libicu74 libisl23 libitm1 libjansson4
+  libjsoncpp25 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap2
+  liblsan0 libmd-dev libmpc3 libmpfr6 libncurses6 libnghttp2-14 libperl5.38t64
+  libpsl5t64 libpython3-stdlib libpython3.12-minimal libpython3.12-stdlib
+  libquadmath0 libreadline8t64 librhash0 librtmp1 libsasl2-2
+  libsasl2-modules-db libsframe1 libsqlite3-0 libssh-4 libstdc++-14-dev
+  libtsan2 libubsan1 libuv1t64 libxml2 linux-libc-dev media-types netbase
+  openssl perl-modules-5.38 python3-minimal python3.12 python3.12-minimal
+  readline-common rpcsvc-proto tzdata
+Suggested packages:
+  binutils-doc gprofng-gui cmake-doc cmake-format elpa-cmake-mode
+  gcc-14-locales cpp-14-doc g++-14-multilib gcc-14-doc gcc-14-multilib lrzip
+  glibc-doc manpages-dev gdbm-l10n krb5-doc krb5-user icu-doc ncurses-doc
+  libstdc++-14-doc pkg-config make-doc perl-doc libterm-readline-gnu-perl
+  | libterm-readline-perl-perl libtap-harness-archive-perl python3-doc
+  python3-tk python3-venv python3.12-venv python3.12-doc binfmt-support
+  readline-doc
+Recommended packages:
+  gcc manpages manpages-dev libc-devtools krb5-locales libldap-common libgpm2
+  publicsuffix libsasl2-modules
+The following NEW packages will be installed:
+  binutils binutils-common binutils-x86-64-linux-gnu ca-certificates cmake
+  cmake-data cpp-14 cpp-14-x86-64-linux-gnu g++-14 g++-14-x86-64-linux-gnu
+  gcc-14 gcc-14-x86-64-linux-gnu icu-devtools libarchive13t64 libasan8
+  libatomic1 libbinutils libbrotli1 libbsd-dev libbsd0 libc-dev-bin libc6-dev
+  libcc1-0 libcrypt-dev libctf-nobfd0 libctf0 libcurl4t64 libedit-dev libedit2
+  libexpat1 libffi-dev libgcc-14-dev libgdbm-compat4t64 libgdbm6t64 libgomp1
+  libgprofng0 libgssapi-krb5-2 libhwasan0 libicu-dev libicu74 libisl23 libitm1
+  libjansson4 libjsoncpp25 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0
+  libldap2 liblsan0 libmd-dev libmpc3 libmpfr6 libncurses-dev libncurses6
+  libnghttp2-14 libperl5.38t64 libpsl5t64 libpython3-stdlib
+  libpython3.12-minimal libpython3.12-stdlib libquadmath0 libreadline8t64
+  librhash0 librtmp1 libsasl2-2 libsasl2-modules-db libsframe1 libsqlite3-0
+  libssh-4 libstdc++-14-dev libtsan2 libubsan1 libuv1t64 libxml2 libxml2-dev
+  libzstd-dev linux-libc-dev make media-types netbase ninja-build openssl perl
+  perl-modules-5.38 python3 python3-minimal python3.12 python3.12-minimal
+  readline-common rpcsvc-proto tzdata zlib1g-dev
+0 upgraded, 93 newly installed, 0 to remove and 0 not upgraded.
+Need to get 134 MB of archives.
+After this operation, 502 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpython3.12-minimal amd64 3.12.3-1ubuntu0.17 [839 kB]
+Get:2 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libexpat1 amd64 2.6.1-2ubuntu0.6 [98.9 kB]
+Get:3 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3.12-minimal amd64 3.12.3-1ubuntu0.17 [2335 kB]
+Get:4 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3-minimal amd64 3.12.3-0ubuntu2.1 [27.4 kB]
+Get:5 http://archive.ubuntu.com/ubuntu noble/main amd64 media-types all 10.1.0 [27.5 kB]
+Get:6 http://archive.ubuntu.com/ubuntu noble/main amd64 netbase all 6.4 [13.1 kB]
+Get:7 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 tzdata all 2026e-0ubuntu0.24.04.1 [282 kB]
+Get:8 http://archive.ubuntu.com/ubuntu noble/main amd64 readline-common all 8.2-4build1 [56.5 kB]
+Get:9 http://archive.ubuntu.com/ubuntu noble/main amd64 libreadline8t64 amd64 8.2-4build1 [153 kB]
+Get:10 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsqlite3-0 amd64 3.45.1-1ubuntu2.8 [702 kB]
+Get:11 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpython3.12-stdlib amd64 3.12.3-1ubuntu0.17 [2071 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3.12 amd64 3.12.3-1ubuntu0.17 [651 kB]
+Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpython3-stdlib amd64 3.12.3-0ubuntu2.1 [10.1 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 python3 amd64 3.12.3-0ubuntu2.1 [23.0 kB]
+Get:15 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 perl-modules-5.38 all 5.38.2-3.2ubuntu0.6 [3110 kB]
+Get:16 http://archive.ubuntu.com/ubuntu noble/main amd64 libgdbm6t64 amd64 1.23-5.1build1 [34.4 kB]
+Get:17 http://archive.ubuntu.com/ubuntu noble/main amd64 libgdbm-compat4t64 amd64 1.23-5.1build1 [6710 B]
+Get:18 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libperl5.38t64 amd64 5.38.2-3.2ubuntu0.6 [4864 kB]
+Get:19 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 perl amd64 5.38.2-3.2ubuntu0.6 [231 kB]
+Get:20 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 openssl amd64 3.0.13-0ubuntu3.16 [1004 kB]
+Get:21 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 ca-certificates all 20260816ubuntu0.24.04.1 [139 kB]
+Get:22 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libbsd0 amd64 0.12.1-1build1.1 [41.2 kB]
+Get:23 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libkrb5support0 amd64 1.20.1-6ubuntu2.10 [34.9 kB]
+Get:24 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libk5crypto3 amd64 1.20.1-6ubuntu2.10 [81.9 kB]
+Get:25 http://archive.ubuntu.com/ubuntu noble/main amd64 libkeyutils1 amd64 1.6.3-3build1 [9490 B]
+Get:26 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libkrb5-3 amd64 1.20.1-6ubuntu2.10 [348 kB]
+Get:27 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgssapi-krb5-2 amd64 1.20.1-6ubuntu2.10 [143 kB]
+Get:28 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libicu74 amd64 74.2-1ubuntu3.1 [10.9 MB]
+Get:29 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxml2 amd64 2.9.14+dfsg-1.3ubuntu3.10 [764 kB]
+Get:30 http://archive.ubuntu.com/ubuntu noble/main amd64 libedit2 amd64 3.1-20230828-1build1 [97.6 kB]
+Get:31 http://archive.ubuntu.com/ubuntu noble/main amd64 libjansson4 amd64 2.14-2build2 [32.8 kB]
+Get:32 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libncurses6 amd64 6.4+20240113-1ubuntu2.2 [112 kB]
+Get:33 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libnghttp2-14 amd64 1.59.0-1ubuntu0.4 [74.6 kB]
+Get:34 http://archive.ubuntu.com/ubuntu noble/main amd64 libpsl5t64 amd64 0.21.2-1.1build1 [57.1 kB]
+Get:35 http://archive.ubuntu.com/ubuntu noble/main amd64 libuv1t64 amd64 1.48.0-1.1build1 [97.3 kB]
+Get:36 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 binutils-common amd64 2.42-4ubuntu2.10 [240 kB]
+Get:37 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsframe1 amd64 2.42-4ubuntu2.10 [15.7 kB]
+Get:38 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libbinutils amd64 2.42-4ubuntu2.10 [577 kB]
+Get:39 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libctf-nobfd0 amd64 2.42-4ubuntu2.10 [98.0 kB]
+Get:40 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libctf0 amd64 2.42-4ubuntu2.10 [94.5 kB]
+Get:41 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgprofng0 amd64 2.42-4ubuntu2.10 [849 kB]
+Get:42 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 binutils-x86-64-linux-gnu amd64 2.42-4ubuntu2.10 [2463 kB]
+Get:43 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 binutils amd64 2.42-4ubuntu2.10 [18.2 kB]
+Get:44 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libarchive13t64 amd64 3.7.2-2ubuntu0.9 [383 kB]
+Get:45 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libbrotli1 amd64 1.1.0-2ubuntu0.1 [331 kB]
+Get:46 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-5ubuntu3.1 [20.4 kB]
+Get:47 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-5ubuntu3.1 [53.2 kB]
+Get:48 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libldap2 amd64 2.6.10+dfsg-0ubuntu0.24.04.1 [198 kB]
+Get:49 http://archive.ubuntu.com/ubuntu noble/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build7 [56.3 kB]
+Get:50 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libssh-4 amd64 0.10.6-2ubuntu0.5 [191 kB]
+Get:51 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libcurl4t64 amd64 8.5.0-2ubuntu10.16 [344 kB]
+Get:52 http://archive.ubuntu.com/ubuntu noble/main amd64 libjsoncpp25 amd64 1.9.5-6build1 [82.8 kB]
+Get:53 http://archive.ubuntu.com/ubuntu noble/main amd64 librhash0 amd64 1.4.3-3build1 [129 kB]
+Get:54 http://archive.ubuntu.com/ubuntu noble/main amd64 cmake-data all 3.28.3-1build7 [2155 kB]
+Get:55 http://archive.ubuntu.com/ubuntu noble/main amd64 cmake amd64 3.28.3-1build7 [11.2 MB]
+Get:56 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libisl23 amd64 0.26-3build1.1 [680 kB]
+Get:57 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libmpfr6 amd64 4.2.1-1build1.1 [353 kB]
+Get:58 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libmpc3 amd64 1.3.1-1build1.1 [54.6 kB]
+Get:59 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 cpp-14-x86-64-linux-gnu amd64 14.2.0-4ubuntu2~24.04.1 [11.9 MB]
+Get:60 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 cpp-14 amd64 14.2.0-4ubuntu2~24.04.1 [1038 B]
+Get:61 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libcc1-0 amd64 14.2.0-4ubuntu2~24.04.1 [48.0 kB]
+Get:62 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgomp1 amd64 14.2.0-4ubuntu2~24.04.1 [148 kB]
+Get:63 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libitm1 amd64 14.2.0-4ubuntu2~24.04.1 [29.7 kB]
+Get:64 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libatomic1 amd64 14.2.0-4ubuntu2~24.04.1 [10.5 kB]
+Get:65 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libasan8 amd64 14.2.0-4ubuntu2~24.04.1 [3027 kB]
+Get:66 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 liblsan0 amd64 14.2.0-4ubuntu2~24.04.1 [1322 kB]
+Get:67 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libtsan2 amd64 14.2.0-4ubuntu2~24.04.1 [2772 kB]
+Get:68 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libubsan1 amd64 14.2.0-4ubuntu2~24.04.1 [1184 kB]
+Get:69 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libhwasan0 amd64 14.2.0-4ubuntu2~24.04.1 [1641 kB]
+Get:70 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libquadmath0 amd64 14.2.0-4ubuntu2~24.04.1 [153 kB]
+Get:71 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgcc-14-dev amd64 14.2.0-4ubuntu2~24.04.1 [2820 kB]
+Get:72 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 gcc-14-x86-64-linux-gnu amd64 14.2.0-4ubuntu2~24.04.1 [23.4 MB]
+Get:73 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libc-dev-bin amd64 2.39-0ubuntu8.9 [20.4 kB]
+Get:74 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 linux-libc-dev amd64 6.8.0-147.147 [1595 kB]
+Get:75 http://archive.ubuntu.com/ubuntu noble/main amd64 libcrypt-dev amd64 1:4.4.36-4build1 [112 kB]
+Get:76 http://archive.ubuntu.com/ubuntu noble/main amd64 rpcsvc-proto amd64 1.4.2-0ubuntu7 [67.4 kB]
+Get:77 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libc6-dev amd64 2.39-0ubuntu8.9 [2126 kB]
+Get:78 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 libstdc++-14-dev amd64 14.2.0-4ubuntu2~24.04.1 [2507 kB]
+Get:79 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 g++-14-x86-64-linux-gnu amd64 14.2.0-4ubuntu2~24.04.1 [13.4 MB]
+Get:80 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 gcc-14 amd64 14.2.0-4ubuntu2~24.04.1 [522 kB]
+Get:81 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 g++-14 amd64 14.2.0-4ubuntu2~24.04.1 [19.0 kB]
+Get:82 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 icu-devtools amd64 74.2-1ubuntu3.1 [212 kB]
+Get:83 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libmd-dev amd64 1.1.0-2build1.1 [45.5 kB]
+Get:84 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libbsd-dev amd64 0.12.1-1build1.1 [169 kB]
+Get:85 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libncurses-dev amd64 6.4+20240113-1ubuntu2.2 [384 kB]
+Get:86 http://archive.ubuntu.com/ubuntu noble/main amd64 libedit-dev amd64 3.1-20230828-1build1 [119 kB]
+Get:87 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libicu-dev amd64 74.2-1ubuntu3.1 [11.9 MB]
+Get:88 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxml2-dev amd64 2.9.14+dfsg-1.3ubuntu3.10 [781 kB]
+Get:89 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libzstd-dev amd64 1.5.5+dfsg2-2build1.1 [364 kB]
+Get:90 http://archive.ubuntu.com/ubuntu noble/main amd64 make amd64 4.3-4.1build2 [180 kB]
+Get:91 http://archive.ubuntu.com/ubuntu noble/universe amd64 ninja-build amd64 1.11.1-2 [129 kB]
+Get:92 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 zlib1g-dev amd64 1:1.3.dfsg-3.1ubuntu2.3 [894 kB]
+Get:93 http://archive.ubuntu.com/ubuntu noble/main amd64 libffi-dev amd64 3.4.6-1build1 [62.8 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 134 MB in 13s (10.3 MB/s)
+Selecting previously unselected package libpython3.12-minimal:amd64.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4381 files and directories currently installed.)
+Preparing to unpack .../libpython3.12-minimal_3.12.3-1ubuntu0.17_amd64.deb ...
+Unpacking libpython3.12-minimal:amd64 (3.12.3-1ubuntu0.17) ...
+Selecting previously unselected package libexpat1:amd64.
+Preparing to unpack .../libexpat1_2.6.1-2ubuntu0.6_amd64.deb ...
+Unpacking libexpat1:amd64 (2.6.1-2ubuntu0.6) ...
+Selecting previously unselected package python3.12-minimal.
+Preparing to unpack .../python3.12-minimal_3.12.3-1ubuntu0.17_amd64.deb ...
+Unpacking python3.12-minimal (3.12.3-1ubuntu0.17) ...
+Setting up libpython3.12-minimal:amd64 (3.12.3-1ubuntu0.17) ...
+Setting up libexpat1:amd64 (2.6.1-2ubuntu0.6) ...
+Setting up python3.12-minimal (3.12.3-1ubuntu0.17) ...
+Selecting previously unselected package python3-minimal.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4700 files and directories currently installed.)
+Preparing to unpack .../0-python3-minimal_3.12.3-0ubuntu2.1_amd64.deb ...
+Unpacking python3-minimal (3.12.3-0ubuntu2.1) ...
+Selecting previously unselected package media-types.
+Preparing to unpack .../1-media-types_10.1.0_all.deb ...
+Unpacking media-types (10.1.0) ...
+Selecting previously unselected package netbase.
+Preparing to unpack .../2-netbase_6.4_all.deb ...
+Unpacking netbase (6.4) ...
+Selecting previously unselected package tzdata.
+Preparing to unpack .../3-tzdata_2026e-0ubuntu0.24.04.1_all.deb ...
+Unpacking tzdata (2026e-0ubuntu0.24.04.1) ...
+Selecting previously unselected package readline-common.
+Preparing to unpack .../4-readline-common_8.2-4build1_all.deb ...
+Unpacking readline-common (8.2-4build1) ...
+Selecting previously unselected package libreadline8t64:amd64.
+Preparing to unpack .../5-libreadline8t64_8.2-4build1_amd64.deb ...
+Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8 to /lib/x86_64-linux-gnu/libhistory.so.8.usr-is-merged by libreadline8t64'
+Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8.2 to /lib/x86_64-linux-gnu/libhistory.so.8.2.usr-is-merged by libreadline8t64'
+Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8 to /lib/x86_64-linux-gnu/libreadline.so.8.usr-is-merged by libreadline8t64'
+Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8.2 to /lib/x86_64-linux-gnu/libreadline.so.8.2.usr-is-merged by libreadline8t64'
+Unpacking libreadline8t64:amd64 (8.2-4build1) ...
+Selecting previously unselected package libsqlite3-0:amd64.
+Preparing to unpack .../6-libsqlite3-0_3.45.1-1ubuntu2.8_amd64.deb ...
+Unpacking libsqlite3-0:amd64 (3.45.1-1ubuntu2.8) ...
+Selecting previously unselected package libpython3.12-stdlib:amd64.
+Preparing to unpack .../7-libpython3.12-stdlib_3.12.3-1ubuntu0.17_amd64.deb ...
+Unpacking libpython3.12-stdlib:amd64 (3.12.3-1ubuntu0.17) ...
+Selecting previously unselected package python3.12.
+Preparing to unpack .../8-python3.12_3.12.3-1ubuntu0.17_amd64.deb ...
+Unpacking python3.12 (3.12.3-1ubuntu0.17) ...
+Selecting previously unselected package libpython3-stdlib:amd64.
+Preparing to unpack .../9-libpython3-stdlib_3.12.3-0ubuntu2.1_amd64.deb ...
+Unpacking libpython3-stdlib:amd64 (3.12.3-0ubuntu2.1) ...
+Setting up python3-minimal (3.12.3-0ubuntu2.1) ...
+Selecting previously unselected package python3.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5706 files and directories currently installed.)
+Preparing to unpack .../00-python3_3.12.3-0ubuntu2.1_amd64.deb ...
+Unpacking python3 (3.12.3-0ubuntu2.1) ...
+Selecting previously unselected package perl-modules-5.38.
+Preparing to unpack .../01-perl-modules-5.38_5.38.2-3.2ubuntu0.6_all.deb ...
+Unpacking perl-modules-5.38 (5.38.2-3.2ubuntu0.6) ...
+Selecting previously unselected package libgdbm6t64:amd64.
+Preparing to unpack .../02-libgdbm6t64_1.23-5.1build1_amd64.deb ...
+Unpacking libgdbm6t64:amd64 (1.23-5.1build1) ...
+Selecting previously unselected package libgdbm-compat4t64:amd64.
+Preparing to unpack .../03-libgdbm-compat4t64_1.23-5.1build1_amd64.deb ...
+Unpacking libgdbm-compat4t64:amd64 (1.23-5.1build1) ...
+Selecting previously unselected package libperl5.38t64:amd64.
+Preparing to unpack .../04-libperl5.38t64_5.38.2-3.2ubuntu0.6_amd64.deb ...
+Unpacking libperl5.38t64:amd64 (5.38.2-3.2ubuntu0.6) ...
+Selecting previously unselected package perl.
+Preparing to unpack .../05-perl_5.38.2-3.2ubuntu0.6_amd64.deb ...
+Unpacking perl (5.38.2-3.2ubuntu0.6) ...
+Selecting previously unselected package openssl.
+Preparing to unpack .../06-openssl_3.0.13-0ubuntu3.16_amd64.deb ...
+Unpacking openssl (3.0.13-0ubuntu3.16) ...
+Selecting previously unselected package ca-certificates.
+Preparing to unpack .../07-ca-certificates_20260816ubuntu0.24.04.1_all.deb ...
+Unpacking ca-certificates (20260816ubuntu0.24.04.1) ...
+Selecting previously unselected package libbsd0:amd64.
+Preparing to unpack .../08-libbsd0_0.12.1-1build1.1_amd64.deb ...
+Unpacking libbsd0:amd64 (0.12.1-1build1.1) ...
+Selecting previously unselected package libkrb5support0:amd64.
+Preparing to unpack .../09-libkrb5support0_1.20.1-6ubuntu2.10_amd64.deb ...
+Unpacking libkrb5support0:amd64 (1.20.1-6ubuntu2.10) ...
+Selecting previously unselected package libk5crypto3:amd64.
+Preparing to unpack .../10-libk5crypto3_1.20.1-6ubuntu2.10_amd64.deb ...
+Unpacking libk5crypto3:amd64 (1.20.1-6ubuntu2.10) ...
+Selecting previously unselected package libkeyutils1:amd64.
+Preparing to unpack .../11-libkeyutils1_1.6.3-3build1_amd64.deb ...
+Unpacking libkeyutils1:amd64 (1.6.3-3build1) ...
+Selecting previously unselected package libkrb5-3:amd64.
+Preparing to unpack .../12-libkrb5-3_1.20.1-6ubuntu2.10_amd64.deb ...
+Unpacking libkrb5-3:amd64 (1.20.1-6ubuntu2.10) ...
+Selecting previously unselected package libgssapi-krb5-2:amd64.
+Preparing to unpack .../13-libgssapi-krb5-2_1.20.1-6ubuntu2.10_amd64.deb ...
+Unpacking libgssapi-krb5-2:amd64 (1.20.1-6ubuntu2.10) ...
+Selecting previously unselected package libicu74:amd64.
+Preparing to unpack .../14-libicu74_74.2-1ubuntu3.1_amd64.deb ...
+Unpacking libicu74:amd64 (74.2-1ubuntu3.1) ...
+Selecting previously unselected package libxml2:amd64.
+Preparing to unpack .../15-libxml2_2.9.14+dfsg-1.3ubuntu3.10_amd64.deb ...
+Unpacking libxml2:amd64 (2.9.14+dfsg-1.3ubuntu3.10) ...
+Selecting previously unselected package libedit2:amd64.
+Preparing to unpack .../16-libedit2_3.1-20230828-1build1_amd64.deb ...
+Unpacking libedit2:amd64 (3.1-20230828-1build1) ...
+Selecting previously unselected package libjansson4:amd64.
+Preparing to unpack .../17-libjansson4_2.14-2build2_amd64.deb ...
+Unpacking libjansson4:amd64 (2.14-2build2) ...
+Selecting previously unselected package libncurses6:amd64.
+Preparing to unpack .../18-libncurses6_6.4+20240113-1ubuntu2.2_amd64.deb ...
+Unpacking libncurses6:amd64 (6.4+20240113-1ubuntu2.2) ...
+Selecting previously unselected package libnghttp2-14:amd64.
+Preparing to unpack .../19-libnghttp2-14_1.59.0-1ubuntu0.4_amd64.deb ...
+Unpacking libnghttp2-14:amd64 (1.59.0-1ubuntu0.4) ...
+Selecting previously unselected package libpsl5t64:amd64.
+Preparing to unpack .../20-libpsl5t64_0.21.2-1.1build1_amd64.deb ...
+Unpacking libpsl5t64:amd64 (0.21.2-1.1build1) ...
+Selecting previously unselected package libuv1t64:amd64.
+Preparing to unpack .../21-libuv1t64_1.48.0-1.1build1_amd64.deb ...
+Unpacking libuv1t64:amd64 (1.48.0-1.1build1) ...
+Selecting previously unselected package binutils-common:amd64.
+Preparing to unpack .../22-binutils-common_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking binutils-common:amd64 (2.42-4ubuntu2.10) ...
+Selecting previously unselected package libsframe1:amd64.
+Preparing to unpack .../23-libsframe1_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking libsframe1:amd64 (2.42-4ubuntu2.10) ...
+Selecting previously unselected package libbinutils:amd64.
+Preparing to unpack .../24-libbinutils_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking libbinutils:amd64 (2.42-4ubuntu2.10) ...
+Selecting previously unselected package libctf-nobfd0:amd64.
+Preparing to unpack .../25-libctf-nobfd0_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking libctf-nobfd0:amd64 (2.42-4ubuntu2.10) ...
+Selecting previously unselected package libctf0:amd64.
+Preparing to unpack .../26-libctf0_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking libctf0:amd64 (2.42-4ubuntu2.10) ...
+Selecting previously unselected package libgprofng0:amd64.
+Preparing to unpack .../27-libgprofng0_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking libgprofng0:amd64 (2.42-4ubuntu2.10) ...
+Selecting previously unselected package binutils-x86-64-linux-gnu.
+Preparing to unpack .../28-binutils-x86-64-linux-gnu_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking binutils-x86-64-linux-gnu (2.42-4ubuntu2.10) ...
+Selecting previously unselected package binutils.
+Preparing to unpack .../29-binutils_2.42-4ubuntu2.10_amd64.deb ...
+Unpacking binutils (2.42-4ubuntu2.10) ...
+Selecting previously unselected package libarchive13t64:amd64.
+Preparing to unpack .../30-libarchive13t64_3.7.2-2ubuntu0.9_amd64.deb ...
+Unpacking libarchive13t64:amd64 (3.7.2-2ubuntu0.9) ...
+Selecting previously unselected package libbrotli1:amd64.
+Preparing to unpack .../31-libbrotli1_1.1.0-2ubuntu0.1_amd64.deb ...
+Unpacking libbrotli1:amd64 (1.1.0-2ubuntu0.1) ...
+Selecting previously unselected package libsasl2-modules-db:amd64.
+Preparing to unpack .../32-libsasl2-modules-db_2.1.28+dfsg1-5ubuntu3.1_amd64.deb ...
+Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-5ubuntu3.1) ...
+Selecting previously unselected package libsasl2-2:amd64.
+Preparing to unpack .../33-libsasl2-2_2.1.28+dfsg1-5ubuntu3.1_amd64.deb ...
+Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-5ubuntu3.1) ...
+Selecting previously unselected package libldap2:amd64.
+Preparing to unpack .../34-libldap2_2.6.10+dfsg-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking libldap2:amd64 (2.6.10+dfsg-0ubuntu0.24.04.1) ...
+Selecting previously unselected package librtmp1:amd64.
+Preparing to unpack .../35-librtmp1_2.4+20151223.gitfa8646d.1-2build7_amd64.deb ...
+Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build7) ...
+Selecting previously unselected package libssh-4:amd64.
+Preparing to unpack .../36-libssh-4_0.10.6-2ubuntu0.5_amd64.deb ...
+Unpacking libssh-4:amd64 (0.10.6-2ubuntu0.5) ...
+Selecting previously unselected package libcurl4t64:amd64.
+Preparing to unpack .../37-libcurl4t64_8.5.0-2ubuntu10.16_amd64.deb ...
+Unpacking libcurl4t64:amd64 (8.5.0-2ubuntu10.16) ...
+Selecting previously unselected package libjsoncpp25:amd64.
+Preparing to unpack .../38-libjsoncpp25_1.9.5-6build1_amd64.deb ...
+Unpacking libjsoncpp25:amd64 (1.9.5-6build1) ...
+Selecting previously unselected package librhash0:amd64.
+Preparing to unpack .../39-librhash0_1.4.3-3build1_amd64.deb ...
+Unpacking librhash0:amd64 (1.4.3-3build1) ...
+Selecting previously unselected package cmake-data.
+Preparing to unpack .../40-cmake-data_3.28.3-1build7_all.deb ...
+Unpacking cmake-data (3.28.3-1build7) ...
+Selecting previously unselected package cmake.
+Preparing to unpack .../41-cmake_3.28.3-1build7_amd64.deb ...
+Unpacking cmake (3.28.3-1build7) ...
+Selecting previously unselected package libisl23:amd64.
+Preparing to unpack .../42-libisl23_0.26-3build1.1_amd64.deb ...
+Unpacking libisl23:amd64 (0.26-3build1.1) ...
+Selecting previously unselected package libmpfr6:amd64.
+Preparing to unpack .../43-libmpfr6_4.2.1-1build1.1_amd64.deb ...
+Unpacking libmpfr6:amd64 (4.2.1-1build1.1) ...
+Selecting previously unselected package libmpc3:amd64.
+Preparing to unpack .../44-libmpc3_1.3.1-1build1.1_amd64.deb ...
+Unpacking libmpc3:amd64 (1.3.1-1build1.1) ...
+Selecting previously unselected package cpp-14-x86-64-linux-gnu.
+Preparing to unpack .../45-cpp-14-x86-64-linux-gnu_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking cpp-14-x86-64-linux-gnu (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package cpp-14.
+Preparing to unpack .../46-cpp-14_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking cpp-14 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libcc1-0:amd64.
+Preparing to unpack .../47-libcc1-0_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libcc1-0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libgomp1:amd64.
+Preparing to unpack .../48-libgomp1_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libgomp1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libitm1:amd64.
+Preparing to unpack .../49-libitm1_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libitm1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libatomic1:amd64.
+Preparing to unpack .../50-libatomic1_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libatomic1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libasan8:amd64.
+Preparing to unpack .../51-libasan8_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libasan8:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package liblsan0:amd64.
+Preparing to unpack .../52-liblsan0_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking liblsan0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libtsan2:amd64.
+Preparing to unpack .../53-libtsan2_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libtsan2:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libubsan1:amd64.
+Preparing to unpack .../54-libubsan1_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libubsan1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libhwasan0:amd64.
+Preparing to unpack .../55-libhwasan0_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libhwasan0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libquadmath0:amd64.
+Preparing to unpack .../56-libquadmath0_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libquadmath0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libgcc-14-dev:amd64.
+Preparing to unpack .../57-libgcc-14-dev_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libgcc-14-dev:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package gcc-14-x86-64-linux-gnu.
+Preparing to unpack .../58-gcc-14-x86-64-linux-gnu_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking gcc-14-x86-64-linux-gnu (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package libc-dev-bin.
+Preparing to unpack .../59-libc-dev-bin_2.39-0ubuntu8.9_amd64.deb ...
+Unpacking libc-dev-bin (2.39-0ubuntu8.9) ...
+Selecting previously unselected package linux-libc-dev:amd64.
+Preparing to unpack .../60-linux-libc-dev_6.8.0-147.147_amd64.deb ...
+Unpacking linux-libc-dev:amd64 (6.8.0-147.147) ...
+Selecting previously unselected package libcrypt-dev:amd64.
+Preparing to unpack .../61-libcrypt-dev_1%3a4.4.36-4build1_amd64.deb ...
+Unpacking libcrypt-dev:amd64 (1:4.4.36-4build1) ...
+Selecting previously unselected package rpcsvc-proto.
+Preparing to unpack .../62-rpcsvc-proto_1.4.2-0ubuntu7_amd64.deb ...
+Unpacking rpcsvc-proto (1.4.2-0ubuntu7) ...
+Selecting previously unselected package libc6-dev:amd64.
+Preparing to unpack .../63-libc6-dev_2.39-0ubuntu8.9_amd64.deb ...
+Unpacking libc6-dev:amd64 (2.39-0ubuntu8.9) ...
+Selecting previously unselected package libstdc++-14-dev:amd64.
+Preparing to unpack .../64-libstdc++-14-dev_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking libstdc++-14-dev:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package g++-14-x86-64-linux-gnu.
+Preparing to unpack .../65-g++-14-x86-64-linux-gnu_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking g++-14-x86-64-linux-gnu (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package gcc-14.
+Preparing to unpack .../66-gcc-14_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking gcc-14 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package g++-14.
+Preparing to unpack .../67-g++-14_14.2.0-4ubuntu2~24.04.1_amd64.deb ...
+Unpacking g++-14 (14.2.0-4ubuntu2~24.04.1) ...
+Selecting previously unselected package icu-devtools.
+Preparing to unpack .../68-icu-devtools_74.2-1ubuntu3.1_amd64.deb ...
+Unpacking icu-devtools (74.2-1ubuntu3.1) ...
+Selecting previously unselected package libmd-dev:amd64.
+Preparing to unpack .../69-libmd-dev_1.1.0-2build1.1_amd64.deb ...
+Unpacking libmd-dev:amd64 (1.1.0-2build1.1) ...
+Selecting previously unselected package libbsd-dev:amd64.
+Preparing to unpack .../70-libbsd-dev_0.12.1-1build1.1_amd64.deb ...
+Unpacking libbsd-dev:amd64 (0.12.1-1build1.1) ...
+Selecting previously unselected package libncurses-dev:amd64.
+Preparing to unpack .../71-libncurses-dev_6.4+20240113-1ubuntu2.2_amd64.deb ...
+Unpacking libncurses-dev:amd64 (6.4+20240113-1ubuntu2.2) ...
+Selecting previously unselected package libedit-dev:amd64.
+Preparing to unpack .../72-libedit-dev_3.1-20230828-1build1_amd64.deb ...
+Unpacking libedit-dev:amd64 (3.1-20230828-1build1) ...
+Selecting previously unselected package libicu-dev:amd64.
+Preparing to unpack .../73-libicu-dev_74.2-1ubuntu3.1_amd64.deb ...
+Unpacking libicu-dev:amd64 (74.2-1ubuntu3.1) ...
+Selecting previously unselected package libxml2-dev:amd64.
+Preparing to unpack .../74-libxml2-dev_2.9.14+dfsg-1.3ubuntu3.10_amd64.deb ...
+Unpacking libxml2-dev:amd64 (2.9.14+dfsg-1.3ubuntu3.10) ...
+Selecting previously unselected package libzstd-dev:amd64.
+Preparing to unpack .../75-libzstd-dev_1.5.5+dfsg2-2build1.1_amd64.deb ...
+Unpacking libzstd-dev:amd64 (1.5.5+dfsg2-2build1.1) ...
+Selecting previously unselected package make.
+Preparing to unpack .../76-make_4.3-4.1build2_amd64.deb ...
+Unpacking make (4.3-4.1build2) ...
+Selecting previously unselected package ninja-build.
+Preparing to unpack .../77-ninja-build_1.11.1-2_amd64.deb ...
+Unpacking ninja-build (1.11.1-2) ...
+Selecting previously unselected package zlib1g-dev:amd64.
+Preparing to unpack .../78-zlib1g-dev_1%3a1.3.dfsg-3.1ubuntu2.3_amd64.deb ...
+Unpacking zlib1g-dev:amd64 (1:1.3.dfsg-3.1ubuntu2.3) ...
+Selecting previously unselected package libffi-dev:amd64.
+Preparing to unpack .../79-libffi-dev_3.4.6-1build1_amd64.deb ...
+Unpacking libffi-dev:amd64 (3.4.6-1build1) ...
+Setting up media-types (10.1.0) ...
+Setting up libkeyutils1:amd64 (1.6.3-3build1) ...
+Setting up libzstd-dev:amd64 (1.5.5+dfsg2-2build1.1) ...
+Setting up libgdbm6t64:amd64 (1.23-5.1build1) ...
+Setting up libgdbm-compat4t64:amd64 (1.23-5.1build1) ...
+Setting up libbrotli1:amd64 (1.1.0-2ubuntu0.1) ...
+Setting up libsqlite3-0:amd64 (3.45.1-1ubuntu2.8) ...
+Setting up libuv1t64:amd64 (1.48.0-1.1build1) ...
+Setting up binutils-common:amd64 (2.42-4ubuntu2.10) ...
+Setting up libpsl5t64:amd64 (0.21.2-1.1build1) ...
+Setting up libnghttp2-14:amd64 (1.59.0-1ubuntu0.4) ...
+Setting up linux-libc-dev:amd64 (6.8.0-147.147) ...
+Setting up libctf-nobfd0:amd64 (2.42-4ubuntu2.10) ...
+Setting up libgomp1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libffi-dev:amd64 (3.4.6-1build1) ...
+Setting up libsframe1:amd64 (2.42-4ubuntu2.10) ...
+Setting up ninja-build (1.11.1-2) ...
+Setting up libjansson4:amd64 (2.14-2build2) ...
+Setting up libkrb5support0:amd64 (1.20.1-6ubuntu2.10) ...
+Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-5ubuntu3.1) ...
+Setting up tzdata (2026e-0ubuntu0.24.04.1) ...
+
+Current default time zone: 'Etc/UTC'
+Local time is now:      Sun Nov  1 16:32:54 UTC 2026.
+Universal Time is now:  Sun Nov  1 16:32:54 UTC 2026.
+Run 'dpkg-reconfigure tzdata' if you wish to change it.
+
+Setting up rpcsvc-proto (1.4.2-0ubuntu7) ...
+Setting up make (4.3-4.1build2) ...
+Setting up libmpfr6:amd64 (4.2.1-1build1.1) ...
+Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build7) ...
+Setting up libncurses6:amd64 (6.4+20240113-1ubuntu2.2) ...
+Setting up perl-modules-5.38 (5.38.2-3.2ubuntu0.6) ...
+Setting up libquadmath0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libmpc3:amd64 (1.3.1-1build1.1) ...
+Setting up libatomic1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libjsoncpp25:amd64 (1.9.5-6build1) ...
+Setting up libk5crypto3:amd64 (1.20.1-6ubuntu2.10) ...
+Setting up libsasl2-2:amd64 (2.1.28+dfsg1-5ubuntu3.1) ...
+Setting up libubsan1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libicu74:amd64 (74.2-1ubuntu3.1) ...
+Setting up libhwasan0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up librhash0:amd64 (1.4.3-3build1) ...
+Setting up libcrypt-dev:amd64 (1:4.4.36-4build1) ...
+Setting up libasan8:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libmd-dev:amd64 (1.1.0-2build1.1) ...
+Setting up netbase (6.4) ...
+Setting up cmake-data (3.28.3-1build7) ...
+Setting up libkrb5-3:amd64 (1.20.1-6ubuntu2.10) ...
+Setting up libperl5.38t64:amd64 (5.38.2-3.2ubuntu0.6) ...
+Setting up libtsan2:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libbinutils:amd64 (2.42-4ubuntu2.10) ...
+Setting up libisl23:amd64 (0.26-3build1.1) ...
+Setting up libc-dev-bin (2.39-0ubuntu8.9) ...
+Setting up openssl (3.0.13-0ubuntu3.16) ...
+Setting up libbsd0:amd64 (0.12.1-1build1.1) ...
+Setting up readline-common (8.2-4build1) ...
+Setting up libxml2:amd64 (2.9.14+dfsg-1.3ubuntu3.10) ...
+Setting up libbsd-dev:amd64 (0.12.1-1build1.1) ...
+Setting up libcc1-0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libldap2:amd64 (2.6.10+dfsg-0ubuntu0.24.04.1) ...
+Setting up liblsan0:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libitm1:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libctf0:amd64 (2.42-4ubuntu2.10) ...
+Setting up libedit2:amd64 (3.1-20230828-1build1) ...
+Setting up ca-certificates (20260816ubuntu0.24.04.1) ...
+Updating certificates in /etc/ssl/certs...
+120 added, 0 removed; done.
+Setting up perl (5.38.2-3.2ubuntu0.6) ...
+Setting up libgprofng0:amd64 (2.42-4ubuntu2.10) ...
+Setting up libgssapi-krb5-2:amd64 (1.20.1-6ubuntu2.10) ...
+Setting up icu-devtools (74.2-1ubuntu3.1) ...
+Setting up cpp-14-x86-64-linux-gnu (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libssh-4:amd64 (0.10.6-2ubuntu0.5) ...
+Setting up cpp-14 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libreadline8t64:amd64 (8.2-4build1) ...
+Setting up libc6-dev:amd64 (2.39-0ubuntu8.9) ...
+Setting up libgcc-14-dev:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libstdc++-14-dev:amd64 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libarchive13t64:amd64 (3.7.2-2ubuntu0.9) ...
+Setting up libicu-dev:amd64 (74.2-1ubuntu3.1) ...
+Setting up binutils-x86-64-linux-gnu (2.42-4ubuntu2.10) ...
+Setting up libncurses-dev:amd64 (6.4+20240113-1ubuntu2.2) ...
+Setting up libpython3.12-stdlib:amd64 (3.12.3-1ubuntu0.17) ...
+Setting up libcurl4t64:amd64 (8.5.0-2ubuntu10.16) ...
+Setting up python3.12 (3.12.3-1ubuntu0.17) ...
+Setting up binutils (2.42-4ubuntu2.10) ...
+Setting up libxml2-dev:amd64 (2.9.14+dfsg-1.3ubuntu3.10) ...
+Setting up libedit-dev:amd64 (3.1-20230828-1build1) ...
+Setting up zlib1g-dev:amd64 (1:1.3.dfsg-3.1ubuntu2.3) ...
+Setting up cmake (3.28.3-1build7) ...
+Setting up gcc-14-x86-64-linux-gnu (14.2.0-4ubuntu2~24.04.1) ...
+Setting up libpython3-stdlib:amd64 (3.12.3-0ubuntu2.1) ...
+Setting up python3 (3.12.3-0ubuntu2.1) ...
+Setting up gcc-14 (14.2.0-4ubuntu2~24.04.1) ...
+Setting up g++-14-x86-64-linux-gnu (14.2.0-4ubuntu2~24.04.1) ...
+Setting up g++-14 (14.2.0-4ubuntu2~24.04.1) ...
+Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+Processing triggers for ca-certificates (20260816ubuntu0.24.04.1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/14
+Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/14
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ (in-process)
+ "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang-23" -cc1 -triple x86_64-unknown-linux-gnu -E -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name null -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=/home/shmellyorc/Documents/Void.Language -v -fcoverage-compilation-dir=/home/shmellyorc/Documents/Void.Language -resource-dir /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/clang/23 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/backward -internal-isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/clang/23/include -internal-isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/../include/x86_64-unknown-linux-gnu -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -ferror-limit 19 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -faddrsig -fdwarf2-cfi-asm -o - -x c++ /dev/null
+clang -cc1 version 23.1.4 based upon LLVM 23.1.4 default target x86_64-unknown-linux-gnu
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include"
+ignoring nonexistent directory "/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14
+ /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14
+ /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/backward
+ /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/clang/23/include
+ /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/../include/x86_64-unknown-linux-gnu
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+# 1 "/dev/null"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 486 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "/dev/null" 2
+
+-- The C compiler identification is Clang 23.1.4
+-- The CXX compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")  
+-- Found zstd: /usr/lib/x86_64-linux-gnu/libzstd.so  
+-- Found LibXml2: /usr/lib/x86_64-linux-gnu/libxml2.so (found version "2.9.14") 
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Debug; 167 files
+
+-- Using CMake version 3.28.3
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found Cares: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/include (found version "1.34.9") 
+-- Found Perl: /usr/bin/perl (found version "5.38.2") 
+-- Looking for connect in socket
+-- Looking for connect in socket - not found
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID - Success
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR - Success
+-- Found OpenSSL: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/lib/libcrypto.a (found version "1.1.1g")  
+-- Looking for OPENSSL_IS_AWSLC
+-- Looking for OPENSSL_IS_AWSLC - found
+-- Looking for DES_ecb_encrypt
+-- Looking for DES_ecb_encrypt - found
+-- Looking for SSL_set0_wbio
+-- Looking for SSL_set0_wbio - found
+-- Found NGHTTP2: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/include (found version "1.70.0") 
+-- Found Libidn2: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/include (found version "2.3.8") 
+-- Found Libpsl: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/include (found version "0.21.5") 
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Looking for sys/eventfd.h
+-- Looking for sys/eventfd.h - found
+-- Looking for sys/filio.h
+-- Looking for sys/filio.h - not found
+-- Looking for sys/ioctl.h
+-- Looking for sys/ioctl.h - found
+-- Looking for sys/param.h
+-- Looking for sys/param.h - found
+-- Looking for sys/poll.h
+-- Looking for sys/poll.h - found
+-- Looking for sys/resource.h
+-- Looking for sys/resource.h - found
+-- Looking for 3 include files sys/socket.h, ..., sys/select.h
+-- Looking for 3 include files sys/socket.h, ..., sys/select.h - found
+-- Looking for sys/sockio.h
+-- Looking for sys/sockio.h - not found
+-- Looking for 4 include files sys/socket.h, ..., sys/types.h
+-- Looking for 4 include files sys/socket.h, ..., sys/types.h - found
+-- Looking for sys/un.h
+-- Looking for sys/un.h - found
+-- Looking for 5 include files sys/socket.h, ..., sys/utime.h
+-- Looking for 5 include files sys/socket.h, ..., sys/utime.h - not found
+-- Looking for 5 include files sys/socket.h, ..., arpa/inet.h
+-- Looking for 5 include files sys/socket.h, ..., arpa/inet.h - found
+-- Looking for fcntl.h
+-- Looking for fcntl.h - found
+-- Looking for 6 include files sys/socket.h, ..., ifaddrs.h
+-- Looking for 6 include files sys/socket.h, ..., ifaddrs.h - found
+-- Looking for io.h
+-- Looking for io.h - not found
+-- Looking for 7 include files sys/socket.h, ..., libgen.h
+-- Looking for 7 include files sys/socket.h, ..., libgen.h - found
+-- Looking for linux/tcp.h
+-- Looking for linux/tcp.h - found
+-- Looking for locale.h
+-- Looking for locale.h - found
+-- Looking for 8 include files sys/socket.h, ..., net/if.h
+-- Looking for 8 include files sys/socket.h, ..., net/if.h - found
+-- Looking for 9 include files sys/socket.h, ..., netdb.h
+-- Looking for 9 include files sys/socket.h, ..., netdb.h - found
+-- Looking for 10 include files sys/socket.h, ..., netinet/in.h
+-- Looking for 10 include files sys/socket.h, ..., netinet/in.h - found
+-- Looking for netinet/in6.h
+-- Looking for netinet/in6.h - not found
+-- Looking for netinet/ip.h
+-- Looking for netinet/ip.h - found
+-- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h
+-- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h - found
+-- Looking for 12 include files sys/socket.h, ..., netinet/udp.h
+-- Looking for 12 include files sys/socket.h, ..., netinet/udp.h - found
+-- Looking for poll.h
+-- Looking for poll.h - found
+-- Looking for pwd.h
+-- Looking for pwd.h - found
+-- Looking for stdatomic.h
+-- Looking for stdatomic.h - found
+-- Looking for stdbool.h
+-- Looking for stdbool.h - found
+-- Looking for strings.h
+-- Looking for strings.h - found
+-- Looking for stropts.h
+-- Looking for stropts.h - not found
+-- Looking for termio.h
+-- Looking for termio.h - found
+-- Looking for termios.h
+-- Looking for termios.h - found
+-- Looking for 13 include files sys/socket.h, ..., unistd.h
+-- Looking for 13 include files sys/socket.h, ..., unistd.h - found
+-- Looking for utime.h
+-- Looking for utime.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of __int64
+-- Check size of __int64 - failed
+-- Check size of time_t
+-- Check size of time_t - done
+-- Check size of suseconds_t
+-- Check size of suseconds_t - done
+-- Looking for accept4
+-- Looking for accept4 - found
+-- Looking for fnmatch
+-- Looking for fnmatch - found
+-- Looking for basename
+-- Looking for basename - found
+-- Looking for poll
+-- Looking for poll - found
+-- Looking for socket
+-- Looking for socket - found
+-- Looking for socketpair
+-- Looking for socketpair - found
+-- Looking for recv
+-- Looking for recv - found
+-- Looking for send
+-- Looking for send - found
+-- Looking for sendmsg
+-- Looking for sendmsg - found
+-- Looking for sendmmsg
+-- Looking for sendmmsg - found
+-- Looking for memrchr
+-- Looking for memrchr - found
+-- Looking for alarm
+-- Looking for alarm - found
+-- Looking for fcntl
+-- Looking for fcntl - found
+-- Looking for getppid
+-- Looking for getppid - found
+-- Looking for utimes
+-- Looking for utimes - found
+-- Looking for closesocket
+-- Looking for closesocket - not found
+-- Looking for sigsetjmp
+-- Looking for sigsetjmp - found
+-- Looking for getpass_r
+-- Looking for getpass_r - not found
+-- Looking for getpwuid
+-- Looking for getpwuid - found
+-- Looking for getpwuid_r
+-- Looking for getpwuid_r - found
+-- Looking for geteuid
+-- Looking for geteuid - found
+-- Looking for utime
+-- Looking for utime - found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for localtime_r
+-- Looking for localtime_r - found
+-- Looking for gethostbyname_r
+-- Looking for gethostbyname_r - found
+-- Looking for gethostname
+-- Looking for gethostname - found
+-- Looking for signal
+-- Looking for signal - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for sigaction
+-- Looking for sigaction - found
+-- Looking for siginterrupt
+-- Looking for siginterrupt - found
+-- Looking for getaddrinfo
+-- Looking for getaddrinfo - found
+-- Looking for getifaddrs
+-- Looking for getifaddrs - found
+-- Looking for freeaddrinfo
+-- Looking for freeaddrinfo - found
+-- Looking for pipe
+-- Looking for pipe - found
+-- Looking for eventfd
+-- Looking for eventfd - found
+-- Looking for getpeername
+-- Looking for getpeername - found
+-- Looking for getsockname
+-- Looking for getsockname - found
+-- Looking for getrlimit
+-- Looking for getrlimit - found
+-- Looking for setlocale
+-- Looking for setlocale - found
+-- Looking for setrlimit
+-- Looking for setrlimit - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for dirent.h
+-- Looking for dirent.h - found
+-- Looking for fchmod
+-- Looking for fchmod - found
+-- Looking for gettimeofday
+-- Looking for gettimeofday - found
+-- Looking for if_nametoindex
+-- Looking for if_nametoindex - found
+-- Looking for realpath
+-- Looking for realpath - found
+-- Looking for sched_yield
+-- Looking for sched_yield - found
+-- Looking for opendir
+-- Looking for opendir - found
+-- Looking for strcasecmp
+-- Looking for strcasecmp - found
+-- Looking for stricmp
+-- Looking for stricmp - not found
+-- Looking for strcmpi
+-- Looking for strcmpi - not found
+-- Looking for memset_s
+-- Looking for memset_s - not found
+-- Looking for memset_explicit
+-- Looking for memset_explicit - not found
+-- Looking for fsetxattr
+-- Looking for fsetxattr - found
+-- Performing Test HAVE_FSETXATTR_5
+-- Performing Test HAVE_FSETXATTR_5 - Success
+-- Performing Test HAVE_FSETXATTR_6
+-- Performing Test HAVE_FSETXATTR_6 - Failed
+-- Check size of sa_family_t
+-- Check size of sa_family_t - done
+-- Performing Test HAVE_FCNTL_O_NONBLOCK
+-- Performing Test HAVE_FCNTL_O_NONBLOCK - Success
+-- Performing Test HAVE_IOCTLSOCKET
+-- Performing Test HAVE_IOCTLSOCKET - Failed
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL - Failed
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO - Failed
+-- Performing Test HAVE_IOCTLSOCKET_FIONBIO
+-- Performing Test HAVE_IOCTLSOCKET_FIONBIO - Failed
+-- Performing Test HAVE_IOCTL_FIONBIO
+-- Performing Test HAVE_IOCTL_FIONBIO - Success
+-- Performing Test HAVE_IOCTL_SIOCGIFADDR
+-- Performing Test HAVE_IOCTL_SIOCGIFADDR - Success
+-- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK
+-- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_3
+-- Performing Test HAVE_GETHOSTBYNAME_R_3 - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_5
+-- Performing Test HAVE_GETHOSTBYNAME_R_5 - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_6
+-- Performing Test HAVE_GETHOSTBYNAME_R_6 - Success
+-- Performing Test HAVE_BOOL_T
+-- Performing Test HAVE_BOOL_T - Success
+-- Performing Test HAVE_ATOMIC
+-- Performing Test HAVE_ATOMIC - Success
+-- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT - Success
+-- Performing Test HAVE_FILE_OFFSET_BITS
+-- Performing Test HAVE_FILE_OFFSET_BITS - Success
+-- Check size of off_t
+-- Check size of off_t - done
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Check size of curl_off_t
+-- Check size of curl_off_t - done
+-- Check size of curl_socket_t
+-- Check size of curl_socket_t - done
+-- Performing Test HAVE_WRITABLE_ARGV
+-- Performing Test HAVE_WRITABLE_ARGV - Success
+-- Performing Test HAVE_TIME_T_UNSIGNED
+-- Performing Test HAVE_TIME_T_UNSIGNED - Failed
+-- Performing Test HAVE_GLIBC_STRERROR_R
+-- Performing Test HAVE_GLIBC_STRERROR_R - Success
+-- Performing Test HAVE_POSIX_STRERROR_R
+-- Performing Test HAVE_POSIX_STRERROR_R - Failed
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC - Success
+-- Check size of struct sockaddr_storage
+-- Check size of struct sockaddr_storage - done
+-- Performing Test HAVE_STRUCT_TIMEVAL
+-- Performing Test HAVE_STRUCT_TIMEVAL - Success
+-- Performing Test HAVE_H_ERRNO
+-- Performing Test HAVE_H_ERRNO - Success
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW - Success
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (18.2s)
+-- Generating done (0.9s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build
+[0/2] Re-checking globbed directories...
+[1/264] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/f2s.c.o
+[2/264] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2s.c.o
+[3/264] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2fixed.c.o
+[4/264] Building CXX object CMakeFiles/void_format_objects.dir/src/format.cpp.o
+[5/264] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[6/264] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/temporal.cpp:3:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+4 warnings generated.
+[7/264] Building CXX object CMakeFiles/void_zone_objects.dir/third_party/date/src/tz.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:86:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz_private.h:31:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:201:23: warning: unused variable 'folder_delimiter' [-Wunused-const-variable]
+  201 | static CONSTDATA char folder_delimiter = '/';
+      |                       ^~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:318:1: warning: unused function 'get_download_folder' [-Wunused-function]
+  318 | get_download_folder()
+      | ^~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:458:1: warning: unused function 'get_install' [-Wunused-function]
+  458 | get_install()
+      | ^~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:3728:1: warning: unused function 'get_version' [-Wunused-function]
+ 3728 | get_version(const std::string& path)
+      | ^~~~~~~~~~~
+8 warnings generated.
+[8/264] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[9/264] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[10/264] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[11/264] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[12/264] Building C object CMakeFiles/void_native_fixture.dir/src/native/fixture.c.o
+[13/264] Building C object CMakeFiles/void_native_fixture.dir/src/native/sink.c.o
+[14/264] Linking C static library libvoid_native_fixture.a
+[15/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os.cpp.o
+[16/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[17/264] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[18/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[19/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[20/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[21/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[22/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[23/264] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[24/264] Linking CXX static library libvoid_core.a
+[25/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[26/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[27/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[28/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[29/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[30/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[31/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[32/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[33/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/heap.cpp.o
+[34/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/gc_schema.cpp.o
+[35/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[36/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:675:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:676:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:677:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:690:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[37/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[38/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[39/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native.cpp.o
+[40/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[41/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[42/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_provider.cpp.o
+[43/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url.cpp.o
+[44/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[45/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url_abi.cpp.o
+[46/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[47/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[48/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[49/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[50/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[51/264] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_work.cpp.o
+[52/264] Building CXX object CMakeFiles/void_lsp.dir/src/lsp/positions.cpp.o
+[53/264] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/native_cache.cpp.o
+[54/264] Linking CXX static library libvoid_lsp.a
+[55/264] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[56/264] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[57/264] Linking CXX executable voidls
+[58/264] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[59/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[60/264] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[61/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[62/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/api.c.o
+[63/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[64/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[65/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[66/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[67/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[68/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[69/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-ip-happy.c.o
+[70/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-recvbuf.c.o
+[71/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-setup.c.o
+[72/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[73/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[74/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[75/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[76/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[77/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+[78/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/creds.c.o
+[79/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cshutdn.c.o
+[80/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[81/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[82/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[83/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[84/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fopen.c.o
+[85/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[86/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+[87/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[88/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[89/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[90/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[91/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[92/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_share.c.o
+[93/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[94/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[95/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[96/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+[97/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[98/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-pause.c.o
+[99/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[100/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[101/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[102/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[103/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[104/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fake_addrinfo.c.o
+[105/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[106/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[107/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[108/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[109/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[110/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+[111/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[112/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[113/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[114/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+[115/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[116/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[117/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[118/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http.c.o
+[119/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+[120/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[121/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_httpsig.c.o
+[122/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ed25519.c.o
+[123/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[124/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[125/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[126/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[127/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[128/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[129/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[130/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[131/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[132/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[133/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[134/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[135/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[136/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[137/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[138/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[139/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[140/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ev.c.o
+[141/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[142/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ntfy.c.o
+[143/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[144/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[145/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[146/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[147/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/peer.c.o
+[148/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[149/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[150/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/protocol.c.o
+[151/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/proxy.c.o
+[152/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[153/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ptrarray.c.o
+[154/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[155/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ratelimit.c.o
+[156/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[157/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[158/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[159/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[160/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[161/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[162/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[163/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[164/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[165/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[166/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[167/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[168/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[169/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[170/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strequal.c.o
+[171/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[172/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[173/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[174/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdpool.c.o
+[175/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdqueue.c.o
+[176/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u8_strset.c.o
+[177/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[178/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u32_ptrset.c.o
+[179/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-bset.c.o
+[180/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-spbset.c.o
+[181/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-table.c.o
+[182/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/url.c.o
+[183/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+[184/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[185/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[186/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[187/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[188/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+[189/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[190/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[191/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[192/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[193/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[194/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[195/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[196/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[197/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[198/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+[199/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-ares.c.o
+[200/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-thrdd.c.o
+[201/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-base.c.o
+[202/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/cf-dns.c.o
+[203/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/dnscache.c.o
+[204/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/doh.c.o
+[205/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip4.c.o
+[206/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip.c.o
+[207/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/httpsrr.c.o
+[208/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip6.c.o
+[209/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/apple.c.o
+[210/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[211/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[212/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[213/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[214/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[215/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[216/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[217/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[218/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_config.c.o
+[219/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+[220/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_spack.c.o
+[221/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_scache.c.o
+[222/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[223/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[224/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/capsule.c.o
+[225/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-capsule.c.o
+[226/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2.c.o
+[227/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-cmn.c.o
+[228/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-proxy.c.o
+[229/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-quiche.c.o
+[230/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[231/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[232/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[233/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[234/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/base64.c.o
+[235/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/vssh.c.o
+[236/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/basename.c.o
+[237/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/dynbuf.c.o
+[238/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/win32-fopen.c.o
+[239/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_ntop.c.o
+[240/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_pton.c.o
+[241/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/multibyte.c.o
+[242/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/snprintf.c.o
+[243/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/nonblock.c.o
+[244/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strcopy.c.o
+[245/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strdup.c.o
+[246/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strerr.c.o
+[247/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strparse.c.o
+[248/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timediff.c.o
+[249/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timeval.c.o
+[250/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/version_win32.c.o
+[251/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/wait.c.o
+[252/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/warnless.c.o
+[253/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/winapi.c.o
+[254/264] Building C object curl/lib/CMakeFiles/libcurl_static.dir/__/__/__/src/runtime/curl_keylog_disabled.c.o
+[255/264] Linking C static library curl/lib/libcurl.a
+[256/264] Linking CXX static library libvoid_runtime.a
+[257/264] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[258/264] cd /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build/void-native-resources.txt
+[259/264] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[260/264] Linking CXX static library libvoid_llvm.a
+[261/264] Generating cache-identity-Debug.cpp
+[262/264] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[263/264] Linking CXX static library libvoid_cache_identity.a
+[264/264] Linking CXX executable voidc
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/net/http/install.py", line 85, in <module>
+    if __name__ == '__main__': main()
+                               ^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/net/http/install.py", line 62, in main
+    run([installed, 'run', source, *options], 'Example JSON complete\n')
+  File "/home/shmellyorc/Documents/Void.Language/tests/net/http/install.py", line 38, in run
+    assert result.returncode == code, (argv, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/tmp/VOID HTTP installation 1ggs6ws5/relocated 雪 # % installation/bin/voidc'), 'run', PosixPath('/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void')], 'URL boundary invariant failedCalled from /@stdlib/url.void::with_query\n/tmp/VOID HTTP installation 1ggs6ws5/relocated 雪 # % installation/share/void/stdlib/url.void:158:32: source call\n    return _text("with_query", _url_with_query(value, items))\n                               ^\nCalled from /main.void::fetch\n/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void:12:26: source call\n    var url_result = url.with_query(target, query)\n                         ^\nCalled from /main.void::$application\n/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void:36:12: source call\n    return fetch(target)\n           ^\nCalled from /main.void::$app_adapter\n/tmp/VOID HTTP installation 1ggs6ws5/project 雪 # %/main.void:1:1: source call\n\n')

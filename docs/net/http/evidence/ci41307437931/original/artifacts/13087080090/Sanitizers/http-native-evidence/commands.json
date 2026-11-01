@@ -1,0 +1,473 @@
+{
+  "argv": [
+    "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_native",
+    "http://127.0.0.1:46371",
+    "https://127.0.0.1:42193",
+    "/tmp/VOID HTTP native osz9x_tx/cert.pem",
+    "https://127.0.0.1:52625",
+    "https://127.0.0.1:34367",
+    "/tmp/VOID HTTP native osz9x_tx/cert.pem",
+    "/tmp/VOID HTTP native osz9x_tx/key.pem",
+    "/tmp/VOID HTTP native osz9x_tx/identity.p12",
+    "/tmp/VOID HTTP native osz9x_tx",
+    "http://127.0.0.1:46095",
+    "https://127.0.0.1:44061",
+    "42321"
+  ],
+  "exit_code": 0,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 15.316628388000026,
+  "binary_sha256": "fbbec89944a9e031ab25a67728f2b761c5abe33ef85f25a2a3ab91254e2a3c6b",
+  "source_sha256": {
+    "src/runtime/http.cpp": "3f1b2904623bc75e9836aa1bab36a5324207d6664aa94d352585e43f1760dc47",
+    "src/runtime/http_bulk.cpp": "35a15181bde46d1832f932076aba471e574d09cc7067ec29716e1b9cfd2d4e74",
+    "src/runtime/http_file.cpp": "66cdea5e72a3460849aaf61f9fcab4386476890b612e3d8c5f6545e04164ea40",
+    "src/runtime/http_resource.cpp": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+    "src/runtime/http_abi.cpp": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992",
+    "src/runtime/native_work.cpp": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4",
+    "src/runtime/async.cpp": "e29616fc3c69306f700978052d2b8b1dc3bc1f6b286b87c62e54126f6b4974d0",
+    "include/void/http.hpp": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4",
+    "tests/net/http/native.cpp": "b56af3a5689e1e51acdfd797b6f7735a60f62e2db9a3ee3cd78b8cdd30cbbcd1",
+    "tests/net/http/runtime.cpp": "e68512ba9c524e4cca34d23ffed95ebb4a0fe943fb39e6a743f67187615aa4dd",
+    "tests/net/http/fixture.py": "05a77c07200b9e0720b7c25bc14f2f4cda38bcb4d123a008d44887409ccf1f8a",
+    "third_party/curl/VOID-PROVENANCE.json": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+    "third_party/http-versions.json": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb"
+  },
+  "soft_hard_stack_bytes": [
+    16777216,
+    -1
+  ],
+  "certificate_tool": {
+    "path": "/home/runner/work/Void.Language/Void.Language/cmake/../.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/bin/openssl",
+    "sha256": "7c28dc2e7069ae51fddbf06b60950189fb64969eaeeb53281dfa27dfb7013964"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "http2_fixture": true,
+  "socks_address_types": [
+    1,
+    3
+  ],
+  "async_pull_bytes": 134217728,
+  "runtime_samples": [
+    {
+      "received": 16068608,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 781220,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 32145408,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 781780,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 48226304,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 783360,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 64303104,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 809376,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 80379904,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 847800,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 96460800,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 858044,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 112537600,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 859176,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 128614400,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 859176,
+      "network_reserved": 75497554
+    },
+    {
+      "received": 134217728,
+      "heap_payload": 65514,
+      "handles": 7,
+      "tasks": 3,
+      "groups": 0,
+      "work": 1,
+      "rss_kib": 859176,
+      "network_reserved": 75497554
+    }
+  ],
+  "proxy_digest_events": [
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:46371/plain",
+      "digest_uri": "/plain",
+      "valid": true
+    },
+    {
+      "method": "CONNECT",
+      "request_target": "127.0.0.1:42193",
+      "digest_uri": "127.0.0.1:42193",
+      "valid": true
+    },
+    {
+      "method": "GET",
+      "request_target": "http://127.0.0.1:46371/plain",
+      "digest_uri": "/plain",
+      "valid": false
+    },
+    {
+      "method": "CONNECT",
+      "request_target": "127.0.0.1:42193",
+      "digest_uri": "127.0.0.1:42193",
+      "valid": false
+    }
+  ],
+  "required_h2_incompatible_requests": [],
+  "h2_paused_events": [
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 65536
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "window",
+      "delta": 10420225
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 65536
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "window",
+      "delta": 10420224
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 65536
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "window",
+      "delta": 10420224
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 1,
+      "event": "sent",
+      "bytes": 10485761
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 3,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    },
+    {
+      "peer_port": 52458,
+      "stream": 5,
+      "event": "sent",
+      "bytes": 10485760
+    }
+  ],
+  "h2_retry_events": [
+    {
+      "peer_port": 52438,
+      "stream": 9,
+      "bytes": 13,
+      "sha256": "164a2289531db8fb9ce2eb44abd292bc0d543635417adbac9f9c5d507eb9760f"
+    }
+  ],
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

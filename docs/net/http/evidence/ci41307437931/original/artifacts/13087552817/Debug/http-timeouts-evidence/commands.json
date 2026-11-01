@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/home/runner/work/Void.Language/Void.Language/build/Debug/void_http_timeouts",
+    "http://127.0.0.1:41059",
+    "https://127.0.0.1:44551",
+    "http://127.0.0.1:44551",
+    "https://127.0.0.1:40423",
+    "/tmp/VOID timeout 4e6dxgp0/cert.pem",
+    "/tmp/VOID timeout 4e6dxgp0/input.bin"
+  ],
+  "exit_code": 0
+}

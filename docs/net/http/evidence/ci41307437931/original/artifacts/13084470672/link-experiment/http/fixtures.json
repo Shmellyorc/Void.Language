@@ -1,0 +1,10 @@
+{
+  "versions": {
+    "h2": "4.4.1",
+    "hpack": "4.2.0",
+    "hyperframe": "6.1.0"
+  },
+  "certificate_tool": "/Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Debug/bin/openssl",
+  "python_ssl": "OpenSSL 3.0.16 11 Feb 2025",
+  "alpn": true
+}

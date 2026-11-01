@@ -1,0 +1,225 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+      "--prefix",
+      "/tmp/VOID HTTP installation 0gd3akim/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.29744471600133693
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+      "--prefix",
+      "/tmp/VOID HTTP installation 0gd3akim/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.12597790800282382
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.002101075999235036
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 18.647698994001985
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 16.68526349700187
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.42538585099828197
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 24.191011388000334
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 0gd3akim/program.o",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2108375919997343
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.426278425999044
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 17.356437944999925
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 14.868849900998612
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.4330471329994907
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 22.19230354499814
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 0gd3akim/program.o",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.21284336000098847
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.42946065500291297
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 2.8459602410002844
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 0gd3akim/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 0gd3akim/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 16.15108373000112
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 0gd3akim/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.42701100100020994
+  }
+]

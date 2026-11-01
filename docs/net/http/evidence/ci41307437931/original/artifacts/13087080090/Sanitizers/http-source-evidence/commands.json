@@ -1,0 +1,189 @@
+[
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+      "check",
+      "/tmp/VOID HTTP source 9wwm38et/sync.void"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+      "run",
+      "/tmp/VOID HTTP source 9wwm38et/sync.void"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+      "build",
+      "/tmp/VOID HTTP source 9wwm38et/sync.void",
+      "-o",
+      "/tmp/VOID HTTP source 9wwm38et/native-False"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source 9wwm38et/native-False"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+      "run",
+      "/tmp/VOID HTTP source 9wwm38et/sync.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+      "build",
+      "/tmp/VOID HTTP source 9wwm38et/sync.void",
+      "-o",
+      "/tmp/VOID HTTP source 9wwm38et/native-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source 9wwm38et/native-True"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+      "check",
+      "/tmp/VOID HTTP source 9wwm38et/async.void"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_source_runner",
+      "--async",
+      "/tmp/VOID HTTP source 9wwm38et/async.void"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_source_runner",
+      "--emit-async",
+      "/tmp/VOID HTTP source 9wwm38et/async.void",
+      "/tmp/VOID HTTP source 9wwm38et/async-normal.o",
+      "normal"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "/tmp/VOID HTTP source 9wwm38et/async-normal.o",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/libvoid_runtime.a",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/libvoid_native_fixture.a",
+      "--driver-mode=g++",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/curl/lib/libcurl.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libpsl.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libnghttp2.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libssl.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcrypto.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcares.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libidn2.so",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libunistring.so",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-o",
+      "/tmp/VOID HTTP source 9wwm38et/async-normal"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source 9wwm38et/async-normal",
+      "7"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_source_runner",
+      "--emit-async",
+      "/tmp/VOID HTTP source 9wwm38et/async.void",
+      "/tmp/VOID HTTP source 9wwm38et/async-optimized.o",
+      "optimized"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "/tmp/VOID HTTP source 9wwm38et/async-optimized.o",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/libvoid_runtime.a",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/libvoid_native_fixture.a",
+      "--driver-mode=g++",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/curl/lib/libcurl.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libpsl.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libnghttp2.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libssl.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcrypto.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libcares.a",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libidn2.so",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libunistring.so",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/home/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-o",
+      "/tmp/VOID HTTP source 9wwm38et/async-optimized"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP source 9wwm38et/async-optimized",
+      "7"
+    ],
+    "exit_code": 0,
+    "timed_out": false
+  }
+]

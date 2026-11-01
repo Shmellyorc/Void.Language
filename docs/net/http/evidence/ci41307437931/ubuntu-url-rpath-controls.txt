@@ -1,0 +1,32 @@
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+g++-14 is already the newest version (14.2.0-4ubuntu2~24.04.1).
+python3 is already the newest version (3.12.3-0ubuntu2.1).
+ninja-build is already the newest version (1.11.1-2).
+libffi-dev is already the newest version (3.4.6-1build1).
+libedit-dev is already the newest version (3.1-20230828-1build1).
+libxml2-dev is already the newest version (2.9.14+dfsg-1.3ubuntu3.10).
+libzstd-dev is already the newest version (1.5.5+dfsg2-2build1.1).
+zlib1g-dev is already the newest version (1:1.3.dfsg-3.1ubuntu2.3).
+libncurses-dev is already the newest version (6.4+20240113-1ubuntu2.2).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+ORIGINAL CHECKSUM 05abec6e5960daf39ed438d52c3c9fd9bb416bd8e3d837ee7830758b306db072 49298957ecb2656e0b2d5fc16c4c9105fbaf206dcb2ac39f05b362eb0db7097e
+	linux-vdso.so.1 (0x00007fc04bbc6000)
+	libidn2.so.0 => /lib/x86_64-linux-gnu/libidn2.so.0 (0x00007fc047dce000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fc047b50000)
+	libunistring.so.5 => /lib/x86_64-linux-gnu/libunistring.so.5 (0x00007fc0479a3000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fc0478ba000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fc04789e000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fc04786e000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fc04765b000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fc04bbc8000)
+installed 1 b'' b'URL boundary invariant failedCalled from /@stdlib/url.void::with_query\n/tmp/VOID HTTP installation emnohpn_/relocated \xe9\x9b\xaa # % installation/share/void/stdlib/url.void:158:32: source call\n    return _text("with_query", _url_with_query(value, items))\n                               ^\nCalled from /main.void::fetch\n/tmp/VOID HTTP installation emnohpn_/project \xe9\x9b\xaa # %/main.void:12:26: source call\n    var url_result = url.with_query(target, query)\n                         ^\nCalled from /main.void::$application\n/tmp/VOID HTTP installation emnohpn_/project \xe9\x9b\xaa # %/main.void:36:12: source call\n    return fetch(target)\n           ^\nCalled from /main.void::$app_adapter\n/tmp/VOID HTTP installation emnohpn_/project \xe9\x9b\xaa # %/main.void:1:1: source call\n\n'
+-- Removed runtime path from "/tmp/VOID HTTP installation emnohpn_/relocated 雪 # % installation/bin/voidc"
+diagnostic-installed 1 b'' b'URL DIAGNOSTIC: Pinned HTTP provider version/features do not match\nURL boundary invariant failedCalled from /@stdlib/url.void::with_query\n/tmp/VOID HTTP installation emnohpn_/relocated \xe9\x9b\xaa # % installation/share/void/stdlib/url.void:158:32: source call\n    return _text("with_query", _url_with_query(value, items))\n                               ^\nCalled from /main.void::fetch\n/tmp/VOID HTTP installation emnohpn_/project \xe9\x9b\xaa # %/main.void:12:26: source call\n    var url_result = url.with_query(target, query)\n                         ^\nCalled from /main.void::$application\n/tmp/VOID HTTP installation emnohpn_/project \xe9\x9b\xaa # %/main.void:36:12: source call\n    return fetch(target)\n           ^\nCalled from /main.void::$app_adapter\n/tmp/VOID HTTP installation emnohpn_/project \xe9\x9b\xaa # %/main.void:1:1: source call\n\n'
+build 0 b'Example JSON complete\n' b''

@@ -1,0 +1,10 @@
+-- Install configuration: "Release"
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/share/doc/nghttp2/README.rst
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include/nghttp2/nghttp2.h
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include/nghttp2/nghttp2ver.h
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/nghttp2/nghttp2Config.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/nghttp2/nghttp2ConfigVersion.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/nghttp2/nghttp2Targets.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/cmake/nghttp2/nghttp2Targets-release.cmake
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/libnghttp2.a
+-- Installing: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/pkgconfig/libnghttp2.pc

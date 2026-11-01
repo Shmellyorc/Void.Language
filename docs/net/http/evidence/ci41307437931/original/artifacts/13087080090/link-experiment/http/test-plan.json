@@ -1,0 +1,381 @@
+{
+  "total_registered": 379,
+  "http_url_tests": {
+    "http_native": {
+      "backtrace": 1,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/fixture.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_native",
+        "--http2",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-native-evidence"
+      ],
+      "name": "http_native",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_tls_memory": {
+      "backtrace": 3,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/tls_memory.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_tls_memory",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-tls-memory-evidence"
+      ],
+      "name": "http_tls_memory",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_reload": {
+      "backtrace": 5,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/reload.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_reload",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-reload-evidence"
+      ],
+      "name": "http_reload",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_timeouts": {
+      "backtrace": 7,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_timeouts",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-timeouts-evidence"
+      ],
+      "name": "http_timeouts",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 60.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_wire": {
+      "backtrace": 9,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/wire.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_wire",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-wire-evidence"
+      ],
+      "name": "http_wire",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_dns": {
+      "backtrace": 11,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/dns.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_dns",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-dns-evidence"
+      ],
+      "name": "http_dns",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "url_native": {
+      "backtrace": 13,
+      "command": [
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_url_native"
+      ],
+      "name": "url_native",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_examples": {
+      "backtrace": 15,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/examples.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_example_host",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-examples-evidence"
+      ],
+      "name": "http_examples",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_install": {
+      "backtrace": 17,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/install.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-install-evidence"
+      ],
+      "name": "http_install",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_bulk": {
+      "backtrace": 19,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/bulk.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_source_runner",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-bulk-evidence"
+      ],
+      "name": "http_bulk",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_ir": {
+      "backtrace": 21,
+      "command": [
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_ir",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/source_sync.void"
+      ],
+      "name": "http_ir",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_source": {
+      "backtrace": 23,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/source.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+        "--runner",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_source_runner",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-source-evidence"
+      ],
+      "name": "http_source",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_source_negative": {
+      "backtrace": 25,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/source_negative.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-source-negative-evidence"
+      ],
+      "name": "http_source_negative",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_source_faults": {
+      "backtrace": 27,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/source.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc",
+        "--runner",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_source_runner",
+        "--faults-only",
+        "--evidence",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/http-source-faults-evidence"
+      ],
+      "name": "http_source_faults",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "url_ir": {
+      "backtrace": 29,
+      "command": [
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_url_ir",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/url.void"
+      ],
+      "name": "url_ir",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "url_source": {
+      "backtrace": 31,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/url_source.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidc"
+      ],
+      "name": "url_source",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "url_lsp": {
+      "backtrace": 33,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/url_lsp.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidls"
+      ],
+      "name": "url_lsp",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    },
+    "http_lsp": {
+      "backtrace": 35,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.15/x64/bin/python3.12",
+        "/home/runner/work/Void.Language/Void.Language/tests/net/http/http_lsp.py",
+        "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/voidls"
+      ],
+      "name": "http_lsp",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/runner/work/Void.Language/Void.Language/build/Sanitizers"
+        }
+      ]
+    }
+  },
+  "execution": "Existing unfiltered CTest step; no HTTP exclusions or skips added",
+  "long_tests": [
+    "http_tls_memory",
+    "http_source_faults"
+  ],
+  "schannel_memory_note": "AWS-LC corpus is not registered on Windows; this is not a Schannel allocator audit"
+}

@@ -1,0 +1,8 @@
+{
+  "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+  "expected_sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+  "cached": true,
+  "actual_sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+  "bytes": 1502830,
+  "result": "verified"
+}

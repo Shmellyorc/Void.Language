@@ -1,0 +1,37 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers",
+      "--prefix",
+      "/tmp/VOID HTTP installation i6jinfzg/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.30191344000013487
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/runner/work/Void.Language/Void.Language/build/Sanitizers",
+      "--prefix",
+      "/tmp/VOID HTTP installation i6jinfzg/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1013462260000324
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation i6jinfzg/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation i6jinfzg/project \u96ea # %/main.void"
+    ],
+    "exit_code": 1,
+    "seconds": 10.29358022800011
+  }
+]

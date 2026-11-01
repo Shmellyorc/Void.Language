@@ -1,0 +1,37 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/runner/work/Void.Language/Void.Language/build/Debug",
+      "--prefix",
+      "/tmp/VOID HTTP installation qarf23gc/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.21526182299999164
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/runner/work/Void.Language/Void.Language/build/Debug",
+      "--prefix",
+      "/tmp/VOID HTTP installation qarf23gc/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.03330271400000129
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation qarf23gc/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation qarf23gc/project \u96ea # %/main.void"
+    ],
+    "exit_code": 1,
+    "seconds": 13.60943618300007
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "head": "77d676d0fc1149e36dd8d19a0e1602e053653fa7",
+  "readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "workflow_sha256": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1",
+  "zlib_before": {
+    "name": "zlib",
+    "version": "1.3.2",
+    "archive": "zlib-1.3.2.tar.gz",
+    "url": "https://zlib.net/zlib-1.3.2.tar.gz",
+    "sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+    "license": "Zlib",
+    "link": "static"
+  },
+  "zlib_after": {
+    "name": "zlib",
+    "version": "1.3.2",
+    "archive": "zlib-1.3.2.tar.gz",
+    "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+    "sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+    "license": "Zlib",
+    "link": "static"
+  }
+}

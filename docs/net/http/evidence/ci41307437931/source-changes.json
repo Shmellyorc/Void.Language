@@ -1,0 +1,58 @@
+{
+  ".gitattributes": {
+    "baseline_sha256": null,
+    "sha256": "97bedd5eb4fd355c203aee4cab84de21f6928a21f701f9fd86f59ca438082aff"
+  },
+  "CMakeLists.txt": {
+    "baseline_sha256": "b35dd11b698c2cb8d776762bcf123d9a01264601e62fd7c5aca5115d28446184",
+    "sha256": "3d29315ad1a482ceb61bf0cd4d662cff87444f8ab82c21dfc2fe97bfeb374ccf"
+  },
+  "cmake/CurlProvider.cmake": {
+    "baseline_sha256": "18c53da59bd5c62f072c7f5c12aa9aa32d35bb484ad9c8a72888575ec557e608",
+    "sha256": "a3eb75e505ab269cf4d43bf2a335863a3191987ad4550746fb85a759c2fbc16f"
+  },
+  "cmake/CurlProviderFeatures.cmake": {
+    "baseline_sha256": null,
+    "sha256": "cd61e1b5f721add7e5a24ebb9b0362c7b312e03a13784c45fe583ade58b0fe0a"
+  },
+  "cmake/NativeBuild.cmake": {
+    "baseline_sha256": "eb3784fc96abc93d4ae4193e753a8fdb84df0aee37e45c92f3c1608e2ec27643",
+    "sha256": "9ee87824d83a6c849c52bf89dd4276441520cf3b9d242d53bf75762245ca3b65"
+  },
+  "tests/net/http/ci_bootstrap_test.py": {
+    "baseline_sha256": "02b8edadb5b2bbfe31ca4e0bddaa040fcce544e9ac4e20ca6aa8e578696ac5b0",
+    "sha256": "fbe7287bef01f86160308ea0c4c0abc450d7f59949859b6815a64160e0de9c54"
+  },
+  "tests/net/http/ci_triage_test.py": {
+    "baseline_sha256": null,
+    "sha256": "b430e96191e1df3f1d3bb890091218dc1445db6f7af1e96d02f2b54a73d4a226"
+  },
+  "tests/net/http/install.py": {
+    "baseline_sha256": "37152fa4a91969960a11afb65e8a9728ae183614de05e18bec557bfd9fef9aa8",
+    "sha256": "2ba43bc597d9c46e3524806302cee53b4bec8132bce34f9f1b44eb595dbb469c"
+  },
+  "third_party/http-versions.json": {
+    "baseline_sha256": "2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb",
+    "sha256": "31cd4d768966d355cbf93552a1f7aa5da1a60d375da2dc61253c4209ec443526"
+  },
+  "tools/ci/http_bootstrap.py": {
+    "baseline_sha256": "2c22489247becb1d0055207837a283901367bab7569555df5ddf3fa64ceba0eb",
+    "sha256": "2794e78404f65a851d052efb8de81f1781c87c91ff02c6ff9b6dedb5edac0f25"
+  },
+  "tools/http_archive.py": {
+    "baseline_sha256": null,
+    "sha256": "b9b0f376e121f8598200a2d2056e97ecf4bb7c000a5fd28f3222c54c063c1fd6"
+  },
+  "tools/setup_http_deps.py": {
+    "baseline_sha256": "4f5dae2358c9e757bf19747149faec7aca4cb3b03e2e7745a65a1e81e24151c6",
+    "sha256": "446f9778732959889f8f3934d57e8b63ba53c182b8e82057b25eac7e07486f09"
+  },
+  "tools/setup_http_deps_native.py": {
+    "baseline_sha256": "ec73a9cc0093cf827d38749e685ea8dc322f6a9fad5c5de5ba271fc7101fdce6",
+    "sha256": "bdc5d5517cc74e917ae584556b19b5e1fe4918e517b1b1dc0db73fc5cc5a7663"
+  },
+  "docs/net/http/CI41307437931_TRIAGE.md": {
+    "baseline_sha256": null,
+    "sha256": "fe5e48d01eac3c99f5b667ad93dd1b6a6cb2249332c204fc85e6f11d2abc9f65"
+  }
+}

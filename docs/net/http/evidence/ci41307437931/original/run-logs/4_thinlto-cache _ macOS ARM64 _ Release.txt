@@ -1,0 +1,1582 @@
+﻿2026-11-01T12:38:18.2838490Z Current runner version: '2.338.2'
+2026-11-01T12:38:18.2852240Z ##[group]Runner Image Provisioner
+2026-11-01T12:38:18.2852730Z Hosted Compute Agent
+2026-11-01T12:38:18.2853080Z Version: 20261021.618
+2026-11-01T12:38:18.2853460Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-11-01T12:38:18.2853900Z Build Date: 2026-10-21T00:45:21Z
+2026-11-01T12:38:18.2854310Z Worker ID: {c2788e14-196d-47a7-afe0-b12058067726}
+2026-11-01T12:38:18.2854740Z Region: westus
+2026-11-01T12:38:18.2855070Z Cloud: MacCloud
+2026-11-01T12:38:18.2855410Z ##[endgroup]
+2026-11-01T12:38:18.2856190Z ##[group]Operating System
+2026-11-01T12:38:18.2856550Z macOS
+2026-11-01T12:38:18.2856850Z 26.6.2
+2026-11-01T12:38:18.2857150Z 25G83
+2026-11-01T12:38:18.2857460Z ##[endgroup]
+2026-11-01T12:38:18.2857790Z ##[group]Runner Image
+2026-11-01T12:38:18.2858140Z Image: macos-26-arm64
+2026-11-01T12:38:18.2858490Z Version: 20261026.0455.2
+2026-11-01T12:38:18.2859260Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20261026.0455/images/macos/macos-26-arm64-Readme.md
+2026-11-01T12:38:18.2860230Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20261026.0455
+2026-11-01T12:38:18.2860860Z ##[endgroup]
+2026-11-01T12:38:18.2861530Z ##[group]GITHUB_TOKEN Permissions
+2026-11-01T12:38:18.2862420Z Contents: read
+2026-11-01T12:38:18.2862760Z Metadata: read
+2026-11-01T12:38:18.2863100Z ##[endgroup]
+2026-11-01T12:38:18.2864440Z Secret source: Actions
+2026-11-01T12:38:18.2864970Z Cache mode: write
+2026-11-01T12:38:18.2865400Z Prepare workflow directory
+2026-11-01T12:38:18.3185440Z Prepare all required actions
+2026-11-01T12:38:18.3217960Z Getting action download info
+2026-11-01T12:38:18.7167710Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+2026-11-01T12:38:19.1219100Z Download action repository 'actions/setup-python@v6' (SHA:ece7cb06caefa5fff74198d8649806c4678c61a1)
+2026-11-01T12:38:19.3235360Z Download action repository 'ilammy/msvc-dev-cmd@v1' (SHA:0b201ec74fa43914dc39ae48a89fd1d8cb592756)
+2026-11-01T12:38:19.7188730Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+2026-11-01T12:38:19.8314050Z Download action repository 'actions/setup-node@v5' (SHA:a0853c24544627f65ddf259abe73b1d18a591444)
+2026-11-01T12:38:19.9971980Z Download action repository 'actions/upload-artifact@v6' (SHA:b7c566a772e6b6bfb58ed0dc250532a479d7789f)
+2026-11-01T12:38:20.2980370Z Complete job name: thinlto-cache / macOS ARM64 / Release
+2026-11-01T12:38:20.3815640Z ##[group]Run actions/checkout@v5
+2026-11-01T12:38:20.3816370Z with:
+2026-11-01T12:38:20.3816730Z   repository: Shmellyorc/Void.Language
+2026-11-01T12:38:20.3819810Z   token: ***
+2026-11-01T12:38:20.3820130Z   ssh-strict: true
+2026-11-01T12:38:20.3820450Z   ssh-user: git
+2026-11-01T12:38:20.3820760Z   persist-credentials: true
+2026-11-01T12:38:20.3821100Z   clean: true
+2026-11-01T12:38:20.3821420Z   sparse-checkout-cone-mode: true
+2026-11-01T12:38:20.3821790Z   fetch-depth: 1
+2026-11-01T12:38:20.3822120Z   fetch-tags: false
+2026-11-01T12:38:20.3822440Z   show-progress: true
+2026-11-01T12:38:20.3822760Z   lfs: false
+2026-11-01T12:38:20.3823060Z   submodules: false
+2026-11-01T12:38:20.3823400Z   set-safe-directory: true
+2026-11-01T12:38:20.3823760Z   allow-unsafe-pr-checkout: false
+2026-11-01T12:38:20.3824310Z env:
+2026-11-01T12:38:20.3824620Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:20.3825000Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:20.3825600Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:20.3826250Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:20.3826790Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:20.3827430Z ##[endgroup]
+2026-11-01T12:38:20.8230890Z Syncing repository: Shmellyorc/Void.Language
+2026-11-01T12:38:20.8232280Z ##[group]Getting Git version info
+2026-11-01T12:38:20.8232920Z Working directory is '/Users/runner/work/Void.Language/Void.Language'
+2026-11-01T12:38:20.8235210Z [command]/opt/homebrew/bin/git version
+2026-11-01T12:38:20.8556030Z git version 2.56.0
+2026-11-01T12:38:20.8573330Z ##[endgroup]
+2026-11-01T12:38:20.8586630Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/0fcf5462-9fcb-4b8c-bd39-49006efc26e4/.gitconfig'
+2026-11-01T12:38:20.8595580Z Temporarily overriding HOME='/Users/runner/work/_temp/0fcf5462-9fcb-4b8c-bd39-49006efc26e4' before making global git config changes
+2026-11-01T12:38:20.8596840Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-01T12:38:20.8599660Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Void.Language/Void.Language
+2026-11-01T12:38:20.8726220Z Deleting the contents of '/Users/runner/work/Void.Language/Void.Language'
+2026-11-01T12:38:20.8731270Z ##[group]Initializing the repository
+2026-11-01T12:38:20.8734820Z [command]/opt/homebrew/bin/git init /Users/runner/work/Void.Language/Void.Language
+2026-11-01T12:38:20.8974760Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-01T12:38:20.8975880Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-01T12:38:20.8976770Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-01T12:38:20.8977340Z hint: call:
+2026-11-01T12:38:20.8977660Z hint:
+2026-11-01T12:38:20.8978070Z hint: 	git config --global init.defaultBranch <name>
+2026-11-01T12:38:20.8979240Z hint:
+2026-11-01T12:38:20.8979850Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-01T12:38:20.8980680Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-01T12:38:20.8981260Z hint:
+2026-11-01T12:38:20.8981560Z hint: 	git branch -m <name>
+2026-11-01T12:38:20.8981900Z hint:
+2026-11-01T12:38:20.8982410Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-01T12:38:20.8987250Z Initialized empty Git repository in /Users/runner/work/Void.Language/Void.Language/.git/
+2026-11-01T12:38:20.8995480Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Shmellyorc/Void.Language
+2026-11-01T12:38:20.9084760Z ##[endgroup]
+2026-11-01T12:38:20.9088630Z ##[group]Disabling automatic garbage collection
+2026-11-01T12:38:20.9089260Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-11-01T12:38:20.9172100Z ##[endgroup]
+2026-11-01T12:38:20.9172740Z ##[group]Setting up auth
+2026-11-01T12:38:20.9177740Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-01T12:38:20.9252670Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-01T12:38:21.0393590Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-01T12:38:21.0461180Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-01T12:38:21.1385090Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-01T12:38:21.1458640Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-01T12:38:21.2164020Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-01T12:38:21.2223910Z ##[endgroup]
+2026-11-01T12:38:21.2224620Z ##[group]Fetching the repository
+2026-11-01T12:38:21.2229430Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +77d676d0fc1149e36dd8d19a0e1602e053653fa7:refs/remotes/origin/main
+2026-11-01T12:38:31.1605300Z From https://github.com/Shmellyorc/Void.Language
+2026-11-01T12:38:31.1612240Z  * [new ref]           77d676d0fc1149e36dd8d19a0e1602e053653fa7 -> origin/main
+2026-11-01T12:38:31.1614930Z ##[endgroup]
+2026-11-01T12:38:31.1615480Z ##[group]Determining the checkout info
+2026-11-01T12:38:31.1616050Z ##[endgroup]
+2026-11-01T12:38:31.1620640Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-11-01T12:38:31.1715910Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-01T12:38:31.1796070Z ##[group]Checking out the ref
+2026-11-01T12:38:31.1799250Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-01T12:38:32.3600020Z Updating files:  12% (7967/64595)
+2026-11-01T12:38:32.4334060Z Updating files:  13% (8398/64595)
+2026-11-01T12:38:32.4984340Z Updating files:  14% (9044/64595)
+2026-11-01T12:38:32.5691740Z Updating files:  15% (9690/64595)
+2026-11-01T12:38:32.6599790Z Updating files:  16% (10336/64595)
+2026-11-01T12:38:32.7302700Z Updating files:  17% (10982/64595)
+2026-11-01T12:38:32.8233940Z Updating files:  18% (11628/64595)
+2026-11-01T12:38:32.9176620Z Updating files:  19% (12274/64595)
+2026-11-01T12:38:32.9779770Z Updating files:  20% (12919/64595)
+2026-11-01T12:38:33.0420790Z Updating files:  21% (13565/64595)
+2026-11-01T12:38:33.1131760Z Updating files:  22% (14211/64595)
+2026-11-01T12:38:33.1780700Z Updating files:  23% (14857/64595)
+2026-11-01T12:38:33.2377390Z Updating files:  24% (15503/64595)
+2026-11-01T12:38:33.2378460Z Updating files:  25% (16149/64595)
+2026-11-01T12:38:33.3266850Z Updating files:  25% (16151/64595)
+2026-11-01T12:38:33.3928400Z Updating files:  26% (16795/64595)
+2026-11-01T12:38:33.4686020Z Updating files:  27% (17441/64595)
+2026-11-01T12:38:33.5320790Z Updating files:  28% (18087/64595)
+2026-11-01T12:38:33.6109670Z Updating files:  29% (18733/64595)
+2026-11-01T12:38:33.6737250Z Updating files:  30% (19379/64595)
+2026-11-01T12:38:33.7500900Z Updating files:  31% (20025/64595)
+2026-11-01T12:38:33.8117220Z Updating files:  32% (20671/64595)
+2026-11-01T12:38:33.8811980Z Updating files:  33% (21317/64595)
+2026-11-01T12:38:33.9481190Z Updating files:  34% (21963/64595)
+2026-11-01T12:38:34.0141480Z Updating files:  35% (22609/64595)
+2026-11-01T12:38:34.0904890Z Updating files:  36% (23255/64595)
+2026-11-01T12:38:34.1618680Z Updating files:  37% (23901/64595)
+2026-11-01T12:38:34.2431950Z Updating files:  38% (24547/64595)
+2026-11-01T12:38:34.2546640Z Updating files:  38% (25061/64595)
+2026-11-01T12:38:34.3315060Z Updating files:  39% (25193/64595)
+2026-11-01T12:38:34.4210320Z Updating files:  40% (25838/64595)
+2026-11-01T12:38:34.4989760Z Updating files:  41% (26484/64595)
+2026-11-01T12:38:34.5842100Z Updating files:  42% (27130/64595)
+2026-11-01T12:38:34.6565320Z Updating files:  43% (27776/64595)
+2026-11-01T12:38:34.7112270Z Updating files:  44% (28422/64595)
+2026-11-01T12:38:34.7692990Z Updating files:  45% (29068/64595)
+2026-11-01T12:38:34.8327380Z Updating files:  46% (29714/64595)
+2026-11-01T12:38:34.8828770Z Updating files:  47% (30360/64595)
+2026-11-01T12:38:34.9715610Z Updating files:  48% (31006/64595)
+2026-11-01T12:38:35.0926630Z Updating files:  49% (31652/64595)
+2026-11-01T12:38:35.2137040Z Updating files:  50% (32298/64595)
+2026-11-01T12:38:35.2400780Z Updating files:  51% (32944/64595)
+2026-11-01T12:38:35.3682060Z Updating files:  51% (32957/64595)
+2026-11-01T12:38:35.5233310Z Updating files:  52% (33590/64595)
+2026-11-01T12:38:35.6972040Z Updating files:  53% (34236/64595)
+2026-11-01T12:38:35.8636020Z Updating files:  54% (34882/64595)
+2026-11-01T12:38:36.0344880Z Updating files:  55% (35528/64595)
+2026-11-01T12:38:36.1602000Z Updating files:  56% (36174/64595)
+2026-11-01T12:38:36.2475530Z Updating files:  57% (36820/64595)
+2026-11-01T12:38:36.2725960Z Updating files:  57% (37298/64595)
+2026-11-01T12:38:36.4259370Z Updating files:  58% (37466/64595)
+2026-11-01T12:38:36.5754670Z Updating files:  59% (38112/64595)
+2026-11-01T12:38:36.8099480Z Updating files:  60% (38757/64595)
+2026-11-01T12:38:37.0944120Z Updating files:  61% (39403/64595)
+2026-11-01T12:38:37.2414930Z Updating files:  62% (40049/64595)
+2026-11-01T12:38:37.2577700Z Updating files:  62% (40661/64595)
+2026-11-01T12:38:37.4033000Z Updating files:  63% (40695/64595)
+2026-11-01T12:38:37.5472540Z Updating files:  64% (41341/64595)
+2026-11-01T12:38:37.7130400Z Updating files:  65% (41987/64595)
+2026-11-01T12:38:37.8531440Z Updating files:  66% (42633/64595)
+2026-11-01T12:38:37.9979880Z Updating files:  67% (43279/64595)
+2026-11-01T12:38:38.4028810Z Updating files:  68% (43925/64595)
+2026-11-01T12:38:39.2929410Z Updating files:  68% (44329/64595)
+2026-11-01T12:38:40.2880120Z Updating files:  68% (44372/64595)
+2026-11-01T12:38:41.3315020Z Updating files:  68% (44472/64595)
+2026-11-01T12:38:41.3726340Z Updating files:  68% (44562/64595)
+2026-11-01T12:38:42.2814140Z Updating files:  69% (44571/64595)
+2026-11-01T12:38:43.2494790Z Updating files:  69% (44642/64595)
+2026-11-01T12:38:43.5324850Z Updating files:  69% (44704/64595)
+2026-11-01T12:38:43.6926420Z Updating files:  70% (45217/64595)
+2026-11-01T12:38:43.8104270Z Updating files:  71% (45863/64595)
+2026-11-01T12:38:43.9776820Z Updating files:  72% (46509/64595)
+2026-11-01T12:38:44.1396640Z Updating files:  73% (47155/64595)
+2026-11-01T12:38:44.2380730Z Updating files:  74% (47801/64595)
+2026-11-01T12:38:44.2749820Z Updating files:  74% (48173/64595)
+2026-11-01T12:38:44.3829870Z Updating files:  75% (48447/64595)
+2026-11-01T12:38:44.5151780Z Updating files:  76% (49093/64595)
+2026-11-01T12:38:44.7135790Z Updating files:  77% (49739/64595)
+2026-11-01T12:38:44.8795250Z Updating files:  78% (50385/64595)
+2026-11-01T12:38:45.0722080Z Updating files:  79% (51031/64595)
+2026-11-01T12:38:45.2444030Z Updating files:  80% (51676/64595)
+2026-11-01T12:38:45.2626470Z Updating files:  80% (52294/64595)
+2026-11-01T12:38:45.4263350Z Updating files:  81% (52322/64595)
+2026-11-01T12:38:45.6110000Z Updating files:  82% (52968/64595)
+2026-11-01T12:38:45.7688220Z Updating files:  83% (53614/64595)
+2026-11-01T12:38:45.9242380Z Updating files:  84% (54260/64595)
+2026-11-01T12:38:46.0937740Z Updating files:  85% (54906/64595)
+2026-11-01T12:38:46.2433480Z Updating files:  86% (55552/64595)
+2026-11-01T12:38:46.2819380Z Updating files:  86% (56185/64595)
+2026-11-01T12:38:46.3981920Z Updating files:  87% (56198/64595)
+2026-11-01T12:38:46.5234630Z Updating files:  88% (56844/64595)
+2026-11-01T12:38:46.6829760Z Updating files:  89% (57490/64595)
+2026-11-01T12:38:46.8368570Z Updating files:  90% (58136/64595)
+2026-11-01T12:38:46.9914150Z Updating files:  91% (58782/64595)
+2026-11-01T12:38:47.1816510Z Updating files:  92% (59428/64595)
+2026-11-01T12:38:47.2389330Z Updating files:  93% (60074/64595)
+2026-11-01T12:38:47.2691790Z Updating files:  93% (60561/64595)
+2026-11-01T12:38:47.4126590Z Updating files:  94% (60720/64595)
+2026-11-01T12:38:47.5239410Z Updating files:  95% (61366/64595)
+2026-11-01T12:38:47.6601740Z Updating files:  96% (62012/64595)
+2026-11-01T12:38:47.8053510Z Updating files:  97% (62658/64595)
+2026-11-01T12:38:47.8941800Z Updating files:  98% (63304/64595)
+2026-11-01T12:38:48.1539750Z Updating files:  99% (63950/64595)
+2026-11-01T12:38:48.1540880Z Updating files: 100% (64595/64595)
+2026-11-01T12:38:48.1541770Z Updating files: 100% (64595/64595), done.
+2026-11-01T12:38:48.2477700Z Switched to a new branch 'main'
+2026-11-01T12:38:48.2487980Z branch 'main' set up to track 'origin/main'.
+2026-11-01T12:38:48.2598880Z ##[endgroup]
+2026-11-01T12:38:48.2824750Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-11-01T12:38:48.2920320Z 77d676d0fc1149e36dd8d19a0e1602e053653fa7
+2026-11-01T12:38:48.3374210Z ##[group]Run actions/setup-python@v6
+2026-11-01T12:38:48.3374500Z with:
+2026-11-01T12:38:48.3374750Z   python-version: 3.12
+2026-11-01T12:38:48.3374960Z   check-latest: false
+2026-11-01T12:38:48.3377220Z   token: ***
+2026-11-01T12:38:48.3377420Z   update-environment: true
+2026-11-01T12:38:48.3377700Z   allow-prereleases: false
+2026-11-01T12:38:48.3377930Z   freethreaded: false
+2026-11-01T12:38:48.3378130Z env:
+2026-11-01T12:38:48.3378330Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:48.3384700Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:48.3385170Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:48.3385670Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:48.3386030Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:48.3386300Z ##[endgroup]
+2026-11-01T12:38:48.5559560Z ##[group]Installed versions
+2026-11-01T12:38:48.5692120Z Successfully set up CPython (3.12.10)
+2026-11-01T12:38:48.5693460Z ##[endgroup]
+2026-11-01T12:38:48.5818120Z ##[group]Run import os
+2026-11-01T12:38:48.5819070Z [36;1mimport os[0m
+2026-11-01T12:38:48.5819280Z [36;1mfrom pathlib import Path[0m
+2026-11-01T12:38:48.5819500Z [36;1mimport tempfile[0m
+2026-11-01T12:38:48.5819770Z [36;1mimport textwrap[0m
+2026-11-01T12:38:48.5819970Z [36;1m[0m
+2026-11-01T12:38:48.5820350Z [36;1mcache = Path(tempfile.mkdtemp(prefix='void-thinlto-', dir=os.environ['RUNNER_TEMP'])).resolve()[0m
+2026-11-01T12:38:48.5820910Z [36;1mhelper = cache.parent / (cache.name + '.py')[0m
+2026-11-01T12:38:48.5821270Z [36;1mhelper.write_text(textwrap.dedent(r'''[0m
+2026-11-01T12:38:48.5821530Z [36;1mimport csv[0m
+2026-11-01T12:38:48.5821710Z [36;1mimport hashlib[0m
+2026-11-01T12:38:48.5821920Z [36;1mimport json[0m
+2026-11-01T12:38:48.5822100Z [36;1mimport os[0m
+2026-11-01T12:38:48.5822290Z [36;1mfrom pathlib import Path[0m
+2026-11-01T12:38:48.5822510Z [36;1mimport platform[0m
+2026-11-01T12:38:48.5822710Z [36;1mimport shutil[0m
+2026-11-01T12:38:48.5823000Z [36;1mimport subprocess[0m
+2026-11-01T12:38:48.5823190Z [36;1mimport sys[0m
+2026-11-01T12:38:48.5823370Z [36;1mimport time[0m
+2026-11-01T12:38:48.5823540Z [36;1m[0m
+2026-11-01T12:38:48.5823700Z [36;1mphase = sys.argv[1][0m
+2026-11-01T12:38:48.5824150Z [36;1mconfiguration = os.environ['EXPERIMENT_CONFIGURATION'][0m
+2026-11-01T12:38:48.5824490Z [36;1mmode = os.environ['EXPERIMENT_MODE'][0m
+2026-11-01T12:38:48.5824750Z [36;1mbuild = Path('build') / configuration[0m
+2026-11-01T12:38:48.5825050Z [36;1mevidence = Path(os.environ['EXPERIMENT_DIR'])[0m
+2026-11-01T12:38:48.5825360Z [36;1mcache = Path(os.environ['THINLTO_CACHE_DIR'])[0m
+2026-11-01T12:38:48.5825650Z [36;1mevidence.mkdir(parents=True, exist_ok=True)[0m
+2026-11-01T12:38:48.5825900Z [36;1m[0m
+2026-11-01T12:38:48.5826060Z [36;1mdef save(name, value):[0m
+2026-11-01T12:38:48.5826420Z [36;1m    (evidence / name).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')[0m
+2026-11-01T12:38:48.5826760Z [36;1m[0m
+2026-11-01T12:38:48.5826910Z [36;1mdef cache_size():[0m
+2026-11-01T12:38:48.5827160Z [36;1m    files = [p for p in cache.rglob('*') if p.is_file()][0m
+2026-11-01T12:38:48.5827510Z [36;1m    return {'directory': str(cache), 'files': len(files),[0m
+2026-11-01T12:38:48.5827860Z [36;1m            'bytes': sum(p.stat().st_size for p in files)}[0m
+2026-11-01T12:38:48.5828120Z [36;1m[0m
+2026-11-01T12:38:48.5828280Z [36;1mdef identity():[0m
+2026-11-01T12:38:48.5828560Z [36;1m    commands = [['git', 'rev-parse', 'HEAD'], ['git', 'status', '--short'],[0m
+2026-11-01T12:38:48.5828940Z [36;1m                ['cmake', '--version'], ['ninja', '--version']][0m
+2026-11-01T12:38:48.5829280Z [36;1m    for key in ('CC', 'CXX', 'VOID_CLANG', 'VOID_LINKER'):[0m
+2026-11-01T12:38:48.5829580Z [36;1m        if os.environ.get(key):[0m
+2026-11-01T12:38:48.5829880Z [36;1m            commands.append([os.environ[key], '--version'])[0m
+2026-11-01T12:38:48.5830190Z [36;1m    if platform.system() == 'Linux':[0m
+2026-11-01T12:38:48.5830500Z [36;1m        commands += [['lscpu'], ['cat', '/proc/meminfo']][0m
+2026-11-01T12:38:48.5830800Z [36;1m    elif platform.system() == 'Darwin':[0m
+2026-11-01T12:38:48.5831150Z [36;1m        commands += [['xcodebuild', '-version'], ['xcrun', '--show-sdk-path'],[0m
+2026-11-01T12:38:48.5831550Z [36;1m                     ['xcrun', 'ld', '-v'], ['sysctl', 'hw'], ['vm_stat']][0m
+2026-11-01T12:38:48.5831850Z [36;1m    else:[0m
+2026-11-01T12:38:48.5832610Z [36;1m        commands += [['where.exe', 'link'], ['link.exe'],[0m
+2026-11-01T12:38:48.5832950Z [36;1m                     ['powershell', '-NoProfile', '-Command',[0m
+2026-11-01T12:38:48.5833590Z [36;1m                      'Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,TotalVisibleMemorySize,FreePhysicalMemory | ConvertTo-Json; '[0m
+2026-11-01T12:38:48.5834490Z [36;1m                      'Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors | ConvertTo-Json']][0m
+2026-11-01T12:38:48.5835220Z [36;1m    records = [][0m
+2026-11-01T12:38:48.5835430Z [36;1m    for command in commands:[0m
+2026-11-01T12:38:48.5835630Z [36;1m        try:[0m
+2026-11-01T12:38:48.5836030Z [36;1m            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors='replace')[0m
+2026-11-01T12:38:48.5836700Z [36;1m            records.append({'argv': command, 'exit_code': result.returncode, 'output': result.stdout})[0m
+2026-11-01T12:38:48.5837100Z [36;1m        except OSError as error:[0m
+2026-11-01T12:38:48.5837390Z [36;1m            records.append({'argv': command, 'error': str(error)})[0m
+2026-11-01T12:38:48.5837680Z [36;1m    save('identity.json', {[0m
+2026-11-01T12:38:48.5838060Z [36;1m        'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),[0m
+2026-11-01T12:38:48.5838590Z [36;1m        'dispatch_sha': os.environ.get('GITHUB_SHA'), 'mode': mode, 'configuration': configuration,[0m
+2026-11-01T12:38:48.5839290Z [36;1m        'run_id': os.environ.get('GITHUB_RUN_ID'), 'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),[0m
+2026-11-01T12:38:48.5839880Z [36;1m        'runner_os': os.environ.get('RUNNER_OS'), 'runner_arch': os.environ.get('RUNNER_ARCH'),[0m
+2026-11-01T12:38:48.5840350Z [36;1m        'platform': platform.platform(), 'logical_cpus': os.cpu_count(),[0m
+2026-11-01T12:38:48.5840750Z [36;1m        'environment': {key: os.environ.get(key) for key in[0m
+2026-11-01T12:38:48.5841140Z [36;1m                        ('CC', 'CXX', 'LLVM_DIR', 'VOID_CLANG', 'VOID_LINKER', 'SDKROOT',[0m
+2026-11-01T12:38:48.5841630Z [36;1m                         'VCToolsVersion', 'WindowsSDKVersion', 'ASAN_OPTIONS', 'UBSAN_OPTIONS')},[0m
+2026-11-01T12:38:48.5842240Z [36;1m        'workflow_sha256': hashlib.sha256(Path('.github/workflows/ci-link-experiment.yml').read_bytes()).hexdigest(),[0m
+2026-11-01T12:38:48.5842710Z [36;1m        'tools_and_host': records,[0m
+2026-11-01T12:38:48.5843110Z [36;1m    })[0m
+2026-11-01T12:38:48.5843310Z [36;1m[0m
+2026-11-01T12:38:48.5843510Z [36;1mdef link_targets():[0m
+2026-11-01T12:38:48.5843830Z [36;1m    result = subprocess.run(['ninja', '-C', str(build), '-t', 'targets', 'all'],[0m
+2026-11-01T12:38:48.5844280Z [36;1m                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)[0m
+2026-11-01T12:38:48.5844750Z [36;1m    (evidence / 'ninja-targets.txt').write_text(result.stdout, encoding='utf-8')[0m
+2026-11-01T12:38:48.5845300Z [36;1m    result.check_returncode()[0m
+2026-11-01T12:38:48.5845680Z [36;1m    return {line.rsplit(': ', 1)[0] for line in result.stdout.splitlines()[0m
+2026-11-01T12:38:48.5846100Z [36;1m            if ': ' in line and 'EXECUTABLE_LINKER' in line.rsplit(': ', 1)[1]}[0m
+2026-11-01T12:38:48.5846500Z [36;1m[0m
+2026-11-01T12:38:48.5846660Z [36;1mdef link_times(label, previous):[0m
+2026-11-01T12:38:48.5846910Z [36;1m    log = build / '.ninja_log'[0m
+2026-11-01T12:38:48.5847190Z [36;1m    if not log.exists():[0m
+2026-11-01T12:38:48.5847400Z [36;1m        return[0m
+2026-11-01T12:38:48.5847720Z [36;1m    shutil.copy2(log, evidence / f'{label}.ninja_log')[0m
+2026-11-01T12:38:48.5848670Z [36;1m    targets = link_targets()[0m
+2026-11-01T12:38:48.5849090Z [36;1m    with (evidence / f'{label}-links.csv').open('w', newline='', encoding='utf-8') as output:[0m
+2026-11-01T12:38:48.5849500Z [36;1m        writer = csv.writer(output)[0m
+2026-11-01T12:38:48.5849930Z [36;1m        writer.writerow(['output', 'start_ms', 'end_ms', 'duration_ms'])[0m
+2026-11-01T12:38:48.5850600Z [36;1m        for line in log.read_text(encoding='utf-8').splitlines():[0m
+2026-11-01T12:38:48.5850940Z [36;1m            fields = line.split('\t')[0m
+2026-11-01T12:38:48.5851360Z [36;1m            if line not in previous and len(fields) == 5 and fields[3] in targets:[0m
+2026-11-01T12:38:48.5851950Z [36;1m                writer.writerow([fields[3], fields[0], fields[1], int(fields[1]) - int(fields[0])])[0m
+2026-11-01T12:38:48.5852480Z [36;1m[0m
+2026-11-01T12:38:48.5852630Z [36;1mprevious = set()[0m
+2026-11-01T12:38:48.5852840Z [36;1mif phase == 'configure':[0m
+2026-11-01T12:38:48.5853060Z [36;1m    identity()[0m
+2026-11-01T12:38:48.5854050Z [36;1m    # Fresh build and cache: the ORC probe may prime SDK entries before the full build.[0m
+2026-11-01T12:38:48.5854750Z [36;1m    assert not (build / 'CMakeCache.txt').exists() and not (build / '.ninja_log').exists()[0m
+2026-11-01T12:38:48.5856110Z [36;1m    assert cache_size()['files'] == 0[0m
+2026-11-01T12:38:48.5856540Z [36;1m    command = ['cmake', '-S', '.', '-B', str(build), '-G', 'Ninja',[0m
+2026-11-01T12:38:48.5857170Z [36;1m               '-DCMAKE_BUILD_TYPE=' + ('RelWithDebInfo' if configuration == 'Sanitizers' else configuration),[0m
+2026-11-01T12:38:48.5857950Z [36;1m               '-DVOID_SANITIZERS=' + ('ON' if configuration == 'Sanitizers' else 'OFF'),[0m
+2026-11-01T12:38:48.5858440Z [36;1m               '-DLLVM_DIR=' + os.environ['LLVM_DIR'], '-DVOID_CLANG=' + os.environ['VOID_CLANG'],[0m
+2026-11-01T12:38:48.5859380Z [36;1m               '-DVOID_LINKER=' + os.environ.get('VOID_LINKER', ''),[0m
+2026-11-01T12:38:48.5859880Z [36;1m               '--trace-format=json-v1', '--trace-source=' + str(Path('CMakeLists.txt').resolve()),[0m
+2026-11-01T12:38:48.5860760Z [36;1m               '--trace-redirect=' + str(evidence / 'configure-trace.jsonl')][0m
+2026-11-01T12:38:48.5861100Z [36;1m    if platform.system() == 'Darwin':[0m
+2026-11-01T12:38:48.5861380Z [36;1m        command += ['-DCMAKE_OSX_ARCHITECTURES=arm64',[0m
+2026-11-01T12:38:48.5861720Z [36;1m                    '-DCMAKE_OSX_SYSROOT=' + os.environ['SDKROOT'],[0m
+2026-11-01T12:38:48.5862150Z [36;1m                    '-DCMAKE_OSX_DEPLOYMENT_TARGET=' + os.environ['MACOSX_DEPLOYMENT_TARGET']][0m
+2026-11-01T12:38:48.5862670Z [36;1m    if mode == 'thinlto-cache' and platform.system() != 'Windows':[0m
+2026-11-01T12:38:48.5863170Z [36;1m        flag = ('-Wl,--thinlto-cache-dir=' if platform.system() == 'Linux' else '-Wl,-cache_path_lto,')[0m
+2026-11-01T12:38:48.5863930Z [36;1m        # CMake parses this string as linker flags; quote the directory for paths with spaces.[0m
+2026-11-01T12:38:48.5864780Z [36;1m        flags = flag + '"' + cache.as_posix() + '"'[0m
+2026-11-01T12:38:48.5865060Z [36;1m        if platform.system() == 'Linux':[0m
+2026-11-01T12:38:48.5865430Z [36;1m            # Compiler checks precede the project's LLD selection. Boss approved[0m
+2026-11-01T12:38:48.5865900Z [36;1m            # repeating that same pinned linker here so GNU ld never sees the cache flag.[0m
+2026-11-01T12:38:48.5866480Z [36;1m            flags = '--ld-path="' + os.environ['VOID_LINKER'] + '" ' + flags[0m
+2026-11-01T12:38:48.5866890Z [36;1m        command.append('-DCMAKE_EXE_LINKER_FLAGS:STRING=' + flags)[0m
+2026-11-01T12:38:48.5867210Z [36;1melif phase in ('build', 'relink'):[0m
+2026-11-01T12:38:48.5867470Z [36;1m    if phase == 'relink':[0m
+2026-11-01T12:38:48.5867850Z [36;1m        # Relink representative voidc after acceptance. Building only this target[0m
+2026-11-01T12:38:48.5868340Z [36;1m        # avoids regenerating its downstream AOT fixtures; objects/cache stay warm.[0m
+2026-11-01T12:38:48.5868850Z [36;1m        targets = {t for t in link_targets() if Path(t).name in ('voidc', 'voidc.exe')}[0m
+2026-11-01T12:38:48.5869380Z [36;1m        assert len(targets) == 1, 'Expected exactly one voidc executable'[0m
+2026-11-01T12:38:48.5869850Z [36;1m        previous = set((build / '.ninja_log').read_text(encoding='utf-8').splitlines())[0m
+2026-11-01T12:38:48.5871190Z [36;1m        save('relink-targets.json', sorted(targets))[0m
+2026-11-01T12:38:48.5871480Z [36;1m        for target in targets:[0m
+2026-11-01T12:38:48.5871750Z [36;1m            (build / target).unlink(missing_ok=True)[0m
+2026-11-01T12:38:48.5872140Z [36;1m    command = ['cmake', '--build', str(build), '--parallel', '3'][0m
+2026-11-01T12:38:48.5872510Z [36;1m    if phase == 'relink':[0m
+2026-11-01T12:38:48.5872910Z [36;1m        command += ['--target', 'voidc'][0m
+2026-11-01T12:38:48.5873150Z [36;1melse:[0m
+2026-11-01T12:38:48.5873360Z [36;1m    raise ValueError(phase)[0m
+2026-11-01T12:38:48.5873610Z [36;1m[0m
+2026-11-01T12:38:48.5873890Z [36;1mmetrics = {'argv': command, 'cache_before': cache_size(), 'phase': phase}[0m
+2026-11-01T12:38:48.5874380Z [36;1m# POSIX child CPU totals include reaped descendants; peak RSS is a maximum, not a sum.[0m
+2026-11-01T12:38:48.5874790Z [36;1mtry:[0m
+2026-11-01T12:38:48.5874950Z [36;1m    import resource[0m
+2026-11-01T12:38:48.5875150Z [36;1mexcept ImportError:[0m
+2026-11-01T12:38:48.5875330Z [36;1m    resource = None[0m
+2026-11-01T12:38:48.5875550Z [36;1mstart = time.perf_counter()[0m
+2026-11-01T12:38:48.5875750Z [36;1mtry:[0m
+2026-11-01T12:38:48.5876020Z [36;1m    with (evidence / f'{phase}.log').open('w', encoding='utf-8') as log:[0m
+2026-11-01T12:38:48.5876390Z [36;1m        print(json.dumps(command), flush=True)[0m
+2026-11-01T12:38:48.5876800Z [36;1m        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,[0m
+2026-11-01T12:38:48.5877340Z [36;1m                                   text=True, errors='replace', bufsize=1)[0m
+2026-11-01T12:38:48.5877640Z [36;1m        for line in process.stdout:[0m
+2026-11-01T12:38:48.5877890Z [36;1m            log.write(line)[0m
+2026-11-01T12:38:48.5878120Z [36;1m            log.flush()[0m
+2026-11-01T12:38:48.5878350Z [36;1m            print(line, end='', flush=True)[0m
+2026-11-01T12:38:48.5878620Z [36;1m        metrics['exit_code'] = process.wait()[0m
+2026-11-01T12:38:48.5878850Z [36;1mfinally:[0m
+2026-11-01T12:38:48.5879080Z [36;1m    metrics['wall_seconds'] = time.perf_counter() - start[0m
+2026-11-01T12:38:48.5879380Z [36;1m    metrics['cache_after'] = cache_size()[0m
+2026-11-01T12:38:48.5879610Z [36;1m    if resource:[0m
+2026-11-01T12:38:48.5879850Z [36;1m        usage = resource.getrusage(resource.RUSAGE_CHILDREN)[0m
+2026-11-01T12:38:48.5880340Z [36;1m        metrics['child_resources'] = {'user_seconds': usage.ru_utime, 'system_seconds': usage.ru_stime,[0m
+2026-11-01T12:38:48.5880910Z [36;1m                                     'max_rss_bytes': usage.ru_maxrss * (1 if platform.system() == 'Darwin' else 1024),[0m
+2026-11-01T12:38:48.5881560Z [36;1m                                     'note': 'Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak.'}[0m
+2026-11-01T12:38:48.5882030Z [36;1m    else:[0m
+2026-11-01T12:38:48.5882450Z [36;1m        metrics['child_resources'] = {'note': 'POSIX rusage unavailable on Windows; host CPU/memory is in identity.json.'}[0m
+2026-11-01T12:38:48.5882930Z [36;1m    if phase == 'configure':[0m
+2026-11-01T12:38:48.5883180Z [36;1m        trace = evidence / 'configure-trace.jsonl'[0m
+2026-11-01T12:38:48.5883500Z [36;1m        probe_start = None[0m
+2026-11-01T12:38:48.5883820Z [36;1m        metrics['orc_probe_seconds'] = None[0m
+2026-11-01T12:38:48.5884130Z [36;1m        if trace.exists():[0m
+2026-11-01T12:38:48.5885020Z [36;1m            for line in trace.read_text(encoding='utf-8').splitlines():[0m
+2026-11-01T12:38:48.5885420Z [36;1m                event = json.loads(line)[0m
+2026-11-01T12:38:48.5885700Z [36;1m                if probe_start is not None:[0m
+2026-11-01T12:38:48.5886020Z [36;1m                    metrics['orc_probe_seconds'] = event['time'] - probe_start[0m
+2026-11-01T12:38:48.5886350Z [36;1m                    break[0m
+2026-11-01T12:38:48.5887010Z [36;1m                if event.get('cmd') == 'check_cxx_source_runs' and 'VOID_LLVM_ORC_RUNS' in event.get('args', []):[0m
+2026-11-01T12:38:48.5887440Z [36;1m                    probe_start = event['time'][0m
+2026-11-01T12:38:48.5887880Z [36;1m        metrics['orc_probe_note'] = 'CMake trace call-to-return wall time; null means the probe did not return.'[0m
+2026-11-01T12:38:48.5888310Z [36;1m    save(f'{phase}.json', metrics)[0m
+2026-11-01T12:38:48.5888550Z [36;1m    if phase in ('build', 'relink'):[0m
+2026-11-01T12:38:48.5888900Z [36;1m        link_times(phase, previous)[0m
+2026-11-01T12:38:48.5889140Z [36;1msys.exit(metrics['exit_code'])[0m
+2026-11-01T12:38:48.5889360Z [36;1m''').lstrip(), encoding='utf-8')[0m
+2026-11-01T12:38:48.5889660Z [36;1mwith open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:[0m
+2026-11-01T12:38:48.5890140Z [36;1m    env.write(f'THINLTO_CACHE_DIR={cache.as_posix()}\nLINK_EXPERIMENT_HELPER={helper.as_posix()}\n')[0m
+2026-11-01T12:38:48.5906630Z shell: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python {0}
+2026-11-01T12:38:48.5906960Z env:
+2026-11-01T12:38:48.5907150Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:48.5907370Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:48.5907710Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:48.5908090Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:48.5908410Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:48.5908810Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:48.5909240Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:38:48.5909640Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:48.5910010Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:48.5910370Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:48.5910660Z ##[endgroup]
+2026-11-01T12:38:48.8677790Z ##[group]Run python -c "import platform; assert platform.machine().lower() in ('arm64', 'aarch64'), 'macOS CI requires ARM64'"
+2026-11-01T12:38:48.8678580Z [36;1mpython -c "import platform; assert platform.machine().lower() in ('arm64', 'aarch64'), 'macOS CI requires ARM64'"[0m
+2026-11-01T12:38:49.0338640Z shell: /bin/bash -e {0}
+2026-11-01T12:38:49.0338840Z env:
+2026-11-01T12:38:49.0339040Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:49.0339310Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:49.0339690Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:49.0340110Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:49.0340490Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:49.0340900Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0341360Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:38:49.0341810Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0342190Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0342570Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0342920Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:38:49.0343310Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:38:49.0343610Z ##[endgroup]
+2026-11-01T12:38:49.0942350Z ##[group]Run actions/cache@v5
+2026-11-01T12:38:49.0942600Z with:
+2026-11-01T12:38:49.0942770Z   path: .toolchains/llvm-23.1.4
+2026-11-01T12:38:49.0943000Z   key: llvm-sdk-23.1.4-macOS-ARM64-v1
+2026-11-01T12:38:49.0943230Z   enableCrossOsArchive: false
+2026-11-01T12:38:49.0943430Z   fail-on-cache-miss: false
+2026-11-01T12:38:49.0943620Z   lookup-only: false
+2026-11-01T12:38:49.0944090Z   save-always: false
+2026-11-01T12:38:49.0944270Z env:
+2026-11-01T12:38:49.0944430Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:38:49.0944640Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:38:49.0945000Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:38:49.0945400Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:38:49.0945750Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:38:49.0946200Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0946680Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:38:49.0947110Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0947500Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0947880Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:38:49.0948260Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:38:49.0948660Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:38:49.0948980Z ##[endgroup]
+2026-11-01T12:38:49.5247380Z Cache hit for: llvm-sdk-23.1.4-macOS-ARM64-v1
+2026-11-01T12:38:50.8558210Z Received 0 of 2277660214 (0.0%), 0.0 MBs/sec
+2026-11-01T12:38:51.8633040Z Received 83886080 of 2277660214 (3.7%), 39.9 MBs/sec
+2026-11-01T12:38:52.8607940Z Received 163577856 of 2277660214 (7.2%), 51.8 MBs/sec
+2026-11-01T12:38:53.8612910Z Received 247463936 of 2277660214 (10.9%), 58.9 MBs/sec
+2026-11-01T12:38:54.8592740Z Received 310378496 of 2277660214 (13.6%), 59.1 MBs/sec
+2026-11-01T12:38:55.8620760Z Received 398458880 of 2277660214 (17.5%), 63.2 MBs/sec
+2026-11-01T12:38:56.8599440Z Received 448790528 of 2277660214 (19.7%), 61.0 MBs/sec
+2026-11-01T12:38:57.8616230Z Received 528482304 of 2277660214 (23.2%), 62.9 MBs/sec
+2026-11-01T12:38:58.8620840Z Received 570425344 of 2277660214 (25.0%), 60.4 MBs/sec
+2026-11-01T12:38:59.8637410Z Received 650117120 of 2277660214 (28.5%), 61.9 MBs/sec
+2026-11-01T12:39:00.8634830Z Received 700448768 of 2277660214 (30.8%), 60.6 MBs/sec
+2026-11-01T12:39:01.8630580Z Received 775946240 of 2277660214 (34.1%), 61.6 MBs/sec
+2026-11-01T12:39:02.8637840Z Received 809500672 of 2277660214 (35.5%), 59.3 MBs/sec
+2026-11-01T12:39:03.8645990Z Received 897581056 of 2277660214 (39.4%), 61.1 MBs/sec
+2026-11-01T12:39:04.8671800Z Received 943718400 of 2277660214 (41.4%), 59.9 MBs/sec
+2026-11-01T12:39:05.8697390Z Received 1027604480 of 2277660214 (45.1%), 61.2 MBs/sec
+2026-11-01T12:39:06.8819740Z Received 1073741824 of 2277660214 (47.1%), 60.2 MBs/sec
+2026-11-01T12:39:07.9038590Z Received 1149239296 of 2277660214 (50.5%), 60.8 MBs/sec
+2026-11-01T12:39:08.8758580Z Received 1207959552 of 2277660214 (53.0%), 60.6 MBs/sec
+2026-11-01T12:39:09.8737250Z Received 1270874112 of 2277660214 (55.8%), 60.5 MBs/sec
+2026-11-01T12:39:10.9572560Z Received 1342177280 of 2277660214 (58.9%), 60.6 MBs/sec
+2026-11-01T12:39:11.9578960Z Received 1400897536 of 2277660214 (61.5%), 60.4 MBs/sec
+2026-11-01T12:39:12.9608410Z Received 1472200704 of 2277660214 (64.6%), 60.7 MBs/sec
+2026-11-01T12:39:13.9609480Z Received 1501560832 of 2277660214 (65.9%), 59.4 MBs/sec
+2026-11-01T12:39:14.9621560Z Received 1577058304 of 2277660214 (69.2%), 59.9 MBs/sec
+2026-11-01T12:39:15.9620410Z Received 1610612736 of 2277660214 (70.7%), 58.8 MBs/sec
+2026-11-01T12:39:16.9857750Z Received 1686110208 of 2277660214 (74.0%), 59.3 MBs/sec
+2026-11-01T12:39:17.9719420Z Received 1744830464 of 2277660214 (76.6%), 59.2 MBs/sec
+2026-11-01T12:39:18.9728530Z Received 1790967808 of 2277660214 (78.6%), 58.6 MBs/sec
+2026-11-01T12:39:19.9742370Z Received 1862270976 of 2277660214 (81.8%), 59.0 MBs/sec
+2026-11-01T12:39:20.9747770Z Received 1908408320 of 2277660214 (83.8%), 58.5 MBs/sec
+2026-11-01T12:39:21.9944490Z Received 1979711488 of 2277660214 (86.9%), 58.7 MBs/sec
+2026-11-01T12:39:22.9946670Z Received 2021654528 of 2277660214 (88.8%), 58.2 MBs/sec
+2026-11-01T12:39:23.9959310Z Received 2097152000 of 2277660214 (92.1%), 58.6 MBs/sec
+2026-11-01T12:39:24.9974550Z Received 2143289344 of 2277660214 (94.1%), 58.2 MBs/sec
+2026-11-01T12:39:25.9986860Z Received 2185232384 of 2277660214 (95.9%), 57.6 MBs/sec
+2026-11-01T12:39:26.9993830Z Received 2256688694 of 2277660214 (99.1%), 57.9 MBs/sec
+2026-11-01T12:39:27.1669780Z Received 2277660214 of 2277660214 (100.0%), 58.2 MBs/sec
+2026-11-01T12:39:27.1683980Z Cache Size: ~2172 MB (2277660214 B)
+2026-11-01T12:39:27.2886740Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/552cd88a-2c74-421f-899c-72e052ec14d7/cache.tzst -P -C /Users/runner/work/Void.Language/Void.Language --delay-directory-restore --use-compress-program unzstd
+2026-11-01T12:39:47.8421090Z Cache restored successfully
+2026-11-01T12:39:48.0162630Z Cache restored from key: llvm-sdk-23.1.4-macOS-ARM64-v1
+2026-11-01T12:39:48.0503160Z ##[group]Run python tools/ci/llvm_sdk.py
+2026-11-01T12:39:48.0503750Z [36;1mpython tools/ci/llvm_sdk.py[0m
+2026-11-01T12:39:48.0860180Z shell: /bin/bash -e {0}
+2026-11-01T12:39:48.0860660Z env:
+2026-11-01T12:39:48.0861090Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:48.0861450Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:48.0861950Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:48.0862830Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:48.0863280Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:48.0863950Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:48.0864440Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:39:48.0865470Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:48.0866350Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:48.0867250Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:48.0867770Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:39:48.0868300Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:39:48.0868790Z ##[endgroup]
+2026-11-01T12:39:48.9985470Z clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+2026-11-01T12:39:49.0011030Z Target: arm64-apple-darwin25.6.0
+2026-11-01T12:39:49.0011710Z Thread model: posix
+2026-11-01T12:39:49.0012670Z InstalledDir: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin
+2026-11-01T12:39:49.0013260Z 
+2026-11-01T12:39:49.0014930Z LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+2026-11-01T12:39:49.0024360Z 
+2026-11-01T12:39:49.0172820Z ##[group]Run python tools/ci/http_bootstrap.py identity
+2026-11-01T12:39:49.0173410Z [36;1mpython tools/ci/http_bootstrap.py identity[0m
+2026-11-01T12:39:49.0227940Z shell: /bin/bash -e {0}
+2026-11-01T12:39:49.0228150Z env:
+2026-11-01T12:39:49.0229810Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:49.0231870Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:49.0232540Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:49.0234170Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:49.0234750Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:49.0235210Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:49.0235810Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:39:49.0236340Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:49.0237360Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:49.0237980Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:49.0238510Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:39:49.0246430Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:39:49.0248340Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:49.0250330Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:49.0252920Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:49.0253610Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:49.0254650Z   VOID_LINKER: 
+2026-11-01T12:39:49.0256030Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:39:49.0257680Z ##[endgroup]
+2026-11-01T12:39:53.1974970Z curl 8.23.0: 1586 files verified; four private corrections
+2026-11-01T12:39:53.2222830Z ##[group]Run actions/cache/restore@v5
+2026-11-01T12:39:53.2223090Z with:
+2026-11-01T12:39:53.2223320Z   path: .toolchains/http/downloads
+2026-11-01T12:39:53.2223750Z   key: http-sources-v1-Darwin-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb
+2026-11-01T12:39:53.2224180Z   enableCrossOsArchive: false
+2026-11-01T12:39:53.2224390Z   fail-on-cache-miss: false
+2026-11-01T12:39:53.2224600Z   lookup-only: false
+2026-11-01T12:39:53.2224760Z env:
+2026-11-01T12:39:53.2224950Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:53.2225180Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:53.2226200Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:53.2226660Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:53.2227020Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:53.2227400Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.2227950Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:39:53.2228680Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.2229190Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.2229630Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.2230890Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:39:53.2231410Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:39:53.2232250Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:53.2233630Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:53.2234150Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:53.2234850Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:53.2235340Z   VOID_LINKER: 
+2026-11-01T12:39:53.2235750Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:39:53.2236210Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:39:53.2236420Z ##[endgroup]
+2026-11-01T12:39:53.7151160Z Cache not found for input keys: http-sources-v1-Darwin-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb
+2026-11-01T12:39:53.7314440Z ##[group]Run actions/cache/restore@v5
+2026-11-01T12:39:53.7315270Z with:
+2026-11-01T12:39:53.7315960Z   path: .toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release
+2026-11-01T12:39:53.7317420Z   key: http-deps-v1-llvm23.1.4-Darwin-arm64-Release-12529980a7215c633077c42afcc0b0f92b02cf9cf14436b862ed50fd617e9318
+2026-11-01T12:39:53.7318750Z   enableCrossOsArchive: false
+2026-11-01T12:39:53.7319340Z   fail-on-cache-miss: false
+2026-11-01T12:39:53.7320740Z   lookup-only: false
+2026-11-01T12:39:53.7321100Z env:
+2026-11-01T12:39:53.7321490Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:53.7321760Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:53.7322810Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:53.7323290Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:53.7323620Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:53.7324240Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.7324790Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:39:53.7325320Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.7325720Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.7326090Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:53.7326460Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:39:53.7326850Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:39:53.7327340Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:53.7327860Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:53.7328350Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:53.7328870Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:53.7329250Z   VOID_LINKER: 
+2026-11-01T12:39:53.7329630Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:39:53.7330070Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:39:53.7330290Z ##[endgroup]
+2026-11-01T12:39:54.1633050Z Cache not found for input keys: http-deps-v1-llvm23.1.4-Darwin-arm64-Release-12529980a7215c633077c42afcc0b0f92b02cf9cf14436b862ed50fd617e9318
+2026-11-01T12:39:54.1680540Z ##[group]Run actions/cache/restore@v5
+2026-11-01T12:39:54.1680860Z with:
+2026-11-01T12:39:54.1681250Z   path: .toolchains/http/test-python
+.toolchains/http/test-certificates
+.toolchains/http/test-certificates-tools
+
+2026-11-01T12:39:54.1682290Z   key: http-fixtures-v1-Darwin-arm64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c
+2026-11-01T12:39:54.1682850Z   enableCrossOsArchive: false
+2026-11-01T12:39:54.1683090Z   fail-on-cache-miss: false
+2026-11-01T12:39:54.1683300Z   lookup-only: false
+2026-11-01T12:39:54.1683480Z env:
+2026-11-01T12:39:54.1684200Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:54.1685040Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:54.1686000Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:54.1687400Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:54.1687820Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:54.1688300Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.1688750Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:39:54.1689190Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.1689580Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.1690610Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.1691030Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:39:54.1691540Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:39:54.1692120Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:54.1692680Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:54.1693190Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:54.1693710Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:54.1694570Z   VOID_LINKER: 
+2026-11-01T12:39:54.1694970Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:39:54.1695520Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:39:54.1695730Z ##[endgroup]
+2026-11-01T12:39:54.6111950Z Cache not found for input keys: http-fixtures-v1-Darwin-arm64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c
+2026-11-01T12:39:54.6180290Z ##[group]Run python tools/ci/http_bootstrap.py bootstrap
+2026-11-01T12:39:54.6180690Z [36;1mpython tools/ci/http_bootstrap.py bootstrap[0m
+2026-11-01T12:39:54.6228380Z shell: /bin/bash -e {0}
+2026-11-01T12:39:54.6228590Z env:
+2026-11-01T12:39:54.6228790Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:39:54.6229010Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:39:54.6229380Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:39:54.6229850Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:39:54.6230200Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:39:54.6230660Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.6231100Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:39:54.6231540Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.6231990Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.6232390Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:39:54.6232790Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:39:54.6233270Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:39:54.6233770Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:39:54.6234340Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:54.6234870Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:39:54.6235400Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:39:54.6235770Z   VOID_LINKER: 
+2026-11-01T12:39:54.6236260Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:39:54.6236790Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:39:54.6237020Z   HTTP_DEPS_CACHE_HIT: 
+2026-11-01T12:39:54.6237200Z ##[endgroup]
+2026-11-01T12:42:26.3979410Z /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release
+2026-11-01T12:42:26.7840970Z HTTP dependency prefix verified: Release; 138 files
+2026-11-01T12:42:26.9811940Z verified test dependency: h2 4.4.1
+2026-11-01T12:42:26.9812490Z verified test dependency: hpack 4.2.0
+2026-11-01T12:42:26.9814790Z verified test dependency: hyperframe 6.1.0
+2026-11-01T12:42:27.2013320Z OpenSSL 1.1.1 (compatible; AWS-LC 5.12.0)
+2026-11-01T12:42:28.0555060Z ##[group]Run actions/cache/save@v5
+2026-11-01T12:42:28.0555530Z with:
+2026-11-01T12:42:28.0555790Z   path: .toolchains/http/downloads
+2026-11-01T12:42:28.0556270Z   key: http-sources-v1-Darwin-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb
+2026-11-01T12:42:28.0556850Z   enableCrossOsArchive: false
+2026-11-01T12:42:28.0557120Z env:
+2026-11-01T12:42:28.0557370Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:42:28.0557710Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:42:28.0558140Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:42:28.0558640Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:42:28.0559020Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:42:28.0559440Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:28.0568500Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:42:28.0570620Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:28.0571890Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:28.0572940Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:28.0574160Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:42:28.0575500Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:42:28.0576990Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:42:28.0578430Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:28.0579840Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:42:28.0581640Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:28.0582870Z   VOID_LINKER: 
+2026-11-01T12:42:28.0584170Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:42:28.0585690Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:42:28.0586340Z ##[endgroup]
+2026-11-01T12:42:28.3949520Z [command]/opt/homebrew/bin/gtar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/runner/work/Void.Language/Void.Language --files-from manifest.txt --delay-directory-restore --use-compress-program zstdmt
+2026-11-01T12:42:29.0398260Z Failed to save: Unable to reserve cache with key http-sources-v1-Darwin-2193708232bdb3b73ad7a5b09300347b112b2d6ba6e71e04bdb9a9913249f3fb, another job may be creating this cache.
+2026-11-01T12:42:29.0546100Z ##[group]Run actions/cache/save@v5
+2026-11-01T12:42:29.0546380Z with:
+2026-11-01T12:42:29.0546750Z   path: .toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release
+2026-11-01T12:42:29.0547500Z   key: http-deps-v1-llvm23.1.4-Darwin-arm64-Release-12529980a7215c633077c42afcc0b0f92b02cf9cf14436b862ed50fd617e9318
+2026-11-01T12:42:29.0548050Z   enableCrossOsArchive: false
+2026-11-01T12:42:29.0548370Z env:
+2026-11-01T12:42:29.0548560Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:42:29.0548870Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:42:29.0549330Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:42:29.0549760Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:42:29.0550120Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:42:29.0550510Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:29.0551030Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:42:29.0551470Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:29.0551860Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:29.0552250Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:29.0552640Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:42:29.0553040Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:42:29.0553540Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:42:29.0554090Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:29.0554560Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:42:29.0555080Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:29.0555470Z   VOID_LINKER: 
+2026-11-01T12:42:29.0555850Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:42:29.0559480Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:42:29.0559700Z ##[endgroup]
+2026-11-01T12:42:29.2266380Z [command]/opt/homebrew/bin/gtar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/runner/work/Void.Language/Void.Language --files-from manifest.txt --delay-directory-restore --use-compress-program zstdmt
+2026-11-01T12:42:30.4773930Z Sent 6352023 of 6352023 (100.0%), 6.9 MBs/sec
+2026-11-01T12:42:30.7342860Z Cache saved with key: http-deps-v1-llvm23.1.4-Darwin-arm64-Release-12529980a7215c633077c42afcc0b0f92b02cf9cf14436b862ed50fd617e9318
+2026-11-01T12:42:30.7405770Z ##[group]Run actions/cache/save@v5
+2026-11-01T12:42:30.7406080Z with:
+2026-11-01T12:42:30.7406530Z   path: .toolchains/http/test-python
+.toolchains/http/test-certificates
+.toolchains/http/test-certificates-tools
+
+2026-11-01T12:42:30.7407350Z   key: http-fixtures-v1-Darwin-arm64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c
+2026-11-01T12:42:30.7407840Z   enableCrossOsArchive: false
+2026-11-01T12:42:30.7408210Z env:
+2026-11-01T12:42:30.7408450Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:42:30.7408750Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:42:30.7409130Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:42:30.7409600Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:42:30.7409950Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:42:30.7410340Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:30.7410890Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:42:30.7411330Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:30.7411730Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:30.7412250Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:30.7412720Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:42:30.7413160Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:42:30.7413740Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:42:30.7414290Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:30.7414770Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:42:30.7415290Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:30.7415660Z   VOID_LINKER: 
+2026-11-01T12:42:30.7416020Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:42:30.7416460Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:42:30.7416690Z ##[endgroup]
+2026-11-01T12:42:30.8885150Z [command]/opt/homebrew/bin/gtar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/runner/work/Void.Language/Void.Language --files-from manifest.txt --delay-directory-restore --use-compress-program zstdmt
+2026-11-01T12:42:31.7356120Z Sent 246554 of 246554 (100.0%), 0.4 MBs/sec
+2026-11-01T12:42:31.9903730Z Cache saved with key: http-fixtures-v1-Darwin-arm64-445c78f32d21dcf851c7cf1629409ec81caa611b2150f5a906ebd3060f9fe25c
+2026-11-01T12:42:32.0000740Z ##[group]Run python "/Users/runner/work/_temp/void-thinlto-qjrfev2f.py" configure
+2026-11-01T12:42:32.0001430Z [36;1mpython "/Users/runner/work/_temp/void-thinlto-qjrfev2f.py" configure[0m
+2026-11-01T12:42:32.0191110Z shell: /bin/bash -e {0}
+2026-11-01T12:42:32.0191350Z env:
+2026-11-01T12:42:32.0191550Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:42:32.0191830Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:42:32.0192210Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:42:32.0192660Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:42:32.0193300Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:42:32.0193690Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:32.0194120Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:42:32.0194630Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:32.0195040Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:32.0195480Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:42:32.0195860Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:42:32.0196270Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:42:32.0196780Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:42:32.0197380Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:32.0197920Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:42:32.0198460Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:42:32.0198830Z   VOID_LINKER: 
+2026-11-01T12:42:32.0199210Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:42:32.0199750Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:42:32.0199990Z ##[endgroup]
+2026-11-01T12:42:35.1278810Z ["cmake", "-S", ".", "-B", "build/Release", "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release", "-DVOID_SANITIZERS=OFF", "-DLLVM_DIR=/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm", "-DVOID_CLANG=/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang", "-DVOID_LINKER=", "--trace-format=json-v1", "--trace-source=/Users/runner/work/Void.Language/Void.Language/CMakeLists.txt", "--trace-redirect=/Users/runner/work/Void.Language/Void.Language/build/link-experiment/configure-trace.jsonl", "-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_SYSROOT=/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk", "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", "-DCMAKE_EXE_LINKER_FLAGS:STRING=-Wl,-cache_path_lto,\"/Users/runner/work/_temp/void-thinlto-qjrfev2f\""]
+2026-11-01T12:42:35.4965650Z Put cmake in trace mode and sets the trace output format.
+2026-11-01T12:42:35.4967650Z Put cmake in trace mode, but output only lines of a specified file. Multiple options are allowed.
+2026-11-01T12:42:35.4968400Z Put cmake in trace mode and redirect trace output to a file instead of stderr.
+2026-11-01T12:42:35.4969200Z Trace will be written to /Users/runner/work/Void.Language/Void.Language/build/link-experiment/configure-trace.jsonl
+2026-11-01T12:42:35.4969870Z -- The C compiler identification is Clang 23.1.4
+2026-11-01T12:42:35.8698400Z -- The CXX compiler identification is Clang 23.1.4
+2026-11-01T12:42:35.9331200Z -- Detecting C compiler ABI info
+2026-11-01T12:42:36.2140810Z -- Detecting C compiler ABI info - done
+2026-11-01T12:42:36.2614440Z -- Check for working C compiler: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+2026-11-01T12:42:36.2616400Z -- Detecting C compile features
+2026-11-01T12:42:36.2619730Z -- Detecting C compile features - done
+2026-11-01T12:42:36.2677480Z -- Detecting CXX compiler ABI info
+2026-11-01T12:42:36.4404570Z -- Detecting CXX compiler ABI info - done
+2026-11-01T12:42:36.4904770Z -- Check for working CXX compiler: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ - skipped
+2026-11-01T12:42:36.4906130Z -- Detecting CXX compile features
+2026-11-01T12:42:36.4918170Z -- Detecting CXX compile features - done
+2026-11-01T12:42:37.5443180Z -- VOID Apple libc++ headers: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/; runtime: selected Apple SDK/system libc++
+2026-11-01T12:42:38.1123540Z -- Looking for histedit.h
+2026-11-01T12:42:38.3047780Z -- Looking for histedit.h - found
+2026-11-01T12:42:38.3048610Z CMake Warning (policy) at .toolchains/llvm-23.1.4/lib/cmake/llvm/FindLibEdit.cmake:31 (file):
+2026-11-01T12:42:38.3049690Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:38.3051320Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:38.3052070Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:38.3052510Z 
+2026-11-01T12:42:38.3052790Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:38.3053340Z Call Stack (most recent call first):
+2026-11-01T12:42:38.3053800Z   .toolchains/llvm-23.1.4/lib/cmake/llvm/LLVMConfig.cmake:288 (find_package)
+2026-11-01T12:42:38.3054290Z   CMakeLists.txt:12 (find_package)
+2026-11-01T12:42:38.3055540Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:38.3056180Z suppress it.
+2026-11-01T12:42:38.3056490Z 
+2026-11-01T12:42:38.3056870Z CMake Warning (policy) at .toolchains/llvm-23.1.4/lib/cmake/llvm/FindLibEdit.cmake:37 (file):
+2026-11-01T12:42:38.3057620Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:38.3058190Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:38.3058790Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:38.3059210Z 
+2026-11-01T12:42:38.3059490Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:38.3060110Z Call Stack (most recent call first):
+2026-11-01T12:42:38.3060670Z   .toolchains/llvm-23.1.4/lib/cmake/llvm/LLVMConfig.cmake:288 (find_package)
+2026-11-01T12:42:38.3061550Z   CMakeLists.txt:12 (find_package)
+2026-11-01T12:42:38.3062100Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:38.3062670Z suppress it.
+2026-11-01T12:42:38.3062860Z 
+2026-11-01T12:42:38.3063360Z -- Found LibEdit: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include (found version "2.11")
+2026-11-01T12:42:38.4719780Z -- Found ZLIB: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libz.tbd (found version "1.2.12")
+2026-11-01T12:42:38.5307400Z -- Found zstd: /opt/homebrew/lib/libzstd.dylib
+2026-11-01T12:42:39.7531060Z -- Found LibXml2: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libxml2.tbd (found version "2.9.13")
+2026-11-01T12:42:39.8206940Z -- VOID LLVM: 23.1.4 at /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:42:39.8242300Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-11-01T12:42:40.0352360Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-11-01T12:42:40.0364080Z -- Found Threads: TRUE
+2026-11-01T12:42:40.0632200Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN
+2026-11-01T12:42:41.4623260Z -- Performing Test VOID_HAS_STANDARD_STOP_TOKEN - Success
+2026-11-01T12:42:41.4623910Z -- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+2026-11-01T12:42:41.7501480Z -- Found Python3: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/bin/python3.12 (found version "3.12.10") found components: Interpreter
+2026-11-01T12:42:42.3982200Z -- curl 8.23.0: 1586 files verified; four private corrections
+2026-11-01T12:42:42.3984170Z 
+2026-11-01T12:42:42.6640650Z -- HTTP dependency prefix verified: Release; 138 files
+2026-11-01T12:42:42.6646550Z 
+2026-11-01T12:42:42.6672600Z -- Using CMake version 4.4.4
+2026-11-01T12:42:42.6709330Z CMake Warning (policy) at third_party/curl/CMakeLists.txt:54 (file):
+2026-11-01T12:42:42.6709860Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:42.6711200Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:42.6711710Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:42.6712270Z 
+2026-11-01T12:42:42.6712530Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:42.6713160Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:42.6713550Z suppress it.
+2026-11-01T12:42:42.6713720Z 
+2026-11-01T12:42:42.6713860Z -- curl version=[8.23.0]
+2026-11-01T12:42:42.6729960Z -- CMake platform flags: APPLE UNIX LLVM-CLANG
+2026-11-01T12:42:42.6743100Z -- Picky compiler options: -Werror=partial-availability -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+2026-11-01T12:42:42.6748940Z CMake Warning (policy) at third_party/curl/CMake/FindCares.cmake:86 (file):
+2026-11-01T12:42:42.6749430Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:42.6750060Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:42.6750610Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:42.6750950Z 
+2026-11-01T12:42:42.6751180Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:42.6751700Z Call Stack (most recent call first):
+2026-11-01T12:42:42.6752090Z   third_party/curl/CMakeLists.txt:416 (find_package)
+2026-11-01T12:42:42.6752530Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:42.6752940Z suppress it.
+2026-11-01T12:42:42.6753110Z 
+2026-11-01T12:42:42.6753390Z CMake Warning (policy) at third_party/curl/CMake/FindCares.cmake:87 (file):
+2026-11-01T12:42:42.6753890Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:42.6754510Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:42.6755110Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:42.6755460Z 
+2026-11-01T12:42:42.6755720Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:42.6756470Z Call Stack (most recent call first):
+2026-11-01T12:42:42.6756990Z   third_party/curl/CMakeLists.txt:416 (find_package)
+2026-11-01T12:42:42.6757600Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:42.6758490Z suppress it.
+2026-11-01T12:42:42.6758690Z 
+2026-11-01T12:42:42.6758990Z CMake Warning (policy) at third_party/curl/CMake/FindCares.cmake:88 (file):
+2026-11-01T12:42:42.6759500Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:42.6760020Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:42.6760780Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:42.6761350Z 
+2026-11-01T12:42:42.6761590Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:42.6761980Z Call Stack (most recent call first):
+2026-11-01T12:42:42.6762410Z   third_party/curl/CMakeLists.txt:416 (find_package)
+2026-11-01T12:42:42.6763280Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:42.6763940Z suppress it.
+2026-11-01T12:42:42.6764140Z 
+2026-11-01T12:42:42.6764650Z -- Found Cares: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include (found version "1.34.9")
+2026-11-01T12:42:42.7484840Z -- Found Perl: /opt/homebrew/bin/perl (found version "5.44.0")
+2026-11-01T12:42:42.7564960Z -- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID
+2026-11-01T12:42:43.0206510Z -- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID - Success
+2026-11-01T12:42:43.0208450Z -- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR
+2026-11-01T12:42:43.2902080Z -- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR - Success
+2026-11-01T12:42:43.2903790Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CMakeDependentOption.cmake:237 (set):
+2026-11-01T12:42:43.2905290Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:43.2906520Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:43.2907900Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:43.2908800Z 
+2026-11-01T12:42:43.2909290Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:43.2910440Z   "CURL_USE_OPENSSL" will be removed from the current scope.
+2026-11-01T12:42:43.2911390Z Call Stack (most recent call first):
+2026-11-01T12:42:43.2912230Z   third_party/curl/CMakeLists.txt:734 (cmake_dependent_option)
+2026-11-01T12:42:43.2913580Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.2914640Z suppress it.
+2026-11-01T12:42:43.2915020Z 
+2026-11-01T12:42:43.2915440Z -- Apple OS-native certificate verification enabled
+2026-11-01T12:42:43.4047910Z -- Found OpenSSL: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/lib/libcrypto.a (found version "1.1.1g")
+2026-11-01T12:42:43.4051150Z -- Looking for OPENSSL_IS_AWSLC
+2026-11-01T12:42:43.4060640Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:171 (try_compile):
+2026-11-01T12:42:43.4062640Z   Policy CMP0200 is not set: Location and configuration selection for
+2026-11-01T12:42:43.4064110Z   imported targets is more consistent.  Run "cmake --help-policy CMP0200" for
+2026-11-01T12:42:43.4065450Z   policy details.  Use the cmake_policy command to set the policy and
+2026-11-01T12:42:43.4066470Z   suppress this warning.
+2026-11-01T12:42:43.4066940Z 
+2026-11-01T12:42:43.4067880Z   Configuration selection for imported target "OpenSSL::SSL" selected
+2026-11-01T12:42:43.4069430Z   configuration "(none)", but would select configuration "NOCONFIG" under the
+2026-11-01T12:42:43.4070520Z   NEW policy.
+2026-11-01T12:42:43.4071140Z Call Stack (most recent call first):
+2026-11-01T12:42:43.4072280Z   /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:99 (__CHECK_SYMBOL_EXISTS_IMPL)
+2026-11-01T12:42:43.4074310Z   third_party/curl/CMakeLists.txt:832 (check_symbol_exists)
+2026-11-01T12:42:43.4075990Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.4076510Z suppress it.
+2026-11-01T12:42:43.4076680Z 
+2026-11-01T12:42:43.4077040Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:171 (try_compile):
+2026-11-01T12:42:43.4077640Z   Policy CMP0200 is not set: Location and configuration selection for
+2026-11-01T12:42:43.4078240Z   imported targets is more consistent.  Run "cmake --help-policy CMP0200" for
+2026-11-01T12:42:43.4078800Z   policy details.  Use the cmake_policy command to set the policy and
+2026-11-01T12:42:43.4079380Z   suppress this warning.
+2026-11-01T12:42:43.4079520Z 
+2026-11-01T12:42:43.4080420Z   Configuration selection for imported target "OpenSSL::Crypto" selected
+2026-11-01T12:42:43.4106540Z   configuration "(none)", but would select configuration "NOCONFIG" under the
+2026-11-01T12:42:43.4106980Z   NEW policy.
+2026-11-01T12:42:43.4107390Z Call Stack (most recent call first):
+2026-11-01T12:42:43.4107930Z   /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:99 (__CHECK_SYMBOL_EXISTS_IMPL)
+2026-11-01T12:42:43.4108990Z   third_party/curl/CMakeLists.txt:832 (check_symbol_exists)
+2026-11-01T12:42:43.4109380Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.4109760Z suppress it.
+2026-11-01T12:42:43.4109940Z 
+2026-11-01T12:42:43.6914050Z -- Looking for OPENSSL_IS_AWSLC - found
+2026-11-01T12:42:43.6941090Z -- Looking for DES_ecb_encrypt
+2026-11-01T12:42:43.7014480Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:171 (try_compile):
+2026-11-01T12:42:43.7015490Z   Policy CMP0200 is not set: Location and configuration selection for
+2026-11-01T12:42:43.7016160Z   imported targets is more consistent.  Run "cmake --help-policy CMP0200" for
+2026-11-01T12:42:43.7016870Z   policy details.  Use the cmake_policy command to set the policy and
+2026-11-01T12:42:43.7020470Z   suppress this warning.
+2026-11-01T12:42:43.7020700Z 
+2026-11-01T12:42:43.7021000Z   Configuration selection for imported target "OpenSSL::SSL" selected
+2026-11-01T12:42:43.7021550Z   configuration "(none)", but would select configuration "NOCONFIG" under the
+2026-11-01T12:42:43.7022030Z   NEW policy.
+2026-11-01T12:42:43.7022340Z Call Stack (most recent call first):
+2026-11-01T12:42:43.7022800Z   /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:99 (__CHECK_SYMBOL_EXISTS_IMPL)
+2026-11-01T12:42:43.7023320Z   third_party/curl/CMakeLists.txt:1022 (check_symbol_exists)
+2026-11-01T12:42:43.7023910Z   third_party/curl/CMakeLists.txt:1060 (curl_openssl_check_exists)
+2026-11-01T12:42:43.7024480Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.7024960Z suppress it.
+2026-11-01T12:42:43.7025130Z 
+2026-11-01T12:42:43.7025390Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:171 (try_compile):
+2026-11-01T12:42:43.7026110Z   Policy CMP0200 is not set: Location and configuration selection for
+2026-11-01T12:42:43.7026710Z   imported targets is more consistent.  Run "cmake --help-policy CMP0200" for
+2026-11-01T12:42:43.7027300Z   policy details.  Use the cmake_policy command to set the policy and
+2026-11-01T12:42:43.7027750Z   suppress this warning.
+2026-11-01T12:42:43.7027880Z 
+2026-11-01T12:42:43.7028130Z   Configuration selection for imported target "OpenSSL::Crypto" selected
+2026-11-01T12:42:43.7028710Z   configuration "(none)", but would select configuration "NOCONFIG" under the
+2026-11-01T12:42:43.7029180Z   NEW policy.
+2026-11-01T12:42:43.7029490Z Call Stack (most recent call first):
+2026-11-01T12:42:43.7029960Z   /opt/homebrew/share/cmake/Modules/CheckSymbolExists.cmake:99 (__CHECK_SYMBOL_EXISTS_IMPL)
+2026-11-01T12:42:43.7030540Z   third_party/curl/CMakeLists.txt:1022 (check_symbol_exists)
+2026-11-01T12:42:43.7030930Z   third_party/curl/CMakeLists.txt:1060 (curl_openssl_check_exists)
+2026-11-01T12:42:43.7031980Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.7032350Z suppress it.
+2026-11-01T12:42:43.7032480Z 
+2026-11-01T12:42:43.9625460Z -- Looking for DES_ecb_encrypt - found
+2026-11-01T12:42:43.9647560Z -- Looking for SSL_set0_wbio
+2026-11-01T12:42:43.9649020Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckFunctionExists.cmake:144 (try_compile):
+2026-11-01T12:42:43.9651050Z   Policy CMP0200 is not set: Location and configuration selection for
+2026-11-01T12:42:43.9652800Z   imported targets is more consistent.  Run "cmake --help-policy CMP0200" for
+2026-11-01T12:42:43.9654250Z   policy details.  Use the cmake_policy command to set the policy and
+2026-11-01T12:42:43.9656680Z   suppress this warning.
+2026-11-01T12:42:43.9657350Z 
+2026-11-01T12:42:43.9657990Z   Configuration selection for imported target "OpenSSL::SSL" selected
+2026-11-01T12:42:43.9659220Z   configuration "(none)", but would select configuration "NOCONFIG" under the
+2026-11-01T12:42:43.9660280Z   NEW policy.
+2026-11-01T12:42:43.9661070Z Call Stack (most recent call first):
+2026-11-01T12:42:43.9662090Z   third_party/curl/CMakeLists.txt:1020 (check_function_exists)
+2026-11-01T12:42:43.9663710Z   third_party/curl/CMakeLists.txt:1063 (curl_openssl_check_exists)
+2026-11-01T12:42:43.9665840Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.9666870Z suppress it.
+2026-11-01T12:42:43.9667180Z 
+2026-11-01T12:42:43.9667490Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckFunctionExists.cmake:144 (try_compile):
+2026-11-01T12:42:43.9668100Z   Policy CMP0200 is not set: Location and configuration selection for
+2026-11-01T12:42:43.9668620Z   imported targets is more consistent.  Run "cmake --help-policy CMP0200" for
+2026-11-01T12:42:43.9669270Z   policy details.  Use the cmake_policy command to set the policy and
+2026-11-01T12:42:43.9669850Z   suppress this warning.
+2026-11-01T12:42:43.9670010Z 
+2026-11-01T12:42:43.9670340Z   Configuration selection for imported target "OpenSSL::Crypto" selected
+2026-11-01T12:42:43.9670840Z   configuration "(none)", but would select configuration "NOCONFIG" under the
+2026-11-01T12:42:43.9671350Z   NEW policy.
+2026-11-01T12:42:43.9671620Z Call Stack (most recent call first):
+2026-11-01T12:42:43.9672000Z   third_party/curl/CMakeLists.txt:1020 (check_function_exists)
+2026-11-01T12:42:43.9672370Z   third_party/curl/CMakeLists.txt:1063 (curl_openssl_check_exists)
+2026-11-01T12:42:43.9672780Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:43.9673180Z suppress it.
+2026-11-01T12:42:43.9673290Z 
+2026-11-01T12:42:44.2205130Z -- Looking for SSL_set0_wbio - found
+2026-11-01T12:42:44.2207560Z CMake Warning (policy) at third_party/curl/CMake/FindNGHTTP2.cmake:82 (file):
+2026-11-01T12:42:44.2208370Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:44.2208860Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:44.2209420Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:44.2209810Z 
+2026-11-01T12:42:44.2210030Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:44.2210420Z Call Stack (most recent call first):
+2026-11-01T12:42:44.2210770Z   third_party/curl/CMakeLists.txt:1114 (find_package)
+2026-11-01T12:42:44.2211220Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:44.2211650Z suppress it.
+2026-11-01T12:42:44.2211860Z 
+2026-11-01T12:42:44.2216970Z -- Found NGHTTP2: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include (found version "1.70.0")
+2026-11-01T12:42:44.2224070Z -- Looking for uidna_openUTS46
+2026-11-01T12:42:44.5047200Z -- Looking for uidna_openUTS46 - found
+2026-11-01T12:42:44.5054500Z CMake Warning (policy) at third_party/curl/CMake/FindLibpsl.cmake:58 (file):
+2026-11-01T12:42:44.5055580Z   Policy CMP0159 is not set: file(STRINGS) with REGEX updates
+2026-11-01T12:42:44.5057150Z   CMAKE_MATCH_<n>.  Run "cmake --help-policy CMP0159" for policy details.
+2026-11-01T12:42:44.5057670Z   Use the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:44.5057930Z 
+2026-11-01T12:42:44.5058080Z   For compatibility, CMake is leaving CMAKE_MATCH_<n> unchanged.
+2026-11-01T12:42:44.5058400Z Call Stack (most recent call first):
+2026-11-01T12:42:44.5058730Z   third_party/curl/CMakeLists.txt:1293 (find_package)
+2026-11-01T12:42:44.5059140Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:44.5059450Z suppress it.
+2026-11-01T12:42:44.5059560Z 
+2026-11-01T12:42:44.5062860Z -- Found Libpsl: /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include (found version "0.21.5")
+2026-11-01T12:42:44.5066490Z -- Looking for sys/eventfd.h
+2026-11-01T12:42:44.6547160Z -- Looking for sys/eventfd.h - not found
+2026-11-01T12:42:44.6547500Z -- Looking for sys/filio.h
+2026-11-01T12:42:44.8681830Z -- Looking for sys/filio.h - found
+2026-11-01T12:42:44.8682990Z -- Looking for sys/ioctl.h
+2026-11-01T12:42:45.1266270Z -- Looking for sys/ioctl.h - found
+2026-11-01T12:42:45.1267380Z -- Looking for sys/param.h
+2026-11-01T12:42:45.3896070Z -- Looking for sys/param.h - found
+2026-11-01T12:42:45.3896550Z -- Looking for sys/poll.h
+2026-11-01T12:42:45.6424590Z -- Looking for sys/poll.h - found
+2026-11-01T12:42:45.9188950Z -- Looking for sys/resource.h
+2026-11-01T12:42:45.9189270Z -- Looking for sys/resource.h - found
+2026-11-01T12:42:45.9191090Z -- Looking for 3 include files sys/socket.h, ..., sys/select.h
+2026-11-01T12:42:46.2048760Z -- Looking for 3 include files sys/socket.h, ..., sys/select.h - found
+2026-11-01T12:42:46.2049680Z -- Looking for sys/sockio.h
+2026-11-01T12:42:46.6977710Z -- Looking for sys/sockio.h - found
+2026-11-01T12:42:46.6978610Z -- Looking for 4 include files sys/socket.h, ..., sys/types.h
+2026-11-01T12:42:46.9952880Z -- Looking for 4 include files sys/socket.h, ..., sys/types.h - found
+2026-11-01T12:42:46.9953910Z -- Looking for sys/un.h
+2026-11-01T12:42:47.2307450Z -- Looking for sys/un.h - found
+2026-11-01T12:42:47.2308310Z -- Looking for 5 include files sys/socket.h, ..., sys/utime.h
+2026-11-01T12:42:47.3918370Z -- Looking for 5 include files sys/socket.h, ..., sys/utime.h - not found
+2026-11-01T12:42:47.3919450Z -- Looking for 5 include files sys/socket.h, ..., arpa/inet.h
+2026-11-01T12:42:47.6130070Z -- Looking for 5 include files sys/socket.h, ..., arpa/inet.h - found
+2026-11-01T12:42:47.6131430Z -- Looking for fcntl.h
+2026-11-01T12:42:47.8644630Z -- Looking for fcntl.h - found
+2026-11-01T12:42:47.8645910Z -- Looking for 6 include files sys/socket.h, ..., ifaddrs.h
+2026-11-01T12:42:48.1387150Z -- Looking for 6 include files sys/socket.h, ..., ifaddrs.h - found
+2026-11-01T12:42:48.1388900Z -- Looking for io.h
+2026-11-01T12:42:48.2876300Z -- Looking for io.h - not found
+2026-11-01T12:42:48.2878210Z -- Looking for 7 include files sys/socket.h, ..., libgen.h
+2026-11-01T12:42:48.5464280Z -- Looking for 7 include files sys/socket.h, ..., libgen.h - found
+2026-11-01T12:42:48.5464860Z -- Looking for linux/tcp.h
+2026-11-01T12:42:48.6882870Z -- Looking for linux/tcp.h - not found
+2026-11-01T12:42:48.6883570Z -- Looking for locale.h
+2026-11-01T12:42:48.9383520Z -- Looking for locale.h - found
+2026-11-01T12:42:48.9392100Z -- Looking for 8 include files sys/socket.h, ..., net/if.h
+2026-11-01T12:42:49.2015140Z -- Looking for 8 include files sys/socket.h, ..., net/if.h - found
+2026-11-01T12:42:49.2017020Z -- Looking for 9 include files sys/socket.h, ..., netdb.h
+2026-11-01T12:42:49.4750790Z -- Looking for 9 include files sys/socket.h, ..., netdb.h - found
+2026-11-01T12:42:49.4751310Z -- Looking for 10 include files sys/socket.h, ..., netinet/in.h
+2026-11-01T12:42:49.7366100Z -- Looking for 10 include files sys/socket.h, ..., netinet/in.h - found
+2026-11-01T12:42:49.7366560Z -- Looking for netinet/in6.h
+2026-11-01T12:42:49.8789220Z -- Looking for netinet/in6.h - not found
+2026-11-01T12:42:49.8791530Z -- Looking for netinet/ip.h
+2026-11-01T12:42:50.1282050Z -- Looking for netinet/ip.h - found
+2026-11-01T12:42:50.1283500Z -- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h
+2026-11-01T12:42:50.4109330Z -- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h - found
+2026-11-01T12:42:50.4113250Z -- Looking for 12 include files sys/socket.h, ..., netinet/udp.h
+2026-11-01T12:42:50.7235070Z -- Looking for 12 include files sys/socket.h, ..., netinet/udp.h - found
+2026-11-01T12:42:50.7242550Z -- Looking for poll.h
+2026-11-01T12:42:51.0782860Z -- Looking for poll.h - found
+2026-11-01T12:42:51.0784820Z -- Looking for pwd.h
+2026-11-01T12:42:51.3933200Z -- Looking for pwd.h - found
+2026-11-01T12:42:51.3941850Z -- Looking for stdatomic.h
+2026-11-01T12:42:51.6626220Z -- Looking for stdatomic.h - found
+2026-11-01T12:42:51.6639750Z -- Looking for stdbool.h
+2026-11-01T12:42:51.9844300Z -- Looking for stdbool.h - found
+2026-11-01T12:42:51.9846260Z -- Looking for strings.h
+2026-11-01T12:42:52.2582220Z -- Looking for strings.h - found
+2026-11-01T12:42:52.2584450Z -- Looking for stropts.h
+2026-11-01T12:42:52.4410340Z -- Looking for stropts.h - not found
+2026-11-01T12:42:52.4410740Z -- Looking for termio.h
+2026-11-01T12:42:52.5898160Z -- Looking for termio.h - not found
+2026-11-01T12:42:52.5899920Z -- Looking for termios.h
+2026-11-01T12:42:52.8699300Z -- Looking for termios.h - found
+2026-11-01T12:42:52.8703730Z -- Looking for 13 include files sys/socket.h, ..., unistd.h
+2026-11-01T12:42:53.2140790Z -- Looking for 13 include files sys/socket.h, ..., unistd.h - found
+2026-11-01T12:42:53.2142660Z -- Looking for utime.h
+2026-11-01T12:42:53.5151300Z -- Looking for utime.h - found
+2026-11-01T12:42:53.5207050Z -- Looking for stdint.h
+2026-11-01T12:42:53.8702990Z -- Looking for stdint.h - found
+2026-11-01T12:42:53.8703510Z -- Looking for stddef.h
+2026-11-01T12:42:54.2428400Z -- Looking for stddef.h - found
+2026-11-01T12:42:54.2526340Z -- Check size of size_t
+2026-11-01T12:42:54.7217180Z -- Check size of size_t - done
+2026-11-01T12:42:54.7217990Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:42:54.7219820Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:54.7221170Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:54.7222350Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:54.7223060Z 
+2026-11-01T12:42:54.7223510Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:54.7224470Z   "SIZEOF_SIZE_T" will be removed from the current scope.
+2026-11-01T12:42:54.7225370Z Call Stack (most recent call first):
+2026-11-01T12:42:54.7226550Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:42:54.7227890Z   third_party/curl/CMakeLists.txt:1587 (check_type_size)
+2026-11-01T12:42:54.7228950Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:54.7229600Z suppress it.
+2026-11-01T12:42:54.7229770Z 
+2026-11-01T12:42:54.7229910Z -- Check size of ssize_t
+2026-11-01T12:42:55.0838940Z -- Check size of ssize_t - done
+2026-11-01T12:42:55.0839740Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:42:55.0840490Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:55.0841200Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:55.0841820Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:55.0842850Z 
+2026-11-01T12:42:55.0843160Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:55.0843770Z   "SIZEOF_SSIZE_T" will be removed from the current scope.
+2026-11-01T12:42:55.0844280Z Call Stack (most recent call first):
+2026-11-01T12:42:55.0844880Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:42:55.0852520Z   third_party/curl/CMakeLists.txt:1588 (check_type_size)
+2026-11-01T12:42:55.0853060Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:55.0853430Z suppress it.
+2026-11-01T12:42:55.0853580Z 
+2026-11-01T12:42:55.0853710Z -- Check size of long
+2026-11-01T12:42:55.4382550Z -- Check size of long - done
+2026-11-01T12:42:55.4386260Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:42:55.4390000Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:55.4393530Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:55.4396120Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:55.4603190Z 
+2026-11-01T12:42:55.4604180Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:55.4607730Z   "SIZEOF_LONG" will be removed from the current scope.
+2026-11-01T12:42:55.4608430Z Call Stack (most recent call first):
+2026-11-01T12:42:55.4610590Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:42:55.4611740Z   third_party/curl/CMakeLists.txt:1589 (check_type_size)
+2026-11-01T12:42:55.4613330Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:55.4615310Z suppress it.
+2026-11-01T12:42:55.4615610Z 
+2026-11-01T12:42:55.4616070Z -- Check size of int
+2026-11-01T12:42:55.7863940Z -- Check size of int - done
+2026-11-01T12:42:55.7864620Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:42:55.7865470Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:55.7866170Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:55.7866800Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:55.7867190Z 
+2026-11-01T12:42:55.7867500Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:55.7868400Z   "SIZEOF_INT" will be removed from the current scope.
+2026-11-01T12:42:55.7868920Z Call Stack (most recent call first):
+2026-11-01T12:42:55.7869480Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:42:55.7870120Z   third_party/curl/CMakeLists.txt:1590 (check_type_size)
+2026-11-01T12:42:55.7870690Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:55.7871320Z suppress it.
+2026-11-01T12:42:55.7871510Z 
+2026-11-01T12:42:55.7871720Z -- Check size of __int64
+2026-11-01T12:42:55.9601670Z -- Check size of __int64 - failed
+2026-11-01T12:42:55.9603170Z -- Check size of time_t
+2026-11-01T12:42:56.2597690Z -- Check size of time_t - done
+2026-11-01T12:42:56.2599180Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:42:56.2600640Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:56.2601950Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:56.2603140Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:56.2603860Z 
+2026-11-01T12:42:56.2604340Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:56.2605460Z   "SIZEOF_TIME_T" will be removed from the current scope.
+2026-11-01T12:42:56.2606390Z Call Stack (most recent call first):
+2026-11-01T12:42:56.2607390Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:42:56.2608690Z   third_party/curl/CMakeLists.txt:1592 (check_type_size)
+2026-11-01T12:42:56.2609870Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:56.2611250Z suppress it.
+2026-11-01T12:42:56.2611450Z 
+2026-11-01T12:42:56.2611620Z -- Check size of suseconds_t
+2026-11-01T12:42:56.5731540Z -- Check size of suseconds_t - done
+2026-11-01T12:42:56.5732790Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:42:56.5733510Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:42:56.5734170Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:42:56.5734780Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:42:56.5735230Z 
+2026-11-01T12:42:56.5735470Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:42:56.5736050Z   "SIZEOF_SUSECONDS_T" will be removed from the current scope.
+2026-11-01T12:42:56.5736420Z Call Stack (most recent call first):
+2026-11-01T12:42:56.5737190Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:42:56.5737730Z   third_party/curl/CMakeLists.txt:1593 (check_type_size)
+2026-11-01T12:42:56.5738130Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:42:56.5738580Z suppress it.
+2026-11-01T12:42:56.5738730Z 
+2026-11-01T12:42:56.5738880Z -- Looking for accept4
+2026-11-01T12:42:56.8436070Z -- Looking for accept4 - not found
+2026-11-01T12:42:56.8436600Z -- Looking for fnmatch
+2026-11-01T12:42:57.1241110Z -- Looking for fnmatch - found
+2026-11-01T12:42:57.1241680Z -- Looking for basename
+2026-11-01T12:42:57.4324610Z -- Looking for basename - found
+2026-11-01T12:42:57.4325450Z -- Looking for poll
+2026-11-01T12:42:57.7041850Z -- Looking for poll - found
+2026-11-01T12:42:57.7042970Z -- Looking for socket
+2026-11-01T12:42:57.9947400Z -- Looking for socket - found
+2026-11-01T12:42:57.9948350Z -- Looking for socketpair
+2026-11-01T12:42:58.2906320Z -- Looking for socketpair - found
+2026-11-01T12:42:58.2912920Z -- Looking for recv
+2026-11-01T12:42:58.6017740Z -- Looking for recv - found
+2026-11-01T12:42:58.6020600Z -- Looking for send
+2026-11-01T12:42:58.9058380Z -- Looking for send - found
+2026-11-01T12:42:58.9061580Z -- Looking for sendmsg
+2026-11-01T12:42:59.2209420Z -- Looking for sendmsg - found
+2026-11-01T12:42:59.2310520Z -- Looking for memrchr
+2026-11-01T12:42:59.4595480Z -- Looking for memrchr - not found
+2026-11-01T12:42:59.4617830Z -- Looking for alarm
+2026-11-01T12:42:59.9229490Z -- Looking for alarm - found
+2026-11-01T12:42:59.9233130Z -- Looking for fcntl
+2026-11-01T12:43:00.3533660Z -- Looking for fcntl - found
+2026-11-01T12:43:00.3534640Z -- Looking for getppid
+2026-11-01T12:43:00.6752970Z -- Looking for getppid - found
+2026-11-01T12:43:00.6753850Z -- Looking for utimes
+2026-11-01T12:43:00.9926670Z -- Looking for utimes - found
+2026-11-01T12:43:00.9961950Z -- Looking for closesocket
+2026-11-01T12:43:01.2276000Z -- Looking for closesocket - not found
+2026-11-01T12:43:01.2294210Z -- Looking for sigsetjmp
+2026-11-01T12:43:01.5423690Z -- Looking for sigsetjmp - found
+2026-11-01T12:43:01.5504590Z -- Looking for getpwuid
+2026-11-01T12:43:01.8755820Z -- Looking for getpwuid - found
+2026-11-01T12:43:01.8760820Z -- Looking for getpwuid_r
+2026-11-01T12:43:02.2307220Z -- Looking for getpwuid_r - found
+2026-11-01T12:43:02.2355390Z -- Looking for geteuid
+2026-11-01T12:43:02.5593720Z -- Looking for geteuid - found
+2026-11-01T12:43:02.5696710Z -- Looking for utime
+2026-11-01T12:43:02.8490940Z -- Looking for utime - found
+2026-11-01T12:43:02.8491580Z -- Looking for gmtime_r
+2026-11-01T12:43:03.1418120Z -- Looking for gmtime_r - found
+2026-11-01T12:43:03.1419190Z -- Looking for localtime_r
+2026-11-01T12:43:03.4908590Z -- Looking for localtime_r - found
+2026-11-01T12:43:03.4954690Z -- Looking for gethostbyname_r
+2026-11-01T12:43:03.6503560Z -- Looking for gethostbyname_r - not found
+2026-11-01T12:43:03.6504380Z -- Looking for gethostname
+2026-11-01T12:43:03.8933760Z -- Looking for gethostname - found
+2026-11-01T12:43:03.8942280Z -- Looking for signal
+2026-11-01T12:43:04.1902920Z -- Looking for signal - found
+2026-11-01T12:43:04.1903720Z -- Looking for strerror_r
+2026-11-01T12:43:04.5114100Z -- Looking for strerror_r - found
+2026-11-01T12:43:04.5120480Z -- Looking for sigaction
+2026-11-01T12:43:04.9554700Z -- Looking for sigaction - found
+2026-11-01T12:43:04.9659370Z -- Looking for siginterrupt
+2026-11-01T12:43:05.5438250Z -- Looking for siginterrupt - found
+2026-11-01T12:43:05.5540450Z -- Looking for getaddrinfo
+2026-11-01T12:43:06.1846420Z -- Looking for getaddrinfo - found
+2026-11-01T12:43:06.1947680Z -- Looking for getifaddrs
+2026-11-01T12:43:06.6201860Z -- Looking for getifaddrs - found
+2026-11-01T12:43:06.6304230Z -- Looking for freeaddrinfo
+2026-11-01T12:43:07.0200530Z -- Looking for freeaddrinfo - found
+2026-11-01T12:43:07.0304610Z -- Looking for pipe
+2026-11-01T12:43:07.4495790Z -- Looking for pipe - found
+2026-11-01T12:43:07.4613410Z -- Looking for getpeername
+2026-11-01T12:43:07.8458230Z -- Looking for getpeername - found
+2026-11-01T12:43:07.8560540Z -- Looking for getsockname
+2026-11-01T12:43:08.1961170Z -- Looking for getsockname - found
+2026-11-01T12:43:08.1962280Z -- Looking for getrlimit
+2026-11-01T12:43:08.5355450Z -- Looking for getrlimit - found
+2026-11-01T12:43:08.5460890Z -- Looking for setlocale
+2026-11-01T12:43:08.9259280Z -- Looking for setlocale - found
+2026-11-01T12:43:08.9384350Z -- Looking for setrlimit
+2026-11-01T12:43:09.2733160Z -- Looking for setrlimit - found
+2026-11-01T12:43:09.2833670Z -- Looking for mach_absolute_time
+2026-11-01T12:43:09.6585670Z -- Looking for mach_absolute_time - found
+2026-11-01T12:43:09.6734240Z -- Looking for dirent.h
+2026-11-01T12:43:10.0152200Z -- Looking for dirent.h - found
+2026-11-01T12:43:10.0153220Z -- Looking for fchmod
+2026-11-01T12:43:10.3469240Z -- Looking for fchmod - found
+2026-11-01T12:43:10.3471760Z -- Looking for gettimeofday
+2026-11-01T12:43:10.6502690Z -- Looking for gettimeofday - found
+2026-11-01T12:43:10.6601800Z -- Looking for if_nametoindex
+2026-11-01T12:43:11.1417270Z -- Looking for if_nametoindex - found
+2026-11-01T12:43:11.1418210Z -- Looking for realpath
+2026-11-01T12:43:11.4444860Z -- Looking for realpath - found
+2026-11-01T12:43:11.4546940Z -- Looking for sched_yield
+2026-11-01T12:43:11.8298520Z -- Looking for sched_yield - found
+2026-11-01T12:43:11.8299440Z -- Looking for opendir
+2026-11-01T12:43:12.1618510Z -- Looking for opendir - found
+2026-11-01T12:43:12.1719990Z -- Looking for strcasecmp
+2026-11-01T12:43:12.4715270Z -- Looking for strcasecmp - found
+2026-11-01T12:43:12.4817870Z -- Looking for stricmp
+2026-11-01T12:43:12.7046440Z -- Looking for stricmp - not found
+2026-11-01T12:43:12.7047360Z -- Looking for strcmpi
+2026-11-01T12:43:12.8891220Z -- Looking for strcmpi - not found
+2026-11-01T12:43:12.8899560Z -- Looking for memset_s
+2026-11-01T12:43:13.2361960Z -- Looking for memset_s - found
+2026-11-01T12:43:13.2467580Z -- Looking for fsetxattr
+2026-11-01T12:43:13.7403630Z -- Looking for fsetxattr - found
+2026-11-01T12:43:13.7505190Z -- Performing Test HAVE_FSETXATTR_5
+2026-11-01T12:43:13.9904730Z -- Performing Test HAVE_FSETXATTR_5 - Failed
+2026-11-01T12:43:13.9905490Z -- Performing Test HAVE_FSETXATTR_6
+2026-11-01T12:43:14.3735390Z -- Performing Test HAVE_FSETXATTR_6 - Success
+2026-11-01T12:43:14.3836540Z -- Check size of sa_family_t
+2026-11-01T12:43:14.7962200Z -- Check size of sa_family_t - done
+2026-11-01T12:43:14.7966560Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:43:14.7971220Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:43:14.7973020Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:43:14.7976860Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:43:14.7978090Z 
+2026-11-01T12:43:14.7980740Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:43:14.7982130Z   "SIZEOF_SA_FAMILY_T" will be removed from the current scope.
+2026-11-01T12:43:14.7983160Z Call Stack (most recent call first):
+2026-11-01T12:43:14.7984310Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:43:14.7985520Z   third_party/curl/CMakeLists.txt:1713 (check_type_size)
+2026-11-01T12:43:14.7988750Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:43:14.7990020Z suppress it.
+2026-11-01T12:43:14.7990370Z 
+2026-11-01T12:43:14.7990700Z -- Performing Test HAVE_FCNTL_O_NONBLOCK
+2026-11-01T12:43:15.1842410Z -- Performing Test HAVE_FCNTL_O_NONBLOCK - Success
+2026-11-01T12:43:15.1944470Z -- Performing Test HAVE_IOCTLSOCKET
+2026-11-01T12:43:15.3978050Z -- Performing Test HAVE_IOCTLSOCKET - Failed
+2026-11-01T12:43:15.3979030Z -- Performing Test HAVE_IOCTLSOCKET_CAMEL
+2026-11-01T12:43:15.5778230Z -- Performing Test HAVE_IOCTLSOCKET_CAMEL - Failed
+2026-11-01T12:43:15.5779970Z -- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO
+2026-11-01T12:43:15.7590850Z -- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO - Failed
+2026-11-01T12:43:15.7591380Z -- Performing Test HAVE_IOCTLSOCKET_FIONBIO
+2026-11-01T12:43:15.9097390Z -- Performing Test HAVE_IOCTLSOCKET_FIONBIO - Failed
+2026-11-01T12:43:15.9101890Z -- Performing Test HAVE_IOCTL_FIONBIO
+2026-11-01T12:43:16.1898300Z -- Performing Test HAVE_IOCTL_FIONBIO - Success
+2026-11-01T12:43:16.1899110Z -- Performing Test HAVE_IOCTL_SIOCGIFADDR
+2026-11-01T12:43:17.0829040Z -- Performing Test HAVE_IOCTL_SIOCGIFADDR - Success
+2026-11-01T12:43:17.0831160Z -- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK
+2026-11-01T12:43:17.3176340Z -- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK - Failed
+2026-11-01T12:43:17.3178010Z -- Performing Test HAVE_GETHOSTBYNAME_R_3
+2026-11-01T12:43:17.6353400Z -- Performing Test HAVE_GETHOSTBYNAME_R_3 - Failed
+2026-11-01T12:43:17.6568160Z -- Performing Test HAVE_GETHOSTBYNAME_R_5
+2026-11-01T12:43:18.1733900Z -- Performing Test HAVE_GETHOSTBYNAME_R_5 - Failed
+2026-11-01T12:43:18.1755650Z -- Performing Test HAVE_GETHOSTBYNAME_R_6
+2026-11-01T12:43:18.6626260Z -- Performing Test HAVE_GETHOSTBYNAME_R_6 - Failed
+2026-11-01T12:43:18.6649200Z -- Performing Test HAVE_BOOL_T
+2026-11-01T12:43:19.0770330Z -- Performing Test HAVE_BOOL_T - Success
+2026-11-01T12:43:19.0870070Z -- Performing Test HAVE_ATOMIC
+2026-11-01T12:43:19.4735210Z -- Performing Test HAVE_ATOMIC - Success
+2026-11-01T12:43:19.4836570Z -- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT
+2026-11-01T12:43:19.6988430Z -- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT - Failed
+2026-11-01T12:43:19.6989250Z -- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT
+2026-11-01T12:43:19.8860440Z -- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT - Failed
+2026-11-01T12:43:19.8861340Z -- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT
+2026-11-01T12:43:20.1008810Z -- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT - Failed
+2026-11-01T12:43:20.1010130Z -- Performing Test HAVE_FILE_OFFSET_BITS
+2026-11-01T12:43:20.4710060Z -- Performing Test HAVE_FILE_OFFSET_BITS - Success
+2026-11-01T12:43:20.4814830Z -- Check size of off_t
+2026-11-01T12:43:20.7958070Z -- Check size of off_t - done
+2026-11-01T12:43:20.7959210Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:43:20.7961190Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:43:20.7962390Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:43:20.7963690Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:43:20.7964500Z 
+2026-11-01T12:43:20.7964990Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:43:20.7965980Z   "SIZEOF_OFF_T" will be removed from the current scope.
+2026-11-01T12:43:20.7967130Z Call Stack (most recent call first):
+2026-11-01T12:43:20.7967850Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:43:20.7968520Z   third_party/curl/CMakeLists.txt:1773 (check_type_size)
+2026-11-01T12:43:20.7969040Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:43:20.7969600Z suppress it.
+2026-11-01T12:43:20.7969780Z 
+2026-11-01T12:43:20.7969930Z -- Looking for fseeko
+2026-11-01T12:43:21.0848900Z -- Looking for fseeko - found
+2026-11-01T12:43:21.0952640Z -- Check size of curl_off_t
+2026-11-01T12:43:21.4712050Z -- Check size of curl_off_t - done
+2026-11-01T12:43:21.4814450Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:43:21.4883040Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:43:21.4891410Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:43:21.4893940Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:43:21.4894460Z 
+2026-11-01T12:43:21.4894900Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:43:21.4896450Z   "SIZEOF_CURL_OFF_T" will be removed from the current scope.
+2026-11-01T12:43:21.4897830Z Call Stack (most recent call first):
+2026-11-01T12:43:21.4898820Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:43:21.4901720Z   third_party/curl/CMakeLists.txt:1790 (check_type_size)
+2026-11-01T12:43:21.4948630Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:43:21.4949370Z suppress it.
+2026-11-01T12:43:21.4949780Z 
+2026-11-01T12:43:21.4950260Z -- Check size of curl_socket_t
+2026-11-01T12:43:21.7683720Z -- Check size of curl_socket_t - done
+2026-11-01T12:43:21.7686920Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:43:21.7688400Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:43:21.7689690Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:43:21.7691030Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:43:21.7691820Z 
+2026-11-01T12:43:21.7692300Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:43:21.7693440Z   "SIZEOF_CURL_SOCKET_T" will be removed from the current scope.
+2026-11-01T12:43:21.7694470Z Call Stack (most recent call first):
+2026-11-01T12:43:21.7695520Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:43:21.7696800Z   third_party/curl/CMakeLists.txt:1792 (check_type_size)
+2026-11-01T12:43:21.7698010Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:43:21.7699510Z suppress it.
+2026-11-01T12:43:21.7699970Z 
+2026-11-01T12:43:21.7700530Z -- Performing Test HAVE_TIME_T_UNSIGNED
+2026-11-01T12:43:21.9411220Z -- Performing Test HAVE_TIME_T_UNSIGNED - Failed
+2026-11-01T12:43:21.9418460Z -- Performing Test HAVE_GLIBC_STRERROR_R
+2026-11-01T12:43:22.1325770Z -- Performing Test HAVE_GLIBC_STRERROR_R - Failed
+2026-11-01T12:43:22.1327270Z -- Performing Test HAVE_POSIX_STRERROR_R
+2026-11-01T12:43:22.4210180Z -- Performing Test HAVE_POSIX_STRERROR_R - Success
+2026-11-01T12:43:22.4310610Z -- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC
+2026-11-01T12:43:22.7624250Z -- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC - Success
+2026-11-01T12:43:22.7625040Z -- Performing Test HAVE_BUILTIN_AVAILABLE
+2026-11-01T12:43:23.0457020Z -- Performing Test HAVE_BUILTIN_AVAILABLE - Success
+2026-11-01T12:43:23.0473430Z -- Check size of struct sockaddr_storage
+2026-11-01T12:43:23.4288550Z -- Check size of struct sockaddr_storage - done
+2026-11-01T12:43:23.4292850Z CMake Warning (policy) at /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:402 (set):
+2026-11-01T12:43:23.4295310Z   Policy CMP0126 is not set: set(CACHE) does not remove a normal variable of
+2026-11-01T12:43:23.4296710Z   the same name.  Run "cmake --help-policy CMP0126" for policy details.  Use
+2026-11-01T12:43:23.4298030Z   the cmake_policy command to set the policy and suppress this warning.
+2026-11-01T12:43:23.4298720Z 
+2026-11-01T12:43:23.4299690Z   For compatibility with older versions of CMake, normal variable
+2026-11-01T12:43:23.4304240Z   "SIZEOF_STRUCT_SOCKADDR_STORAGE" will be removed from the current scope.
+2026-11-01T12:43:23.4304770Z Call Stack (most recent call first):
+2026-11-01T12:43:23.4306120Z   /opt/homebrew/share/cmake/Modules/CheckTypeSize.cmake:476 (__check_type_size_impl)
+2026-11-01T12:43:23.4306720Z   third_party/curl/CMake/OtherTests.cmake:48 (check_type_size)
+2026-11-01T12:43:23.4307190Z   third_party/curl/CMakeLists.txt:1828 (include)
+2026-11-01T12:43:23.4307620Z This warning is for project developers.  Use -Wno-author or -Wno-policy to
+2026-11-01T12:43:23.4308070Z suppress it.
+2026-11-01T12:43:23.4308240Z 
+2026-11-01T12:43:23.4308370Z -- Performing Test HAVE_STRUCT_TIMEVAL
+2026-11-01T12:43:23.6984980Z -- Performing Test HAVE_STRUCT_TIMEVAL - Success
+2026-11-01T12:43:23.6989880Z -- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW
+2026-11-01T12:43:24.1648130Z -- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW - Success
+2026-11-01T12:43:24.2053360Z -- Protocols: http https
+2026-11-01T12:43:24.2055290Z -- Features: AppleSecTrust AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+2026-11-01T12:43:24.2056730Z -- Enabled SSL backends: AWS-LC
+2026-11-01T12:43:24.2057700Z -- 
+2026-11-01T12:43:24.2058570Z buildinfo.configure.tool: cmake
+2026-11-01T12:43:24.2059540Z buildinfo.configure.command: /opt/homebrew/bin/cmake
+2026-11-01T12:43:24.2060530Z buildinfo.configure.version: 4.4.4
+2026-11-01T12:43:24.2062860Z buildinfo.configure.args: -DLLVM_DIR="/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm" -DVOID_CLANG="/Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang"
+2026-11-01T12:43:24.2065120Z buildinfo.configure.generator: Ninja
+2026-11-01T12:43:24.2066070Z buildinfo.configure.make: /opt/homebrew/bin/ninja
+2026-11-01T12:43:24.2067340Z buildinfo.host.cpu: arm64
+2026-11-01T12:43:24.2068120Z buildinfo.host.os: Darwin
+2026-11-01T12:43:24.2069050Z buildinfo.target.cpu: arm64
+2026-11-01T12:43:24.2069880Z buildinfo.target.os: Darwin
+2026-11-01T12:43:24.2070830Z buildinfo.target.flags: APPLE UNIX LLVM-CLANG
+2026-11-01T12:43:24.2071660Z buildinfo.compiler: Clang
+2026-11-01T12:43:24.2072820Z buildinfo.compiler.version: 23.1.4
+2026-11-01T12:43:24.2073450Z buildinfo.sysroot: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:43:24.2073930Z 
+2026-11-01T12:43:24.2075820Z CMake Error at cmake/CurlProvider.cmake:80 (message):
+2026-11-01T12:43:24.2076340Z   macOS HTTP requires native ICU IDN, SecTrust and the pinned TLS provider
+2026-11-01T12:43:24.2076850Z Call Stack (most recent call first):
+2026-11-01T12:43:24.2078300Z   CMakeLists.txt:109 (void_add_curl_provider)
+2026-11-01T12:43:24.2078620Z 
+2026-11-01T12:43:24.2078620Z 
+2026-11-01T12:43:24.2079320Z -- Configuring incomplete, errors occurred!
+2026-11-01T12:43:24.2449340Z ##[error]Process completed with exit code 1.
+2026-11-01T12:43:24.2769590Z ##[group]Run actions/upload-artifact@v6
+2026-11-01T12:43:24.2769930Z with:
+2026-11-01T12:43:24.2770430Z   name: link-experiment-thinlto-cache-macOS-ARM64-Release-77d676d0fc1149e36dd8d19a0e1602e053653fa7-1
+2026-11-01T12:43:24.2771040Z   include-hidden-files: true
+2026-11-01T12:43:24.2771920Z   path: build/link-experiment/
+build/**/CMakeCache.txt
+build/**/build.ninja
+build/**/CMakeFiles/rules.ninja
+build/**/.ninja_log
+build/**/ctest-results.xml
+build/**/Testing/
+build/**/http-*-evidence/
+build/**/url-*-evidence/
+
+2026-11-01T12:43:24.2773400Z   if-no-files-found: ignore
+2026-11-01T12:43:24.2773660Z   compression-level: 6
+2026-11-01T12:43:24.2773870Z   overwrite: false
+2026-11-01T12:43:24.2774100Z env:
+2026-11-01T12:43:24.2774300Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:43:24.2774590Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:43:24.2775030Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:43:24.2775940Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:43:24.2776400Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:43:24.2776870Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:24.2777340Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:43:24.2777770Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:24.2778250Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:24.2778680Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:24.2779140Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:43:24.2779630Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:43:24.2781120Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:43:24.2782220Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:43:24.2783120Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:43:24.2783730Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:43:24.2784190Z   VOID_LINKER: 
+2026-11-01T12:43:24.2784640Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:43:24.2785110Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:43:24.2785330Z ##[endgroup]
+2026-11-01T12:43:25.0196620Z With the provided path, there will be 62 files uploaded
+2026-11-01T12:43:25.0197490Z Artifact name is valid!
+2026-11-01T12:43:25.0198430Z Root directory input is valid!
+2026-11-01T12:43:25.5415400Z Beginning upload of artifact content to blob storage
+2026-11-01T12:43:26.0936790Z Uploaded bytes 187879
+2026-11-01T12:43:26.1665110Z Finished uploading artifact content to blob storage!
+2026-11-01T12:43:26.1665980Z SHA256 digest of uploaded artifact zip is 726eaa9385119d2f7ad0523730b4f6b3e4cbd5dc7dd80b791f8951cc21e73dfe
+2026-11-01T12:43:26.1666560Z Finalizing artifact upload
+2026-11-01T12:43:26.8370410Z Artifact link-experiment-thinlto-cache-macOS-ARM64-Release-77d676d0fc1149e36dd8d19a0e1602e053653fa7-1.zip successfully finalized. Artifact ID 13083827887
+2026-11-01T12:43:26.8371790Z Artifact link-experiment-thinlto-cache-macOS-ARM64-Release-77d676d0fc1149e36dd8d19a0e1602e053653fa7-1 has been successfully uploaded! Final size is 187879 bytes. Artifact ID is 13083827887
+2026-11-01T12:43:26.8372840Z Artifact download URL: https://github.com/Shmellyorc/Void.Language/actions/runs/41307437931/artifacts/13083827887
+2026-11-01T12:43:26.8483660Z ##[group]Run actions/upload-artifact@v6
+2026-11-01T12:43:26.8484940Z with:
+2026-11-01T12:43:26.8485530Z   name: tests-macOS-ARM64-Release
+2026-11-01T12:43:26.8487330Z   path: build/**/Testing/Temporary/LastTest.log
+build/**/CMakeFiles/CMakeConfigureLog.yaml
+build/**/CMakeFiles/CMakeError.log
+build/**/CMakeFiles/CMakeOutput.log
+
+2026-11-01T12:43:26.8489030Z   if-no-files-found: ignore
+2026-11-01T12:43:26.8489610Z   compression-level: 6
+2026-11-01T12:43:26.8490160Z   overwrite: false
+2026-11-01T12:43:26.8490690Z   include-hidden-files: false
+2026-11-01T12:43:26.8491250Z env:
+2026-11-01T12:43:26.8491730Z   EXPERIMENT_MODE: thinlto-cache
+2026-11-01T12:43:26.8492340Z   EXPERIMENT_CONFIGURATION: Release
+2026-11-01T12:43:26.8493280Z   EXPERIMENT_DIR: /Users/runner/work/Void.Language/Void.Language/build/link-experiment
+2026-11-01T12:43:26.8494420Z   ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+2026-11-01T12:43:26.8495680Z   UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
+2026-11-01T12:43:26.8496740Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:26.8498040Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.12.10/arm64/lib/pkgconfig
+2026-11-01T12:43:26.8499180Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:26.8500200Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:26.8501230Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.12.10/arm64
+2026-11-01T12:43:26.8502360Z   THINLTO_CACHE_DIR: /Users/runner/work/_temp/void-thinlto-qjrfev2f
+2026-11-01T12:43:26.8503540Z   LINK_EXPERIMENT_HELPER: /Users/runner/work/_temp/void-thinlto-qjrfev2f.py
+2026-11-01T12:43:26.8504890Z   LLVM_DIR: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+2026-11-01T12:43:26.8506330Z   CC: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:43:26.8507630Z   CXX: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+2026-11-01T12:43:26.8508970Z   VOID_CLANG: /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+2026-11-01T12:43:26.8509990Z   VOID_LINKER: 
+2026-11-01T12:43:26.8511030Z   SDKROOT: /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+2026-11-01T12:43:26.8513640Z   MACOSX_DEPLOYMENT_TARGET: 14.0
+2026-11-01T12:43:26.8514230Z ##[endgroup]
+2026-11-01T12:43:27.1176320Z With the provided path, there will be 6 files uploaded
+2026-11-01T12:43:27.1177210Z Artifact name is valid!
+2026-11-01T12:43:27.1177480Z Root directory input is valid!
+2026-11-01T12:43:27.5651100Z Beginning upload of artifact content to blob storage
+2026-11-01T12:43:28.0262330Z Uploaded bytes 130441
+2026-11-01T12:43:28.0969560Z Finished uploading artifact content to blob storage!
+2026-11-01T12:43:28.0973190Z SHA256 digest of uploaded artifact zip is cdd9e2895e1f734835e6312e82731f41319551ec4e06934156ce5ec6c2a9e62e
+2026-11-01T12:43:28.0974360Z Finalizing artifact upload
+2026-11-01T12:43:28.7373470Z Artifact tests-macOS-ARM64-Release.zip successfully finalized. Artifact ID 13083743130
+2026-11-01T12:43:28.7374460Z Artifact tests-macOS-ARM64-Release has been successfully uploaded! Final size is 130441 bytes. Artifact ID is 13083743130
+2026-11-01T12:43:28.7375700Z Artifact download URL: https://github.com/Shmellyorc/Void.Language/actions/runs/41307437931/artifacts/13083743130
+2026-11-01T12:43:28.7541420Z Post job cleanup.
+2026-11-01T12:43:28.9490110Z [command]/opt/homebrew/bin/git version
+2026-11-01T12:43:28.9684980Z git version 2.56.0
+2026-11-01T12:43:28.9715560Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/9e23da15-6e09-45b4-bc84-08f6c86e8be0/.gitconfig'
+2026-11-01T12:43:28.9726960Z Temporarily overriding HOME='/Users/runner/work/_temp/9e23da15-6e09-45b4-bc84-08f6c86e8be0' before making global git config changes
+2026-11-01T12:43:28.9728800Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-01T12:43:28.9736900Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Void.Language/Void.Language
+2026-11-01T12:43:28.9864690Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-01T12:43:28.9982610Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-01T12:43:29.1557950Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-01T12:43:29.1627220Z http.https://github.com/.extraheader
+2026-11-01T12:43:29.1637030Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-01T12:43:29.1716570Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-01T12:43:29.2928010Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-01T12:43:29.3130150Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-01T12:43:29.4748530Z Cleaning up orphan processes

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/home/runner/work/Void.Language/Void.Language/build/Sanitizers/void_http_wire",
+    "http://127.0.0.1:46621"
+  ],
+  "exit_code": 0,
+  "stack_bytes": [
+    1048576,
+    1048576
+  ],
+  "binary_sha256": "23f184cf47667772c4ff6391aaff0c4074412eddd86a676c7547921498314b0d",
+  "source_sha256": {
+    "src/runtime/http.cpp": "3f1b2904623bc75e9836aa1bab36a5324207d6664aa94d352585e43f1760dc47",
+    "tests/net/http/wire.cpp": "c93e2612c75e4973810053d0173728c1eecda033c12df2763ad2651b9b1736e8",
+    "tests/net/http/wire.py": "3b3e669dd7eb29e6f66559c07e12e0c1e5887eb8c7203eecf765a7e57694aacb"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  }
+}

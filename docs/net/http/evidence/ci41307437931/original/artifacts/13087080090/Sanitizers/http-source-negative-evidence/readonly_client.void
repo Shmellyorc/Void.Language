@@ -1,0 +1,4 @@
+use net/http
+func probe(const owner: http.client):
+    owner.close()
+return 0

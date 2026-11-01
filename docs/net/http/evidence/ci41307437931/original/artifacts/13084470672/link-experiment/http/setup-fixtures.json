@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.12/bin/python",
+    "/Users/runner/work/Void.Language/Void.Language/tools/setup_http_tests.py",
+    "--jobs",
+    "3"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.2659709590000148
+}

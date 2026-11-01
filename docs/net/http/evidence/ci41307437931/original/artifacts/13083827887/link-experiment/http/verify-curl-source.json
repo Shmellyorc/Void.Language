@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.12/bin/python",
+    "/Users/runner/work/Void.Language/Void.Language/tools/verify_curl_source.py"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.6996509580000065
+}

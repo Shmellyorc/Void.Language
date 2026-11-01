@@ -1,0 +1,223 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build",
+      "--prefix",
+      "/tmp/VOID HTTP installation l3zf_fcq/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1967965900003037
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41307437931-ubuntu/build",
+      "--prefix",
+      "/tmp/VOID HTTP installation l3zf_fcq/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0368660109998018
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0018503290011722129
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 19.18423801300014
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 17.086801091998495
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07019543500064174
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 24.237356746998557
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation l3zf_fcq/program.o",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10480518999975175
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06841412599897012
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 18.281715578999865
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 15.490239389997441
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06773595000049681
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 22.01074660700033
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation l3zf_fcq/program.o",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10015344899875345
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06706393399872468
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 3.1519217239983846
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation l3zf_fcq/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation l3zf_fcq/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 17.121302253999602
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation l3zf_fcq/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06558053300250322
+  }
+]
