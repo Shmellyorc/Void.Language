@@ -1,0 +1,16 @@
+CMake Error at CMakeLists.txt:13 (add_library):
+  Syntax error in cmake code when parsing string
+
+    D:\a\Void.Language\Void.Language\.toolchains\http\build\windows-schannel-x86_64\Release\source\libpsl-0.21.5/src/psl.c
+
+  Invalid character escape '\a'.
+
+
+CMake Error at CMakeLists.txt:13 (add_library):
+  Syntax error in cmake code when parsing string
+
+    D:\a\Void.Language\Void.Language\.toolchains\http\build\windows-schannel-x86_64\Release\source\libpsl-0.21.5/src/lookup_string_in_fixed_set.c
+
+  Invalid character escape '\a'.
+
+

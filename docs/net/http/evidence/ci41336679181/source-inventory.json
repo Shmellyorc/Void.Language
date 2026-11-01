@@ -1,0 +1,9 @@
+{
+  "CMakeLists.txt": "f8cf062e8f956d14e4f67952743ea05f04809a434f93c1342e388678c5578f1f",
+  "cmake/http-psl/CMakeLists.txt": "1ec49e97f92705b22ee7487fc342f6d28710252f67eaf131ea57e95ad64742b3",
+  "src/runtime/conversion.cpp": "0489132b69e5f8792182789ef3e892621ef846ab66aced326ca233d48ec27133",
+  "src/runtime/decimal_float.hpp": "b2e03f51da782c330296ec26071e9d9e63e9344ec58b52f53372b8b11b149720",
+  "tests/net/http/ci_triage_test.py": "e150b033b722f3c772c670de254f636fc9be61c87afe25e361f8812f8ce45f33",
+  "tests/stage10/decimal_float.cpp": "c86133176a1600fcbe06b0458ef80dcb2d9fbb67b9e80736fea4691661184df1",
+  "third_party/http-versions.json": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496"
+}

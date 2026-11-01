@@ -1,0 +1,4 @@
+curl 8.23.0: 1586 files verified; four private corrections
+HTTP dependency prefix verified: Release; 167 files
+HTTP dependency prefix verified: Debug; 167 files
+HTTP dependency prefix verified: strict; 167 files

@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.24)
 project(VoidPinnedPSL C)
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+# Untyped -D arguments can contain native Windows separators. Normalize before
+# CMake re-parses source entries while generating the target.
+file(TO_CMAKE_PATH "${PSL_SOURCE}" PSL_SOURCE)
+file(TO_CMAKE_PATH "${PSL_DATA}" PSL_DATA)
 if(NOT EXISTS "${PSL_SOURCE}/src/psl.c" OR NOT EXISTS "${PSL_DATA}")
   message(FATAL_ERROR "Supply verified PSL_SOURCE and PSL_DATA")
 endif()

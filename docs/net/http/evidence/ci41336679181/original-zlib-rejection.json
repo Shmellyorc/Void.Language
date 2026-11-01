@@ -1,0 +1,21 @@
+{
+  "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+  "expected_sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+  "cached": false,
+  "effective_url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+  "status": 200,
+  "headers": {
+    "Server": "openresty/1.31.1.1",
+    "Date": "Sun, 01 Nov 2026 18:29:18 GMT",
+    "Content-Length": "11880",
+    "Connection": "close",
+    "Content-Type": "text/html",
+    "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
+    "cf-edge-cache": "no-cache"
+  },
+  "actual_sha256": "75f9bd754f72601f06f1d99460ddbf009b17af8abea735b857632bc9dd3c3d2d",
+  "bytes": 11880,
+  "result": "rejected",
+  "error": "HTTP archive verification failed: zlib-1.3.2.tar.gz; expected bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16, got 75f9bd754f72601f06f1d99460ddbf009b17af8abea735b857632bc9dd3c3d2d, 11880 bytes; D:\\a\\Void.Language\\Void.Language\\docs\\net\\http\\evidence\\dependencies-windows-schannel-x86_64-Debug-20261101T182916334981Z\\zlib-1.3.2.tar.gz.acquisition.json",
+  "rejected_file": "zlib-1.3.2.tar.gz.rejected"
+}

@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start   9: http_ci_policy
+1/4 Test   #9: http_ci_policy ...................   Passed    4.11 sec
+    Start  32: decimal_float
+2/4 Test  #32: decimal_float ....................   Passed    0.01 sec
+    Start  33: stage10_conversion
+3/4 Test  #33: stage10_conversion ...............   Passed   73.35 sec
+    Start 371: stage10_conversion_aot
+4/4 Test #371: stage10_conversion_aot ...........   Passed    0.49 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  77.97 sec

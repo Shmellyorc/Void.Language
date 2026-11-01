@@ -43,6 +43,25 @@ class CheckoutTests(unittest.TestCase):
         print(f'Windows checkout filters: {len(expected)} source/review blobs verified')
 
 
+class WindowsPathTests(unittest.TestCase):
+    def test_psl_native_separators_and_spaces(self):
+        with tempfile.TemporaryDirectory(prefix='VOID PSL paths ') as temporary:
+            root = Path(temporary); source = root / 'a source'; (source / 'src').mkdir(parents=True)
+            (source / 'include').mkdir()
+            for name in ('psl.c', 'lookup_string_in_fixed_set.c'):
+                (source / 'src' / name).write_text('/* fixture */')
+            (source / 'include/libpsl.h').write_text('/* fixture */')
+            (source / 'src/psl-make-dafsa').write_text('import pathlib,sys\npathlib.Path(sys.argv[-1]).write_text("/* fixture */")\n')
+            data = root / 'a data.dat'; data.write_text('com\n')
+            # Native backslashes reach CMake exactly as in the failed -D values.
+            args = ['cmake', '-S', str(ROOT / 'cmake/http-psl'), '-B', str(root / 'build'),
+                    '-DPSL_SOURCE=' + str(source).replace('/', chr(92)),
+                    '-DPSL_DATA=' + str(data).replace('/', chr(92))]
+            result = subprocess.run(args, capture_output=True, text=True)
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertTrue((root / 'build/suffixes_dafsa.h').exists())
+
+
 class FeatureTests(unittest.TestCase):
     def configure(self, absent=None, zero=False, missing=False):
         with tempfile.TemporaryDirectory(prefix='VOID curl feature scope ') as directory:

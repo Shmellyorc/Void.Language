@@ -1,5 +1,9 @@
 #include "void/runtime_abi.hpp"
 
+#ifdef __APPLE__
+#include "decimal_float.hpp"
+#endif
+
 #include <bit>
 #include <charconv>
 #include <cmath>
@@ -58,12 +62,19 @@ unsigned number(std::string_view text, std::uint64_t& bits) {
         text.remove_prefix(1);
     }
     T value{};
-    const auto parsed = std::from_chars(text.data(), text.data() + text.size(), value);
-    if (parsed.ec == std::errc::result_out_of_range) {
-        return 2;
-    }
-    if (parsed.ec != std::errc{} || parsed.ptr != text.data() + text.size()) {
-        return 1;
+#ifdef __APPLE__
+    if constexpr (floating) {
+        value = vd::detail::decimal_float<T>(text);
+    } else
+#endif
+    {
+        const auto parsed = std::from_chars(text.data(), text.data() + text.size(), value);
+        if (parsed.ec == std::errc::result_out_of_range) {
+            return 2;
+        }
+        if (parsed.ec != std::errc{} || parsed.ptr != text.data() + text.size()) {
+            return 1;
+        }
     }
     if constexpr (floating) {
         // from_chars reports overflow and underflow; also defend zero rounding

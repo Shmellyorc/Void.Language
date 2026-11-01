@@ -1,0 +1,2 @@
+2026-11-01T18:35:29.2503510Z /Users/runner/work/Void.Language/Void.Language/src/runtime/conversion.cpp:61:30: error: 'from_chars' is unavailable: introduced in macOS 26.0
+2026-11-01T18:35:29.3422900Z /Users/runner/work/Void.Language/Void.Language/src/runtime/conversion.cpp:61:30: error: 'from_chars' is unavailable: introduced in macOS 26.0

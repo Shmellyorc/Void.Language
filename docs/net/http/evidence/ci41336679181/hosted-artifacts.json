@@ -1,0 +1,30 @@
+[
+  {
+    "id": 13096060456,
+    "name": "link-experiment-thinlto-cache-macOS-ARM64-Debug-40ecd4238a0c3b781c308144e1bf7a8fd56dfaaa-1",
+    "sha256": "7b54713a60493195d55876c42f376643a38e87b9a1e87d09fdf7adad76fc474c",
+    "bytes": 491208,
+    "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41336679181/artifacts/13096060456"
+  },
+  {
+    "id": 13095867405,
+    "name": "link-experiment-thinlto-cache-macOS-ARM64-Release-40ecd4238a0c3b781c308144e1bf7a8fd56dfaaa-1",
+    "sha256": "543aed7eac07c69f0ab3cfddb118f2eab9d8ba7e5a89328711c99bdc458a7f37",
+    "bytes": 491514,
+    "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41336679181/artifacts/13095867405"
+  },
+  {
+    "id": 13095384619,
+    "name": "link-experiment-thinlto-cache-Windows-X64-Release-40ecd4238a0c3b781c308144e1bf7a8fd56dfaaa-1",
+    "sha256": "a99a7e5de1c02d744ba6eb6d210de63562ed33fad9f0b22d4a7a55c883587390",
+    "bytes": 97751,
+    "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41336679181/artifacts/13095384619"
+  },
+  {
+    "id": 13095369194,
+    "name": "link-experiment-thinlto-cache-Windows-X64-Debug-40ecd4238a0c3b781c308144e1bf7a8fd56dfaaa-1",
+    "sha256": "f90cf33da1fd6d2163e2003fd7f1ff20243e8f5f4ae1a96be711caef002d0ae7",
+    "bytes": 14594,
+    "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41336679181/artifacts/13095369194"
+  }
+]
