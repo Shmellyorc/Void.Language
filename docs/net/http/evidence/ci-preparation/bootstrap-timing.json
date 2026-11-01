@@ -1,0 +1,11 @@
+{
+  "scope": "Linux local native Release build in a new disposable source/build/prefix replica; verified SDK, archives and wheel downloads already present; no hosted runtime or Windows/macOS execution claim",
+  "cold_dependency_build_seconds": 184.96513471700018,
+  "cold_dependency_build_exit_code": 0,
+  "warm_bootstrap_seconds": 0.5131633239943767,
+  "warm_bootstrap_exit_code": 0,
+  "warm_dependency_compilation": false,
+  "negative_restore_exit_code": 1,
+  "negative_restore_rejected_before_fixtures": true,
+  "fixture_script_sha256": "1071ed131b85857c9238f64ee71d985c3eec9064166bfdcba22c82eb5c455ca1"
+}

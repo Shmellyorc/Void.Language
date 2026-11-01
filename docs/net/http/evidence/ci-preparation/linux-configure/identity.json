@@ -1,0 +1,108 @@
+{
+  "commit": "490df04edee92756c20c336c0f32114476167941",
+  "dispatch_sha": null,
+  "mode": "thinlto-cache",
+  "configuration": "Release",
+  "run_id": null,
+  "run_attempt": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "logical_cpus": 16,
+  "environment": {
+    "CC": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "CXX": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "SDKROOT": null,
+    "VCToolsVersion": null,
+    "WindowsSDKVersion": null,
+    "ASAN_OPTIONS": null,
+    "UBSAN_OPTIONS": null
+  },
+  "workflow_sha256": "ea20d03ca0b841f671f89977e14173a9c7764c74b3892dccbc07a9017d3f74e6",
+  "tools_and_host": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "output": "490df04edee92756c20c336c0f32114476167941\n"
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "output": " M .github/workflows/ci-link-experiment.yml\n M tools/setup_http_tests.py\n?? docs/net/http/evidence/ci-preparation/\n?? tests/net/http/ci_bootstrap_test.py\n?? tools/ci/http_bootstrap.py\n"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "cmake version 4.3.4\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n"
+    },
+    {
+      "argv": [
+        "ninja",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "1.13.2\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "--version"
+      ],
+      "exit_code": 0,
+      "output": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)\n"
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "exit_code": 0,
+      "output": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           43 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 7 1700X Eight-Core Processor\nCPU family:                              23\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                1\nMicrocode version:                       0x8001139\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      62%\nCPU max MHz:                             3900.0000\nCPU min MHz:                             2200.0000\nBogoMIPS:                                6800.06\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb hw_pstate ssbd ibpb vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif overflow_recov succor smca sev\nVirtualization:                          AMD-V\nL1d cache:                               256 KiB (8 instances)\nL1i cache:                               512 KiB (8 instances)\nL2 cache:                                4 MiB (8 instances)\nL3 cache:                                16 MiB (2 instances)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; untrained return thunk; SMT vulnerable\nVulnerability Spec rstack overflow:      Mitigation; Safe RET\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n"
+    },
+    {
+      "argv": [
+        "cat",
+        "/proc/meminfo"
+      ],
+      "exit_code": 0,
+      "output": "MemTotal:       32771920 kB\nMemFree:        13845428 kB\nMemAvailable:   22096068 kB\nBuffers:            1428 kB\nCached:          8152532 kB\nSwapCached:         2636 kB\nActive:          9938668 kB\nInactive:        5682820 kB\nActive(anon):    6047232 kB\nInactive(anon):  1667436 kB\nActive(file):    3891436 kB\nInactive(file):  4015384 kB\nUnevictable:       32240 kB\nMlocked:             252 kB\nSwapTotal:      32771916 kB\nSwapFree:       30585468 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:             35044 kB\nWriteback:             0 kB\nAnonPages:       6985524 kB\nMapped:          1632556 kB\nShmem:            215196 kB\nKReclaimable:     809328 kB\nSlab:            1248756 kB\nSReclaimable:     809328 kB\nSUnreclaim:       439428 kB\nKernelStack:       36624 kB\nPageTables:       140432 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    49157876 kB\nCommitted_AS:   49969420 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:      229136 kB\nVmallocChunk:          0 kB\nPercpu:            14784 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:   1529856 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:   1185792 kB\nFilePmdMapped:    491520 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nGPUActive:        247580 kB\nGPUReclaim:        75032 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:     2324116 kB\nDirectMap2M:    31150080 kB\nDirectMap1G:           0 kB\n"
+    }
+  ]
+}

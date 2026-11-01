@@ -10,7 +10,7 @@ on:
         description: Link experiment mode (compare both modes on the same commit)
         type: choice
         required: true
-        default: control
+        default: thinlto-cache
         options:
           - control
           - thinlto-cache
@@ -152,6 +152,10 @@ jobs:
                          '-DVOID_LINKER=' + os.environ.get('VOID_LINKER', ''),
                          '--trace-format=json-v1', '--trace-source=' + str(Path('CMakeLists.txt').resolve()),
                          '--trace-redirect=' + str(evidence / 'configure-trace.jsonl')]
+              if platform.system() == 'Darwin':
+                  command += ['-DCMAKE_OSX_ARCHITECTURES=arm64',
+                              '-DCMAKE_OSX_SYSROOT=' + os.environ['SDKROOT'],
+                              '-DCMAKE_OSX_DEPLOYMENT_TARGET=' + os.environ['MACOSX_DEPLOYMENT_TARGET']]
               if mode == 'thinlto-cache' and platform.system() != 'Windows':
                   flag = ('-Wl,--thinlto-cache-dir=' if platform.system() == 'Linux' else '-Wl,-cache_path_lto,')
                   # CMake parses this string as linker flags; quote the directory for paths with spaces.
@@ -244,10 +248,63 @@ jobs:
           key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Install and verify LLVM development SDK
         run: python tools/ci/llvm_sdk.py
+      - name: Identify pinned native HTTP dependencies
+        id: http
+        run: python tools/ci/http_bootstrap.py identity
+      - name: Cache verified HTTP source archives
+        id: http-sources
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Cache native HTTP dependency profile
+        id: http-deps
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Cache pinned local HTTP fixtures
+        id: http-fixtures
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            .toolchains/http/test-python
+            .toolchains/http/test-certificates
+            .toolchains/http/test-certificates-tools
+          key: ${{ steps.http.outputs.fixtures-key }}
+      - name: Bootstrap and verify HTTP dependencies and fixtures
+        env:
+          HTTP_DEPS_CACHE_HIT: ${{ steps.http-deps.outputs.cache-hit }}
+        run: python tools/ci/http_bootstrap.py bootstrap
+      # Save after verification, so later native compiler/test failures do not
+      # force rebuilding an already verified immutable dependency closure.
+      - name: Save verified HTTP source archives
+        if: steps.http-sources.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Save verified native HTTP dependency profile
+        if: steps.http-deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Save verified local HTTP fixtures
+        if: steps.http-fixtures.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            .toolchains/http/test-python
+            .toolchains/http/test-certificates
+            .toolchains/http/test-certificates-tools
+          key: ${{ steps.http.outputs.fixtures-key }}
       - name: Configure ${{ matrix.configuration }}
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" configure
       - name: Build ${{ matrix.configuration }}
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" build
+      - name: Verify HTTP and URL acceptance registration
+        run: python tools/ci/http_bootstrap.py test-plan
       - name: Execute ${{ matrix.configuration }} tests
         run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure --output-junit ctest-results.xml
       - name: Frontend Debug and Release small-stack regression
@@ -316,6 +373,8 @@ jobs:
             build/**/.ninja_log
             build/**/ctest-results.xml
             build/**/Testing/
+            build/**/http-*-evidence/
+            build/**/url-*-evidence/
           if-no-files-found: ignore
       - name: Preserve test results
         if: always()

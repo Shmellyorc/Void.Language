@@ -1,0 +1,107 @@
+{
+  "client_date": "2026-10-31",
+  "baseline": "490df04edee92756c20c336c0f32114476167941",
+  "scope": "Local CI preparation only; no hosted native acceptance or dispatch",
+  "workflow_validation": "PASS",
+  "actionlint": {
+    "version": "1.7.12",
+    "exit_code": 0
+  },
+  "cache_policy_tests": {
+    "passed": 17,
+    "total": 17,
+    "native_windows_execution": false
+  },
+  "linux_focused_ctests": {
+    "passed": 9,
+    "total": 9,
+    "tests": [
+      "http_native",
+      "http_timeouts",
+      "http_wire",
+      "http_dns",
+      "url_native",
+      "http_ir",
+      "url_ir",
+      "url_lsp",
+      "http_lsp"
+    ]
+  },
+  "linux_prefixes": {
+    "Release": {
+      "files_verified": 167,
+      "result": "PASS"
+    },
+    "Debug": {
+      "files_verified": 167,
+      "result": "PASS"
+    },
+    "strict": {
+      "files_verified": 167,
+      "result": "PASS"
+    }
+  },
+  "clean_bootstrap": {
+    "scope": "Linux local native Release build in a new disposable source/build/prefix replica; verified SDK, archives and wheel downloads already present; no hosted runtime or Windows/macOS execution claim",
+    "cold_dependency_build_seconds": 184.96513471700018,
+    "cold_dependency_build_exit_code": 0,
+    "warm_bootstrap_seconds": 0.5131633239943767,
+    "warm_bootstrap_exit_code": 0,
+    "warm_dependency_compilation": false,
+    "negative_restore_exit_code": 1,
+    "negative_restore_rejected_before_fixtures": true,
+    "fixture_script_sha256": "1071ed131b85857c9238f64ee71d985c3eec9064166bfdcba22c82eb5c455ca1"
+  },
+  "linux_configure": {
+    "argv": [
+      "cmake",
+      "-S",
+      ".",
+      "-B",
+      ".toolchains/http-ci-configure",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DVOID_SANITIZERS=OFF",
+      "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+      "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-DVOID_HTTP_DEPS_ROOT=/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+      "--trace-format=json-v1",
+      "--trace-source=/home/shmellyorc/Documents/Void.Language/CMakeLists.txt",
+      "--trace-redirect=/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/ci-preparation/linux-configure/configure-trace.jsonl",
+      "-DCMAKE_EXE_LINKER_FLAGS:STRING=--ld-path=\"/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\" -Wl,--thinlto-cache-dir=\"/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache\""
+    ],
+    "cache_before": {
+      "directory": "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache",
+      "files": 0,
+      "bytes": 0
+    },
+    "phase": "configure",
+    "exit_code": 0,
+    "wall_seconds": 15.863305753999157,
+    "cache_after": {
+      "directory": "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache",
+      "files": 1,
+      "bytes": 0
+    },
+    "child_resources": {
+      "user_seconds": 9.915282,
+      "system_seconds": 7.141634,
+      "max_rss_bytes": 409530368,
+      "note": "Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak."
+    },
+    "orc_probe_seconds": 4.565498113632202,
+    "orc_probe_note": "CMake trace call-to-return wall time; null means the probe did not return."
+  },
+  "pins_changed": false,
+  "curl_source_changed": false,
+  "protected_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "hosted_dispatch": false,
+  "source_files_sha256": {
+    ".github/workflows/ci-link-experiment.yml": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1",
+    "tools/ci/http_bootstrap.py": "2c22489247becb1d0055207837a283901367bab7569555df5ddf3fa64ceba0eb",
+    "tools/setup_http_tests.py": "1071ed131b85857c9238f64ee71d985c3eec9064166bfdcba22c82eb5c455ca1",
+    "tests/net/http/ci_bootstrap_test.py": "02b8edadb5b2bbfe31ca4e0bddaa040fcce544e9ac4e20ca6aa8e578696ac5b0"
+  }
+}

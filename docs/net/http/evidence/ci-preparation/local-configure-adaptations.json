@@ -1,0 +1,4 @@
+{
+  "scope": "Original workflow configure helper, isolated local build directory and fresh dependency-prefix path only; Ninja and thinlto-cache selection preserved",
+  "helper_sha256": "ba586e4059314ccb0404d4e5b2050203b4b0fa9e9c7ccbf1333c1b22feab345a"
+}

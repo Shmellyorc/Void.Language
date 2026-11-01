@@ -1,0 +1,10 @@
+{
+  "versions": {
+    "h2": "4.4.1",
+    "hpack": "4.2.0",
+    "hyperframe": "6.1.0"
+  },
+  "certificate_tool": "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+  "python_ssl": "OpenSSL 4.0.1 9 Jun 2026",
+  "alpn": true
+}

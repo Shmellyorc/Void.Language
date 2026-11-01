@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/tools/setup_http_deps.py",
+    "--profile",
+    "Release",
+    "--jobs",
+    "3"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 184.96513471700018
+}

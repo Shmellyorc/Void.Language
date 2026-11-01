@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/tools/verify_http_dependencies.py",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+    "Release"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.20637268701102585
+}

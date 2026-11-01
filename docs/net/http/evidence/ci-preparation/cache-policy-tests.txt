@@ -1,0 +1,22 @@
+test_changed_certificate_identity_rejected (__main__.CertificateCacheTests.test_changed_certificate_identity_rejected) ... ok
+test_corrupted_certificate_binary_rejected (__main__.CertificateCacheTests.test_corrupted_certificate_binary_rejected) ... ok
+test_matching_fixture_skips_build_and_removes_obsolete_import (__main__.CertificateCacheTests.test_matching_fixture_skips_build_and_removes_obsolete_import) ... ok
+test_crt_sdk_changes_invalidate_windows_binary_caches (__main__.IdentityTests.test_crt_sdk_changes_invalidate_windows_binary_caches) ... ok
+test_macos_sdk_and_deployment_invalidate_prefix (__main__.IdentityTests.test_macos_sdk_and_deployment_invalidate_prefix) ... ok
+test_native_host_rejects_architecture_mismatch (__main__.IdentityTests.test_native_host_rejects_architecture_mismatch) ... ok
+test_plan_roundtrips_json (__main__.IdentityTests.test_plan_roundtrips_json) ... ok
+test_recipe_and_fixture_pins_invalidate_respective_keys (__main__.IdentityTests.test_recipe_and_fixture_pins_invalidate_respective_keys) ... ok
+test_seven_profiles_have_distinct_native_keys (__main__.IdentityTests.test_seven_profiles_have_distinct_native_keys) ... ok
+test_windows_fixture_and_sources_shared_across_profiles (__main__.IdentityTests.test_windows_fixture_and_sources_shared_across_profiles) ... ok
+test_cache_hit_never_builds_dependencies (__main__.RestoreTests.test_cache_hit_never_builds_dependencies) ... ok
+test_cache_miss_does_not_adopt_preexisting_prefix (__main__.RestoreTests.test_cache_miss_does_not_adopt_preexisting_prefix) ... ok
+test_changed_manifest_rejected_before_subprocess (__main__.RestoreTests.test_changed_manifest_rejected_before_subprocess) ... ok
+test_exact_cache_hit_verifies_manifest (__main__.RestoreTests.test_exact_cache_hit_verifies_manifest) ... ok
+test_missing_seal_rejected (__main__.RestoreTests.test_missing_seal_rejected) ... ok
+test_wrong_manifest_architecture_rejected (__main__.RestoreTests.test_wrong_manifest_architecture_rejected) ... ok
+test_wrong_profile_identity_rejected (__main__.RestoreTests.test_wrong_profile_identity_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.106s
+
+OK

@@ -1,0 +1,28 @@
+compiler: passed
+nghttp2-configure: passed
+nghttp2-build: passed
+nghttp2-install: passed
+c-ares-configure: passed
+c-ares-build: passed
+c-ares-install: passed
+zlib-configure: passed
+zlib-build: passed
+zlib-install: passed
+aws-lc-configure: passed
+aws-lc-build: passed
+aws-lc-install: passed
+libunistring-configure: passed
+libunistring-build: passed
+libunistring-install: passed
+libidn2-configure: passed
+libidn2-build: passed
+libidn2-install: passed
+libpsl-configure: passed
+libpsl-build: passed
+libpsl-install: passed
+/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release
+HTTP dependency prefix verified: Release; 167 files
+verified test dependency: h2 4.4.1
+verified test dependency: hpack 4.2.0
+verified test dependency: hyperframe 6.1.0
+OpenSSL 1.1.1 (compatible; AWS-LC 5.12.0)

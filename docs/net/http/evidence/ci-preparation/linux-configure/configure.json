@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "cmake",
+    "-S",
+    ".",
+    "-B",
+    ".toolchains/http-ci-configure",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DVOID_SANITIZERS=OFF",
+    "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "-DVOID_HTTP_DEPS_ROOT=/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+    "--trace-format=json-v1",
+    "--trace-source=/home/shmellyorc/Documents/Void.Language/CMakeLists.txt",
+    "--trace-redirect=/home/shmellyorc/Documents/Void.Language/docs/net/http/evidence/ci-preparation/linux-configure/configure-trace.jsonl",
+    "-DCMAKE_EXE_LINKER_FLAGS:STRING=--ld-path=\"/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\" -Wl,--thinlto-cache-dir=\"/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache\""
+  ],
+  "cache_before": {
+    "directory": "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache",
+    "files": 0,
+    "bytes": 0
+  },
+  "phase": "configure",
+  "exit_code": 0,
+  "wall_seconds": 15.863305753999157,
+  "cache_after": {
+    "directory": "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache",
+    "files": 1,
+    "bytes": 0
+  },
+  "child_resources": {
+    "user_seconds": 9.915282,
+    "system_seconds": 7.141634,
+    "max_rss_bytes": 409530368,
+    "note": "Child totals for this wrapper, including diagnostic subprocesses; RSS is the largest child peak."
+  },
+  "orc_probe_seconds": 4.565498113632202,
+  "orc_probe_note": "CMake trace call-to-return wall time; null means the probe did not return."
+}

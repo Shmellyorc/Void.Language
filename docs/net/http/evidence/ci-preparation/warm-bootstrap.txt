@@ -1,0 +1,5 @@
+HTTP dependency prefix verified: Release; 167 files
+verified test dependency: h2 4.4.1
+verified test dependency: hpack 4.2.0
+verified test dependency: hyperframe 6.1.0
+OpenSSL 1.1.1 (compatible; AWS-LC 5.12.0)

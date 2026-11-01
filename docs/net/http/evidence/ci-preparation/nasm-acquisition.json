@@ -1,0 +1,10 @@
+{
+  "url": "https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip",
+  "sha256": "3ee4782247bcb874378d02f7eab4e294a84d3d15f3f6ee2de2f47a46aa7226e6",
+  "scope": "Test-only Windows certificate-tool assembler; archive downloaded and inspected on Linux, executable not run",
+  "files": [
+    "nasm-2.16.03/LICENSE",
+    "nasm-2.16.03/nasm.exe",
+    "nasm-2.16.03/ndisasm.exe"
+  ]
+}

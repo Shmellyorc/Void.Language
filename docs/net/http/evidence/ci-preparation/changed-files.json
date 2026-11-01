@@ -1,0 +1,655 @@
+{
+  "baseline": "490df04edee92756c20c336c0f32114476167941",
+  "scope": "Unstaged CI integration source/docs and local retained evidence; includes ignored local diagnostic logs, not a Git operation or hosted execution",
+  "source_and_documentation": [
+    {
+      "path": ".github/workflows/ci-link-experiment.yml",
+      "bytes": 20383,
+      "sha256": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1"
+    },
+    {
+      "path": "tools/ci/http_bootstrap.py",
+      "bytes": 13808,
+      "sha256": "2c22489247becb1d0055207837a283901367bab7569555df5ddf3fa64ceba0eb"
+    },
+    {
+      "path": "tools/setup_http_tests.py",
+      "bytes": 7658,
+      "sha256": "1071ed131b85857c9238f64ee71d985c3eec9064166bfdcba22c82eb5c455ca1"
+    },
+    {
+      "path": "tests/net/http/ci_bootstrap_test.py",
+      "bytes": 9956,
+      "sha256": "02b8edadb5b2bbfe31ca4e0bddaa040fcce544e9ac4e20ca6aa8e578696ac5b0"
+    },
+    {
+      "path": "docs/net/http/NATIVE_PLATFORMS.md",
+      "bytes": 3926,
+      "sha256": "39c1d8baf50a23c3058b22445d2104e2fb1d89d17de87ca8cd3cfc80d506eb0c"
+    },
+    {
+      "path": "docs/net/http/CI_HANDOFF.md",
+      "bytes": 12476,
+      "sha256": "388fbf7059d0c5c628436213903bce2b13ed99f965b3eedd8b79e88f266fce85"
+    }
+  ],
+  "local_evidence": [
+    {
+      "path": "docs/net/http/evidence/ci-preparation/actionlint-identity.json",
+      "bytes": 217,
+      "sha256": "e7908b4471228cb141435982cffa68c1a5b4433aed20f94cf690d6825df36d45"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/actionlint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/bootstrap-timing.json",
+      "bytes": 609,
+      "sha256": "e1cd0178cc283304091d16589bc2c525d254cbdc8cf7515e454e5342ccec332f"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/cache-policy-tests.log",
+      "bytes": 2192,
+      "sha256": "6ad73edc756968504abbf0e4d9221b868ad8f5e040baca8a63914e6ad6b5f502"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/cache-policy-tests.txt",
+      "bytes": 2192,
+      "sha256": "9d8e834458a6007cc1dd65e1be9d830f8c8633d774bd428d279a042e234f3e91"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/aws-lc/CMakeCache.txt",
+      "bytes": 25515,
+      "sha256": "bac8995451c291acf635e1f0393c2c8f89dbe8515765b1155b7d07d2c5f81c30"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/aws-lc/CMakeFiles/CMakeConfigureLog.yaml",
+      "bytes": 187203,
+      "sha256": "4ade09fb718aea3d7d504078317af0aa69f9461c8d0e40350ec4425f5218fd71"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/c-ares/CMakeCache.txt",
+      "bytes": 31239,
+      "sha256": "ba512c1521b91339f0daa7a52bcf5c5a30f9abccec71bcbf983208060a215455"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/c-ares/CMakeFiles/CMakeConfigureLog.yaml",
+      "bytes": 805860,
+      "sha256": "19bc57d6ad2b7a3a98bbc972eaae2f9da1b495766e0ed5134bbd01040e049306"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/libidn2/config.log",
+      "bytes": 500530,
+      "sha256": "a082f112f35a2d9a2668ddde7a92ef8dfdf35a17d7635d8c71f701709c42ed36"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/libpsl/config.log",
+      "bytes": 67894,
+      "sha256": "29293e55759a0d22f64633a59320f1d63480f12f2d86f458d21e0e66bb9d3ad3"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/libunistring/config.log",
+      "bytes": 858674,
+      "sha256": "fedf9b33f8b22455b5934113a683a02caf02e7dae42c5bb6840a9cf3d1079f88"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/nghttp2/CMakeCache.txt",
+      "bytes": 30043,
+      "sha256": "23be59b7ebec50e03ff76c7fbff97502ac91b15a7c69c6dcdd4075b2e46be49d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/nghttp2/CMakeFiles/CMakeConfigureLog.yaml",
+      "bytes": 393218,
+      "sha256": "00f46874ecf46179462213c5de61274851bd3c7675ef1db8a02aad95d932fccc"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/zlib/CMakeCache.txt",
+      "bytes": 22255,
+      "sha256": "64f0474e27f36c89d629db98ce23eb281f53f4509f3095c9f65c2a88b59a61ec"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap-configure/0/zlib/CMakeFiles/CMakeConfigureLog.yaml",
+      "bytes": 81053,
+      "sha256": "f76c7ab196ba37a2c506df0fffa75247a8851aaf435a189e91b078fb5de88e6d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/bootstrap.json",
+      "bytes": 123,
+      "sha256": "0e1a67e78b8943335d407ed05643f0daaec17bc46b77929ac3c2a8c3ece31b8a"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/build-dependencies.json",
+      "bytes": 255,
+      "sha256": "6fd798208bfc94c5b572c39efc7b533fe0711eaca7e64a66927e04557b13ba05"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/build-dependencies.log",
+      "bytes": 639,
+      "sha256": "e2c5d0e6498f50f23db80ea835580ec2f4291de68b1a26fa5ce7974aabc9aaa4"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/certificate-version.json",
+      "bytes": 231,
+      "sha256": "e4808c1ca2579cf651c50c2f1e646ab5c9d4843124534553b176feaf2c71e4d5"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/certificate-version.log",
+      "bytes": 42,
+      "sha256": "2fdff531cb40b4cc2eb44b0ee5648bc721ba0131aa89096b4b673c42397d6436"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/aws-lc-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/aws-lc-build.stdout",
+      "bytes": 45054,
+      "sha256": "6c2204a2655223735e2f0c5516858803a3ecf9ccf5a1ea3b4a132e65bfb44237"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/aws-lc-configure.stderr",
+      "bytes": 370,
+      "sha256": "2c9df83654cf880b9e3475142473b6c6255b65b84f817aa5b8e1c23ad8fba8f1"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/aws-lc-configure.stdout",
+      "bytes": 2774,
+      "sha256": "e66c6e319b17012c9188fbbb57a5eef90d575b2ab48674ed528252c96da9c704"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/aws-lc-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/aws-lc-install.stdout",
+      "bytes": 18147,
+      "sha256": "7a7033326785b38bf93ba917dab8021cc3d6009952bee5d4c8779269fcc86e3f"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/c-ares-build.stderr",
+      "bytes": 9557,
+      "sha256": "b23cbdacecd72588c2ece93392f26dfdaaf99f5aea82d19ebb9374df46270269"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/c-ares-build.stdout",
+      "bytes": 7186,
+      "sha256": "2c355845b97a5d071f1cfbfe92f1cc12698e297ee21ad32e491e87046308c8d2"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/c-ares-configure.stderr",
+      "bytes": 102,
+      "sha256": "dca66a1fa2bef568b42ced7345109854f60e50a10a066b49a2ca01cd5f3e8c65"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/c-ares-configure.stdout",
+      "bytes": 13567,
+      "sha256": "e70cc0d7e9b4d4b298b091691781e4f2f7015ce6f28ac4f2e353bbce4f0c1987"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/c-ares-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/c-ares-install.stdout",
+      "bytes": 28164,
+      "sha256": "8c967f3045b9e54e370ea82a3c73e801158c55614f7fe80ca9bde0bd919f4970"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/commands.json",
+      "bytes": 30932,
+      "sha256": "7283d5e6d42a526e442d6ee9d0ee9c670ffab116f0ad31d71a4df19c4b89dc8d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/compiler.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/compiler.stdout",
+      "bytes": 237,
+      "sha256": "3ee53c517641b504c9e8079877242227292ea9995c5a7cf4e81e679adf4e5953"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libidn2-build.stderr",
+      "bytes": 3137,
+      "sha256": "363cbe4a351c304178331f4336576ac1ddf064847c620bf059d082f57fc42a0a"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libidn2-build.stdout",
+      "bytes": 7527,
+      "sha256": "f073775f1e05168ab11b508fd09c4c56ee387bed3e70c730d1978619d474a3d2"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libidn2-configure.stderr",
+      "bytes": 126,
+      "sha256": "5e67888f22b7a8082c6f660f9ddb1a7b9e0595556287400d3c250cb73982f3e0"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libidn2-configure.stdout",
+      "bytes": 20308,
+      "sha256": "6a5c9d15dfd9ca8318993fe45932dddec24f29c1be0d809787fcbb73206866e0"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libidn2-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libidn2-install.stdout",
+      "bytes": 13402,
+      "sha256": "6cf17789b0b728b28758f61cf5525b3b80fc306b20a41cd37751f2f9f7cc21ed"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libpsl-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libpsl-build.stdout",
+      "bytes": 768,
+      "sha256": "c738a3499f21b5dacd7b670343bc91f77e8f4f4f38745778dc205305e1f0f714"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libpsl-configure.stderr",
+      "bytes": 126,
+      "sha256": "b556a911a723886183bc54fcc9a27a331e2e06903034d22b6188677791756700"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libpsl-configure.stdout",
+      "bytes": 9908,
+      "sha256": "ebf9ea649de4bfcb38d32868e2343570973ebab48dd649b6e0b7f3d46826b82c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libpsl-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libpsl-install.stdout",
+      "bytes": 4041,
+      "sha256": "fa77dce084e3c1d9ba16e71a3d6442693d49efae13865163a669aa7802a04e03"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libunistring-build.stderr",
+      "bytes": 10668,
+      "sha256": "0978a991569955464aafdb689128bfa14b8ab620086d21fcb1c2b6ec87f8df6b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libunistring-build.stdout",
+      "bytes": 2162893,
+      "sha256": "730100972549145f063333de951913694e61b56ffee065a331aa2cb9654d4733"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libunistring-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libunistring-configure.stdout",
+      "bytes": 27300,
+      "sha256": "3530c2c24a4aab4dcc3e4dfe1947922feadc032e74820f286e55a64f59f44828"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libunistring-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/libunistring-install.stdout",
+      "bytes": 5646,
+      "sha256": "73d148933e7dadc3f12a1063dd961e2f55b54e62c6295dac2cb6370014bb92b9"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/nghttp2-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/nghttp2-build.stdout",
+      "bytes": 2107,
+      "sha256": "27974d56554ef0455ddc9d7328dbb570300388e55130436b66c53254f3117a44"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/nghttp2-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/nghttp2-configure.stdout",
+      "bytes": 5789,
+      "sha256": "12c96189aa32ae30949aa5a6b8f025d0965e8e95bf39011554bef1d0a33f25f8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/nghttp2-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/nghttp2-install.stdout",
+      "bytes": 1558,
+      "sha256": "e906af987efe735c545d0dfa9724a4b730c09b9de773fcd67d20862725ca10ab"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/zlib-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/zlib-build.stdout",
+      "bytes": 1008,
+      "sha256": "526968503b7dc976d0e605e702b20c961129cacfebf7d45ef4e2a4bfcf456687"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/zlib-configure.stderr",
+      "bytes": 122,
+      "sha256": "5368f9e5e04230ba65f541387a1b0a9a749e92427e5a50389eb9190e8580cb24"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/zlib-configure.stdout",
+      "bytes": 1045,
+      "sha256": "7d22d2b77d2583b02a108a00be456982d8aefc23ae9786ba7f2d39e39e9f0a65"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/zlib-install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-builds/dependencies-Release-20261031T145105767794Z/zlib-install.stdout",
+      "bytes": 2670,
+      "sha256": "d1c496eefda1da0cc4deb0de225336e3950bd363484ebb2315957a7cf5cb43d8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/dependency-manifest.json",
+      "bytes": 30932,
+      "sha256": "7283d5e6d42a526e442d6ee9d0ee9c670ffab116f0ad31d71a4df19c4b89dc8d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/fixtures.json",
+      "bytes": 309,
+      "sha256": "451c7355f9072dc8e9e75e72654b30939fa4cc8e75b80be0c72ca2ca3535c5a8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/setup-fixtures.json",
+      "bytes": 225,
+      "sha256": "900949203d49c2d2df5c07ee584d5e266c1c372a7abce566bb6bfb2547077b2a"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/setup-fixtures.log",
+      "bytes": 116,
+      "sha256": "a001a1a16632b0fc9f3c3fa0919c92653c8455859277aa85340ba9b40f9d5579"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/verify-dependencies.json",
+      "bytes": 353,
+      "sha256": "c63187f2dcebffce971265500e62b58f425fe97ff9ec54e90c1c7e578439b34e"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap/verify-dependencies.log",
+      "bytes": 52,
+      "sha256": "9f00364d8d065f193e5b0cef16a4b1d37efdec6532a4d52084a4d7b910bdabe7"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/clean-bootstrap.txt",
+      "bytes": 849,
+      "sha256": "b44cec83fe64e8535455ccbed078d8704406715188edb5e8542425af6eb480ae"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/identity/identity.json",
+      "bytes": 2382,
+      "sha256": "0ee18b89f5de413b22e02ba40b05c8588336b3318ea43eec50b80c63cee2cacb"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/identity/verify-curl-source.json",
+      "bytes": 176,
+      "sha256": "e10e49cdac2e0dfc524d5dd7b824d30d339612cab040124d53485f795a887dfd"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/identity/verify-curl-source.log",
+      "bytes": 59,
+      "sha256": "a778047eb97833eb4a064af0efe12cac6efe9dc646319f885d33406046c45d68"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-configure/configure-trace.jsonl",
+      "bytes": 1130662,
+      "sha256": "3b15bd99f3764669b3884bdb36758b45584f48bf60061b25068cc7466161aa68"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-configure/configure.json",
+      "bytes": 1859,
+      "sha256": "b4e22c422317954754d1e47f98891a4ae36085407c3b9660105095f786feecbb"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-configure/configure.log",
+      "bytes": 1717532,
+      "sha256": "0e081a1bf5c416b7182f059ebe9b02efa49759a85ce1749955eddc79110e8e2a"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-configure/identity.json",
+      "bytes": 8954,
+      "sha256": "bb2dc1fd4f2cd9a54ce5bf823e7e0e4a0cc7f81654f4a7e94cca5666b40471f9"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-configure/test-plan.json",
+      "bytes": 11779,
+      "sha256": "3fc5dc09f82ea014008dc10de4313445634d6eea46acc445d61cd1c2a82571a1"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-configure.txt",
+      "bytes": 1718551,
+      "sha256": "1ce2d3f854843c8a39302ab6e2415ca96cc00d3f9d4b811ff25ac9106604295e"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-focused.log",
+      "bytes": 1000,
+      "sha256": "0ba142cd2ef38adae4ffa0980806163aa24cd7e10dbbb37aa382e3b66948f003"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-focused.xml",
+      "bytes": 3255,
+      "sha256": "01976a8a1283b189c55cbea025a6c897f859b7371383f41079d9ddc99dad7550"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-verify/certificate-version.json",
+      "bytes": 205,
+      "sha256": "a514512e167c8efdf60e64f9315069e7f057d0a1a7115559595cd34480ab71bc"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-verify/certificate-version.log",
+      "bytes": 42,
+      "sha256": "2fdff531cb40b4cc2eb44b0ee5648bc721ba0131aa89096b4b673c42397d6436"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-verify/fixtures.json",
+      "bytes": 281,
+      "sha256": "fdaa757be2464738d5fab9dc559220141c56345b1de1a771867ba7e4098fa6db"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-verify/test-plan.json",
+      "bytes": 11839,
+      "sha256": "b4975bd7ff32424c6825f137e6eb61715b0dc4d0bdc7cf853781ffbb4f4444e4"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-verify/verify-dependencies.json",
+      "bytes": 296,
+      "sha256": "b7d2da80075008bbcf9a37b3df3a715bbd5d4a230e7e3db33a6baa28f8ec9675"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/linux-verify/verify-dependencies.log",
+      "bytes": 52,
+      "sha256": "9f00364d8d065f193e5b0cef16a4b1d37efdec6532a4d52084a4d7b910bdabe7"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/local-configure-adaptations.json",
+      "bytes": 254,
+      "sha256": "4e08decc296e91cd4a7b0d83c5ce1278e574d143e95f2b8de9eab19389700bf9"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/nasm-acquisition.json",
+      "bytes": 403,
+      "sha256": "9e177e584c9d51d83c9aa72a4672230269ffb3f2672b0a9879a6d56f6efca9c6"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/negative-restore/dependency-cache-seal.json",
+      "bytes": 2000,
+      "sha256": "0c34aa527d9fae85af4daa418f7877f786f4d746623a70b25e53d19a6fb0645f"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/negative-restore/dependency-manifest.json",
+      "bytes": 30932,
+      "sha256": "7283d5e6d42a526e442d6ee9d0ee9c670ffab116f0ad31d71a4df19c4b89dc8d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/negative-restore/verify-dependencies.json",
+      "bytes": 353,
+      "sha256": "e8233b594188d1823b345a3b57162e0c631a3c07d334c47bb651ffe55f56d4d0"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/negative-restore/verify-dependencies.log",
+      "bytes": 66,
+      "sha256": "b1a356395f79b86006c75eaf5f7b853455157eba89f24915435fd4f881401d52"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/negative-restore.txt",
+      "bytes": 1023,
+      "sha256": "bceead1d40f9e4ec42a4f15d38f0cf6a0579422d0f5c0f188ad614e445f153d7"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/ninja-identity.json",
+      "bytes": 197,
+      "sha256": "e910992f88da0f448b643c74c8e46bab6e02cf03852f258990aa94878dcb087c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verification.json",
+      "bytes": 4140,
+      "sha256": "97d1769c07e4c78b29c6587e6849ca59e15e752e9cc82ab0600e0760f8431d74"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Debug/certificate-version.json",
+      "bytes": 202,
+      "sha256": "3c9809fe2e817a61667fbde3afb71644c19e16fc4a309f559215650e6a839c62"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Debug/certificate-version.log",
+      "bytes": 42,
+      "sha256": "2fdff531cb40b4cc2eb44b0ee5648bc721ba0131aa89096b4b673c42397d6436"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Debug/dependency-manifest.json",
+      "bytes": 29110,
+      "sha256": "6e6d1f84948d0e555bc8c6236c9ce2e4e5f1410525723c059931dcc12c523161"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Debug/fixtures.json",
+      "bytes": 279,
+      "sha256": "dadcd61d026ad21313d1829baecae14ca4a320299563305b5b56495c5b5120eb"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Debug/verify-dependencies.json",
+      "bytes": 292,
+      "sha256": "efd1dbf7ec31fada6c7b3fdc58334ccf1bf2f92058f9ca49d55b48b03753e4b1"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Debug/verify-dependencies.log",
+      "bytes": 50,
+      "sha256": "8345ca34abc63bdf1a449809d23344d2af0e7aa03f17f626643f04c86ca91bfa"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Sanitizers/certificate-version.json",
+      "bytes": 202,
+      "sha256": "956ca3c62b960f84a3f1536e1514b9bbabb24f4abc13b7ef967628f42f3758a5"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Sanitizers/certificate-version.log",
+      "bytes": 42,
+      "sha256": "2fdff531cb40b4cc2eb44b0ee5648bc721ba0131aa89096b4b673c42397d6436"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Sanitizers/dependency-manifest.json",
+      "bytes": 29693,
+      "sha256": "f48367e7813531c46fcd4bb3d91bd28febb902e34819fdb196e12785ab752927"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Sanitizers/fixtures.json",
+      "bytes": 280,
+      "sha256": "fcda81ce02b040e762f1a65613fd398a07a4c0605d7f7b883c1a86e4155e85cb"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Sanitizers/verify-dependencies.json",
+      "bytes": 295,
+      "sha256": "e726c02b26739b9db9e138d9496b4561719c7a3c62b71716f20cba46a293c91b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/verify-Sanitizers/verify-dependencies.log",
+      "bytes": 51,
+      "sha256": "f80b8fc5142c2af92e682082087a3825cfd803967fc26ee9a0ae64146f59299b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/bootstrap.json",
+      "bytes": 122,
+      "sha256": "b687252b9c808336315635dfad4d65ab1a0c36de7a8f8e9f7992935081bc72f1"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/certificate-version.json",
+      "bytes": 233,
+      "sha256": "4ae8798557ce25b6bc663ad00b7a7087119f76b672d5de7422cafcdb1f24fcef"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/certificate-version.log",
+      "bytes": 42,
+      "sha256": "2fdff531cb40b4cc2eb44b0ee5648bc721ba0131aa89096b4b673c42397d6436"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/dependency-cache-seal.json",
+      "bytes": 2000,
+      "sha256": "0c34aa527d9fae85af4daa418f7877f786f4d746623a70b25e53d19a6fb0645f"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/dependency-manifest.json",
+      "bytes": 30932,
+      "sha256": "7283d5e6d42a526e442d6ee9d0ee9c670ffab116f0ad31d71a4df19c4b89dc8d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/fixtures.json",
+      "bytes": 309,
+      "sha256": "451c7355f9072dc8e9e75e72654b30939fa4cc8e75b80be0c72ca2ca3535c5a8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/setup-fixtures.json",
+      "bytes": 225,
+      "sha256": "31df7cc060a8df23251267e9ce1e861eb34050fa1c83fc6156faaf2bac9371b0"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/setup-fixtures.log",
+      "bytes": 116,
+      "sha256": "a001a1a16632b0fc9f3c3fa0919c92653c8455859277aa85340ba9b40f9d5579"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/verify-dependencies.json",
+      "bytes": 353,
+      "sha256": "36272041c8085b047f895d59df5f5fa572cd57e4f6bf5e2116a30e4ce03c48eb"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap/verify-dependencies.log",
+      "bytes": 52,
+      "sha256": "9f00364d8d065f193e5b0cef16a4b1d37efdec6532a4d52084a4d7b910bdabe7"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/warm-bootstrap.txt",
+      "bytes": 210,
+      "sha256": "a9263d89e9fa81523dae1f99f1d0180f105d68086b324cb2e7a2c042475108d5"
+    },
+    {
+      "path": "docs/net/http/evidence/ci-preparation/workflow-validation.json",
+      "bytes": 1448,
+      "sha256": "14a0ce8fb5f52d1809b5d40992b17ec378651efb11e026235409e59fa0a1f010"
+    }
+  ],
+  "protected_root_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "local_document_links_checked": 11
+}

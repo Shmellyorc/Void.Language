@@ -1,0 +1,54 @@
+{
+  "baseline": "490df04edee92756c20c336c0f32114476167941",
+  "yaml_parser": "PyYAML 6.0.3 BaseLoader",
+  "matrix": [
+    {
+      "os": "ubuntu-24.04",
+      "platform": "Ubuntu 24.04",
+      "configuration": "Debug"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "platform": "Ubuntu 24.04",
+      "configuration": "Release"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "platform": "Ubuntu 24.04",
+      "configuration": "Sanitizers"
+    },
+    {
+      "os": "windows-2022",
+      "platform": "Windows 2022",
+      "configuration": "Debug"
+    },
+    {
+      "os": "windows-2022",
+      "platform": "Windows 2022",
+      "configuration": "Release"
+    },
+    {
+      "os": "macos-latest",
+      "platform": "macOS ARM64",
+      "configuration": "Debug"
+    },
+    {
+      "os": "macos-latest",
+      "platform": "macOS ARM64",
+      "configuration": "Release"
+    }
+  ],
+  "matrix_unchanged": true,
+  "original_env_timeout_and_dispatch_options_preserved": true,
+  "default_mode": "thinlto-cache",
+  "unfiltered_ctest_unchanged": true,
+  "http_cache_restore_save_pairs": 3,
+  "no_fuzzy_restore_keys": true,
+  "http_bootstrap_before_configure": true,
+  "save_after_verification_before_configure": true,
+  "original_build_test_sdk_editor_steps_preserved": true,
+  "inline_python_syntax": "PASS",
+  "workflow_sha256": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1",
+  "actionlint_version": "1.7.12",
+  "actionlint_exit_code": 0
+}

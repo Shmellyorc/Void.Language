@@ -53,6 +53,7 @@ relocation require platform evidence. No user trust store is modified by the
 loopback fixtures. The AWS-LC parser-memory corpus is not a Schannel allocator
 audit and is intentionally not registered as such on Windows.
 
-No hosted CI configuration or run was changed in this mission. Existing hosted
-jobs need the explicit dependency and test-fixture bootstrap before configuring
-the HTTP-enabled root project; Boss owns that integration and dispatch.
+The subsequent 31 October 2026 [CI preparation](CI_HANDOFF.md) integrates pinned
+dependency/fixture bootstrap and verified caches into the existing seven-job fast
+workflow. No hosted run was dispatched. Native Windows/macOS execution acceptance
+remains open; Boss owns Git and hosted acceptance after Golden Wrench review.

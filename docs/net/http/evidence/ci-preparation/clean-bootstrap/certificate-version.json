@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-replica/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+    "version"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.00262686399219092
+}
