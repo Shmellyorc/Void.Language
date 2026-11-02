@@ -1,0 +1,6 @@
+{
+  "production_http_sha256": "17ae4d6a9d447495584d8b48d338d7534f3a4f7e1d1bec9d9bfe5fc3830c0c3d",
+  "negative_http_sha256": "46272eac09a76c26f6a07a60e0a8c7f05781e7794355c13d69179584a31569ff",
+  "negative_change": "CURLOPT_PIPEWAIT conditional replaced by unconditional 1L",
+  "compiler": ".toolchains/llvm-23.1.4/bin/clang++"
+}

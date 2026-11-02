@@ -212,3 +212,14 @@ with observable readiness/close checks. Local Debug/Release/strict checks pass;
 Windows linking and macOS behavior still require the reviewed native seven-job
 rerun. The original Debug cancellation artifact lacked its HTTP timeout phase;
 that evidence limitation and the new diagnostic are recorded explicitly.
+
+
+[CI 41443618378 full repair handoff](CI41443618378_TRIAGE.md) records the failed
+cancellation fixture's connection-wait dependency, the controlled producer-total
+reproduction, Schannel explicit-CA option correction, and Windows generator/text
+fixture fixes. It supersedes the preceding local-confidence claim for cancellation.
+The unchanged seven-job native acceptance must include the new `http_dns`
+connection/producer gates, original `http_timeouts` with barrier timing, both
+cancellation/timeout example outcomes, and Windows TLS/auth/native/URL checks.
+Corrected native Windows/macOS results remain **UNVERIFIED** until Boss's reviewed
+hosted run; no dispatch is authorized or performed by this handoff.

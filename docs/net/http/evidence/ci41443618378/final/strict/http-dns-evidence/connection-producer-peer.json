@@ -1,0 +1,17 @@
+[
+  [
+    "/plain",
+    "received",
+    0.5250946939922869
+  ],
+  [
+    "/plain",
+    "barrier",
+    0.5252219239919214
+  ],
+  [
+    "producer",
+    "second-block",
+    1024
+  ]
+]

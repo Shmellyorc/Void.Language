@@ -1,0 +1,181 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/tmp/VOID HTTP examples 5gco16vt/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/tmp/VOID HTTP examples 5gco16vt/key.pem",
+      "-out",
+      "/tmp/VOID HTTP examples 5gco16vt/cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2283230870089028
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3668559700017795
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3525809550046688
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2713561630080221
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2718560289940797
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "check",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2856991670123534
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 6.201681651000399
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/api_json.void",
+      "-o",
+      "/tmp/VOID HTTP examples 5gco16vt/api_json"
+    ],
+    "exit_code": 0,
+    "seconds": 5.864080642000772
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 5gco16vt/api_json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05197145600686781
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 5.113286747000529
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/authenticated_post.void",
+      "-o",
+      "/tmp/VOID HTTP examples 5gco16vt/authenticated_post"
+    ],
+    "exit_code": 0,
+    "seconds": 4.810384961005184
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 5gco16vt/authenticated_post"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10079463401052635
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 4.201119732999359
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/files.void",
+      "-o",
+      "/tmp/VOID HTTP examples 5gco16vt/files"
+    ],
+    "exit_code": 0,
+    "seconds": 3.9902293419872876
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 5gco16vt/files"
+    ],
+    "exit_code": 0,
+    "seconds": 0.15375811699777842
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP examples 5gco16vt/api_json"
+    ],
+    "exit_code": 1,
+    "seconds": 0.05816774698905647
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_example_host",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 8.530580667007598
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_example_host",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 1,
+    "seconds": 8.36801689499407
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_http_example_host",
+      "/tmp/VOID HTTP examples 5gco16vt/cancellation-timeout.void"
+    ],
+    "exit_code": 1,
+    "seconds": 8.40700895700138
+  }
+]

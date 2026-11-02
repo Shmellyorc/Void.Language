@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_http_dns",
+    "--connection-wait",
+    "http://pending.void.test:46873",
+    "127.0.0.1:43369",
+    "producer"
+  ],
+  "timeout": false,
+  "exit_code": 0,
+  "dns_events": [
+    {
+      "name": "pending.void.test",
+      "type": 1,
+      "transport": "udp"
+    },
+    {
+      "name": "pending.void.test",
+      "type": 1,
+      "transport": "udp"
+    }
+  ]
+}

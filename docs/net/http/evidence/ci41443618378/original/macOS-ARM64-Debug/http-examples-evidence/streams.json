@@ -1,0 +1,110 @@
+{
+  "0.stderr": {
+    "utf8": "Writing private key to /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples 1moeq_f7/key.pem\n"
+  },
+  "0.stdout": {
+    "utf8": ""
+  },
+  "1.stderr": {
+    "utf8": ""
+  },
+  "1.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "10.stderr": {
+    "utf8": ""
+  },
+  "10.stdout": {
+    "utf8": "Built native executable: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples 1moeq_f7/authenticated_post\n"
+  },
+  "11.stderr": {
+    "utf8": ""
+  },
+  "11.stdout": {
+    "utf8": "HTTP 200; 13 response bytes\n"
+  },
+  "12.stderr": {
+    "utf8": ""
+  },
+  "12.stdout": {
+    "utf8": "Native download, upload and multipart complete\n"
+  },
+  "13.stderr": {
+    "utf8": ""
+  },
+  "13.stdout": {
+    "utf8": "Built native executable: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples 1moeq_f7/files\n"
+  },
+  "14.stderr": {
+    "utf8": ""
+  },
+  "14.stdout": {
+    "utf8": "Native download, upload and multipart complete\n"
+  },
+  "15.stderr": {
+    "utf8": ""
+  },
+  "15.stdout": {
+    "utf8": "JSON /@stdlib/json.void::error_kind.syntax at byte 1\n"
+  },
+  "16.stderr": {
+    "utf8": ""
+  },
+  "16.stdout": {
+    "utf8": "Streamed 8388608 bytes\n"
+  },
+  "17.stderr": {
+    "utf8": ""
+  },
+  "17.stdout": {
+    "utf8": "HTTP /@stdlib/net/http.void::error_kind.timeout, phase /@stdlib/net/http.void::failure_phase.connect, native code 28\n"
+  },
+  "2.stderr": {
+    "utf8": ""
+  },
+  "2.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "3.stderr": {
+    "utf8": ""
+  },
+  "3.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "4.stderr": {
+    "utf8": ""
+  },
+  "4.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "5.stderr": {
+    "utf8": ""
+  },
+  "5.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "6.stderr": {
+    "utf8": ""
+  },
+  "6.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "7.stderr": {
+    "utf8": ""
+  },
+  "7.stdout": {
+    "utf8": "Built native executable: /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples 1moeq_f7/api_json\n"
+  },
+  "8.stderr": {
+    "utf8": ""
+  },
+  "8.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "9.stderr": {
+    "utf8": ""
+  },
+  "9.stdout": {
+    "utf8": "HTTP 200; 13 response bytes\n"
+  }
+}

@@ -1,0 +1,223 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation 8p28kp08/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11393996200058609
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+      "--prefix",
+      "/tmp/VOID HTTP installation 8p28kp08/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.033524250000482425
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0018487079942133278
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 6.151116930006538
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 5.729333408002276
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05318144100601785
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 9.639965284994105
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 8p28kp08/program.o",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.055797654000343755
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05524561800120864
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 5.159541602013633
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 4.606964986000094
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05324618199665565
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 8.10206107700651
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 8p28kp08/program.o",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05832132000068668
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.052824885002337396
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 0.385645571994246
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 8p28kp08/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 8p28kp08/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 5.649387766010477
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 8p28kp08/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05246320799051318
+  }
+]

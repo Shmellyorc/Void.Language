@@ -1,0 +1,18 @@
+Connection #0 is not open enough, cannot reuse
+Host pending.void.test:34703 was resolved.
+IPv6: (none)
+IPv4: 127.0.0.1
+  Trying 127.0.0.1:34703...
+Hostname 'pending.void.test' was found in DNS cache
+Host pending.void.test:34703 was resolved.
+IPv6: (none)
+IPv4: 127.0.0.1
+  Trying 127.0.0.1:34703...
+Established connection to pending.void.test (127.0.0.1 port 34703) from 127.0.0.1 port 55324 
+using HTTP/1.x
+Request completely sent off
+Established connection to pending.void.test (127.0.0.1 port 34703) from 127.0.0.1 port 55330 
+using HTTP/1.x
+Request completely sent off
+Connection #1 to host pending.void.test:34703 left intact
+closing connection #0

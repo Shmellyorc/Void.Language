@@ -1,0 +1,92 @@
+{
+  "0.stderr": {
+    "utf8": ""
+  },
+  "0.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "1.stderr": {
+    "utf8": ""
+  },
+  "1.stdout": {
+    "utf8": "true\n"
+  },
+  "10.stderr": {
+    "utf8": ""
+  },
+  "10.stdout": {
+    "utf8": ""
+  },
+  "11.stderr": {
+    "utf8": ""
+  },
+  "11.stdout": {
+    "utf8": "7\n"
+  },
+  "12.stderr": {
+    "utf8": ""
+  },
+  "12.stdout": {
+    "utf8": ""
+  },
+  "13.stderr": {
+    "utf8": ""
+  },
+  "13.stdout": {
+    "utf8": ""
+  },
+  "14.stderr": {
+    "utf8": ""
+  },
+  "14.stdout": {
+    "utf8": "7\n"
+  },
+  "2.stderr": {
+    "utf8": ""
+  },
+  "2.stdout": {
+    "utf8": "Built native executable: /tmp/VOID HTTP source pxtaanat/native-False\n"
+  },
+  "3.stderr": {
+    "utf8": ""
+  },
+  "3.stdout": {
+    "utf8": "true\n"
+  },
+  "4.stderr": {
+    "utf8": ""
+  },
+  "4.stdout": {
+    "utf8": "true\n"
+  },
+  "5.stderr": {
+    "utf8": ""
+  },
+  "5.stdout": {
+    "utf8": "Built native executable: /tmp/VOID HTTP source pxtaanat/native-True\n"
+  },
+  "6.stderr": {
+    "utf8": ""
+  },
+  "6.stdout": {
+    "utf8": "true\n"
+  },
+  "7.stderr": {
+    "utf8": ""
+  },
+  "7.stdout": {
+    "utf8": "Source checked successfully\n"
+  },
+  "8.stderr": {
+    "utf8": ""
+  },
+  "8.stdout": {
+    "utf8": "{\"source_http_sample\":{\"constructions\":512,\"heap_payload\":215991,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":768,\"heap_payload\":212919,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1024,\"heap_payload\":215991,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1280,\"heap_payload\":215991,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1536,\"heap_payload\":212919,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1792,\"heap_payload\":215991,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":2048,\"heap_payload\":215991,\"tasks\":10,\"groups\":2,\"work\":1,\"handles\":11}}\nnormal HTTP source, one worker, forced GC and root retirement passed\n{\"source_http_sample\":{\"constructions\":512,\"heap_payload\":215991,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":768,\"heap_payload\":212919,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1024,\"heap_payload\":215991,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1280,\"heap_payload\":215991,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1536,\"heap_payload\":212919,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":1792,\"heap_payload\":215991,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\n{\"source_http_sample\":{\"constructions\":2048,\"heap_payload\":215991,\"tasks\":11,\"groups\":2,\"work\":1,\"handles\":11}}\nO2 HTTP source, one worker, forced GC and root retirement passed\n"
+  },
+  "9.stderr": {
+    "utf8": ""
+  },
+  "9.stdout": {
+    "utf8": ""
+  }
+}

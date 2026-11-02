@@ -1,0 +1,105 @@
+[
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\.toolchains\\http\\test-certificates\\bin\\openssl.exe",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP examples 7x9pi19l\\openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP examples 7x9pi19l\\key.pem",
+      "-out",
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP examples 7x9pi19l\\cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 0.14000000000010004
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "check",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 2.1410000000000764
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "check",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 2.0470000000000255
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "check",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\cancellation.void"
+    ],
+    "exit_code": 0,
+    "seconds": 1.5460000000000491
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "check",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 1.594000000000051
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "check",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 1.5629999999998745
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "run",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 13.922000000000025
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "build",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\api_json.void",
+      "-o",
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP examples 7x9pi19l\\api_json.exe"
+    ],
+    "exit_code": 0,
+    "seconds": 12.780999999999949
+  },
+  {
+    "argv": [
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP examples 7x9pi19l\\api_json.exe"
+    ],
+    "exit_code": 0,
+    "seconds": 0.03199999999992542
+  },
+  {
+    "argv": [
+      "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe",
+      "run",
+      "D:\\a\\Void.Language\\Void.Language\\examples\\net_http\\authenticated_post.void"
+    ],
+    "exit_code": 1,
+    "seconds": 12.233999999999924
+  }
+]

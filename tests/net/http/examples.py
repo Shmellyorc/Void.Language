@@ -72,9 +72,9 @@ def main():
             commands.append(dict(argv=list(map(str, argv)), exit_code=result.returncode,
                                  seconds=time.monotonic() - start))
             (evidence / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
-            assert result.returncode == code, (argv, result.stderr.decode(errors='replace'))
+            assert result.returncode == code, (argv, result.returncode, result.stdout, result.stderr)
             assert expected in result.stdout.decode(), (argv, result.stdout)
-            assert error in result.stderr.decode(), (argv, result.stderr)
+            assert error in result.stderr.decode(), (argv, result.returncode, result.stdout, result.stderr)
             return result
         tool = fixture.certificate_tool(compiler)
         config = work / 'openssl.cnf'

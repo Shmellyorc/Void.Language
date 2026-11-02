@@ -1,0 +1,55 @@
+{
+  "argv": [
+    "D:\\a\\Void.Language\\Void.Language\\build\\Debug\\void_http_native.exe",
+    "http://127.0.0.1:50675",
+    "https://127.0.0.1:50676",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP native wd6166v3\\cert.pem",
+    "https://127.0.0.1:50681",
+    "https://127.0.0.1:50677",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP native wd6166v3\\cert.pem",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP native wd6166v3\\key.pem",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP native wd6166v3\\identity.p12",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP native wd6166v3",
+    "http://127.0.0.1:50678",
+    "https://127.0.0.1:50679",
+    "50680"
+  ],
+  "exit_code": 1,
+  "timeout": false,
+  "tls_keylog_file_created": false,
+  "seconds": 1.125,
+  "binary_sha256": "3ee5e730b531e71dbe381bf912ac991ab25778599945f13695f1b23a5a9135ba",
+  "source_sha256": {
+    "src/runtime/http.cpp": "a7271f0b72c499fc5cf4626dd72895adbfa296e82711fd024914a0872d691bda",
+    "src/runtime/http_bulk.cpp": "ffb67caa3ee65acc6eee30bb6ebe402194be034187be4e6b94bdb9e930ee4c0d",
+    "src/runtime/http_file.cpp": "f41314bf18d17078f7a2643784a0896c31857da71c0f13046f1374fd571e80ac",
+    "src/runtime/http_resource.cpp": "3831a2b35c6a577c77e25c65074094b2510a43bb2967d1d8a93aab3bc540c31e",
+    "src/runtime/http_abi.cpp": "5405067ad7e1dd2e3b9450db9b730a62936b845945c528b3114b703eef53f09e",
+    "src/runtime/native_work.cpp": "c1b97695950be11d735d70abebf992bbe725aa09770ba010a03a02076b3c2e5a",
+    "src/runtime/async.cpp": "dd0f242b165fe00d34510b4a8150a231282b7dc2778e5906c6bf415feab0e196",
+    "include/void/http.hpp": "53f03463fdf5c1cd83ab0bee1edd3df35380b4e1f60186dd0961dd2c0ebd7da0",
+    "tests/net/http/native.cpp": "66b3418d6cdbfa280cb6fb7f5deb66630b9890c7464b2851e9bf2d496bb64ef3",
+    "tests/net/http/runtime.cpp": "cb0a33fb5e8ece2b2d62cd54bd44cfd6689ba64ea657960d8b33da143fa4ab51",
+    "tests/net/http/fixture.py": "2fec31fdfdec75a99debe7befd225651bda74bc4dd61d1a4dc7789fbc9b29c9f",
+    "third_party/curl/VOID-PROVENANCE.json": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+    "third_party/http-versions.json": "3c4bdfb45e4630e7dcfed3ffffef4d2f5a6933dfe56552467591df329168473f"
+  },
+  "soft_hard_stack_bytes": null,
+  "certificate_tool": {
+    "path": "D:\\a\\Void.Language\\Void.Language\\.toolchains\\http\\test-certificates\\bin\\openssl.exe",
+    "sha256": "148968a0ac40447c5889a353ac174a743ca9b5976729d315d3d0118fda57ff74"
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "http2_fixture": true,
+  "socks_address_types": [],
+  "async_pull_bytes": 134217728,
+  "runtime_samples": [],
+  "proxy_digest_events": [],
+  "required_h2_incompatible_requests": [],
+  "h2_paused_events": [],
+  "h2_retry_events": [],
+  "scope": "loopback native transport; not complete source/platform acceptance"
+}

@@ -1,0 +1,225 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+      "--prefix",
+      "/tmp/VOID HTTP installation pfxdooaw/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3037982440000633
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+      "--prefix",
+      "/tmp/VOID HTTP installation pfxdooaw/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.12281037899083458
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0020614859968191013
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 18.44013713399181
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 16.208098266011802
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.4245803160010837
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 23.277558977002627
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation pfxdooaw/program.o",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.20918910100590438
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.42048764901119284
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 17.193917936005164
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 14.522234445001232
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.43812067300314084
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 21.501396849998855
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation pfxdooaw/program.o",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-fsanitize=address,undefined",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.22933726898918394
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.45606640398909803
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 2.886967676997301
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation pfxdooaw/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation pfxdooaw/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 15.998948919994291
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation pfxdooaw/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.45152338698972017
+  }
+]

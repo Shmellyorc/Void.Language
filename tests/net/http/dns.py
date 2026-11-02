@@ -15,8 +15,54 @@ import threading
 import time
 import fixture
 from dns_fixture import DNS
+from examples import CancellationHandler
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def connection_wait(binary, evidence):
+    class DelayedDNS(DNS):
+        def answer(self, data, transport):
+            # Force both transfers to enter the provider before the first
+            # connection resolves. This is a scheduling stimulus, not a retry
+            # or a larger request deadline.
+            time.sleep(0.15)
+            return super().answer(data, transport)
+    class Producer(CancellationHandler):
+        def do_POST(self):
+            assert self.path == '/producer'
+            self.connection.settimeout(5)
+            assert self.rfile.read(1024) == b'p' * 1024
+            self.server.pending.set()
+            block = self.rfile.read(1024)
+            self.server.events.append(('producer', 'second-block', len(block)))
+            assert block == b'p' * 1024
+            self.reply(b'ok')
+    for mode in ('negotiate', 'http1', 'producer'):
+        dns = DelayedDNS()
+        peer = fixture.Server(('127.0.0.1', 0), Producer if mode == 'producer' else CancellationHandler)
+        peer.pending, peer.closed, peer.stopping = threading.Event(), threading.Event(), threading.Event()
+        peer.events, peer.started, peer.fail_barrier = [], time.monotonic(), False
+        threading.Thread(target=peer.serve_forever, daemon=True).start()
+        argv = [str(binary), '--connection-wait', f'http://pending.void.test:{peer.server_port}', dns.endpoint, mode]
+        command = dict(argv=argv, timeout=True)
+        try:
+            result = subprocess.run(argv, capture_output=True, timeout=10)
+            command.update(timeout=False, exit_code=result.returncode)
+            (evidence / f'connection-{mode}.stdout').write_bytes(result.stdout)
+            (evidence / f'connection-{mode}.stderr').write_bytes(result.stderr)
+            assert result.returncode == 0, (result.returncode, result.stdout, result.stderr)
+            assert peer.pending.is_set()
+            if mode != 'producer':
+                assert peer.closed.wait(3), 'held response did not close after cancellation'
+            else:
+                assert ('producer', 'second-block', 1024) in peer.events, peer.events
+            assert any(event[1] == 'barrier' for event in peer.events), peer.events
+        finally:
+            command['dns_events'] = dns.events
+            (evidence / f'connection-{mode}-command.json').write_text(json.dumps(command, indent=2) + '\n')
+            (evidence / f'connection-{mode}-peer.json').write_text(json.dumps(peer.events, indent=2) + '\n')
+            peer.stopping.set(); peer.shutdown(); peer.server_close(); dns.close()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -24,6 +70,7 @@ def main():
     parser.add_argument('--evidence', type=Path, required=True)
     args = parser.parse_args(); args.binary = args.binary.resolve()
     args.evidence.mkdir(parents=True, exist_ok=True)
+    connection_wait(args.binary, args.evidence)
     class Closing(fixture.Handler):
         def reply(self, body, status=200, headers=()):
             super().reply(body, status, [*headers, ('Connection', 'close')])

@@ -1,0 +1,223 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "--prefix",
+      "/tmp/VOID HTTP installation 571hj_ik/original",
+      "--component",
+      "compiler"
+    ],
+    "exit_code": 0,
+    "seconds": 0.18574446500861086
+  },
+  {
+    "argv": [
+      "cmake",
+      "--install",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "--prefix",
+      "/tmp/VOID HTTP installation 571hj_ik/original",
+      "--component",
+      "tooling"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06953993201022968
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc"
+    ],
+    "exit_code": 0,
+    "seconds": 0.002020297004492022
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void"
+    ],
+    "exit_code": 0,
+    "seconds": 18.873400013995706
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 16.540701441001147
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/built-False"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07008620000851806
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/program.o"
+    ],
+    "exit_code": 0,
+    "seconds": 24.1216514359985
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 571hj_ik/program.o",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10912702200585045
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07605363300535828
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "run",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 17.927623129013227
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/built-True",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 15.603407360002166
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/built-True"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07066637900425121
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "emit",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/program.o",
+      "--no-opt"
+    ],
+    "exit_code": 0,
+    "seconds": 22.146910576993832
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+      "--driver-mode=g++",
+      "/tmp/VOID HTTP installation 571hj_ik/program.o",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/lib/void/libvoid_runtime.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/lib/void/libvoid_native_fixture.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libcurl.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libpsl.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libnghttp2.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libssl.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libcrypto.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libcares.a",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libidn2.so",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libunistring.so",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void/libz.a",
+      "-Xlinker",
+      "-rpath",
+      "-Xlinker",
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/../lib/void",
+      "-pthread",
+      "-Xlinker",
+      "--exclude-libs",
+      "-Xlinker",
+      "libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-ldl",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.11539025499951094
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/direct"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07513513199228328
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/protected-output"
+    ],
+    "exit_code": 1,
+    "seconds": 3.2068548149982234
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/relocated \u96ea # % installation/bin/voidc",
+      "build",
+      "/tmp/VOID HTTP installation 571hj_ik/project \u96ea # %/main.void",
+      "-o",
+      "/tmp/VOID HTTP installation 571hj_ik/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 16.765615327996784
+  },
+  {
+    "argv": [
+      "/tmp/VOID HTTP installation 571hj_ik/protected-output"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07291933700616937
+  }
+]

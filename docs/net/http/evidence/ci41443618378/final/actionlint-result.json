@@ -1,0 +1,9 @@
+{
+  "argv": [
+    ".toolchains/actionlint-1.7.12/actionlint",
+    ".github/workflows/ci-link-experiment.yml"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": ""
+}

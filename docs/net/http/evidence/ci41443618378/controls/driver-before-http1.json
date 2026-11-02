@@ -1,0 +1,27 @@
+{
+  "code": 0,
+  "stdout": "barrier kind=0 native=0\n",
+  "stderr": "",
+  "events": [
+    [
+      "/slow",
+      "received",
+      0.19639894600550178
+    ],
+    [
+      "/plain",
+      "received",
+      0.19695461199444253
+    ],
+    [
+      "/plain",
+      "barrier",
+      0.19706989100086503
+    ],
+    [
+      "/slow",
+      "closed",
+      0.19733747899590526
+    ]
+  ]
+}

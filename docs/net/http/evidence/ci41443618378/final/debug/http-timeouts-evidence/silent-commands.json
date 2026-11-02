@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_http_timeouts",
+    "http://127.0.0.1:36803",
+    "https://127.0.0.1:58799",
+    "http://127.0.0.1:58799",
+    "https://127.0.0.1:41903",
+    "/tmp/VOID timeout eirit64g/cert.pem",
+    "/tmp/VOID timeout eirit64g/input.bin",
+    "silent-producer"
+  ],
+  "exit_code": 0
+}

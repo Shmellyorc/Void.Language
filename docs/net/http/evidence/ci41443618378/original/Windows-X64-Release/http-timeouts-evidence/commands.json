@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "D:\\a\\Void.Language\\Void.Language\\build\\Release\\void_http_timeouts.exe",
+    "http://127.0.0.1:52119",
+    "https://127.0.0.1:52121",
+    "http://127.0.0.1:52121",
+    "https://127.0.0.1:52120",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID timeout 734q7ipe\\cert.pem",
+    "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID timeout 734q7ipe\\input.bin"
+  ],
+  "exit_code": 0
+}

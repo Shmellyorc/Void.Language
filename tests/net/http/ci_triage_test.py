@@ -3,6 +3,7 @@ import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -67,7 +68,7 @@ class WindowsPathTests(unittest.TestCase):
                     f'include("{(ROOT / "cmake/HttpNativeDependencies.cmake").as_posix()}")\n' +
                     'void_import_native_http_dependencies()\n' +
                     'file(WRITE "${CMAKE_BINARY_DIR}/selected.txt" "${CARES_LIBRARY}")\n')
-                result = subprocess.run(['cmake', '-S', str(root), '-B', str(root / 'build')],
+                result = subprocess.run(['cmake', '-G', 'Ninja' if os.name == 'nt' else 'Unix Makefiles', '-S', str(root), '-B', str(root / 'build')],
                                         capture_output=True, text=True)
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
                 self.assertEqual((prefix / 'lib/cares.lib').as_posix(), (root / 'build/selected.txt').read_text())

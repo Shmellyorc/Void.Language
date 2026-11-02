@@ -6,6 +6,28 @@
 [Golden Wrench handoff](HANDOFF.md); full HTTP acceptance is pending.** [Earlier chronological checkpoints](ENGINEERING_HISTORY.md)
 retain every original failure and intermediate limitation.
 
+## Native CI repair checkpoint — 2 November 2026
+
+[CI 41443618378 consolidated triage](CI41443618378_TRIAGE.md) supersedes the
+previous cancellation confidence claim. Ubuntu Debug/Sanitizers passed the
+original hosted run; five other jobs failed. A controlled Driver/curl negative
+control reproduces PIPEWAIT leaving a second negotiated request pending behind
+a held HTTP/1.1 response. The same barrier dependency can expire an upload's
+**total** deadline while its source producer waits, without a broken 20 ms
+write-idle predicate. Negotiated requests now use the existing spare connection
+capacity; required HTTP/2 retains PIPEWAIT. No timeout limits or Runtime
+cancellation semantics changed.
+
+Windows explicit CA snapshots no longer set unsupported Schannel CAPATH options;
+CA blobs and verification remain mandatory. The c-ares policy fixture selects a
+single-configuration generator, and URL source expectations enforce the established
+exact UTF-8/LF contract. Final evidence and platform limits are in the linked
+triage. Final focused Linux checks pass **12/12 in each of Release, Debug and
+strict**, with no skips or sanitizer findings. Corrected Windows/macOS native
+execution remains **UNVERIFIED** pending
+Golden Wrench review and Boss's next seven-job run. Historical records below
+remain evidence of their stated checkpoints, not acceptance of these repairs.
+
 ## Settled decisions implemented
 
 - Authoritative curl 8.23.0 is directly in `third_party/curl/`, left unstaged for

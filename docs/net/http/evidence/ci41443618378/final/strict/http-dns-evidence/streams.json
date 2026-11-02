@@ -1,0 +1,26 @@
+{
+  "connection-http1.stderr": {
+    "utf8": ""
+  },
+  "connection-http1.stdout": {
+    "utf8": "barrier kind=0 native=0\n"
+  },
+  "connection-negotiate.stderr": {
+    "utf8": ""
+  },
+  "connection-negotiate.stdout": {
+    "utf8": "barrier kind=0 native=0\n"
+  },
+  "connection-producer.stderr": {
+    "utf8": ""
+  },
+  "connection-producer.stdout": {
+    "utf8": "producer kind=0 phase=0 uploaded=2048 total_ms=216\n"
+  },
+  "native.stderr": {
+    "utf8": ""
+  },
+  "native.stdout": {
+    "utf8": "DNS retained live allocations: 261101; steady 303693..419242 bytes\nNative c-ares UDP/TCP, IPv4/IPv6, IDN, cache pressure, negative cache, cancellation and timeout passed\n"
+  }
+}

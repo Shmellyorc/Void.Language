@@ -1,0 +1,14 @@
+Connection #0 is not open enough, cannot reuse
+Found pending candidate for reuse and CURLOPT_PIPEWAIT is set
+Waiting on connection to negotiate possible multiplexing.
+Host pending.void.test:35445 was resolved.
+IPv6: (none)
+IPv4: 127.0.0.1
+  Trying 127.0.0.1:35445...
+Established connection to pending.void.test (127.0.0.1 port 35445) from 127.0.0.1 port 38070 
+using HTTP/1.x
+Request completely sent off
+Operation timed out after 1000 milliseconds with 0 bytes received
+PENDING handle timeout
+Operation timed out after 1000 milliseconds with 0 bytes received
+closing connection #0

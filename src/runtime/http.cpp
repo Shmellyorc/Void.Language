@@ -669,7 +669,13 @@ void DriverState::configure(const std::shared_ptr<TransferState>& state) {
     option(easy, CURLOPT_MAXAGE_CONN, static_cast<long>((client.options.idle_timeout_ms + 999) / 1000));
     option(easy, CURLOPT_MAXLIFETIME_CONN, static_cast<long>((client.options.connection_lifetime_ms + 999) / 1000));
     option(easy, CURLOPT_DNS_CACHE_TIMEOUT, static_cast<long>((client.options.dns_cache_ms + 999) / 1000));
-    option(easy, CURLOPT_PIPEWAIT, 1L); option(easy, CURLOPT_SUPPRESS_CONNECT_HEADERS, 1L);
+    // A negotiated connection may become HTTP/1.1. Curl 8.23 can leave a
+    // speculative PIPEWAIT transfer pending until that connection completes,
+    // even with spare connection capacity. A streaming response need not end.
+    // Only wait when multiplexing is required; negotiated transfers still reuse
+    // established HTTP/2 connections and obey the same multi connection limits.
+    option(easy, CURLOPT_PIPEWAIT, transfer.options.protocol == Protocol::http2_required ? 1L : 0L);
+    option(easy, CURLOPT_SUPPRESS_CONNECT_HEADERS, 1L);
     option(easy, CURLOPT_USERAGENT, client.options.user_agent.c_str());
     option(easy, CURLOPT_URL, transfer.address.text.c_str());
     option(easy, CURLOPT_HEADERFUNCTION, header_callback); option(easy, CURLOPT_HEADERDATA, state.get());
@@ -692,10 +698,16 @@ void DriverState::configure(const std::shared_ptr<TransferState>& state) {
     }
     if (!client.options.tls.ca_bundle.empty()) {
         curl_blob ca{client.ca_material.data(), client.ca_material.size(), CURL_BLOB_NOCOPY};
-        option(easy, CURLOPT_CAINFO_BLOB, &ca); option(easy, CURLOPT_CAINFO, nullptr); option(easy, CURLOPT_CAPATH, nullptr);
+        option(easy, CURLOPT_CAINFO_BLOB, &ca); option(easy, CURLOPT_CAINFO, nullptr);
         option(easy, CURLOPT_SSL_OPTIONS, 0L);
-        option(easy, CURLOPT_PROXY_CAINFO_BLOB, &ca); option(easy, CURLOPT_PROXY_CAINFO, nullptr); option(easy, CURLOPT_PROXY_CAPATH, nullptr);
+        option(easy, CURLOPT_PROXY_CAINFO_BLOB, &ca); option(easy, CURLOPT_PROXY_CAINFO, nullptr);
         option(easy, CURLOPT_PROXY_SSL_OPTIONS, 0L);
+#ifndef _WIN32
+        // Schannel has no CA-directory facility and rejects CAPATH even when
+        // null. AWS-LC profiles must clear their compiled-in directory so an
+        // explicit snapshot replaces, rather than augments, system trust.
+        option(easy, CURLOPT_CAPATH, nullptr); option(easy, CURLOPT_PROXY_CAPATH, nullptr);
+#endif
     }
     if (client.options.tls.identity == TlsOptions::windows_store) {
         option(easy, CURLOPT_SSLCERT, client.options.tls.certificate.c_str());

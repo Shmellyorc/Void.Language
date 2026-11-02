@@ -1,0 +1,34 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41443618378/control/dns-before",
+    "--connection-wait",
+    "http://pending.void.test:36917",
+    "127.0.0.1:58756",
+    "producer"
+  ],
+  "code": 1,
+  "stdout": "producer kind=14 phase=7 uploaded=1024 total_ms=2062\n",
+  "stderr": "producer resumes beyond write-idle deadline\n",
+  "events": [
+    [
+      "first",
+      1024,
+      0.1969894890062278
+    ],
+    [
+      "second",
+      0,
+      2.045753655998851
+    ],
+    [
+      "/plain",
+      "received",
+      2.0463979019987164
+    ],
+    [
+      "/plain",
+      "barrier",
+      2.0465395409992198
+    ]
+  ]
+}

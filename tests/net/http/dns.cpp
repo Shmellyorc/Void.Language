@@ -22,6 +22,53 @@ std::size_t live_bytes() {
 }
 int main(int argc, char** argv) {
     try {
+        if (argc == 5 && std::string_view(argv[1]) == "--connection-wait") {
+            auto hooks = std::make_shared<testing::Hooks>(); hooks->dns_servers = argv[3];
+            Driver driver(hooks); Error error;
+            auto client = driver.open({}, error); require(bool(client), "connection wait client");
+            RequestOptions options; options.ip_family = IpFamily::v4;
+            options.connect_timeout_ms = 1000; options.total_timeout_ms = 2000;
+            if (std::string_view(argv[4]) == "http1") options.protocol = Protocol::http1;
+            Request slow; slow.target = std::string(argv[2]) + "/slow";
+            Request barrier; barrier.target = std::string(argv[2]) + "/plain";
+            if (std::string_view(argv[4]) == "producer") {
+                slow.target = std::string(argv[2]) + "/producer";
+                slow.method = "POST"; slow.body = Request::stream; slow.stream_length = 2048;
+                options.write_timeout_ms = 20;
+                const auto started = std::chrono::steady_clock::now();
+                auto upload = driver.start(client, slow, options, error); require(bool(upload), "producer admission");
+                require(driver.write(upload, std::string(1024, 'p'))->take().error.kind == ErrorKind::success, "first producer write");
+                // The barrier itself must survive beyond the upload's total
+                // deadline, as in the original fixture. A stuck PIPEWAIT can
+                // otherwise masquerade as an upload-idle failure.
+                RequestOptions barrier_options; barrier_options.ip_family = IpFamily::v4;
+                auto ready = driver.send(client, barrier, barrier_options)->take();
+                require(ready.error.kind == ErrorKind::success, "producer barrier");
+                std::this_thread::sleep_for(std::chrono::milliseconds(60));
+                auto result = driver.write(upload, std::string(1024, 'p'))->take();
+                if (result.error.kind == ErrorKind::success) {
+                    require(driver.finish_upload(upload).kind == ErrorKind::success, "producer finish");
+                    result = driver.response(upload)->take();
+                }
+                std::cout << "producer kind=" << static_cast<int>(result.error.kind)
+                          << " phase=" << static_cast<int>(result.error.phase) << " uploaded=" << result.uploaded
+                          << " total_ms=" << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count() << '\n';
+                require(result.error.kind == ErrorKind::success && result.uploaded == 2048, "producer resumes beyond write-idle deadline");
+                require(driver.close(upload)->take().error.kind == ErrorKind::success, "producer close");
+                require(driver.close(client)->take().error.kind == ErrorKind::success, "producer client close");
+                return 0;
+            }
+            auto held = driver.send(client, slow, options);
+            auto ready = driver.send(client, barrier, options)->take();
+            std::cout << "barrier kind=" << static_cast<int>(ready.error.kind)
+                      << " native=" << ready.error.native_code << '\n';
+            require(ready.error.kind == ErrorKind::success, "pending connection must progress before held body completes");
+            require(!held->ready(), "held body must not complete before cancellation");
+            held->cancel();
+            require(held->take().error.kind == ErrorKind::closed, "held connection cancellation drains");
+            require(driver.close(client)->take().error.kind == ErrorKind::success, "connection wait client closes");
+            return 0;
+        }
         require(argc == 4, "HTTP port, DNS endpoint and IPv6 HTTP port required");
         auto hooks = std::make_shared<testing::Hooks>(); hooks->dns_servers = argv[2];
         Driver driver(hooks); Error error; ClientOptions config;

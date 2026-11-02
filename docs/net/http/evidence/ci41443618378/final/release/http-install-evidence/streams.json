@@ -1,0 +1,110 @@
+{
+  "0.stderr": {
+    "utf8": ""
+  },
+  "0.stdout": {
+    "utf8": "-- Install configuration: \"Release\"\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/UNICODE-LICENSE.txt\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/time.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/console.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/binary.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/hex.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/base64.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/ascii.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/io\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/io/memory.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/error.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/convert.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/io.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/path.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/text.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/random.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/math.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/json.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/channel.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/os.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/collections.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/log.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/url.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/net\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/net/http.void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/LICENSE-Boost\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/LICENSE.txt\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/NOTICE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/LICENSE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/stage10-versions.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/bin/voidc\n-- Set non-toolchain portion of runtime path of \"/tmp/VOID HTTP installation 8p28kp08/original/bin/voidc\" to \"$ORIGIN/../lib/void\"\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libvoid_runtime.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libvoid_native_fixture.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libcurl.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libpsl.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libnghttp2.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libssl.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libcrypto.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libcares.a\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libz.a\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/lib/void\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/cmake\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/cmake/nghttp2\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/cmake/c-ares\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/cmake/zlib\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/pkgconfig\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/crypto\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/crypto/cmake\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/crypto/cmake/static\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/ssl\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/ssl/cmake\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/ssl/cmake/static\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libunistring.so.5\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libunistring.so\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libidn2.so.0\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libidn2.so\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libunistring.so.5.2.2\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/lib/void/libidn2.so.0.4.0\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/nghttp2-1.70.0\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/nghttp2-1.70.0/COPYING\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/nghttp2-1.70.0/README\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/c-ares-1.34.9\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/c-ares-1.34.9/LICENSE.md\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/zlib-1.3.2\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/zlib-1.3.2/LICENSE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/zlib-1.3.2/README\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/openssl-3.5.9\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/openssl-3.5.9/LICENSE.txt\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libidn2-2.3.8\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libidn2-2.3.8/COPYING\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libidn2-2.3.8/COPYINGv2\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libidn2-2.3.8/README\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libpsl-0.21.5\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libpsl-0.21.5/README\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libpsl-0.21.5/COPYING\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libpsl-0.21.5/LICENSE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libunistring-1.5\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libunistring-1.5/COPYING.LIB\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libunistring-1.5/README\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/libunistring-1.5/COPYING\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/aws-lc-5.12.0\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/aws-lc-5.12.0/LICENSE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/aws-lc-5.12.0/NOTICE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/COPYING\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/NOTICE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/VOID-PROVENANCE.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/http-versions.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/publicsuffix\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/publicsuffix/public_suffix_list.dat\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/publicsuffix/UPSTREAM.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/publicsuffix/LICENSE\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/corresponding-source/setup_http_deps.py\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/corresponding-source/setup_http_deps_native.py\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/corresponding-source/http_archive.py\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/bin/void-native.txt\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/bin/void-native-resources.txt\n"
+  },
+  "1.stderr": {
+    "utf8": ""
+  },
+  "1.stdout": {
+    "utf8": "-- Install configuration: \"Release\"\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/bin/voidls\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/UNICODE-LICENSE.txt\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/time.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/console.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/binary.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/hex.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/base64.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/encoding/ascii.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/io\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/io/memory.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/error.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/convert.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/io.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/path.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/text.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/random.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/math.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/json.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/channel.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/os.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/collections.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/log.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/url.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/net\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/stdlib/net/http.void\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/LICENSE-Boost\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/LICENSE.txt\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/NOTICE\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/LICENSE\n-- Up-to-date: /tmp/VOID HTTP installation 8p28kp08/original/share/void/licenses/stage10-versions.json\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/ftdetect\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/ftdetect/void.vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/ftplugin\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/ftplugin/void.vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/syntax\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/syntax/void.vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/indent\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/indent/void.vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/autoload\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/autoload/void.vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/vim/autoload/void_format.vim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/neovim\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/neovim/lua\n-- Installing: /tmp/VOID HTTP installation 8p28kp08/original/share/void/neovim/lua/void.lua\n"
+  },
+  "10.stderr": {
+    "utf8": ""
+  },
+  "10.stdout": {
+    "utf8": "Built native executable: /tmp/VOID HTTP installation 8p28kp08/built-True\n"
+  },
+  "11.stderr": {
+    "utf8": ""
+  },
+  "11.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "12.stderr": {
+    "utf8": ""
+  },
+  "12.stdout": {
+    "utf8": "Wrote native source object: /tmp/VOID HTTP installation 8p28kp08/program.o\n"
+  },
+  "13.stderr": {
+    "utf8": ""
+  },
+  "13.stdout": {
+    "utf8": ""
+  },
+  "14.stderr": {
+    "utf8": ""
+  },
+  "14.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "15.stderr": {
+    "utf8": "Native link resource checksum mismatch: /tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/lib/void/libcurl.a\n"
+  },
+  "15.stdout": {
+    "utf8": ""
+  },
+  "16.stderr": {
+    "utf8": ""
+  },
+  "16.stdout": {
+    "utf8": "Built native executable: /tmp/VOID HTTP installation 8p28kp08/protected-output\n"
+  },
+  "17.stderr": {
+    "utf8": ""
+  },
+  "17.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "2.stderr": {
+    "utf8": ""
+  },
+  "2.stdout": {
+    "utf8": "\tlinux-vdso.so.1 (0x00007f5885044000)\n\tlibidn2.so.0 => /tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libidn2.so.0 (0x00007f5884fe3000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f5884c00000)\n\tlibunistring.so.5 => /tmp/VOID HTTP installation 8p28kp08/relocated \u96ea # % installation/bin/../lib/void/libunistring.so.5 (0x00007f5884a18000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f5884ec8000)\n\tlibz.so.1 => /usr/lib/x86_64-linux-gnu/libz.so.1 (0x00007f58849f9000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f58849cb000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f5884600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f5885046000)\n"
+  },
+  "3.stderr": {
+    "utf8": ""
+  },
+  "3.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "4.stderr": {
+    "utf8": ""
+  },
+  "4.stdout": {
+    "utf8": "Built native executable: /tmp/VOID HTTP installation 8p28kp08/built-False\n"
+  },
+  "5.stderr": {
+    "utf8": ""
+  },
+  "5.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "6.stderr": {
+    "utf8": ""
+  },
+  "6.stdout": {
+    "utf8": "Wrote native source object: /tmp/VOID HTTP installation 8p28kp08/program.o\n"
+  },
+  "7.stderr": {
+    "utf8": ""
+  },
+  "7.stdout": {
+    "utf8": ""
+  },
+  "8.stderr": {
+    "utf8": ""
+  },
+  "8.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "9.stderr": {
+    "utf8": ""
+  },
+  "9.stdout": {
+    "utf8": "Example JSON complete\n"
+  }
+}

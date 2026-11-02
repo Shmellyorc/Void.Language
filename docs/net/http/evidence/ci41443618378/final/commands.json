@@ -1,0 +1,81 @@
+{
+  "source_sha256": {
+    "src/runtime/http.cpp": "17ae4d6a9d447495584d8b48d338d7534f3a4f7e1d1bec9d9bfe5fc3830c0c3d",
+    "tests/net/http/ci_triage_test.py": "67bdcb1f30de6342653bccc298397caa8eb382b4156908e8b9a841fcae2c1517",
+    "tests/net/http/dns.cpp": "b98cc64863e2938b4a4bfe630ec52f34967aa66ac96b076a26a1d74a2137e7c5",
+    "tests/net/http/dns.py": "32a4aa6f46e62b299014de0ffe3e48db8854295ed10e9374d9b7c5a59e2b894e",
+    "tests/net/http/examples.py": "86006a0adab1e0130e156b7ce5792ca3450dddc1f2f193d51772b1af6534d302",
+    "tests/net/http/timeouts.cpp": "314bcb247e7c930839f5f008532798320bd83aff577366ee098ba6dba53ce759",
+    "tests/net/http/url_source.py": "d3b8c5266186ca02d653e165bfc71c94ac4085b4078391af1d35286f5899cf4c"
+  },
+  "toolchain": "LLVM/Clang/LLD 23.1.4",
+  "stack_bytes": 1048576,
+  "profiles": {
+    "release": {
+      "configuration": [
+        "CMAKE_BUILD_TYPE:STRING=Release",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "CMAKE_C_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "VOID_HTTP_DEPS_ROOT:PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "VOID_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "VOID_SANITIZERS:BOOL=OFF"
+      ],
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-release",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41443618378/final-release.xml",
+        "-R",
+        "^(http_native|http_timeouts|http_dns|http_examples|http_ci_policy|http_curl_objects|http_source|http_install|url_source|url_native|http_wire|http_reload)$"
+      ],
+      "environment": {}
+    },
+    "debug": {
+      "configuration": [
+        "CMAKE_BUILD_TYPE:STRING=Debug",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "CMAKE_C_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "VOID_HTTP_DEPS_ROOT:PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug",
+        "VOID_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "VOID_SANITIZERS:BOOL=OFF"
+      ],
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-debug",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41443618378/final-debug.xml",
+        "-R",
+        "^(http_native|http_timeouts|http_dns|http_examples|http_ci_policy|http_curl_objects|http_source|http_install|url_source|url_native|http_wire|http_reload)$"
+      ],
+      "environment": {}
+    },
+    "strict": {
+      "configuration": [
+        "CMAKE_BUILD_TYPE:STRING=RelWithDebInfo",
+        "CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "CMAKE_C_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "VOID_HTTP_DEPS_ROOT:PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict",
+        "VOID_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "VOID_SANITIZERS:BOOL=ON"
+      ],
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-strict",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41443618378/final-strict.xml",
+        "-R",
+        "^(http_native|http_timeouts|http_dns|http_examples|http_ci_policy|http_curl_objects|http_source|http_install|url_source|url_native|http_wire|http_reload)$"
+      ],
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      }
+    }
+  }
+}

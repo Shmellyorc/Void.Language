@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/home/runner/work/Void.Language/Void.Language/build/Release/void_http_timeouts",
+    "http://127.0.0.1:35173",
+    "https://127.0.0.1:44875",
+    "http://127.0.0.1:44875",
+    "https://127.0.0.1:36351",
+    "/tmp/VOID timeout 7fcwnxte/cert.pem",
+    "/tmp/VOID timeout 7fcwnxte/input.bin",
+    "silent-producer"
+  ],
+  "exit_code": 0
+}

@@ -97,9 +97,12 @@ int main(int argc,char** argv) {
             Request request;request.target=std::string(argv[1])+"/producer-pause";request.method="POST";
             request.body=Request::stream;request.stream_length=2048;
             RequestOptions timed;timed.write_timeout_ms=20;timed.total_timeout_ms=3000;
+            const auto admitted=Clock::now();
             auto transfer=driver.start(client,request,timed,error);require(bool(transfer),"paused producer");
             require(driver.write(transfer,std::string(1024,'p'))->take().error.kind==ErrorKind::success,"first producer block");
-            require(get("/producer-seen").error.kind==ErrorKind::success,"peer saw first producer bytes");
+            const auto seen=get("/producer-seen");
+            report("producer-barrier",seen,admitted);
+            require(seen.error.kind==ErrorKind::success,"peer saw first producer bytes");
             // The deferred case keeps curl rate-limited for one second after
             // sending the block, before it can call us again to observe PAUSE.
             std::this_thread::sleep_for(std::chrono::milliseconds(deferred ? 1100 : 60));

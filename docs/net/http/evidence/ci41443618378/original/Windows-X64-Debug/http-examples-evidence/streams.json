@@ -1,0 +1,62 @@
+{
+  "0.stderr": {
+    "utf8": "Writing private key to C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID HTTP examples 7x9pi19l\\key.pem\n"
+  },
+  "0.stdout": {
+    "utf8": ""
+  },
+  "1.stderr": {
+    "utf8": ""
+  },
+  "1.stdout": {
+    "utf8": "Source checked successfully\r\n"
+  },
+  "2.stderr": {
+    "utf8": ""
+  },
+  "2.stdout": {
+    "utf8": "Source checked successfully\r\n"
+  },
+  "3.stderr": {
+    "utf8": ""
+  },
+  "3.stdout": {
+    "utf8": "Source checked successfully\r\n"
+  },
+  "4.stderr": {
+    "utf8": ""
+  },
+  "4.stdout": {
+    "utf8": "Source checked successfully\r\n"
+  },
+  "5.stderr": {
+    "utf8": ""
+  },
+  "5.stdout": {
+    "utf8": "Source checked successfully\r\n"
+  },
+  "6.stderr": {
+    "utf8": ""
+  },
+  "6.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "7.stderr": {
+    "utf8": ""
+  },
+  "7.stdout": {
+    "utf8": "Built native executable: C:/Users/RUNNER~1/AppData/Local/Temp/VOID HTTP examples 7x9pi19l/api_json.exe\r\n"
+  },
+  "8.stderr": {
+    "utf8": ""
+  },
+  "8.stdout": {
+    "utf8": "Example JSON complete\n"
+  },
+  "9.stderr": {
+    "utf8": ""
+  },
+  "9.stdout": {
+    "utf8": "HTTP /@stdlib/net/http.void::error_kind.transport_failure, phase /@stdlib/net/http.void::failure_phase.download\n"
+  }
+}

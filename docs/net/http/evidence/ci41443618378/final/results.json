@@ -1,0 +1,170 @@
+{
+  "release": {
+    "tests": 12,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 211.19,
+    "cases": [
+      {
+        "name": "http_native",
+        "seconds": 17.2004
+      },
+      {
+        "name": "http_reload",
+        "seconds": 21.5384
+      },
+      {
+        "name": "http_timeouts",
+        "seconds": 6.07811
+      },
+      {
+        "name": "http_wire",
+        "seconds": 1.1785
+      },
+      {
+        "name": "http_dns",
+        "seconds": 6.19296
+      },
+      {
+        "name": "url_native",
+        "seconds": 0.0464237
+      },
+      {
+        "name": "http_examples",
+        "seconds": 59.0439
+      },
+      {
+        "name": "http_ci_policy",
+        "seconds": 4.39727
+      },
+      {
+        "name": "http_curl_objects",
+        "seconds": 0.614906
+      },
+      {
+        "name": "http_install",
+        "seconds": 46.5874
+      },
+      {
+        "name": "http_source",
+        "seconds": 46.3645
+      },
+      {
+        "name": "url_source",
+        "seconds": 1.93193
+      }
+    ]
+  },
+  "debug": {
+    "tests": 12,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 558.1,
+    "cases": [
+      {
+        "name": "http_native",
+        "seconds": 22.0129
+      },
+      {
+        "name": "http_reload",
+        "seconds": 60.5817
+      },
+      {
+        "name": "http_timeouts",
+        "seconds": 6.12624
+      },
+      {
+        "name": "http_wire",
+        "seconds": 1.15665
+      },
+      {
+        "name": "http_dns",
+        "seconds": 6.18001
+      },
+      {
+        "name": "url_native",
+        "seconds": 0.0508729
+      },
+      {
+        "name": "http_examples",
+        "seconds": 179.167
+      },
+      {
+        "name": "http_ci_policy",
+        "seconds": 4.32251
+      },
+      {
+        "name": "http_curl_objects",
+        "seconds": 0.614766
+      },
+      {
+        "name": "http_install",
+        "seconds": 136.721
+      },
+      {
+        "name": "http_source",
+        "seconds": 136.494
+      },
+      {
+        "name": "url_source",
+        "seconds": 4.65532
+      }
+    ]
+  },
+  "strict": {
+    "tests": 12,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 556.0,
+    "cases": [
+      {
+        "name": "http_native",
+        "seconds": 20.6653
+      },
+      {
+        "name": "http_reload",
+        "seconds": 61.7126
+      },
+      {
+        "name": "http_timeouts",
+        "seconds": 8.59813
+      },
+      {
+        "name": "http_wire",
+        "seconds": 1.50308
+      },
+      {
+        "name": "http_dns",
+        "seconds": 6.54499
+      },
+      {
+        "name": "url_native",
+        "seconds": 0.413376
+      },
+      {
+        "name": "http_examples",
+        "seconds": 173.978
+      },
+      {
+        "name": "http_ci_policy",
+        "seconds": 4.32597
+      },
+      {
+        "name": "http_curl_objects",
+        "seconds": 0.578687
+      },
+      {
+        "name": "http_install",
+        "seconds": 133.809
+      },
+      {
+        "name": "http_source",
+        "seconds": 136.123
+      },
+      {
+        "name": "url_source",
+        "seconds": 7.73139
+      }
+    ]
+  }
+}

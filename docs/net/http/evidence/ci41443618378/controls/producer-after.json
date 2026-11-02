@@ -1,0 +1,34 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/ci41443618378/control/dns-after",
+    "--connection-wait",
+    "http://pending.void.test:39545",
+    "127.0.0.1:48911",
+    "producer"
+  ],
+  "code": 0,
+  "stdout": "producer kind=0 phase=0 uploaded=2048 total_ms=212\n",
+  "stderr": "",
+  "events": [
+    [
+      "first",
+      1024,
+      0.2093640839884756
+    ],
+    [
+      "/plain",
+      "received",
+      0.20968594199803192
+    ],
+    [
+      "/plain",
+      "barrier",
+      0.209811490989523
+    ],
+    [
+      "second",
+      1024,
+      0.27022692099853884
+    ]
+  ]
+}

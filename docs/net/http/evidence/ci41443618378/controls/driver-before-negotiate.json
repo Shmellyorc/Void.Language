@@ -1,0 +1,17 @@
+{
+  "code": 1,
+  "stdout": "barrier kind=14 native=28\n",
+  "stderr": "pending connection must progress before held body completes\n",
+  "events": [
+    [
+      "/slow",
+      "received",
+      0.19594274800329003
+    ],
+    [
+      "/slow",
+      "closed",
+      1.0452954170032172
+    ]
+  ]
+}
