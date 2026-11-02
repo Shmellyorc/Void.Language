@@ -14,7 +14,17 @@ ROOT = Path(__file__).resolve().parents[3]
 
 class Handler(fixture.Handler):
     def do_GET(self):
-        if self.path.startswith('/json'):
+        if self.path == '/slow':
+            self.send_response(200); self.send_header('Content-Length', '8'); self.end_headers(); self.wfile.flush()
+            # Cancellation must race a pending request, even on a slow JIT host.
+            # The subprocess deadline and finally block own fixture teardown.
+            fixture.release.wait()
+            self.close_connection = True
+        elif self.path == '/plain' and getattr(self.server, 'cancellation_barrier', False):
+            # Reproduce the old five-second fixture expiry before cancellation.
+            time.sleep(6)
+            super().do_GET()
+        elif self.path.startswith('/json'):
             self.reply(b'{"message":"Example JSON complete"}', headers=[('Content-Type', 'application/json')])
         elif self.path.startswith('/broken-json'):
             self.reply(b'{bad', headers=[('Content-Type', 'application/json')])
@@ -80,6 +90,7 @@ def main():
             run([work / ('api_json.exe' if os.name == 'nt' else 'api_json')],
                 base + '/broken-json', 'JSON ', code=1)
             run([host, sources / 'streaming_async.void'], base, 'Streamed 8388608 bytes')
+            plain.cancellation_barrier = True
             run([host, sources / 'cancellation.void'], base, code=1, error='Async task cancelled')
         finally:
             fixture.release.set()

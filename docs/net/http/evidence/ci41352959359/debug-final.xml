@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="6"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="278"
+	timestamp="2026-11-01T18:03:05"
+	>
+	<testcase name="target_triple" classname="target_triple" time="0.00386408" status="run">
+		<properties/>
+		<system-out>arm64-apple-macosx14.0
+</system-out>
+	</testcase>
+	<testcase name="http_native" classname="http_native" time="22.0268" status="run">
+		<properties/>
+		<system-out>{"http_latency":{"profile":"HTTP/1.1 plaintext","samples":64,"median_ms":41.0025,"p95_ms":41.1152,"process_cpu_seconds":0.041449}}
+{"http_latency":{"profile":"HTTP/1.1 verified TLS","samples":64,"median_ms":41.0315,"p95_ms":41.9733,"process_cpu_seconds":0.051774}}
+{"http_latency":{"profile":"HTTP/2 verified TLS","samples":64,"median_ms":0.513867,"p95_ms":0.980135,"process_cpu_seconds":0.020549}}
+{"h2_paused_sample":{"sample":0,"rss_kib":39716,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":39716,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":39716,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":39716,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":39716,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_timeouts" classname="http_timeouts" time="3.95248" status="run">
+		<properties/>
+		<system-out>TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed
+</system-out>
+	</testcase>
+	<testcase name="http_examples" classname="http_examples" time="160.906" status="run">
+		<properties/>
+		<system-out>HTTP published examples: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_install" classname="http_install" time="139.981" status="run">
+		<properties/>
+		<system-out>Installed HTTP/URL/JSON: 18 relocated native/JIT/link checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_source" classname="http_source" time="138.264" status="run">
+		<properties/>
+		<system-out>Public HTTP source: 15 analysis/JIT/native-link checks passed
+</system-out>
+	</testcase>
+</testsuite>

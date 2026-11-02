@@ -193,3 +193,14 @@ HTTP registration/feature reports, dependency/fixture identities and editor
 artifacts. Cold/warm cache status and bootstrap/link/test measurements are
 available for the first actual hosted runtime assessment. No dispatch was made
 by Keyboard. **Stop here for Golden Wrench source review.**
+
+## Subsequent native run repairs
+
+[CI 41352959359 consolidated triage](CI41352959359_TRIAGE.md) records the
+Windows static-only c-ares import correction, macOS deployment propagation,
+streamed-producer deadline repair and cancellation-fixture race. The existing
+seven-job workflow and approved pins remain authoritative. The native rerun
+must include `target_triple`, the macOS-only `macos_deployment`, both producer
+pause paths in `http_timeouts`, and the delayed-barrier cancellation example,
+along with the complete existing acceptance suite. Native acceptance remains
+pending Golden Wrench review and Boss's hosted rerun.

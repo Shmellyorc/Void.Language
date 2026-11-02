@@ -644,6 +644,8 @@ void DriverState::configure(const std::shared_ptr<TransferState>& state) {
     if (!easy) throw std::bad_alloc();
     transfer.easy = easy;
     if (hooks && !hooks->dns_servers.empty()) option(easy, CURLOPT_DNS_SERVERS, hooks->dns_servers.c_str());
+    if (hooks && hooks->upload_bytes_per_second > 0)
+        option(easy, CURLOPT_MAX_SEND_SPEED_LARGE, static_cast<curl_off_t>(hooks->upload_bytes_per_second));
     option(easy, CURLOPT_PRIVATE, state.get()); option(easy, CURLOPT_NOSIGNAL, 1L);
     option(easy, CURLOPT_PROTOCOLS_STR, "http,https"); option(easy, CURLOPT_REDIR_PROTOCOLS_STR, "http,https");
     option(easy, CURLOPT_FOLLOWLOCATION, 0L);
@@ -937,8 +939,17 @@ void DriverState::service(const std::shared_ptr<TransferState>& state) {
         (!transfer.detached || !producer_done || transfer.queues->encoded.size || transfer.queues->decoded.size || !transfer.decoder_finished))
         transfer.fail(ErrorKind::timeout, timeout_phase(transfer));
     if (!transfer.detached) {
+        // A fixed-length producer can be idle before curl asks for its next block
+        // (and observes CURL_READFUNC_PAUSE). Once every admitted byte has
+        // reached curl's send counter, there is no socket write to time out.
+        // Bytes still queued here or buffered by curl keep the deadline active.
+        // Unknown-length HTTP/1 uploads include chunk framing in curl's sent
+        // counter, so their raw admitted count is not comparable here.
+        const bool producer_idle = transfer.request.body == Request::stream && transfer.request.stream_length >= 0 &&
+            !transfer.upload_finished && !transfer.queues->upload.size &&
+            transfer.write_accepted == static_cast<std::uint64_t>(transfer.uploaded - transfer.uploaded_before_hop);
         const bool write_active = transfer.request_permitted && !transfer.upload_transmitted && !transfer.upload_stopped &&
-            transfer.request.body != Request::empty && (!transfer.send_paused || transfer.queues->upload.size);
+            transfer.request.body != Request::empty && !producer_idle && (!transfer.send_paused || transfer.queues->upload.size);
         if (write_active && !transfer.write_timer) transfer.write_at = Clock::now();
         transfer.write_timer = write_active;
         if (transfer.header_timer && expired(transfer.header_at, transfer.options.header_timeout_ms)) transfer.fail(ErrorKind::timeout, Phase::headers);

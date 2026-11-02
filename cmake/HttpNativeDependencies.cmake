@@ -62,7 +62,9 @@ macro(void_import_native_http_dependencies)
     set(ENABLE_UNICODE ON)
     set(USE_WIN32_IDN ON)
     set(NGHTTP2_LIBRARY "${VOID_HTTP_DEPS_ROOT}/lib/nghttp2.lib")
-    set(CARES_LIBRARY "${VOID_HTTP_DEPS_ROOT}/lib/cares_static.lib")
+    # c-ares adds _static only when shared and static are built together.
+    # Our verified recipe builds static only in both Debug and Release.
+    set(CARES_LIBRARY "${VOID_HTTP_DEPS_ROOT}/lib/cares.lib")
     set(LIBPSL_LIBRARY "${VOID_HTTP_DEPS_ROOT}/lib/psl.lib")
     if(_http_profile STREQUAL "Release")
       set(VOID_HTTP_ZLIB "${VOID_HTTP_DEPS_ROOT}/lib/zs.lib")

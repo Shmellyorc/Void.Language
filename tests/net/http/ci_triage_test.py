@@ -44,6 +44,39 @@ class CheckoutTests(unittest.TestCase):
 
 
 class WindowsPathTests(unittest.TestCase):
+    def test_static_only_cares_import_in_both_profiles(self):
+        # CMake/platform simulation: verified fixture files, not MSVC binaries.
+        for profile in ('Debug', 'Release'):
+            with self.subTest(profile=profile), tempfile.TemporaryDirectory(prefix='VOID cares import ') as directory:
+                root = Path(directory); prefix = root / 'prefix'; (prefix / 'lib').mkdir(parents=True)
+                files = {}
+                for name in ('cares.lib', 'nghttp2.lib', 'psl.lib', 'zs.lib' if profile == 'Release' else 'zsd.lib'):
+                    path = prefix / 'lib' / name; path.write_bytes(b'fixture static archive')
+                    files['lib/' + name] = digest(path.read_bytes())
+                manifest = dict(profile=profile, platform='Windows', architecture='x86_64',
+                                pins_sha256=digest((ROOT / 'third_party/http-versions.json').read_bytes()),
+                                files=files, selected_dependencies=[])
+                (prefix / 'VOID-HTTP-DEPENDENCIES.json').write_text(json.dumps(manifest))
+                (root / 'CMakeLists.txt').write_text(
+                    'cmake_minimum_required(VERSION 3.24)\nproject(cares_import NONE)\n'
+                    'set(WIN32 TRUE)\nset(APPLE FALSE)\nset(CMAKE_SYSTEM_NAME Windows)\n'
+                    'set(CMAKE_SYSTEM_PROCESSOR AMD64)\n' +
+                    f'set(CMAKE_BUILD_TYPE {profile})\nset(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")\n' +
+                    f'set(VOID_HTTP_DEPS_ROOT "{prefix.as_posix()}")\n' +
+                    f'set(CMAKE_CURRENT_FUNCTION_LIST_DIR "{(ROOT / "cmake").as_posix()}")\n' +
+                    f'include("{(ROOT / "cmake/HttpNativeDependencies.cmake").as_posix()}")\n' +
+                    'void_import_native_http_dependencies()\n' +
+                    'file(WRITE "${CMAKE_BINARY_DIR}/selected.txt" "${CARES_LIBRARY}")\n')
+                result = subprocess.run(['cmake', '-S', str(root), '-B', str(root / 'build')],
+                                        capture_output=True, text=True)
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+                self.assertEqual((prefix / 'lib/cares.lib').as_posix(), (root / 'build/selected.txt').read_text())
+                (prefix / 'lib/cares.lib').unlink()
+                result = subprocess.run(['cmake', '-S', str(root), '-B', str(root / 'build')],
+                                        capture_output=True, text=True)
+                self.assertNotEqual(0, result.returncode)
+                self.assertIn('digest mismatch: lib/cares.lib', result.stderr)
+
     def test_psl_native_separators_and_spaces(self):
         with tempfile.TemporaryDirectory(prefix='VOID PSL paths ') as temporary:
             root = Path(temporary); source = root / 'a source'; (source / 'src').mkdir(parents=True)

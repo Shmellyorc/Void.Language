@@ -1,0 +1,20 @@
+{
+  "kind": "Linux cross-object simulation; no native Apple linking or execution",
+  "compiler": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n",
+  "objects": [
+    {
+      "target": "arm64-apple-macosx26.0",
+      "minimum": [
+        1703936
+      ],
+      "object_sha256": "7b01de7cbf1c5130f3944822a2342f2a7b8a80948cc728c798b4ea293011e797"
+    },
+    {
+      "target": "arm64-apple-macosx14.0",
+      "minimum": [
+        917504
+      ],
+      "object_sha256": "0a219c87c4ae9e50f579a517e2065ab29785765a635448fbe5bd0e7d252aac01"
+    }
+  ]
+}

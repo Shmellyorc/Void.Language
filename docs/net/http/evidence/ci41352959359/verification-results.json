@@ -1,0 +1,410 @@
+{
+  "debug-final.xml": {
+    "summary": {
+      "name": "Linux-clang++",
+      "tests": "6",
+      "failures": "0",
+      "disabled": "0",
+      "skipped": "0",
+      "hostname": "gamedev",
+      "time": "278",
+      "timestamp": "2026-11-01T18:03:05"
+    },
+    "tests": [
+      {
+        "name": "target_triple",
+        "classname": "target_triple",
+        "time": "0.00386408",
+        "status": "run"
+      },
+      {
+        "name": "http_native",
+        "classname": "http_native",
+        "time": "22.0268",
+        "status": "run"
+      },
+      {
+        "name": "http_timeouts",
+        "classname": "http_timeouts",
+        "time": "3.95248",
+        "status": "run"
+      },
+      {
+        "name": "http_examples",
+        "classname": "http_examples",
+        "time": "160.906",
+        "status": "run"
+      },
+      {
+        "name": "http_install",
+        "classname": "http_install",
+        "time": "139.981",
+        "status": "run"
+      },
+      {
+        "name": "http_source",
+        "classname": "http_source",
+        "time": "138.264",
+        "status": "run"
+      }
+    ]
+  },
+  "debug-focused.xml": {
+    "summary": {
+      "name": "Linux-clang++",
+      "tests": "12",
+      "failures": "0",
+      "disabled": "0",
+      "skipped": "0",
+      "hostname": "gamedev",
+      "time": "438",
+      "timestamp": "2026-11-01T17:55:21"
+    },
+    "tests": [
+      {
+        "name": "target_triple",
+        "classname": "target_triple",
+        "time": "0.00353398",
+        "status": "run"
+      },
+      {
+        "name": "http_native",
+        "classname": "http_native",
+        "time": "22.1215",
+        "status": "run"
+      },
+      {
+        "name": "http_timeouts",
+        "classname": "http_timeouts",
+        "time": "3.99432",
+        "status": "run"
+      },
+      {
+        "name": "http_examples",
+        "classname": "http_examples",
+        "time": "162.169",
+        "status": "run"
+      },
+      {
+        "name": "http_ci_policy",
+        "classname": "http_ci_policy",
+        "time": "4.39698",
+        "status": "run"
+      },
+      {
+        "name": "http_install",
+        "classname": "http_install",
+        "time": "139.836",
+        "status": "run"
+      },
+      {
+        "name": "http_source",
+        "classname": "http_source",
+        "time": "136.879",
+        "status": "run"
+      },
+      {
+        "name": "http_source_negative",
+        "classname": "http_source_negative",
+        "time": "5.73975",
+        "status": "run"
+      },
+      {
+        "name": "http_source_faults",
+        "classname": "http_source_faults",
+        "time": "312.24",
+        "status": "run"
+      },
+      {
+        "name": "url_source",
+        "classname": "url_source",
+        "time": "4.95538",
+        "status": "run"
+      },
+      {
+        "name": "url_lsp",
+        "classname": "url_lsp",
+        "time": "0.241255",
+        "status": "run"
+      },
+      {
+        "name": "http_lsp",
+        "classname": "http_lsp",
+        "time": "11.2263",
+        "status": "run"
+      }
+    ]
+  },
+  "release-final.xml": {
+    "summary": {
+      "name": "Linux-clang++",
+      "tests": "6",
+      "failures": "0",
+      "disabled": "0",
+      "skipped": "0",
+      "hostname": "gamedev",
+      "time": "94",
+      "timestamp": "2026-11-01T18:01:11"
+    },
+    "tests": [
+      {
+        "name": "target_triple",
+        "classname": "target_triple",
+        "time": "0.00372832",
+        "status": "run"
+      },
+      {
+        "name": "http_native",
+        "classname": "http_native",
+        "time": "17.3362",
+        "status": "run"
+      },
+      {
+        "name": "http_timeouts",
+        "classname": "http_timeouts",
+        "time": "3.82789",
+        "status": "run"
+      },
+      {
+        "name": "http_examples",
+        "classname": "http_examples",
+        "time": "56.8068",
+        "status": "run"
+      },
+      {
+        "name": "http_install",
+        "classname": "http_install",
+        "time": "46.508",
+        "status": "run"
+      },
+      {
+        "name": "http_source",
+        "classname": "http_source",
+        "time": "47.6289",
+        "status": "run"
+      }
+    ]
+  },
+  "release-focused.xml": {
+    "summary": {
+      "name": "Linux-clang++",
+      "tests": "12",
+      "failures": "0",
+      "disabled": "0",
+      "skipped": "0",
+      "hostname": "gamedev",
+      "time": "221",
+      "timestamp": "2026-11-01T17:55:21"
+    },
+    "tests": [
+      {
+        "name": "target_triple",
+        "classname": "target_triple",
+        "time": "0.00257936",
+        "status": "run"
+      },
+      {
+        "name": "http_native",
+        "classname": "http_native",
+        "time": "17.235",
+        "status": "run"
+      },
+      {
+        "name": "http_timeouts",
+        "classname": "http_timeouts",
+        "time": "3.85894",
+        "status": "run"
+      },
+      {
+        "name": "http_examples",
+        "classname": "http_examples",
+        "time": "55.364",
+        "status": "run"
+      },
+      {
+        "name": "http_ci_policy",
+        "classname": "http_ci_policy",
+        "time": "4.36652",
+        "status": "run"
+      },
+      {
+        "name": "http_install",
+        "classname": "http_install",
+        "time": "46.7472",
+        "status": "run"
+      },
+      {
+        "name": "http_source",
+        "classname": "http_source",
+        "time": "47.4025",
+        "status": "run"
+      },
+      {
+        "name": "http_source_negative",
+        "classname": "http_source_negative",
+        "time": "0.776053",
+        "status": "run"
+      },
+      {
+        "name": "http_source_faults",
+        "classname": "http_source_faults",
+        "time": "221.35",
+        "status": "run"
+      },
+      {
+        "name": "url_source",
+        "classname": "url_source",
+        "time": "1.92108",
+        "status": "run"
+      },
+      {
+        "name": "url_lsp",
+        "classname": "url_lsp",
+        "time": "0.0997185",
+        "status": "run"
+      },
+      {
+        "name": "http_lsp",
+        "classname": "http_lsp",
+        "time": "1.55726",
+        "status": "run"
+      }
+    ]
+  },
+  "strict-final.xml": {
+    "summary": {
+      "name": "Linux-clang++",
+      "tests": "6",
+      "failures": "0",
+      "disabled": "0",
+      "skipped": "0",
+      "hostname": "gamedev",
+      "time": "273",
+      "timestamp": "2026-11-01T18:05:29"
+    },
+    "tests": [
+      {
+        "name": "target_triple",
+        "classname": "target_triple",
+        "time": "0.0169293",
+        "status": "run"
+      },
+      {
+        "name": "http_native",
+        "classname": "http_native",
+        "time": "20.5059",
+        "status": "run"
+      },
+      {
+        "name": "http_timeouts",
+        "classname": "http_timeouts",
+        "time": "5.05399",
+        "status": "run"
+      },
+      {
+        "name": "http_examples",
+        "classname": "http_examples",
+        "time": "156.229",
+        "status": "run"
+      },
+      {
+        "name": "http_install",
+        "classname": "http_install",
+        "time": "133.577",
+        "status": "run"
+      },
+      {
+        "name": "http_source",
+        "classname": "http_source",
+        "time": "139.915",
+        "status": "run"
+      }
+    ]
+  },
+  "strict-focused.xml": {
+    "summary": {
+      "name": "Linux-clang++",
+      "tests": "12",
+      "failures": "0",
+      "disabled": "0",
+      "skipped": "0",
+      "hostname": "gamedev",
+      "time": "434",
+      "timestamp": "2026-11-01T17:57:46"
+    },
+    "tests": [
+      {
+        "name": "target_triple",
+        "classname": "target_triple",
+        "time": "0.013017",
+        "status": "run"
+      },
+      {
+        "name": "http_native",
+        "classname": "http_native",
+        "time": "21.5643",
+        "status": "run"
+      },
+      {
+        "name": "http_timeouts",
+        "classname": "http_timeouts",
+        "time": "5.46467",
+        "status": "run"
+      },
+      {
+        "name": "http_examples",
+        "classname": "http_examples",
+        "time": "156.595",
+        "status": "run"
+      },
+      {
+        "name": "http_ci_policy",
+        "classname": "http_ci_policy",
+        "time": "4.31734",
+        "status": "run"
+      },
+      {
+        "name": "http_install",
+        "classname": "http_install",
+        "time": "136.587",
+        "status": "run"
+      },
+      {
+        "name": "http_source",
+        "classname": "http_source",
+        "time": "141.375",
+        "status": "run"
+      },
+      {
+        "name": "http_source_negative",
+        "classname": "http_source_negative",
+        "time": "5.29595",
+        "status": "run"
+      },
+      {
+        "name": "http_source_faults",
+        "classname": "http_source_faults",
+        "time": "302.711",
+        "status": "run"
+      },
+      {
+        "name": "url_source",
+        "classname": "url_source",
+        "time": "7.82335",
+        "status": "run"
+      },
+      {
+        "name": "url_lsp",
+        "classname": "url_lsp",
+        "time": "0.256177",
+        "status": "run"
+      },
+      {
+        "name": "http_lsp",
+        "classname": "http_lsp",
+        "time": "8.69419",
+        "status": "run"
+      }
+    ]
+  }
+}

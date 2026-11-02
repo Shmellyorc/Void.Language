@@ -1,0 +1,26 @@
+[
+  {
+    "profile": "Release",
+    "exit": 0,
+    "stdout": "HTTP dependency prefix verified: Release; 167 files\n",
+    "stderr": ""
+  },
+  {
+    "profile": "Debug",
+    "exit": 0,
+    "stdout": "HTTP dependency prefix verified: Debug; 167 files\n",
+    "stderr": ""
+  },
+  {
+    "profile": "strict",
+    "exit": 0,
+    "stdout": "HTTP dependency prefix verified: strict; 167 files\n",
+    "stderr": ""
+  },
+  {
+    "test": "ci-bootstrap-policy",
+    "exit": 0,
+    "stdout": "",
+    "stderr": "test_changed_certificate_identity_rejected (__main__.CertificateCacheTests.test_changed_certificate_identity_rejected) ... ok\ntest_corrupted_certificate_binary_rejected (__main__.CertificateCacheTests.test_corrupted_certificate_binary_rejected) ... ok\ntest_matching_fixture_skips_build_and_removes_obsolete_import (__main__.CertificateCacheTests.test_matching_fixture_skips_build_and_removes_obsolete_import) ... ok\ntest_crt_sdk_changes_invalidate_windows_binary_caches (__main__.IdentityTests.test_crt_sdk_changes_invalidate_windows_binary_caches) ... ok\ntest_macos_sdk_and_deployment_invalidate_prefix (__main__.IdentityTests.test_macos_sdk_and_deployment_invalidate_prefix) ... ok\ntest_native_host_rejects_architecture_mismatch (__main__.IdentityTests.test_native_host_rejects_architecture_mismatch) ... ok\ntest_plan_roundtrips_json (__main__.IdentityTests.test_plan_roundtrips_json) ... ok\ntest_recipe_and_fixture_pins_invalidate_respective_keys (__main__.IdentityTests.test_recipe_and_fixture_pins_invalidate_respective_keys) ... ok\ntest_seven_profiles_have_distinct_native_keys (__main__.IdentityTests.test_seven_profiles_have_distinct_native_keys) ... ok\ntest_windows_fixture_and_sources_shared_across_profiles (__main__.IdentityTests.test_windows_fixture_and_sources_shared_across_profiles) ... ok\ntest_cache_hit_never_builds_dependencies (__main__.RestoreTests.test_cache_hit_never_builds_dependencies) ... ok\ntest_cache_miss_does_not_adopt_preexisting_prefix (__main__.RestoreTests.test_cache_miss_does_not_adopt_preexisting_prefix) ... ok\ntest_changed_manifest_rejected_before_subprocess (__main__.RestoreTests.test_changed_manifest_rejected_before_subprocess) ... ok\ntest_exact_cache_hit_verifies_manifest (__main__.RestoreTests.test_exact_cache_hit_verifies_manifest) ... ok\ntest_missing_seal_rejected (__main__.RestoreTests.test_missing_seal_rejected) ... ok\ntest_wrong_manifest_architecture_rejected (__main__.RestoreTests.test_wrong_manifest_architecture_rejected) ... ok\ntest_wrong_profile_identity_rejected (__main__.RestoreTests.test_wrong_profile_identity_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 17 tests in 0.112s\n\nOK\n"
+  }
+]

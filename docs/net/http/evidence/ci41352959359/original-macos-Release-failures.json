@@ -1,0 +1,277 @@
+[
+  {
+    "name": "http_timeouts",
+    "family": "http_timeouts",
+    "diagnostic": "----------------------------------------\nException occurred during processing of request from ('127.0.0.1', 49565)\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 697, in process_request_thread\n    self.finish_request(request, client_address)\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 362, in finish_request\n    self.RequestHandlerClass(request, client_address, self)\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 766, in __init__\n    self.handle()\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/http/server.py\", line 436, in handle\n    self.handle_one_request()\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/http/server.py\", line 424, in handle_one_request\n    method()\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 38, in route\n    assert self.rfile.read(1024)==b'p'*1024\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n----------------------------------------\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 105, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 96, in main\n    assert rows['producer-resume']['kind']=='success',rows\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'tls': {'case': 'tls', 'kind': 'timeout', 'phase': 'tls', 'unknown': False, 'kind_code': 14, 'native_code': 28, 'elapsed_ms': 55}, 'proxy': {'case': 'proxy', 'kind': 'timeout', 'phase': 'proxy', 'unknown': False, 'kind_code': 14, 'native_code': 28, 'elapsed_ms': 52}, 'producer-resume': {'case': 'producer-resume', 'kind': 'timeout', 'phase': 'upload', 'unknown': True, 'kind_code': 14, 'native_code': 0, 'elapsed_ms': 0}, 'write': {'case': 'write', 'kind': 'timeout', 'phase': 'upload', 'unknown': True, 'kind_code': 14, 'native_code': 0, 'elapsed_ms': 35}, 'digest-upload': {'case': 'digest-upload', 'kind': 'success', 'phase': 'other', 'unknown': False, 'kind_code': 0, 'native_code': 0, 'elapsed_ms': 17}, 'file-wait-cpu': {'case': 'file-wait-cpu', 'cpu_seconds': 0.000511}, 'file-drain': {'case': 'file-drain', 'kind': 'timeout', 'phase': 'file', 'unknown': True, 'kind_code': 14, 'native_code': 0, 'elapsed_ms': 314}}"
+  },
+  {
+    "name": "http_examples",
+    "family": "http_examples",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/examples.py\", line 89, in <module>\n    if __name__ == '__main__': main()\n                               ^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/examples.py\", line 83, in main\n    run([host, sources / 'cancellation.void'], base, code=1, error='Async task cancelled')\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/examples.py\", line 50, in run\n    assert error in result.stderr.decode(), (argv, result.stderr)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ([PosixPath('/Users/runner/work/Void.Language/Void.Language/build/Release/void_http_example_host'), PosixPath('/Users/runner/work/Void.Language/Void.Language/examples/net_http/cancellation.void')], b'')"
+  },
+  {
+    "name": "url_source",
+    "family": "deployment-target",
+    "diagnostic": "CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/net/http/evidence/crashes/incident-ufwb5wxz\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/url_source.py\", line 22, in <module>\n    h.run([compiler, \"build\", source, \"-o\", binary, *mode], work, sources=(source,))\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/support.py\", line 11, in run\n    return harness.run(command, cwd, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID URL source 8tkhnjwl/.void-build-881388eddff2640e/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_readonly",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/readonly.py\", line 26, in <module>\n    run([compiler,'build',src,'-o',output,*flags],src)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/readonly.py\", line 13, in run\n    result=h.run(args,src.parent,expected=expected,status=status,sources=[src],small=True,timeout=120)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-readonly-pwxuwjtk/.void-build-abdb16d0f8b15ef9/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_dynamic",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/dynamic.py\", line 39, in <module>\n    h.run([h.compiler,'build',source_path,'-o',native,*flags],source_path)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-dynamic-wp_p_kze/.void-build-242cc879c8d5df2f/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_numbers",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/numbers.py\", line 35, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-numbers-zckr43r_/.void-build-aab28da7185e58c2/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_schema",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/schema.py\", line 49, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-schema-ney19__v/.void-build-47990b66a08ad381/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_bounds",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/bounds.py\", line 68, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-bounds-rrnu_ht_/.void-build-75e65754a44125e6/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_install",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/install.py\", line 18, in <module>\n    h.run([installed,'build',src,'-o',native,*flags],src,env=env)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-installed-tpb21qvm/.void-build-008e91207829d9a3/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_adversarial",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/adversarial.py\", line 71, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=300)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-adversarial-cmfg341t/.void-build-c01f80456cece6c9/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_metering",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/metering.py\", line 13, in <module>\n    h.run([h.compiler, 'build', source, '-o', native, *flags], source)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-metering-i5nr3v4x/.void-build-88cee9cbeb4be3b4/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_validated",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-gxrqrjba/.void-build-9942c0ee1dce4958/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_accessors",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-tw2qu9ni/.void-build-1c4568544ae39246/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_dynamic_smoke",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-q1j0t4th/.void-build-9760e3c6dd69d2ba/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_typed_smoke",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-nn9bowk1/.void-build-38c5e74df4837d22/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_shapes",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-4jespm3j/.void-build-45d8afec600383ea/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_ownership",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-1ky37hc6/.void-build-628866c6d9f8a3f7/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_execution_nested_inference",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/execution.py\", line 26, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-execution-y9sai8g9/.void-build-7405211decdc33f5/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_stress_fixed",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/stress.py\", line 43, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=600)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-stress-8d7qxn0e/.void-build-a4c29ea176054027/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "json_stress_wide",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/stress.py\", line 43, in <module>\n    h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=600)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/json/harness.py\", line 33, in run\n    assert not internal and b'warning' not in r.stderr.lower(),r.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-json-stress-m3u3bt68/.void-build-806aa32947d4757a/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "generics_hint_execution",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/generics/hints.py\", line 21, in <module>\n    h.run([compiler, 'build', source, '-o', native, *flags], ROOT, sources=[source], small=True)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/void-hint-contracts-jr488gj2/.void-build-0fb351de7e790337/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "math_execution",
+    "family": "deployment-target",
+    "diagnostic": "Math check: 1372 vectors, 59675 source bytes\nMath JIT O0\nMath linked AOT O0\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/math/execution.py\", line 243, in <module>\n    h.run([compiler,'build',fixture,'-o',executable,*flags],work,small=small,timeout=300)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math execution ywrne_hc/.void-build-a26102163bba2de6/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "math_errors",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/math/errors.py\", line 21, in <module>\n    h.run([compiler,'build',source,'-o',exe,*flags],work)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math checked errors 7w5om4te/.void-build-0e38dcc6139ed126/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "math_worker",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/math/worker.py\", line 21, in <module>\n    h.run([manifest[1],obj,*manifest[3:5],*flags,'-o',exe],work,sources=(source,))\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math worker b9llj0ez/worker-normal.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "math_install",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/math/install.py\", line 31, in <module>\n    h.run([installed,'build',fixture,'-o',executable,*flags],work,env=env)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math relocated 1si6wlbb/.void-build-bfe095b1847b8762/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "math_stack",
+    "family": "deployment-target",
+    "diagnostic": "Math check: 1372 vectors, 59675 source bytes\nMath JIT O0\nMath linked AOT O0\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/math/execution.py\", line 243, in <module>\n    h.run([compiler,'build',fixture,'-o',executable,*flags],work,small=small,timeout=300)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID math execution hw5xrz7e/.void-build-5a897f4ec78a20e6/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "os_errors",
+    "family": "deployment-target",
+    "diagnostic": "CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/os/evidence/crashes/incident-8yytchzt\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/errors.py\", line 28, in <module>\n    h.run([compiler,'build',fixture,'-o',binary,*[flag for flag in flags if flag!='--no-cache']],work,small=small)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/support.py\", line 11, in run\n    return harness.run(command, cwd, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID OS errors 5z1iqppf/.void-build-b38ad6c7edb0f0a5/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "os_owner",
+    "family": "deployment-target",
+    "diagnostic": "CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/os/evidence/crashes/incident-_hummjcl\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/owner.py\", line 21, in <module>\n    h.run([manifest[1],obj,*manifest[3:5],*flags,'-o',native],work,sources=(source,))\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/support.py\", line 11, in run\n    return harness.run(command, cwd, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID OS owner jo4qnwoo/owner-normal.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "os_examples",
+    "family": "deployment-target",
+    "diagnostic": "CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/os/evidence/crashes/incident-9d0n3wnu\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/examples.py\", line 20, in <module>\n    h.run([compiler,'build',examples/'resources.void','-o',native,*flags],work)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/support.py\", line 11, in run\n    return harness.run(command, cwd, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID OS examples s3bzi1k7/.void-build-0ca7cae62055a9d3/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "os_install",
+    "family": "deployment-target",
+    "diagnostic": "CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/os/evidence/crashes/incident-qxl8sx5s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/install.py\", line 44, in <module>\n    h.run([installed,'build',fixture,'-o',binary,*args],work,env=env)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/support.py\", line 11, in run\n    return harness.run(command, cwd, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID OS installed ip0oyk0i/.void-build-7653739700546b20/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "os_packaging",
+    "family": "deployment-target",
+    "diagnostic": "CRASH EVIDENCE: /Users/runner/work/Void.Language/Void.Language/docs/os/evidence/crashes/incident-bg3i_8lw\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/packaging.py\", line 32, in <module>\n    h.run([compiler,'build',source,'-o',binary,*flags],work)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/os/support.py\", line 11, in run\n    return harness.run(command, cwd, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID OS bundles d8y5nr_s/Game \\xe9\\x9b\\xaa # % True.app/Contents/MacOS/.void-build-25b9289a3d081b1f/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "random_execution",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/execution.py\", line 183, in <module>\n    h.run([compiler,'build',fixture,'-o',executable,*flags],work,small=small)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random execution chf0u156/.void-build-56f5cfc644511b92/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "random_install",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/install.py\", line 33, in <module>\n    h.run([installed,'build',fixture,'-o',executable,*flags],work,env=env)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random relocated 32gziy9l/.void-build-d934ba395fb49233/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "random_errors",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/errors.py\", line 17, in <module>\n    h.run([compiler,'build',source,'-o',exe,*flags],work)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random errors tuoujnjn/.void-build-d622831cab25968c/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "random_worker",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/worker.py\", line 21, in <module>\n    h.run([manifest[1],obj,*manifest[3:5],*flags,'-o',exe],work,sources=(source,))\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random worker 5_fbc6pd/worker-normal.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "random_stack",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/execution.py\", line 183, in <module>\n    h.run([compiler,'build',fixture,'-o',executable,*flags],work,small=small)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/random/harness.py\", line 29, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID random execution id7yrxf4/.void-build-18371aa68e8c3854/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "binary_execution",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/binary/execution.py\", line 196, in <module>\n    run([COMPILER, \"build\", path, \"-o\", executable, *flags])\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/binary/execution.py\", line 22, in run\n    assert b\"warning\" not in result.stderr.lower(), (arguments, result.stderr)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ([PosixPath('/Users/runner/work/Void.Language/Void.Language/build/Release/voidc'), 'build', PosixPath('/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID binary \u00e9\ud83d\ude00 qexidl50/main.void'), '-o', PosixPath('/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID binary \u00e9\ud83d\ude00 qexidl50/binaryTrue'), '--no-opt'], b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID binary \\xc3\\xa9\\xf0\\x9f\\x98\\x80 qexidl50/.void-build-965e87684a4da856/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\")"
+  },
+  {
+    "name": "binary_stack",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/binary/stack.py\", line 34, in <module>\n    run([compiler, \"build\", source, \"-o\", executable, *flags])\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/binary/stack.py\", line 23, in run\n    assert b\"warning\" not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID binary 1MiB 7rej078e/.void-build-777b7ccba023c039/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "combined_execution",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/combined/execution.py\", line 148, in <module>\n    run([compiler, 'build', source, '-o', executable, *flags])\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/combined/execution.py\", line 28, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID combined itpuf0uj/.void-build-a133fe0bb7925618/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "combined_stack",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/combined/execution.py\", line 148, in <module>\n    run([compiler, 'build', source, '-o', executable, *flags])\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/combined/execution.py\", line 28, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID combined zy1pwm2b/.void-build-6c202947a7274cb3/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "memory_execution",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/memory/execution.py\", line 252, in <module>\n    run([compiler, \"build\", path, \"-o\", executable, *flags])\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/memory/execution.py\", line 21, in run\n    assert b\"warning\" not in result.stderr.lower(), (arguments, result.stderr)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ([PosixPath('/Users/runner/work/Void.Language/Void.Language/build/Release/voidc'), 'build', PosixPath('/Users/runner/work/Void.Language/Void.Language/tests/memory/semantics.void'), '-o', PosixPath('/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID memory \u00e9\ud83d\ude00 81w00juz/semanticsTrue'), '--no-opt'], b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID memory \\xc3\\xa9\\xf0\\x9f\\x98\\x80 81w00juz/.void-build-81d64c6c5f8bed5e/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\")"
+  },
+  {
+    "name": "text_encoding_text",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/text.void 0.022s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/text.void --no-opt 0.237s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/text.void 0.288s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution j8mqfoae/text-aot/.void-build-f68854c6e319d175/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_hex",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/hex.void 0.017s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/hex.void --no-opt 0.087s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/hex.void 0.098s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution i9k58rlg/hex-aot/.void-build-14b8f21b3b459a45/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_base64",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/base64.void 0.019s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/base64.void --no-opt 0.154s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/base64.void 0.177s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution ldxq80_3/base64-aot/.void-build-ff5a790645196302/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_ascii",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/ascii.void 0.016s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/ascii.void --no-opt 0.082s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/ascii.void 0.095s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution 1a2nyrd4/ascii-aot/.void-build-d0a4c137fd3188c1/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_oracles",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/oracles.void 0.155s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/oracles.void --no-opt 13.477s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/oracles.void 13.198s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution k026dcpe/oracles-aot/.void-build-9a6f56029cec654c/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_interop",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/interop.void 0.065s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/interop.void --no-opt 0.386s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/interop.void 0.416s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution dlvz4vda/interop-aot/.void-build-3dd0f6e6879962dd/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_large",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/large.void 0.022s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/large.void --no-opt 3.177s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/large.void 3.252s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution 6px5s490/large-aot/.void-build-76fb74a3d71199c3/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_errors",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/errors.void 0.024s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/errors.void --no-opt 0.226s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/errors.void 0.254s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution o60vw1os/errors-aot/.void-build-53b0c24e9a4c9911/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_install",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/install.py\", line 39, in <module>\n    invoke([installed, 'build', fixture, '-o', output], root)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/install.py\", line 19, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text installed \\xe9\\x9b\\xaa 7blt_ykv/.void-build-691166b6b0a4118a/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "text_encoding_stack",
+    "family": "deployment-target",
+    "diagnostic": "PASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc check /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/text.void 0.103s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/text.void --no-opt 0.054s\nPASS /Users/runner/work/Void.Language/Void.Language/build/Release/voidc run /Users/runner/work/Void.Language/Void.Language/tests/text_encoding/text.void 0.026s\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 50, in <module>\n    invoke(build, cwd, fixture)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/text_encoding/execution.py\", line 27, in invoke\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID text encoding execution l77buxm7/text-aot/.void-build-ded9bf37bc481064/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "memory_stack",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/memory/stack.py\", line 34, in <module>\n    run([compiler, \"build\", source, \"-o\", executable, *flags])\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/memory/stack.py\", line 23, in run\n    assert b\"warning\" not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID memory 1MiB p4asc51s/.void-build-94aa144d9ca47414/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "io_execution",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/execution.py\", line 269, in <module>\n    main()\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/execution.py\", line 246, in main\n    run(arguments, cwd, expected=None, source_inputs=(fixture,))\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/execution.py\", line 36, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID io source hb1qxkxi/native/.void-build-7dbc3766b4c2aae7/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "io_stack",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/execution.py\", line 269, in <module>\n    main()\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/execution.py\", line 246, in main\n    run(arguments, cwd, expected=None, source_inputs=(fixture,))\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/execution.py\", line 36, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID io source f44cj___/native/.void-build-7047ba079a713c91/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  },
+  {
+    "name": "io_examples_install",
+    "family": "deployment-target",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/examples.py\", line 40, in <module>\n    run(arguments, cwd)\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/io/examples.py\", line 19, in run\n    assert b'warning' not in result.stderr.lower(), result.stderr\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: b\"ld: warning: object file (/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID io examples install 2p03lx_v/aot/.void-build-a6e8dd2f5b117f30/program.o) was built for newer 'macOS' version (26.0) than being linked (14.0)\\n\""
+  }
+]

@@ -1,5 +1,6 @@
 #include "void/path.hpp"
 #include "native_cache.hpp"
+#include "target.hpp"
 #include <llvm/ExecutionEngine/Orc/ObjectTransformLayer.h>
 #include <llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h>
 #include "void/backend.hpp"
@@ -98,7 +99,7 @@ void finish(llvm::Module& module, bool optimize) {
     }
 }
 std::unique_ptr<llvm::TargetMachine> native_machine() {
-    const llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
+    const auto triple = detail::native_deployment_triple(llvm::Triple(llvm::sys::getDefaultTargetTriple()));
     std::string error;
     auto* target = llvm::TargetRegistry::lookupTarget(triple, error);
     if (!target) throw std::runtime_error(error);
@@ -1860,6 +1861,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     impl_->emission=emission;
     initialize();
     auto machine=unwrap(llvm::orc::JITTargetMachineBuilder::detectHost());
+    machine.getTargetTriple()=detail::native_deployment_triple(machine.getTargetTriple());
     machine.setCodeGenOptLevel(llvm::CodeGenOptLevel::Default);
     impl_->target_identity=machine.getTargetTriple().str()+"|"+machine.getCPU()+"|"+machine.getFeatures().getString()+"|default-codegen|default-relocation|default-code-model";
     impl_->jit = unwrap(llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(machine)).create());

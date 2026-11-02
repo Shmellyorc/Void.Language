@@ -1,0 +1,189 @@
+{
+  "baseline": "516183b9e1cb4c61e16a00a0e5dc547b931f36b6",
+  "files": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "c7071d6bc1237f5c668e781668e588670a31524e2348c4babdd44a32c3336038"
+    },
+    {
+      "path": "cmake/HttpNativeDependencies.cmake",
+      "sha256": "0799e44b29a5aa1938c500c964ee184a3cdc88b5da079e99dc4423069f950970"
+    },
+    {
+      "path": "docs/net/http/CI41352959359_TRIAGE.md",
+      "sha256": "41a0eebb75aaf272951424479b16e4227bab0eb42770bdf7dac741d67c670419"
+    },
+    {
+      "path": "docs/net/http/CI_HANDOFF.md",
+      "sha256": "b0f1291965d0a266a35834efef5cf97701fbac55b22b0b341d177628d5beeaf8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/build-policy.json",
+      "sha256": "288e1b418afe56a44360da1b4b0232ee0f2ea94003ca9a4e4e9f7f5850525a9c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/changed-files.json",
+      "note": "Self inventory; no recursive digest"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-cancellation.json",
+      "sha256": "30d0bc79841da736e893f8aff44f1d3fa79429ad1a27727aa2c5c62a64c9546c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-final.xml",
+      "sha256": "2820c89a670b75432774cb01fafc2e019ba5756c11991c0275d151e69adc8a52"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-focused.xml",
+      "sha256": "132610586988209c951b4a5eef900bd3c8a77e1e8ef22b3bea1944030602f24a"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-timeouts-deferred-commands.json",
+      "sha256": "e562194a8f09c3c31e6ee3de635d88b5eee884e60f424d60c6b059024f99af3e"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-timeouts-deferred.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-timeouts-deferred.stdout",
+      "sha256": "00b7d7bc95c75c4090c821668c278838bfdfc7cbe37f57808983a2988065edcd"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/debug-timeouts-native.stdout",
+      "sha256": "cc5077d99867ddece14665198b0f820b8403a3335376e2ff3fb4f57abba656ac"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/dependency-verification.json",
+      "sha256": "aab05c131088259ac65b93d2a52ecef81773272510809ec9ba1a55f81d5a2593"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/mach-o-simulation.json",
+      "sha256": "f28fe76f3bee0dfe103642ef2d21156a5468f0b3ba6c1195d75a70b5522f8a3f"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/negative-cancellation-before.json",
+      "sha256": "4efede6b357566e47092afec71dea39ec33046398b807879d9a480d784185791"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/negative-deferred.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/negative-deferred.stdout",
+      "sha256": "67f6f676c2588712d626b3ce6f8b09e8fd8d28979ba6a8f9721741a0125a5eaf"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/original-evidence.json",
+      "sha256": "020b8f5ad3a47af535229008eb6e2a00b3f67637994010dba16f11c558370fbc"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/original-macos-Debug-failures.json",
+      "sha256": "b3bf72dbeeab8fbe6670b5d8267d6ae0d280ca31e2268d78c27a2208c71ed62c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/original-macos-Release-failures.json",
+      "sha256": "0fa4a05622b7ef33ce0a3ec8e51c23e7bd80bf852ac09133c03533563ffe0298"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-cancellation.json",
+      "sha256": "60fa13050fd53da0fe17ea9fe68425d8540c5189894a35bf1227ee659224769a"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-final.xml",
+      "sha256": "ffa5e25e1a42dd32b05915db7c927538db6f930baabc5d5702beb7f45000c872"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-focused.xml",
+      "sha256": "08702c10af29b6c43754cbaa58eb2d0589dbe6fa5f2c92c88302134c838b99b7"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-timeouts-deferred-commands.json",
+      "sha256": "fd984ea3b8071ab4f613dabf1ff6ed6721a072ef2bb5d4448d51e0234595a41e"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-timeouts-deferred.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-timeouts-deferred.stdout",
+      "sha256": "9bc342529504612c00b5feffc6efa8b88b562e7f813bd658ecb9de2160d695e5"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/release-timeouts-native.stdout",
+      "sha256": "e11f06930fa9e1c5e8419bcc343d0bbab0a9d4dc40589e0eded85213425d1f70"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-cancellation.json",
+      "sha256": "13e4e5b962d9a1c193bd5aefceb5a7b1ef0d9c81128e0045d3e424f978da7243"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-final.xml",
+      "sha256": "12f4884fe253ade62970785d0e77027f03f72ca892c1b03a12bd75273eab74ae"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-focused.xml",
+      "sha256": "6c5207ccb7126e8a0ad675914f774f7956ee653ece7d43e72c4f50bd7aba3421"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-timeouts-deferred-commands.json",
+      "sha256": "a80d7b1917436ca84e182a05dbdc9d60bdbf5bb951296a2066a3f9bdc2d929f8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-timeouts-deferred.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-timeouts-deferred.stdout",
+      "sha256": "6c5d0acebbdac8899709cf5146efe4b0c459775eb10c6eb1717cb49c9545293b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/strict-timeouts-native.stdout",
+      "sha256": "600cc582698f8da9dc84fc70e9e890c5a34b861db9cb19c037676d5c555d419b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41352959359/verification-results.json",
+      "sha256": "bf3f684924ce6494606a294293824f2a59e03bd5baa28659c7deec91ca1fd1af"
+    },
+    {
+      "path": "include/void/detail/http_hooks.hpp",
+      "sha256": "db17ef91fe6f944b4571f0bde41d81f9e27359a1aa44f904219a2c9a257e7529"
+    },
+    {
+      "path": "src/backend/llvm/backend.cpp",
+      "sha256": "a54ddfa2d5cc2454c5423dd52907712f26a5415336986e388fdd5c73daa1b4ac"
+    },
+    {
+      "path": "src/backend/llvm/target.hpp",
+      "sha256": "c0e6b3d988d47c530f7efb51c0e6cbcb956994d0e83cfab03bc57f8ca0a3179a"
+    },
+    {
+      "path": "src/runtime/http.cpp",
+      "sha256": "c1ce8dfdaae28188844964badc46f2bcc569378c9ab3159d61ca3f99209f8aee"
+    },
+    {
+      "path": "tests/net/http/ci_triage_test.py",
+      "sha256": "5572b1c2ecba7f896260e730ada76a41c02954478f43faa3fe52b99ba7fe2642"
+    },
+    {
+      "path": "tests/net/http/examples.py",
+      "sha256": "cd4a46fe629f86ea07948c8879f5abe7d739a7172b1e5d2d02d6a6c8a4b13535"
+    },
+    {
+      "path": "tests/net/http/timeouts.cpp",
+      "sha256": "4449aabb7f73922e541e9d29096e98f1aed751eb003efc557acae7ff26fc09c9"
+    },
+    {
+      "path": "tests/net/http/timeouts.py",
+      "sha256": "961ce9eb157a067fa6b46c6cb764efcb0394310a942862a5047c7bf9aaacc61b"
+    },
+    {
+      "path": "tests/toolchain/Target.cpp",
+      "sha256": "741e16d8fbe48fc9ac8ab4808f578fc4af88496e34759f6ac01bac088baca3b7"
+    },
+    {
+      "path": "tests/toolchain/macos_deployment.py",
+      "sha256": "b718d21a7caa4a3a60eba5f2fbab1f79f7e6fa20b1ad64ba4d3a3e5fa198e217"
+    }
+  ]
+}

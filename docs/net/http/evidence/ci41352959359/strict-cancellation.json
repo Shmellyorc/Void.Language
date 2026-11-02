@@ -1,0 +1,12 @@
+{
+  "command": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_http_example_host",
+      "/home/shmellyorc/Documents/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 1,
+    "seconds": 27.647589510997932
+  },
+  "expected_exit_code": 1,
+  "stderr": "Async task cancelled\n"
+}

@@ -1,6 +1,7 @@
 #include "void/http.hpp"
 #include "void/http_file.hpp"
 #include "void/detail/filesystem_hooks.hpp"
+#include "void/detail/http_hooks.hpp"
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -69,8 +70,11 @@ void file_deadline(const std::string& base,const std::string& path) {
 }
 int main(int argc,char** argv) {
     try {
-        require(argc==7,"timeout fixture endpoints and file required");
-        Driver driver;Error error;ClientOptions options;options.max_connections=options.max_per_origin=options.max_idle=2;
+        const bool deferred = argc==8 && std::string(argv[7])=="deferred-producer";
+        require(argc==7 || deferred,"timeout fixture endpoints and file required");
+        auto hooks=std::make_shared<testing::Hooks>();
+        if(deferred) hooks->upload_bytes_per_second=1024;
+        Driver driver(hooks);Error error;ClientOptions options;options.max_connections=options.max_per_origin=options.max_idle=2;
         auto client=driver.open(options,error);require(bool(client),"timeout client");
         RequestOptions short_connect;short_connect.connect_timeout_ms=50;short_connect.total_timeout_ms=2000;
         short_connect.max_buffer_bytes=1024;
@@ -93,12 +97,15 @@ int main(int argc,char** argv) {
             auto transfer=driver.start(client,request,timed,error);require(bool(transfer),"paused producer");
             require(driver.write(transfer,std::string(1024,'p'))->take().error.kind==ErrorKind::success,"first producer block");
             require(get("/producer-seen").error.kind==ErrorKind::success,"peer saw first producer bytes");
-            std::this_thread::sleep_for(std::chrono::milliseconds(60));
+            // The deferred case keeps curl rate-limited for one second after
+            // sending the block, before it can call us again to observe PAUSE.
+            std::this_thread::sleep_for(std::chrono::milliseconds(deferred ? 1100 : 60));
             auto start=Clock::now();auto written=driver.write(transfer,std::string(1024,'p'))->take();
             if(written.error.kind==ErrorKind::success){driver.finish_upload(transfer);report("producer-resume",driver.response(transfer)->take(),start);}
             else report("producer-resume",written,start);
             driver.close(transfer)->take();
         }
+        if(deferred){driver.close(client)->take();return 0;}
         {
             Request request;request.target=std::string(argv[1])+"/write-stall";request.method="POST";
             request.body=Request::stream;request.stream_length=33554432;

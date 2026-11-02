@@ -97,6 +97,15 @@ def main():
             assert rows['digest-upload']['kind']=='success',rows
             assert rows['write']['kind']=='timeout' and rows['write']['phase']=='upload' and rows['write']['unknown'],rows
             assert rows['file-drain']['kind']=='timeout' and rows['file-drain']['phase']=='file' and rows['file-drain']['unknown'],rows
+            producer_seen.clear()
+            deferred_argv=[*argv,'deferred-producer']
+            result=subprocess.run(deferred_argv,capture_output=True,timeout=40)
+            (args.evidence/'deferred.stdout').write_bytes(result.stdout)
+            (args.evidence/'deferred.stderr').write_bytes(result.stderr)
+            (args.evidence/'deferred-commands.json').write_text(json.dumps({'argv':deferred_argv,'exit_code':result.returncode},indent=2)+'\n')
+            assert result.returncode==0,result.stderr.decode()
+            rows={row['case']:row for row in map(json.loads,result.stdout.splitlines())}
+            assert rows['producer-resume']['kind']=='success',rows
         finally:
             stall_release.set();digest_release.set()
             for peer in [plain,secure,stalled]:peer.shutdown();peer.server_close()

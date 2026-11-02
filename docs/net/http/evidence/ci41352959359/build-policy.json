@@ -1,0 +1,41 @@
+{
+  "release": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "CMAKE_C_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "VOID_SANITIZERS": "OFF"
+  },
+  "debug": {
+    "CMAKE_BUILD_TYPE": "Debug",
+    "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "CMAKE_C_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "VOID_SANITIZERS": "OFF"
+  },
+  "strict": {
+    "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+    "CMAKE_CXX_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "CMAKE_C_COMPILER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "LLVM_DIR": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+    "VOID_CLANG": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+    "VOID_LINKER": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+    "VOID_SANITIZERS": "ON"
+  },
+  "verification_environment": {
+    "stack_kib": 1024,
+    "strict_ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "strict_UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "host": "Linux; not Windows/macOS acceptance"
+  },
+  "unchanged": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "third_party/http-versions.json": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496",
+    ".github/workflows/ci-link-experiment.yml": "10d56b249613ec168ada7be59957e458be5cff4dde8634f96bf70333b955f3a1",
+    "third_party/curl/VOID-PROVENANCE.json": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646"
+  }
+}

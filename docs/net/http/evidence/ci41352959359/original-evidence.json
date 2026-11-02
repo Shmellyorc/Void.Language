@@ -1,0 +1,201 @@
+{
+  "run": 41352959359,
+  "head_sha": "516183b9e1cb4c61e16a00a0e5dc547b931f36b6",
+  "log_archive_sha256": "5971f52c262ac2d73ceaeef18d8c7b824e02ea47dee4f4114186a58d95afdcd6",
+  "jobs": [
+    {
+      "id": 124986896872,
+      "name": "thinlto-cache / macOS ARM64 / Release",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986896872"
+    },
+    {
+      "id": 124986896913,
+      "name": "thinlto-cache / Ubuntu 24.04 / Debug",
+      "conclusion": "success",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986896913"
+    },
+    {
+      "id": 124986896979,
+      "name": "thinlto-cache / Ubuntu 24.04 / Release",
+      "conclusion": "success",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986896979"
+    },
+    {
+      "id": 124986896994,
+      "name": "thinlto-cache / Windows 2022 / Debug",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986896994"
+    },
+    {
+      "id": 124986897020,
+      "name": "thinlto-cache / macOS ARM64 / Debug",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986897020"
+    },
+    {
+      "id": 124986897091,
+      "name": "thinlto-cache / Windows 2022 / Release",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986897091"
+    },
+    {
+      "id": 124986897116,
+      "name": "thinlto-cache / Ubuntu 24.04 / Sanitizers",
+      "conclusion": "success",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41352959359/job/124986897116"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13106320081,
+      "name": "link-experiment-thinlto-cache-macOS-ARM64-Debug-516183b9e1cb4c61e16a00a0e5dc547b931f36b6-1",
+      "size_in_bytes": 1038126,
+      "digest": "sha256:7f9fcc3f90307108a22edb21f7f85f44c4456580ad74101c3c025d822fe3b6c6"
+    },
+    {
+      "id": 13105943230,
+      "name": "tests-macOS-ARM64-Debug",
+      "size_in_bytes": 184289,
+      "digest": "sha256:21545a555ff755715262e4c7a8b4cbaf6090504748cfa8fe35d3f0683547f6fc"
+    },
+    {
+      "id": 13102494037,
+      "name": "tests-macOS-ARM64-Release",
+      "size_in_bytes": 183222,
+      "digest": "sha256:477e9087d742a49e146f0a12d5e3e86e85950cfe7a1835bb29b7b114b51695d3"
+    },
+    {
+      "id": 13102410970,
+      "name": "tests-Windows-X64-Release",
+      "size_in_bytes": 45327,
+      "digest": "sha256:a3417b896e20dff7959e68f1fb82584089ac44818a00c5bf5ee7023b15b873f3"
+    },
+    {
+      "id": 13102346153,
+      "name": "tests-Windows-X64-Debug",
+      "size_in_bytes": 45469,
+      "digest": "sha256:2198989eb158b6f73ff449019f002fc1bf86851dc944ce18b2def67b3c07b905"
+    },
+    {
+      "id": 13102326140,
+      "name": "link-experiment-thinlto-cache-Windows-X64-Debug-516183b9e1cb4c61e16a00a0e5dc547b931f36b6-1",
+      "size_in_bytes": 139775,
+      "digest": "sha256:657d688860d3502914b5b92764b50c934fdbb7e04992bd709a3295837f1fae75"
+    },
+    {
+      "id": 13102231269,
+      "name": "link-experiment-thinlto-cache-Windows-X64-Release-516183b9e1cb4c61e16a00a0e5dc547b931f36b6-1",
+      "size_in_bytes": 139605,
+      "digest": "sha256:af8c6398a4e891e0813824eb37d7000e63be5eb8e53f3fd553d6c425ba3684bf"
+    },
+    {
+      "id": 13102104703,
+      "name": "link-experiment-thinlto-cache-macOS-ARM64-Release-516183b9e1cb4c61e16a00a0e5dc547b931f36b6-1",
+      "size_in_bytes": 1034970,
+      "digest": "sha256:14b0ef2d574efbb23ccc840c30d3cb24ca015b5cc26b5254b9ff5e8287e19bbe"
+    }
+  ],
+  "macos_failures": {
+    "Debug": {
+      "junit_sha256": "abb3151e0dda3ba36d094c7ab3983355c165081dbe09c8944c8234b2b74953b0",
+      "count": 55,
+      "families": {
+        "http_timeouts": 1,
+        "http_examples": 1,
+        "deployment-target": 53
+      }
+    },
+    "Release": {
+      "junit_sha256": "1bb2a862702361150f4f48ae394f232f54b5b530637f1a3411ff3d6717fac711",
+      "count": 55,
+      "families": {
+        "http_timeouts": 1,
+        "http_examples": 1,
+        "deployment-target": 53
+      }
+    }
+  },
+  "windows_cares": {
+    "Debug": {
+      "manifest_sha256": "7d5456c298b0802c4a2404ffdd82eb6d406c77493b500421c0a594d537be0c5c",
+      "archives": {
+        "lib/cares.lib": "f37a3dead8d93d23f975238d0a2d0d4d793c7e6d54c962450ce888b75b030808",
+        "lib/nghttp2.lib": "75f1428937385e701a302ed5810e9ece78e56f4850d297e5d3b5ec7ed37bded4",
+        "lib/psl.lib": "4802e559509ab3d8fdefa6a0ba3e5516aeb39307c364730d05ad48e78670675e",
+        "lib/zsd.lib": "b4c28c0795f6bbf31cdf726984b399b46e1ddf4b4cb37520a887e0f9b7df5f33"
+      },
+      "install": [
+        "-- Installing: D:/a/Void.Language/Void.Language/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/cares.lib"
+      ]
+    },
+    "Release": {
+      "manifest_sha256": "a805e5b961d28a726f7a72dd4f07d70d4788622fca258d09bce66cb3bb5ec1f8",
+      "archives": {
+        "lib/cares.lib": "9da2fe24a7c50894d099a80a63962141e0421d9089657684283783c57571df14",
+        "lib/nghttp2.lib": "f2989b0407275150a1f2607c19c1c7bb8866004a8add1cdf6c5773eb6576f61a",
+        "lib/psl.lib": "45ff360da9ec5afaa9928c4570b871316caf6695ada43e663ee58cd656c038f0",
+        "lib/zs.lib": "cfd78bc48a18221db723b7f150bb86253dc2b4549482b34790f499c6c77e3ad4"
+      },
+      "install": [
+        "-- Installing: D:/a/Void.Language/Void.Language/.toolchains/http/prefix/windows-schannel-x86_64/Release/lib/cares.lib"
+      ]
+    }
+  },
+  "logs": [
+    {
+      "name": "0_thinlto-cache _ Ubuntu 24.04 _ Sanitizers.txt",
+      "sha256": "2aec920a664a88100a77aa76bf8b507316619bf51cbfbe4717bf6df3666d04ef",
+      "lines": 9690,
+      "errors": []
+    },
+    {
+      "name": "1_thinlto-cache _ macOS ARM64 _ Release.txt",
+      "sha256": "86caf7e0b60adace9dd1e18c9a3d85218782e85038301076918c3d6873e585be",
+      "lines": 99319,
+      "errors": [
+        "2026-11-01T22:12:03.4377410Z ##[error]Process completed with exit code 8."
+      ]
+    },
+    {
+      "name": "2_thinlto-cache _ Windows 2022 _ Debug.txt",
+      "sha256": "241e39b51c2c327daa509431b2be4d54eba5d5a600166411fc04a64b366bc81c",
+      "lines": 56047,
+      "errors": [
+        "2026-11-01T21:43:45.6705573Z CMake Error at cmake/HttpNativeDependencies.cmake:100 (message):",
+        "2026-11-01T21:43:45.6706251Z   Pinned native HTTP library missing:",
+        "2026-11-01T21:43:45.8075700Z ##[error]Process completed with exit code 1."
+      ]
+    },
+    {
+      "name": "3_thinlto-cache _ macOS ARM64 _ Debug.txt",
+      "sha256": "8205279a2d89ef3f2b98d87001f06a6586a418031fc7e85bed7984fc0c7ec395",
+      "lines": 99466,
+      "errors": [
+        "2026-11-01T23:35:40.8976270Z ##[error]Process completed with exit code 8."
+      ]
+    },
+    {
+      "name": "4_thinlto-cache _ Ubuntu 24.04 _ Release.txt",
+      "sha256": "eb0f9c8dcd893084c5e4514d014b7fb1578bbe1db68f230d2688db85688a46b1",
+      "lines": 9732,
+      "errors": []
+    },
+    {
+      "name": "5_thinlto-cache _ Windows 2022 _ Release.txt",
+      "sha256": "e5fae92ccf6684ddb1b1b54da37893afcbd9ae3c4ecb79849efdd7f3944d4eb8",
+      "lines": 55971,
+      "errors": [
+        "2026-11-01T21:43:47.0705763Z CMake Error at cmake/HttpNativeDependencies.cmake:100 (message):",
+        "2026-11-01T21:43:47.0706284Z   Pinned native HTTP library missing:",
+        "2026-11-01T21:43:47.2036224Z ##[error]Process completed with exit code 1."
+      ]
+    },
+    {
+      "name": "6_thinlto-cache _ Ubuntu 24.04 _ Debug.txt",
+      "sha256": "ae808e332a4ff8e7b1d8d6b3e1a1ef43075b4f8e41d1d613a09af4caab495f05",
+      "lines": 11133,
+      "errors": []
+    }
+  ]
+}
