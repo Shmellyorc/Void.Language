@@ -1,0 +1,208 @@
+{
+  "run": 41378401662,
+  "baseline": "452866b68876bede1c4c59d916264feaa7117e18",
+  "logs_zip_sha256": "239de54b53c29b909c51a8c9123dcd427cae794886a38c7145585f50bf63b5af",
+  "jobs": [
+    {
+      "id": 125063620059,
+      "name": "thinlto-cache / Windows 2022 / Release",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620059"
+    },
+    {
+      "id": 125063620149,
+      "name": "thinlto-cache / Ubuntu 24.04 / Sanitizers",
+      "conclusion": "success",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620149"
+    },
+    {
+      "id": 125063620187,
+      "name": "thinlto-cache / Ubuntu 24.04 / Release",
+      "conclusion": "success",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620187"
+    },
+    {
+      "id": 125063620231,
+      "name": "thinlto-cache / Ubuntu 24.04 / Debug",
+      "conclusion": "success",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620231"
+    },
+    {
+      "id": 125063620285,
+      "name": "thinlto-cache / Windows 2022 / Debug",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620285"
+    },
+    {
+      "id": 125063620286,
+      "name": "thinlto-cache / macOS ARM64 / Release",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620286"
+    },
+    {
+      "id": 125063620295,
+      "name": "thinlto-cache / macOS ARM64 / Debug",
+      "conclusion": "failure",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41378401662/job/125063620295"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13116801054,
+      "name": "tests-macOS-ARM64-Debug",
+      "digest": "sha256:e6c736d12fdbe8f4031a62d7c934b084cc4299a9fb67dbd0cdb57c4d84259f0f",
+      "size_in_bytes": 181851
+    },
+    {
+      "id": 13116766209,
+      "name": "link-experiment-thinlto-cache-macOS-ARM64-Debug-452866b68876bede1c4c59d916264feaa7117e18-1",
+      "digest": "sha256:fcba6343b012e912bd71d168d312fe284ba5ffdbeecd97553873a31390ad5e36",
+      "size_in_bytes": 1024925
+    },
+    {
+      "id": 13113617979,
+      "name": "link-experiment-thinlto-cache-macOS-ARM64-Release-452866b68876bede1c4c59d916264feaa7117e18-1",
+      "digest": "sha256:60d20d499a98e16563d6f0fa18a96dc15fd0c46573d793c0cd7d904164aeba42",
+      "size_in_bytes": 1024840
+    },
+    {
+      "id": 13112834886,
+      "name": "tests-macOS-ARM64-Release",
+      "digest": "sha256:76faa8ee6643c52439fdc2c242706dd7430c7cb4105816f18854670b6d21d8b7",
+      "size_in_bytes": 180716
+    },
+    {
+      "id": 13112795118,
+      "name": "tests-Windows-X64-Release",
+      "digest": "sha256:cae4565520f14a2f074ced020699eccb40871702038c66f1d5736f1c2a6452ad",
+      "size_in_bytes": 38520
+    },
+    {
+      "id": 13112442221,
+      "name": "tests-Windows-X64-Debug",
+      "digest": "sha256:8973863bf15bfd8181d02a080205af2f76068b98c3a0149e5a65f05f12044b08",
+      "size_in_bytes": 38675
+    },
+    {
+      "id": 13112159212,
+      "name": "link-experiment-thinlto-cache-Windows-X64-Debug-452866b68876bede1c4c59d916264feaa7117e18-1",
+      "digest": "sha256:5f18b9393c440d2bf0617d6bf589b267dcd0ef95c29f12789f726ad89178d71e",
+      "size_in_bytes": 344064
+    },
+    {
+      "id": 13111624406,
+      "name": "link-experiment-thinlto-cache-Windows-X64-Release-452866b68876bede1c4c59d916264feaa7117e18-1",
+      "digest": "sha256:4adeab2f65111f3b4548ca8035805dfa8a27b5654cf6400e1a276e6dd53565a9",
+      "size_in_bytes": 344372
+    }
+  ],
+  "logs": [
+    {
+      "name": "0_thinlto-cache _ macOS ARM64 _ Debug.txt",
+      "sha256": "b869d4c9a57145cf2a214fc41119ba798428dd2995ebb27b04892d3551df1070",
+      "lines": 98611,
+      "errors": [
+        "2026-11-02T04:29:57.9780430Z ##[error]Process completed with exit code 8."
+      ]
+    },
+    {
+      "name": "1_thinlto-cache _ macOS ARM64 _ Release.txt",
+      "sha256": "ca0b1e0760ba55cf3f17b8d47ba2b667ede9a0e137d86d8d2b60be2becbcf8d7",
+      "lines": 98457,
+      "errors": [
+        "2026-11-02T03:22:02.5196820Z ##[error]Process completed with exit code 8."
+      ]
+    },
+    {
+      "name": "2_thinlto-cache _ Windows 2022 _ Debug.txt",
+      "sha256": "212b983468b3fd8718cc4d1986bdafc40235951c478c352994714eaed807381a",
+      "lines": 60972,
+      "errors": [
+        "2026-11-02T02:40:34.9897144Z lld-link: error: undefined symbol: __declspec(dllimport) psl_check_version_number",
+        "2026-11-02T02:40:34.9902398Z lld-link: error: undefined symbol: __declspec(dllimport) psl_is_cookie_domain_acceptable",
+        "2026-11-02T02:40:34.9905994Z lld-link: error: undefined symbol: __declspec(dllimport) psl_is_public_suffix",
+        "2026-11-02T02:40:34.9910044Z lld-link: error: undefined symbol: __declspec(dllimport) psl_free",
+        "2026-11-02T02:40:34.9912895Z lld-link: error: undefined symbol: __declspec(dllimport) psl_latest",
+        "2026-11-02T02:40:34.9915595Z lld-link: error: undefined symbol: __declspec(dllimport) psl_builtin",
+        "2026-11-02T02:40:37.7446652Z ##[error]Process completed with exit code 1."
+      ]
+    },
+    {
+      "name": "3_thinlto-cache _ Ubuntu 24.04 _ Debug.txt",
+      "sha256": "fb382a78e847b59032ef5a347613c307831c6b3b1ffd230cf9152198ec592a1e",
+      "lines": 11050,
+      "errors": []
+    },
+    {
+      "name": "4_thinlto-cache _ Windows 2022 _ Release.txt",
+      "sha256": "84a47f1706065615f40353e6b6b68df610a02b7c5db85759eb9548779b4a93dd",
+      "lines": 60892,
+      "errors": [
+        "2026-11-02T02:41:52.4927750Z lld-link: error: undefined symbol: __declspec(dllimport) psl_check_version_number",
+        "2026-11-02T02:41:52.4932276Z lld-link: error: undefined symbol: __declspec(dllimport) psl_is_cookie_domain_acceptable",
+        "2026-11-02T02:41:52.4936844Z lld-link: error: undefined symbol: __declspec(dllimport) psl_is_public_suffix",
+        "2026-11-02T02:41:52.4941885Z lld-link: error: undefined symbol: __declspec(dllimport) psl_free",
+        "2026-11-02T02:41:52.4946573Z lld-link: error: undefined symbol: __declspec(dllimport) psl_latest",
+        "2026-11-02T02:41:52.4950797Z lld-link: error: undefined symbol: __declspec(dllimport) psl_builtin",
+        "2026-11-02T02:41:56.3914319Z ##[error]Process completed with exit code 1."
+      ]
+    },
+    {
+      "name": "5_thinlto-cache _ Ubuntu 24.04 _ Release.txt",
+      "sha256": "d51b343dbb5a59ecf505316365d184e5329b9489dced054c5d291d13eecfb5a8",
+      "lines": 9723,
+      "errors": []
+    },
+    {
+      "name": "6_thinlto-cache _ Ubuntu 24.04 _ Sanitizers.txt",
+      "sha256": "8b239aab82faaec32b07ccb939c4327504f052276326e7529b18b4fedb7f4258",
+      "lines": 9680,
+      "errors": []
+    }
+  ],
+  "failures": {
+    "Debug": {
+      "junit": {
+        "name": "Darwin-clang++",
+        "tests": "386",
+        "failures": "2",
+        "disabled": "0",
+        "skipped": "1",
+        "hostname": "sat12-dp152-1680b87a-b6c2-4530-880e-d9a70345d9bf-B2CCB2127329.local",
+        "time": "6042",
+        "timestamp": "2026-11-02T02:49:15"
+      },
+      "failed": [
+        {
+          "name": "http_timeouts",
+          "diagnostic": "----------------------------------------\nException occurred during processing of request from ('127.0.0.1', 49567)\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 697, in process_request_thread\n    self.finish_request(request, client_address)\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 362, in finish_request\n    self.RequestHandlerClass(request, client_address, self)\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 766, in __init__\n    self.handle()\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/http/server.py\", line 436, in handle\n    self.handle_one_request()\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/http/server.py\", line 424, in handle_one_request\n    method()\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 38, in route\n    assert self.rfile.read(1024)==b'p'*1024\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n----------------------------------------\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 114, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 108, in main\n    assert rows['producer-resume']['kind']=='success',rows\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'tls': {'case': 'tls', 'kind': 'timeout', 'phase': 'tls', 'unknown': False, 'kind_code': 14, 'native_code': 28, 'elapsed_ms': 53}, 'proxy': {'case': 'proxy', 'kind': 'timeout', 'phase': 'proxy', 'unknown': False, 'kind_code': 14, 'native_code': 28, 'elapsed_ms': 55}, 'producer-resume': {'case': 'producer-resume', 'kind': 'timeout', 'phase': 'upload', 'unknown': True, 'kind_code': 14, 'native_code': 0, 'elapsed_ms': 0}}"
+        },
+        {
+          "name": "http_examples",
+          "diagnostic": "Traceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/examples.py\", line 100, in <module>\n    if __name__ == '__main__': main()\n                               ^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/examples.py\", line 94, in main\n    run([host, sources / 'cancellation.void'], base, code=1, error='Async task cancelled')\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/examples.py\", line 60, in run\n    assert error in result.stderr.decode(), (argv, result.stderr)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ([PosixPath('/Users/runner/work/Void.Language/Void.Language/build/Debug/void_http_example_host'), PosixPath('/Users/runner/work/Void.Language/Void.Language/examples/net_http/cancellation.void')], b'')"
+        }
+      ]
+    },
+    "Release": {
+      "junit": {
+        "name": "Darwin-clang++",
+        "tests": "386",
+        "failures": "1",
+        "disabled": "0",
+        "skipped": "1",
+        "hostname": "sjc22-bt144-e744a53d-718c-409e-984b-522c2f18f94f-46FBE286DB05.local",
+        "time": "2023",
+        "timestamp": "2026-11-02T02:48:19"
+      },
+      "failed": [
+        {
+          "name": "http_timeouts",
+          "diagnostic": "----------------------------------------\nException occurred during processing of request from ('127.0.0.1', 49566)\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 697, in process_request_thread\n    self.finish_request(request, client_address)\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 362, in finish_request\n    self.RequestHandlerClass(request, client_address, self)\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/socketserver.py\", line 766, in __init__\n    self.handle()\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/http/server.py\", line 436, in handle\n    self.handle_one_request()\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/http/server.py\", line 424, in handle_one_request\n    method()\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 38, in route\n    assert self.rfile.read(1024)==b'p'*1024\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n----------------------------------------\nTraceback (most recent call last):\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 114, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/Users/runner/work/Void.Language/Void.Language/tests/net/http/timeouts.py\", line 108, in main\n    assert rows['producer-resume']['kind']=='success',rows\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'tls': {'case': 'tls', 'kind': 'timeout', 'phase': 'tls', 'unknown': False, 'kind_code': 14, 'native_code': 28, 'elapsed_ms': 50}, 'proxy': {'case': 'proxy', 'kind': 'timeout', 'phase': 'proxy', 'unknown': False, 'kind_code': 14, 'native_code': 28, 'elapsed_ms': 53}, 'producer-resume': {'case': 'producer-resume', 'kind': 'timeout', 'phase': 'upload', 'unknown': True, 'kind_code': 14, 'native_code': 0, 'elapsed_ms': 0}}"
+        }
+      ]
+    }
+  },
+  "negative_control": {
+    "progress": "Temporarily omitted service-time getinfo refresh, with real CURLOPT_NOPROGRESS=1; deferred mode name predates split into silent-producer."
+  }
+}

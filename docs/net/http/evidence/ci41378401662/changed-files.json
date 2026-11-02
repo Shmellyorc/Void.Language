@@ -1,0 +1,193 @@
+{
+  "baseline": "452866b68876bede1c4c59d916264feaa7117e18",
+  "files": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "52b2364afadf1351e7a4d741d06157f66846b27a51e3b0b181bbe7ba1b219a84"
+    },
+    {
+      "path": "cmake/CurlProvider.cmake",
+      "sha256": "9b86f370fa081dab85c6d2bd0b5eab90deb1942228c26a905686d8f840e85fe9"
+    },
+    {
+      "path": "cmake/CurlProviderObjects.cmake",
+      "sha256": "c60140abab6972920ef97eab9ca42548d79b20e09be57138b5f08425bdcae334"
+    },
+    {
+      "path": "docs/net/http/CI41378401662_TRIAGE.md",
+      "sha256": "87bb24cf02f891f236543cbe09914cc117cdd7c1cac160f7e3dfc04040019346"
+    },
+    {
+      "path": "docs/net/http/CI_HANDOFF.md",
+      "sha256": "0df2503a10edb67310f18e414a9593b7900049462303059df8976da5bfaace65"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Debug-http-examples-evidence-17.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Debug-http-examples-evidence-17.stdout",
+      "sha256": "be616d72b5daa0e5b2dea995f19ecfa406333f88c95c1b1416c66e857957fddf"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Debug-http-examples-evidence-commands.json",
+      "sha256": "c510f2eacf78674c342ccd6cac68db78d9f8cd47a078161744d1a35436674c69"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Debug-http-timeouts-evidence-deferred.stdout",
+      "sha256": "3c8339ab692eefd4bd23c1b1d011fec4b88e751ea70122c22d649a5d80a5455c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Debug-http-timeouts-evidence-native.stdout",
+      "sha256": "18a446f250e230166d6525bb0945aa54995b5dd4d8a4fbdd4682f4f889bb72d3"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Release-http-examples-evidence-17.stderr",
+      "sha256": "0d615fe382eaf6667c91be2abbe71fdd597c53761318a38c17bf988f62eb5d29"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Release-http-examples-evidence-17.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Release-http-examples-evidence-commands.json",
+      "sha256": "d010ed18a58b8a14a887d57c8152209c3a77aba826e1fa0f6f8131202b119c63"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Release-http-timeouts-evidence-deferred.stdout",
+      "sha256": "5cdaae24e7984cfd4dcdf14da4ea8806c347e2f06c456c50cd42c829ae58e84d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Release-http-timeouts-evidence-native.stdout",
+      "sha256": "f9460bf7669014bffebb81ed2ff69c8ebe220c5ec334b2d8fd365d42edff9b50"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Windows-Debug-compile-rules.txt",
+      "sha256": "83f14c3be269dfa54f211a3669bb4baea3dc937884abe7462c773d9c3b95522b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/Windows-Release-compile-rules.txt",
+      "sha256": "5ceb747f153d7e3405a15e895ea3f4db5149584662cfb70aac1c4de61fc79509"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/changed-files.json",
+      "note": "Self inventory; no recursive digest"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/debug-cancellation.json",
+      "sha256": "755104eecf43738c47508a65df10f26628d3f75a95ebdd2defec80deccdca23e"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/debug-focused.xml",
+      "sha256": "c2b853d7e66dfbc06791cbf2eebbc1d2913f94fe5e48dee7810f91af884b6a41"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/debug-timeouts-deferred.stdout",
+      "sha256": "ff28cfca18efed0eef918a8314ba3a19b92e74b51cb4e2433ba29fb03d1707f8"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/debug-timeouts-native.stdout",
+      "sha256": "4c6b3e700515bac9ee39b5d455a253c0c0a54087eab36222ba8d8e5953576635"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/debug-timeouts-silent.stdout",
+      "sha256": "517159dabc727f6dcfef85b570da2940a1cce7238c585fea6af34e0bb7b5c05c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/local-cancellation-probe.json",
+      "sha256": "aa1444b1a40d0958c261ecae4432fd112699259052923b107563c3b244de30b4"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/local-deferred.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/local-deferred.stdout",
+      "sha256": "4222a92a4bf7fd6a651622c6a4b6056fa8f08304b924d6ce05e61869fb985218"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/original-evidence.json",
+      "sha256": "9ce43dcc93857b2f7d179e0f695ffe101e284599d81e51e51507745cf2b300ac"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/release-cancellation.json",
+      "sha256": "9c99342de964ac2ca5d3a0aa24ce591aa787b35f54b261c92eee28f41e8f7bef"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/release-focused.xml",
+      "sha256": "115fbbb799d65280b65dc05f0cadb355e3d543651589d79bf46fdab7bc15721d"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/release-timeouts-deferred.stdout",
+      "sha256": "8d67577d72332517f5e303788972264269eb082d610d83301f60bf93a3111e4b"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/release-timeouts-native.stdout",
+      "sha256": "d7c221c5e2b26b8555d575c80d3d8c972e22595f627096bcb3c5ef1f22f769ea"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/release-timeouts-silent.stdout",
+      "sha256": "17d197195cd92a9bc521b26aede56bb53f595c5e40cbb52259393e9c5ad6ddc4"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/shared-object-build.json",
+      "sha256": "31412ae41bd21db428e014c149b3c3c252b7f5250e660c9c66b15c6f9ada78a7"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/strict-cancellation.json",
+      "sha256": "9643166a550bd39b562f42174fa985972d1c3ee3da472393ceb40883dbd95fd6"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/strict-focused.xml",
+      "sha256": "2365f4f33fd39adf0e417d2dcd05b964a96c775b9a7bdd6c5518555e95e12675"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/strict-timeouts-deferred.stdout",
+      "sha256": "956508bf052f8594bc0f85515b85e4e61f311658112da153500eab5c469fa8b6"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/strict-timeouts-native.stdout",
+      "sha256": "2395888e9b56038901591855ca9e45ca7b92992bd89abfd179023560c9597247"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/strict-timeouts-silent.stdout",
+      "sha256": "cb160045b2626e05d1910206b96be7a20d3053fa0ba7ab9dffc516f2e195208c"
+    },
+    {
+      "path": "docs/net/http/evidence/ci41378401662/verification-results.json",
+      "sha256": "a1d433d8044b642e96784d31f3a4d23765ec367cca73de4e98eab5055fd163a6"
+    },
+    {
+      "path": "examples/net_http/cancellation.void",
+      "sha256": "a90a3c7c2c53da034c0742ead5d09a8badf5c57685eb934ef255e54a280f5c46"
+    },
+    {
+      "path": "include/void/detail/http_hooks.hpp",
+      "sha256": "81a4a3726166fcbfda5a4f37959a08b1000f7aecfa9e2049842fa2c2f96fc019"
+    },
+    {
+      "path": "src/runtime/http.cpp",
+      "sha256": "809385e81ad6059c77cbc6760151d9d080062b84e6c9b373672bc969a2c5d578"
+    },
+    {
+      "path": "tests/net/http/curl_objects_test.py",
+      "sha256": "7c223500838da8ecb41fdfa390fd2514471daa97b8bbe881ae83eb7a92461ab4"
+    },
+    {
+      "path": "tests/net/http/examples.py",
+      "sha256": "ad5a8d89df87a49e3c218ef21815d59ac6b198e0699ad0568d951f64ec6e868b"
+    },
+    {
+      "path": "tests/net/http/timeouts.cpp",
+      "sha256": "f7537237f3219ddfa7274fe8724946685788a15d76fe0ad4a6588a1f526ee717"
+    },
+    {
+      "path": "tests/net/http/timeouts.py",
+      "sha256": "9c89413409c11e1b7d42a22e093bfbe771dc218074594cc3ba512639dc51f0a3"
+    },
+    {
+      "path": "tools/ci/http_bootstrap.py",
+      "sha256": "84e2c38c67c2ec4ad4e138356afa372491b87640846ab39b1958c7262de505ab"
+    }
+  ]
+}

@@ -550,11 +550,9 @@ std::size_t mime_read_callback(char* bytes, std::size_t size, std::size_t count,
     return amount;
 }
 int mime_seek_callback(void*, curl_off_t, int) noexcept { return CURL_SEEKFUNC_CANTSEEK; }
-int progress_callback(void* context, curl_off_t, curl_off_t, curl_off_t, curl_off_t sent) noexcept {
-    auto& transfer = *static_cast<TransferState*>(context);
-    std::lock_guard lock(transfer.mutex);
+bool update_upload_progress(TransferState& transfer, curl_off_t sent) noexcept {
     if (sent > std::numeric_limits<std::int64_t>::max() - transfer.uploaded_before_hop) {
-        transfer.fail(ErrorKind::limit_exceeded, Phase::upload); return 1;
+        transfer.fail(ErrorKind::limit_exceeded, Phase::upload); return false;
     }
     if (transfer.uploaded_before_hop + sent > transfer.uploaded) {
         transfer.uploaded = transfer.uploaded_before_hop + sent; transfer.write_at = Clock::now();
@@ -566,6 +564,12 @@ int progress_callback(void* context, curl_off_t, curl_off_t, curl_off_t, curl_of
         transfer.upload_transmitted = true;
         if (!transfer.response_ready) { transfer.header_timer = true; transfer.header_at = Clock::now(); }
     }
+    return true;
+}
+int progress_callback(void* context, curl_off_t, curl_off_t, curl_off_t, curl_off_t sent) noexcept {
+    auto& transfer = *static_cast<TransferState*>(context);
+    std::lock_guard lock(transfer.mutex);
+    if (!update_upload_progress(transfer, sent)) return 1;
     return transfer.close_requested.load(std::memory_order_acquire) ? 1 : 0;
 }
 int prerequisite_callback(void* context, char*, char*, int, int) noexcept {
@@ -672,7 +676,8 @@ void DriverState::configure(const std::shared_ptr<TransferState>& state) {
     option(easy, CURLOPT_WRITEFUNCTION, write_callback); option(easy, CURLOPT_WRITEDATA, state.get());
     option(easy, CURLOPT_READFUNCTION, read_callback); option(easy, CURLOPT_READDATA, state.get());
     option(easy, CURLOPT_SEEKFUNCTION, seek_callback); option(easy, CURLOPT_SEEKDATA, state.get());
-    option(easy, CURLOPT_NOPROGRESS, 0L); option(easy, CURLOPT_XFERINFOFUNCTION, progress_callback); option(easy, CURLOPT_XFERINFODATA, state.get());
+    option(easy, CURLOPT_NOPROGRESS, hooks && hooks->suppress_progress_notifications ? 1L : 0L);
+    option(easy, CURLOPT_XFERINFOFUNCTION, progress_callback); option(easy, CURLOPT_XFERINFODATA, state.get());
     option(easy, CURLOPT_PREREQFUNCTION, prerequisite_callback); option(easy, CURLOPT_PREREQDATA, state.get());
     if (client.options.proxy.mode == ProxyOptions::direct) option(easy, CURLOPT_PROXY, "");
     else if (client.options.proxy.mode == ProxyOptions::explicit_proxy) {
@@ -939,6 +944,13 @@ void DriverState::service(const std::shared_ptr<TransferState>& state) {
         (!transfer.detached || !producer_done || transfer.queues->encoded.size || transfer.queues->decoded.size || !transfer.decoder_finished))
         transfer.fail(ErrorKind::timeout, timeout_phase(transfer));
     if (!transfer.detached) {
+        // XFERINFO is a notification, not a synchronization point. Curl can
+        // send in its DO phase, then defer notifications while rate-limited.
+        // Sample the actual counter on the owning driver before deadlines.
+        curl_off_t sent = 0;
+        const auto progress_status = curl_easy_getinfo(transfer.easy, CURLINFO_SIZE_UPLOAD_T, &sent);
+        if (progress_status != CURLE_OK) transfer.error = classify(progress_status);
+        else update_upload_progress(transfer, sent);
         // A fixed-length producer can be idle before curl asks for its next block
         // (and observes CURL_READFUNC_PAUSE). Once every admitted byte has
         // reached curl's send counter, there is no socket write to time out.

@@ -1,0 +1,23 @@
+{
+  "stdout": "",
+  "stderr": "Async task cancelled\n",
+  "code": 1,
+  "seconds": 28.52314044800005,
+  "events": [
+    [
+      "/slow",
+      "start",
+      22.48090935900109
+    ],
+    [
+      "/plain",
+      "start",
+      22.481295110002975
+    ],
+    [
+      "/plain",
+      "end",
+      28.48158219701145
+    ]
+  ]
+}

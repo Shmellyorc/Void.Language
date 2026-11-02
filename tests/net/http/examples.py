@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import ssl
+import select
 import subprocess
 import tempfile
 import threading
@@ -14,22 +15,38 @@ ROOT = Path(__file__).resolve().parents[3]
 
 class Handler(fixture.Handler):
     def do_GET(self):
-        if self.path == '/slow':
-            self.send_response(200); self.send_header('Content-Length', '8'); self.end_headers(); self.wfile.flush()
-            # Cancellation must race a pending request, even on a slow JIT host.
-            # The subprocess deadline and finally block own fixture teardown.
-            fixture.release.wait()
-            self.close_connection = True
-        elif self.path == '/plain' and getattr(self.server, 'cancellation_barrier', False):
-            # Reproduce the old five-second fixture expiry before cancellation.
-            time.sleep(6)
-            super().do_GET()
-        elif self.path.startswith('/json'):
+        if self.path.startswith('/json'):
             self.reply(b'{"message":"Example JSON complete"}', headers=[('Content-Type', 'application/json')])
         elif self.path.startswith('/broken-json'):
             self.reply(b'{bad', headers=[('Content-Type', 'application/json')])
         else:
             super().do_GET()
+
+class CancellationHandler(fixture.Handler):
+    def do_GET(self):
+        peer = self.server
+        peer.events.append((self.path, 'received', time.monotonic() - peer.started))
+        if self.path == '/slow':
+            self.send_response(200); self.send_header('Content-Length', '8'); self.end_headers(); self.wfile.flush()
+            peer.pending.set()
+            # No automatic completion and no timed sleep posing as readiness.
+            # Observe native close before fixture teardown, not just host exit 1.
+            while not peer.stopping.is_set():
+                if not select.select([self.connection], [], [], 0.1)[0]: continue
+                try: data = self.connection.recv(1)
+                except ConnectionResetError: data = b''
+                if not data:
+                    peer.events.append((self.path, 'closed', time.monotonic() - peer.started))
+                    peer.closed.set(); break
+                raise AssertionError('unexpected request bytes on held connection')
+            self.close_connection = True
+        elif self.path == '/plain':
+            assert peer.pending.wait(3), 'barrier reached without the pending request'
+            if peer.fail_barrier: time.sleep(0.06)
+            self.reply(b'pending request observed')
+            peer.events.append((self.path, 'barrier', time.monotonic() - peer.started))
+        else:
+            raise AssertionError(self.path)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -58,6 +75,7 @@ def main():
             assert result.returncode == code, (argv, result.stderr.decode(errors='replace'))
             assert expected in result.stdout.decode(), (argv, result.stdout)
             assert error in result.stderr.decode(), (argv, result.stderr)
+            return result
         tool = fixture.certificate_tool(compiler)
         config = work / 'openssl.cnf'
         config.write_text('[req]\ndistinguished_name=dn\nx509_extensions=ext\n[dn]\nCN=localhost\n'
@@ -90,8 +108,32 @@ def main():
             run([work / ('api_json.exe' if os.name == 'nt' else 'api_json')],
                 base + '/broken-json', 'JSON ', code=1)
             run([host, sources / 'streaming_async.void'], base, 'Streamed 8388608 bytes')
-            plain.cancellation_barrier = True
-            run([host, sources / 'cancellation.void'], base, code=1, error='Async task cancelled')
+            for fail_barrier in (False, True):
+                peer = fixture.Server(('127.0.0.1', 0), CancellationHandler)
+                peer.pending, peer.closed, peer.stopping = threading.Event(), threading.Event(), threading.Event()
+                peer.events, peer.started, peer.fail_barrier = [], time.monotonic(), fail_barrier
+                threading.Thread(target=peer.serve_forever, daemon=True).start()
+                source = sources / 'cancellation.void'
+                if fail_barrier:
+                    # Lower only this negative control's header deadline. It
+                    # must return an HTTP error before reaching pending.cancel.
+                    source = work / 'cancellation-timeout.void'
+                    source.write_text((sources / 'cancellation.void').read_text().replace(
+                        'owner.get_async(base + "/plain")',
+                        'owner.get_async(base + "/plain", http.request_options(header_timeout_ms = 20))'))
+                try:
+                    result = run([host, source], f'http://127.0.0.1:{peer.server_port}',
+                                 code=1, error='' if fail_barrier else 'Async task cancelled')
+                    if fail_barrier:
+                        assert b'timeout' in result.stdout and b'headers' in result.stdout, result.stdout
+                        assert not result.stderr, result.stderr
+                    else:
+                        assert not result.stdout, result.stdout
+                    assert peer.pending.is_set() and peer.closed.wait(3), 'held request did not close before teardown'
+                finally:
+                    (evidence / ('cancellation-timeout-peer.json' if fail_barrier else 'cancellation-peer.json')).write_text(
+                        json.dumps(peer.events, indent=2) + '\n')
+                    peer.stopping.set(); peer.shutdown(); peer.server_close()
         finally:
             fixture.release.set()
             for server in (plain, secure): server.shutdown(); server.server_close()

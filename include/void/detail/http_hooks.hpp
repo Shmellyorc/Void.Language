@@ -10,5 +10,7 @@ struct Hooks {
     // Defer curl's next producer callback with its real upload rate limiter.
     // Used to test idle-producer deadlines independently of socket scheduling.
     std::int64_t upload_bytes_per_second = 0;
+    // Exercise deadlines when curl has sent bytes without notifying XFERINFO.
+    bool suppress_progress_notifications = false;
 };
 }

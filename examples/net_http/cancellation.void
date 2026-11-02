@@ -14,5 +14,5 @@ async func cancel_request(base: string) -> result<i32, http.error>:
 async func entry(input: i32) -> i32:
     if os.env("VOID_HTTP_URL") is Ok(var base):
         if (await cancel_request(base)) is Err(var failure):
-            print("HTTP {failure.kind}")
+            print("HTTP {failure.kind}, phase {failure.phase}, native code {failure.native_code}")
     return 1

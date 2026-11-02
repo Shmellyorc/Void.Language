@@ -1,0 +1,173 @@
+[
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/cmake/../.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/bin/openssl",
+      "req",
+      "-x509",
+      "-newkey",
+      "rsa:2048",
+      "-nodes",
+      "-days",
+      "1",
+      "-config",
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/openssl.cnf",
+      "-subj",
+      "/CN=localhost",
+      "-keyout",
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/key.pem",
+      "-out",
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/cert.pem"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07032462500001202
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "check",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.29553133299987167
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "check",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.17926541700012422
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "check",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.13504437500000677
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "check",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.14203437500009386
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "check",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 0.14526204200001303
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "run",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/api_json.void"
+    ],
+    "exit_code": 0,
+    "seconds": 3.3109392500000467
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "build",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/api_json.void",
+      "-o",
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/api_json"
+    ],
+    "exit_code": 0,
+    "seconds": 3.4416507079999974
+  },
+  {
+    "argv": [
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/api_json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.042835041999978785
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "run",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/authenticated_post.void"
+    ],
+    "exit_code": 0,
+    "seconds": 2.7290385829999195
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "build",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/authenticated_post.void",
+      "-o",
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/authenticated_post"
+    ],
+    "exit_code": 0,
+    "seconds": 2.6510376659998656
+  },
+  {
+    "argv": [
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/authenticated_post"
+    ],
+    "exit_code": 0,
+    "seconds": 0.043462667000085276
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "run",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/files.void"
+    ],
+    "exit_code": 0,
+    "seconds": 2.301127542000131
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/voidc",
+      "build",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/files.void",
+      "-o",
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/files"
+    ],
+    "exit_code": 0,
+    "seconds": 2.230674166999961
+  },
+  {
+    "argv": [
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/files"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10216616699995029
+  },
+  {
+    "argv": [
+      "/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/VOID HTTP examples w6n7dx0x/api_json"
+    ],
+    "exit_code": 1,
+    "seconds": 0.03822045799984153
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/void_http_example_host",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/streaming_async.void"
+    ],
+    "exit_code": 0,
+    "seconds": 4.932066500000019
+  },
+  {
+    "argv": [
+      "/Users/runner/work/Void.Language/Void.Language/build/Release/void_http_example_host",
+      "/Users/runner/work/Void.Language/Void.Language/examples/net_http/cancellation.void"
+    ],
+    "exit_code": 1,
+    "seconds": 10.519901333999996
+  }
+]

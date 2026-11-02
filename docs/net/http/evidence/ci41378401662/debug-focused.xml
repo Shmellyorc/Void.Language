@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="7"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="284"
+	timestamp="2026-11-02T03:52:48"
+	>
+	<testcase name="http_native" classname="http_native" time="22.3315" status="run">
+		<properties/>
+		<system-out>{"http_latency":{"profile":"HTTP/1.1 plaintext","samples":64,"median_ms":41.0315,"p95_ms":42.0324,"process_cpu_seconds":0.042428}}
+{"http_latency":{"profile":"HTTP/1.1 verified TLS","samples":64,"median_ms":41.9105,"p95_ms":42.9727,"process_cpu_seconds":0.061537}}
+{"http_latency":{"profile":"HTTP/2 verified TLS","samples":64,"median_ms":0.490914,"p95_ms":1.20912,"process_cpu_seconds":0.021162}}
+{"h2_paused_sample":{"sample":0,"rss_kib":39496,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":39496,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":39496,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":39496,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":39496,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_p...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_timeouts" classname="http_timeouts" time="6.19221" status="run">
+		<properties/>
+		<system-out>TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed
+</system-out>
+	</testcase>
+	<testcase name="http_examples" classname="http_examples" time="187.042" status="run">
+		<properties/>
+		<system-out>HTTP published examples: 19 checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_ci_policy" classname="http_ci_policy" time="4.3553" status="run">
+		<properties/>
+		<system-out>test_corrupted_cache_rejected_without_replacement (__main__.AcquisitionTests.test_corrupted_cache_rejected_without_replacement) ... ok
+test_http_error_body_and_status_retained (__main__.AcquisitionTests.test_http_error_body_and_status_retained) ... ok
+test_network_failure_does_not_report_a_stale_partial_as_response (__main__.AcquisitionTests.test_network_failure_does_not_report_a_stale_partial_as_response) ... ok
+test_redirect_records_final_location_and_verifies_bytes (__main__.AcquisitionTests.test_redirect_records_final_location_and_verifies_bytes) ... ok
+test_successful_http_with_wrong_bytes_never_enters_cache (__main__.AcquisitionTests.test_successful_http_with_wrong_bytes_never_enters_cache) ... ok
+test_verified_bytes_promoted_and_cache_reverified (__main__.AcquisitionTests.test_verified_bytes_promoted_and_cache_reverified) ... ok
+test_every_reviewed_blob_survives_windows_checkout_filter (__main__.CheckoutTests.test_every_reviewed_blob_survives_windows_checkout_filter) ... ok
+test_each_missing_or_disable...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_curl_objects" classname="http_curl_objects" time="0.582427" status="run">
+		<properties/>
+		<system-out>test_static_and_object_library_compilation_policy (__main__.CurlObjectsTests.test_static_and_object_library_compilation_policy) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.512s
+
+OK
+Both curl layouts: static definitions, sanitizers and keylog ownership; six COFF import negative controls verified
+</system-out>
+	</testcase>
+	<testcase name="http_install" classname="http_install" time="145.217" status="run">
+		<properties/>
+		<system-out>Installed HTTP/URL/JSON: 18 relocated native/JIT/link checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_source" classname="http_source" time="139.336" status="run">
+		<properties/>
+		<system-out>Public HTTP source: 15 analysis/JIT/native-link checks passed
+</system-out>
+	</testcase>
+</testsuite>

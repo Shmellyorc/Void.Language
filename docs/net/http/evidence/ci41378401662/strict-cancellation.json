@@ -1,0 +1,68 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_http_example_host",
+        "/home/shmellyorc/Documents/Void.Language/examples/net_http/cancellation.void"
+      ],
+      "exit_code": 1,
+      "seconds": 23.540072584990412,
+      "stdout": "",
+      "stderr": "Async task cancelled\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_http_example_host",
+        "/tmp/VOID HTTP examples sus24j37/cancellation-timeout.void"
+      ],
+      "exit_code": 1,
+      "seconds": 23.395233538001776,
+      "stdout": "HTTP /@stdlib/net/http.void::error_kind.timeout, phase /@stdlib/net/http.void::failure_phase.headers, native code 0\n",
+      "stderr": ""
+    }
+  ],
+  "pending_peer": [
+    [
+      "/slow",
+      "received",
+      23.043199852996622
+    ],
+    [
+      "/plain",
+      "received",
+      23.04378902100143
+    ],
+    [
+      "/plain",
+      "barrier",
+      23.043883863996598
+    ],
+    [
+      "/slow",
+      "closed",
+      23.048287368001183
+    ]
+  ],
+  "timeout_peer": [
+    [
+      "/slow",
+      "received",
+      22.83388415000809
+    ],
+    [
+      "/plain",
+      "received",
+      22.834389715004363
+    ],
+    [
+      "/slow",
+      "closed",
+      22.85476650101191
+    ],
+    [
+      "/plain",
+      "barrier",
+      22.894691779001732
+    ]
+  ]
+}

@@ -20,7 +20,8 @@ void report(const char* name,const Result& result,Clock::time_point start) {
     std::cout<<"{\"case\":\""<<name<<"\",\"kind\":\""<<(result.error.kind==ErrorKind::success?"success":
         result.error.kind==ErrorKind::timeout?"timeout":"other")<<"\",\"phase\":\""<<phase(result.error.phase)
         <<"\",\"unknown\":"<<(result.error.remote_outcome_unknown?"true":"false")
-        <<",\"kind_code\":"<<static_cast<int>(result.error.kind)<<",\"native_code\":"<<result.error.native_code<<",\"elapsed_ms\":"<<std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-start).count()<<"}\n";
+        <<",\"kind_code\":"<<static_cast<int>(result.error.kind)<<",\"native_code\":"<<result.error.native_code
+        <<",\"uploaded\":"<<result.uploaded<<",\"elapsed_ms\":"<<std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-start).count()<<"}\n";
 }
 void require(bool value,const char* message){if(!value)throw std::runtime_error(message);}
 class Borrow final : public vd::filesystem::FileBorrow {
@@ -70,10 +71,12 @@ void file_deadline(const std::string& base,const std::string& path) {
 }
 int main(int argc,char** argv) {
     try {
-        const bool deferred = argc==8 && std::string(argv[7])=="deferred-producer";
+        const bool silent = argc==8 && std::string(argv[7])=="silent-producer";
+        const bool deferred = argc==8 && (std::string(argv[7])=="deferred-producer" || silent);
         require(argc==7 || deferred,"timeout fixture endpoints and file required");
         auto hooks=std::make_shared<testing::Hooks>();
         if(deferred) hooks->upload_bytes_per_second=1024;
+        hooks->suppress_progress_notifications=silent;
         Driver driver(hooks);Error error;ClientOptions options;options.max_connections=options.max_per_origin=options.max_idle=2;
         auto client=driver.open(options,error);require(bool(client),"timeout client");
         RequestOptions short_connect;short_connect.connect_timeout_ms=50;short_connect.total_timeout_ms=2000;
@@ -105,7 +108,7 @@ int main(int argc,char** argv) {
             else report("producer-resume",written,start);
             driver.close(transfer)->take();
         }
-        if(deferred){driver.close(client)->take();return 0;}
+        if(deferred && !silent){driver.close(client)->take();return 0;}
         {
             Request request;request.target=std::string(argv[1])+"/write-stall";request.method="POST";
             request.body=Request::stream;request.stream_length=33554432;
@@ -117,6 +120,17 @@ int main(int argc,char** argv) {
             driver.close(transfer)->take();
         }
         {
+            if(silent) {
+                Request request;request.target=std::string(argv[1])+"/producer-total";request.method="POST";
+                request.body=Request::stream;request.stream_length=2048;
+                RequestOptions timed;timed.write_timeout_ms=20;timed.total_timeout_ms=200;
+                auto start=Clock::now();auto transfer=driver.start(client,request,timed,error);
+                require(bool(transfer),"total producer");
+                require(driver.write(transfer,std::string(1024,'p'))->take().error.kind==ErrorKind::success,"total producer block");
+                require(get("/producer-total-seen").error.kind==ErrorKind::success,"total peer saw producer");
+                report("producer-total",driver.response(transfer)->take(),start);
+                driver.close(transfer)->take();driver.close(client)->take();return 0;
+            }
             auto trusted=options;trusted.tls.ca_bundle=argv[5];
             auto tls=driver.open(trusted,error);require(bool(tls),"digest timer client");
             Request request;request.target=std::string(argv[4])+"/digest-slow";request.method="POST";

@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RECIPES = ('tools/ci/http_bootstrap.py', 'tools/ci/llvm_sdk.py',
            'tools/setup_http_deps.py', 'tools/setup_http_deps_native.py', 'tools/http_archive.py',
            'tools/verify_http_dependencies.py', 'cmake/HttpDependencies.cmake',
-           'cmake/HttpNativeDependencies.cmake', 'cmake/CurlProvider.cmake', 'cmake/CurlProviderFeatures.cmake',
+           'cmake/HttpNativeDependencies.cmake', 'cmake/CurlProvider.cmake', 'cmake/CurlProviderFeatures.cmake', 'cmake/CurlProviderObjects.cmake',
            'cmake/http-psl/CMakeLists.txt', 'cmake/NativeBuild.cmake', 'third_party/http-versions.json',
            'third_party/publicsuffix/UPSTREAM.json',
            'third_party/publicsuffix/public_suffix_list.dat',

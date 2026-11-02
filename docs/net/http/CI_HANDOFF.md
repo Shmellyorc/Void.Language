@@ -204,3 +204,11 @@ must include `target_triple`, the macOS-only `macos_deployment`, both producer
 pause paths in `http_timeouts`, and the delayed-barrier cancellation example,
 along with the complete existing acceptance suite. Native acceptance remains
 pending Golden Wrench review and Boss's hosted rerun.
+
+[CI 41378401662 follow-up](CI41378401662_TRIAGE.md) corrects static dependency
+definitions on curl's actual object target, samples current provider upload
+state before deadlines, and replaces the cancellation fixture's timed barrier
+with observable readiness/close checks. Local Debug/Release/strict checks pass;
+Windows linking and macOS behavior still require the reviewed native seven-job
+rerun. The original Debug cancellation artifact lacked its HTTP timeout phase;
+that evidence limitation and the new diagnostic are recorded explicitly.

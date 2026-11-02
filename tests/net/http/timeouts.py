@@ -11,6 +11,7 @@ import threading
 import fixture
 
 producer_seen=threading.Event()
+total_seen=threading.Event()
 digest_seen=threading.Event()
 digest_release=threading.Event()
 stall_release=threading.Event()
@@ -39,6 +40,11 @@ class Handler(fixture.Handler):
             self.reply(b'ok');return
         if self.path=='/producer-seen':
             assert producer_seen.wait(3);self.reply(b'ok');return
+        if self.path=='/producer-total':
+            assert self.rfile.read(1024)==b'p'*1024;total_seen.set()
+            assert self.rfile.read(1)==b'';self.close_connection=True;return
+        if self.path=='/producer-total-seen':
+            assert total_seen.wait(3);self.reply(b'ok');return
         if self.path=='/write-stall':
             self.connection.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,4096)
             stall_release.wait(3);self.close_connection=True;return
@@ -97,15 +103,25 @@ def main():
             assert rows['digest-upload']['kind']=='success',rows
             assert rows['write']['kind']=='timeout' and rows['write']['phase']=='upload' and rows['write']['unknown'],rows
             assert rows['file-drain']['kind']=='timeout' and rows['file-drain']['phase']=='file' and rows['file-drain']['unknown'],rows
-            producer_seen.clear()
-            deferred_argv=[*argv,'deferred-producer']
-            result=subprocess.run(deferred_argv,capture_output=True,timeout=40)
-            (args.evidence/'deferred.stdout').write_bytes(result.stdout)
-            (args.evidence/'deferred.stderr').write_bytes(result.stderr)
-            (args.evidence/'deferred-commands.json').write_text(json.dumps({'argv':deferred_argv,'exit_code':result.returncode},indent=2)+'\n')
-            assert result.returncode==0,result.stderr.decode()
-            rows={row['case']:row for row in map(json.loads,result.stdout.splitlines())}
-            assert rows['producer-resume']['kind']=='success',rows
+            for mode in ('deferred', 'silent'):
+                producer_seen.clear()
+                probe_argv=[*argv,mode+'-producer']
+                try: result=subprocess.run(probe_argv,capture_output=True,timeout=40)
+                except subprocess.TimeoutExpired as failure:
+                    (args.evidence/(mode+'.stdout')).write_bytes(failure.stdout or b'')
+                    (args.evidence/(mode+'.stderr')).write_bytes(failure.stderr or b'')
+                    (args.evidence/(mode+'-commands.json')).write_text(json.dumps({'argv':probe_argv,'timeout':True},indent=2)+'\n')
+                    raise
+                (args.evidence/(mode+'.stdout')).write_bytes(result.stdout)
+                (args.evidence/(mode+'.stderr')).write_bytes(result.stderr)
+                (args.evidence/(mode+'-commands.json')).write_text(json.dumps({'argv':probe_argv,'exit_code':result.returncode},indent=2)+'\n')
+                assert result.returncode==0,result.stderr.decode()
+                rows={row['case']:row for row in map(json.loads,result.stdout.splitlines())}
+                assert rows['producer-resume']['kind']=='success' and rows['producer-resume']['uploaded']==2048,rows
+                if mode=='silent':
+                    assert rows['write']['kind']=='timeout' and rows['write']['unknown'],rows
+                    assert rows['producer-total']['kind']=='timeout' and rows['producer-total']['unknown'],rows
+                    assert rows['producer-total']['uploaded']==1024 and rows['producer-total']['elapsed_ms']>=150,rows
         finally:
             stall_release.set();digest_release.set()
             for peer in [plain,secure,stalled]:peer.shutdown();peer.server_close()
