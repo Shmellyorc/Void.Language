@@ -6,6 +6,14 @@
 [Golden Wrench handoff](HANDOFF.md); full HTTP acceptance is pending.** [Earlier chronological checkpoints](ENGINEERING_HISTORY.md)
 retain every original failure and intermediate limitation.
 
+## Ubuntu LLVM cache disk repair review
+
+[Disk-space repair](CI_LLVM_DISK_REPAIR.md) adds bounded unused-SDK cleanup before
+LLVM restoration and measured capacity preflights, preserving all seven jobs,
+pins and acceptance tests. Local workflow/policy checks pass; actual hosted disk
+recovery and full-build headroom remain UNVERIFIED. Windows mTLS diagnostics and
+its unresolved native acceptance requirements are unchanged.
+
 ## Windows final repair checkpoint — CI 41533124522
 
 [Current triage](CI41533124522_TRIAGE.md): the hosted run passed all five

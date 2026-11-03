@@ -1,0 +1,8 @@
+{
+  "phase": "local-measurement",
+  "df": "Filesystem        1B-blocks         Used    Available Use% Mounted on\n/dev/sda3      998143664128 557879504896 440264159232  56% /\ntmpfs           16779227136    356515840  16422711296   3% /tmp\n/dev/sda3      998143664128 557879504896 440264159232  56% /\n/dev/sda3      998143664128 557879504896 440264159232  56% /\n/dev/sda3      998143664128 557879504896 440264159232  56% /\n/dev/sda3      998143664128 557879504896 440264159232  56% /\n/dev/sda3      998143664128 557879504896 440264159232  56% /\n/dev/sda3      998143664128 557879504896 440264159232  56% /\n",
+  "du": "652115968\t/usr/share/dotnet\n12432510976\t/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4\n9882714112\t/home/shmellyorc/Documents/Void.Language/.toolchains/http\n135174680576\t/home/shmellyorc/Documents/Void.Language/build\n0\t/home/shmellyorc/Documents/Void.Language/.toolchains/http-ci-thinlto-cache\n",
+  "workspace_free": 440261943296,
+  "temp_free": 16422711296,
+  "same_filesystem": false
+}

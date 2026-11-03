@@ -241,6 +241,11 @@ jobs:
       - name: Verify macOS ARM64 runner
         if: runner.os == 'macOS'
         run: python -c "import platform; assert platform.machine().lower() in ('arm64', 'aarch64'), 'macOS CI requires ARM64'"
+      - name: Reclaim unused Ubuntu SDKs and check disk capacity
+        if: runner.os == 'Linux'
+        run: |
+          python tests/net/http/ci_disk_test.py
+          python tools/ci/linux_disk.py prepare
       - name: Cache complete official LLVM SDK
         uses: actions/cache@v5
         with:
@@ -248,6 +253,9 @@ jobs:
           key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Install and verify LLVM development SDK
         run: python tools/ci/llvm_sdk.py
+      - name: Measure Linux disk after verified SDK extraction
+        if: runner.os == 'Linux'
+        run: python tools/ci/linux_disk.py after-sdk
       - name: Identify pinned native HTTP dependencies
         id: http
         run: python tools/ci/http_bootstrap.py identity
@@ -301,6 +309,9 @@ jobs:
           key: ${{ steps.http.outputs.fixtures-key }}
       - name: Configure ${{ matrix.configuration }}
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" configure
+      - name: Check Linux build disk headroom
+        if: runner.os == 'Linux'
+        run: python tools/ci/linux_disk.py before-build
       - name: Build ${{ matrix.configuration }}
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" build
       - name: Verify HTTP and URL acceptance registration

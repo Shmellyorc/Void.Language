@@ -5,6 +5,14 @@ LLVM/Clang/LLD 23.1.4. **Prepared for source review; hosted native acceptance is
 not claimed.** No staging, commits, branches, pushes, hosted dispatch, publication
 or protected root README edits were performed.
 
+## Ubuntu LLVM cache disk repair review
+
+[Disk-space repair](CI_LLVM_DISK_REPAIR.md) adds bounded unused-SDK cleanup before
+LLVM restoration and measured capacity preflights, preserving all seven jobs,
+pins and acceptance tests. Local workflow/policy checks pass; actual hosted disk
+recovery and full-build headroom remain UNVERIFIED. Windows mTLS diagnostics and
+its unresolved native acceptance requirements are unchanged.
+
 ## Latest Windows review boundary
 
 [CI 41533124522 triage](CI41533124522_TRIAGE.md) records five successful hosted
