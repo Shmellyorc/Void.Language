@@ -1,0 +1,29 @@
+{
+  "scope": "Linux local regressions only; Windows Schannel correction not implemented or accepted",
+  "stack_bytes": 1048576,
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "source_verification": "curl 8.23.0: 1586 files verified; four private corrections\n",
+  "profiles": {
+    "debug": {
+      "ctest": "Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug\n    Start  2: http_native\n1/6 Test  #2: http_native ......................   Passed   22.04 sec\n    Start  5: http_timeouts\n2/6 Test  #5: http_timeouts ....................   Passed    6.24 sec\n    Start  7: http_dns\n3/6 Test  #7: http_dns .........................   Passed    5.67 sec\n    Start  9: http_examples\n4/6 Test  #9: http_examples ....................   Passed  138.97 sec\n    Start 10: http_ci_policy\n5/6 Test #10: http_ci_policy ...................   Passed    4.34 sec\n    Start 11: http_curl_objects\n6/6 Test #11: http_curl_objects ................   Passed    0.62 sec\n\n100% tests passed, 0 tests failed out of 6\n\nTotal Test time (real) = 177.91 sec\n",
+      "tests": 6,
+      "failures": 0,
+      "skips": 0
+    },
+    "release": {
+      "ctest": "Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release\n    Start  2: http_native\n1/6 Test  #2: http_native ......................   Passed   17.33 sec\n    Start  5: http_timeouts\n2/6 Test  #5: http_timeouts ....................   Passed    6.10 sec\n    Start  7: http_dns\n3/6 Test  #7: http_dns .........................   Passed    5.67 sec\n    Start  9: http_examples\n4/6 Test  #9: http_examples ....................   Passed   44.39 sec\n    Start 10: http_ci_policy\n5/6 Test #10: http_ci_policy ...................   Passed    4.39 sec\n    Start 11: http_curl_objects\n6/6 Test #11: http_curl_objects ................   Passed    0.72 sec\n\n100% tests passed, 0 tests failed out of 6\n\nTotal Test time (real) =  78.61 sec\n",
+      "tests": 6,
+      "failures": 0,
+      "skips": 0
+    },
+    "strict": {
+      "ctest": "Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict\n    Start  2: http_native\n1/6 Test  #2: http_native ......................   Passed   21.27 sec\n    Start  5: http_timeouts\n2/6 Test  #5: http_timeouts ....................   Passed    8.39 sec\n    Start  7: http_dns\n3/6 Test  #7: http_dns .........................   Passed    6.53 sec\n    Start  9: http_examples\n4/6 Test  #9: http_examples ....................   Passed  135.93 sec\n    Start 10: http_ci_policy\n5/6 Test #10: http_ci_policy ...................   Passed    4.37 sec\n    Start 11: http_curl_objects\n6/6 Test #11: http_curl_objects ................   Passed    0.57 sec\n\n100% tests passed, 0 tests failed out of 6\n\nTotal Test time (real) = 177.07 sec\n",
+      "tests": 6,
+      "failures": 0,
+      "skips": 0
+    }
+  }
+}

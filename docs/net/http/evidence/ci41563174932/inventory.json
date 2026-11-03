@@ -1,0 +1,95 @@
+{
+  "run": 41563174932,
+  "commit": "c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8",
+  "artifacts": [
+    {
+      "id": 13202226262,
+      "node_id": "MDg6QXJ0aWZhY3QxMzIwMjIyNjI2Mg==",
+      "name": "link-experiment-thinlto-cache-Windows-X64-Debug-c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8-1",
+      "size_in_bytes": 506465,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13202226262",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13202226262/zip",
+      "expired": false,
+      "digest": "sha256:90a6841bb356f1ea80b2b584eaa3fb2f0668204d3dc03a5f8f91319329d048f5",
+      "created_at": "2026-11-03T03:28:44Z",
+      "updated_at": "2026-11-03T03:28:44Z",
+      "expires_at": "2027-02-01T01:58:38Z",
+      "workflow_run": {
+        "id": 41563174932,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8"
+      }
+    },
+    {
+      "id": 13201792497,
+      "node_id": "MDg6QXJ0aWZhY3QxMzIwMTc5MjQ5Nw==",
+      "name": "tests-Windows-X64-Debug",
+      "size_in_bytes": 43997,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13201792497",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13201792497/zip",
+      "expired": false,
+      "digest": "sha256:3d54f68f6c910be996818425cf5a7d783f6dec71d41bfa2f34bcb4b375c66746",
+      "created_at": "2026-11-03T03:28:47Z",
+      "updated_at": "2026-11-03T03:28:47Z",
+      "expires_at": "2027-02-01T01:58:38Z",
+      "workflow_run": {
+        "id": 41563174932,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8"
+      }
+    },
+    {
+      "id": 13198789399,
+      "node_id": "MDg6QXJ0aWZhY3QxMzE5ODc4OTM5OQ==",
+      "name": "link-experiment-thinlto-cache-Windows-X64-Release-c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8-1",
+      "size_in_bytes": 504763,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13198789399",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13198789399/zip",
+      "expired": false,
+      "digest": "sha256:30c99e251ad79c46bfe87d4e21b7ddad73d9805f9f0c807ae11e0c8a6ff253a6",
+      "created_at": "2026-11-03T02:41:02Z",
+      "updated_at": "2026-11-03T02:41:02Z",
+      "expires_at": "2027-02-01T01:58:38Z",
+      "workflow_run": {
+        "id": 41563174932,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8"
+      }
+    },
+    {
+      "id": 13198649628,
+      "node_id": "MDg6QXJ0aWZhY3QxMzE5ODY0OTYyOA==",
+      "name": "tests-Windows-X64-Release",
+      "size_in_bytes": 43067,
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13198649628",
+      "archive_download_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/artifacts/13198649628/zip",
+      "expired": false,
+      "digest": "sha256:eca25e509fac6a2c2a5e736029a8dcd1467da5d7e9edc3ae09f17144dc39e39f",
+      "created_at": "2026-11-03T02:41:05Z",
+      "updated_at": "2026-11-03T02:41:05Z",
+      "expires_at": "2027-02-01T01:58:38Z",
+      "workflow_run": {
+        "id": 41563174932,
+        "repository_id": 1413790846,
+        "head_repository_id": 1413790846,
+        "head_branch": "main",
+        "head_sha": "c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8"
+      }
+    }
+  ],
+  "job_log_sha256": {
+    "125678330370.log": "4dd688c803da9550db784ae0fed27e7fa42f0952ea279d1fef26110488dad081",
+    "125678330377.log": "4af53df6b44e1ee7215ae692aab2ad7ddd804f9168f280a77218a12fab9b07f9"
+  },
+  "upstream_material_sha256": {
+    "fork.patch": "8327c779304c9e9e45c22db6477ad6a28b8059d537d2a81199e2dab80baf5d3e",
+    "SslStreamPal.Windows.cs": "88584322ae8b9ed67e081b917060dba18ad447215af777c769b5897e644058f2"
+  },
+  "raw_storage": ".toolchains/ci41563174932"
+}

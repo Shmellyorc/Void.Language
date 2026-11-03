@@ -1,0 +1,29 @@
+{
+  "scope": "Design only; no native experiments, no production or existing-test changes",
+  "files_changed_this_assignment": [
+    "docs/net/http/WINDOWS_MTLS_CREDENTIAL_DESIGN.md",
+    "docs/net/http/CI41563174932_SCHANNEL_REVIEW.md",
+    "docs/net/http/CURRENT_ENGINEERING.md",
+    "docs/net/http/CI_HANDOFF.md",
+    "docs/README.md",
+    "docs/net/http/evidence/windows-mtls-design-review.json"
+  ],
+  "relative_design_links_checked": [
+    "CI41563174932_SCHANNEL_REVIEW.md",
+    "MEMORY_REVIEW.md"
+  ],
+  "checks": {
+    "git_diff_check": "pass",
+    "non_documentation_changes": "none"
+  },
+  "source_audit_sha256": {
+    "stdlib/net/http.void": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+    "src/runtime/http.cpp": "63a86f8a6d5971ad90cfee706cfdcb10afeb4529ee4f183d836fa73820dde573",
+    "src/runtime/http_resource.cpp": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+    "src/runtime/http_abi.cpp": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992",
+    "src/runtime/native_resource.cpp": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+    "include/void/http.hpp": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4",
+    "include/void/detail/http_hooks.hpp": "5d59f53e60b1dc17a7b91909f6690240952e0615f378284a0fdf8b63a72ceeaf",
+    "third_party/curl/lib/vtls/schannel.c": "096bde9e187750fd2ec31578c0a2656dd3e2709bf8aebcb6b5433c68b791aafc"
+  }
+}

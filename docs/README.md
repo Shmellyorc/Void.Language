@@ -1,5 +1,13 @@
 # VOID documentation
 
+## Windows mTLS architecture proposal — 3 November 2026
+
+[Windows-only credential design](net/http/WINDOWS_MTLS_CREDENTIAL_DESIGN.md)
+records explicit opt-in authority, CNG key ownership, reuse of the existing store
+identity API, cleanup/recovery limits and native acceptance gates. Research and
+design only; production persistence and implementation remain unapproved.
+Linux/macOS are unchanged. Stop for Golden Wrench architecture review.
+
 ## HTTP client engineering authorized, 30 October 2026
 
 Boss authorizes the complete `url`/`net/http` mission at `15f7868b`, LLVM/Clang/LLD

@@ -1,0 +1,45 @@
+{
+  "scope": "Source-only feasibility; native crypto experiments NOT EXECUTED",
+  "environment": {
+    "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+    "clang": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n",
+    "lld": "LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)\n",
+    "running_virtualbox_guests": "",
+    "registered_guest_summary": "Windows 11; poweroff; not booted or modified"
+  },
+  "native_results": {
+    "created_credentials": 0,
+    "deleted_credentials": 0,
+    "schannel_handshakes": 0,
+    "native_negative_controls": "NOT EXECUTED"
+  },
+  "read_only_checks": {
+    "curl_source_verification": "curl 8.23.0: 1586 files verified; four private corrections\n",
+    "original_windows_artifacts": {
+      "13202226262": "sha256:90a6841bb356f1ea80b2b584eaa3fb2f0668204d3dc03a5f8f91319329d048f5",
+      "13201792497": "sha256:3d54f68f6c910be996818425cf5a7d783f6dec71d41bfa2f34bcb4b375c66746",
+      "13198789399": "sha256:30c99e251ad79c46bfe87d4e21b7ddad73d9805f9f0c807ae11e0c8a6ff253a6",
+      "13198649628": "sha256:eca25e509fac6a2c2a5e736029a8dcd1467da5d7e9edc3ae09f17144dc39e39f"
+    },
+    "source_matches_prior_design_audit": {
+      "stdlib/net/http.void": "fd588bd1869a0d544c68c1f095ce976c96cc5ba895a775047ecf1b2f1e5781f4",
+      "src/runtime/http.cpp": "63a86f8a6d5971ad90cfee706cfdcb10afeb4529ee4f183d836fa73820dde573",
+      "src/runtime/http_resource.cpp": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+      "src/runtime/http_abi.cpp": "6c159e5f7d5c495f0eb95c768891019571e2beabbd7a626f8dfb3d91392aa992",
+      "src/runtime/native_resource.cpp": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+      "include/void/http.hpp": "8110833e08b937e778835659e3bf41d5c3ddfd49330693d8c6631245bdf9d8e4",
+      "include/void/detail/http_hooks.hpp": "5d59f53e60b1dc17a7b91909f6690240952e0615f378284a0fdf8b63a72ceeaf",
+      "third_party/curl/lib/vtls/schannel.c": "096bde9e187750fd2ec31578c0a2656dd3e2709bf8aebcb6b5433c68b791aafc"
+    },
+    "documentation_links_checked": 27,
+    "diff_check": "pass"
+  },
+  "conditional_approval": "Temporary in-memory exportability and conservative crash residue approved for feasibility only; no production authorization",
+  "files_changed_this_assignment": [
+    "docs/net/http/WINDOWS_MTLS_FEASIBILITY.md",
+    "docs/net/http/WINDOWS_MTLS_CREDENTIAL_DESIGN.md",
+    "docs/net/http/CURRENT_ENGINEERING.md",
+    "docs/net/http/CI_HANDOFF.md",
+    "docs/net/http/evidence/windows-mtls-feasibility.json"
+  ]
+}

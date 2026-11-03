@@ -6,6 +6,36 @@
 [Golden Wrench handoff](HANDOFF.md); full HTTP acceptance is pending.** [Earlier chronological checkpoints](ENGINEERING_HISTORY.md)
 retain every original failure and intermediate limitation.
 
+## Windows credential feasibility — source-only result
+
+[Feasibility report](WINDOWS_MTLS_FEASIBILITY.md): Boss conditionally approved
+temporary exportability and crash residue for experiments, not production. No
+disposable native Windows session was available. Source review identifies required
+durable-store-marker and stable-lock refinements; native import, non-exportability,
+Schannel and recovery results remain UNVERIFIED. Production and Linux/macOS are
+unchanged. Stop for Golden Wrench review; no hosted run requested.
+
+## Windows-only credential architecture proposal
+
+[Windows mTLS credential design](WINDOWS_MTLS_CREDENTIAL_DESIGN.md) proposes one
+explicit identity case, controlled user-scoped CNG ownership and the already
+implemented exact Windows store selector; no curl correction is currently
+justified. Temporary in-memory exportability and crash/cleanup residuals require
+explicit review. Production behavior and all Linux/macOS code remain unchanged.
+**Design only: stop for Golden Wrench architecture review, not a hosted run.**
+
+## Windows Schannel security review — 3 November 2026
+
+[CI 41563174932 review](CI41563174932_SCHANNEL_REVIEW.md) confirms Windows
+Debug/Release pass 340/341 tests; the only failure is the P12 identity handshake.
+Both now capture `next InitializeSecurityContext`, `SEC_E_INTERNAL_ERROR
+(0x80090304)`, and peer EOF without authenticated identity. Source and Microsoft
+contracts strongly implicate the non-persisted-key/LSASS boundary. No safe
+contract-preserving correction is established. A concrete explicit opt-in key
+persistence design is proposed for Golden Wrench/Boss architecture review;
+no production/security change is implemented. Windows mTLS remains failed.
+The five other hosted configurations passed, including Ubuntu disk preflight.
+
 ## Ubuntu LLVM cache disk repair review
 
 [Disk-space repair](CI_LLVM_DISK_REPAIR.md) adds bounded unused-SDK cleanup before
