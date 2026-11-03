@@ -1,5 +1,19 @@
 # Windows P12 credential ownership — proposed architecture
 
+## Native feasibility correction, 3 November 2026
+
+The [Windows VM evidence](WINDOWS_MTLS_FEASIBILITY.md#native-windows-vm-verdict-3-november-2026)
+demonstrates real TLS 1.2 mTLS, but **disproves the no-overwrite ownership
+assumption in the named PKCS#8 import sequence below on Windows 10 build 19045**.
+Both immediate import and deferred import/finalization replaced a different
+fixture-owned sentinel without an overwrite flag. Random names and a pre-open
+check do not repair that atomicity requirement. The proposed creation transaction
+must be redesigned and natively reviewed before production implementation.
+The report also records the required encrypted PKCS#8 parameters, cached-handle
+acquisition, custom-property flags and CNG provider-association key spec.
+The original proposal remains below as history; it is not a safe implementation
+recipe or production approval. TLS 1.3 remains unverified on a supporting OS.
+
 3 November 2026. LLVM/Clang/LLD 23.1.4; source baseline
 `c9a1f47c16b8fe2410cf33dd97e33dfff72edcc8`. **Design only; requires Golden Wrench
 architecture review and Boss implementation approval.** No production, tests,
