@@ -5,6 +5,15 @@ LLVM/Clang/LLD 23.1.4. **Prepared for source review; hosted native acceptance is
 not claimed.** No staging, commits, branches, pushes, hosted dispatch, publication
 or protected root README edits were performed.
 
+## Latest Windows review boundary
+
+[CI 41533124522 triage](CI41533124522_TRIAGE.md) records five successful hosted
+platform configurations and two remaining Windows failures. The path test has
+a focused correction; mTLS has stronger diagnostics/negative controls but no
+proven transport repair. Local Release/Debug/strict focused tests pass 6/6 each.
+Windows acceptance remains UNVERIFIED; Boss controls native diagnostic execution.
+No workflow dispatch or dependency/policy change is part of this handoff.
+
 ## Workflow and bootstrap
 
 Only the existing [fast workflow](../../../.github/workflows/ci-link-experiment.yml)

@@ -12,5 +12,8 @@ struct Hooks {
     std::int64_t upload_bytes_per_second = 0;
     // Exercise deadlines when curl has sent bytes without notifying XFERINFO.
     bool suppress_progress_notifications = false;
+    // Native fixture diagnostics only. Called on the driver before handle
+    // cleanup; text is borrowed for the call. Must not reenter the driver.
+    void (*provider_error)(int code, const char* text) noexcept = nullptr;
 };
 }

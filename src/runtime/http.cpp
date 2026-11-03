@@ -181,6 +181,7 @@ struct TransferState {
     bool native_failure = false, producer_eof = false, used_proxy = false;
     bool request_permitted = false, request_sent = false;
     CURL* easy = nullptr;
+    std::unique_ptr<std::array<char, CURL_ERROR_SIZE>> provider_error;
     curl_slist* outgoing = nullptr;
     curl_mime* mime = nullptr;
     z_stream inflater{};
@@ -647,6 +648,11 @@ void DriverState::configure(const std::shared_ptr<TransferState>& state) {
     auto* easy = curl_easy_init();
     if (!easy) throw std::bad_alloc();
     transfer.easy = easy;
+    if (hooks && hooks->provider_error) {
+        if (!transfer.provider_error) transfer.provider_error = std::make_unique<std::array<char, CURL_ERROR_SIZE>>();
+        transfer.provider_error->fill(0);
+        option(easy, CURLOPT_ERRORBUFFER, transfer.provider_error->data());
+    }
     if (hooks && !hooks->dns_servers.empty()) option(easy, CURLOPT_DNS_SERVERS, hooks->dns_servers.c_str());
     if (hooks && hooks->upload_bytes_per_second > 0)
         option(easy, CURLOPT_MAX_SEND_SPEED_LARGE, static_cast<curl_off_t>(hooks->upload_bytes_per_second));
@@ -787,6 +793,8 @@ void DriverState::detach(TransferState& transfer, CURLcode code, std::unique_loc
     const auto timed_phase = code == CURLE_OPERATION_TIMEDOUT ? timeout_phase(transfer) : Phase::connect;
     long request_bytes = 0, connect_status = 0, proxy_verification = 0;
     if (transfer.easy) {
+        if (code != CURLE_OK && hooks && hooks->provider_error && transfer.provider_error && (*transfer.provider_error)[0])
+            hooks->provider_error(static_cast<int>(code), transfer.provider_error->data());
         long used_proxy = 0;
         curl_easy_getinfo(transfer.easy, CURLINFO_USED_PROXY, &used_proxy); transfer.used_proxy = used_proxy != 0;
         curl_easy_getinfo(transfer.easy, CURLINFO_REQUEST_SIZE, &request_bytes);

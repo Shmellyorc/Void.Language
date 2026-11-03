@@ -71,7 +71,19 @@ class WindowsPathTests(unittest.TestCase):
                 result = subprocess.run(['cmake', '-G', 'Ninja' if os.name == 'nt' else 'Unix Makefiles', '-S', str(root), '-B', str(root / 'build')],
                                         capture_output=True, text=True)
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-                self.assertEqual((prefix / 'lib/cares.lib').as_posix(), (root / 'build/selected.txt').read_text())
+                expected = prefix / 'lib/cares.lib'
+                selected = Path((root / 'build/selected.txt').read_text())
+                # Windows TEMP may use an 8.3 alias while CMake expands its
+                # real path. Ask the OS for directory and file identity.
+                self.assertTrue(selected.parent.samefile(expected.parent), (selected, expected))
+                self.assertTrue(selected.samefile(expected), (selected, expected))
+                other = prefix / 'lib/other.lib'
+                other.write_bytes(expected.read_bytes())
+                self.assertFalse(selected.samefile(other), 'identical bytes are not the selected library')
+                alias = prefix / 'lib/cares-alias.lib'
+                os.link(expected, alias)
+                self.assertTrue(selected.samefile(alias), 'OS-recognized aliases retain file identity')
+                alias.unlink()
                 (prefix / 'lib/cares.lib').unlink()
                 result = subprocess.run(['cmake', '-S', str(root), '-B', str(root / 'build')],
                                         capture_output=True, text=True)

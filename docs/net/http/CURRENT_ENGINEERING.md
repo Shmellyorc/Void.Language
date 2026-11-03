@@ -6,6 +6,18 @@
 [Golden Wrench handoff](HANDOFF.md); full HTTP acceptance is pending.** [Earlier chronological checkpoints](ENGINEERING_HISTORY.md)
 retain every original failure and intermediate limitation.
 
+## Windows final repair checkpoint — CI 41533124522
+
+[Current triage](CI41533124522_TRIAGE.md): the hosted run passed all five
+Ubuntu/macOS configurations; Windows Debug/Release each passed 339/341.
+The c-ares test now compares OS file/directory identity, with distinct-file
+rejection and real-alias controls. Focused local Release/Debug/strict checks
+pass 6/6 each. **Windows mTLS remains unresolved and native acceptance is
+UNVERIFIED.** Original evidence lacks the SSPI error; opt-in provider diagnostics
+and peer identity/negative controls are ready for Golden Wrench review. The
+known Schannel non-persisted-key limitation is a candidate, not a proven cause.
+No TLS policy or private-key persistence workaround has been applied.
+
 ## Native CI repair checkpoint — 2 November 2026
 
 [CI 41443618378 consolidated triage](CI41443618378_TRIAGE.md) supersedes the

@@ -1,0 +1,39 @@
+{
+  "server_ssl": "OpenSSL 4.0.1 9 Jun 2026",
+  "verify_mode": "CERT_REQUIRED",
+  "expected_client_sha256": "f24f12b8e2f46679854fa2e2d1769376746d748ae220368c2b7acf946b7b7c31",
+  "events": [
+    {
+      "event": "handshake_failed",
+      "library": "SSL",
+      "reason": "PEER_DID_NOT_RETURN_A_CERTIFICATE",
+      "error": "[SSL: PEER_DID_NOT_RETURN_A_CERTIFICATE] peer did not return a certificate (_ssl.c:1127)"
+    },
+    {
+      "event": "authenticated",
+      "tls": "TLSv1.3",
+      "cipher": [
+        "TLS_AES_256_GCM_SHA384",
+        "TLSv1.3",
+        256
+      ],
+      "client_sha256": "f24f12b8e2f46679854fa2e2d1769376746d748ae220368c2b7acf946b7b7c31"
+    },
+    {
+      "event": "handshake_failed",
+      "library": "SSL",
+      "reason": "UNEXPECTED_EOF_WHILE_READING",
+      "error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1127)"
+    },
+    {
+      "event": "authenticated",
+      "tls": "TLSv1.3",
+      "cipher": [
+        "TLS_AES_256_GCM_SHA384",
+        "TLSv1.3",
+        256
+      ],
+      "client_sha256": "f24f12b8e2f46679854fa2e2d1769376746d748ae220368c2b7acf946b7b7c31"
+    }
+  ]
+}

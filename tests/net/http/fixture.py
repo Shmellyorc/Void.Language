@@ -163,6 +163,24 @@ class Server(http.server.ThreadingHTTPServer):
             return
         super().handle_error(request, client_address)
 
+class MutualServer(Server):
+    """Capture handshake failures normally swallowed by HTTPServer.accept()."""
+    def get_request(self):
+        try:
+            stream, address = super().get_request()
+        except ssl.SSLError as error:
+            self.tls_events.append({'event': 'handshake_failed', 'library': error.library,
+                                    'reason': error.reason, 'error': str(error)})
+            raise
+        certificate = stream.getpeercert(binary_form=True)
+        fingerprint = hashlib.sha256(certificate).hexdigest() if certificate else None
+        self.tls_events.append({'event': 'authenticated', 'tls': stream.version(),
+                                'cipher': stream.cipher(), 'client_sha256': fingerprint})
+        if fingerprint != self.expected_client:
+            stream.close()
+            raise ssl.SSLError('unexpected mutual TLS client identity')
+        return stream, address
+
 class H2Handler(socketserver.BaseRequestHandler):
     def handle(self):
         import h2.config
@@ -418,12 +436,20 @@ def main():
             "-out", str(work / "identity.p12"), "-passout", "pass:integration"], capture_output=True)
         (args.evidence / "pkcs12.stderr").write_bytes(p12.stderr)
         assert p12.returncode == 0
+        parsed = subprocess.run([str(openssl), 'pkcs12', '-in', str(work / 'identity.p12'),
+                                 '-passin', 'pass:integration', '-noout'], capture_output=True)
+        (args.evidence / 'pkcs12-parse.stderr').write_bytes(parsed.stderr)
+        assert parsed.returncode == 0, 'generated P12 must authenticate and parse'
         server = Server(("127.0.0.1", 0), Handler)
         secure = Server(("127.0.0.1", 0), Handler)
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(work / "cert.pem", work / "key.pem")
         secure.socket = context.wrap_socket(secure.socket, server_side=True)
-        mutual = Server(("127.0.0.1", 0), Handler)
+        mutual = MutualServer(("127.0.0.1", 0), Handler)
+        mutual.tls_events = []
+        mutual.expected_client = hashlib.sha256(ssl.PEM_cert_to_DER_cert((work / 'cert.pem').read_text())).hexdigest()
+        # Retain public certificate evidence only; never export a private key.
+        (args.evidence / 'mutual-certificate.pem').write_bytes((work / 'cert.pem').read_bytes())
         mutual_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         mutual_context.load_cert_chain(work / "cert.pem", work / "key.pem")
         mutual_context.load_verify_locations(work / "cert.pem")
@@ -499,6 +525,11 @@ def main():
                 "h2_retry_events": h2_retry_events,
                 "scope": "loopback native transport; not complete source/platform acceptance"}, indent=2) + "\n")
             assert status == 0 and not timed_out, (status, (args.evidence / "native.stderr").read_text())
+            assert 'curl provider error 58:' in (args.evidence / 'native.stderr').read_text(), 'P12 rejection must retain provider diagnostics'
+            identities = [event for event in mutual.tls_events if event['event'] == 'authenticated']
+            assert len(identities) == (1 if os.name == 'nt' else 2), mutual.tls_events
+            assert all(event['client_sha256'] == mutual.expected_client for event in identities), mutual.tls_events
+            assert any(event['event'] == 'handshake_failed' for event in mutual.tls_events), 'peer must reject anonymous client'
             assert not keylog_created, "Inherited key logging wrote a file during the native TLS fixture"
             assert not required_h2_violations, "Required HTTP/2 sent an incompatible HTTP request without h2 negotiation"
             if args.http2:
@@ -515,6 +546,9 @@ def main():
         finally:
             server.shutdown(); secure.shutdown(); server.server_close(); secure.server_close()
             mutual.shutdown(); mutual.server_close()
+            (args.evidence / 'mutual-peer.json').write_text(json.dumps({
+                'server_ssl': ssl.OPENSSL_VERSION, 'verify_mode': 'CERT_REQUIRED',
+                'expected_client_sha256': mutual.expected_client, 'events': mutual.tls_events}, indent=2) + '\n')
             for value in [forward, tls_proxy, socks]: value.shutdown(); value.server_close()
             if h2_server: h2_server.shutdown(); h2_server.server_close()
 

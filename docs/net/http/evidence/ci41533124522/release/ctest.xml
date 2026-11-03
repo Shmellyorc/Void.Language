@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="6"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="92"
+	timestamp="2026-11-02T17:51:12"
+	>
+	<testcase name="http_native" classname="http_native" time="17.3035" status="run">
+		<properties/>
+		<system-out>{"http_latency":{"profile":"HTTP/1.1 plaintext","samples":64,"median_ms":41.0077,"p95_ms":41.995,"process_cpu_seconds":0.02364}}
+{"http_latency":{"profile":"HTTP/1.1 verified TLS","samples":64,"median_ms":41.0096,"p95_ms":42.0224,"process_cpu_seconds":0.026329}}
+{"http_latency":{"profile":"HTTP/2 verified TLS","samples":64,"median_ms":0.403547,"p95_ms":0.939045,"process_cpu_seconds":0.010877}}
+{"h2_paused_sample":{"sample":0,"rss_kib":38832,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":38832,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":38832,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":38832,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":38832,"live_native_bytes":0,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_pa...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_timeouts" classname="http_timeouts" time="6.12236" status="run">
+		<properties/>
+		<system-out>TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed
+</system-out>
+	</testcase>
+	<testcase name="http_dns" classname="http_dns" time="6.19034" status="run">
+		<properties/>
+		<system-out>DNS retained live allocations: 0; steady 0..0 bytes
+Native c-ares UDP/TCP, IPv4/IPv6, IDN, cache pressure, negative cache, cancellation and timeout passed
+</system-out>
+	</testcase>
+	<testcase name="http_examples" classname="http_examples" time="57.8457" status="run">
+		<properties/>
+		<system-out>HTTP published examples: 19 checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_ci_policy" classname="http_ci_policy" time="4.36388" status="run">
+		<properties/>
+		<system-out>test_corrupted_cache_rejected_without_replacement (__main__.AcquisitionTests.test_corrupted_cache_rejected_without_replacement) ... ok
+test_http_error_body_and_status_retained (__main__.AcquisitionTests.test_http_error_body_and_status_retained) ... ok
+test_network_failure_does_not_report_a_stale_partial_as_response (__main__.AcquisitionTests.test_network_failure_does_not_report_a_stale_partial_as_response) ... ok
+test_redirect_records_final_location_and_verifies_bytes (__main__.AcquisitionTests.test_redirect_records_final_location_and_verifies_bytes) ... ok
+test_successful_http_with_wrong_bytes_never_enters_cache (__main__.AcquisitionTests.test_successful_http_with_wrong_bytes_never_enters_cache) ... ok
+test_verified_bytes_promoted_and_cache_reverified (__main__.AcquisitionTests.test_verified_bytes_promoted_and_cache_reverified) ... ok
+test_every_reviewed_blob_survives_windows_checkout_filter (__main__.CheckoutTests.test_every_reviewed_blob_survives_windows_checkout_filter) ... ok
+test_each_missing_or_disable...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_curl_objects" classname="http_curl_objects" time="0.617752" status="run">
+		<properties/>
+		<system-out>test_static_and_object_library_compilation_policy (__main__.CurlObjectsTests.test_static_and_object_library_compilation_policy) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.543s
+
+OK
+Both curl layouts: static definitions, sanitizers and keylog ownership; six COFF import negative controls verified
+</system-out>
+	</testcase>
+</testsuite>

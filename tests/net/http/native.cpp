@@ -1,6 +1,7 @@
 #include "void/http.hpp"
 #include "void/http_bulk.hpp"
 #include "void/detail/filesystem_hooks.hpp"
+#include "void/detail/http_hooks.hpp"
 #include <algorithm>
 #include <chrono>
 #include <iostream>
@@ -9,6 +10,7 @@
 #include <charconv>
 #include <cstdlib>
 #include <ctime>
+#include <cstdio>
 #ifndef _WIN32
 #include <sys/stat.h>
 #else
@@ -63,7 +65,11 @@ int main(int argc, char** argv) {
     using namespace vd::http;
     try {
         require(argc == 13, "fixture arguments");
-        Driver driver;
+        auto diagnostics = std::make_shared<testing::Hooks>();
+        diagnostics->provider_error = [](int code, const char* text) noexcept {
+            std::fprintf(stderr, "curl provider error %d: %s\n", code, text);
+        };
+        Driver driver(diagnostics);
         ClientOptions settings; settings.cookies = true;
         Error error;
         auto client = driver.open(settings, error); require(bool(client), "client acquisition");
@@ -252,6 +258,14 @@ int main(int argc, char** argv) {
             }
             success(driver.close(tls)->take(), "TLS client close");
         }
+        {
+            ClientOptions options; options.tls.ca_bundle = argv[3];
+            auto anonymous = driver.open(options, error); require(bool(anonymous), "anonymous mutual TLS client");
+            Request request; request.target = std::string(argv[5]) + "/plain";
+            auto denied = driver.send(anonymous, request, {})->take();
+            require(denied.error.kind != ErrorKind::success && !denied.info, "mutual TLS rejects missing identity");
+            success(driver.close(anonymous)->take(), "anonymous mutual TLS close");
+        }
         for (auto identity : {TlsOptions::pem, TlsOptions::pkcs12}) {
             ClientOptions options; options.tls.ca_bundle = argv[3]; options.tls.identity = identity;
             options.tls.certificate = argv[identity == TlsOptions::pem ? 6 : 8];
@@ -262,8 +276,15 @@ int main(int argc, char** argv) {
                 continue;
             }
 #endif
-            auto mutual = driver.open(options, error); require(bool(mutual), "mutual TLS client acquisition");
             Request request; request.target = std::string(argv[5]) + "/plain";
+            if (identity == TlsOptions::pkcs12) {
+                auto incorrect = options; incorrect.tls.password = "incorrect";
+                auto rejected = driver.open(incorrect, error); require(bool(rejected), "bad-password snapshot acquisition");
+                auto denied = driver.send(rejected, request, {})->take();
+                require(denied.error.kind == ErrorKind::tls_failure && !denied.info, "wrong P12 password rejects identity");
+                success(driver.close(rejected)->take(), "bad-password client close");
+            }
+            auto mutual = driver.open(options, error); require(bool(mutual), "mutual TLS client acquisition");
             auto result = driver.send(mutual, request, {})->take(); success(result, "explicit mutual TLS identity");
             require(result.bytes.size() == 11, "mutual TLS response"); success(driver.close(mutual)->take(), "mutual TLS close");
         }
