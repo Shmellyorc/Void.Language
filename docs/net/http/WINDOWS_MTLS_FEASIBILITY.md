@@ -1,5 +1,171 @@
 # Windows Schannel credential feasibility
 
+## Collision-safe creation follow-up, 3 November 2026
+
+**HOLD: no collision-safe creation mechanism was established on this VM.**
+The preferred documented create/set-blob/finalize alternative is rejected:
+two pending creators of the same name both finalized successfully and the second
+replaced the first key. Direct raw private-key import is also rejected: competing
+immediate imports reported multiple successful creators of one fresh name.
+Successful mTLS does not repair either ownership failure. Stop for Golden Wrench
+review; no production persistence implementation or hosted CI dispatch.
+
+This follow-up starts at `23e642dc377ff643b6d76f806d84fd1b5f8d60ca` on existing
+`main`, with the same pinned LLVM/Clang/LLD 23.1.4, SDK 10.0.19041.0, static `/MT`
+and independent Debug/Release profiles described below. The original
+[native receipt](evidence/windows-native-schannel-20261103.json) is unchanged.
+The independent [collision receipt](evidence/windows-cng-collision-20261103.json)
+contains 28 final profile/case results, earlier experiments, binary/source hashes,
+public snapshots and before/after inventories. Hashes identify the actual Windows
+working-file bytes; Git normalizes source line endings when committing.
+
+### Documented contracts and tested mechanism
+
+Microsoft's [NCryptImportKey contract](https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptimportkey)
+says Software KSP named imports should return `NTE_EXISTS` without overwrite
+permission. It permits supplying the name through `NCRYPTBUFFER_PKCS_KEY_NAME`
+and deferring PKCS#8 finalization. The observed PKCS#8 behavior contradicts that
+contract on this configuration. Microsoft's
+[persisted import procedure](https://learn.microsoft.com/en-us/windows/win32/seccng/key-import-and-export)
+instead creates a persisted-key handle, applies properties and the import blob,
+then finalizes. [NCryptCreatePersistedKey](https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptcreatepersistedkey)
+also documents rejection of existing names without overwrite permission.
+[NCryptFinalizeKey](https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptfinalizekey)
+completes that handle; its documentation does not promise a reservation against
+other pending handles.
+
+The SDK header defines overwrite as `0x80`, deferred finalization as `0x400`,
+and the name-buffer identifier as 45. Probe creation and immediate import use
+flags **0**; deferred import uses **0x400**, with no overwrite, machine or legacy
+store flag. The actual provider is **Microsoft Software Key Storage Provider**,
+`NCRYPT_VERSION_PROPERTY = 65536` (1.0). Both `ncrypt.dll` and `ncryptprov.dll`
+report file version `10.0.19041.1 (WinBuild.160101.0800)` on Windows 10 Home 22H2
+x64 `10.0.19045.6456`.
+
+The candidate reuses the established P12 decoder, certificate identity check,
+store binding, Schannel selector, peer, recovery probe and explicit cleanup.
+`reserved-import.hpp` adds only the import experiment. An unnamed ephemeral key
+converts the encrypted PKCS#8 bridge to `BCRYPT_RSAPRIVATE_BLOB` or
+`BCRYPT_ECCPRIVATE_BLOB`. It temporarily permits plaintext export (policy **3**),
+so a bounded raw private blob exists in zeroing process memory. That is a new
+research tradeoff, not approval of a production bridge. The final named key
+retains export policy **0**, user scope, signing-only usage, the restricted
+current-user/SYSTEM DACL and a persisted owner marker. Raw and encrypted transport
+buffers are wiped before publishing a selector. No private blobs are receipts.
+
+Windows exposes the staged ECDSA certificate through an ECDH-group CNG key here.
+The first candidate rejected that group before persistence. That failure is
+retained; accepting the documented ECC blob format for both ECC groups allowed
+the final ECDSA signing and mTLS controls to run. The first inventory attempt
+also lacked PowerShell's `Cert:` provider. The controller now uses read-only
+registry store-name enumeration and .NET X509Store, with terminating errors;
+the incomplete attempt was not accepted as an empty inventory.
+
+### Native collision results
+
+All rows below were repeated for RSA and ECDSA in Debug and Release unless the
+row explicitly says RSA-only. Snapshots compare actual bytes before producing
+public evidence, including the public blob, owner marker, name, unique name,
+algorithm, length, key type, export policy, usage and DACL. Private raw and PKCS#8
+export return codes are captured too. Existing final-key controls separately
+reject correctly parameterized encrypted export and verify a live signature.
+
+| Disposable synthetic control | Exact observed result | Decision |
+| --- | --- | --- |
+| Fresh create, set raw blob, set properties, finalize, reopen | All operations `0`; original public identity preserved; final plaintext/encrypted private exports `0x80090029` | Functional, insufficient ownership guarantee |
+| Create against an already finalized same-key sentinel | `0x8009000F` (`NTE_EXISTS`); reopened public blob, all metadata, marker, DACL and export controls identical | Existing object preserved |
+| Create against an already finalized different-key sentinel | `0x8009000F`; same full byte comparisons unchanged | Existing object preserved |
+| Named encrypted PKCS#8 immediate import against different-key sentinel | Import `0`; reopened public key and metadata changed | Rejected |
+| Named encrypted PKCS#8 deferred import against different-key sentinel | Import `0`, finalize `0`; reopened public key and metadata changed | Rejected |
+| Named raw private-blob immediate/deferred-flag imports against different-key sentinel | Import `0x8009000F`; reopened complete snapshots unchanged | Existing-name protection only; does not prove raw deferred support on a fresh name |
+| Two pending `NCryptCreatePersistedKey` handles for one name | Both prepares `0`, both finalizations `0`; reopened public blob and owner marker changed | Preferred candidate rejected |
+| Eight simultaneous immediate raw imports into one fresh name, eight rounds per algorithm/profile | 31 rounds had **8** successful creators; one Release ECDSA round had **4**; remaining calls returned `NTE_EXISTS` | Direct raw alternative rejected |
+| Malformed one-byte import property | Setter `0x80090005` (`NTE_BAD_DATA`); freed pending handle; reopen `0x80090016` | Failure left no persisted key |
+| Invalid finalization flags `0x80000000` | Finalize `0x80090009` (`NTE_BAD_FLAGS`); freed pending handle; reopen `0x80090016` | Failure left no persisted key |
+| Original named-PKCS#8 immediate/deferred reproducer, RSA-only | Probe exit 1 with public identity changed and ownership marker lost; exact fixture cleanup succeeded | Original failed guarantee preserved |
+
+The pending-handle schedule is deterministic: prepare A, prepare B, finalize A,
+snapshot A through a fresh open, finalize B, reopen the name and compare. B has
+different generated key material and a distinct marker. No vulnerable preflight
+existence check is offered as a repair. In the raw-import stress control, eight
+threads start the import API together with identical material and the same name;
+multiple success returns disprove exclusive creation even when the intended key
+bytes happen to match. There were 256 calls and 252 reported successes across
+32 fresh names. These are actual simultaneous calls, not a retry scheme.
+
+The behavioral mechanism is now bounded more precisely: already existing names
+are protected on the raw and create-handle entry points, but PKCS#8 named import
+does not preserve that protection; a pending create handle also does not reserve
+its name until finalization. The prepare/finalize schedule behaves as a
+check-then-persist sequence, rather than an exclusive ownership transaction.
+That is an inference from public API results, not a claim about proprietary KSP
+source code. The internal reason PKCS#8 bypasses the documented collision result
+remains unknown. Format dependence is demonstrated; deferring PKCS#8 does not
+repair it. Only this provider/version/build was tested. Another Windows release,
+patched provider, hardware provider or Windows 11 cannot be claimed safe from
+these measurements.
+
+### Preserved authentication, recovery and cleanup
+
+The candidate's functional runs again passed RSA and ECDSA TLS **1.2** in both
+profiles through the existing curl Schannel store selector. The peer required
+the exact expected client DER; CA, hostname and ordinary revocation checks stayed
+enabled. Anonymous identity, wrong hostname, wrong root and the NO_PERSIST-only
+P12 case failed. Two requests reused one connection (`1`, then `0` new
+connections). Independent owners authenticated concurrently, and the second
+continued after the first owner's cleanup. This validates compatibility, not
+the rejected creation policy. Explicit TLS 1.3 requests still fail as unsupported
+on this Windows 10 VM; no downgrade or Windows 11/Server 2022 acceptance is added.
+
+Both profiles exercised termination at public intent, pending import, finalized
+key, unmarked/marked store, unmarked key and mismatched marker. The live-owner
+lock rejected recovery with exit 3. Recovery deleted only a matching finalized
+object; ambiguous unmarked/mismatched objects were quarantined with exit 4 and
+removed only by the fixture controller's explicit authority over its own child.
+Corrupt, oversized and wrong-public-identity records were rejected. A pending
+handle is freed on failure rather than treated as an owned persisted key.
+Successful finalization grants only fixture cleanup authority here; the racing
+test demonstrates why it does not prove unique production ownership.
+
+Every final case verified key reopen failure `0x80090016` (`NTE_BAD_KEYSET`) and
+private-store absence `2` after cleanup. Auxiliary collision/race keys have their
+own exact deletion/reopen controls. Before/after inventories match in each
+profile: **one pre-existing Software KSP key and eight CurrentUser stores**,
+with unchanged store certificate DER fingerprints. No test-created credentials
+remain. The key inventory covers name/algorithm/flags fingerprints, not private
+key-file bytes or all metadata of unrelated keys. Full byte comparisons apply to
+the controlled sentinels; no authority to mutate unrelated objects was assumed.
+Process termination does not prove power-loss recovery or secure memory erasure.
+
+### Modified-file inventory and recommendation
+
+The feasibility-only inventory is:
+
+- `WINDOWS_MTLS_FEASIBILITY.md`: this investigation, evidence, limits and verdict.
+- `WINDOWS_MTLS_CREDENTIAL_DESIGN.md`: current rejection alert; historical proposal retained.
+- `native-schannel/README.md`: new study, raw-memory tradeoff and reproduction.
+- `native-schannel/probe.cpp`: candidate dispatch, provider version, inventory and ownership timing.
+- `native-schannel/reserved-import.hpp`: documented import candidate, exact snapshots, fault injection, format and race controls.
+- `native-schannel/run.py`: candidate selection and independent receipt names/hashes.
+- `native-schannel/collision-study.py`: bounded 28-case driver, validation, inventory comparison and independent public collection.
+- `evidence/windows-cng-collision-20261103.json`: final and earlier public receipts.
+
+Production Runtime, public API, curl, other platforms, workflows, root README and
+the original evidence remain unchanged. The pre-existing case-colliding JSON
+working-tree differences remain excluded. No toolchain, generated private fixture,
+P12, key file, build output or host credential is a deliverable.
+
+**Recommendation: retain the production HOLD.** Neither random names, a pre-open
+check, an application lock that other creators do not honor, nor same-key
+idempotence establishes the required guarantee. The smallest remaining options
+for review are an externally provisioned credential selected through the existing
+store pathway, or a provider-supported atomic persistence operation/provider fix
+whose collision semantics can be demonstrated. Testing another OS/provider is a
+new acceptance investigation, not evidence that upgrading fixes this issue.
+An application-owned namespace enforced by an additional admission mechanism
+would change the design/threat model and needs separate review; none is introduced
+here. The rejected research candidate must not be promoted into production.
+
 ## Native Windows VM verdict, 3 November 2026
 
 **The credential mechanism works for genuine TLS 1.2 mTLS, but the proposed

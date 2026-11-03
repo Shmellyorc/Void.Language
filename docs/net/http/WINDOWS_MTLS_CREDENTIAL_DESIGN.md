@@ -2,6 +2,13 @@
 
 ## Native feasibility correction, 3 November 2026
 
+The [collision follow-up](WINDOWS_MTLS_FEASIBILITY.md#collision-safe-creation-follow-up-3-november-2026)
+also rejects create/set-blob/finalize as an exclusive reservation: two pending
+handles both finalize and the second replaces the first. Immediate raw imports
+reject finalized sentinels but admit multiple successful competing creators.
+Neither alternative establishes unique ownership on the tested Software KSP.
+Production HOLD remains; functional RSA/ECDSA TLS 1.2 and cleanup still pass.
+
 The [Windows VM evidence](WINDOWS_MTLS_FEASIBILITY.md#native-windows-vm-verdict-3-november-2026)
 demonstrates real TLS 1.2 mTLS, but **disproves the no-overwrite ownership
 assumption in the named PKCS#8 import sequence below on Windows 10 build 19045**.

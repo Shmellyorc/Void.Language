@@ -26,6 +26,8 @@ def main():
         'stop-intent','stop-import','stop-finalize','stop-store-unmarked','stop-store-marked','stop-key-unmarked','stop-wrong-marker'])
     parser.add_argument('--algorithm',default='RSA',choices=['RSA','ECDSA'])
     parser.add_argument('--build',default='build')
+    parser.add_argument('--creation',default='pkcs8',choices=['pkcs8','reserved'])
+    parser.add_argument('--study',action='store_true',help='write independent collision-study receipts')
     args=parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     scratch = Path(tempfile.mkdtemp(prefix='fixture-', dir=OUT))
@@ -81,7 +83,8 @@ def main():
         def recovery(intent,operator=False):
             p=subprocess.run([str(executable),'operator-cleanup' if operator else 'recover',str(scratch/intent)],capture_output=True,text=True,timeout=15)
             return {'exit':p.returncode,'records':[json.loads(line) for line in p.stdout.splitlines()]}
-        proc=start('intent.txt',args.mode)
+        selected_mode=('reserved:' if args.creation=='reserved' else '')+args.mode
+        proc=start('intent.txt',selected_mode)
         handshakes=[];recovery_rows=[];second_records=[];second_selector=None
         for line in proc.stdout:
             row = json.loads(line); records.append(row)
@@ -112,7 +115,7 @@ def main():
                 except OSError as error:records.append({'lock_replace_error':error.winerror})
                 recovery_rows.append({'case':'live_owner',**recovery('intent.txt')})
                 if args.mode=='concurrent':
-                    second=start('second-intent.txt','normal')
+                    second=start('second-intent.txt',('reserved:' if args.creation=='reserved' else '')+'normal')
                     for second_line in second.stdout:
                         second_row=json.loads(second_line);second_records.append(second_row)
                         if second_row.get('ready'):second_selector=second_row['selector'];break
@@ -133,18 +136,20 @@ def main():
         if not args.mode.startswith('stop-'):
             recovery_rows.append({'case':'absence_after_cleanup',**recovery('intent.txt')})
         resolved=all(not any(r.get('residual') for r in check['records']) for check in recovery_rows) and recovery_rows[-1]['exit']==0
-        report = {'schema':1, 'fixture':args.algorithm+' synthetic, two-day validity', 'mode':args.mode,
+        report = {'schema':1, 'fixture':args.algorithm+' synthetic, two-day validity', 'mode':args.mode,'creation':args.creation,
                   'probe_exit':rc, 'records':records, 'handshakes':handshakes,'recovery':recovery_rows,'residual':not resolved,
                   'second_owner_records':second_records,
                   'probe_source_sha256':hashlib.sha256((Path(__file__).parent/'probe.cpp').read_bytes()).hexdigest(),
+                  'import_source_sha256':hashlib.sha256((Path(__file__).parent/'reserved-import.hpp').read_bytes()).hexdigest(),
                   'probe_binary_sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),
                   'peer_binary_sha256':hashlib.sha256((OUT/args.build/'peer-client.exe').read_bytes()).hexdigest()}
         (OUT/'initial-result.json').write_text(json.dumps(report, indent=2)+'\n')
-        (OUT/f'{args.build}-{args.mode}-{args.algorithm}.json').write_text(json.dumps(report, indent=2)+'\n')
+        receipt_case=('collision-study-' if args.study else '')+('reserved-' if args.creation=='reserved' else '')+args.mode
+        (OUT/f'{args.build}-{receipt_case}-{args.algorithm}.json').write_text(json.dumps(report, indent=2)+'\n')
         print(json.dumps(report, indent=2))
         if args.mode.startswith('stop-'):
             return 0 if resolved and recovery_rows[0]['exit']==3 else 1
-        if args.mode in ('collision','deferred-collision'):
+        if args.creation=='pkcs8' and args.mode in ('collision','deferred-collision'):
             return 0 if rc==1 and resolved else 1
         good=rc==0 and resolved
         for h in handshakes:

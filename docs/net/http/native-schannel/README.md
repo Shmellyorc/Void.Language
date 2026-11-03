@@ -1,5 +1,49 @@
 # Standalone native Schannel feasibility probes
 
+## Collision follow-up, 3 November 2026
+
+`--creation reserved` is a **rejected research candidate**, not a corrected
+production owner. It exercises Microsoft's documented persisted import sequence:
+`NCryptCreatePersistedKey`, properties including a raw private blob, then
+`NCryptFinalizeKey`. Already finalized same-key and different-key objects reject
+creation, but two pending handles can both finalize under the same name. Never
+treat the first handle as an exclusive reservation.
+
+The candidate adds an unnamed, ephemeral bridge key with temporary export policy
+**3** to convert encrypted PKCS#8 to a bounded raw RSA/ECC private blob in zeroing
+memory. This is an additional research tradeoff, not an approved production
+change. Its final persistent key still has export policy zero. The original
+encrypted-only bridge remains the default and its prior receipts are unchanged.
+
+After building both profiles below, run the independent study:
+
+```powershell
+python docs/net/http/native-schannel/collision-study.py --run
+```
+
+The study records security rejection separately from working TLS. Reserved-path
+collision probes deliberately exit **1** after recording both successful racing
+finalizations and changed public identity; the study requires that exact failure
+and verified cleanup. It also compares named PKCS#8/raw imports, runs eight rounds
+of eight competing immediate raw imports, checks creation/finalization errors,
+repeats RSA/ECDSA TLS 1.2 and interruption recovery, and compares read-only
+CurrentUser key-name/algorithm/flags inventories and certificate-store DER hashes.
+Inventory fingerprints avoid publishing unrelated key/store names. They do not
+prove private-key file bytes or metadata of unrelated objects were unchanged.
+
+New files use `collision-study-` receipt names. Earlier study attempts are copied
+to public `earlier-...json` receipts before another run replaces their case file.
+`collision-study.py` without `--run` validates existing final receipts and writes
+`evidence/windows-cng-collision-20261103.json`. Original `collect.py` and its
+baseline receipt remain historical; do not regenerate them with modified source.
+
+Snapshots retain public blobs, owner markers, private-export return codes and
+SHA-256 fingerprints in this order: name, unique name, algorithm, length, key
+type, export policy, usage, DACL. Equality is checked on actual property bytes
+before hashing. Failure controls free an unfinalized handle and require exact
+reopen failure. Race cleanup targets only keys all created by this invocation;
+that fixture authority is not evidence of exclusive production ownership.
+
 These programs are research fixtures, never production initialization or a
 credential-management library. They create explicitly disclosed, disposable,
 non-exportable **persistent CurrentUser test keys** and private certificate

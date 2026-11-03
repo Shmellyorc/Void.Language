@@ -12,6 +12,9 @@
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
+#include <algorithm>
+#include <atomic>
+#include <thread>
 
 static void result(const char* op, ULONG status) {
   printf("{\"operation\":\"%s\",\"status\":\"0x%08lX\"}\n", op, status); fflush(stdout);
@@ -113,6 +116,7 @@ struct Owner {
     if(live_lock!=INVALID_HANDLE_VALUE){CloseHandle(live_lock);live_lock=INVALID_HANDLE_VALUE;}
   }
 };
+#include "reserved-import.hpp"
 // This is an experiment-specific recovery probe, not a production journal parser.
 // It accepts only a bounded nonce/public-key/certificate receipt generated here.
 static int recover(const wchar_t* path,bool operator_cleanup){
@@ -154,13 +158,27 @@ static int recover(const wchar_t* path,bool operator_cleanup){
   o.owned_key=key_present;o.owned_store=store_present;o.cleanup();return o.owned_key||o.owned_store?5:0;
 }
 int wmain(int argc,wchar_t** argv){
+  if(argc==2&&wcscmp(argv[1],L"inventory")==0){
+    try{
+      Owner inventory;require("inventory_provider",NCryptOpenStorageProvider(&inventory.provider,MS_KEY_STORAGE_PROVIDER,0));
+      void* state=nullptr;NCryptKeyName* item=nullptr;SECURITY_STATUS s=0;std::vector<std::string> rows;
+      while(!(s=NCryptEnumKeys(inventory.provider,nullptr,&item,&state,0))){
+        std::wstring value=item->pszName;value+=L"|";value+=item->pszAlgid;value+=L"|"+std::to_wstring(item->dwLegacyKeySpec)+L"|"+std::to_wstring(item->dwFlags);
+        rows.push_back(digest(reinterpret_cast<const BYTE*>(value.data()),static_cast<DWORD>(value.size()*sizeof(wchar_t))));NCryptFreeBuffer(item);item=nullptr;
+      }
+      if(state)NCryptFreeBuffer(state);require("inventory_enum_end",s==NTE_NO_MORE_ITEMS?0:s);std::sort(rows.begin(),rows.end());
+      for(auto& row:rows)printf("{\"key_inventory_sha256\":\"%s\"}\n",row.c_str());
+      printf("{\"key_count\":%zu}\n",rows.size());return 0;
+    }catch(const std::exception& e){printf("{\"failure\":\"%s\"}\n",e.what());return 1;}
+  }
   if(argc<3||argc>4)return 2; Owner o;
   if(wcscmp(argv[1],L"recover")==0||wcscmp(argv[1],L"operator-cleanup")==0){
     try{return recover(argv[2],wcscmp(argv[1],L"operator-cleanup")==0);}catch(const std::exception& e){printf("{\"failure\":\"%s\"}\n",e.what());return 1;}}
   mode=argc==4?argv[3]:L"normal";
-  bool deferred=argc<4||wcscmp(argv[3],L"immediate")!=0;
-  bool deferred_collision=argc==4&&wcscmp(argv[3],L"deferred-collision")==0;
-  bool test_collision=deferred_collision||(argc==4&&wcscmp(argv[3],L"collision")==0);
+  bool reserved=mode.rfind(L"reserved:",0)==0;if(reserved)mode.erase(0,9);
+  bool deferred=reserved||mode!=L"immediate";
+  bool deferred_collision=mode==L"deferred-collision";
+  bool test_collision=deferred_collision||mode==L"collision";
   try{
     // Password arrives over a pipe, never argv, environment, receipt or file.
     std::string password; std::getline(std::cin,password);
@@ -224,10 +242,15 @@ int wmain(int argc,wchar_t** argv){
     DWORD written=0;BOOL journal_ok=WriteFile(journal,metadata.data(),static_cast<DWORD>(metadata.size()),&written,nullptr)&&written==metadata.size()&&FlushFileBuffers(journal);CloseHandle(journal);wincheck("intent_flush",journal_ok);
     checkpoint(L"intent");
     require("provider_open",NCryptOpenStorageProvider(&o.provider,MS_KEY_STORAGE_PROVIDER,0));
+    auto provider_version=property(o.provider,NCRYPT_VERSION_PROPERTY);
+    printf("{\"software_ksp_version\":%lu}\n",*reinterpret_cast<DWORD*>(provider_version.data()));
+    Secret raw;
+    if(reserved)prepare_raw_import(o.provider,exported,secret,o.temporary,raw);
     NCryptBuffer named{static_cast<ULONG>((o.name.size()+1)*sizeof(wchar_t)),NCRYPTBUFFER_PKCS_KEY_NAME,o.name.data()};
     NCryptBuffer params[]{named,secret};NCryptBufferDesc desc{NCRYPTBUFFER_VERSION,2,params};
-    SECURITY_STATUS s=NCryptImportKey(o.provider,0,NCRYPT_PKCS8_PRIVATE_KEY_BLOB,&desc,&o.key,exported.v.data(),n,deferred?NCRYPT_DO_NOT_FINALIZE_FLAG:0);
-    if(!s)o.owned_key=true;require(deferred?"named_import_deferred":"named_import_immediate",s);
+    SECURITY_STATUS s=reserved?create_import_handle(o.provider,o.temporary,o.name,raw,&o.key):
+      NCryptImportKey(o.provider,0,NCRYPT_PKCS8_PRIVATE_KEY_BLOB,&desc,&o.key,exported.v.data(),n,deferred?NCRYPT_DO_NOT_FINALIZE_FLAG:0);
+    if(!s&&!reserved)o.owned_key=true;require(reserved?"candidate_import_prepared":deferred?"named_import_deferred":"named_import_immediate",s);
     checkpoint(L"import");
     if(!deferred){auto initial=property(o.key,NCRYPT_EXPORT_POLICY_PROPERTY);
       printf("{\"immediate_import_export_policy\":%lu}\n",*reinterpret_cast<DWORD*>(initial.data()));
@@ -246,7 +269,7 @@ int wmain(int argc,wchar_t** argv){
       if(mode==L"stop-wrong-marker")random[0]^=1;
     }
     reopened=0;s=NCryptOpenKey(o.provider,&reopened,o.name.c_str(),0,0);result("open_after_marker_before_finalize",s);if(reopened)NCryptFreeObject(reopened);
-    if(deferred)require("finalize",NCryptFinalizeKey(o.key,0));
+    if(deferred){s=NCryptFinalizeKey(o.key,0);if(!s&&reserved)o.owned_key=true;require("finalize",s);}
     checkpoint(L"finalize");
     checkpoint(L"key-unmarked");checkpoint(L"wrong-marker");
     require("key_reopen",NCryptOpenKey(o.provider,&reopened,o.name.c_str(),0,0));
@@ -263,7 +286,8 @@ int wmain(int argc,wchar_t** argv){
     if(!plain_status||!encrypted_status)throw std::runtime_error("final private export allowed");
     NCryptFreeObject(reopened);
     require("marker_after_finalize",NCryptSetProperty(o.key,L"VOID-SCHANNEL-TEST-OWNER",random,sizeof random,NCRYPT_PERSIST_FLAG|NCRYPT_PERSIST_ONLY_FLAG));
-    if(test_collision){
+    if(test_collision&&reserved)reserved_collision_gate(o,o.temporary,raw,random,exported,secret);
+    if(test_collision&&!reserved){
     // Different synthetic key material prevents idempotent same-key import from
     // being confused with protection of an unrelated credential.
     Owner sentinel;sentinel.name=o.name+L"-sentinel";
@@ -321,7 +345,7 @@ int wmain(int argc,wchar_t** argv){
     require("key_reopen_after_close",NCryptOpenKey(o.provider,&o.key,o.name.c_str(),0,0));
     if(o.temporary && o.free_temp)NCryptFreeObject(o.temporary);o.temporary=0;
     CertFreeCertificateContext(o.cert);o.cert=nullptr;wincheck("staging_release",CertCloseStore(o.staging,CERT_CLOSE_STORE_CHECK_FLAG));o.staging=0;
-    exported.wipe();bridge.wipe();input.wipe();
+    exported.wipe();bridge.wipe();input.wipe();raw.wipe();
     printf("{\"ready\":true,\"selector\":\"CurrentUser\\\\%s\\\\%s\"}\n",("VOID-SCHANNEL-TEST-STORE-"+nonce).c_str(),hex(sha1,20).c_str());fflush(stdout);
     std::string command;std::getline(std::cin,command);if(!command.empty()&&command.back()=='\r')command.pop_back();
     if(command!="cleanup")throw std::runtime_error("control closed");
