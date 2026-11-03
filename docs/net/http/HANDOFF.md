@@ -1,5 +1,34 @@
 # Golden Wrench HTTP implementation and evidence handoff
 
+## Windows security adapter follow-up, 3 November 2026
+
+The [adapter feasibility report](WINDOWS_TLS_ADAPTER_FEASIBILITY.md), baseline
+`5bf1c514cb9c6a52d00a1ee359d5c54af762e8ec`, establishes Windows chain-policy
+verification and exact non-exportable software CNG RSA/ECDSA signing inside one
+AWS-LC transport in Debug/Release. Independent mechanisms precede combined TLS
+1.2/1.3 controls. [Public evidence](evidence/windows-awslc-adapters-20261103.json)
+contains 82 TLS observations and two read-only public-anchor controls: 78 valid
+functional/limitation controls, two inconclusive original proxy controls and
+**two failed identity privacy assertions**. These are not 84 security passes.
+
+**Retain Schannel for the full Windows production contract.** The prototype's
+origin store identity reached a requesting HTTPS proxy. Public curl SSL-context
+metadata also cannot establish the authoritative IP peer/connection role;
+AWS-LC async verification/key retries fail in pinned curl, and synchronous native
+verification overran the configured 100 ms curl deadline. The report identifies
+the exact missing peer-context, retry/wakeup and Runtime lifetime work. This
+rejects the current integration without weakening verification or silently
+reducing store capabilities. No provider migration or vendor patch is approved.
+
+Only disposable owned keys/stores were provisioned; native use leaves their
+public metadata unchanged, and final inventories restore the pre-existing key
+and eight CurrentUser stores. The original AIA public-intermediate cache delta,
+exact cleanup receipts, fixture failures and invalid proxy control remain
+visible. No private material, production/API/platform/CI change or compiler
+build is included. Strict/memory, Server 2022, hardware/CAPI and full Runtime
+acceptance remain open. The Boss explicitly authorized this feasibility-only
+commit/push with `[skip ci]`; stop for Golden Wrench review afterwards.
+
 ## Windows in-memory TLS follow-up, 3 November 2026
 
 The [provider architecture review](WINDOWS_TLS_PROVIDER_REVIEW.md), baseline

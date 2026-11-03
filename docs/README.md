@@ -1,5 +1,16 @@
 # VOID documentation
 
+## Windows AWS-LC security adapter feasibility, 3 November 2026
+
+[Native verification and store-signing investigation](net/http/WINDOWS_TLS_ADAPTER_FEASIBILITY.md)
+confirms Windows chain-policy callbacks and non-exportable RSA/ECDSA CNG mTLS
+with one AWS-LC backend. The public-hook integration is rejected: it disclosed
+the origin identity to a requesting HTTPS proxy and lacks complete peer-context,
+retry and deadline integration. Debug/Release evidence preserves the failed
+privacy assertions and original inconclusive controls. Retain Schannel for the
+full Windows contract; no production migration. Stop for Golden Wrench review
+after the explicitly authorized feasibility-only commit/push.
+
 ## Windows in-memory TLS provider research, 3 November 2026
 
 [Windows AWS-LC architecture review](net/http/WINDOWS_TLS_PROVIDER_REVIEW.md)

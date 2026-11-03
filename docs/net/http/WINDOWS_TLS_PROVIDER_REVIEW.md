@@ -3,6 +3,13 @@
 3 November 2026. Baseline `51e7ff6f8c202db56fc0a317b87d73ddb10972d9`;
 LLVM/Clang/LLD 23.1.4. Architecture research and isolated native evidence only.
 
+**Subsequent adapter evidence:** the [native security integration investigation](WINDOWS_TLS_ADAPTER_FEASIBILITY.md)
+proves bounded Windows verification/CNG signing but rejects the public-hook
+integration after an origin identity reached a requesting HTTPS proxy. IP peer
+context, AWS-LC async retry and Runtime deadline/lifetime integration also remain
+unresolved. Its current recommendation is to retain Schannel for the full Windows
+contract; the conditional proposal below is historical, not migration approval.
+
 **AWS-LC is practical for in-memory Windows P12 authentication, including TLS
 1.3 on this Windows 10 VM. It is not an unchanged, security-equivalent replacement
 for Schannel.** Its default revocation behavior and Windows store identity support
