@@ -140,9 +140,12 @@ int main(int argc,char** argv) {
             request.body=Request::bytes;request.data=std::string(8388608,'d');
             request.auth.kind=Authentication::digest;request.auth.user="user";request.auth.password="password";
             RequestOptions timed;timed.header_timeout_ms=20;timed.write_timeout_ms=0;timed.total_timeout_ms=5000;timed.max_buffer_bytes=1024;
-            auto pending=driver.send(tls,request,timed);get("/digest-seen");
+            auto pending=driver.send(tls,request,timed);auto seen_start=Clock::now();
+            auto seen=get("/digest-seen");report("digest-seen",seen,seen_start);
+            require(seen.error.kind==ErrorKind::success,"authenticated body barrier");
             std::this_thread::sleep_for(std::chrono::milliseconds(60));
-            auto start=Clock::now();require(get("/digest-release").error.kind==ErrorKind::success,"release authenticated body");
+            auto start=Clock::now();auto released=get("/digest-release");report("digest-release",released,start);
+            require(released.error.kind==ErrorKind::success,"release authenticated body");
             report("digest-upload",pending->take(),start);driver.close(tls)->take();
         }
         driver.close(client)->take();

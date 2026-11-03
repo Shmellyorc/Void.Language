@@ -74,6 +74,17 @@ cancellation-to-drain; no hard real-time return guarantee or total RSS ceiling i
 claimed. The 512 MiB native admission budget remains provisional pending the
 complete provider audit.
 
+Windows retains Schannel. Use `client_identity.windows_store(reference)` for an
+explicit caller-provisioned certificate and associated private key. References
+have the form `location\store\40-hex-thumbprint`, with an unseparated SHA-1
+thumbprint in either hexadecimal case; for example, location `CurrentUser` and
+store `MY`. The caller provisions and retains the credential through client/pool
+cleanup; VOID never deletes it or chooses a default identity. Windows supplied
+PEM/P12 returns `unsupported` during preparation, with no import, persistence or
+fallback. Linux/macOS supplied-P12 behavior is preserved. See the
+[native acceptance and complete selector formats](WINDOWS_SCHANNEL_ACCEPTANCE.md)
+for tested providers and the separate hosted/strict limitations.
+
 DNS uses c-ares with finite cache capacity/TTL; capacity eviction can precede TTL.
 Response queues use fixed bounded rings. Headers, trailers, cookies, snapshots,
 decoding and response publication have separate finite limits described in the

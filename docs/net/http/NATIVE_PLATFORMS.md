@@ -1,5 +1,12 @@
 # Native platform recipes and acceptance boundary
 
+The [3 November Windows repair](WINDOWS_SCHANNEL_ACCEPTANCE.md) adds actual
+Windows 10 VM Debug/Release public-store mTLS and focused HTTP/URL/source/install
+evidence. Schannel supports explicitly provisioned store identities in that tested
+scope; supplied P12/PEM is unsupported without a persistence fallback. Windows
+Server 2022 hosted acceptance, supported strict and full memory certification
+remain separate. The earlier Linux-host checkpoint below retains its date/scope.
+
 The Linux x86_64 implementation has actual local Debug, Release and strict
 execution receipts. Native Windows and macOS recipes and adapter code are
 implemented but **unexecuted on this Linux host**. This is an acceptance gap,
@@ -14,10 +21,11 @@ exclusion or portable delivery acceptance has been approved.
 
 The native macOS recipe reuses the exact already selected AWS-LC revision and
 archive checksum. It does not introduce a different TLS release or source fix.
-Only Linux has an executed backend acceptance record. Windows identity supports
-P12 and an explicit `location\store\40-hex-thumbprint` reference; PEM remains an
-explicit unsupported case. Automatic client-certificate selection is disabled.
-Store lookup and P12 parsing require real Schannel verification before acceptance.
+Windows identity uses an explicit `location\store\40-hex-thumbprint` reference;
+supplied P12 and PEM return unsupported before file access or key import.
+Automatic client-certificate selection is disabled. Caller-managed CurrentUser
+software-CNG RSA/ECDSA store identities now have native source acceptance;
+hardware, other locations and hosted acceptance retain their own proof gates.
 
 Use the existing LLVM SDK setup and native platform prerequisites first, then:
 

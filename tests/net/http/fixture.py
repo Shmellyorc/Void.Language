@@ -1,5 +1,6 @@
 """Loopback-only native HTTP integration fixture; no external service required."""
 import argparse
+import contextlib
 import base64
 import gzip
 import hashlib
@@ -390,6 +391,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     part = min(size, len(block)); self.wfile.write(block[:part]); size -= part
             except (BrokenPipeError, ConnectionResetError, ssl.SSLError):
                 pass
+        elif path == "/store-shutdown":
+            self.send_response(200); self.send_header("Content-Length", "20"); self.end_headers()
+            self.wfile.write(b"first"); self.wfile.flush()
+            assert self.server.store_shutdown.wait(30), 'Runtime did not drain the held TLS body'
         elif path == "/slow":
             self.send_response(200); self.send_header("Content-Length", "8"); self.end_headers(); self.wfile.flush()
             release.wait(5)
@@ -422,11 +427,16 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]
     args.evidence.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="VOID HTTP native ") as temporary:
+    with tempfile.TemporaryDirectory(prefix="VOID HTTP native ") as temporary, contextlib.ExitStack() as owned:
         work = Path(temporary)
+        openssl = certificate_tool(args.binary, args.certificate_tool)
+        windows = None
+        if os.name == 'nt':
+            from windows_identity import WindowsIdentities
+            windows = owned.enter_context(WindowsIdentities(args.binary.resolve().parent / 'void_http_windows_identity.exe',
+                                                           work, openssl, args.evidence))
         (work / "openssl.cnf").write_text("[req]\ndistinguished_name = dn\nx509_extensions = extensions\n[dn]\n"
             "[extensions]\nsubjectAltName = DNS:localhost,IP:127.0.0.1\nbasicConstraints = critical,CA:TRUE\n", encoding="ascii")
-        openssl = certificate_tool(args.binary, args.certificate_tool)
         generated = subprocess.run([str(openssl), "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1",
             "-config", str(work / "openssl.cnf"),
             "-keyout", str(work / "key.pem"), "-out", str(work / "cert.pem"), "-subj", "/CN=localhost"], capture_output=True)
@@ -440,6 +450,12 @@ def main():
                                  '-passin', 'pass:integration', '-noout'], capture_output=True)
         (args.evidence / 'pkcs12-parse.stderr').write_bytes(parsed.stderr)
         assert parsed.returncode == 0, 'generated P12 must authenticate and parse'
+        windows_client = windows.provision('store-rsa', 'RSA') if windows else None
+        if windows:
+            wrong_password = subprocess.run([str(openssl), 'pkcs12', '-in', str(work / 'identity.p12'),
+                '-passin', 'pass:incorrect', '-noout'], capture_output=True)
+            (args.evidence / 'pkcs12-wrong-password.stderr').write_bytes(wrong_password.stderr)
+            assert wrong_password.returncode != 0, 'P12 wrong-password regression remains a real parser rejection'
         server = Server(("127.0.0.1", 0), Handler)
         secure = Server(("127.0.0.1", 0), Handler)
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -447,9 +463,13 @@ def main():
         secure.socket = context.wrap_socket(secure.socket, server_side=True)
         mutual = MutualServer(("127.0.0.1", 0), Handler)
         mutual.tls_events = []
+        mutual.store_shutdown = threading.Event()
         mutual.expected_client = hashlib.sha256(ssl.PEM_cert_to_DER_cert((work / 'cert.pem').read_text())).hexdigest()
+        if windows_client:
+            mutual.expected_client = windows_client['sha256']
         # Retain public certificate evidence only; never export a private key.
-        (args.evidence / 'mutual-certificate.pem').write_bytes((work / 'cert.pem').read_bytes())
+        (args.evidence / 'mutual-certificate.pem').write_bytes(
+            (work / ('store-rsa.pem' if windows_client else 'cert.pem')).read_bytes())
         mutual_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         mutual_context.load_cert_chain(work / "cert.pem", work / "key.pem")
         mutual_context.load_verify_locations(work / "cert.pem")
@@ -477,7 +497,7 @@ def main():
             argv = [str(args.binary.resolve()), f"http://127.0.0.1:{server.server_port}",
                 f"https://127.0.0.1:{secure.server_port}", str(work / "cert.pem")]
             argv.extend([f"https://127.0.0.1:{h2_server.server_address[1]}" if h2_server else "-",
-                f"https://127.0.0.1:{mutual.server_port}", str(work / "cert.pem"), str(work / "key.pem"), str(work / "identity.p12"), str(work),
+                f"https://127.0.0.1:{mutual.server_port}", windows_client['reference'] if windows_client else str(work / "cert.pem"), str(work / "key.pem"), str(work / "identity.p12"), str(work),
                 f"http://127.0.0.1:{forward.server_port}", f"https://127.0.0.1:{tls_proxy.server_port}", str(socks.server_address[1])])
             if args.gdb:
                 argv = ["timeout", "--signal=INT", "--preserve-status", "5", "gdb", "-q", "-batch",
@@ -525,9 +545,12 @@ def main():
                 "h2_retry_events": h2_retry_events,
                 "scope": "loopback native transport; not complete source/platform acceptance"}, indent=2) + "\n")
             assert status == 0 and not timed_out, (status, (args.evidence / "native.stderr").read_text())
-            assert 'curl provider error 58:' in (args.evidence / 'native.stderr').read_text(), 'P12 rejection must retain provider diagnostics'
+            if windows:
+                assert 'Schannel supplied-P12 unsupported before provider' in (args.evidence / 'native.stderr').read_text()
+            else:
+                assert 'curl provider error 58:' in (args.evidence / 'native.stderr').read_text(), 'P12 rejection must retain provider diagnostics'
             identities = [event for event in mutual.tls_events if event['event'] == 'authenticated']
-            assert len(identities) == (1 if os.name == 'nt' else 2), mutual.tls_events
+            assert len(identities) == 2, mutual.tls_events
             assert all(event['client_sha256'] == mutual.expected_client for event in identities), mutual.tls_events
             assert any(event['event'] == 'handshake_failed' for event in mutual.tls_events), 'peer must reject anonymous client'
             assert not keylog_created, "Inherited key logging wrote a file during the native TLS fixture"
@@ -544,6 +567,7 @@ def main():
             assert 3 in socks_addresses and (1 in socks_addresses or 4 in socks_addresses), "SOCKS local and remote DNS were not both exercised"
             print((args.evidence / "native.stdout").read_text(), end="")
         finally:
+            mutual.store_shutdown.set()
             server.shutdown(); secure.shutdown(); server.server_close(); secure.server_close()
             mutual.shutdown(); mutual.server_close()
             (args.evidence / 'mutual-peer.json').write_text(json.dumps({

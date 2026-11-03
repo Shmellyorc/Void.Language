@@ -1,5 +1,16 @@
 # VOID documentation
 
+## Windows Schannel store-identity repair, 3 November 2026
+
+[Scoped native acceptance](net/http/WINDOWS_SCHANNEL_ACCEPTANCE.md) records genuine
+public-source RSA/ECDSA mTLS through explicit caller-provisioned Windows stores,
+normal/O2 JIT/AOT, ownership, cancellation and active Runtime shutdown. Effective
+focused Debug/Release acceptance is 34/34 with original failures retained.
+Windows supplied P12 is explicitly unsupported and no longer advertised; Linux/
+macOS P12 behavior is unchanged. No key persistence or provider migration.
+Unstaged engineering candidate; stop for Golden Wrench review. Boss controls Git
+and the separate Windows Server 2022/seven-job hosted acceptance.
+
 ## Windows AWS-LC security adapter feasibility, 3 November 2026
 
 [Native verification and store-signing investigation](net/http/WINDOWS_TLS_ADAPTER_FEASIBILITY.md)

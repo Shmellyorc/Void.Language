@@ -1294,7 +1294,10 @@ Error client_error(ClientOptions& options) {
         return {ErrorKind::invalid_argument, Phase::prepare};
     if (options.tls.identity < TlsOptions::none || options.tls.identity > TlsOptions::windows_store) return {ErrorKind::invalid_argument, Phase::prepare};
 #ifdef _WIN32
-    if (options.tls.identity == TlsOptions::pem) return {ErrorKind::unsupported, Phase::prepare};
+    // Schannel cannot use the required non-persistent supplied private key in
+    // its external handshake path. Never import/persist or select a fallback.
+    if (options.tls.identity == TlsOptions::pem || options.tls.identity == TlsOptions::pkcs12)
+        return {ErrorKind::unsupported, Phase::prepare};
     if (options.tls.identity == TlsOptions::windows_store) {
         const auto& reference = options.tls.certificate;
         const auto first = reference.find('\\');

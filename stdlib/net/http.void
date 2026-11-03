@@ -165,9 +165,9 @@ enum client_identity:
     none
     ## Regular PEM certificate chain/key paths and explicit key password.
     pem(certificate: string, key: string, password: string)
-    ## Regular PKCS#12 identity path and import password.
+    ## Regular PKCS#12 identity path/password. Unsupported with Windows Schannel; no persistence fallback.
     pkcs12(path: string, password: string)
-    ## Native Windows location\store\40-hex-thumbprint reference; other backends return unsupported.
+    ## Explicit caller-provisioned Windows location\store\40-hex-thumbprint; VOID never deletes its key. Other backends return unsupported.
     windows_store(reference: string)
 
 

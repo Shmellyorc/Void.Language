@@ -508,6 +508,39 @@ void http_runtime_cases(const std::string& base, const std::string& directory, s
     }
     std::cout << "Actual HTTP Runtime driver, single-worker file producer and activation cleanup passed\n";
 }
+#ifdef _WIN32
+void http_store_runtime_shutdown(const std::string& base, const std::string& ca, const std::string& reference) {
+    Runtime runtime(256); runtime.async_worker_limit(1);
+    Runtime::Attachment attached(runtime); Runtime::Managed managed(runtime);
+    void* identity = nullptr; constexpr std::size_t zero = 0;
+    Runtime::Slot slot{&identity, sizeof(identity), &zero, 1}; Runtime::Frame roots(runtime, &slot, 1);
+    runtime.allocate_into(&identity, {1, {}});
+    ClientOptions options; options.tls.ca_bundle = ca; options.tls.identity = TlsOptions::windows_store;
+    options.tls.certificate = reference; Error error;
+    auto owner = open_client_resource(runtime, identity, options, error);
+    require(bool(owner), "store-backed Runtime client acquisition");
+    auto& driver = owner->provider->driver(); std::shared_ptr<Transfer> transfer;
+    {
+        Runtime::Native safe(runtime); Request request; request.target = base + "/store-shutdown";
+        transfer = driver.start(owner->client, request, {}, error);
+        require(bool(transfer), "store-backed Runtime transfer acquisition");
+        auto headers = driver.response(transfer)->take();
+        require(headers.error.kind == ErrorKind::success && headers.info && headers.info->status == 200,
+            "store-backed Runtime authenticated response before shutdown");
+        auto prefix = driver.read(transfer, 1)->take();
+        require(prefix.error.kind == ErrorKind::success && prefix.bytes == "f", "held authenticated TLS body before shutdown");
+    }
+    identity = nullptr;
+    {
+        Runtime::Native safe(runtime);
+        require(!runtime.close(), "Runtime shutdown drains active store-backed TLS");
+        require(driver.finish(transfer)->take().error.kind == ErrorKind::closed, "Runtime shutdown cancels held store TLS");
+    }
+    transfer.reset(); owner.reset(); // Release this test's native observer leases too.
+    require(runtime.memory_snapshot().handles == 0, "store-backed Runtime shutdown releases managed handles");
+    std::cout << "Runtime shutdown drained an authenticated Windows store TLS body\n";
+}
+#endif
 
 void http_h2_backpressure_cases(const std::string& base, const std::string& certificate) {
     Driver driver; Error error; ClientOptions config;

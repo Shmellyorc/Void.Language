@@ -1,5 +1,17 @@
 # Current HTTP engineering
 
+## Current Windows delivery — 3 November 2026
+
+[Schannel store-identity acceptance repair](WINDOWS_SCHANNEL_ACCEPTANCE.md)
+implements the Boss-approved Windows capability boundary: caller-provisioned
+explicit store identities, supplied P12 unsupported before provider work, no
+persistence/fallback, unchanged Linux/macOS P12. Actual native public-source
+RSA/ECDSA, normal/O2 JIT/AOT, GC/lifetime and focused regressions have effective
+Debug/Release acceptance of 34/34. Original failures remain in evidence. This
+supersedes the Windows capability statements in older checkpoints below, not
+their historical results. Unstaged; independent review and hosted Server 2022 /
+seven-job acceptance remain pending. [Exact handoff](HANDOFF.md).
+
 31 October 2026 UTC (30 October local). LLVM/Clang/LLD 23.1.4, baseline
 `15f7868b0af177f8f7d49c548392c79c7bd921d2`.
 **Architecture GO. Linux implementation and local verification are ready for

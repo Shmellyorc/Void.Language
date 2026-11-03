@@ -1,0 +1,66 @@
+use net/http
+
+func settings(reference: string, ca: string) -> http.client_options:
+    return http.client_options(tls = http.tls_options(trust = http.trust_source.pem_bundle(ca),
+        identity = http.client_identity.windows_store(reference)))
+
+@ASYNC@func rejected(reference: string) -> result<bool, http.error>:
+    with http.open_client(settings(reference, "@CA@"))? as owner:
+        if (@AWAIT@owner.get@SUFFIX@("@RSA@/must-not-authenticate")) is Err(var failure):
+            return Ok(failure.kind is http.error_kind.tls_failure)
+    return Ok(false)
+
+@ASYNC@func suite() -> result<bool, http.error>:
+    var caps = http.capabilities()
+    if caps.tls_backend != "Schannel" or caps.client_identity_forms.count != 1 or caps.client_identity_forms[0] != "windows_store":
+        return Ok(false)
+    for password in ["integration", "incorrect"]:
+        var unsupported = http.client_options(tls = http.tls_options(identity = http.client_identity.pkcs12("@P12@", password)))
+        if http.open_client(unsupported) is Err(var failure):
+            if not (failure.kind is http.error_kind.unsupported) or not (failure.phase is http.failure_phase.prepare):
+                return Ok(false)
+        else:
+            return Ok(false)
+    for reference in ["not-a-store", "CurrentUser\\MY\\XYZ", "CurrentUser\\bad/path\\0000000000000000000000000000000000000000"]:
+        if http.open_client(settings(reference, "@CA@")) is Err(var failure):
+            if not (failure.kind is http.error_kind.invalid_argument):
+                return Ok(false)
+        else:
+            return Ok(false)
+    if not (@AWAIT@rejected("@MISSING_STORE@"))? or not (@AWAIT@rejected("@MISSING_CERT@"))? or not (@AWAIT@rejected("@UNUSABLE@"))?:
+        return Ok(false)
+    with http.open_client(http.client_options(tls = http.tls_options(trust = http.trust_source.pem_bundle("@CA@"))))? as anonymous:
+        if (@AWAIT@anonymous.get@SUFFIX@("@RSA@/anonymous")) is Ok(var unexpected):
+            return Ok(false)
+    with http.open_client(settings("@ECDSA@", "@CA@"))? as wrong_identity:
+        if (@AWAIT@wrong_identity.get@SUFFIX@("@RSA@/wrong-identity")) is Ok(var unexpected):
+            return Ok(false)
+    with http.open_client(settings("@RSA_REF@", "@WRONG_CA@"))? as wrong_root:
+        if (@AWAIT@wrong_root.get@SUFFIX@("@RSA@/wrong-root")) is Err(var failure):
+            if not (failure.kind is http.error_kind.tls_verification):
+                return Ok(false)
+        else:
+            return Ok(false)
+    with http.open_client(settings("@RSA_REF@", "@CA@"))? as wrong_host:
+        if (@AWAIT@wrong_host.get@SUFFIX@("@WRONG_HOST@/wrong-host")) is Err(var failure):
+            if not (failure.kind is http.error_kind.tls_verification):
+                return Ok(false)
+        else:
+            return Ok(false)
+    with http.open_client(settings("@RSA_REF@", "@CA@"))? as first:
+        with http.open_client(settings("@ECDSA@", "@CA@"))? as second:
+            var rsa_first = (@AWAIT@first.get@SUFFIX@("@RSA@/first"))?
+            var ec_first = (@AWAIT@second.get@SUFFIX@("@EC@/first"))?
+            var rsa_reuse = (@AWAIT@first.get@SUFFIX@("@RSA@/reuse"))?
+            var ec_reuse = (@AWAIT@second.get@SUFFIX@("@EC@/reuse"))?
+            if rsa_first.text()? != "authenticated" or ec_first.text()? != "authenticated" or rsa_reuse.info.status != 200 or ec_reuse.info.status != 200:
+                return Ok(false)
+            var closed = (@AWAIT@first.close@SUFFIX@())?
+            var surviving = (@AWAIT@second.get@SUFFIX@("@EC@/after-other-close"))?
+            if surviving.text()? != "authenticated":
+                return Ok(false)
+    with http.open_client(settings("@RSA_REF@", "@CA@"))? as cancellation:
+        @CANCELLATION@
+    return Ok(true)
+
+@ENTRY@

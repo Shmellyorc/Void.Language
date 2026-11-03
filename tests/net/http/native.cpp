@@ -25,6 +25,9 @@
 
 void http_runtime_cases(const std::string&, const std::string&, std::uint64_t);
 void http_h2_backpressure_cases(const std::string&, const std::string&);
+#ifdef _WIN32
+void http_store_runtime_shutdown(const std::string&, const std::string&, const std::string&);
+#endif
 
 namespace {
 void require(bool condition, const char* context) { if (!condition) throw std::runtime_error(context); }
@@ -275,6 +278,13 @@ int main(int argc, char** argv) {
                 require(!driver.open(options,error) && error.kind == ErrorKind::unsupported,"Schannel PEM identity is explicitly unsupported");
                 continue;
             }
+            for (const auto* password : {"integration", "incorrect"}) {
+                options.tls.password = password;
+                require(!driver.open(options, error) && error.kind == ErrorKind::unsupported && error.phase == Phase::prepare,
+                    "Schannel supplied-P12 is unsupported without persistence or fallback");
+            }
+            std::cerr << "passed: Schannel supplied-P12 unsupported before provider\n";
+            continue;
 #endif
             Request request; request.target = std::string(argv[5]) + "/plain";
             if (identity == TlsOptions::pkcs12) {
@@ -288,6 +298,20 @@ int main(int argc, char** argv) {
             auto result = driver.send(mutual, request, {})->take(); success(result, "explicit mutual TLS identity");
             require(result.bytes.size() == 11, "mutual TLS response"); success(driver.close(mutual)->take(), "mutual TLS close");
         }
+#ifdef _WIN32
+        {
+            ClientOptions options; options.tls.ca_bundle = argv[3]; options.tls.identity = TlsOptions::windows_store;
+            options.tls.certificate = argv[6];
+            auto mutual = driver.open(options, error); require(bool(mutual), "store mutual TLS client acquisition");
+            Request request; request.target = std::string(argv[5]) + "/plain";
+            for (unsigned count = 0; count < 2; ++count) {
+                auto result = driver.send(mutual, request, {})->take(); success(result, "explicit Windows store mutual TLS identity");
+                require(result.info && result.info->status == 200 && result.bytes.size() == 11, "store mutual TLS response");
+            }
+            success(driver.close(mutual)->take(), "store mutual TLS close");
+            http_store_runtime_shutdown(argv[5], argv[3], argv[6]);
+        }
+#endif
         for (int mode = 0; mode < 5; ++mode) {
             ClientOptions options; options.tls.ca_bundle = argv[3]; options.proxy.mode = ProxyOptions::explicit_proxy;
             if (mode < 2) options.proxy.endpoint = argv[10];

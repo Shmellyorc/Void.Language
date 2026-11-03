@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
             runtime->async_worker_limit(1);
             auto module = analysis.program->lower();
             const auto mode = std::string_view(argv[1]);
-            module.async_root = mode == "--async" || mode == "--faults-async";
+            module.async_root = mode == "--async" || mode == "--faults-async" || mode == "--tls-async";
             auto code = jit.compile(module, module.entry_symbol, optimize, {}, runtime);
             if (mode == "--faults" || mode == "--faults-async") {
                 if (code->invoke(7) != 7) throw std::runtime_error("HTTP fault fixture warmup failed");
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
                 if (code->invoke(7) != 7) throw std::runtime_error("HTTP source returned a failed assertion");
             }
             if (!probe.roots_valid || !probe.commits_valid || !probe.frames.empty()) throw std::runtime_error("HTTP precise root/commit imbalance");
-            if (module.async_root && (samples < 4 || maximum - minimum > 524288 || tasks > 64 || handles > 64))
+            if (mode == "--async" && (samples < 4 || maximum - minimum > 524288 || tasks > 64 || handles > 64))
                 throw std::runtime_error("HTTP source pull lifetime window: samples=" + std::to_string(samples) +
                     ", payload=" + std::to_string(minimum) + ".." + std::to_string(maximum) +
                     ", tasks=" + std::to_string(tasks) + ", handles=" + std::to_string(handles));

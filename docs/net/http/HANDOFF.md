@@ -1,5 +1,31 @@
 # Golden Wrench HTTP implementation and evidence handoff
 
+## Windows Schannel acceptance repair, 3 November 2026
+
+[Current source/evidence handoff](WINDOWS_SCHANNEL_ACCEPTANCE.md), baseline
+`eb1b396a3e0199a5d0c804e96bd8564d6053e0b8`: Boss approved Schannel plus explicit
+caller-provisioned stores and the Windows supplied-P12 limitation. Production
+rejects Windows P12 at preparation and advertises only `windows_store`; existing
+store lookup and ownership work through the real public API. No persistence,
+export, second provider or production driver/GC change.
+
+Effective focused native acceptance is **17/17 per profile, 34/34 combined**,
+including 32 public command checks across normal/O2 JIT, independent sync/async
+AOT, forced GC, RSA/ECDSA exact peer identity, negatives, reuse, cancellation,
+active Runtime shutdown and complete owned-credential removal. Original failures
+and final reruns are preserved in the [public receipt](evidence/windows-schannel-acceptance-20261103.json).
+The Windows Digest peer gate removes a fixture dependency cycle while preserving
+the original payload/deadlines and adding full-body checks. Schannel's synchronous
+record-send/cancellation latency boundary remains explicit.
+
+The report contains the exact 23-path unstaged inventory, provisioning/selector
+formats, fixture authority, native statuses, setup failures and recommended hosted
+checks. Full Windows strict configuration fails its unchanged ASan/UBSan runtime
+link probe; no relaxed substitute. Server 2022, supported Linux strict and seven
+hosted jobs remain Boss-controlled acceptance. No staging, commit, push, branch,
+remote change, CI dispatch or root README edit. **Stop for independent Golden
+Wrench source review.** Earlier research and checkpoints follow unchanged.
+
 ## Windows security adapter follow-up, 3 November 2026
 
 The [adapter feasibility report](WINDOWS_TLS_ADAPTER_FEASIBILITY.md), baseline

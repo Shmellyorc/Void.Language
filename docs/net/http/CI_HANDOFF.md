@@ -1,5 +1,23 @@
 # Native HTTP CI preparation — Golden Wrench handoff
 
+## Current Windows repair candidate — 3 November 2026
+
+[Schannel store acceptance](WINDOWS_SCHANNEL_ACCEPTANCE.md) replaces the unsupported
+Windows positive-P12 requirement with real caller-provisioned store mTLS, retains
+P12 rejection/parser negatives and corrects capabilities. New Windows-only
+`http_windows_store` proves RSA/ECDSA through public source JIT/O2/independent AOT,
+exact peer DER, GC/cancellation/cleanup. `http_native` also covers active Runtime
+shutdown during authenticated TLS. Effective local Windows 10 Debug/Release
+focused acceptance is 34/34; strict Windows configuration fails its full-runtime
+probe without a reduced substitute. Original hosted failure remains historical.
+
+Boss should manually run the unchanged seven-job `ci-link-experiment.yml`, mode
+`thinlto-cache`, after independent review. Require full Windows Server 2022 Debug/
+Release HTTP/URL tests including both credential-owning tests and successful
+credential inventory/deletion evidence, plus all existing Ubuntu/macOS and strict
+gates. The CTest resource lock serializes user-store inventory fixtures. No staging,
+commit, push or dispatch occurred. Earlier dated preparation records follow.
+
 31 October 2026. Baseline `490df04edee92756c20c336c0f32114476167941`;
 LLVM/Clang/LLD 23.1.4. **Prepared for source review; hosted native acceptance is
 not claimed.** No staging, commits, branches, pushes, hosted dispatch, publication

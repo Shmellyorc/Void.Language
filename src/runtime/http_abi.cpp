@@ -224,11 +224,11 @@ void build(Runtime& runtime, const SourceLayout& layout, Record& reply, const Re
     if (features) {
         runtime.string_into(reply.reference(26), features->transport); runtime.string_into(reply.reference(27), features->tls);
         runtime.string_into(reply.reference(28), features->resolver); runtime.string_into(reply.reference(29), features->idn);
-        std::int64_t flags = 1 | 2 | 8 | 16 | 32 | 64 | 128 | 512;
+        std::int64_t flags = 1 | 2 | 8 | 16 | 32 | 64 | 128;
 #ifdef _WIN32
         flags |= 1024;
 #else
-        flags |= 256;
+        flags |= 256 | 512;
 #endif
         reply.set(30, flags);
     }

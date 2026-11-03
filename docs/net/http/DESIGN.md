@@ -324,10 +324,14 @@ backend on macOS, and configured distribution CA locations on Linux.
 pkcs12(path,password), windows_store(reference)). Explicit custom trust means
 **replacement**, not silently widening system trust. A selected provider must
 implement that meaning or return unsupported. Client identity is opt-in; PEM
-separate keys are unsupported under Schannel, which uses its P12/store forms.
+separate keys and supplied P12 are unsupported under Windows Schannel. The
+3 November Boss-approved Windows capability is an explicit caller-provisioned
+store identity, with no persistence or provider fallback; see
+[native acceptance](WINDOWS_SCHANNEL_ACCEPTANCE.md).
 Require a real P12 native acceptance on the selected OpenSSL builds, otherwise
 report that form unavailable instead of claiming parity. The common guaranteed
-client-auth route can use PEM on Linux/macOS and P12/store on Windows.
+client-auth route can use PEM/P12 on Linux/macOS and explicit store identities
+on Windows. Windows capabilities must not advertise supplied P12 support.
 Paths are UTF-8 host paths with existing safe conversion, unrelated to source VFS.
 Loading certificates must not block the managed executor during an async request.
 

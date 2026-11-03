@@ -1,6 +1,7 @@
 """Independent gates for timeout phases, producer pauses and Digest replay timing."""
 import argparse
 import json
+import os
 from pathlib import Path
 import socket
 import socketserver
@@ -8,6 +9,7 @@ import ssl
 import subprocess
 import tempfile
 import threading
+import time
 import fixture
 
 producer_seen=threading.Event()
@@ -16,6 +18,7 @@ digest_seen=threading.Event()
 digest_release=threading.Event()
 stall_release=threading.Event()
 early_release=threading.Event()
+digest_events=[]
 
 class Stall(socketserver.BaseRequestHandler):
     def handle(self):
@@ -56,14 +59,30 @@ class Handler(fixture.Handler):
             valid=fixture.valid_digest(self.headers.get('Authorization',''),'user','password',self.command,
                                        self.path,'fixture','fixture-nonce')
             if not valid:
-                self.read_body();self.reply(b'',401,[('WWW-Authenticate','Digest realm="fixture", nonce="fixture-nonce", algorithm=MD5, qop="auth"')]);return
+                body=self.read_body();digest_events.append({'event':'challenge','bytes':len(body),'time':time.monotonic()})
+                self.reply(b'',401,[('WWW-Authenticate','Digest realm="fixture", nonce="fixture-nonce", algorithm=MD5, qop="auth"')]);return
             remaining=int(self.headers['Content-Length'])
             block=self.rfile.read(min(1024,remaining));remaining-=len(block);digest_seen.set()
+            held_at=time.monotonic()
+            digest_events.append({'event':'authenticated-prefix','remaining':remaining,'time':held_at})
+            if os.name=='nt':
+                # Schannel can block its caller finishing an encrypted record.
+                # The peer must not depend on that same driver to release TCP
+                # backpressure. Still hold the real 8 MiB upload longer than
+                # its unchanged 20 ms header budget, and verify the whole body.
+                time.sleep(.060);digest_release.set()
             assert digest_release.wait(3)
+            digest_events.append({'event':'released','time':time.monotonic(),'hold_ms':(time.monotonic()-held_at)*1000})
+            assert block==b'd'*len(block)
             while remaining:
                 block=self.rfile.read(min(65536,remaining))
-                if not block:return
+                if not block:
+                    digest_events.append({'event':'short-body','remaining':remaining,'time':time.monotonic()});return
                 remaining-=len(block)
+                assert block==b'd'*len(block)
+                if remaining<65536 or remaining%1048576<65536:
+                    digest_events.append({'event':'body-progress','remaining':remaining,'time':time.monotonic()})
+            digest_events.append({'event':'body-complete','time':time.monotonic()})
             self.reply(b'ok');return
         super().route()
     do_GET = route
@@ -101,6 +120,9 @@ def main():
             assert rows['proxy']['kind']=='timeout' and rows['proxy']['phase']=='proxy' and not rows['proxy']['unknown'],rows
             assert rows['producer-resume']['kind']=='success',rows
             assert rows['digest-upload']['kind']=='success',rows
+            assert rows['digest-upload']['uploaded']==8388608,rows
+            assert any(event['event']=='body-complete' for event in digest_events),digest_events
+            assert next(event for event in digest_events if event['event']=='released')['hold_ms']>=50,digest_events
             assert rows['write']['kind']=='timeout' and rows['write']['phase']=='upload' and rows['write']['unknown'],rows
             assert rows['file-drain']['kind']=='timeout' and rows['file-drain']['phase']=='file' and rows['file-drain']['unknown'],rows
             for mode in ('deferred', 'silent'):
@@ -125,6 +147,7 @@ def main():
         finally:
             stall_release.set();digest_release.set()
             for peer in [plain,secure,stalled]:peer.shutdown();peer.server_close()
+            (args.evidence/'digest-peer.json').write_text(json.dumps(digest_events,indent=2)+'\n')
     print('TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed')
 
 if __name__=='__main__':main()

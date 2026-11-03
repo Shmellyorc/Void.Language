@@ -305,6 +305,11 @@ if(BUILD_TESTING)
   endif()
   add_executable(void_http_native tests/net/http/native.cpp tests/net/http/runtime.cpp)
   target_link_libraries(void_http_native PRIVATE void_runtime)
+  if(WIN32)
+    add_executable(void_http_windows_identity tests/net/http/windows_identity.cpp)
+    target_link_libraries(void_http_windows_identity PRIVATE void_options crypt32 ncrypt bcrypt advapi32)
+    add_dependencies(void_http_native void_http_windows_identity)
+  endif()
   add_test(NAME http_native COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/fixture.py"
     "$<TARGET_FILE:void_http_native>" --http2 --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-native-evidence")
   set_tests_properties(http_native PROPERTIES TIMEOUT 180)
@@ -347,6 +352,14 @@ if(BUILD_TESTING)
   add_test(NAME url_native COMMAND void_url_native)
   add_executable(void_http_source_runner tests/net/http/source_runner.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_http_source_runner PRIVATE void_llvm void_cache_identity)
+  if(WIN32)
+    add_test(NAME http_windows_store COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/windows_mtls.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_source_runner>" "$<TARGET_FILE:void_http_windows_identity>"
+      --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-windows-store-evidence")
+    set_tests_properties(http_windows_store PROPERTIES TIMEOUT 600)
+    # Both fixtures compare the complete user-scoped credential inventory.
+    set_tests_properties(http_native http_windows_store PROPERTIES RESOURCE_LOCK void_windows_http_credentials)
+  endif()
   add_executable(void_http_example_host examples/net_http/host.cpp)
   target_link_libraries(void_http_example_host PRIVATE void_llvm void_cache_identity)
   add_test(NAME http_examples COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/examples.py"
