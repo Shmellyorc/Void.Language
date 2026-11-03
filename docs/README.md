@@ -1,5 +1,14 @@
 # VOID documentation
 
+## Windows in-memory TLS provider research, 3 November 2026
+
+[Windows AWS-LC architecture review](net/http/WINDOWS_TLS_PROVIDER_REVIEW.md)
+records native Debug/Release RSA/ECDSA P12 mTLS, TLS 1.2/1.3 and h1/h2, trust,
+revocation, HTTPS proxy and MultiSSL controls. In-memory authentication works on
+Windows 10; Schannel-equivalent revocation and Windows store identity are not
+preserved by an unchanged provider swap. Research only; production migration
+remains on HOLD pending Golden Wrench/Boss security and capability decisions.
+
 ## Windows mTLS architecture proposal — 3 November 2026
 
 [Windows-only credential design](net/http/WINDOWS_MTLS_CREDENTIAL_DESIGN.md)

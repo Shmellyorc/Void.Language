@@ -1,5 +1,28 @@
 # Golden Wrench HTTP implementation and evidence handoff
 
+## Windows in-memory TLS follow-up, 3 November 2026
+
+The [provider architecture review](WINDOWS_TLS_PROVIDER_REVIEW.md), baseline
+`51e7ff6f8c202db56fc0a317b87d73ddb10972d9`, adds isolated native Windows research:
+76 Debug/Release TLS/security controls and four MultiSSL controls. AWS-LC 5.12.0
+with pinned curl 8.23.0 authenticates RSA/ECDSA P12 from memory using TLS 1.2/1.3
+and h1/h2 on Windows 10. Exact peer DER, verification negatives, reuse, HTTPS proxy
+trust/identity, cleanup and unchanged OS credential inventories are recorded.
+
+An unchanged provider swap fails policy equivalence: default AWS-LC accepts the
+revoked fixture, native-root import does not reproduce Windows chain policy, and
+the Schannel store identity selector has no AWS-LC equivalent. MultiSSL selects
+one backend per libcurl image globally; separate clients/Runtimes cannot choose
+different backends concurrently. Prefer one transport provider and the existing
+driver, conditional on reviewed Windows verification/store-signing adapters or
+explicit Boss contract decisions. Production migration remains HOLD.
+
+The [new receipt](evidence/windows-awslc-provider-20261103.json) preserves original
+build/fixture failures separately. No production/API/policy/vendor/platform/CI
+change was made. Full Server 2022 Runtime, strict, memory, installation and native
+Windows policy/store acceptance remain open. Stop for Golden Wrench review after
+the authorized feasibility-only push. The earlier implementation handoff follows.
+
 31 October 2026 UTC. Baseline `15f7868b0af177f8f7d49c548392c79c7bd921d2`;
 LLVM/Clang/LLD 23.1.4. **Architecture GO; full HTTP acceptance remains pending.**
 Linux implementation and local verification are ready for independent review.
