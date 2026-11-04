@@ -1,5 +1,17 @@
 # Native HTTP CI preparation — Golden Wrench handoff
 
+## Hosted acceptance — 4 November 2026
+
+**ACCEPTED.** [Final acceptance](ACCEPTANCE.md) records run
+[41815539463](https://github.com/Shmellyorc/Void.Language/actions/runs/41815539463),
+commit `1afd881ecfa65c616261e7aeb76ecd2bf87770b6`, Compiler link experiment,
+mode `thinlto-cache`, LLVM/Clang/LLD 23.1.4. All seven hosted jobs passed.
+Golden Wrench closes HTTP/HTTPS cross-platform acceptance, including Windows
+Schannel store-backed mTLS and the connection-scoped HTTP/2 ALPN retention issue.
+The separate optimizer incident and documented limitations retain their status.
+Earlier checkpoints below preserve their original scope and evidence.
+
+
 ## Current Windows repair candidate — 3 November 2026
 
 [Schannel store acceptance](WINDOWS_SCHANNEL_ACCEPTANCE.md) replaces the unsupported

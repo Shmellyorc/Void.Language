@@ -1,5 +1,14 @@
 # VOID documentation
 
+## HTTP/HTTPS accepted — 4 November 2026
+
+Golden Wrench closes HTTP/HTTPS cross-platform acceptance at
+`1afd881ecfa65c616261e7aeb76ecd2bf87770b6`. Run 41815539463 passed all seven
+Ubuntu, Windows Server 2022 and macOS ARM64 configurations in thinlto-cache mode.
+Windows store-backed mTLS and HTTP/2 ALPN retention have cleared acceptance.
+[Accepted scope, evidence and independent limits](net/http/ACCEPTANCE.md).
+Earlier dated checkpoints below retain their historical results.
+
 ## Windows Schannel store-identity repair, 3 November 2026
 
 [Scoped native acceptance](net/http/WINDOWS_SCHANNEL_ACCEPTANCE.md) records genuine

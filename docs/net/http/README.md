@@ -6,14 +6,13 @@ buffered responses, streaming, native file transfers, auth, cookies and proxies.
 The complete public contract is in [DESIGN.md](DESIGN.md); declarations and
 parameter/result documentation live in `stdlib/url.void` and `stdlib/net/http.void`.
 
-**Architecture is approved. Full HTTP acceptance remains pending.**
-[CURRENT_ENGINEERING.md](CURRENT_ENGINEERING.md) records implemented behavior,
-retained failures and current tests. [ROADMAP.md](ROADMAP.md) defines acceptance;
-[AUTHORIZATION.md](AUTHORIZATION.md) preserves Boss decisions. Native Windows/macOS
-recipes are present; their execution acceptance, [provider-memory proof](MEMORY_REVIEW.md)
-must be resolved before claiming complete portable delivery.
-The [Golden Wrench handoff](HANDOFF.md) records exact local results and review gates.
-See [native recipes and exact verification gaps](NATIVE_PLATFORMS.md).
+**HTTP/HTTPS cross-platform acceptance is complete** at commit
+`1afd881ecfa65c616261e7aeb76ecd2bf87770b6`, with all seven hosted jobs passing.
+[Final acceptance and scope](ACCEPTANCE.md) records the Golden Wrench decision,
+Windows store-identity and HTTP/2 ALPN repairs, original evidence and retained
+limitations. [Current engineering](CURRENT_ENGINEERING.md),
+[handoff](HANDOFF.md), [platform capability boundaries](NATIVE_PLATFORMS.md) and
+[provider-memory limits](MEMORY_REVIEW.md) remain the detailed references.
 
 ## Local Linux build
 
