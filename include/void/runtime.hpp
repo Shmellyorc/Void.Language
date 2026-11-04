@@ -81,6 +81,9 @@ public:
     void concat_into(void** rooted_slot, void* left, void* right);
     std::uint64_t string_count(void*, bool bytes) const;
     void string_index_into(void**, void*, ScalarEncoding, std::uint64_t);
+    int translate_scalars(void** output, RegisteredRootWord input, RegisteredRootWord keys,
+                          RegisteredRootWord replacements, const NativeArrayElement& strings,
+                          std::int64_t max_bytes);
     void string_encode_into(void**, void*);
     bool string_decode_into(void**, RegisteredRootWord);
 

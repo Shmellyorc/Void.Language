@@ -1,5 +1,81 @@
 # VOID 2.0 private preview qualification handoff
 
+## Bounded framing implementation — 4 November 2026
+
+**LOG-PERF OPEN / release HOLD. Golden Wrench approved the bounded candidate for commit and push.**
+The authorized text.translate_scalars candidate and _quote integration are
+implemented in the working tree. The current LLVM 23 check passed 48 observations
+on the historical source path. Original LLVM 19 cause/classification evidence
+is preserved. Golden Wrench explicitly approved existing frozen-backing
+snapshots and atomic string publication.
+
+Final Release/LLVM 23 JIT O2 medians are heavy framing **8.603 ms** (PASS ≤10),
+full heavy console **18.501 ms** (PASS ≤20), and file200 **21.390 ms** (FAIL <10).
+The current prepared-file control is 12.195 ms. Text JIT/AOT, 31,224 ownership
+checks, 15 logging byte/UTC checks, 1,688 logging JIT checks and 827 checks per
+AOT mode pass. The initial candidate and failed build diagnostics are retained.
+The report includes the source diff identity, measurements, safety boundary and
+remaining limitations. [Candidate report](../log/BOUNDED_FRAMING_RESULT.md) · [Evidence](../log/evidence/llvm23-framing-20261104/results.json)
+
+The smallest next measurement is a bounded small-file/direct-I/O comparison
+separating framing, writes and flush/close costs after candidate review.
+Installation remains closed at d784c049. The reviewed logging candidate is authorized for commit and push with [skip ci].
+Further small-file investigation remains separately scoped for Golden Wrench review.
+
+
+## Retained logging baseline investigation — 4 November 2026 (review only)
+
+**LOG-PERF remains OPEN / release HOLD. Stop for Golden Wrench review before
+production implementation changes.** The installation closure alone was committed
+and pushed with `[skip ci]` as `d784c0490d13b8abdca754dfecf99578ab498733`;
+`origin/main` was independently checked at that SHA. It contains exactly the
+installation handoff, blocker register and acceptance receipt. No CI was dispatched.
+All logging investigation changes below remain uncommitted for separate review.
+
+The [concise report](../log/PERFORMANCE_BASELINE_LLVM23.md) and
+[machine-readable results](../log/evidence/llvm23-baseline-20261104/results.json)
+record criteria, historical profiling, exact build/source identities, commands,
+wall/CPU samples, throughput, allocation/resource observations and limitations.
+Production code measured was `ffd8920befe04a67e3eaef6aadcdf0233df13563`, with
+fresh Release libraries and LLVM/Clang/LLD 23.1.4; the later closure commit changes
+documentation only. No production compiler/Runtime/CMake/logger/README byte changed.
+
+The bounded original benchmark supplied 216 normal/O2 JIT and independent AOT
+observations. Selected component timing/allocation runs supplied 192 observations,
+including warmups; all benchmark processes exited 0 with their own byte/count
+oracles satisfied. This is performance evidence, not a new correctness acceptance.
+GC budget was 256, timed children had actual hard/soft 1 MiB stacks, and builds
+finished before measurements. The developer desktop remained active.
+
+JIT O2 file200 is **24.042 ms**, versus **11.662 ms** prepared direct I/O:
+**2.06×** meets the relative aim but the **<10 ms absolute screen FAILS**.
+The direct-I/O floor itself exceeds that screen in JIT on this host; no logger-only
+causal regression is inferred. Heavy 1-KiB/100 framing is **910.628 ms** against
+10 ms; full console is **947.525 ms** against 20 ms: both FAIL. Prepared output is
+7.946 ms. Framing records **2,509,955 ordinary C++ allocations**, **77,100 source
+managed constructions** and 1,162 collections for those 100 records.
+
+All recorded post-GC heap/handle snapshots return to their pre-sample baseline;
+disabled sink/lazy and ordinary-file metadata observations meet their bounded
+criteria. Complete scaling/nonregression, current heavy AOT components, native
+Windows/macOS logging performance, tail latency and continuous peak/live native
+memory remain UNKNOWN. Installation 3/3 PASS does not qualify logging performance.
+
+The current evidence locates the dominant heavy workload in quote/framing and
+reproduces the large allocation/construction counts in historical profiles. It
+does not newly split wall time among metadata-key allocation, locks/root checks,
+polling, copying and GC, or establish why the file-I/O floor changed. The smallest
+justified next action is Golden Wrench review of a separately scoped framing
+repair plan against the existing scalar-substitution safety contract and unchanged
+screens. The historical implementation stop condition needs explicit review;
+passing current benchmarks does not prove a cause or repair of earlier crashes.
+
+Exact raw receipts, generated measurement-only copies and preserved binary/source
+hashes are private under
+`/home/shmellyorc/.local/state/void-log-performance/ffd8920b-20261104-9v8echee/`.
+No historical crash campaign, full CTest, sanitizer, HTTP/HTTPS, installation or VM
+testing was run. There is no speculative optimization or production repair.
+
 ## Installation qualification closed — 4 November 2026
 
 **ACCEPTED — 3/3 PASS. Hosted installation qualification is complete.**

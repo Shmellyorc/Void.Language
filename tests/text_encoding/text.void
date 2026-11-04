@@ -1,6 +1,16 @@
 use text
 
 
+private func rejected(outcome: result<string, text.error>, expected: text.error_kind) -> bool:
+    if outcome is Err(var reason):
+        if expected is text.error_kind.invalid_range:
+            return reason.kind is text.error_kind.invalid_range
+        if expected is text.error_kind.invalid_argument:
+            return reason.kind is text.error_kind.invalid_argument
+        return reason.kind is text.error_kind.limit_exceeded
+    return false
+
+
 func main() -> i32:
     if text.trim("\u{2003}\t雪\0 \r") != "雪\0":
         return 1
@@ -80,4 +90,37 @@ func main() -> i32:
     if text.to_upper("Straße ﬃ ᾀ \0é𐐨") != "STRASSE FFI ἈΙ \0É𐐀":
         return 26
 
+    # A mapped replacement also occurs as a key. Translate original scalars once.
+    var source = "雪a😀\0e\u{301}"
+    var keys = [38634, 97, 128512]
+    var replacements = ["a", "😀", ""]
+    if text.translate_scalars(source, keys, replacements, 9) is Ok(var translated):
+        if translated != "a😀\0e\u{301}" or keys[0] != 38634 or replacements[0] != "a":
+            return 27
+    else:
+        return 28
+    if not rejected(text.translate_scalars(source, keys, replacements, 8), text.error_kind.limit_exceeded):
+        return 29
+    if not rejected(text.translate_scalars("雪", [], [], 2), text.error_kind.limit_exceeded):
+        return 30
+    if not rejected(text.translate_scalars("", [], [], -1), text.error_kind.invalid_range):
+        return 31
+    if not rejected(text.translate_scalars("", [2], [], 0), text.error_kind.invalid_argument):
+        return 32
+    if not rejected(text.translate_scalars("", [65, 65], ["", ""], 0), text.error_kind.invalid_argument):
+        return 33
+    for invalid in [-1, 55296, 57343, 1114112]:
+        if not rejected(text.translate_scalars("", [invalid], ["x"], 0), text.error_kind.invalid_argument):
+            return 34
+    var alias = "aa"
+    if text.translate_scalars(alias, [97], [alias], 4) is Ok(var doubled):
+        if doubled != "aaaa" or alias != "aa":
+            return 35
+    else:
+        return 36
+    if text.translate_scalars("雪", [38634], [""], 0) is Ok(var empty):
+        if empty != "":
+            return 37
+    else:
+        return 38
     return 0

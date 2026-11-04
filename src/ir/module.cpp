@@ -1150,6 +1150,25 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result = i.type;
                     break;
                 }
+                case Op::text_translate: {
+                    valid_type(i.type);
+                    if (!m.coordinated || f.module_identity != "/@stdlib/text.void" ||
+                        i.a || i.b || i.immediate || i.receiver || i.initialization ||
+                        i.array_repeat || !i.callee.empty() || i.arguments.size() != 4 ||
+                        i.type.kind != Type::aggregate || !i.type.definition->result_type ||
+                        field_type(i.type,1) != Type::string || field_type(i.type,2) != Type::i32)
+                        fail("invalid private scalar translation");
+                    expect(i.arguments[0], Type::string);
+                    for (unsigned n = 1; n <= 2; ++n) {
+                        auto array = operand(i.arguments[n]);
+                        if (array.kind != Type::growable_array || array.nullable ||
+                            array_element(array) != (n == 1 ? Type::i32 : Type::string))
+                            fail("invalid scalar translation rule array");
+                    }
+                    expect(i.arguments[3], Type::i64);
+                    result = i.type;
+                    break;
+                }
                 case Op::text_case: {
                     if (!m.coordinated || f.module_identity != "/@stdlib/text.void" ||
                         i.type != Type::string || i.immediate || i.receiver ||

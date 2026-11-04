@@ -60,16 +60,20 @@ void inventory(const vd::ValidatedAnalysis& program) {
 }
 
 void independent_ir(const vd::ValidatedAnalysis& program) {
+    auto unauthorized = vd::analyze_source({"user.void",
+        "func entry(x: i32) -> i32:\n    var result = _translate_scalars(\"\", [], [], 0)\n    return x\n"});
+    if (unauthorized.succeeded()) throw std::runtime_error("private text operation exposed to user source");
     auto valid = program.lower();
     vd::ir::validate(valid);
     unsigned checks = 0;
+    auto selected_op = vd::ir::Op::text_case;
     auto reject = [&](const std::function<void(vd::ir::Function&, vd::ir::Instruction&)>& mutate) {
         auto invalid = valid;
         bool found = false;
         for (auto& function : invalid.functions) {
             for (auto& block : function.blocks) {
                 for (auto& instruction : block.instructions) {
-                    if (!found && instruction.op == vd::ir::Op::text_case) {
+                    if (!found && instruction.op == selected_op) {
                         mutate(function, instruction);
                         found = true;
                     }
@@ -77,7 +81,7 @@ void independent_ir(const vd::ValidatedAnalysis& program) {
             }
         }
         if (!found) {
-            throw std::runtime_error("missing Unicode casing IR");
+            throw std::runtime_error("missing private text IR");
         }
         try {
             vd::ir::validate(invalid);
@@ -85,7 +89,7 @@ void independent_ir(const vd::ValidatedAnalysis& program) {
             ++checks;
             return;
         }
-        throw std::runtime_error("forged Unicode casing IR accepted");
+        throw std::runtime_error("forged private text IR accepted");
     };
     reject([](auto& function, auto&) { function.module_identity = "/user.void"; });
     reject([](auto&, auto& instruction) { instruction.type = vd::ir::Type::i64; });
@@ -97,6 +101,12 @@ void independent_ir(const vd::ValidatedAnalysis& program) {
     reject([](auto&, auto& instruction) { instruction.a = instruction.b; });
     reject([](auto&, auto& instruction) { instruction.initialization = true; });
     reject([](auto&, auto& instruction) { instruction.array_repeat = true; });
+    selected_op = vd::ir::Op::text_translate;
+    reject([](auto& f, auto&) { f.module_identity = "/user.void"; });
+    reject([](auto&, auto& i) { i.arguments.pop_back(); });
+    reject([](auto&, auto& i) { std::swap(i.arguments[1], i.arguments[2]); });
+    reject([](auto&, auto& i) { i.arguments[0] = i.arguments[3]; });
+    reject([](auto&, auto& i) { i.type = vd::ir::Type::string; });
     auto uncoordinated = valid;
     uncoordinated.coordinated = false;
     try {

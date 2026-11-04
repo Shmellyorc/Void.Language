@@ -1,0 +1,6185 @@
+{
+  "tested_source_commit": "ffd8920befe04a67e3eaef6aadcdf0233df13563",
+  "date": "2026-11-04",
+  "configuration": "Release",
+  "LLVM": "23.1.4",
+  "host": {
+    "commit": "ffd8920befe04a67e3eaef6aadcdf0233df13563",
+    "configuration": "Release",
+    "LLVM": "23.1.4",
+    "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+    "os_release": {
+      "NAME": "PikaOS",
+      "ID": "pika",
+      "PRETTY_NAME": "PikaOS 4",
+      "VERSION_ID": "4",
+      "VERSION": "4",
+      "VERSION_CODENAME": "nest",
+      "HOME_URL": "https://www.pika-os.com/",
+      "SUPPORT_URL": "https://discord.gg/6HKR2YRvNg",
+      "BUG_REPORT_URL": "https://git.pika-os.com/",
+      "PRIVACY_POLICY_URL": "https://www.pika-os.com/",
+      "ID_LIKE": "debian",
+      "DEBIAN_CODENAME": "sid",
+      "LOGO": "pika-logo"
+    },
+    "cpu_count": 16,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "memory": [
+      "MemTotal:       32771924 kB",
+      "MemFree:        12355220 kB",
+      "MemAvailable:   19497452 kB"
+    ],
+    "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           43 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 7 1700X Eight-Core Processor\nCPU family:                              23\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                1\nMicrocode version:                       0x8001139\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      61%\nCPU max MHz:                             3900.0000\nCPU min MHz:                             2200.0000\nBogoMIPS:                                6800.16\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb hw_pstate ssbd ibpb vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif overflow_recov succor smca sev\nVirtualization:                          AMD-V\nL1d cache:                               256 KiB (8 instances)\nL1i cache:                               512 KiB (8 instances)\nL2 cache:                                4 MiB (8 instances)\nL3 cache:                                16 MiB (2 instances)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; untrained return thunk; SMT vulnerable\nVulnerability Spec rstack overflow:      Mitigation; Safe RET\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+    "loadavg_before": [
+      1.259765625,
+      1.63134765625,
+      1.5771484375
+    ],
+    "policy": "Sequential builds then bounded benchmark processes; active desktop; no physical-machine isolation claim; Runtime GC budget 256; measured children hard/soft stack 1 MiB",
+    "cpu_model": "AMD Ryzen 7 1700X Eight-Core Processor",
+    "cpp_flags": "# CMAKE generated file: DO NOT EDIT!\n# Generated by \"Unix Makefiles\" Generator, CMake Version 4.3\n\n# compile CXX with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++\nCXX_DEFINES = -DCURL_STATICLIB\n\nCXX_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -I/home/shmellyorc/Documents/Void.Language/third_party/curl/include -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include\n\nCXX_FLAGS = -O3 -DNDEBUG -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic\n\n"
+  },
+  "warmup": "one per original workload; component sample -1 retained separately",
+  "repetitions": 3,
+  "gc_budget": 256,
+  "stack_bytes": 1048576,
+  "criteria": [
+    {
+      "criterion": "small file 64 B x 200 <10 ms",
+      "status": "FAIL",
+      "observed_ms": 24.04198,
+      "all_modes_fail": true
+    },
+    {
+      "criterion": "approximately 2-3x contemporaneous prepared I/O aim",
+      "status": "PASS (bounded aim)",
+      "ratio": 2.0615636478508166,
+      "by_mode": {
+        "JIT normal": 2.0818524083884506,
+        "JIT O2": 2.0615636478508166,
+        "AOT normal": 2.541878057263415,
+        "AOT O2": 2.3617352425122204
+      }
+    },
+    {
+      "criterion": "heavy 1 KiB x 100 complete frame <=10 ms",
+      "status": "FAIL",
+      "observed_ms": 910.628222
+    },
+    {
+      "criterion": "heavy 1 KiB x 100 full console <=20 ms",
+      "status": "FAIL",
+      "observed_ms": 947.525418
+    },
+    {
+      "criterion": "disabled calls do not render lazy bodies or perform sink I/O",
+      "status": "PASS (bounded source oracles/counters)"
+    },
+    {
+      "criterion": "no native metadata call per ordinary exclusive-writer record",
+      "status": "PASS (4 acquisition observations, 200 writes)"
+    },
+    {
+      "criterion": "post-root collected managed heap/handles return to baseline",
+      "status": "PASS (all 408 recorded observations)"
+    },
+    {
+      "criterion": "complete scaling/nonregression across escape/Unicode/modes/platforms",
+      "status": "UNKNOWN",
+      "reason": "No current expanded occasional/mixed Unicode matrix, heavy AOT component or Windows/macOS performance execution"
+    },
+    {
+      "criterion": "tail latency, peak live/native memory and malloc-only allocations",
+      "status": "UNKNOWN",
+      "reason": "No documented numeric cap; current counters do not measure these quantities"
+    }
+  ],
+  "original": {
+    "JIT normal/1": {
+      "wall_ms": [
+        24.785605,
+        25.146683,
+        25.74652
+      ],
+      "median_ms": 25.146683,
+      "min_ms": 24.785605,
+      "max_ms": 25.74652,
+      "cpu_ms": [
+        24.674000000000003,
+        25.027,
+        25.604
+      ],
+      "median_cpu_ms": 25.027,
+      "command": 1,
+      "mode": "JIT normal",
+      "records": 10000,
+      "records_per_second": 397666.7618548339,
+      "amortized_us": 2.5146683000000003,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          780
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/2": {
+      "wall_ms": [
+        52.858162,
+        53.971526,
+        52.396275
+      ],
+      "median_ms": 52.858162,
+      "min_ms": 52.396275,
+      "max_ms": 53.971526,
+      "cpu_ms": [
+        52.581,
+        53.665,
+        52.132999999999996
+      ],
+      "median_cpu_ms": 52.581,
+      "command": 2,
+      "mode": "JIT normal",
+      "records": 10000,
+      "records_per_second": 189185.5414874244,
+      "amortized_us": 5.285816199999999,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          1548
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/3": {
+      "wall_ms": [
+        11.579853,
+        11.657072,
+        11.725142
+      ],
+      "median_ms": 11.657072,
+      "min_ms": 11.579853,
+      "max_ms": 11.725142,
+      "cpu_ms": [
+        11.533,
+        11.602,
+        11.674999999999999
+      ],
+      "median_cpu_ms": 11.602,
+      "command": 3,
+      "mode": "JIT normal",
+      "records": 10000,
+      "records_per_second": 857848.3516272354,
+      "amortized_us": 1.1657072,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          509
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/4": {
+      "wall_ms": [
+        20.53764,
+        20.57124,
+        20.031633
+      ],
+      "median_ms": 20.53764,
+      "min_ms": 20.031633,
+      "max_ms": 20.57124,
+      "cpu_ms": [
+        20.454,
+        20.480999999999998,
+        19.936
+      ],
+      "median_cpu_ms": 20.454,
+      "command": 4,
+      "mode": "JIT normal",
+      "records": 10000,
+      "records_per_second": 486910.86220227834,
+      "amortized_us": 2.053764,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          509
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/5": {
+      "wall_ms": [
+        28.029707,
+        28.392114,
+        28.712463
+      ],
+      "median_ms": 28.392114,
+      "min_ms": 28.029707,
+      "max_ms": 28.712463,
+      "cpu_ms": [
+        27.862000000000002,
+        28.224,
+        28.552
+      ],
+      "median_cpu_ms": 28.224,
+      "command": 5,
+      "mode": "JIT normal",
+      "records": 10000,
+      "records_per_second": 352210.4764724458,
+      "amortized_us": 2.8392114,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          10005
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          588
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/10": {
+      "wall_ms": [
+        14.238677,
+        14.316067,
+        14.277567
+      ],
+      "median_ms": 14.277567,
+      "min_ms": 14.238677,
+      "max_ms": 14.316067,
+      "cpu_ms": [
+        14.151,
+        14.225,
+        14.187999999999999
+      ],
+      "median_cpu_ms": 14.187999999999999,
+      "command": 10,
+      "mode": "JIT normal",
+      "records": 200,
+      "records_per_second": 14007.988896147363,
+      "amortized_us": 71.387835,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          1017
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2067
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/11": {
+      "wall_ms": [
+        27.55013,
+        23.199445,
+        22.934606
+      ],
+      "median_ms": 23.199445,
+      "min_ms": 22.934606,
+      "max_ms": 27.55013,
+      "cpu_ms": [
+        18.646,
+        17.389000000000003,
+        17.337000000000003
+      ],
+      "median_cpu_ms": 17.389000000000003,
+      "command": 11,
+      "mode": "JIT normal",
+      "records": 200,
+      "records_per_second": 8620.89588781111,
+      "amortized_us": 115.997225,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2478
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/12": {
+      "wall_ms": [
+        76.632104,
+        79.860835,
+        77.958456
+      ],
+      "median_ms": 77.958456,
+      "min_ms": 76.632104,
+      "max_ms": 79.860835,
+      "cpu_ms": [
+        69.65100000000001,
+        69.988,
+        69.852
+      ],
+      "median_cpu_ms": 69.852,
+      "command": 12,
+      "mode": "JIT normal",
+      "records": 100,
+      "records_per_second": 1282.7344861729946,
+      "amortized_us": 779.5845599999999,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          939
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          39454
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/13": {
+      "wall_ms": [
+        136.778084,
+        135.138883,
+        133.633782
+      ],
+      "median_ms": 135.138883,
+      "min_ms": 133.633782,
+      "max_ms": 136.778084,
+      "cpu_ms": [
+        124.89,
+        124.45299999999999,
+        122.92999999999999
+      ],
+      "median_cpu_ms": 124.45299999999999,
+      "command": 13,
+      "mode": "JIT normal",
+      "records": 3,
+      "records_per_second": 22.199384317835452,
+      "amortized_us": 45046.29433333333,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          66
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          3
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          1120253
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/14": {
+      "wall_ms": [
+        25.67516,
+        26.217617,
+        26.712044
+      ],
+      "median_ms": 26.217617,
+      "min_ms": 25.67516,
+      "max_ms": 26.712044,
+      "cpu_ms": [
+        19.887999999999998,
+        20.299,
+        20.895
+      ],
+      "median_cpu_ms": 20.299,
+      "command": 14,
+      "mode": "JIT normal",
+      "records": 200,
+      "records_per_second": 7628.458375908077,
+      "amortized_us": 131.088085,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          8024
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/15": {
+      "wall_ms": [
+        131.147816,
+        128.646451,
+        133.423653
+      ],
+      "median_ms": 131.147816,
+      "min_ms": 128.646451,
+      "max_ms": 133.423653,
+      "cpu_ms": [
+        10.882,
+        10.184999999999999,
+        13.003
+      ],
+      "median_cpu_ms": 10.882,
+      "command": 15,
+      "mode": "JIT normal",
+      "records": 21,
+      "records_per_second": 160.1246642185791,
+      "amortized_us": 6245.134095238095,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          565
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          1
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          4617
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/16": {
+      "wall_ms": [
+        135.602041,
+        136.080028,
+        135.021393
+      ],
+      "median_ms": 135.602041,
+      "min_ms": 135.021393,
+      "max_ms": 136.080028,
+      "cpu_ms": [
+        17.034,
+        16.076,
+        16.212
+      ],
+      "median_cpu_ms": 16.212,
+      "command": 16,
+      "mode": "JIT normal",
+      "records": 21,
+      "records_per_second": 154.86492566878104,
+      "amortized_us": 6457.240047619049,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          571
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          60
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2333
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/17": {
+      "wall_ms": [
+        165.646686,
+        160.496515,
+        158.184289
+      ],
+      "median_ms": 160.496515,
+      "min_ms": 158.184289,
+      "max_ms": 165.646686,
+      "cpu_ms": [
+        38.89,
+        38.944,
+        39.237
+      ],
+      "median_cpu_ms": 38.944,
+      "command": 17,
+      "mode": "JIT normal",
+      "records": 21,
+      "records_per_second": 130.84396256205315,
+      "amortized_us": 7642.69119047619,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          1027
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          33
+        ],
+        "moves": [
+          640
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          5447
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/18": {
+      "wall_ms": [
+        11.143655,
+        11.090375,
+        11.215375
+      ],
+      "median_ms": 11.143655,
+      "min_ms": 11.090375,
+      "max_ms": 11.215375,
+      "cpu_ms": [
+        5.420999999999999,
+        5.193,
+        5.4479999999999995
+      ],
+      "median_cpu_ms": 5.420999999999999,
+      "command": 18,
+      "mode": "JIT normal",
+      "records": 200,
+      "records_per_second": 17947.432866505646,
+      "amortized_us": 55.718275000000006,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          816
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          4060
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/19": {
+      "wall_ms": [
+        2.294287,
+        2.135228,
+        2.072248
+      ],
+      "median_ms": 2.135228,
+      "min_ms": 2.072248,
+      "max_ms": 2.294287,
+      "cpu_ms": [
+        2.258,
+        2.1159999999999997,
+        2.06
+      ],
+      "median_cpu_ms": 2.1159999999999997,
+      "command": 19,
+      "mode": "JIT normal",
+      "records": 200,
+      "records_per_second": 93666.81216244822,
+      "amortized_us": 10.67614,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          0
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          7153
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/20": {
+      "wall_ms": [
+        151.248689,
+        149.297631,
+        152.441422
+      ],
+      "median_ms": 151.248689,
+      "min_ms": 149.297631,
+      "max_ms": 152.441422,
+      "cpu_ms": [
+        34.109,
+        32.644,
+        33.094
+      ],
+      "median_cpu_ms": 33.094,
+      "command": 20,
+      "mode": "JIT normal",
+      "records": 200,
+      "records_per_second": 1322.325511198315,
+      "amortized_us": 756.2434450000001,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          2019
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2478
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/30": {
+      "wall_ms": [
+        22.619659,
+        22.693088,
+        18.91086
+      ],
+      "median_ms": 22.619659,
+      "min_ms": 18.91086,
+      "max_ms": 22.693088,
+      "cpu_ms": [
+        12.286,
+        12.994,
+        12.644
+      ],
+      "median_cpu_ms": 12.644,
+      "command": 30,
+      "mode": "JIT normal",
+      "records": 100,
+      "records_per_second": 4420.9331360830865,
+      "amortized_us": 226.19659,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          935
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          16395
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT normal/31": {
+      "wall_ms": [
+        118.43303,
+        112.432025,
+        113.2082
+      ],
+      "median_ms": 113.2082,
+      "min_ms": 112.432025,
+      "max_ms": 118.43303,
+      "cpu_ms": [
+        103.33399999999999,
+        96.998,
+        98.32100000000001
+      ],
+      "median_cpu_ms": 98.32100000000001,
+      "command": 31,
+      "mode": "JIT normal",
+      "records": 1000,
+      "records_per_second": 8833.28239473819,
+      "amortized_us": 113.2082,
+      "compile_ms": 6899.411306,
+      "counters": {
+        "managed_constructions": [
+          9035
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          1000
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          9714
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          160608
+        ]
+      }
+    },
+    "JIT O2/1": {
+      "wall_ms": [
+        26.782094,
+        26.027519,
+        25.77793
+      ],
+      "median_ms": 26.027519,
+      "min_ms": 25.77793,
+      "max_ms": 26.782094,
+      "cpu_ms": [
+        26.594,
+        25.866,
+        25.624000000000002
+      ],
+      "median_cpu_ms": 25.866,
+      "command": 1,
+      "mode": "JIT O2",
+      "records": 10000,
+      "records_per_second": 384208.7292300123,
+      "amortized_us": 2.6027519,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          780
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/2": {
+      "wall_ms": [
+        53.797387,
+        52.889023,
+        53.543328
+      ],
+      "median_ms": 53.543328,
+      "min_ms": 52.889023,
+      "max_ms": 53.797387,
+      "cpu_ms": [
+        53.48,
+        52.592,
+        53.245
+      ],
+      "median_cpu_ms": 53.245,
+      "command": 2,
+      "mode": "JIT O2",
+      "records": 10000,
+      "records_per_second": 186764.63293428454,
+      "amortized_us": 5.3543328,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          1548
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/3": {
+      "wall_ms": [
+        11.954921,
+        11.901541,
+        11.820621
+      ],
+      "median_ms": 11.901541,
+      "min_ms": 11.820621,
+      "max_ms": 11.954921,
+      "cpu_ms": [
+        11.903,
+        11.853000000000002,
+        11.775
+      ],
+      "median_cpu_ms": 11.853000000000002,
+      "command": 3,
+      "mode": "JIT O2",
+      "records": 10000,
+      "records_per_second": 840227.3285451018,
+      "amortized_us": 1.1901541,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          509
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/4": {
+      "wall_ms": [
+        20.55074,
+        20.512331,
+        20.59093
+      ],
+      "median_ms": 20.55074,
+      "min_ms": 20.512331,
+      "max_ms": 20.59093,
+      "cpu_ms": [
+        20.459000000000003,
+        20.414,
+        20.514
+      ],
+      "median_cpu_ms": 20.459000000000003,
+      "command": 4,
+      "mode": "JIT O2",
+      "records": 10000,
+      "records_per_second": 486600.48251303844,
+      "amortized_us": 2.0550740000000003,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          509
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/5": {
+      "wall_ms": [
+        28.325795,
+        28.433554,
+        28.404674
+      ],
+      "median_ms": 28.404674,
+      "min_ms": 28.325795,
+      "max_ms": 28.433554,
+      "cpu_ms": [
+        28.168,
+        28.298000000000002,
+        28.266
+      ],
+      "median_cpu_ms": 28.266,
+      "command": 5,
+      "mode": "JIT O2",
+      "records": 10000,
+      "records_per_second": 352054.7357804564,
+      "amortized_us": 2.8404674,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          10005
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          588
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/10": {
+      "wall_ms": [
+        14.286747,
+        14.409666,
+        14.312997
+      ],
+      "median_ms": 14.312997,
+      "min_ms": 14.286747,
+      "max_ms": 14.409666,
+      "cpu_ms": [
+        14.196,
+        14.302999999999999,
+        14.225
+      ],
+      "median_cpu_ms": 14.225,
+      "command": 10,
+      "mode": "JIT O2",
+      "records": 200,
+      "records_per_second": 13973.313904837682,
+      "amortized_us": 71.564985,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          1017
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2067
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/11": {
+      "wall_ms": [
+        24.297938,
+        23.745602,
+        24.04198
+      ],
+      "median_ms": 24.04198,
+      "min_ms": 23.745602,
+      "max_ms": 24.297938,
+      "cpu_ms": [
+        18.728,
+        18.026,
+        18.446
+      ],
+      "median_cpu_ms": 18.446,
+      "command": 11,
+      "mode": "JIT O2",
+      "records": 200,
+      "records_per_second": 8318.782396458195,
+      "amortized_us": 120.2099,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2478
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/12": {
+      "wall_ms": [
+        81.332467,
+        84.413329,
+        80.459682
+      ],
+      "median_ms": 81.332467,
+      "min_ms": 80.459682,
+      "max_ms": 84.413329,
+      "cpu_ms": [
+        74.093,
+        74.036,
+        73.62599999999999
+      ],
+      "median_cpu_ms": 74.036,
+      "command": 12,
+      "mode": "JIT O2",
+      "records": 100,
+      "records_per_second": 1229.5212931386923,
+      "amortized_us": 813.3246699999999,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          939
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          39454
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/13": {
+      "wall_ms": [
+        143.124767,
+        143.652164,
+        144.481549
+      ],
+      "median_ms": 143.652164,
+      "min_ms": 143.124767,
+      "max_ms": 144.481549,
+      "cpu_ms": [
+        132.77800000000002,
+        133.334,
+        134.261
+      ],
+      "median_cpu_ms": 133.334,
+      "command": 13,
+      "mode": "JIT O2",
+      "records": 3,
+      "records_per_second": 20.88377868084187,
+      "amortized_us": 47884.05466666666,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          66
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          3
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          1120253
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/14": {
+      "wall_ms": [
+        26.264337,
+        26.239257,
+        27.288221
+      ],
+      "median_ms": 26.264337,
+      "min_ms": 26.239257,
+      "max_ms": 27.288221,
+      "cpu_ms": [
+        20.572,
+        20.400000000000002,
+        21.614
+      ],
+      "median_cpu_ms": 20.572,
+      "command": 14,
+      "mode": "JIT O2",
+      "records": 200,
+      "records_per_second": 7614.888584471026,
+      "amortized_us": 131.321685,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          8024
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/15": {
+      "wall_ms": [
+        132.32819,
+        127.601647,
+        131.461994
+      ],
+      "median_ms": 131.461994,
+      "min_ms": 127.601647,
+      "max_ms": 132.32819,
+      "cpu_ms": [
+        13.785,
+        13.950000000000001,
+        14.514000000000001
+      ],
+      "median_cpu_ms": 13.950000000000001,
+      "command": 15,
+      "mode": "JIT O2",
+      "records": 21,
+      "records_per_second": 159.74198596135702,
+      "amortized_us": 6260.094952380952,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          565
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          1
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          4617
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/16": {
+      "wall_ms": [
+        132.805577,
+        133.093025,
+        132.707048
+      ],
+      "median_ms": 132.805577,
+      "min_ms": 132.707048,
+      "max_ms": 133.093025,
+      "cpu_ms": [
+        17.015,
+        18.314,
+        16.264
+      ],
+      "median_cpu_ms": 17.015,
+      "command": 16,
+      "mode": "JIT O2",
+      "records": 21,
+      "records_per_second": 158.12588954754514,
+      "amortized_us": 6324.075095238095,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          571
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          60
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2333
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/17": {
+      "wall_ms": [
+        107.167476,
+        70.244471,
+        171.217093
+      ],
+      "median_ms": 107.167476,
+      "min_ms": 70.244471,
+      "max_ms": 171.217093,
+      "cpu_ms": [
+        36.519999999999996,
+        32.102,
+        37.996
+      ],
+      "median_cpu_ms": 36.519999999999996,
+      "command": 17,
+      "mode": "JIT O2",
+      "records": 21,
+      "records_per_second": 195.9549742498368,
+      "amortized_us": 5103.213142857143,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          1027
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          33
+        ],
+        "moves": [
+          640
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          5447
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/18": {
+      "wall_ms": [
+        11.136485,
+        11.899271,
+        11.662012
+      ],
+      "median_ms": 11.662012,
+      "min_ms": 11.136485,
+      "max_ms": 11.899271,
+      "cpu_ms": [
+        6.015000000000001,
+        5.882,
+        5.877000000000001
+      ],
+      "median_cpu_ms": 5.882,
+      "command": 18,
+      "mode": "JIT O2",
+      "records": 200,
+      "records_per_second": 17149.699382919516,
+      "amortized_us": 58.31006,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          816
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          4060
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/19": {
+      "wall_ms": [
+        2.818604,
+        2.473805,
+        2.458266
+      ],
+      "median_ms": 2.473805,
+      "min_ms": 2.458266,
+      "max_ms": 2.818604,
+      "cpu_ms": [
+        2.797,
+        2.4610000000000003,
+        2.447
+      ],
+      "median_cpu_ms": 2.4610000000000003,
+      "command": 19,
+      "mode": "JIT O2",
+      "records": 200,
+      "records_per_second": 80847.11608231044,
+      "amortized_us": 12.369024999999999,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          0
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          7153
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/20": {
+      "wall_ms": [
+        149.321871,
+        145.463963,
+        141.411187
+      ],
+      "median_ms": 145.463963,
+      "min_ms": 141.411187,
+      "max_ms": 149.321871,
+      "cpu_ms": [
+        29.963,
+        29.441,
+        25.892
+      ],
+      "median_cpu_ms": 29.441,
+      "command": 20,
+      "mode": "JIT O2",
+      "records": 200,
+      "records_per_second": 1374.9109805292462,
+      "amortized_us": 727.3198150000001,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          2019
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          2478
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/30": {
+      "wall_ms": [
+        16.881632,
+        24.10717,
+        22.727237
+      ],
+      "median_ms": 22.727237,
+      "min_ms": 16.881632,
+      "max_ms": 24.10717,
+      "cpu_ms": [
+        10.376,
+        17.015,
+        16.226999999999997
+      ],
+      "median_cpu_ms": 16.226999999999997,
+      "command": 30,
+      "mode": "JIT O2",
+      "records": 100,
+      "records_per_second": 4400.006916810873,
+      "amortized_us": 227.27236999999997,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          935
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          16395
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "JIT O2/31": {
+      "wall_ms": [
+        104.614121,
+        112.742504,
+        116.298303
+      ],
+      "median_ms": 112.742504,
+      "min_ms": 104.614121,
+      "max_ms": 116.298303,
+      "cpu_ms": [
+        93.904,
+        99.43,
+        100.345
+      ],
+      "median_cpu_ms": 99.43,
+      "command": 31,
+      "mode": "JIT O2",
+      "records": 1000,
+      "records_per_second": 8869.769293043199,
+      "amortized_us": 112.742504,
+      "compile_ms": 8569.263138,
+      "counters": {
+        "managed_constructions": [
+          9035
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          1000
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          128
+        ],
+        "heap_transient_after_root": [
+          9714
+        ],
+        "heap_after_gc": [
+          128
+        ],
+        "handles_before": [
+          3
+        ],
+        "handles_after": [
+          3
+        ],
+        "process_high_water_rss_kib": [
+          173624
+        ]
+      }
+    },
+    "AOT normal/1": {
+      "wall_ms": [
+        23.467873,
+        23.432874,
+        23.429244
+      ],
+      "median_ms": 23.432874,
+      "min_ms": 23.429244,
+      "max_ms": 23.467873,
+      "cpu_ms": [
+        23.352,
+        23.316,
+        23.307000000000002
+      ],
+      "median_cpu_ms": 23.316,
+      "command": 1,
+      "mode": "AOT normal",
+      "records": 10000,
+      "records_per_second": 426750.8970517231,
+      "amortized_us": 2.3432874000000004,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          1174
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/2": {
+      "wall_ms": [
+        54.590282,
+        54.91121,
+        55.03234
+      ],
+      "median_ms": 54.91121,
+      "min_ms": 54.590282,
+      "max_ms": 55.03234,
+      "cpu_ms": [
+        54.269,
+        54.635999999999996,
+        54.759
+      ],
+      "median_cpu_ms": 54.635999999999996,
+      "command": 2,
+      "mode": "AOT normal",
+      "records": 10000,
+      "records_per_second": 182112.1770946224,
+      "amortized_us": 5.491121,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          1942
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/3": {
+      "wall_ms": [
+        10.869967,
+        10.628468,
+        10.817947
+      ],
+      "median_ms": 10.817947,
+      "min_ms": 10.628468,
+      "max_ms": 10.869967,
+      "cpu_ms": [
+        10.821000000000002,
+        10.581999999999999,
+        10.769
+      ],
+      "median_cpu_ms": 10.769,
+      "command": 3,
+      "mode": "AOT normal",
+      "records": 10000,
+      "records_per_second": 924389.8125956801,
+      "amortized_us": 1.0817947,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          903
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/4": {
+      "wall_ms": [
+        18.844431,
+        18.83007,
+        18.77528
+      ],
+      "median_ms": 18.83007,
+      "min_ms": 18.77528,
+      "max_ms": 18.844431,
+      "cpu_ms": [
+        18.762999999999998,
+        18.755999999999997,
+        18.696
+      ],
+      "median_cpu_ms": 18.755999999999997,
+      "command": 4,
+      "mode": "AOT normal",
+      "records": 10000,
+      "records_per_second": 531065.4713445038,
+      "amortized_us": 1.8830069999999999,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          903
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/5": {
+      "wall_ms": [
+        26.642365,
+        26.633435,
+        26.606515
+      ],
+      "median_ms": 26.633435,
+      "min_ms": 26.606515,
+      "max_ms": 26.642365,
+      "cpu_ms": [
+        26.525,
+        26.516000000000002,
+        26.474
+      ],
+      "median_cpu_ms": 26.516000000000002,
+      "command": 5,
+      "mode": "AOT normal",
+      "records": 10000,
+      "records_per_second": 375467.9034078781,
+      "amortized_us": 2.6633435,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          10005
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          982
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/10": {
+      "wall_ms": [
+        14.111358,
+        14.100898,
+        14.396866
+      ],
+      "median_ms": 14.111358,
+      "min_ms": 14.100898,
+      "max_ms": 14.396866,
+      "cpu_ms": [
+        14.052999999999999,
+        14.039,
+        14.322
+      ],
+      "median_cpu_ms": 14.052999999999999,
+      "command": 10,
+      "mode": "AOT normal",
+      "records": 200,
+      "records_per_second": 14172.980375099265,
+      "amortized_us": 70.55678999999999,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1017
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2461
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/11": {
+      "wall_ms": [
+        25.81266,
+        22.470199,
+        23.467424
+      ],
+      "median_ms": 23.467424,
+      "min_ms": 22.470199,
+      "max_ms": 25.81266,
+      "cpu_ms": [
+        16.87,
+        16.695999999999998,
+        17.46
+      ],
+      "median_cpu_ms": 16.87,
+      "command": 11,
+      "mode": "AOT normal",
+      "records": 200,
+      "records_per_second": 8522.45222995076,
+      "amortized_us": 117.33712000000001,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2872
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/12": {
+      "wall_ms": [
+        81.593585,
+        80.963318,
+        80.059304
+      ],
+      "median_ms": 80.963318,
+      "min_ms": 80.059304,
+      "max_ms": 81.593585,
+      "cpu_ms": [
+        71.97000000000001,
+        71.21,
+        72.03
+      ],
+      "median_cpu_ms": 71.97000000000001,
+      "command": 12,
+      "mode": "AOT normal",
+      "records": 100,
+      "records_per_second": 1235.1272461437413,
+      "amortized_us": 809.63318,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          939
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          39848
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/13": {
+      "wall_ms": [
+        139.458198,
+        139.707797,
+        142.238402
+      ],
+      "median_ms": 139.707797,
+      "min_ms": 139.458198,
+      "max_ms": 142.238402,
+      "cpu_ms": [
+        128.96699999999998,
+        129.14600000000002,
+        131.803
+      ],
+      "median_cpu_ms": 129.14600000000002,
+      "command": 13,
+      "mode": "AOT normal",
+      "records": 3,
+      "records_per_second": 21.473389921107984,
+      "amortized_us": 46569.265666666666,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          66
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          3
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          1120647
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/14": {
+      "wall_ms": [
+        25.095454,
+        28.824482,
+        24.819385
+      ],
+      "median_ms": 25.095454,
+      "min_ms": 24.819385,
+      "max_ms": 28.824482,
+      "cpu_ms": [
+        18.874,
+        19.924,
+        18.932000000000002
+      ],
+      "median_cpu_ms": 18.932000000000002,
+      "command": 14,
+      "mode": "AOT normal",
+      "records": 200,
+      "records_per_second": 7969.570903160389,
+      "amortized_us": 125.47727,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          8418
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/15": {
+      "wall_ms": [
+        137.851877,
+        137.487979,
+        141.092879
+      ],
+      "median_ms": 137.851877,
+      "min_ms": 137.487979,
+      "max_ms": 141.092879,
+      "cpu_ms": [
+        13.635,
+        13.58,
+        13.363999999999999
+      ],
+      "median_cpu_ms": 13.58,
+      "command": 15,
+      "mode": "AOT normal",
+      "records": 21,
+      "records_per_second": 152.33742519153367,
+      "amortized_us": 6564.375095238096,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          565
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          1
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          5011
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/16": {
+      "wall_ms": [
+        133.420504,
+        132.37119,
+        135.517161
+      ],
+      "median_ms": 133.420504,
+      "min_ms": 132.37119,
+      "max_ms": 135.517161,
+      "cpu_ms": [
+        12.058,
+        13.239,
+        13.586
+      ],
+      "median_cpu_ms": 13.239,
+      "command": 16,
+      "mode": "AOT normal",
+      "records": 21,
+      "records_per_second": 157.39709692597174,
+      "amortized_us": 6353.3573333333325,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          571
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          60
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2727
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/17": {
+      "wall_ms": [
+        154.681929,
+        175.728237,
+        168.245361
+      ],
+      "median_ms": 168.245361,
+      "min_ms": 154.681929,
+      "max_ms": 175.728237,
+      "cpu_ms": [
+        28.98,
+        40.043,
+        37.766
+      ],
+      "median_cpu_ms": 37.766,
+      "command": 17,
+      "mode": "AOT normal",
+      "records": 21,
+      "records_per_second": 124.81770596931942,
+      "amortized_us": 8011.683857142857,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1027
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          33
+        ],
+        "moves": [
+          640
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          5841
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/18": {
+      "wall_ms": [
+        9.232317,
+        10.41483,
+        9.045477
+      ],
+      "median_ms": 9.232317,
+      "min_ms": 9.045477,
+      "max_ms": 10.41483,
+      "cpu_ms": [
+        3.3600000000000003,
+        4.602,
+        3.318
+      ],
+      "median_cpu_ms": 3.3600000000000003,
+      "command": 18,
+      "mode": "AOT normal",
+      "records": 200,
+      "records_per_second": 21663.034317387497,
+      "amortized_us": 46.161585,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          816
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          4454
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/19": {
+      "wall_ms": [
+        2.370436,
+        2.642505,
+        2.380516
+      ],
+      "median_ms": 2.380516,
+      "min_ms": 2.370436,
+      "max_ms": 2.642505,
+      "cpu_ms": [
+        2.353,
+        2.629,
+        2.363
+      ],
+      "median_cpu_ms": 2.363,
+      "command": 19,
+      "mode": "AOT normal",
+      "records": 200,
+      "records_per_second": 84015.39834220815,
+      "amortized_us": 11.90258,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          0
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          7547
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/20": {
+      "wall_ms": [
+        147.925889,
+        142.720999,
+        141.855664
+      ],
+      "median_ms": 142.720999,
+      "min_ms": 141.855664,
+      "max_ms": 147.925889,
+      "cpu_ms": [
+        32.052,
+        26.696,
+        26.318
+      ],
+      "median_cpu_ms": 26.696,
+      "command": 20,
+      "mode": "AOT normal",
+      "records": 200,
+      "records_per_second": 1401.3354825241938,
+      "amortized_us": 713.604995,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          2019
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2872
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/30": {
+      "wall_ms": [
+        16.086316,
+        16.435055,
+        15.595679
+      ],
+      "median_ms": 16.086316,
+      "min_ms": 15.595679,
+      "max_ms": 16.435055,
+      "cpu_ms": [
+        9.889,
+        10.315,
+        9.491
+      ],
+      "median_cpu_ms": 9.889,
+      "command": 30,
+      "mode": "AOT normal",
+      "records": 100,
+      "records_per_second": 6216.463732280281,
+      "amortized_us": 160.86316,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          935
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          16789
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT normal/31": {
+      "wall_ms": [
+        107.571873,
+        111.539951,
+        108.216581
+      ],
+      "median_ms": 108.216581,
+      "min_ms": 107.571873,
+      "max_ms": 111.539951,
+      "cpu_ms": [
+        95.58500000000001,
+        97.19999999999999,
+        93.155
+      ],
+      "median_cpu_ms": 95.58500000000001,
+      "command": 31,
+      "mode": "AOT normal",
+      "records": 1000,
+      "records_per_second": 9240.728091381856,
+      "amortized_us": 108.216581,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          9035
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          1000
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          10108
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17684
+        ]
+      }
+    },
+    "AOT O2/1": {
+      "wall_ms": [
+        22.850717,
+        23.642472,
+        23.664632
+      ],
+      "median_ms": 23.642472,
+      "min_ms": 22.850717,
+      "max_ms": 23.664632,
+      "cpu_ms": [
+        22.728,
+        23.474999999999998,
+        23.488
+      ],
+      "median_cpu_ms": 23.474999999999998,
+      "command": 1,
+      "mode": "AOT O2",
+      "records": 10000,
+      "records_per_second": 422967.61523075926,
+      "amortized_us": 2.3642472000000003,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          1174
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/2": {
+      "wall_ms": [
+        50.115029,
+        50.202868,
+        51.355901
+      ],
+      "median_ms": 50.202868,
+      "min_ms": 50.115029,
+      "max_ms": 51.355901,
+      "cpu_ms": [
+        49.81,
+        49.961999999999996,
+        51.026
+      ],
+      "median_cpu_ms": 49.961999999999996,
+      "command": 2,
+      "mode": "AOT O2",
+      "records": 10000,
+      "records_per_second": 199191.80712942535,
+      "amortized_us": 5.0202868,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          1942
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/3": {
+      "wall_ms": [
+        11.274264,
+        12.10495,
+        11.542733
+      ],
+      "median_ms": 11.542733,
+      "min_ms": 11.274264,
+      "max_ms": 12.10495,
+      "cpu_ms": [
+        11.12,
+        11.934000000000001,
+        11.414
+      ],
+      "median_cpu_ms": 11.414,
+      "command": 3,
+      "mode": "AOT O2",
+      "records": 10000,
+      "records_per_second": 866345.9511711828,
+      "amortized_us": 1.1542733,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          903
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/4": {
+      "wall_ms": [
+        29.07325,
+        28.550474,
+        27.925308
+      ],
+      "median_ms": 28.550474,
+      "min_ms": 27.925308,
+      "max_ms": 29.07325,
+      "cpu_ms": [
+        28.535999999999998,
+        27.989,
+        27.459
+      ],
+      "median_cpu_ms": 27.989,
+      "command": 4,
+      "mode": "AOT O2",
+      "records": 10000,
+      "records_per_second": 350256.8818997541,
+      "amortized_us": 2.8550474,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          5
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          903
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/5": {
+      "wall_ms": [
+        34.486599,
+        27.912798,
+        26.900454
+      ],
+      "median_ms": 27.912798,
+      "min_ms": 26.900454,
+      "max_ms": 34.486599,
+      "cpu_ms": [
+        33.891,
+        27.55,
+        26.627000000000002
+      ],
+      "median_cpu_ms": 27.55,
+      "command": 5,
+      "mode": "AOT O2",
+      "records": 10000,
+      "records_per_second": 358258.60238016985,
+      "amortized_us": 2.7912798,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          10005
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          982
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/10": {
+      "wall_ms": [
+        13.254962,
+        13.318542,
+        13.336382
+      ],
+      "median_ms": 13.318542,
+      "min_ms": 13.254962,
+      "max_ms": 13.336382,
+      "cpu_ms": [
+        13.147,
+        13.202,
+        13.235999999999999
+      ],
+      "median_cpu_ms": 13.202,
+      "command": 10,
+      "mode": "AOT O2",
+      "records": 200,
+      "records_per_second": 15016.658730362527,
+      "amortized_us": 66.59271000000001,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1017
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2461
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/11": {
+      "wall_ms": [
+        22.37838,
+        22.892047,
+        25.708481
+      ],
+      "median_ms": 22.892047,
+      "min_ms": 22.37838,
+      "max_ms": 25.708481,
+      "cpu_ms": [
+        16.082,
+        16.782999999999998,
+        19.596
+      ],
+      "median_cpu_ms": 16.782999999999998,
+      "command": 11,
+      "mode": "AOT O2",
+      "records": 200,
+      "records_per_second": 8736.658630833668,
+      "amortized_us": 114.46023500000001,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2872
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/12": {
+      "wall_ms": [
+        79.042,
+        78.208225,
+        76.106477
+      ],
+      "median_ms": 78.208225,
+      "min_ms": 76.106477,
+      "max_ms": 79.042,
+      "cpu_ms": [
+        71.02799999999999,
+        68.315,
+        68.33200000000001
+      ],
+      "median_cpu_ms": 68.33200000000001,
+      "command": 12,
+      "mode": "AOT O2",
+      "records": 100,
+      "records_per_second": 1278.6378926257437,
+      "amortized_us": 782.08225,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          939
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          39848
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/13": {
+      "wall_ms": [
+        144.017021,
+        136.294497,
+        144.992236
+      ],
+      "median_ms": 144.017021,
+      "min_ms": 136.294497,
+      "max_ms": 144.992236,
+      "cpu_ms": [
+        133.386,
+        121.197,
+        133.291
+      ],
+      "median_cpu_ms": 133.291,
+      "command": 13,
+      "mode": "AOT O2",
+      "records": 3,
+      "records_per_second": 20.830871095438088,
+      "amortized_us": 48005.67366666667,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          66
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          3
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          1120647
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/14": {
+      "wall_ms": [
+        29.452598,
+        24.229859,
+        24.772116
+      ],
+      "median_ms": 24.772116,
+      "min_ms": 24.229859,
+      "max_ms": 29.452598,
+      "cpu_ms": [
+        23.551,
+        18.241,
+        18.804000000000002
+      ],
+      "median_cpu_ms": 18.804000000000002,
+      "command": 14,
+      "mode": "AOT O2",
+      "records": 200,
+      "records_per_second": 8073.593713189459,
+      "amortized_us": 123.86058000000001,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1839
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          8418
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/15": {
+      "wall_ms": [
+        130.295242,
+        131.881503,
+        138.654183
+      ],
+      "median_ms": 131.881503,
+      "min_ms": 130.295242,
+      "max_ms": 138.654183,
+      "cpu_ms": [
+        12.681,
+        12.581999999999999,
+        12.462000000000002
+      ],
+      "median_cpu_ms": 12.581999999999999,
+      "command": 15,
+      "mode": "AOT O2",
+      "records": 21,
+      "records_per_second": 159.23385404547594,
+      "amortized_us": 6280.071571428572,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          565
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          1
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          5011
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/16": {
+      "wall_ms": [
+        131.442695,
+        132.933676,
+        130.078553
+      ],
+      "median_ms": 131.442695,
+      "min_ms": 130.078553,
+      "max_ms": 132.933676,
+      "cpu_ms": [
+        12.274999999999999,
+        14.544,
+        13.155999999999999
+      ],
+      "median_cpu_ms": 13.155999999999999,
+      "command": 16,
+      "mode": "AOT O2",
+      "records": 21,
+      "records_per_second": 159.76543998888644,
+      "amortized_us": 6259.1759523809515,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          571
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          60
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2727
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/17": {
+      "wall_ms": [
+        159.093294,
+        149.724699,
+        152.506392
+      ],
+      "median_ms": 152.506392,
+      "min_ms": 149.724699,
+      "max_ms": 159.093294,
+      "cpu_ms": [
+        29.027,
+        27.941,
+        28.766
+      ],
+      "median_cpu_ms": 28.766,
+      "command": 17,
+      "mode": "AOT O2",
+      "records": 21,
+      "records_per_second": 137.69914640692568,
+      "amortized_us": 7262.209142857142,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          1027
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          21
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          33
+        ],
+        "moves": [
+          640
+        ],
+        "deletes": [
+          20
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          5841
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/18": {
+      "wall_ms": [
+        9.111176,
+        9.692893,
+        11.588553
+      ],
+      "median_ms": 9.692893,
+      "min_ms": 9.111176,
+      "max_ms": 11.588553,
+      "cpu_ms": [
+        3.25,
+        3.8939999999999997,
+        5.75
+      ],
+      "median_cpu_ms": 3.8939999999999997,
+      "command": 18,
+      "mode": "AOT O2",
+      "records": 200,
+      "records_per_second": 20633.674590238435,
+      "amortized_us": 48.464465,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          816
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          4454
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/19": {
+      "wall_ms": [
+        2.317937,
+        2.394656,
+        2.298827
+      ],
+      "median_ms": 2.317937,
+      "min_ms": 2.298827,
+      "max_ms": 2.394656,
+      "cpu_ms": [
+        2.303,
+        2.3770000000000002,
+        2.2889999999999997
+      ],
+      "median_cpu_ms": 2.303,
+      "command": 19,
+      "mode": "AOT O2",
+      "records": 200,
+      "records_per_second": 86283.62203114234,
+      "amortized_us": 11.589685000000001,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          0
+        ],
+        "console_calls": [
+          200
+        ],
+        "file_writes": [
+          0
+        ],
+        "flushes": [
+          0
+        ],
+        "metadata": [
+          0
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          7547
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/20": {
+      "wall_ms": [
+        143.095088,
+        146.224049,
+        144.852247
+      ],
+      "median_ms": 144.852247,
+      "min_ms": 143.095088,
+      "max_ms": 146.224049,
+      "cpu_ms": [
+        24.185000000000002,
+        25.232999999999997,
+        28.226000000000003
+      ],
+      "median_cpu_ms": 25.232999999999997,
+      "command": 20,
+      "mode": "AOT O2",
+      "records": 200,
+      "records_per_second": 1380.7172766881552,
+      "amortized_us": 724.261235,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          2019
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          200
+        ],
+        "flushes": [
+          21
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          2872
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/30": {
+      "wall_ms": [
+        16.278445,
+        16.789572,
+        16.713113
+      ],
+      "median_ms": 16.713113,
+      "min_ms": 16.278445,
+      "max_ms": 16.789572,
+      "cpu_ms": [
+        9.905000000000001,
+        10.003,
+        10.191
+      ],
+      "median_cpu_ms": 10.003,
+      "command": 30,
+      "mode": "AOT O2",
+      "records": 100,
+      "records_per_second": 5983.325787362294,
+      "amortized_us": 167.13113,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          935
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          100
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          16789
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    },
+    "AOT O2/31": {
+      "wall_ms": [
+        114.719422,
+        109.413483,
+        110.276579
+      ],
+      "median_ms": 110.276579,
+      "min_ms": 109.413483,
+      "max_ms": 114.719422,
+      "cpu_ms": [
+        97.50399999999999,
+        94.69900000000001,
+        93.648
+      ],
+      "median_cpu_ms": 94.69900000000001,
+      "command": 31,
+      "mode": "AOT O2",
+      "records": 1000,
+      "records_per_second": 9068.108650704517,
+      "amortized_us": 110.276579,
+      "compile_ms": 0.0,
+      "counters": {
+        "managed_constructions": [
+          9035
+        ],
+        "console_calls": [
+          0
+        ],
+        "file_writes": [
+          1000
+        ],
+        "flushes": [
+          1
+        ],
+        "metadata": [
+          4
+        ],
+        "moves": [
+          0
+        ],
+        "deletes": [
+          0
+        ],
+        "heap_before": [
+          234
+        ],
+        "heap_transient_after_root": [
+          10108
+        ],
+        "heap_after_gc": [
+          234
+        ],
+        "handles_before": [
+          7
+        ],
+        "handles_after": [
+          7
+        ],
+        "process_high_water_rss_kib": [
+          17824
+        ]
+      }
+    }
+  },
+  "components_JIT_O2": {
+    "0/4": {
+      "wall_ms": [
+        0.936385,
+        0.931265,
+        0.903535
+      ],
+      "median_ms": 0.931265,
+      "min_ms": 0.903535,
+      "max_ms": 0.936385,
+      "cpu_ms": [
+        0.933,
+        0.9269999999999999,
+        0.9
+      ],
+      "median_cpu_ms": 0.9269999999999999,
+      "shape": 0,
+      "stage": 4,
+      "native_allocations": [
+        3421,
+        3421,
+        3421
+      ],
+      "requested_native_allocation_bytes": [
+        142392,
+        142392,
+        142392
+      ],
+      "allocation_counting_wall_ms": [
+        0.940565,
+        0.927225,
+        0.900494
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        6415,
+        6415,
+        6415
+      ],
+      "gc_collections": [
+        1,
+        1,
+        1
+      ],
+      "heap_before": [
+        543,
+        543,
+        543
+      ],
+      "heap_after_root": [
+        7687,
+        7687,
+        7687
+      ],
+      "heap_after_gc": [
+        543,
+        543,
+        543
+      ]
+    },
+    "0/6": {
+      "wall_ms": [
+        8.699249,
+        8.693859,
+        8.663219
+      ],
+      "median_ms": 8.693859,
+      "min_ms": 8.663219,
+      "max_ms": 8.699249,
+      "cpu_ms": [
+        8.657,
+        8.655,
+        8.626
+      ],
+      "median_cpu_ms": 8.655,
+      "shape": 0,
+      "stage": 6,
+      "native_allocations": [
+        16223,
+        16223,
+        16223
+      ],
+      "requested_native_allocation_bytes": [
+        539704,
+        539704,
+        539704
+      ],
+      "allocation_counting_wall_ms": [
+        9.069197,
+        9.590214,
+        8.876538
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        85215,
+        85215,
+        85215
+      ],
+      "gc_collections": [
+        1,
+        1,
+        1
+      ],
+      "heap_before": [
+        543,
+        543,
+        543
+      ],
+      "heap_after_root": [
+        7591,
+        7591,
+        7591
+      ],
+      "heap_after_gc": [
+        543,
+        543,
+        543
+      ]
+    },
+    "0/7": {
+      "wall_ms": [
+        11.132626,
+        11.192925,
+        11.119515
+      ],
+      "median_ms": 11.132626,
+      "min_ms": 11.119515,
+      "max_ms": 11.192925,
+      "cpu_ms": [
+        11.073,
+        11.14,
+        11.063
+      ],
+      "median_cpu_ms": 11.073,
+      "shape": 0,
+      "stage": 7,
+      "native_allocations": [
+        24523,
+        24523,
+        24523
+      ],
+      "requested_native_allocation_bytes": [
+        941752,
+        941752,
+        941752
+      ],
+      "allocation_counting_wall_ms": [
+        11.844041,
+        11.514764,
+        11.240875
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        89215,
+        89215,
+        89215
+      ],
+      "gc_collections": [
+        8,
+        8,
+        8
+      ],
+      "heap_before": [
+        543,
+        543,
+        543
+      ],
+      "heap_after_root": [
+        6568,
+        6568,
+        6568
+      ],
+      "heap_after_gc": [
+        543,
+        543,
+        543
+      ]
+    },
+    "0/9": {
+      "wall_ms": [
+        18.647232,
+        18.629802,
+        18.664541
+      ],
+      "median_ms": 18.647232,
+      "min_ms": 18.629802,
+      "max_ms": 18.664541,
+      "cpu_ms": [
+        18.558999999999997,
+        18.554000000000002,
+        18.591
+      ],
+      "median_cpu_ms": 18.558999999999997,
+      "shape": 0,
+      "stage": 9,
+      "native_allocations": [
+        26211,
+        26211,
+        26211
+      ],
+      "requested_native_allocation_bytes": [
+        813696,
+        813696,
+        813696
+      ],
+      "allocation_counting_wall_ms": [
+        18.725251,
+        18.734341,
+        18.586392
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        58015,
+        58015,
+        58015
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        543,
+        543,
+        543
+      ],
+      "heap_after_root": [
+        679,
+        679,
+        679
+      ],
+      "heap_after_gc": [
+        543,
+        543,
+        543
+      ]
+    },
+    "0/11": {
+      "wall_ms": [
+        1.78319,
+        1.785489,
+        1.602511
+      ],
+      "median_ms": 1.78319,
+      "min_ms": 1.602511,
+      "max_ms": 1.785489,
+      "cpu_ms": [
+        1.777,
+        1.776,
+        1.591
+      ],
+      "median_cpu_ms": 1.776,
+      "shape": 0,
+      "stage": 11,
+      "native_allocations": [
+        3411,
+        3411,
+        3411
+      ],
+      "requested_native_allocation_bytes": [
+        125296,
+        125296,
+        125296
+      ],
+      "allocation_counting_wall_ms": [
+        1.591721,
+        1.5847,
+        1.564181
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        7215,
+        7215,
+        7215
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        543,
+        543,
+        543
+      ],
+      "heap_after_root": [
+        7079,
+        7079,
+        7079
+      ],
+      "heap_after_gc": [
+        543,
+        543,
+        543
+      ]
+    },
+    "0/12": {
+      "wall_ms": [
+        14.903203,
+        14.762394,
+        14.732225
+      ],
+      "median_ms": 14.762394,
+      "min_ms": 14.732225,
+      "max_ms": 14.903203,
+      "cpu_ms": [
+        14.824,
+        14.681,
+        14.661999999999999
+      ],
+      "median_cpu_ms": 14.681,
+      "shape": 0,
+      "stage": 12,
+      "native_allocations": [
+        32425,
+        32425,
+        32425
+      ],
+      "requested_native_allocation_bytes": [
+        1251976,
+        1251976,
+        1251976
+      ],
+      "allocation_counting_wall_ms": [
+        14.725024,
+        14.488976,
+        14.978572
+      ],
+      "constructions": [
+        1000,
+        1000,
+        1000
+      ],
+      "polls": [
+        107015,
+        107015,
+        107015
+      ],
+      "gc_collections": [
+        14,
+        14,
+        14
+      ],
+      "heap_before": [
+        543,
+        543,
+        543
+      ],
+      "heap_after_root": [
+        1297,
+        1297,
+        1297
+      ],
+      "heap_after_gc": [
+        543,
+        543,
+        543
+      ]
+    },
+    "1/4": {
+      "wall_ms": [
+        0.484407,
+        0.492417,
+        0.473728
+      ],
+      "median_ms": 0.484407,
+      "min_ms": 0.473728,
+      "max_ms": 0.492417,
+      "cpu_ms": [
+        0.486,
+        0.48700000000000004,
+        0.475
+      ],
+      "median_cpu_ms": 0.486,
+      "shape": 1,
+      "stage": 4,
+      "native_allocations": [
+        1711,
+        1711,
+        1711
+      ],
+      "requested_native_allocation_bytes": [
+        263696,
+        263696,
+        263696
+      ],
+      "allocation_counting_wall_ms": [
+        0.491987,
+        0.490157,
+        0.478017
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        3215,
+        3215,
+        3215
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        109159,
+        109159,
+        109159
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "1/6": {
+      "wall_ms": [
+        59.556154,
+        59.253025,
+        60.355539
+      ],
+      "median_ms": 59.556154,
+      "min_ms": 59.253025,
+      "max_ms": 60.355539,
+      "cpu_ms": [
+        59.288000000000004,
+        58.986,
+        60.068999999999996
+      ],
+      "median_cpu_ms": 59.288000000000004,
+      "shape": 1,
+      "stage": 6,
+      "native_allocations": [
+        104111,
+        104111,
+        104111
+      ],
+      "requested_native_allocation_bytes": [
+        3438096,
+        3438096,
+        3438096
+      ],
+      "allocation_counting_wall_ms": [
+        61.639782,
+        61.636282,
+        61.94068
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        618615,
+        618615,
+        618615
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        109159,
+        109159,
+        109159
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "1/7": {
+      "wall_ms": [
+        62.396657,
+        63.189222,
+        61.957979
+      ],
+      "median_ms": 62.396657,
+      "min_ms": 61.957979,
+      "max_ms": 63.189222,
+      "cpu_ms": [
+        62.059000000000005,
+        62.885,
+        61.673
+      ],
+      "median_cpu_ms": 62.059000000000005,
+      "shape": 1,
+      "stage": 7,
+      "native_allocations": [
+        108267,
+        108267,
+        108267
+      ],
+      "requested_native_allocation_bytes": [
+        4599624,
+        4599624,
+        4599624
+      ],
+      "allocation_counting_wall_ms": [
+        64.644154,
+        64.521444,
+        65.30398
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        620615,
+        620615,
+        620615
+      ],
+      "gc_collections": [
+        4,
+        4,
+        4
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        34397,
+        34397,
+        34397
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "1/9": {
+      "wall_ms": [
+        141.382607,
+        140.599642,
+        144.772097
+      ],
+      "median_ms": 141.382607,
+      "min_ms": 140.599642,
+      "max_ms": 144.772097,
+      "cpu_ms": [
+        140.796,
+        140.024,
+        143.41
+      ],
+      "median_cpu_ms": 140.796,
+      "shape": 1,
+      "stage": 9,
+      "native_allocations": [
+        205111,
+        205111,
+        205111
+      ],
+      "requested_native_allocation_bytes": [
+        6359596,
+        6359596,
+        6359596
+      ],
+      "allocation_counting_wall_ms": [
+        142.892989,
+        143.005898,
+        145.294155
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        413015,
+        413015,
+        413015
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        3559,
+        3559,
+        3559
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "1/11": {
+      "wall_ms": [
+        4.198596,
+        4.137386,
+        5.440178
+      ],
+      "median_ms": 4.198596,
+      "min_ms": 4.137386,
+      "max_ms": 5.440178,
+      "cpu_ms": [
+        4.1770000000000005,
+        4.118,
+        5.420999999999999
+      ],
+      "median_cpu_ms": 4.1770000000000005,
+      "shape": 1,
+      "stage": 11,
+      "native_allocations": [
+        1711,
+        1711,
+        1711
+      ],
+      "requested_native_allocation_bytes": [
+        255396,
+        255396,
+        255396
+      ],
+      "allocation_counting_wall_ms": [
+        4.062537,
+        6.221444,
+        4.090036
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        3615,
+        3615,
+        3615
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        6759,
+        6759,
+        6759
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "1/12": {
+      "wall_ms": [
+        69.149677,
+        70.098492,
+        69.099428
+      ],
+      "median_ms": 69.149677,
+      "min_ms": 69.099428,
+      "max_ms": 70.098492,
+      "cpu_ms": [
+        68.79899999999999,
+        69.727,
+        68.735
+      ],
+      "median_cpu_ms": 68.79899999999999,
+      "shape": 1,
+      "stage": 12,
+      "native_allocations": [
+        112219,
+        112219,
+        112219
+      ],
+      "requested_native_allocation_bytes": [
+        4947760,
+        4947760,
+        4947760
+      ],
+      "allocation_counting_wall_ms": [
+        67.879255,
+        67.681296,
+        66.442004
+      ],
+      "constructions": [
+        500,
+        500,
+        500
+      ],
+      "polls": [
+        629515,
+        629515,
+        629515
+      ],
+      "gc_collections": [
+        7,
+        7,
+        7
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        6961,
+        6961,
+        6961
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "4/4": {
+      "wall_ms": [
+        0.534447,
+        0.498717,
+        0.497138
+      ],
+      "median_ms": 0.498717,
+      "min_ms": 0.497138,
+      "max_ms": 0.534447,
+      "cpu_ms": [
+        0.528,
+        0.5,
+        0.49200000000000005
+      ],
+      "median_cpu_ms": 0.5,
+      "shape": 4,
+      "stage": 4,
+      "native_allocations": [
+        1711,
+        1711,
+        1711
+      ],
+      "requested_native_allocation_bytes": [
+        263696,
+        263696,
+        263696
+      ],
+      "allocation_counting_wall_ms": [
+        0.497537,
+        0.474547,
+        0.488887
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        3215,
+        3215,
+        3215
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        4575,
+        4575,
+        4575
+      ],
+      "heap_after_root": [
+        110311,
+        110311,
+        110311
+      ],
+      "heap_after_gc": [
+        4575,
+        4575,
+        4575
+      ]
+    },
+    "4/6": {
+      "wall_ms": [
+        921.526739,
+        922.152385,
+        931.163103
+      ],
+      "median_ms": 922.152385,
+      "min_ms": 921.526739,
+      "max_ms": 931.163103,
+      "cpu_ms": [
+        915.571,
+        916.614,
+        925.284
+      ],
+      "median_cpu_ms": 916.614,
+      "shape": 4,
+      "stage": 6,
+      "native_allocations": [
+        2504835,
+        2504835,
+        2504835
+      ],
+      "requested_native_allocation_bytes": [
+        86424340,
+        86424340,
+        86424340
+      ],
+      "allocation_counting_wall_ms": [
+        908.763584,
+        914.978898,
+        906.381778
+      ],
+      "constructions": [
+        77100,
+        77100,
+        77100
+      ],
+      "polls": [
+        2553315,
+        2553315,
+        2553315
+      ],
+      "gc_collections": [
+        1158,
+        1158,
+        1158
+      ],
+      "heap_before": [
+        4575,
+        4575,
+        4575
+      ],
+      "heap_after_root": [
+        24334,
+        24334,
+        24334
+      ],
+      "heap_after_gc": [
+        4575,
+        4575,
+        4575
+      ]
+    },
+    "4/7": {
+      "wall_ms": [
+        910.628222,
+        908.790613,
+        911.368018
+      ],
+      "median_ms": 910.628222,
+      "min_ms": 908.790613,
+      "max_ms": 911.368018,
+      "cpu_ms": [
+        904.914,
+        903.475,
+        905.959
+      ],
+      "median_cpu_ms": 904.914,
+      "shape": 4,
+      "stage": 7,
+      "native_allocations": [
+        2509955,
+        2509955,
+        2509955
+      ],
+      "requested_native_allocation_bytes": [
+        89737292,
+        89737292,
+        89737292
+      ],
+      "allocation_counting_wall_ms": [
+        943.026435,
+        921.385731,
+        949.05021
+      ],
+      "constructions": [
+        77100,
+        77100,
+        77100
+      ],
+      "polls": [
+        2555315,
+        2555315,
+        2555315
+      ],
+      "gc_collections": [
+        1162,
+        1162,
+        1162
+      ],
+      "heap_before": [
+        4575,
+        4575,
+        4575
+      ],
+      "heap_after_root": [
+        26045,
+        26045,
+        26045
+      ],
+      "heap_after_gc": [
+        4575,
+        4575,
+        4575
+      ]
+    },
+    "4/9": {
+      "wall_ms": [
+        138.221696,
+        137.367071,
+        137.290851
+      ],
+      "median_ms": 137.367071,
+      "min_ms": 137.290851,
+      "max_ms": 138.221696,
+      "cpu_ms": [
+        137.56799999999998,
+        136.783,
+        136.72400000000002
+      ],
+      "median_cpu_ms": 136.783,
+      "shape": 4,
+      "stage": 9,
+      "native_allocations": [
+        205111,
+        205111,
+        205111
+      ],
+      "requested_native_allocation_bytes": [
+        6359596,
+        6359596,
+        6359596
+      ],
+      "allocation_counting_wall_ms": [
+        143.932753,
+        144.151971,
+        144.588819
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        413015,
+        413015,
+        413015
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        4575,
+        4575,
+        4575
+      ],
+      "heap_after_root": [
+        4711,
+        4711,
+        4711
+      ],
+      "heap_after_gc": [
+        4575,
+        4575,
+        4575
+      ]
+    },
+    "4/11": {
+      "wall_ms": [
+        7.946224,
+        7.876844,
+        8.350892
+      ],
+      "median_ms": 7.946224,
+      "min_ms": 7.876844,
+      "max_ms": 8.350892,
+      "cpu_ms": [
+        7.912000000000001,
+        7.846000000000001,
+        8.309000000000001
+      ],
+      "median_cpu_ms": 7.912000000000001,
+      "shape": 4,
+      "stage": 11,
+      "native_allocations": [
+        1711,
+        1711,
+        1711
+      ],
+      "requested_native_allocation_bytes": [
+        485796,
+        485796,
+        485796
+      ],
+      "allocation_counting_wall_ms": [
+        8.015333,
+        7.966514,
+        8.044913
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        3615,
+        3615,
+        3615
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        4575,
+        4575,
+        4575
+      ],
+      "heap_after_root": [
+        7911,
+        7911,
+        7911
+      ],
+      "heap_after_gc": [
+        4575,
+        4575,
+        4575
+      ]
+    },
+    "4/12": {
+      "wall_ms": [
+        942.703856,
+        954.317748,
+        947.525418
+      ],
+      "median_ms": 947.525418,
+      "min_ms": 942.703856,
+      "max_ms": 954.317748,
+      "cpu_ms": [
+        936.843,
+        945.349,
+        937.8290000000001
+      ],
+      "median_cpu_ms": 937.8290000000001,
+      "shape": 4,
+      "stage": 12,
+      "native_allocations": [
+        2516265,
+        2516265,
+        2516265
+      ],
+      "requested_native_allocation_bytes": [
+        95087668,
+        95087668,
+        95087668
+      ],
+      "allocation_counting_wall_ms": [
+        917.908872,
+        945.943238,
+        939.111038
+      ],
+      "constructions": [
+        77600,
+        77600,
+        77600
+      ],
+      "polls": [
+        2564215,
+        2564215,
+        2564215
+      ],
+      "gc_collections": [
+        1165,
+        1165,
+        1165
+      ],
+      "heap_before": [
+        4575,
+        4575,
+        4575
+      ],
+      "heap_after_root": [
+        22492,
+        22492,
+        22492
+      ],
+      "heap_after_gc": [
+        4575,
+        4575,
+        4575
+      ]
+    },
+    "7/4": {
+      "wall_ms": [
+        0.487637,
+        0.470197,
+        0.465857
+      ],
+      "median_ms": 0.470197,
+      "min_ms": 0.465857,
+      "max_ms": 0.487637,
+      "cpu_ms": [
+        0.48000000000000004,
+        0.472,
+        0.462
+      ],
+      "median_cpu_ms": 0.472,
+      "shape": 7,
+      "stage": 4,
+      "native_allocations": [
+        1711,
+        1711,
+        1711
+      ],
+      "requested_native_allocation_bytes": [
+        263696,
+        263696,
+        263696
+      ],
+      "allocation_counting_wall_ms": [
+        0.454537,
+        0.460127,
+        0.452897
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        3215,
+        3215,
+        3215
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        109159,
+        109159,
+        109159
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "7/6": {
+      "wall_ms": [
+        38.770495,
+        38.196138,
+        38.409627
+      ],
+      "median_ms": 38.409627,
+      "min_ms": 38.196138,
+      "max_ms": 38.770495,
+      "cpu_ms": [
+        38.439,
+        37.982,
+        38.23
+      ],
+      "median_cpu_ms": 38.23,
+      "shape": 7,
+      "stage": 6,
+      "native_allocations": [
+        56111,
+        56111,
+        56111
+      ],
+      "requested_native_allocation_bytes": [
+        1950096,
+        1950096,
+        1950096
+      ],
+      "allocation_counting_wall_ms": [
+        39.67602,
+        39.51348,
+        39.59369
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        530615,
+        530615,
+        530615
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        109159,
+        109159,
+        109159
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "7/7": {
+      "wall_ms": [
+        41.115271,
+        41.152481,
+        41.17958
+      ],
+      "median_ms": 41.152481,
+      "min_ms": 41.115271,
+      "max_ms": 41.17958,
+      "cpu_ms": [
+        40.842999999999996,
+        40.851,
+        40.916000000000004
+      ],
+      "median_cpu_ms": 40.851,
+      "shape": 7,
+      "stage": 7,
+      "native_allocations": [
+        60267,
+        60267,
+        60267
+      ],
+      "requested_native_allocation_bytes": [
+        3111624,
+        3111624,
+        3111624
+      ],
+      "allocation_counting_wall_ms": [
+        41.697598,
+        41.783517,
+        41.487979
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        532615,
+        532615,
+        532615
+      ],
+      "gc_collections": [
+        4,
+        4,
+        4
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        34397,
+        34397,
+        34397
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "7/9": {
+      "wall_ms": [
+        162.641934,
+        135.578242,
+        135.447863
+      ],
+      "median_ms": 135.578242,
+      "min_ms": 135.447863,
+      "max_ms": 162.641934,
+      "cpu_ms": [
+        161.28400000000002,
+        134.768,
+        134.52
+      ],
+      "median_cpu_ms": 134.768,
+      "shape": 7,
+      "stage": 9,
+      "native_allocations": [
+        205111,
+        205111,
+        205111
+      ],
+      "requested_native_allocation_bytes": [
+        6359596,
+        6359596,
+        6359596
+      ],
+      "allocation_counting_wall_ms": [
+        144.636099,
+        144.59635,
+        144.060012
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        413015,
+        413015,
+        413015
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        3559,
+        3559,
+        3559
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "7/11": {
+      "wall_ms": [
+        4.036877,
+        4.294935,
+        4.067466
+      ],
+      "median_ms": 4.067466,
+      "min_ms": 4.036877,
+      "max_ms": 4.294935,
+      "cpu_ms": [
+        4.018,
+        4.225,
+        4.047000000000001
+      ],
+      "median_cpu_ms": 4.047000000000001,
+      "shape": 7,
+      "stage": 11,
+      "native_allocations": [
+        1711,
+        1711,
+        1711
+      ],
+      "requested_native_allocation_bytes": [
+        255396,
+        255396,
+        255396
+      ],
+      "allocation_counting_wall_ms": [
+        4.130156,
+        4.071796,
+        5.334549
+      ],
+      "constructions": [
+        0,
+        0,
+        0
+      ],
+      "polls": [
+        3615,
+        3615,
+        3615
+      ],
+      "gc_collections": [
+        0,
+        0,
+        0
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        6759,
+        6759,
+        6759
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    },
+    "7/12": {
+      "wall_ms": [
+        46.880027,
+        46.708688,
+        46.47491
+      ],
+      "median_ms": 46.708688,
+      "min_ms": 46.47491,
+      "max_ms": 46.880027,
+      "cpu_ms": [
+        46.544000000000004,
+        46.357,
+        46.203
+      ],
+      "median_cpu_ms": 46.357,
+      "shape": 7,
+      "stage": 12,
+      "native_allocations": [
+        64219,
+        64219,
+        64219
+      ],
+      "requested_native_allocation_bytes": [
+        3459760,
+        3459760,
+        3459760
+      ],
+      "allocation_counting_wall_ms": [
+        45.715235,
+        45.709374,
+        45.498835
+      ],
+      "constructions": [
+        500,
+        500,
+        500
+      ],
+      "polls": [
+        541515,
+        541515,
+        541515
+      ],
+      "gc_collections": [
+        7,
+        7,
+        7
+      ],
+      "heap_before": [
+        3423,
+        3423,
+        3423
+      ],
+      "heap_after_root": [
+        6961,
+        6961,
+        6961
+      ],
+      "heap_after_gc": [
+        3423,
+        3423,
+        3423
+      ]
+    }
+  },
+  "raw_evidence": "/home/shmellyorc/.local/state/void-log-performance/ffd8920b-20261104-9v8echee",
+  "raw_stdout_sha256": {
+    "measure-void_log_host.stdout": "b0c29149040a2c00c1e7a103eb0d023b509d0e1c80afaef0e43c0298929e54a2",
+    "measure-void_log_probe_normal.stdout": "6e50b4c86351144f58f43077dd9d5dc4dc09ded9f26e5d207e73477831c620ca",
+    "measure-void_log_probe_optimized.stdout": "fecf6f405fa5f4df18227cea7881fee9f478fa96d2147485738fddd7705ca261",
+    "measure-components-timing.stdout": "7dd1e58ab4a1c32e5aadb307c2ace4a444c157baac08c2fb18d0f376e54400be",
+    "measure-components-counts.stdout": "27b3ab03677d873437f2b9847e31a5ad14bb22d4893d75d5c22af01664d0be92"
+  },
+  "source_preservation": "all source-before hashes unchanged",
+  "logger_sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+  "limitations": [
+    "Active desktop, no CPU isolation; no concurrent builds/validation during execution",
+    "console is existing isolated adapter, not physical terminal rendering",
+    "RSS is process cumulative high-water mark; post-root snapshots are not peak live heap",
+    "native counts use ordinary C++ new/new[] shim; not malloc/mmap/OS total allocation",
+    "allocation counting runs are excluded from timing rankings",
+    "no production edits, full CTest or correctness acceptance, HTTP/installation/VM tests, historical crash campaign or ptrace"
+  ]
+}

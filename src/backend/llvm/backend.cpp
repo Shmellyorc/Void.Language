@@ -1385,6 +1385,21 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     v = b.CreateInsertValue(v, rejected, 2);
                     break;
                 }
+                case Op::text_translate: {
+                    auto* storage = value_roots[n].at(values.size());
+                    b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)), storage);
+                    auto* payload = b.CreateStructGEP(type(instruction.type), storage, 1);
+                    const auto& args = instruction.arguments;
+                    auto* status = b.CreateCall(module->getOrInsertFunction("vd_text_translate", b.getInt32Ty(),
+                        b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), b.getInt64Ty(), b.getPtrTy()),
+                        {payload, value_roots[n].at(args[0]), value_roots[n].at(args[1]),
+                         value_roots[n].at(args[2]), element_record(ir::Type::string), values[args[3]], failure});
+                    array_failure();
+                    v = b.CreateLoad(type(instruction.type), storage);
+                    v = b.CreateInsertValue(v, b.CreateZExt(b.CreateICmpNE(status, b.getInt32(0)), b.getInt32Ty()), 0);
+                    v = b.CreateInsertValue(v, status, 2);
+                    break;
+                }
                 case Op::text_case: {
                     auto* storage = value_roots[n].at(values.size());
                     b.CreateCall(module->getOrInsertFunction("vd_text_case", b.getVoidTy(),
@@ -1897,6 +1912,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);
     bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);
     bind("vd_text_case", vd_text_case);
+    bind("vd_text_translate", vd_text_translate);
     bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);

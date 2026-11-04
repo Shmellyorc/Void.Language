@@ -1707,7 +1707,13 @@ class Semantics {
         auto context=current?current:default_context;
         return base.token.text=="string" || (context && context->substitutions.contains(base.token.text) && context->substitutions.at(base.token.text)==Type::string);
     }
-    Type byte_list() {auto definition=std::make_shared<ir::ValueType>();definition->identity=definition->name=ir::array_identity(Type::u8,{});definition->element=ir::FieldType(Type::u8);return Type(definition,Type::growable_array);}
+    Type list_type(Type element) {
+        auto definition = std::make_shared<ir::ValueType>();
+        definition->identity = definition->name = ir::array_identity(element, {});
+        definition->element = ir::FieldType(element);
+        return Type(definition, Type::growable_array);
+    }
+    Type byte_list() { return list_type(Type::u8); }
     void builtin_record(const Function& function,const std::string& documentation) {
         auto text=std::make_shared<const SourceFile>("<core prelude>",function.token.text);SourceSpan site{text,"$core",0,function.token.text.size()};
         AnalyzedDeclaration record{AnalyzedDeclaration::Kind::function,function.symbol,"$core","public",site,{},function.result,{}};
@@ -3140,13 +3146,29 @@ class Semantics {
             return e.type;
         }
 
-        if (e.target == "$text.case") {
+        if (e.target == "$text.case" || e.target == "$text.translate") {
             return e.type;
         }
 
         if (unit.identity == "/@stdlib/text.void" && e.qualifier.empty() &&
             e.token.text == "_text_case") {
             return text_case_call(e);
+        }
+
+        if (unit.identity == "/@stdlib/text.void" && e.qualifier.empty() &&
+            e.token.text == "_translate_scalars") {
+            if (!current || !e.type_arguments.empty())
+                error(source,e.token,Code::unsupported_type,"Private text translation requires a runtime call.");
+            Function target;
+            target.token = e.token;
+            target.symbol = "$text.translate";
+            target.result = unit.make_result(Type::string, Type::i32);
+            target.parameters.push_back({Token{TokenKind::name, "value", e.token.offset}, Type::string});
+            target.parameters.push_back({Token{TokenKind::name, "keys", e.token.offset}, ir::readonly_view(list_type(Type::i32))});
+            target.parameters.push_back({Token{TokenKind::name, "replacements", e.token.offset}, ir::readonly_view(list_type(Type::string))});
+            target.parameters.push_back({Token{TokenKind::name, "max_bytes", e.token.offset}, Type::i64});
+            e.target = target.symbol;
+            return e.type = call_arguments(e, target, 0);
         }
 
         if (e.target == "$memory.write" || e.target == "$temporal.result") {
@@ -3963,7 +3985,7 @@ class Lowering {
             i.op == ir::Op::string_join ||
             i.op == ir::Op::format_unwrap ||
             i.op == ir::Op::format_layout ||
-            i.op == ir::Op::text_case ||
+            i.op == ir::Op::text_case || i.op == ir::Op::text_translate ||
             i.op == ir::Op::memory_write ||
             i.op == ir::Op::temporal_result ||
             i.op == ir::Op::scalar_parse ||
@@ -4546,6 +4568,15 @@ class Lowering {
                 ir::Instruction operation{ir::Op::text_case,
                     expression(*e.parts[0]), expression(*e.parts[1])};
                 operation.type = Type::string;
+                return emit(operation, e.token);
+            }
+
+            if (e.target == "$text.translate") {
+                ir::Instruction operation{ir::Op::text_translate};
+                operation.type = e.type;
+                operation.arguments.resize(e.parts.size());
+                for (unsigned n = 0; n < e.parts.size(); ++n)
+                    operation.arguments.at(e.argument_indexes.at(n)) = expression(*e.parts[n]);
                 return emit(operation, e.token);
             }
 

@@ -1,5 +1,69 @@
 # VOID logging — mandatory performance repair handoff
 
+## Bounded framing implementation — 4 November 2026
+
+**LOG-PERF OPEN / release HOLD. Golden Wrench approved the bounded candidate for commit and push.**
+The authorized text.translate_scalars candidate and _quote integration are
+implemented in the working tree. The current LLVM 23 check passed 48 observations
+on the historical source path. Original LLVM 19 cause/classification evidence
+is preserved. Golden Wrench explicitly approved existing frozen-backing
+snapshots and atomic string publication.
+
+Final Release/LLVM 23 JIT O2 medians are heavy framing **8.603 ms** (PASS ≤10),
+full heavy console **18.501 ms** (PASS ≤20), and file200 **21.390 ms** (FAIL <10).
+The current prepared-file control is 12.195 ms. Text JIT/AOT, 31,224 ownership
+checks, 15 logging byte/UTC checks, 1,688 logging JIT checks and 827 checks per
+AOT mode pass. The initial candidate and failed build diagnostics are retained.
+The report includes the source diff identity, measurements, safety boundary and
+remaining limitations. [Candidate report](BOUNDED_FRAMING_RESULT.md) · [Evidence](evidence/llvm23-framing-20261104/results.json)
+
+The smallest next measurement is a bounded small-file/direct-I/O comparison
+separating framing, writes and flush/close costs after candidate review.
+Installation remains closed at d784c049. The reviewed logging candidate is authorized for commit and push with [skip ci].
+Further small-file investigation remains separately scoped for Golden Wrench review.
+
+
+## Retained LLVM23 performance baseline — 4 November 2026
+
+**Performance OPEN; release HOLD. Stop for Golden Wrench review before production
+changes.** The [new report](PERFORMANCE_BASELINE_LLVM23.md) and
+[machine-readable measurements](evidence/llvm23-baseline-20261104/results.json)
+record fresh Release observations at
+`ffd8920befe04a67e3eaef6aadcdf0233df13563`, pinned LLVM/Clang/LLD 23.1.4.
+The logger source matches the historical measured hash; no implementation changed.
+
+Original normal/O2 JIT and independent AOT yield 216 measured observations;
+selected JIT O2 timing/allocation components yield 192 including warmups. Each
+cell has warmup plus three samples; measured children retain GC=256 and hard/soft
+1 MiB stacks. This is an active Linux developer desktop, not an isolated-host or
+native Windows/macOS performance qualification. All measured exits are 0; no full
+correctness matrix or historical crash launch was performed.
+
+JIT O2 file200 **24.042 ms** fails <10 ms. Its contemporaneous direct-I/O control
+is **11.662 ms**, so the relative aim passes at **2.06×** and the absolute miss
+cannot be attributed wholly to logger overhead. Heavy 1-KiB/100 framing
+**910.628 ms** fails ≤10 ms; full console **947.525 ms** fails ≤20 ms. Prepared
+console bytes take 7.946 ms. The frame repeats 2,509,955 ordinary native
+allocations, 77,100 managed constructions and 1,162 collections per 100 records.
+
+Bounded disabled-sink/lazy, per-record metadata and post-GC heap/handle observations
+meet their documented criteria. Full scaling/nonregression and platform coverage,
+tail latency and peak/native-live memory remain UNKNOWN. The report separates
+current component localization from historical exclusive timing attribution and
+unproved causes of changed file-I/O timing. No numerical target is relaxed.
+
+Next action: Golden Wrench reviews a separately scoped escape/framing repair plan
+against the existing bounded scalar-substitution contract, safety refinements and
+unchanged screens, and explicitly dispositions the historical implementation stop
+condition before authorizing source changes. No speculative optimization, shared
+Runtime primitive or logger integration was implemented.
+
+Raw sources/receipts/binary hashes are retained privately under
+`/home/shmellyorc/.local/state/void-log-performance/ffd8920b-20261104-9v8echee/`.
+This report does not consume or reopen the exhausted historical LLVM19 capture
+budgets below. Installation qualification is separately ACCEPTED 3/3; only that
+documentation closure was committed/pushed. Logging changes remain uncommitted.
+
 ## Native C supervisor: 12 plus 50 complete — STOP for review
 
 See [C_SUPERVISOR_CAPTURE.md](C_SUPERVISOR_CAPTURE.md). The completed private

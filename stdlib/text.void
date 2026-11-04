@@ -10,7 +10,7 @@ enum error_kind:
     ## A literal delimiter/search is empty or padding is not one scalar.
     invalid_argument
 
-    ## Construction would exceed 64 MiB or the requested field count.
+    ## Construction would exceed the operation's byte or field-count limit.
     limit_exceeded
 
 
@@ -557,3 +557,21 @@ func to_lower(value: string) -> string:
 ## @return Uppercase immutable text; resource exhaustion follows checked Runtime failure.
 func to_upper(value: string) -> string:
     return _text_case(value, true)
+
+
+## Replace each original Unicode scalar once. Empty replacements delete a scalar.
+## @param value Immutable UTF-8 input.
+## @param keys Unique Unicode scalar values, excluding surrogates.
+## @param replacements One immutable replacement per key, in matching order.
+## @param max_bytes Nonnegative maximum encoded result size.
+## @return Translated text, or invalid_range, invalid_argument or limit_exceeded.
+func translate_scalars(value: string, const keys: [i32], const replacements: [string], max_bytes: i64) -> result<string, error>:
+    var translated = _translate_scalars(value, keys, replacements, max_bytes)
+    if translated is Ok(var output):
+        return Ok(output)
+    if translated is Err(var code):
+        if code == 1:
+            return Err(_error(error_kind.invalid_range))
+        if code == 2:
+            return Err(_error(error_kind.invalid_argument))
+    return Err(_error(error_kind.limit_exceeded))
