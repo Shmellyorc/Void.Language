@@ -1,0 +1,105 @@
+{
+  "run_id": 41916674041,
+  "attempt": 1,
+  "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/41916674041",
+  "tested_commit": "ffd8920befe04a67e3eaef6aadcdf0233df13563",
+  "status": "ACCEPTED",
+  "acceptance_authority": "Boss supplied ACCEPTED — 3/3 PASS in this chat",
+  "verification": "Read-only GitHub job/step and artifact metadata; no rerun, artifact rehash or installation requalification",
+  "jobs": [
+    {
+      "id": 126878099207,
+      "name": "Install / Linux x64 / Release",
+      "status": "PASS",
+      "completed_steps": [
+        "Set up job",
+        "Run actions/checkout@v5",
+        "Run actions/setup-python@v6",
+        "Record source and verify native runner identity",
+        "Prepare and record platform prerequisites",
+        "Install and verify LLVM Clang LLD 23.1.4",
+        "Build and verify approved Release HTTP dependencies",
+        "Configure production Release without tests",
+        "Build compiler tooling and required Runtime resources",
+        "Install compiler and tooling into fresh private prefix",
+        "Exercise installed tools in external projects",
+        "Report this operating system's acceptance status",
+        "Retain receipts and failure logs",
+        "Post Run actions/setup-python@v6",
+        "Post Run actions/checkout@v5",
+        "Complete job"
+      ]
+    },
+    {
+      "id": 126878099627,
+      "name": "Install / macOS ARM64 / Release",
+      "status": "PASS",
+      "completed_steps": [
+        "Set up job",
+        "Run actions/checkout@v5",
+        "Run actions/setup-python@v6",
+        "Record source and verify native runner identity",
+        "Prepare and record platform prerequisites",
+        "Install and verify LLVM Clang LLD 23.1.4",
+        "Build and verify approved Release HTTP dependencies",
+        "Configure production Release without tests",
+        "Build compiler tooling and required Runtime resources",
+        "Install compiler and tooling into fresh private prefix",
+        "Exercise installed tools in external projects",
+        "Report this operating system's acceptance status",
+        "Retain receipts and failure logs",
+        "Post Run actions/setup-python@v6",
+        "Post Run actions/checkout@v5",
+        "Complete job"
+      ]
+    },
+    {
+      "id": 126878099689,
+      "name": "Install / Windows x64 / Release",
+      "status": "PASS",
+      "completed_steps": [
+        "Set up job",
+        "Run actions/checkout@v5",
+        "Run actions/setup-python@v6",
+        "Record source and verify native runner identity",
+        "Windows native SDK environment",
+        "Prepare and record platform prerequisites",
+        "Install and verify LLVM Clang LLD 23.1.4",
+        "Build and verify approved Release HTTP dependencies",
+        "Configure production Release without tests",
+        "Build compiler tooling and required Runtime resources",
+        "Install compiler and tooling into fresh private prefix",
+        "Exercise installed tools in external projects",
+        "Report this operating system's acceptance status",
+        "Retain receipts and failure logs",
+        "Post Run actions/setup-python@v6",
+        "Post Run actions/checkout@v5",
+        "Complete job"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13366530339,
+      "name": "install-ubuntu-24.04-X64-Release-1",
+      "sha256": "sha256:60bc629792c9af11961aa2b9f8696945c77c1b671db1b04b3a262ccdd2fbdcba",
+      "size_in_bytes": 268262,
+      "expires_at": "2026-11-18T21:39:11Z"
+    },
+    {
+      "id": 13365732830,
+      "name": "install-macos-15-ARM64-Release-1",
+      "sha256": "sha256:350ecf41e85cf54d57ac4def50d7597f11bcacf84552ca7b9d36a62d4fedfe94",
+      "size_in_bytes": 271669,
+      "expires_at": "2026-11-18T21:45:14Z"
+    },
+    {
+      "id": 13364738356,
+      "name": "install-windows-2022-X64-Release-1",
+      "sha256": "sha256:9d23a18b5795305db599eb844d2aedfbc54dffab5df19ece883d2d09fa7a9571",
+      "size_in_bytes": 562521,
+      "expires_at": "2026-11-18T21:37:57Z"
+    }
+  ],
+  "scope": "Tested hosted environments only; no public binary distribution, independent physical-machine portability or VM acceptance"
+}

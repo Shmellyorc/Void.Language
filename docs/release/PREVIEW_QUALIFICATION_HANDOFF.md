@@ -1,5 +1,39 @@
 # VOID 2.0 private preview qualification handoff
 
+## Installation qualification closed — 4 November 2026
+
+**ACCEPTED — 3/3 PASS. Hosted installation qualification is complete.**
+Boss accepted [run 41916674041](https://github.com/Shmellyorc/Void.Language/actions/runs/41916674041),
+attempt 1, at exact commit `ffd8920befe04a67e3eaef6aadcdf0233df13563`.
+Read-only GitHub metadata confirms that every platform completed dependency
+provisioning, Release builds, compiler/tooling component installation, installed
+executable smoke checks and evidence upload. The
+[compact closure receipt](evidence/install-ci-41916674041.json) records the job
+IDs, artifact IDs/digests, tested SHA and verification boundary.
+
+| Tested hosted environment | Job | Result |
+| --- | --- | --- |
+| Ubuntu 24.04 x64 | `126878099207` | PASS |
+| Windows Server 2022 x64 | `126878099689` | PASS |
+| macOS ARM64 (`macos-15`) | `126878099627` | PASS |
+
+This closes the hosted install hold, including the earlier macOS dependency
+failure. The installation-only AWS-LC option is covered at this tested SHA;
+ordinary HTTP fixture callers retain their separate tool-enabled contract.
+Artifacts were uploaded with the recorded 14-day retention; closure uses Boss's
+verified acceptance plus job/artifact metadata, without rerunning or rehashing
+the installations. Earlier failed-run and source-review records below remain
+historical snapshots; their UNKNOWN/HOLD statements are superseded only for
+this bounded hosted qualification.
+
+Acceptance covers these hosted source-build/install/use environments. It grants
+no public binary distribution, license clearance, independent physical-machine
+portability, broader ABI, editor-UI or relocated-application acceptance. No
+installation, HTTP/HTTPS or VM testing is reopened. Logging performance and
+public licensing remain separate release holds. This documentation closure is
+prepared for a separately authorized commit/push; logging investigation work
+must remain outside that closure commit.
+
 ## macOS installation dependency failure — 4 November 2026
 
 **INSTALLATION-ONLY REMEDY VALIDATED — REVIEW BEFORE THE NEXT MANUAL RUN.**
