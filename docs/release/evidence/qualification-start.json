@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-04",
+  "head": "97aa4e4334f1b9354ba651770b5cf13e74da03d0",
+  "initial_status_porcelain": "",
+  "initial_branch": "main",
+  "initial_tracking": "origin/main",
+  "mandatory_files": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "docs/SOURCE_COMPILER.md": "f75b43b92118a5f81ea9b3a3835a1299bb24d59b8a1364f40c2ddc566a063b6e",
+    "docs/KNOWN_ISSUES.md": "5877170b8e3431235c54218d5a1b9ad55892f4a9ca4d0bb5028811d571e36613",
+    "docs/llvm23/ACCEPTANCE.md": "fece61ad782c6a07e4fb72191077d2a7577acf87abc6f7eee2d736a91d952465",
+    "docs/log/HANDOFF.md": "d0792fef52879b128fef5a8866d8b77122f62c6d6442242460874ce350a03619",
+    "docs/log/CRASH_CLASSIFICATION.md": "2448f91e2c1a11cf941f0d36dbedb01c6476fb81fac88535159ff11ed716ee24",
+    "docs/log/DSE_INPUT_REVIEW.md": "92243f1ccab545004d015bb470c3b689766faa112a069928066fb2dec84c304c",
+    "docs/net/http/ACCEPTANCE.md": "babf9283f872a55ed91450326a45d054c717412c9afdac7a5d0f8080ee2eb1c6",
+    "docs/net/http/MEMORY_REVIEW.md": "cb0792ece18973ea96eded4c9fe7c64c9921a78873c3903dbc3b4bc8df2cf939",
+    "cmake/HttpDependencies.cmake": "ef8a0e5334a38e2e54a71e756b91461009f399e133a62e440381063ec3159ab5",
+    "cmake/NativeBuild.cmake": "9ee87824d83a6c849c52bf89dd4276441520cf3b9d242d53bf75762245ca3b65",
+    "tools/package_tooling.py": "f063b70f56fddaa92d16a0ce3b0217d24d770538c925837fdea040146df00541"
+  },
+  "applicable_AGENTS_files": [],
+  "environment_kind": "existing development host; not clean-host evidence",
+  "phase": "inventory in progress"
+}

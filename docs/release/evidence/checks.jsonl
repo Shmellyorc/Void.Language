@@ -1,0 +1,15 @@
+{"command_id": "fresh-probe-fixtures", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "FAIL"}
+{"command_id": "fresh-probe-fixtures-corrected", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "PASS"}
+{"command_id": "fresh-relocation-source-isolation", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-cli-path-discovery", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-minimal-check", "expected_exit": 0, "expected_stdout": "", "stderr_contains": null, "result": "FAIL"}
+{"command_id": "installed-minimal-check-corrected", "expected_exit": 0, "expected_stdout": "Source checked successfully\n", "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-minimal-run", "expected_exit": 0, "expected_stdout": "", "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-standard-check", "expected_exit": 0, "expected_stdout": "Source checked successfully\n", "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-standard-run", "expected_exit": 0, "expected_stdout": "VOID installed stdlib OK\n", "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-native-build", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-native-execute", "expected_exit": 0, "expected_stdout": "VOID installed stdlib OK\n", "stderr_contains": null, "result": "PASS"}
+{"command_id": "installed-server-project-discovery", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "PASS"}
+{"command_id": "negative-missing-standard-root", "expected_exit": 1, "expected_stdout": null, "stderr_contains": "Standard-library source root is unavailable", "result": "PASS"}
+{"command_id": "negative-native-fixture-setup", "expected_exit": 0, "expected_stdout": null, "stderr_contains": null, "result": "PASS"}
+{"command_id": "negative-native-manifest", "expected_exit": 1, "expected_stdout": null, "stderr_contains": "Native toolchain resources missing or invalid", "result": "PASS"}

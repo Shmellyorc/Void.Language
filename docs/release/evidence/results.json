@@ -1,0 +1,595 @@
+{
+  "scope": "Fresh Ubuntu userspace source installation; independent machine/VM and public preview acceptance not claimed",
+  "commands": [
+    {
+      "id": "podman-version",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "podman-info",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "user-namespace",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-image-pull",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-image-identity",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-container-create",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-container-baseline",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "pristine-source-archive",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "official-sdk-archive-hash",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-source-copy",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-host-packages",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-sdk-copy",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-source-sdk-extract",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-environment-versions",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "negative-missing-http",
+      "result": "PASS_EXPECTED_REJECTION",
+      "exit_code": 1,
+      "recorded_expected_exit": 1,
+      "reason": "Deliberately absent prerequisite rejected with clear diagnostic.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-sdk-provenance-config",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-isolation-mounts",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-http-source-build",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-http-prefix-verify",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-void-configure",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-dependency-build-summary",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "preserve-dependency-raw-evidence",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "copy-dependency-summary",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-void-build",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-install-compiler",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-install-tooling",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-probe-fixtures",
+      "result": "FAIL_HARNESS",
+      "exit_code": 1,
+      "recorded_expected_exit": 0,
+      "reason": "Python quoting syntax error before VOID execution; original preserved, corrected fixture passed.",
+      "probe_oracle": {
+        "command_id": "fresh-probe-fixtures",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "FAIL"
+      }
+    },
+    {
+      "id": "fresh-probe-fixtures-corrected",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "fresh-probe-fixtures-corrected",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "fresh-relocation-source-isolation",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "fresh-relocation-source-isolation",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-cli-path-discovery",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-cli-path-discovery",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-minimal-check",
+      "result": "FAIL_HARNESS_ORACLE",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Product exit 0 with correct success text; original harness incorrectly required empty stdout. Corrected current-contract check passed.",
+      "probe_oracle": {
+        "command_id": "installed-minimal-check",
+        "expected_exit": 0,
+        "expected_stdout": "",
+        "stderr_contains": null,
+        "result": "FAIL"
+      }
+    },
+    {
+      "id": "installed-minimal-check-corrected",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-minimal-check-corrected",
+        "expected_exit": 0,
+        "expected_stdout": "Source checked successfully\n",
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-minimal-run",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-minimal-run",
+        "expected_exit": 0,
+        "expected_stdout": "",
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-standard-check",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-standard-check",
+        "expected_exit": 0,
+        "expected_stdout": "Source checked successfully\n",
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-standard-run",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-standard-run",
+        "expected_exit": 0,
+        "expected_stdout": "VOID installed stdlib OK\n",
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-native-build",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-native-build",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-native-execute",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-native-execute",
+        "expected_exit": 0,
+        "expected_stdout": "VOID installed stdlib OK\n",
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-server-project-discovery",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "installed-server-project-discovery",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "negative-missing-standard-root",
+      "result": "PASS_EXPECTED_REJECTION",
+      "exit_code": 1,
+      "recorded_expected_exit": 1,
+      "reason": "Deliberately absent prerequisite rejected with clear diagnostic.",
+      "probe_oracle": {
+        "command_id": "negative-missing-standard-root",
+        "expected_exit": 1,
+        "expected_stdout": null,
+        "stderr_contains": "Standard-library source root is unavailable",
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "negative-native-fixture-setup",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": {
+        "command_id": "negative-native-fixture-setup",
+        "expected_exit": 0,
+        "expected_stdout": null,
+        "stderr_contains": null,
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "negative-native-manifest",
+      "result": "PASS_EXPECTED_REJECTION",
+      "exit_code": 1,
+      "recorded_expected_exit": 1,
+      "reason": "Deliberately absent prerequisite rejected with clear diagnostic.",
+      "probe_oracle": {
+        "command_id": "negative-native-manifest",
+        "expected_exit": 1,
+        "expected_stdout": null,
+        "stderr_contains": "Native toolchain resources missing or invalid",
+        "result": "PASS"
+      }
+    },
+    {
+      "id": "installed-server-handshake",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "installed-layout-loader-audit",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "copy-installed-layout",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "negative-native-driver-fixture",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "negative-native-driver",
+      "result": "PASS_EXPECTED_REJECTION",
+      "exit_code": 1,
+      "recorded_expected_exit": 1,
+      "reason": "Deliberately absent prerequisite rejected with clear diagnostic.",
+      "probe_oracle": null
+    },
+    {
+      "id": "preserve-fresh-configuration",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "copy-fresh-configuration",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "installation-probe-inputs",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "preserved-input-hashes",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-container-stop",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Exit 0; PID 1 sleep required SIGKILL after 10-second SIGTERM timeout. No VOID probe active; not a compiler crash.",
+      "probe_oracle": null
+    },
+    {
+      "id": "fresh-container-final-state",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "final-git-head",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "final-git-branch",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "final-tracked-preservation",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "final-index-preservation",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Observed exit matches recorded expected exit; per-step scope/oracles in qualification report.",
+      "probe_oracle": null
+    },
+    {
+      "id": "documentation-whitespace-check",
+      "result": "RECORDER_EXPECTATION_MISMATCH",
+      "exit_code": 1,
+      "recorded_expected_exit": 0,
+      "reason": "No-index new-file difference exit 1 with empty output; original recorder expected 0. Separate final whitespace validation covers all documents.",
+      "probe_oracle": null
+    },
+    {
+      "id": "final-documentation-evidence-validation",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Final documentation/evidence validation or complete working-tree inventory; see exact receipt.",
+      "probe_oracle": null
+    },
+    {
+      "id": "final-git-status-complete",
+      "result": "PASS",
+      "exit_code": 0,
+      "recorded_expected_exit": 0,
+      "reason": "Final documentation/evidence validation or complete working-tree inventory; see exact receipt.",
+      "probe_oracle": null
+    }
+  ],
+  "skipped": [
+    "full CTest/Debug/strict matrix",
+    "HTTP/HTTPS acceptance rerun",
+    "LLVM19 or current-toolchain crash campaign",
+    "logging/performance/text.translate_scalars",
+    "preserved optimizer artifact investigation",
+    "actual editor UI",
+    "Windows/macOS installation",
+    "VSIX/server archive packaging",
+    "Git mutations/hosted CI/publication/deployment"
+  ],
+  "unknown": [
+    "independent machine/VM compatibility",
+    "other distro/older ABI floor",
+    "complete missing-prerequisite matrix including absent CA",
+    "fresh-network LLVM SDK archive download",
+    "native application relocation after prefix movement",
+    "broader editor compatibility",
+    "public license and complete notice clearance"
+  ],
+  "command_count": 59,
+  "result_counts": {
+    "FAIL_HARNESS": 1,
+    "FAIL_HARNESS_ORACLE": 1,
+    "PASS": 52,
+    "PASS_EXPECTED_REJECTION": 4,
+    "RECORDER_EXPECTATION_MISMATCH": 1
+  }
+}

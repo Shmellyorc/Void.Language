@@ -1,0 +1,210 @@
+{
+  "scope": "Files read or inspected for this qualification; some large files examined in relevant sections only. Mandatory files read in full. Directory/name listings do not imply every file was read.",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+      "bytes": 5598
+    },
+    {
+      "path": "docs/SOURCE_COMPILER.md",
+      "sha256": "f75b43b92118a5f81ea9b3a3835a1299bb24d59b8a1364f40c2ddc566a063b6e",
+      "bytes": 26091
+    },
+    {
+      "path": "docs/KNOWN_ISSUES.md",
+      "sha256": "5877170b8e3431235c54218d5a1b9ad55892f4a9ca4d0bb5028811d571e36613",
+      "bytes": 47524
+    },
+    {
+      "path": "docs/llvm23/ACCEPTANCE.md",
+      "sha256": "fece61ad782c6a07e4fb72191077d2a7577acf87abc6f7eee2d736a91d952465",
+      "bytes": 15971
+    },
+    {
+      "path": "docs/log/HANDOFF.md",
+      "sha256": "d0792fef52879b128fef5a8866d8b77122f62c6d6442242460874ce350a03619",
+      "bytes": 23476
+    },
+    {
+      "path": "docs/log/CRASH_CLASSIFICATION.md",
+      "sha256": "2448f91e2c1a11cf941f0d36dbedb01c6476fb81fac88535159ff11ed716ee24",
+      "bytes": 15081
+    },
+    {
+      "path": "docs/log/DSE_INPUT_REVIEW.md",
+      "sha256": "92243f1ccab545004d015bb470c3b689766faa112a069928066fb2dec84c304c",
+      "bytes": 13491
+    },
+    {
+      "path": "docs/net/http/ACCEPTANCE.md",
+      "sha256": "babf9283f872a55ed91450326a45d054c717412c9afdac7a5d0f8080ee2eb1c6",
+      "bytes": 3324
+    },
+    {
+      "path": "docs/net/http/MEMORY_REVIEW.md",
+      "sha256": "cb0792ece18973ea96eded4c9fe7c64c9921a78873c3903dbc3b4bc8df2cf939",
+      "bytes": 6077
+    },
+    {
+      "path": "cmake/HttpDependencies.cmake",
+      "sha256": "ef8a0e5334a38e2e54a71e756b91461009f399e133a62e440381063ec3159ab5",
+      "bytes": 4589
+    },
+    {
+      "path": "cmake/NativeBuild.cmake",
+      "sha256": "9ee87824d83a6c849c52bf89dd4276441520cf3b9d242d53bf75762245ca3b65",
+      "bytes": 7187
+    },
+    {
+      "path": "tools/package_tooling.py",
+      "sha256": "f063b70f56fddaa92d16a0ce3b0217d24d770538c925837fdea040146df00541",
+      "bytes": 4971
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "043fcfcd21b8886250371edd2a376c2da6b962fe0a2402c1e33614d7c2c8f0e0",
+      "bytes": 121908
+    },
+    {
+      "path": "tools/ci/llvm_sdk.py",
+      "sha256": "fe46fcc151529e310af95888711eb03b229f67fcc2565d5841f03f6428b0dfdb",
+      "bytes": 6369
+    },
+    {
+      "path": "tools/ci/http_bootstrap.py",
+      "sha256": "84e2c38c67c2ec4ad4e138356afa372491b87640846ab39b1958c7262de505ab",
+      "bytes": 13949
+    },
+    {
+      "path": "tools/setup_http_deps.py",
+      "sha256": "446f9778732959889f8f3934d57e8b63ba53c182b8e82057b25eac7e07486f09",
+      "bytes": 7336
+    },
+    {
+      "path": "tools/verify_http_dependencies.py",
+      "sha256": "ea211bdfe4640f86e46ea1a408a2b7c8b94838f78e1f8845043ecc4fd82350a7",
+      "bytes": 2673
+    },
+    {
+      "path": "tools/http_archive.py",
+      "sha256": "b9b0f376e121f8598200a2d2056e97ecf4bb7c000a5fd28f3222c54c063c1fd6",
+      "bytes": 2458
+    },
+    {
+      "path": "tools/verify_curl_source.py",
+      "sha256": "f3c11213bdc5b5570c2cab0c0965896448604ff44a0d7d3032415de483aaf039",
+      "bytes": 1830
+    },
+    {
+      "path": "third_party/http-versions.json",
+      "sha256": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496",
+      "bytes": 2812
+    },
+    {
+      "path": "third_party/curl/VOID-PROVENANCE.json",
+      "sha256": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+      "bytes": 167784
+    },
+    {
+      "path": "cmake/CurlProvider.cmake",
+      "sha256": "9b86f370fa081dab85c6d2bd0b5eab90deb1942228c26a905686d8f840e85fe9",
+      "bytes": 4037
+    },
+    {
+      "path": "cmake/NativeInventory.cmake",
+      "sha256": "0294fd8c322fb6f1beb2e1fd5d0f337f017b7f44d15650b93dc8c9b49f1bf53c",
+      "bytes": 906
+    },
+    {
+      "path": "cmake/LLVMPlatform.cmake",
+      "sha256": "cbb9905a7d2a84748f6a3a42e10bdb5258e53857843619da3024c8d96c6542d1",
+      "bytes": 5678
+    },
+    {
+      "path": "docs/STAGE9_APPLICATION_WORKFLOW.md",
+      "sha256": "1266b0c6527fbcc74d126f4e20405d072786d904790c71df43791dc8d3cda594",
+      "bytes": 8666
+    },
+    {
+      "path": "docs/EDITOR_INTEGRATION.md",
+      "sha256": "27674c926dee323b9a0810e7bbb6e8e008984ae445685b6fe6b91f55ecfa0f82",
+      "bytes": 24336
+    },
+    {
+      "path": "docs/MODULE_SYSTEM.md",
+      "sha256": "f873ea6a0f4bc04fe32ca272c10a2ce196eacda3880a9e3d4c19d10a70377222",
+      "bytes": 15591
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "23fdc276f429abd981564069fd4f301ce4e079f18175f4c8de408ee1d9217925",
+      "bytes": 5451
+    },
+    {
+      "path": ".github/workflows/ci-link-experiment.yml",
+      "sha256": "f69ffda09d7f67fde574148f7804fde26e5f1fe20cf162cddbfd5ae4254c6731",
+      "bytes": 20876
+    },
+    {
+      "path": "src/frontend/compiler.cpp",
+      "sha256": "e1bbce064280824a0152ede96110c789293f6e2dee2d9b2da43a1da99efdeaf4",
+      "bytes": 538584
+    },
+    {
+      "path": "src/frontend/source.cpp",
+      "sha256": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+      "bytes": 12888
+    },
+    {
+      "path": "src/native_build.cpp",
+      "sha256": "6ab8b0a3a4ae4ee34e72f2e8b37314ff152fa9e7d5932cf42b1e6d7cabd30229",
+      "bytes": 14587
+    },
+    {
+      "path": "src/main.cpp",
+      "sha256": "a21aa1630db01ddb50eb80f1bb1cc91d9994231eba69ca4631ce7db933f45d07",
+      "bytes": 7048
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "7a425cd8dcc142234d5f1721971baff050af156c50ad6981c5c1dcc7fc6bafa9",
+      "bytes": 821
+    },
+    {
+      "path": "stdlib/console.void",
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "bytes": 22807
+    },
+    {
+      "path": "stdlib/math.void",
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "bytes": 18696
+    },
+    {
+      "path": "stdlib/README.md",
+      "sha256": "dc453d7c54ac7857b8ab6a4a0753767660ba9df8a7f9e4af55557aa9243c7818",
+      "bytes": 12328
+    },
+    {
+      "path": "tests/net/http/install.py",
+      "sha256": "2ba43bc597d9c46e3524806302cee53b4bec8132bce34f9f1b44eb595dbb469c",
+      "bytes": 5882
+    },
+    {
+      "path": "examples/stage10_console_time/main.void",
+      "sha256": "2227e1c2094d71c73896e90d82a2dbabc899f63ddbec666da20db9bd9419027e",
+      "bytes": 792
+    },
+    {
+      "path": "tools/lsp_client.py",
+      "sha256": "36f54726c6ba9e4c52f1cd278c5fe1ff0ac209428a9783a60137579b218d0b3a",
+      "bytes": 6438
+    },
+    {
+      "path": "src/lsp/main.cpp",
+      "sha256": "e725f9a854a930a367390bcd5597227ee4eca6f969e8907a9f4eb6bf6a0158c2",
+      "bytes": 48268
+    }
+  ]
+}

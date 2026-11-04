@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-04",
+  "head": "97aa4e4334f1b9354ba651770b5cf13e74da03d0",
+  "branch": "main",
+  "tracking": "origin/main",
+  "initial_working_tree": "clean",
+  "final_tracked_diff_empty": true,
+  "final_staged_diff_empty": true,
+  "uncommitted": true,
+  "unstaged": true,
+  "scope": "Documentation/evidence only; fresh Ubuntu container source installation passed, independent-host and public-release acceptance not claimed",
+  "protected_readme": {
+    "initial_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "final_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+  },
+  "examined_source_files_verified_unchanged": 41,
+  "exact_changed_files": [
+    "docs/release/LINUX_CLEAN_HOST_QUALIFICATION.md",
+    "docs/release/PREVIEW_BLOCKERS.md",
+    "docs/release/PREVIEW_QUALIFICATION_HANDOFF.md",
+    "docs/release/evidence/build-log-review.json",
+    "docs/release/evidence/checks.jsonl",
+    "docs/release/evidence/commands.jsonl",
+    "docs/release/evidence/dependency-build.json",
+    "docs/release/evidence/examined-files.json",
+    "docs/release/evidence/final-inventory.json",
+    "docs/release/evidence/installed-layout.json",
+    "docs/release/evidence/inventory-tooling-notes.json",
+    "docs/release/evidence/lsp-handshake.json",
+    "docs/release/evidence/probe-inputs.json",
+    "docs/release/evidence/qualification-start.json",
+    "docs/release/evidence/results.json"
+  ],
+  "changed_file_sha256_except_this_inventory": {
+    "docs/release/LINUX_CLEAN_HOST_QUALIFICATION.md": "f142fa6340edbdc63a4eba3466983549b254e7a5a5b07310d6b6abcc3b0d7723",
+    "docs/release/PREVIEW_BLOCKERS.md": "d941cebe5239ac8b4da3f7d40ad8801893889eaa41fea30c8449739efe2a8403",
+    "docs/release/PREVIEW_QUALIFICATION_HANDOFF.md": "e7286614e49e3758fff262cf6236199a943373badf22381fcf370d49b40db444",
+    "docs/release/evidence/build-log-review.json": "090e94194dad720e3cb6a17c19f41cf470778ecf95f130185f22803810745358",
+    "docs/release/evidence/checks.jsonl": "d5c23fba8d74fd406491287a3376d02b2967592f68f941bd7f99fb0b3fb04594",
+    "docs/release/evidence/commands.jsonl": "4fa250b08d187b4191e1a0291e93a9ed1f09daa3c35ccdd435b39c8e59398f3c",
+    "docs/release/evidence/dependency-build.json": "3345596de294c2f837806221dadc3b6b58db1486163596a66beb575ba27adb51",
+    "docs/release/evidence/examined-files.json": "d21ea0304393f4fe72ea3eefea2176cf0eb0e1c2da509c87830c80ffbe1933e1",
+    "docs/release/evidence/installed-layout.json": "e0540ae9d28caf92e18aba284cba3c410502d4175008aaeb77efe0461afa5151",
+    "docs/release/evidence/inventory-tooling-notes.json": "b2a3531e58d3e739d6d7459ca3f034f787d14c37239d8c29bb06e9281eb71ee2",
+    "docs/release/evidence/lsp-handshake.json": "f90d7789ef9e71f3f79ad78b56e267003a768f06ea80237fe5216008da2a9f1f",
+    "docs/release/evidence/probe-inputs.json": "43d4cf45594100b106bf6fb3cbec115d2e2515038ab5918949df3fe5e1a04573",
+    "docs/release/evidence/qualification-start.json": "aeacf2ad500f5cf4efdee232486d46aae66ab88b37122876d9be9a266fa79c61",
+    "docs/release/evidence/results.json": "b08841b8023ba19767117090b0b719beedff1ded0d5bd67f14b243a4116f7152"
+  },
+  "command_receipts": 59,
+  "preserved_private_artifacts": {
+    "source.tar": {
+      "bytes": 2028083200,
+      "sha256": "23b64f89c787f54379d85b13e8a667f79fbc580dcbce27789a0a335f390f3ca9"
+    },
+    "dependency-raw-evidence.tar": {
+      "bytes": 1966080,
+      "sha256": "5abf892e7dd80799f8bb29f5fd30b0a83f00bc108ffbfc2994ff16388ca9b830"
+    },
+    "qualification-config.tar": {
+      "bytes": 1812480,
+      "sha256": "7a0c8c61a0507d474bac99e845ccdce48a6a1c1540d47398c3127eb7e7a7ae6a"
+    }
+  },
+  "private_evidence_root": "$HOME/.local/state/void-preview-qualification/97aa4e43-20261104",
+  "container": {
+    "name": "void-preview-linux-97aa4e43",
+    "state": "exited",
+    "host_mounts": [],
+    "retained_not_published": true
+  },
+  "no_production_runtime_cmake_test_or_protected_readme_changes": true,
+  "no_git_mutation_hosted_ci_publication_or_deployment": true,
+  "self_hash_policy": "This inventory deliberately omits its own digest."
+}

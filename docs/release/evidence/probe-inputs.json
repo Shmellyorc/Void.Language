@@ -1,0 +1,23 @@
+{
+  "artifacts": [
+    {
+      "path": "/work/minimal/main.void",
+      "bytes": 33,
+      "sha256": "406782bfa0a1d1590dad124fca0226cde484bd5f0b632d652eaa294cf706dd52",
+      "text": "func main() -> i32:\n    return 0\n"
+    },
+    {
+      "path": "/work/standard/main.void",
+      "bytes": 84,
+      "sha256": "519fb952eeef4e04b7ad1f6df058bdd4a60c5408a32356d02f66aa9cd0e67c0b",
+      "text": "use console\n\nfunc main() -> i32:\n    print(\"VOID installed stdlib OK\")\n    return 0\n"
+    },
+    {
+      "path": "/work/standard/hello-native",
+      "bytes": 1867064,
+      "sha256": "53459e1034a44e9b9e7dbcc851b92548d404280b1c573c1af56f82f0cdc9d03e"
+    }
+  ],
+  "default_IR_optimization": "O2; no --no-opt or optimizer workaround",
+  "source_stdlib_hidden_for_positive_checks": true
+}

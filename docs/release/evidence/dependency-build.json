@@ -1,0 +1,370 @@
+{
+  "profile": "Release",
+  "result": "PASS (native Linux dependency build; transport acceptance separate)",
+  "pins_sha256": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496",
+  "commands": [
+    {
+      "argv": [
+        "/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "--version"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.010133094998309389
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/nghttp2-1.70.0",
+        "-B",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2",
+        "-DCMAKE_C_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DENABLE_LIB_ONLY=ON",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_STATIC_LIBS=ON",
+        "-DBUILD_TESTING=OFF",
+        "-DENABLE_DOC=OFF"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 3.391050878999522
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 1.0335860229970422
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/nghttp2"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.01614170300308615
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/c-ares-1.34.9",
+        "-B",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares",
+        "-DCMAKE_C_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DCARES_STATIC=ON",
+        "-DCARES_SHARED=OFF",
+        "-DCARES_BUILD_TESTS=OFF",
+        "-DCARES_BUILD_TOOLS=OFF",
+        "-DCARES_INSTALL=ON"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 18.36119057398173
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 2.628766709007323
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/c-ares"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.04747235297691077
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/zlib-1.3.2",
+        "-B",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/zlib",
+        "-DCMAKE_C_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DZLIB_BUILD_TESTING=OFF",
+        "-DZLIB_BUILD_SHARED=OFF",
+        "-DZLIB_BUILD_STATIC=ON"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 1.1221901130047627
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/zlib",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.6803163529839367
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/zlib"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.015605205990141258
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/aws-lc-cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+        "-B",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/aws-lc",
+        "-DCMAKE_C_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCMAKE_INSTALL_PREFIX=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_FLAGS=-O2 -fPIC",
+        "-DCMAKE_CXX_FLAGS=-O2 -fPIC",
+        "-DCMAKE_EXE_LINKER_FLAGS=",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_LIBSSL=ON",
+        "-DDISABLE_GO=ON",
+        "-DENABLE_SOURCE_MODIFICATION=OFF"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 1.8112220090115443
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/aws-lc",
+        "--parallel",
+        "3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 36.34080649499083
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/aws-lc"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release",
+      "exit_code": 0,
+      "seconds": 0.06294013999286108
+    },
+    {
+      "argv": [
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libunistring-1.5/configure",
+        "--prefix=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "--libdir=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--enable-shared",
+        "--disable-static"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libunistring",
+      "exit_code": 0,
+      "seconds": 29.280660721007735
+    },
+    {
+      "argv": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libunistring/lib",
+      "exit_code": 0,
+      "seconds": 46.88315752899507
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libunistring/lib",
+      "exit_code": 0,
+      "seconds": 0.21671652802615426
+    },
+    {
+      "argv": [
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libidn2-2.3.8/configure",
+        "--prefix=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "--libdir=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--enable-shared",
+        "--disable-static",
+        "--disable-nls",
+        "--disable-doc",
+        "--with-libunistring-prefix=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 12.115619165007956
+    },
+    {
+      "argv": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 2.87908449099632
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libidn2",
+      "exit_code": 0,
+      "seconds": 0.5072630669747014
+    },
+    {
+      "argv": [
+        "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/libpsl-0.21.5/configure",
+        "--prefix=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "--libdir=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib",
+        "--disable-dependency-tracking",
+        "--disable-rpath",
+        "--disable-shared",
+        "--enable-static",
+        "--disable-nls",
+        "--disable-man",
+        "--enable-runtime=libidn2",
+        "--enable-builtin",
+        "--with-psl-file=/src/void/third_party/publicsuffix/public_suffix_list.dat",
+        "--with-psl-distfile=/dev/null"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl",
+      "exit_code": 0,
+      "seconds": 3.6189576399920043
+    },
+    {
+      "argv": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl/src",
+      "exit_code": 0,
+      "seconds": 2.988969897007337
+    },
+    {
+      "argv": [
+        "make",
+        "install"
+      ],
+      "cwd": "/src/void/.toolchains/http/build/linux-aws-lc-5.12.0/Release/libpsl/src",
+      "exit_code": 0,
+      "seconds": 0.15503946199896745
+    }
+  ],
+  "verified_prefix_files": 167,
+  "acquisitions": [
+    {
+      "url": "https://codeload.github.com/aws/aws-lc/tar.gz/cd481c207e38f06aeb5766f4a1cdfce10a4c0af8",
+      "expected_sha256": "1de549ad9ac709d08a7e26ac5aa77dc90d55811c5c5c54b4ec3e442b00e98e68",
+      "cached": false,
+      "actual_sha256": "1de549ad9ac709d08a7e26ac5aa77dc90d55811c5c5c54b4ec3e442b00e98e68",
+      "bytes": 154548427,
+      "result": "verified"
+    },
+    {
+      "url": "https://github.com/c-ares/c-ares/releases/download/v1.34.9/c-ares-1.34.9.tar.gz",
+      "expected_sha256": "9364b70a12eb59a06830fb488d9357f90100dff0d98b23ea3593a183d43e6f2f",
+      "cached": false,
+      "actual_sha256": "9364b70a12eb59a06830fb488d9357f90100dff0d98b23ea3593a183d43e6f2f",
+      "bytes": 1083895,
+      "result": "verified"
+    },
+    {
+      "url": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz",
+      "expected_sha256": "f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a",
+      "cached": false,
+      "actual_sha256": "f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a",
+      "bytes": 2234804,
+      "result": "verified"
+    },
+    {
+      "url": "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz",
+      "expected_sha256": "1dcc9ceae8b128f3c0b3f654decd0e1e891afc6ff81098f227ef260449dae208",
+      "cached": false,
+      "actual_sha256": "1dcc9ceae8b128f3c0b3f654decd0e1e891afc6ff81098f227ef260449dae208",
+      "bytes": 7624251,
+      "result": "verified"
+    },
+    {
+      "url": "https://ftp.gnu.org/gnu/libunistring/libunistring-1.5.tar.xz",
+      "expected_sha256": "fe89007a8a414ae4790b816b86859e877d3ab135db3c37f06541ff7e85ac344b",
+      "cached": false,
+      "actual_sha256": "fe89007a8a414ae4790b816b86859e877d3ab135db3c37f06541ff7e85ac344b",
+      "bytes": 2856424,
+      "result": "verified"
+    },
+    {
+      "url": "https://github.com/nghttp2/nghttp2/releases/download/v1.70.0/nghttp2-1.70.0.tar.gz",
+      "expected_sha256": "aa317e2cf9dca6afa0aed68f8fad6ff303ec6982e25a78c75c0b65e2b9b3ded5",
+      "cached": false,
+      "actual_sha256": "aa317e2cf9dca6afa0aed68f8fad6ff303ec6982e25a78c75c0b65e2b9b3ded5",
+      "bytes": 3104002,
+      "result": "verified"
+    },
+    {
+      "url": "https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz",
+      "expected_sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+      "cached": false,
+      "actual_sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+      "bytes": 1502830,
+      "result": "verified"
+    }
+  ]
+}

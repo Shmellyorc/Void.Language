@@ -1,0 +1,28 @@
+{
+  "command_id": "fresh-void-build",
+  "exit_code": 0,
+  "unexpected_crash_or_sanitizer_markers": [],
+  "warning_lines": [
+    "/src/void/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]",
+    "/src/void/third_party/date/src/tz.cpp:201:23: warning: unused variable 'folder_delimiter' [-Wunused-const-variable]",
+    "/src/void/third_party/date/src/tz.cpp:318:1: warning: unused function 'get_download_folder' [-Wunused-function]",
+    "/src/void/third_party/date/src/tz.cpp:458:1: warning: unused function 'get_install' [-Wunused-function]",
+    "/src/void/third_party/date/src/tz.cpp:3728:1: warning: unused function 'get_version' [-Wunused-function]",
+    "/src/void/src/runtime/console.cpp:669:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]",
+    "/src/void/src/runtime/console.cpp:672:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]",
+    "/src/void/src/runtime/console.cpp:675:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]",
+    "/src/void/src/runtime/console.cpp:676:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]",
+    "/src/void/src/runtime/console.cpp:677:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]",
+    "/src/void/src/runtime/console.cpp:690:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]",
+    "/src/void/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]",
+    "/src/void/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]"
+  ],
+  "result": "PASS"
+}

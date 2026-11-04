@@ -1,0 +1,21 @@
+{
+  "source": "Reconstructed from observed read-only tool results; not claimed as retained raw-process receipts.",
+  "inventory_attempts": [
+    {
+      "exit_code": 127,
+      "result": "rg unavailable; used Python/find thereafter",
+      "command_summary": "pwd && rg --files -g AGENTS.md -g !node_modules -g !target -g !build -g !vendor /home/<user>/Documents 2>/dev/null"
+    },
+    {
+      "exit_code": 1,
+      "result": "No applicable repository/ancestor guidance listed; exit cause not retained; later targeted repository find succeeded with no matches",
+      "command_summary": "find $HOME -name AGENTS.md with build/cache exclusions; stderr redirected to /dev/null"
+    },
+    {
+      "exit_code": 2,
+      "stderr": "sed: can't read examples/stage10_console_time/console.void: No such file or directory",
+      "result": "Guessed read path; actual main.void read later",
+      "command_summary": "sed -n 1,60p examples/stage10_console_time/console.void"
+    }
+  ]
+}

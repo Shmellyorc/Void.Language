@@ -1,0 +1,607 @@
+{
+  "prefix": "/opt/void-relocated",
+  "original_install_prefix_absent": true,
+  "configured_source_stdlib_absent": true,
+  "stdlib_source_equality": {
+    "channel.void": true,
+    "collections.void": true,
+    "console.void": true,
+    "convert.void": true,
+    "error.void": true,
+    "io.void": true,
+    "json.void": true,
+    "log.void": true,
+    "math.void": true,
+    "os.void": true,
+    "path.void": true,
+    "random.void": true,
+    "text.void": true,
+    "time.void": true,
+    "url.void": true,
+    "encoding/ascii.void": true,
+    "encoding/base64.void": true,
+    "encoding/binary.void": true,
+    "encoding/hex.void": true,
+    "io/memory.void": true,
+    "net/http.void": true
+  },
+  "files": [
+    {
+      "path": "bin/void-native-resources.txt",
+      "bytes": 1210,
+      "sha256": "b700102dce0ee18945c8b64120e358c3d3bd68fae5f087b918d77efdce180d10",
+      "symlink_target": null
+    },
+    {
+      "path": "bin/void-native.txt",
+      "bytes": 714,
+      "sha256": "3755cdce61074c24ccca191f7ab162c177b5491fd9a4eda03d0ef7067d189725",
+      "symlink_target": null
+    },
+    {
+      "path": "bin/voidc",
+      "bytes": 75993784,
+      "sha256": "9cdca2af57a1b993e3a0f070a8b76aec8a7c8a4c852d80b8548d93f2c3f71a23",
+      "symlink_target": null
+    },
+    {
+      "path": "bin/voidls",
+      "bytes": 7774816,
+      "sha256": "bafc79d47e6b69647a14733143a84063f53b59dd686b5cd00d0f6e63a6afc87a",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libcares.a",
+      "bytes": 531388,
+      "sha256": "6430ecf3ddd80e690f4198768623c781355340062baf57ed28adb8f7e6079011",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libcrypto.a",
+      "bytes": 6787598,
+      "sha256": "e1370fd69993b84684f12df80835983fb1d7f7738f1c48f270756111161b6cfe",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libcurl.a",
+      "bytes": 1451702,
+      "sha256": "47013f784bbc11a1495a005ea617ae18ad9eaec194794a0293af75807914cf6e",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libidn2.so",
+      "bytes": 208512,
+      "sha256": "b41334b68a85a5033e3ce20e5d8dfa6b4bea8599c381cb4a58328e6801b6cf41",
+      "symlink_target": "libidn2.so.0.4.0"
+    },
+    {
+      "path": "lib/void/libidn2.so.0",
+      "bytes": 208512,
+      "sha256": "b41334b68a85a5033e3ce20e5d8dfa6b4bea8599c381cb4a58328e6801b6cf41",
+      "symlink_target": "libidn2.so.0.4.0"
+    },
+    {
+      "path": "lib/void/libidn2.so.0.4.0",
+      "bytes": 208512,
+      "sha256": "b41334b68a85a5033e3ce20e5d8dfa6b4bea8599c381cb4a58328e6801b6cf41",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libnghttp2.a",
+      "bytes": 336860,
+      "sha256": "8d3efd772c05a77e8621c144215f4caf9e264bceb54a2cf7806a1e8286489479",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libpsl.a",
+      "bytes": 74062,
+      "sha256": "9170f1e643c32a5cd601f5e2c6305aa4adf50bc99d6d1cd14dbc8ad7b9f06f27",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libssl.a",
+      "bytes": 1152096,
+      "sha256": "7b5b4c713c03ec5959f2682ff6d6bd40a92d70fcb044ec2f31792a323686afb4",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libunistring.so",
+      "bytes": 2072120,
+      "sha256": "1118b42c02a4f58b3f5918882469e212dc8883eb5157f8b4de4d7b38034c1589",
+      "symlink_target": "libunistring.so.5.2.2"
+    },
+    {
+      "path": "lib/void/libunistring.so.5",
+      "bytes": 2072120,
+      "sha256": "1118b42c02a4f58b3f5918882469e212dc8883eb5157f8b4de4d7b38034c1589",
+      "symlink_target": "libunistring.so.5.2.2"
+    },
+    {
+      "path": "lib/void/libunistring.so.5.2.2",
+      "bytes": 2072120,
+      "sha256": "1118b42c02a4f58b3f5918882469e212dc8883eb5157f8b4de4d7b38034c1589",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libvoid_native_fixture.a",
+      "bytes": 6896,
+      "sha256": "4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libvoid_runtime.a",
+      "bytes": 4088672,
+      "sha256": "0bca41e953fbeaa7fe243fdaba2f0af119d4a15d70723be500431f0ad5f08833",
+      "symlink_target": null
+    },
+    {
+      "path": "lib/void/libz.a",
+      "bytes": 138558,
+      "sha256": "da59c9da952cf3d6215e4d279e362d02fbc2b046407c62c5017d3d7e8a42c457",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/LICENSE",
+      "bytes": 252,
+      "sha256": "0613408568889f5739e5ae252b722a2659c02002839ad970a63dc5e9174b27cf",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/LICENSE-Boost",
+      "bytes": 1338,
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/LICENSE.txt",
+      "bytes": 1637,
+      "sha256": "c90f6c00fb961170560299cbda28ca2d45804913aa8b2a9f36dbb8e0028d6930",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/NOTICE",
+      "bytes": 7846,
+      "sha256": "b9d840b5a888bf6dfe9c22cddc75cfa5a9413d4b9a6a9c0ca7372dd4b58b6c8e",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/UNICODE-LICENSE.txt",
+      "bytes": 1995,
+      "sha256": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/COPYING",
+      "bytes": 1088,
+      "sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/NOTICE",
+      "bytes": 1757,
+      "sha256": "f30b8977b052458af98ea36850eaad6a7da3ec5be2b7f7922d1856abfd50a833",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json",
+      "bytes": 27275,
+      "sha256": "3372ab76a26e68e70b8010cf5b33e9656082bd3459365f2e8116c87d1bc1e7b5",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/VOID-PROVENANCE.json",
+      "bytes": 167784,
+      "sha256": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/aws-lc-5.12.0/LICENSE",
+      "bytes": 20338,
+      "sha256": "977c541bd25ffe36975dde25c028c0cd15ddf3d08243983b58e8a6a3d9447523",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/aws-lc-5.12.0/NOTICE",
+      "bytes": 75,
+      "sha256": "f97c469fa666b51b3dae2e1530504a5ee73bbf47b980aa76746d26c271dd591d",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json",
+      "bytes": 527,
+      "sha256": "4654f3e63c03d0834b1a52c366a39d89f05e3702e6896db97da56efa29a45892",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/c-ares-1.34.9/LICENSE.md",
+      "bytes": 1211,
+      "sha256": "460f5e768fda3752ca2169a95df062578a10fb126bfd65f3b9b1a1bed2f84807",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/corresponding-source/http_archive.py",
+      "bytes": 2458,
+      "sha256": "b9b0f376e121f8598200a2d2056e97ecf4bb7c000a5fd28f3222c54c063c1fd6",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz",
+      "bytes": 2234804,
+      "sha256": "f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz",
+      "bytes": 2856424,
+      "sha256": "fe89007a8a414ae4790b816b86859e877d3ab135db3c37f06541ff7e85ac344b",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/corresponding-source/setup_http_deps.py",
+      "bytes": 7336,
+      "sha256": "446f9778732959889f8f3934d57e8b63ba53c182b8e82057b25eac7e07486f09",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/corresponding-source/setup_http_deps_native.py",
+      "bytes": 8117,
+      "sha256": "bdc5d5517cc74e917ae584556b19b5e1fe4918e517b1b1dc0db73fc5cc5a7663",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/http-versions.json",
+      "bytes": 2812,
+      "sha256": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libidn2-2.3.8/COPYING",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3",
+      "bytes": 7652,
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libidn2-2.3.8/COPYING.unicode",
+      "bytes": 8782,
+      "sha256": "01d621eef165cf4d3d3dbb737aa0699178d94c6f18cf87e9dde6db3ca7790f46",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libidn2-2.3.8/COPYINGv2",
+      "bytes": 17984,
+      "sha256": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libidn2-2.3.8/README",
+      "bytes": 4213,
+      "sha256": "fd8b5fd38cb6e5599ff412bf7411108e83c830aea75a47bcc96c86f05b8ff607",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libpsl-0.21.5/COPYING",
+      "bytes": 1060,
+      "sha256": "322392e6001b2b3b0fca705dc9f11f26e12441188ecde50eb1d22909980b2925",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libpsl-0.21.5/LICENSE",
+      "bytes": 1060,
+      "sha256": "322392e6001b2b3b0fca705dc9f11f26e12441188ecde50eb1d22909980b2925",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libpsl-0.21.5/README",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libunistring-1.5/COPYING",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libunistring-1.5/COPYING.LIB",
+      "bytes": 7639,
+      "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/libunistring-1.5/README",
+      "bytes": 2977,
+      "sha256": "0b77c6e58bab43cf80f817c778e917e25bd42a154893492d8ae284e3853cfa56",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/nghttp2-1.70.0/COPYING",
+      "bytes": 1156,
+      "sha256": "6b94f3abc1aabd0c72a7c7d92a77f79dda7c8a0cb3df839a97890b4116a2de2a",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/nghttp2-1.70.0/README",
+      "bytes": 15,
+      "sha256": "f3c22082da5ff8b5313d36e2b8a1a83d28ff1d379a9dfd3f18582ce933b9159c",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/openssl-3.5.9/LICENSE.txt",
+      "bytes": 10175,
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/publicsuffix/LICENSE",
+      "bytes": 16727,
+      "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/publicsuffix/UPSTREAM.json",
+      "bytes": 327,
+      "sha256": "49eca4a0c92d4ee58266821be4142e8f626d9a38e90345430af1468054af1533",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/publicsuffix/public_suffix_list.dat",
+      "bytes": 337923,
+      "sha256": "d3e6243b51695327984abb3e2a5aa7077096867f75121e031e6a5a3840ca8bcd",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/zlib-1.3.2/LICENSE",
+      "bytes": 1002,
+      "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/http/zlib-1.3.2/README",
+      "bytes": 5291,
+      "sha256": "4026d921213bb2e311d8d42b44ef53361c102d5d45ae32f93f8e52eaee8d068f",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/licenses/stage10-versions.json",
+      "bytes": 472,
+      "sha256": "dfd06fa5b4605b85d756e00923357ae05dc0c16199abce3d4ddc7c1d89cce184",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/neovim/lua/void.lua",
+      "bytes": 6734,
+      "sha256": "fbfb7e91284ff918e6c3f4b6f05f79f2f89b5608c33362c702861008de90743a",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/channel.void",
+      "bytes": 4573,
+      "sha256": "155e03d6d176832cd1b891e63a3f88198a0f0d23374a967d06c1cf7ad932d3d4",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/collections.void",
+      "bytes": 15745,
+      "sha256": "72c5fd2cbcacb26cf656d64f35ea16dfbc2b577ce6faa7b5ca67d32fb4fe0fa4",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/console.void",
+      "bytes": 22807,
+      "sha256": "58a7e0adf267110790e2e3e2f1aa920b2fed5550ddd67e3e0117fa2ebc9f768e",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/convert.void",
+      "bytes": 2881,
+      "sha256": "37b5aebb9987f4ca2b05303d18741257e14b79605d862763872c2abbae97a2d7",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/encoding/ascii.void",
+      "bytes": 4598,
+      "sha256": "48c27440dda0d1bd53a6a4bf176c5fd306a59e5450063b1b83305e2e7e2c6b93",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/encoding/base64.void",
+      "bytes": 7903,
+      "sha256": "b2802159b73337a712c4ba0eb3222304fcdafde76d6e55976e848e2badb83dd4",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/encoding/binary.void",
+      "bytes": 2640,
+      "sha256": "2938847e4e89921c6bd549720f47e1c10719a064eeba04528721211699abf37e",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/encoding/hex.void",
+      "bytes": 3752,
+      "sha256": "7bc7dbadd326032c485299e6a54d46eebeba846a255235c13ac042b427b151a0",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/error.void",
+      "bytes": 390,
+      "sha256": "1ab9d1ca3420aa77274f0ce3b4bedbf87c670476e026898a8ceec948bf86db2d",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/io/memory.void",
+      "bytes": 10869,
+      "sha256": "33401233367af0dc0a8f0399eb6757cdf8ac679e7030ac5819531c69d3be439d",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/io.void",
+      "bytes": 71543,
+      "sha256": "492474132c00c2c0eaeb9963b76fd5c062676d4b7a3394afc3bba3a04b631cd4",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/json.void",
+      "bytes": 48490,
+      "sha256": "94ab0a6fb8856ddd20209727341a8336f048fdf430fa3dace045d8eb44340857",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/log.void",
+      "bytes": 61172,
+      "sha256": "8cf2a66301ab4b955a2506b69c8c331e4d62639235a68de61957935c294e1821",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/math.void",
+      "bytes": 18696,
+      "sha256": "d960ef9015b49f180bd49c13a00ad8006b4cd235e101ad1ca99c66eca4f3e2e4",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/net/http.void",
+      "bytes": 57227,
+      "sha256": "3dc77729522d1ea1e2ed9ae14962b82e4cf2e4793219f613772584f2591ac1b4",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/os.void",
+      "bytes": 12892,
+      "sha256": "b4415c00e3d8eb24480123f742ca63166c02feb4bd26abb88545c69dec74ab37",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/path.void",
+      "bytes": 5093,
+      "sha256": "cc1d1f69ff8a27c86bfb85027ec8d8b2c54133b9d4107633ecf07664ea58e30d",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/random.void",
+      "bytes": 56124,
+      "sha256": "37414b6f12e97719f2bbf342c88f5f98dc7e4eb3fc2b2b1f56b78e4aa28d95a3",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/text.void",
+      "bytes": 18097,
+      "sha256": "7156d4c7446e045b528abf8dfe68a84c01f8184907c0a8d40ed485849e80ce84",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/time.void",
+      "bytes": 29072,
+      "sha256": "f0de623206cbcd5679764f61c9df2be9dd025c3de37704ad1e46509a72bd595b",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/stdlib/url.void",
+      "bytes": 5376,
+      "sha256": "7ab8b1b17235560f5438420449d6c4a372eaf8318c52e636ffaf487657f44152",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/vim/autoload/void.vim",
+      "bytes": 1973,
+      "sha256": "0d58908a2b10fb76a5435021bbf784335df5555cd74584f1e0f7cc0fc9ac2409",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/vim/autoload/void_format.vim",
+      "bytes": 1023,
+      "sha256": "6d55afde48efbc6936fa57532e97cb9085360c359fc882a8eda4087f23c18b78",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/vim/ftdetect/void.vim",
+      "bytes": 98,
+      "sha256": "92d9d8837d956d93cfc02b027c19c2115b06bff8a1fc316533493a53bc1910fc",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/vim/ftplugin/void.vim",
+      "bytes": 237,
+      "sha256": "20eb79c218aa4b62a64d33137b486503141866249ff3e891768dd17eeaf7fccb",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/vim/indent/void.vim",
+      "bytes": 200,
+      "sha256": "f67328078a7aee01ee75a429443a8f5da642415d72d506f650f8a68896f82caf",
+      "symlink_target": null
+    },
+    {
+      "path": "share/void/vim/syntax/void.vim",
+      "bytes": 1501,
+      "sha256": "bcb42f40131ff5739f9a1c3c5d9039162b3a2cf0729532749c97869c1b5c5aee",
+      "symlink_target": null
+    }
+  ],
+  "native_manifest": "VOID native 23.1.4 v2\n/src/void/.toolchains/llvm-23.1.4/bin/clang\n/src/void/.toolchains/llvm-23.1.4/bin/ld.lld\n../lib/void/libvoid_runtime.a\n../lib/void/libvoid_native_fixture.a\n@VOID_NATIVE_DIR@/../lib/void/libcurl.a\n@VOID_NATIVE_DIR@/../lib/void/libpsl.a\n@VOID_NATIVE_DIR@/../lib/void/libnghttp2.a\n@VOID_NATIVE_DIR@/../lib/void/libssl.a\n@VOID_NATIVE_DIR@/../lib/void/libcrypto.a\n@VOID_NATIVE_DIR@/../lib/void/libcares.a\n@VOID_NATIVE_DIR@/../lib/void/libidn2.so\n@VOID_NATIVE_DIR@/../lib/void/libunistring.so\n@VOID_NATIVE_DIR@/../lib/void/libz.a\n-Xlinker\n-rpath\n-Xlinker\n@VOID_NATIVE_DIR@/../lib/void\n-pthread\n-Xlinker\n--exclude-libs\n-Xlinker\nlibcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a\n",
+  "native_resources": "VOID native resources 1\n0bca41e953fbeaa7fe243fdaba2f0af119d4a15d70723be500431f0ad5f08833\t@VOID_NATIVE_DIR@/../lib/void/libvoid_runtime.a\n4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865\t@VOID_NATIVE_DIR@/../lib/void/libvoid_native_fixture.a\n47013f784bbc11a1495a005ea617ae18ad9eaec194794a0293af75807914cf6e\t@VOID_NATIVE_DIR@/../lib/void/libcurl.a\n9170f1e643c32a5cd601f5e2c6305aa4adf50bc99d6d1cd14dbc8ad7b9f06f27\t@VOID_NATIVE_DIR@/../lib/void/libpsl.a\n8d3efd772c05a77e8621c144215f4caf9e264bceb54a2cf7806a1e8286489479\t@VOID_NATIVE_DIR@/../lib/void/libnghttp2.a\n7b5b4c713c03ec5959f2682ff6d6bd40a92d70fcb044ec2f31792a323686afb4\t@VOID_NATIVE_DIR@/../lib/void/libssl.a\ne1370fd69993b84684f12df80835983fb1d7f7738f1c48f270756111161b6cfe\t@VOID_NATIVE_DIR@/../lib/void/libcrypto.a\n6430ecf3ddd80e690f4198768623c781355340062baf57ed28adb8f7e6079011\t@VOID_NATIVE_DIR@/../lib/void/libcares.a\nb41334b68a85a5033e3ce20e5d8dfa6b4bea8599c381cb4a58328e6801b6cf41\t@VOID_NATIVE_DIR@/../lib/void/libidn2.so\n1118b42c02a4f58b3f5918882469e212dc8883eb5157f8b4de4d7b38034c1589\t@VOID_NATIVE_DIR@/../lib/void/libunistring.so\nda59c9da952cf3d6215e4d279e362d02fbc2b046407c62c5017d3d7e8a42c457\t@VOID_NATIVE_DIR@/../lib/void/libz.a\n",
+  "loader_commands": [
+    {
+      "argv": [
+        "ldd",
+        "/opt/void-relocated/bin/voidc"
+      ],
+      "exit_code": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f382ef4d000)\n\tlibidn2.so.0 => /opt/void-relocated/bin/../lib/void/libidn2.so.0 (0x00007f382b2b0000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f382b02f000)\n\tlibunistring.so.5 => /opt/void-relocated/bin/../lib/void/libunistring.so.5 (0x00007f382ae47000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f382ad5e000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f382ad42000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f382ad12000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f382aaff000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f382ef4f000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "readelf",
+        "-d",
+        "/opt/void-relocated/bin/voidc"
+      ],
+      "exit_code": 0,
+      "stdout": "\nDynamic section at offset 0x3bda1c8 contains 34 entries:\n  Tag        Type                         Name/Value\n 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN/../lib/void]\n 0x0000000000000001 (NEEDED)             Shared library: [libidn2.so.0]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libunistring.so.5]\n 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]\n 0x000000006ffffffb (FLAGS_1)            Flags: PIE\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000007 (RELA)               0x9008\n 0x0000000000000008 (RELASZ)             1285080 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000006ffffff9 (RELACOUNT)          52650\n 0x0000000000000017 (JMPREL)             0x142be0\n 0x0000000000000002 (PLTRELSZ)           12936 (bytes)\n 0x0000000000000003 (PLTGOT)             0x3be2660\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000006 (SYMTAB)             0x320\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000005 (STRTAB)             0x4a84\n 0x000000000000000a (STRSZ)              17789 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x4910\n 0x0000000000000019 (INIT_ARRAY)         0x3b44428\n 0x000000000000001b (INIT_ARRAYSZ)       3336 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x3b44410\n 0x000000000000001c (FINI_ARRAYSZ)       24 (bytes)\n 0x000000000000000c (INIT)               0x3b41214\n 0x000000000000000d (FINI)               0x3b41230\n 0x000000006ffffff0 (VERSYM)             0x4070\n 0x000000006ffffffe (VERNEED)            0x458c\n 0x000000006fffffff (VERNEEDNUM)         6\n 0x0000000000000000 (NULL)               0x0\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "/opt/void-relocated/bin/voidls"
+      ],
+      "exit_code": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f1763265000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f1762aa7000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f1762a8b000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f176280d000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f17627df000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f17625cc000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f1763267000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "readelf",
+        "-d",
+        "/opt/void-relocated/bin/voidls"
+      ],
+      "exit_code": 0,
+      "stdout": "\nDynamic section at offset 0x6b3270 contains 31 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]\n 0x000000006ffffffb (FLAGS_1)            Flags: PIE\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000007 (RELA)               0x5798\n 0x0000000000000008 (RELASZ)             62616 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000006ffffff9 (RELACOUNT)          2512\n 0x0000000000000017 (JMPREL)             0x14c30\n 0x0000000000000002 (PLTRELSZ)           6864 (bytes)\n 0x0000000000000003 (PLTGOT)             0x6b6908\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000006 (SYMTAB)             0x320\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000005 (STRTAB)             0x2bd8\n 0x000000000000000a (STRSZ)              11195 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x2ac8\n 0x0000000000000019 (INIT_ARRAY)         0x6ae3a0\n 0x000000000000001b (INIT_ARRAYSZ)       32 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x6ae398\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000000000000c (INIT)               0x6ac174\n 0x000000000000000d (FINI)               0x6ac190\n 0x000000006ffffff0 (VERSYM)             0x2588\n 0x000000006ffffffe (VERNEED)            0x2868\n 0x000000006fffffff (VERNEEDNUM)         5\n 0x0000000000000000 (NULL)               0x0\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "/work/standard/hello-native"
+      ],
+      "exit_code": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007f54fa4e8000)\n\tlibidn2.so.0 => /opt/void-relocated/bin/../lib/void/libidn2.so.0 (0x00007f54fa308000)\n\tlibunistring.so.5 => /opt/void-relocated/bin/../lib/void/libunistring.so.5 (0x00007f54fa120000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f54f9e9f000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f54f9db6000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f54f9d88000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f54f9b73000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f54fa4ea000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "readelf",
+        "-d",
+        "/work/standard/hello-native"
+      ],
+      "exit_code": 0,
+      "stdout": "\nDynamic section at offset 0x1a1c58 contains 32 entries:\n  Tag        Type                         Name/Value\n 0x000000000000001d (RUNPATH)            Library runpath: [/opt/void-relocated/bin/../lib/void]\n 0x0000000000000001 (NEEDED)             Shared library: [libidn2.so.0]\n 0x0000000000000001 (NEEDED)             Shared library: [libunistring.so.5]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x000000006ffffffb (FLAGS_1)            Flags: PIE\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000007 (RELA)               0x3b40\n 0x0000000000000008 (RELASZ)             9864 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000006ffffff9 (RELACOUNT)          346\n 0x0000000000000017 (JMPREL)             0x61c8\n 0x0000000000000002 (PLTRELSZ)           3840 (bytes)\n 0x0000000000000003 (PLTGOT)             0x1a5038\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000006 (SYMTAB)             0x320\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000005 (STRTAB)             0x1d8c\n 0x000000000000000a (STRSZ)              7601 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x1c90\n 0x0000000000000019 (INIT_ARRAY)         0x1a2b80\n 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x1a2b78\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000000000000c (INIT)               0x1a1130\n 0x000000000000000d (FINI)               0x1a114c\n 0x000000006ffffff0 (VERSYM)             0x18b0\n 0x000000006ffffffe (VERNEED)            0x1a7c\n 0x000000006fffffff (VERNEEDNUM)         3\n 0x0000000000000000 (NULL)               0x0\n",
+      "stderr": ""
+    }
+  ]
+}
