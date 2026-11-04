@@ -197,7 +197,10 @@ class Qualification:
 
     def dependencies(self):
         require(not self.http.exists(), 'HTTP Release prefix must be built afresh')
-        self.run('http-bootstrap', [sys.executable, 'tools/setup_http_deps.py', '--profile', 'Release', '--jobs', '3'])
+        command = [sys.executable, 'tools/setup_http_deps.py', '--profile', 'Release', '--jobs', '3']
+        if SYSTEM == 'Darwin':
+            command.append('--macos-install-only')
+        self.run('http-bootstrap', command)
         args = [sys.executable, 'tools/verify_http_dependencies.py', self.http, 'Release', SYSTEM]
         if SYSTEM != 'Linux':
             args.append('x86_64' if SYSTEM == 'Windows' else 'arm64')

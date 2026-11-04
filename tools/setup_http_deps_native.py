@@ -23,8 +23,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=['Release', 'Debug', 'strict'], default='Release')
     parser.add_argument('--jobs', type=int, default=4)
+    parser.add_argument('--macos-install-only', action='store_true',
+                        help='macOS installation CI only: omit AWS-LC auxiliary tools')
     args = parser.parse_args()
     system = platform.system()
+    if args.macos_install_only and system != 'Darwin':
+        parser.error('--macos-install-only requires macOS')
     if system not in ('Windows', 'Darwin'): raise SystemExit('Native Windows/macOS host required')
     architecture = platform.machine().lower()
     architecture = {'amd64': 'x86_64', 'aarch64': 'arm64'}.get(architecture, architecture)
@@ -101,6 +105,7 @@ def main():
     cmake('zlib', ['-DZLIB_BUILD_TESTING=OFF', '-DZLIB_BUILD_SHARED=OFF', '-DZLIB_BUILD_STATIC=ON'])
     if system == 'Darwin':
         cmake('aws-lc', ['-DBUILD_SHARED_LIBS=OFF', '-DBUILD_TESTING=OFF', '-DBUILD_LIBSSL=ON',
+                         '-DBUILD_TOOL=' + ('OFF' if args.macos_install_only else 'ON'),
                          '-DDISABLE_GO=ON', '-DENABLE_SOURCE_MODIFICATION=OFF'])
     cmake('libpsl', [f'-DPSL_SOURCE={sources["libpsl"]}', f'-DPSL_DATA={root / "third_party/publicsuffix/public_suffix_list.dat"}'],
           root / 'cmake/http-psl')

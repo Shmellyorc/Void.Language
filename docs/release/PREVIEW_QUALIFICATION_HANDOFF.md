@@ -1,5 +1,106 @@
 # VOID 2.0 private preview qualification handoff
 
+## macOS installation dependency failure — 4 November 2026
+
+**INSTALLATION-ONLY REMEDY VALIDATED — REVIEW BEFORE THE NEXT MANUAL RUN.**
+Boss authorized a narrowly scoped commit/push with `[skip ci]`. Workflow dispatch
+and reruns remain Boss-controlled and are not part of that authorization.
+The source-review sections below are preserved pre-run snapshots; their former
+uncommitted/not-dispatched statements do not describe this investigation.
+
+[Installation run 41902140893](https://github.com/Shmellyorc/Void.Language/actions/runs/41902140893),
+attempt 1, tested `ca923ffaac418c2c0b8b6a065868b57b5bf2fbf4`. This correction
+started at that same SHA on a clean working tree.
+
+| Hosted platform | Recorded run result | Status of the proposed correction |
+| --- | --- | --- |
+| Linux x64 | PASS; job `126827103064` succeeded | Linux recipe unchanged; no new run |
+| Windows x64 | PASS; job `126827103472` succeeded | Windows branch unchanged; no new run |
+| macOS ARM64 | FAIL; job `126827103377`, AWS-LC dependency build | Installation UNKNOWN; corrected recipe unexecuted |
+
+Golden Wrench supplied the platform conclusions. This investigation independently
+checked the job/step metadata and downloaded macOS artifact
+`install-macos-15-ARM64-Release-1`, ID `13358678047`. Its ZIP SHA-256 is
+`4e9a007468f349cd3187e1ad2fa5cb23a19902d7829320bc4db1ef73b50ed0ce`;
+all 80 entries in its evidence seal verified. Linux/Windows artifact contents were
+not rehashed here. Hosted results do not establish independent physical-machine
+portability.
+
+Confirmed immediate cause: the macOS arm64 linker cannot resolve
+`std::__1::__hash_memory(void const*, unsigned long)` from `pkcs8.cc.o` while
+linking AWS-LC's auxiliary `tool-openssl/openssl`. The dependency receipt records
+`cmake --build <macOS Release dependency build>/aws-lc --parallel 3` exiting **2**.
+The setup wrapper propagates failure as exit **1**. Python is reporting the
+failed native command, not causing the unresolved symbol. Build stdout records
+`crypto`, `ssl` and `bssl` targets completed before that failure; AWS-LC's install
+command was not reached. VOID configure/build/install/smoke were all SKIP, so no
+macOS installation pass is claimed. A deeper libc++ ABI diagnosis or repair is
+not established by this bounded inspection.
+
+The cached AWS-LC 5.12.0 archive rehashes to the existing approved pin
+`1de549ad9ac709d08a7e26ac5aa77dc90d55811c5c5c54b4ec3e442b00e98e68`,
+revision `cd481c207e38f06aeb5766f4a1cdfce10a4c0af8`. Its top-level CMake source
+also byte-matches the official immutable revision. That
+[pinned source](https://github.com/aws/aws-lc/blob/cd481c207e38f06aeb5766f4a1cdfce10a4c0af8/CMakeLists.txt#L1510)
+declares `BUILD_TOOL` and gates only the `tool` and `tool-openssl` directories with
+it. Crypto remains unconditional; SSL remains under `BUILD_LIBSSL`. Headers and
+the library install/export rules remain outside that gate; C++ stays enabled for
+SSL. The existing static-library and SSL options therefore preserve VOID's
+required `libcrypto.a`, `libssl.a`, `include/openssl` and library CMake exports.
+In installation-only mode, the omitted tool-directory installs are `bssl`,
+`openssl` and `c_rehash`; default provisioning keeps them. This is source
+verification of the required production contract, not a newly executed macOS
+install.
+
+Golden Wrench held the initial unconditional `-DBUILD_TOOL=OFF` proposal because
+the shared recipe also serves HTTP regression fixtures. The corrected
+[native recipe](../../tools/setup_http_deps_native.py) adds an explicit
+`--macos-install-only` option, default **false**. The Darwin AWS-LC configure
+command now explicitly selects **`BUILD_TOOL=ON` by default**, selecting OFF only
+when that option is supplied. It is rejected outside macOS before provisioning.
+[The installation harness](../../tools/ci/install_smoke.py) supplies the option
+only for macOS dependency setup; Linux and Windows installation commands retain
+their original arguments. The existing setup forwarder passes macOS arguments
+through unchanged. No compiler, Runtime, production CMake, optimization flags,
+upstream source, LLVM version, platform SDK, dependency pin or workflow changes.
+Recipe identities already include this script's hash; use a fresh matching
+dependency prefix for the reviewed run.
+
+**Compatibility boundary:** existing HTTP fixture callers omit the new option,
+so they keep the default tool build and installation of `<prefix>/bin/openssl`.
+[The regression fixture preflight](../../tools/ci/http_bootstrap.py) and separate
+fixture provisioning are unchanged. Both command modes retain static
+`libssl.a`, `libcrypto.a`, headers and library install/export rules. The opt-out
+is used only by installation CI, which provisions fresh dependencies without
+compiled caches and never runs HTTP fixtures. An installation-only prefix is not
+a substitute for a tool-enabled HTTP fixture prefix. This correction does not
+repair or claim acceptance of the auxiliary executable's libc++ linkage in the
+default mode; it preserves existing behavior. No HTTP campaign was run or marked
+passing here.
+
+The new [focused command tests](../../tests/ci/install_dependencies_test.py) PASS:
+**8 tests**, including default ON versus explicit OFF across Release/Debug/strict,
+unchanged SSL/static-library options and install commands, argument forwarding,
+macOS-only harness opt-in, non-macOS rejection, unchanged Windows provider
+selection and the required archive/header consumer paths. Reproduce with
+`python3 tests/ci/install_dependencies_test.py`. Downloads, archive extraction and
+native subprocesses are mocked; these are command-generation checks, not native
+installation acceptance. Pinned upstream source inspection confirms the crypto/
+SSL/header install rules survive both modes and default tool installation retains
+`openssl`. Python AST/bytecode and Python 3.12 grammar checks PASS for both changed
+scripts and the new tests; Actionlint 1.7.12 and whitespace checks PASS.
+
+Original artifact/source evidence remains under
+`/tmp/void-macos-build-tool-_y743x9w/`. Option command plans, validation results
+and all local test attempts are retained under
+`/tmp/void-macos-install-option-k3149okd/`. Two initial test-fixture attempts lacked
+host-query isolation and copied recipe-hash inputs; only the fixture was corrected
+before all tests passed. The relevant change set is exactly the native recipe,
+installation harness, focused command tests and this handoff. Nothing was
+configured, built or installed locally; no CTest, sanitizer, benchmark, HTTP/HTTPS
+campaign or historical crash reproduction was executed. macOS installation after
+this remedy remains **UNKNOWN** until a reviewed manual run.
+
 ## Installation CI source review — 4 November 2026
 
 **HARNESS CORRECTED — COMMIT HOLD FOR GOLDEN WRENCH SOURCE REVIEW.**
