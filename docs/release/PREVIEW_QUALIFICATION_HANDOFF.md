@@ -1,5 +1,175 @@
 # VOID 2.0 private preview qualification handoff
 
+## First-install documentation sprint — 4 November 2026
+
+**REPORT READY — STOP FOR GOLDEN WRENCH REVIEW.**
+
+Documentation validation passed; no implementation or host test was performed.
+
+This section is current. The original Linux qualification handoff below is a
+preserved historical snapshot. Boss subsequently committed those 15 Linux records
+at `d52e6b708539dd3026c934c98332c58c8e5e311d`; their former uncommitted status is
+not the initial state of this sprint. This sprint began at that SHA on clean
+`main`, tracking `origin/main`. See [start hashes](evidence/first-install-docs/start.json).
+HEAD, root README, production/Runtime/CMake, licensing and historical acceptance/
+crash evidence remain protected. Only documentation and review evidence are in scope.
+
+### Accepted installation evidence and provenance
+
+| Platform / exact tested input | Accepted scope | Still open |
+| --- | --- | --- |
+| Linux x64, `97aa4e4334f1b9354ba651770b5cf13e74da03d0` | Fresh Ubuntu 24.04 container source build, component install, installed stdlib/native execution and real LSP handshake. [Original report](LINUX_CLEAN_HOST_QUALIFICATION.md) and receipts unchanged. | Shared hardware/kernel; separate VM/machine, fresh-network SDK acquisition and broader ABI coverage unqualified. |
+| Windows x64, `1afd881ecfa65c616261e7aeb76ecd2bf87770b6` | Golden Wrench accepted the bounded Windows 10 developer-host isolated install of existing Release artifacts. [Exact Windows-authored record](WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md). | No fresh compiler rebuild or independent clean-host provisioning; later refs including observed remote `97aa4e43` are not qualified by these hashes. |
+| macOS ARM64 | Existing hosted compiler/HTTP acceptance only. | Source installation/clean-host qualification unexecuted. |
+
+The complete Windows report was supplied by Boss in the connected chat
+“Review before continuing,” then explicitly accepted by Golden Wrench there.
+It was recovered from that exact Boss message and copied as supplied, retaining
+host paths, hashes, command descriptions, shadow-install method and both original
+harness failures. [Import provenance](evidence/first-install-docs/windows-import-source.json)
+identifies the source/acceptance messages and the imported UTF-8 text hash. Only a
+terminal LF is standardized; original Windows file bytes/line endings and private
+raw VM receipts were not accessed. No missing commands, script or results were
+reconstructed. No Windows test was repeated.
+
+Windows host assumptions: Windows 10 Home 22H2 build 19045.6466 AMD64; full
+LLVM/Clang/LLD 23.1.4; VS Build Tools 2022 17.14.37806.7; MSVC toolset 14.44.35207
+(cl 19.44.35229); Windows SDK 10.0.19041.0; CMake 4.4.3, Ninja 1.13.2, Python
+3.14.8. The installed VC redistributable was v14.44.35211.00. Restricted PATH and
+removed explicit VS/VOID environment overrides did not remove these disk inputs.
+The absolute SDK driver and Microsoft libraries remained available. The successful
+EXE-only copy proves that VM's result, not a machine without those prerequisites.
+
+| Windows artifact | Exact tested SHA-256 |
+| --- | --- |
+| Installed `voidc.exe` | `9e7a9d283dc9ba51bdb3bed00aeb680af687bdbfa86d1743ad63ee130d662993` |
+| Installed `voidls.exe` | `2b9ee648cbc67976363c93a0413e48de9065ad943fd38c2d2795688286faf2ca` |
+| Native `qualified.exe` | `68423ed09a68e2436fc6253a047ae5f07ce306734e5bc1348e2530f4ca3483df` |
+
+Other source/Runtime/SDK identities remain in the exact imported report. Its 562
+original Release-tree files were preserved by paths, sizes and modification times;
+76 installed files and seven resource archives were hash checked. Those are the
+Windows author's reported checks, not a new Linux-side raw-evidence verification.
+
+### Exact modifications and verification
+
+- Imported the Windows-authored report without changing its content.
+- Updated the blocker register for accepted bounded Windows/Linux results, separate
+  independent-host gates, and the first-install guide/README review state.
+- Corrected `docs/SOURCE_COMPILER.md`: Linux prerequisites, pinned full SDK and
+  standalone helper invocation, HTTP setup/verification, profile/source-cache/CA
+  contract, production Release configuration, component installs, current
+  `main.void` and native CLI workflow, installed stdlib discovery and portability
+  limits. Windows developer-host requirements are distinct from fresh provisioning;
+  macOS hosted compiler evidence is distinct from source-install acceptance.
+- Prepared [README_LLVM23_CLI.patch](proposals/README_LLVM23_CLI.patch), **unapplied**.
+  It corrects LLVM/Python requirements, points to the maintained complete recipe,
+  qualifies the still-supported legacy entry example and uses current `build`.
+  Feature/editor/licensing sections and the valid legacy source example are unchanged.
+- Retained all historical Linux/HTTP/LLVM/crash records and existing receipts;
+  no prior evidence digest/inventory is rewritten to describe this new sprint.
+
+[Validation results](evidence/first-install-docs/validation.json) and the
+[reproducible checker](evidence/first-install-docs/validate.py) record local links/
+anchors, shell/heredoc syntax, Linux recipe comparison with retained accepted
+argv, exact known smoke-source comparison, Windows identity/provenance, the dry-run
+README patch check and scope/preservation. The
+[sprint inventory](evidence/first-install-docs/inventory.json) lists every changed
+path and digest. Validation is static and source/receipt based: no new compiler,
+CMake configure/build/install, SDK download, Windows command or LSP exchange is
+executed in this documentation sprint. Existing command results remain attached
+to their original SHAs. Network link reachability is not newly verified.
+
+Read-only retrieval note: the first chat-read request exceeded the tool's 20,000-
+character per-item limit and was rejected before retrieval. The corrected request
+returned the complete supplied Windows report. No source content was reconstructed.
+The first static checker incorrectly treated Python code inside a fenced block as
+an inline Markdown link. Its failure is retained in `validation.json`'s attempt
+history, with the original full report/checker preserved privately under
+`$HOME/.local/state/void-first-install-docs/d52e6b70-20261104/`. Excluding code from
+link extraction corrected the validator; no documentation criterion was relaxed.
+
+Final static results: all six validation groups PASS, 97 local links/anchors,
+10 shell blocks accepted by `bash -n`, and one Python SDK heredoc AST-parsed.
+Linux package/configure/build/HTTP/component-install/smoke commands match retained
+accepted argv after documented path normalization. Both smoke-source texts match
+accepted source hashes. The unapplied README diff passes `git apply --check`;
+root README still hashes to
+`c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add`.
+The Windows import matches the exact supplied Markdown body, SHA-256
+`a20fa700f27990d6748df3cb0b7b5f030bed94c3ebc0becac1c8ed66b08613f0`.
+The complete changed-file inventory contains 10 paths: three modified documents
+and seven new documentation/review-evidence files. All remain unstaged/uncommitted.
+
+### Unresolved gaps and next clean-host procedure (plan only)
+
+The source guide now includes the previously omitted HTTP/CA/install workflow.
+The protected README remains unchanged pending approval of its separate proposal.
+Standalone SDK download wiring is source-inspected; the accepted Linux test used
+a locally cached official archive with a verified hash. Generated Linux apps
+retain an absolute installed-library RUNPATH, and native manifests retain absolute
+SDK paths. LLVM notice completeness, public licensing, logging performance and
+current-toolchain optimizer risk remain separate register entries. No crash
+campaign or logging work reopened. Windows' exact shadow-install harness/raw
+receipts are private on the VM; no universal shadow generator is invented here.
+
+After Golden Wrench reviews this documentation and Boss authorizes the next run:
+
+1. Create a fresh Ubuntu 24.04 x64 VM with a new disk and record image digest,
+   hypervisor, kernel, architecture, libc, resources and whether hardware is shared.
+   A VM on the same physical machine is an intermediate test, not independent
+   physical-host portability. Do not mount the development home, SDK, build tree
+   or dependency prefixes, and do not reuse a prepared VM snapshot.
+2. Obtain Boss's exact reviewed source revision and these guide changes in that
+   VM. Record full SHA, clean status and source/archive identities. Install only
+   declared prerequisites; retain exact package versions and every command's
+   exit, stdout/stderr and relevant environment. Obtain the official SDK anew via
+   the documented pinned helper and retain its identity/hash receipt. Build HTTP
+   dependencies from their pinned sources in that VM, without compiled caches.
+3. Follow the corrected Linux guide verbatim: verify the prefix/source hashes,
+   configure plain Release, build `voidc`/`voidls` and Runtime dependencies, and
+   install both components into a new private prefix. Preserve any failure before
+   any change; classify it without speculative production/build-system repair.
+4. In a fresh project outside the source, check/run minimal `main`, import/run
+   installed console, build/execute native output, verify loader/manifest paths
+   and installed stdlib byte identities, discover installed `voidls`, and perform
+   real framed initialize/initialized/shutdown/exit. Test source-fallback isolation
+   only on disposable VM copies. Repeat the bounded missing-prefix/std-root/native-
+   manifest/driver controls; record expected failures separately from product faults.
+5. Preserve compact non-sensitive receipts and all failed attempts. Stop immediately
+   on a correctness/safety concern and stop for Golden Wrench review at completion.
+   Do not use repeated LLVM19/current-optimizer crash campaigns, change optimization
+   to make a check pass, or infer editor/public-release acceptance from these checks.
+
+This sprint does not launch that VM, repeat Windows tests or authorize an installer,
+CI run, Git mutation, package publication or deployment. Independent Windows
+provisioning/source rebuild and macOS install qualification remain later explicit
+scopes. Current optimizer risk uses LLVM23 evidence, with historical Linux LLVM19
+and earlier Windows LLVM23 incidents distinct and causal repair unproven.
+
+### Current changed-file inventory and stop
+
+All current changes remain **unstaged and uncommitted**. Root README is unchanged;
+its proposal exists only as the separate patch and a private validation copy.
+
+- `docs/SOURCE_COMPILER.md`
+- `docs/release/PREVIEW_QUALIFICATION_HANDOFF.md`
+- `docs/release/PREVIEW_BLOCKERS.md`
+- `docs/release/WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md`
+- `docs/release/proposals/README_LLVM23_CLI.patch`
+- `docs/release/evidence/first-install-docs/start.json`
+- `docs/release/evidence/first-install-docs/windows-import-source.json`
+- `docs/release/evidence/first-install-docs/validate.py`
+- `docs/release/evidence/first-install-docs/validation.json`
+- `docs/release/evidence/first-install-docs/inventory.json`
+
+Validation is complete; stopped for Golden Wrench review. No staging, commits,
+pushes, branch creation, hosted CI, publication, deployment, README application,
+production/CMake/Runtime changes, historical crash-evidence edits or licensing
+decision is authorized by this sprint.
+
+## Original Linux qualification handoff — preserved prior snapshot
+
 4 November 2026. **REPORT READY — STOP FOR GOLDEN WRENCH REVIEW.**
 
 Linux x64 source installation passed the bounded fresh Ubuntu container checks.

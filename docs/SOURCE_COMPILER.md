@@ -50,137 +50,320 @@ required-reference readiness, safe helper contexts and complete-object commit; s
 
 ## Building the compiler
 
-VOID requires the complete LLVM **23.1.4** SDK, including headers and development
-libraries. For a first program, start with the
-[root README](../README.md#a-small-example).
-The [migration record](llvm23/IMPLEMENTATION.md) and
-[local acceptance](llvm23/ACCEPTANCE.md) distinguish the current toolchain from
-the historical LLVM19 feature and verification records below.
-The protected root README's older toolchain commands are superseded by this
-build section; its source examples remain separate from those setup commands.
+VOID requires the complete **LLVM/Clang/LLD 23.1.4** development SDK: headers,
+LLVM libraries, CMake exports and matching host tools. CMake rejects other LLVM
+versions. Python **3.12+** is required for dependency preparation; Python is also
+used during ordinary configuration, even when tests are disabled. A C++20 host
+standard library and platform development files are required in addition to Clang.
+
+The accepted [Linux qualification](release/LINUX_CLEAN_HOST_QUALIFICATION.md)
+built source `97aa4e4334f1b9354ba651770b5cf13e74da03d0` in fresh Ubuntu 24.04
+x64 container userspace. The [Windows qualification](release/WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md)
+installed existing Release artifacts from `1afd881ecfa65c616261e7aeb76ecd2bf87770b6`
+on a developer VM. Neither establishes independent-machine portability.
+[The release handoff](release/PREVIEW_QUALIFICATION_HANDOFF.md) tracks the next
+clean-host procedure and remaining review gates. These are private source-install
+instructions, not a public binary package or redistribution authorization.
+
+The protected root README still contains older setup/CLI wording. This build
+section supersedes those commands; a separate README correction is proposed for
+Boss review. Historical LLVM19 feature and acceptance notes below remain history.
+See the [migration record](llvm23/IMPLEMENTATION.md) for that transition.
 
 ### Linux dependencies and build
 
-Requires CMake 3.24+, C++20, and the complete **LLVM 23.1.4** development SDK.
-Use matching Clang, LLD and `llvm-dwarfdump`. CI uses Python 3.12; the official
-SDK installer requires Python 3.12+. Install the verified full SDK separately at
-`.toolchains/llvm-23.1.4`, retaining its provenance receipt. Do not assume a
-distribution's compiler-only package provides this exact version. On Debian-family
-distributions, install host dependencies and configure with explicit SDK paths:
+Use Linux x86-64 with the complete official Linux x64 SDK. The verified Ubuntu
+userspace used CMake 3.28.3, Ninja 1.11.1, Python 3.12.3, Make 4.3, Perl 5.38.2,
+glibc 2.39 and GCC/libstdc++ development headers 13.3.0. These are observed
+versions, not a proven minimum ABI matrix. The project CMake minimum is 3.24;
+Ninja has no separate repository-enforced minimum.
+
+Run from the physical source-checkout root. On Ubuntu 24.04, prepare the host:
 
 ```sh
-sudo apt-get install build-essential cmake ninja-build python3 libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+  build-essential cmake ninja-build python3 libffi-dev libedit-dev \
+  libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev \
+  ca-certificates xz-utils curl git perl
+```
+
+`build-essential` supplies Make, host C/C++ headers and startup/link resources;
+Perl is used by AWS-LC assembly generation. LLVM exports need real development
+libraries, including zlib, zstd and LibXml2; `libedit-dev` provides optional
+line-editing support. Ubuntu supplies `libtinfo-dev` through `libncurses-dev`.
+Other distributions may need different package names. Distribution CA files must
+be available both for downloads and curl's configuration-time trust discovery.
+
+Install the SDK at **`.toolchains/llvm-23.1.4` inside this checkout**. HTTP setup
+uses that path directly, regardless of a later custom `LLVM_DIR`. The Linux asset
+is `LLVM-23.1.4-Linux-X64.tar.xz`, SHA-256
+`25d814fda50d5fb0084b42be09605d8b1595d49d5e2e03a3345d7e112ff6f9f3`.
+The [repository SDK helper](../tools/ci/llvm_sdk.py) pins its official URL and hash.
+For a new download outside GitHub Actions, its install function can be called
+without the CI entrypoint's `GITHUB_ENV`/`GITHUB_PATH` assumptions:
+
+```sh
+python3 - <<'PY'
+from pathlib import Path
+import runpy
+sdk_setup = runpy.run_path("tools/ci/llvm_sdk.py")
+sdk_setup["install"](Path(".toolchains/llvm-23.1.4").resolve())
+PY
 void_llvm23_sdk="$PWD/.toolchains/llvm-23.1.4"
-cmake -S . -B build/debug -G Ninja \
+test -f "$void_llvm23_sdk/lib/cmake/llvm/LLVMConfig.cmake"
+"$void_llvm23_sdk/bin/clang" --version
+"$void_llvm23_sdk/bin/ld.lld" --version
+"$void_llvm23_sdk/bin/llvm-config" --version --build-mode --assertion-mode --has-rtti
+```
+
+Require 23.1.4 from the selected tools; the official qualified archive reports
+Release, assertions off and RTTI off. Retain `void-sdk-identity.json`. The helper
+rejects an existing SDK without the expected identity receipt. The first Linux
+qualification copied and rehashed the official archive rather than downloading it
+anew. The standalone download invocation above is source-inspected; its fresh-
+network execution remains part of the next clean-host test, not a new claimed pass.
+
+The Runtime includes the accepted HTTP provider, so prepare its pinned native
+dependencies **before** configuring VOID:
+
+```sh
+python3 tools/setup_http_deps.py --profile Release --jobs 3
+python3 tools/verify_http_dependencies.py \
+  .toolchains/http/prefix/linux-aws-lc-5.12.0/Release Release
+```
+
+[The pin set](../third_party/http-versions.json) covers nghttp2, c-ares, zlib,
+AWS-LC, libidn2, libpsl and libunistring. Curl and public-suffix data are checked-in
+source. The native prefix defaults to
+`.toolchains/http/prefix/linux-aws-lc-5.12.0/Release`; `VOID_HTTP_DEPS_ROOT` can
+select another verified matching prefix. `CMAKE_PREFIX_PATH` alone does not select
+it. Keep the manifest, library/header files and verified corresponding source
+archives in `.toolchains/http/downloads`: the verifier checks those archives too.
+An ambient system curl/TLS installation is not a replacement. Setup writes local
+build receipts under `docs/net/http/evidence/`; retain them privately for a
+qualification rather than treating them as publication artifacts.
+
+The following production-only Release configuration matches the verified recipe,
+with source/build paths made checkout-relative. It builds the compiler, Runtime,
+required native libraries and language server; it does not claim a CTest pass:
+
+```sh
+cmake -S . -B build/preview-release -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
   -DLLVM_DIR="$void_llvm23_sdk/lib/cmake/llvm" \
   -DCMAKE_C_COMPILER="$void_llvm23_sdk/bin/clang" \
   -DCMAKE_CXX_COMPILER="$void_llvm23_sdk/bin/clang++" \
   -DVOID_CLANG="$void_llvm23_sdk/bin/clang" \
-  -DVOID_DWARFDUMP="$void_llvm23_sdk/bin/llvm-dwarfdump" \
   -DVOID_LINKER="$void_llvm23_sdk/bin/ld.lld" \
-  -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$void_llvm23_sdk/bin/ld.lld" \
-  -DCMAKE_BUILD_TYPE=Debug
-cmake --build build/debug --parallel 4
-ctest --test-dir build/debug --output-on-failure
+  -DVOID_DWARFDUMP="$void_llvm23_sdk/bin/llvm-dwarfdump" \
+  -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$void_llvm23_sdk/bin/ld.lld"
+cmake --build build/preview-release --target voidc voidls --parallel 3
 ```
 
-Machine-code ownership certification is optional research. Ordinary JIT/AOT
-compilation uses typed IR validation, LLVM verification and the shared lowerer;
-it does not require allocation lineage or final-byte certificates. To build the
-existing experiments, configure with `-DVOID_LLVM_RESEARCH=ON`, build
-`void_arrays_storage_audit`, and run
-`ctest --test-dir build/debug -L research --output-on-failure`. Research checker rejections are not LLVM correctness
-failures or production compilation blockers. The research-only 64 KiB storage
-budget is not a production limit.
-The optional [private fixed-call experiment](../tests/research/call_envelope/README.md)
-uses direct LLVM arguments and Runtime copy helpers, without envelope
-permissions, store-identity protocols or a linked-byte certificate gate. It is
-separate from already implemented production source arrays.
+CMake verifies SDK version/RTTI, the HTTP prefix, CA locations and a real ORC
+link-and-run probe. Missing dependencies must diagnose; do not replace imported
+libraries with stubs. `VOID_DWARFDUMP` is test-only and is reported unused with
+`BUILD_TESTING=OFF`, as in the qualification receipt.
 
-Verify the SDK actually provides 23.1.4. CMake rejects different SDK
-versions. LLVM's development package depends on other development libraries;
-keep them installed. In particular, missing `libzstd-dev` prevents the installed
-LLVM CMake targets from linking. `libedit-dev` supplies the optional SDK
-line-editing dependency. No alternate library paths or stub targets are used.
+### Install and first program (Linux)
 
-For optimized and instrumented builds, use separate directories with
-`-DCMAKE_BUILD_TYPE=Release`, or `-DCMAKE_BUILD_TYPE=RelWithDebInfo
--DVOID_SANITIZERS=ON`. Run the same CTest suite in each directory.
-LeakSanitizer requires a host that permits process inspection and cannot run
-under ptrace; use an environment without that tracing restriction.
+Choose an unused private prefix. From the same checkout and shell:
 
-CMake matches the selected SDK's RTTI setting across all linked C++ targets.
-The complete official Linux archive has RTTI disabled; ASan/UBSan remain enabled,
-but Clang's RTTI-dependent vptr check is unavailable in that ABI. A complete
-RTTI-enabled LLVM 23.1.4 SDK would be required for separate vptr validation;
-that is not claimed for the official no-RTTI artifact tested here.
-See [the CI sanitizer investigation and coverage limits](CI_SANITIZER_ABI.md).
+```sh
+void_install_prefix="$HOME/.local/opt/void-2-preview"
+cmake --install build/preview-release --config Release \
+  --component compiler --prefix "$void_install_prefix"
+cmake --install build/preview-release --config Release \
+  --component tooling --prefix "$void_install_prefix"
+```
+
+The compiler component installs `bin/voidc`, both native manifest files,
+`lib/void` Runtime/provider libraries, standard-library sources and notices.
+The tooling component installs `bin/voidls` and Vim/Neovim adapters; both components
+install matching `.void` sources under `share/void/stdlib`. Editor applications
+and a VSIX are separate. Installation does not install Clang, MSVC/platform SDKs
+or grant a redistribution license; the standalone LLVM notice gap remains in the
+[blocker register](release/PREVIEW_BLOCKERS.md).
+
+For the smoke check, remove source/library overrides and select installed tools.
+Use a new temporary project outside the checkout:
+
+```sh
+unset VOID_STDLIB_ROOT LD_LIBRARY_PATH
+export PATH="$void_install_prefix/bin:/usr/bin:/bin"
+command -v voidc
+command -v voidls
+void_smoke_dir="$(mktemp -d "${TMPDIR:-/tmp}/void-first-install.XXXXXXXX")"
+cat > "$void_smoke_dir/main.void" <<'VOID'
+func main() -> i32:
+    return 0
+VOID
+voidc check "$void_smoke_dir/main.void"
+voidc run "$void_smoke_dir/main.void"
+```
+
+`check` prints `Source checked successfully`; both commands exit 0. This `main`
+prints nothing. Then replace this disposable project's file with an installed
+standard-module program:
+
+```sh
+cat > "$void_smoke_dir/main.void" <<'VOID'
+use console
+
+func main() -> i32:
+    print("VOID installed stdlib OK")
+    return 0
+VOID
+voidc check "$void_smoke_dir/main.void"
+voidc run "$void_smoke_dir/main.void"
+voidc build "$void_smoke_dir/main.void" -o "$void_smoke_dir/hello-native"
+"$void_smoke_dir/hello-native"
+voidls --discover "$void_smoke_dir" "$void_smoke_dir/main.void" ""
+```
+
+Both executions print exactly `VOID installed stdlib OK` followed by LF and exit
+0. Discovery selects that project's `main.void`; it is not a protocol handshake.
+The accepted [LSP wire receipt](release/evidence/lsp-handshake.json) separately
+records initialize/initialized/shutdown/exit and tooling protocol 1. A new
+qualification must perform that real exchange too; compilation/discovery alone
+does not establish server or editor usability. See the
+[language-server contract](LANGUAGE_SERVER.md) and
+[editor setup](EDITOR_INTEGRATION.md) for client configuration.
+
+Installed standard sources are found relative to the executable. An absolute
+`VOID_STDLIB_ROOT` override takes precedence; the configured build-source root is
+the fallback when no installed tree is available. To prove installed-source use,
+the accepted container test relocated its prefix and moved its original source
+stdlib out of reach. Merely moving a checkout is not an independent-host test.
+
+Native manifests keep absolute configured Clang/LLD paths and hash-verified
+prefix-relative Runtime/provider resources. Keep the matching SDK and host
+C++/CRT development files available. Linux `voidc` uses an executable-relative
+library RUNPATH; generated programs retain an absolute RUNPATH to the install's
+shared IDN/Unicode libraries. Moving that prefix after linking applications has
+not been qualified. The complete recorded loader closure is in the
+[Linux report](release/LINUX_CLEAN_HOST_QUALIFICATION.md#observed-portability-and-notice-limits).
 
 ### Native execution and linking
 
+`run` uses the native ORC JIT. `build` emits and links a host executable using the
+configured toolchain and Runtime/provider closure. `emit` writes only a native
+object with source line information; it does not run a linker. Prefer `build`
+for an executable, especially for standard modules and managed features.
+`--no-opt` is available for run/build/emit; ordinary use defaults to O2.
+
+The older architecture example uses the still-supported legacy
+`entry(i32) -> i32` adapter, rather than application `main`:
+
 ```sh
-build/debug/voidc check examples/architecture.void
-build/debug/voidc run examples/architecture.void 10
+build/preview-release/voidc check examples/architecture.void
+build/preview-release/voidc run examples/architecture.void 10
 # 52
-build/debug/voidc emit examples/architecture.void -o build/debug/architecture.o
-"$void_llvm23_sdk/bin/clang" --ld-path="$void_llvm23_sdk/bin/ld.lld" build/debug/architecture.o -o build/debug/architecture
-build/debug/architecture 10
+build/preview-release/voidc build examples/architecture.void \
+  -o build/preview-release/architecture
+build/preview-release/architecture 10
 # 52
 ```
 
-`run` uses the native ORC JIT. `emit` produces a host-native object with a `main`
-adapter and source line information; the compiler does not launch a shell or
-linker. Both execution modes accept one optional decimal i32 input, defaulting to
-zero. The adapter requires `func entry(value: i32) -> i32` (any parameter name).
-The executable prints its i32 result and exits successfully; invalid input exits
-with status 2. `check` also accepts libraries without an entry function. Append
-`--no-opt` to `run` or `emit` to disable LLVM O2.
-
-For managed programs, link the VOID Runtime and its dependencies as described in
-[managed structs](MANAGED_STRUCTS.md). Feature-specific native examples belong in
-[receiver methods](RECEIVER_METHODS.md), [initialization](INITIALIZATION.md),
-[managed initialization](MANAGED_INITIALIZATION.md),
-[reference-containing values](REFERENCE_VALUE_STRUCTS.md),
-[inheritance](INHERITANCE.md) and [interfaces](INTERFACES.md).
+Only that legacy adapter accepts one optional decimal i32, defaulting to zero,
+and prints its i32 result while exiting successfully. Application `main()` and
+top-level execution accept no numeric operand; their i32 result is the exit status.
+`check` also accepts libraries without an entry. For manual object-linking
+contracts see [managed structs](MANAGED_STRUCTS.md) and the feature guides; an
+object alone is not the full Runtime/provider link closure.
 
 The older `--jit-proof` and `--emit-proof OBJECT` options are hand-built IR
-architecture harnesses, separate from source compilation. Their AOT adapter uses
-argument count. They are not substitutes for the source commands above.
+architecture harnesses, not source compilation or source-install qualification.
 
-### Windows and macOS
+### Windows developer-host requirements
 
-The [CI workflow](../.github/workflows/ci.yml) downloads complete official
-LLVM 23.1.4 development archives, including headers and static libraries.
-Windows uses the MSVC/Windows SDK environment and `clang-cl`, with the release
-MSVC static runtime (`/MT`) and iterator ABI matching the actual LLVM 23 libraries in
-both build configurations. The native AOT link uses the SDK's `clang` driver,
-with `-llegacy_stdio_definitions` to resolve the direct native `printf` symbol
-through the active MSVC library search paths. Use a Visual Studio developer
-environment (CI initializes it before configuration and testing).
-macOS selects the official ARM64 archive matching the supported runner and uses
-the Xcode SDK's vendor libc++ headers with Apple's system runtime (Xcode 26+).
-The SDK helper supplies pinned Windows zlib, zstd and LibXml2 development
-libraries; [the cross-platform repair record](llvm23/CROSS_PLATFORM_REPAIR.md)
-contains setup, ABI evidence and pending native acceptance.
-Linux installs development dependencies explicitly and selects
-the same archive's LLD 23.1.4. Inspected LLVM23 Linux library members are native
-ELF, whereas inspected LLVM19 members were bitcode; this is not an exhaustive
-cross-platform archive-format claim.
-CMake matches the LLVM backend's RTTI setting to the selected SDK, retaining
-exception support. Configuration links and executes an ORC host as an SDK check.
-On Windows, stale exported DIA library paths are resolved against the active
-Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
-`-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
+**Accepted: isolated installation of existing Release artifacts on the named
+Windows developer VM. Open: fresh Windows source build and independent clean-host
+installation.** The [unaltered Windows-authored record](release/WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md)
+is authoritative for its tested SHA, paths, hashes, controls and limitations.
+It tested `1afd881ecfa65c616261e7aeb76ecd2bf87770b6`, not the later observed remote
+`97aa4e43` or this documentation checkout.
 
-On Windows, link an unmanaged source object from the Visual Studio developer
-environment with `clang architecture.o -llegacy_stdio_definitions -o architecture.exe`.
-On macOS, use the pinned SDK's `clang architecture.o -o architecture`.
+| Requirement | Observed Windows developer host |
+| --- | --- |
+| OS / architecture | Windows 10 Home 22H2, build 19045.6466, AMD64 |
+| Full LLVM SDK | LLVM/Clang/clang-cl/LLD 23.1.4, x86_64-pc-windows-msvc; archive SHA-256 `854bffcfc84528e0ee92490ff5c178920abd358a79c3e98f053e41e3e8e4c6d2` |
+| Microsoft environment | VS Build Tools 2022 17.14.37806.7; MSVC toolset 14.44.35207, cl 19.44.35229; Windows SDK 10.0.19041.0 includes/UCRT/UM libraries |
+| Other observed tools | CMake 4.4.3, Ninja 1.13.2, Python 3.14.8; these are observations, not certified minimum versions |
+| Existing native inputs | `.toolchains/schannel-acceptance/{Debug,Release}` and matching `.toolchains/http/prefix/windows-schannel-x86_64/{Debug,Release}`; Release CMake prefix also included the SDK's `-deps` directory |
 
-The established seven-job gate covers Ubuntu Debug/Release/Sanitizers, Windows
-Debug/Release and macOS ARM64 Debug/Release. Stage 6 is hosted locked at CI #78;
-Stage 7's Linux local acceptance does not certify its new Windows/macOS tooling.
-See [current status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and
-[local evidence](stage7/ACCEPTANCE.md) for the distinction.
+Source builds require the native x64 Visual Studio developer environment, the full
+SDK with `clang-cl`, real zlib/static zstd/LibXml2 development targets, and the
+matching Windows Schannel HTTP dependency profile. The
+[SDK helper](../tools/ci/llvm_sdk.py),
+[native dependency recipe](../tools/setup_http_deps_native.py) and
+[ABI repair record](llvm23/CROSS_PLATFORM_REPAIR.md) describe those build inputs;
+the isolated-install exercise did **not** freshly provision or rebuild them.
+The standard HTTP recipe expects `.toolchains/llvm-23.1.4`; the report's existing
+SDK was at its separately recorded developer path. Do not substitute the Linux
+AWS-LC/GNU-library prefix or assume the developer VM's layout is a clean recipe.
+
+Windows CMake matches the official SDK's release static MSVC runtime `/MT` and
+iterator ABI in Debug and Release. Native `voidc build` uses configured `clang.exe`
+with static runtime flags and the active/installed Microsoft libraries; its
+manifest linker override may be empty. The Windows driver-plan inspection chose
+SDK `lld-link`, static `libcmt` and MSVC/Windows SDK x64 libraries. That inspection
+was a plan, not a trace of the successful build. DIA discovery may additionally
+require `VSINSTALLDIR` or a real `VOID_DIA_GUIDS_LIBRARY`.
+
+The accepted test installed compiler/tooling into a restricted new prefix from
+private copies of generated CMake install scripts. Those copies redirected only
+absolute manifest-write/nested-script paths into a shadow directory, preserving
+artifact sources and component rules; all 562 original build-tree files retained
+paths, sizes and modification times. The report does not supply a universal shadow
+script generator, so no reconstructed script or untested clean-host command is
+presented here as proven.
+
+Installed check/run/native build, an EXE-only copied execution and a real `voidls`
+handshake passed with restricted PATH and no explicit VOID/VS include/library
+overrides. The SDK, MSVC, Windows SDK and installed VC redistributable remained on
+disk. Direct PE imports were system DLLs; transitive/dynamic dependencies and a
+machine without those developer/runtime installations were not established.
+Independent provisioning, fresh compiler rebuild, installer/PATH registration and
+uninstall remain unqualified.
+
+### macOS build requirements
+
+The hosted LLVM23 matrix includes macOS ARM64 Debug/Release. It is compiler
+regression evidence, not a clean source-install qualification. Use the complete
+official ARM64 SDK, Xcode 26+ vendor libc++ headers with Apple's system runtime,
+a physical selected Xcode SDK, explicit architecture/deployment target, and the
+matching macOS HTTP prefix. Configuration checks the actual C++20 stop-token and
+ORC link/run paths. The [cross-platform record](llvm23/CROSS_PLATFORM_REPAIR.md)
+describes the ABI setup; the later
+[HTTP acceptance](net/http/ACCEPTANCE.md) records the successful seven-job run.
+Linux/Windows install results do not establish macOS installation or editor use.
+
+### Tests, sanitizers and optional research
+
+The production-only install recipe above deliberately does not run CTest. For a
+separate developer regression build, prepare the corresponding HTTP profile
+(`Debug`, `Release`, or `strict`), then the
+[HTTP test fixtures](../tools/setup_http_tests.py), and configure a separate build
+with `BUILD_TESTING=ON`. Build all targets and run its unfiltered CTest suite;
+building only `voidc`/`voidls` does not build every test executable. The fixture
+setup also supplies certificate tooling and pinned Python test modules.
+
+Use `RelWithDebInfo` plus `VOID_SANITIZERS=ON` for the strict profile. LeakSanitizer
+needs a host that permits process inspection and cannot run under ptrace.
+CMake matches SDK RTTI across linked C++ targets; the official Linux no-RTTI SDK
+cannot provide UBSan vptr coverage. ASan/other supported UBSan checks remain
+available. See [sanitizer coverage limits](CI_SANITIZER_ABI.md). No instrumented
+coverage is claimed for this Release installation exercise.
+
+Machine-code ownership certification is optional research: configure
+`VOID_LLVM_RESEARCH=ON`, build `void_arrays_storage_audit` and run the research
+label separately. Ordinary source JIT/AOT uses typed IR validation, LLVM
+verification and shared lowering without a production machine-code certificate
+requirement. The [private fixed-call experiment](../tests/research/call_envelope/README.md)
+remains separate from source arrays. None of these experiments was run as part of
+this documentation sprint.
 
 ## Working pipeline
 
@@ -318,19 +501,32 @@ float division by zero follows IEEE. No Language Bible text was changed.
 
 ## CLI and native executable boundary
 
-```sh
-voidc check program.void
-voidc run program.void [decimal-i32-input] [--no-opt]
-voidc emit program.void -o program.o [--no-opt]
+```text
+voidc check <file-or-directory>
+voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]
+voidc build [file-or-directory] [-o executable] [--no-opt]
+voidc emit <file-or-directory> -o <object> [--no-opt]
 ```
 
-`check` needs no entry function. `run` and `emit` currently require an
-`entry(i32) -> i32` adapter, with any parameter name. This is the CLI host ABI,
-not a restriction on language function signatures. Input defaults to zero.
-O2 is the default; `--no-opt` selects unoptimized LLVM lowering. `emit` produces a
-host-native object; a matching Clang driver links it (see README). Its native
-`main` accepts the same optional input, prints the result and exits with status
-zero; malformed/out-of-range input or extra arguments exit with status 2.
+Run/build without a path select cwd using exact-case `main.void` discovery.
+`check` accepts libraries with no entry. Executable programs use synchronous
+zero-argument `main` (no result or i32), executable top-level statements, or the
+legacy `entry(i32) -> i32` adapter. The application forms take no numeric operand;
+fallthrough/no-result main exits 0 and an i32 result supplies the exit status.
+Only legacy entry takes the optional decimal input and prints its numeric result.
+Competing application entry forms reject; the legacy adapter retains its defined
+precedence. See [application hosting](STAGE9_APPLICATION_WORKFLOW.md).
+
+O2 is the default. `--no-opt` disables LLVM IR optimization for run/build/emit.
+Run's `--no-cache` bypasses persistence; explicit `--cache` selects the existing
+Debug-cache behavior and disables optimization. The flags cannot be combined.
+The removed `--app` option rejects. Invalid invocation exits 2; source/backend/
+Runtime/toolchain failures exit 1. An application's deliberate nonzero result is
+its status, not an invented compiler diagnostic.
+
+`build` performs native linking with configured resources and preserves the
+output on failure. `emit` remains object-only; manual linking must supply the
+matching driver, Runtime/provider archives and platform flags.
 
 Source symbols encode their declaring module and function identity before the C
 adapter is added, allowing same-named functions in different modules and helpers

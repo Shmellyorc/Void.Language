@@ -1,0 +1,15 @@
+{
+  "threadId": "6aea96cd-28a0-83e8-bdb3-93b875dbb13d",
+  "threadTitle": "Review before continuing",
+  "turnId": "bb0c80a9-e013-453e-9022-c648ecaa16f6",
+  "messageId": "bb0c80a9-e013-453e-9022-c648ecaa16f6",
+  "source": "Boss-pasted complete Windows-authored report; no reconstruction; source Windows file bytes/line endings and raw receipts not accessed",
+  "imported_utf8_lf_sha256": "a20fa700f27990d6748df3cb0b7b5f030bed94c3ebc0becac1c8ed66b08613f0",
+  "bytes": 9202,
+  "normalization": "Exact supplied Markdown body, with one terminal LF; no reconstruction or redaction. Original Windows file line endings not inspected.",
+  "acceptanceSource": {
+    "threadId": "6aea96cd-28a0-83e8-bdb3-93b875dbb13d",
+    "messageId": "ab5c51ab-9f7e-4030-9c2c-4f427ed74edb",
+    "disposition": "Golden Wrench accepted the bounded developer-host isolated install; independent raw-receipt review and clean-host qualification not claimed."
+  }
+}

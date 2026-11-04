@@ -1,0 +1,71 @@
+--- a/README.md
++++ b/README.md
+@@ -48,45 +48,40 @@
+ After building the compiler:
+ 
+ ```sh
+-build/debug/voidc check hello.void
+-build/debug/voidc run hello.void 10
++build/preview-release/voidc check hello.void
++build/preview-release/voidc run hello.void 10
+ # 21
+ ```
+ 
+-The CLI accepts one optional decimal `i32` input, defaulting to zero. Its execution
+-adapter requires `entry(i32) -> i32`; ordinary language functions support other
+-signatures. Browse [more examples](examples/) for complete programs.
++This example uses the supported legacy `entry(i32) -> i32` adapter, which takes
++one optional decimal i32 input (default zero) and prints its result. Current
++applications can instead use synchronous `main()` or top-level statements; they
++accept no numeric operand and return their application status. `run` and `build`
++can discover `main.void` from a directory or cwd. Browse [more examples](examples/).
+ 
+ ## Build and get started
+ 
+-You need CMake **3.24+**, a C++20 compiler, Python **3.9+** for tests, and the complete
+-**LLVM 19.1.7** development SDK with matching Clang. CMake rejects other LLVM versions.
+-Ninja is used below. On Linux, with the SDK installed under `/usr/lib/llvm-19`:
++You need CMake **3.24+**, a C++20 host development environment, Python **3.12+**,
++and the complete **LLVM/Clang/LLD 23.1.4** development SDK. CMake rejects other LLVM
++versions. The Runtime also requires the pinned HTTP dependencies and host CA files.
++
++Follow the [source-build guide](docs/SOURCE_COMPILER.md#building-the-compiler) for
++SDK acquisition, Linux prerequisites and HTTP preparation, the Release recipe
++using `build/preview-release`, installation and a current `main.void` smoke
++check. It distinguishes Windows developer-host requirements from clean-host
++qualification and describes macOS setup and separate sanitizer/test builds.
++
++To build and execute the example on Linux:
+ 
+ ```sh
+-cmake -S . -B build/debug -G Ninja \
+-  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
+-  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
+-  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld \
+-  -DCMAKE_BUILD_TYPE=Debug
+-cmake --build build/debug --parallel 4
+-ctest --test-dir build/debug --output-on-failure
+-```
+-
+-Adjust SDK paths for your installation. The [build guide](docs/SOURCE_COMPILER.md#building-the-compiler) covers
+-dependencies, Windows/macOS setup, sanitizers and native object linking.
+-
+-To emit and link the example on Linux:
+-
+-```sh
+-build/debug/voidc emit hello.void -o build/debug/hello.o
+-clang-19 -fuse-ld=/usr/lib/llvm-19/bin/ld.lld build/debug/hello.o -o build/debug/hello
+-build/debug/hello 10
++build/preview-release/voidc build hello.void -o build/preview-release/hello
++build/preview-release/hello 10
+ # 21
+ ```
+ 
+-Programs that use managed features also require the VOID Runtime when linking;
+-see the [managed-source guide](docs/MANAGED_STRUCTS.md).
++`voidc build` supplies the configured native toolchain and Runtime/provider link
++resources. `voidc emit` remains available for object-only output; manual linking
++requires the matching complete link closure described in the build guide.
+ 
+ ## Platforms and editor support
+ 

@@ -1,0 +1,71 @@
+{
+  "head": "d52e6b708539dd3026c934c98332c58c8e5e311d",
+  "initial_working_tree": "clean",
+  "uncommitted": true,
+  "unstaged": true,
+  "scope": "Documentation and review evidence only; README proposal unapplied",
+  "exact_changed_files": [
+    "docs/SOURCE_COMPILER.md",
+    "docs/release/PREVIEW_BLOCKERS.md",
+    "docs/release/PREVIEW_QUALIFICATION_HANDOFF.md",
+    "docs/release/WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md",
+    "docs/release/evidence/first-install-docs/inventory.json",
+    "docs/release/evidence/first-install-docs/start.json",
+    "docs/release/evidence/first-install-docs/validate.py",
+    "docs/release/evidence/first-install-docs/validation.json",
+    "docs/release/evidence/first-install-docs/windows-import-source.json",
+    "docs/release/proposals/README_LLVM23_CLI.patch"
+  ],
+  "files_except_this_inventory": {
+    "docs/SOURCE_COMPILER.md": {
+      "before_sha256": "f75b43b92118a5f81ea9b3a3835a1299bb24d59b8a1364f40c2ddc566a063b6e",
+      "after_sha256": "08406a09c6e81f83db004e13da86cfe4c4764361f661600b64409c0e3e8a0d3f",
+      "bytes": 36284
+    },
+    "docs/release/PREVIEW_BLOCKERS.md": {
+      "before_sha256": "d941cebe5239ac8b4da3f7d40ad8801893889eaa41fea30c8449739efe2a8403",
+      "after_sha256": "e72b767a3141463cc18b74ab9c7e1cc65db6b6ad1108410e2bd2821f3023e809",
+      "bytes": 4722
+    },
+    "docs/release/PREVIEW_QUALIFICATION_HANDOFF.md": {
+      "before_sha256": "e7286614e49e3758fff262cf6236199a943373badf22381fcf370d49b40db444",
+      "after_sha256": "06f58b7915e18b9e272ded5177ec02a1d947d3e209ab3acb422d99dfadbd54a8",
+      "bytes": 21811
+    },
+    "docs/release/WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md": {
+      "before_sha256": null,
+      "after_sha256": "a20fa700f27990d6748df3cb0b7b5f030bed94c3ebc0becac1c8ed66b08613f0",
+      "bytes": 9202
+    },
+    "docs/release/evidence/first-install-docs/start.json": {
+      "before_sha256": null,
+      "after_sha256": "11d1f5facf263dbe33b8fb9b4c7267b3523aa357cb32b25a3e452f9beba90f39",
+      "bytes": 2878
+    },
+    "docs/release/evidence/first-install-docs/validate.py": {
+      "before_sha256": null,
+      "after_sha256": "0b41fb41bb3363844592c901008ea68b35118b8b2c7d1b130deccc6876aae4dc",
+      "bytes": 13939
+    },
+    "docs/release/evidence/first-install-docs/validation.json": {
+      "before_sha256": null,
+      "after_sha256": "eb5f5b06e635160a37deb9c39b537d748de9333f925e19c6602d0442131894da",
+      "bytes": 19143
+    },
+    "docs/release/evidence/first-install-docs/windows-import-source.json": {
+      "before_sha256": null,
+      "after_sha256": "24ea5d2d7550f25a660f8ba5bd512b5e46d32de4b02f65bf6c55247eeebc2bd5",
+      "bytes": 932
+    },
+    "docs/release/proposals/README_LLVM23_CLI.patch": {
+      "before_sha256": null,
+      "after_sha256": "8c539060a5a0d5496bce1e1bd7e06dbe1c4d6d66112a78774747a9337bb4d5a1",
+      "bytes": 3173
+    }
+  },
+  "protected_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+  "windows_record_sha256": "a20fa700f27990d6748df3cb0b7b5f030bed94c3ebc0becac1c8ed66b08613f0",
+  "validation_result": "PASS",
+  "historical_inputs_protected_by": "start.json digests plus git diff allowlist and prior handoff-body equality",
+  "self_hash_policy": "Own digest omitted to avoid recursive checksum."
+}

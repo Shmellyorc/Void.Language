@@ -1,0 +1,300 @@
+{
+  "scope": "static documentation/source/retained-receipt validation only",
+  "compiler_build_download_windows_and_LSP_execution": "NOT RUN",
+  "checks": [
+    {
+      "name": "scope_and_historical_preservation",
+      "result": "PASS",
+      "detail": "Only the 10 inventoried documentation/evidence paths changed; existing Linux receipts, acceptance/crash records, root README, staged contents and HEAD preserved. Prior handoff body retained verbatim."
+    },
+    {
+      "name": "exact_windows_import",
+      "result": "PASS",
+      "detail": "Imported text hash matches the exact Boss-supplied message body, with one terminal LF. Six author-reported hashes and tested SHA retained. Original Windows file/raw receipts were not accessed or independently verified."
+    },
+    {
+      "name": "unapplied_readme_proposal",
+      "result": "PASS",
+      "detail": "Dry-run git apply succeeds. Proposal changes only setup/current CLI guidance; valid legacy source example and all feature/editor/licensing sections are preserved. Root README bytes unchanged."
+    },
+    {
+      "name": "links_and_syntax",
+      "result": "PASS",
+      "detail": {
+        "local_links_and_anchors": 97,
+        "shell_blocks_bash_n": 10,
+        "Python_heredocs_ast_parsed": 1,
+        "external_network_reachability": "NOT RUN"
+      }
+    },
+    {
+      "name": "documented_command_receipt_map",
+      "result": "PASS",
+      "detail": "HTTP setup/verify, both CMake component installs and all five minimal/standard check/run/build commands exactly match retained argv after explicit path normalization."
+    },
+    {
+      "name": "linux_recipe_and_examples",
+      "result": "PASS",
+      "detail": "Package set, complete Release configure argv (only paths normalized), build target/parallel arguments, HTTP profile, component installs and both smoke source texts match retained accepted evidence. SDK helper invocation is AST/source inspected only; no fresh download/runtime/example execution is claimed."
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "d52e6b708539dd3026c934c98332c58c8e5e311d\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "main\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--exit-code"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "docs/SOURCE_COMPILER.md\ndocs/release/PREVIEW_BLOCKERS.md\ndocs/release/PREVIEW_QUALIFICATION_HANDOFF.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": " M docs/SOURCE_COMPILER.md\n M docs/release/PREVIEW_BLOCKERS.md\n M docs/release/PREVIEW_QUALIFICATION_HANDOFF.md\n?? docs/release/WINDOWS_X64_ISOLATED_INSTALL_QUALIFICATION.md\n?? docs/release/evidence/first-install-docs/inventory.json\n?? docs/release/evidence/first-install-docs/start.json\n?? docs/release/evidence/first-install-docs/validate.py\n?? docs/release/evidence/first-install-docs/validation.json\n?? docs/release/evidence/first-install-docs/windows-import-source.json\n?? docs/release/proposals/README_LLVM23_CLI.patch\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "HEAD:docs/release/PREVIEW_QUALIFICATION_HANDOFF.md"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "# VOID 2.0 private preview qualification handoff\n\n4 November 2026. **REPORT READY \u2014 STOP FOR GOLDEN WRENCH REVIEW.**\n\nLinux x64 source installation passed the bounded fresh Ubuntu container checks.\nThis is private qualification, not public-preview/release acceptance, independent\nmachine/VM certification or permission to distribute compiler/dependency binaries.\n\n## Identity, mission and authority\n\nInitial and final source HEAD: `97aa4e4334f1b9354ba651770b5cf13e74da03d0`,\nbranch `main`, tracking `origin/main`. Initial working tree was clean. No applicable\nancestor/repository `AGENTS.md` was found. All twelve mandatory files were read\nbefore checks; [initial hashes](evidence/qualification-start.json) and\n[exact examined-file inventory](evidence/examined-files.json) preserve the inputs.\nAdditional large files were inspected in relevant sections as marked there.\n\nBoss authorizes Linux source-build dependency inventory, available fresh-environment\nverification, classification and durable reporting. Production, CMake and Runtime\nrepairs require separate Golden Wrench review and Boss authorization. Root README\nis protected/read-only. No production/test/Runtime/CMake change was made in the\nactual checkout. No staging, commit, push, branch creation, hosted CI dispatch,\npackage publication, deployment or public redistribution occurred.\n\nHTTP/HTTPS remains [accepted](../net/http/ACCEPTANCE.md) at the recorded seven-job\nLLVM23 hosted run; it was not reopened. Website modernization is outside this task.\nNo historical investigation or acceptance record was rewritten.\n\nBoss further clarified that historical Linux LLVM19 DSE cause remains unproven;\nLLVM23 may have eliminated an upstream defect, but this is not established.\nCurrent optimizer risk must use LLVM23 evidence: its three passing bounded\nDSE-associated checks, seven passing hosted jobs and separately tracked current-\ntoolchain incidents. Historical uncertainty is not itself a demonstrated current\nLLVM23 defect. Exhausted LLVM19 reproduction campaigns remain closed. Earlier\nWindows LLVM23 incidents remain separate. None was rerun or causally reclassified.\n\n## Completed work and every outcome\n\nThe [qualification report](LINUX_CLEAN_HOST_QUALIFICATION.md) contains the complete\nsource dependency/install contract, exact successful recipe, observed runtime\nclosure, missing-prerequisite classifications and seven first-install guidance gaps.\n[Command receipts](evidence/commands.jsonl), [all-command result index](evidence/results.json)\nand [probe oracles](evidence/checks.jsonl) include passes and failed attempts.\n\n- PASS: independent initial Git inspection and all mandatory preparation.\n- PASS: new rootless Podman Ubuntu 24.04 x64 userspace, no host mounts or initial\n  build tools; exact image/package versions recorded. It shares host kernel/CPU\n  and network. This is not a relocated checkout test on the existing host OS.\n- PASS: official full LLVM 23.1.4 archive hash checked before/after transfer,\n  extracted fresh; versions/commit, Release, assertions OFF and RTTI NO confirmed.\n- PASS: all seven HTTP dependency source downloads/builds, 22 child commands,\n  167 prefix files verified. No development-built HTTP library was reused.\n- PASS: plain Release CMake configure including genuine ORC link/run probe,\n  264 production build actions, compiler and tooling component installs.\n- PASS: prefix relocation; original container source stdlib moved out of reach;\n  installed PATH discovery, minimal `main.void` check/run and installed `console`\n  import check/run, default O2. Standard module output matched exactly.\n- PASS: installed `voidc build` and direct execution of its native executable.\n- PASS: installed `voidls --discover` and real framed initialize/initialized/\n  shutdown/exit; protocol 1, shutdown null, exit 0. No editor UI claim.\n- PASS: 86 installed files/aliases hashed; all 21 installed standard sources\n  byte-match preserved source; actual ldd/readelf closure resolves successfully.\n- PASS EXPECTED REJECTIONS: missing HTTP prefix, unavailable stdlib root,\n  absent native manifest, missing configured Clang. Each exits 1 with useful\n  diagnostics. Disposable negative-control copies were never used for positives.\n- FAIL, harness preparation: first fixture-generation command had Python quoting\n  syntax error before VOID execution. Original preserved; corrected fixture passed.\n- FAIL, harness oracle: first minimal check exited 0 with correct current success\n  text, but the harness incorrectly required empty stdout. Source inspection\n  confirmed the CLI contract; corrected check passed. Original failed oracle\n  remains in receipts. No production repair or required status change occurred.\n- FOLLOW-UP: existing date/console/proof warnings retained without suppression;\n  no crash/sanitizer marker found in completed build output. Release is not\n  sanitizer coverage. CMake's test-only dwarfdump variable was unused as expected.\n- FOLLOW-UP, documentation recorder: no-index new-file diff returned 1 without\n  whitespace output; its recorder expected 0. Original receipt retained; the\n  final direct Markdown/JSON/link/preservation validation passed.\n- INVENTORY TOOL LIMITS: absent `rg`, broad find exit 1 with suppressed stderr,\n  and a guessed example-path read failure are recorded separately. Python/find\n  and the actual paths supplied the inventory. No test result depends on them.\n\nSKIP: full CTest/Debug/strict reruns, HTTP/HTTPS regression campaign, logging and\n`text.translate_scalars`, LLVM19 crash reproductions, preserved-artifact optimizer\ninvestigation, native Windows/macOS, actual editor UI, archive/VSIX packaging and\nall owner-controlled Git/CI/publication actions.\n\nUNKNOWN: independent machine/VM and other distro/ABI results, complete missing-\nprerequisite matrix, absent-CA diagnostics, fresh-network LLVM SDK download,\npost-link application relocation, broader editor compatibility and distribution\nlicense/notice clearance. No unavailable host result was invented.\n\n## Blockers, next step and stop conditions\n\nThe [blocker register](PREVIEW_BLOCKERS.md) separately classifies optimizer risk,\nlogging performance, public licensing, Linux install scope, SDK/application\nportability, notice completeness, documentation and platform/editor coverage.\nLogging performance remains OPEN and public redistribution is not authorized.\nHistorical logging correctness is not performance acceptance.\n\nFresh source installation works on the recorded Ubuntu userspace with its\nretained absolute SDK paths. Generated executables retain an absolute installed\nlibrary RUNPATH. CMake installed HTTP/common notices and GNU corresponding source,\nbut has no standalone LLVM notice rule; this needs review before distribution.\nThe protected README still names LLVM19, and the current build guide omits HTTP\npreparation and the complete installed-use workflow. These findings were documented,\nnot repaired speculatively. No environmental blocker prevented this bounded run.\n\n**Recommended next step:** Golden Wrench reviews this report, evidence and the\nfresh-container acceptance boundary. Boss then decides any separately scoped\ndocumentation/notice/portability work and a later independent Linux machine/VM\nattempt. Windows/macOS installation qualification follows the accepted Linux\nbaseline. No implementation, CI or public release action is authorized by this\nhandoff; engineering stops here for review.\n\nStop immediately for a new correctness/safety issue outside installation scope.\nNo crash campaign or logging work may restart under this qualification. Do not\nmark historical optimizer cause fixed from passing LLVM23 checks. Do not edit\nroot README, production/CMake/Runtime, stage/commit/push, create a branch, dispatch\nhosted CI, distribute binaries or deploy without the stated owner authority.\n\n## Resumption and evidence\n\nRaw evidence is retained privately under\n`$HOME/.local/state/void-preview-qualification/97aa4e43-20261104/`: per-command raw\nstdout/stderr/stdin and argv, source tar identity, dependency build evidence and\nCMake/configuration archive. Portable receipt variables redact actual host path\nbindings; no full environment dump or credentials are included. Large logs,\ncompiler binaries, SDK and installed payloads remain outside repository docs,\nwebsite and public outputs. Only compact metadata/receipts are added here.\n\nContainer `void-preview-linux-97aa4e43` is stopped and retained. A later explicitly\nscoped resumption can start it; do not treat its already-built state as a new\nclean attempt. Valid install: `/opt/void-relocated`; original source stdlib:\n`/work/source-stdlib-preserved`; negative-control install:\n`/opt/void-missing-manifest`. The SDK remains under `/src/void/.toolchains/llvm-23.1.4`.\nNo further test or repair is needed to complete this report.\n\n## Exact changed-file inventory\n\nAll changes are new, **uncommitted and unstaged** documentation/receipt files.\nTracked source, protected README, historical evidence and HEAD remain unchanged.\nThe [final preservation/inventory receipt](evidence/final-inventory.json) records\nGit checks, protected/input hashes and every path below. Its own hash is omitted\nfrom the digest table to avoid a recursive checksum.\n\n- `docs/release/LINUX_CLEAN_HOST_QUALIFICATION.md`\n- `docs/release/PREVIEW_BLOCKERS.md`\n- `docs/release/PREVIEW_QUALIFICATION_HANDOFF.md`\n- `docs/release/evidence/build-log-review.json`\n- `docs/release/evidence/checks.jsonl`\n- `docs/release/evidence/commands.jsonl`\n- `docs/release/evidence/dependency-build.json`\n- `docs/release/evidence/examined-files.json`\n- `docs/release/evidence/final-inventory.json`\n- `docs/release/evidence/installed-layout.json`\n- `docs/release/evidence/inventory-tooling-notes.json`\n- `docs/release/evidence/lsp-handshake.json`\n- `docs/release/evidence/probe-inputs.json`\n- `docs/release/evidence/qualification-start.json`\n- `docs/release/evidence/results.json`\n\nContainer cleanup note: `podman stop --time 10` exited 0 after warning that PID 1\n(`sleep infinity`) did not stop on SIGTERM and required SIGKILL. No VOID probe was\nrunning then; this is container housekeeping, not a compiler crash or unknown\nqualification exit. Final inspection reports `exited` with no mounts.\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "docs/release/proposals/README_LLVM23_CLI.patch"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "bdc408b48567114c61c7a7dce81d8ce93e08afc3c5d2a8feb1b0c4b74d71099e",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "b16c1f9b1355407aeed7a569eed0f6953ec9e8b06d0d45269b89fff95ebae6ff",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "a6b0c2276b2641bae72ed2c8ef4ca2ba0e219a4c4ba3d6467cdfa991bb3cbc58",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "73caa6925f0346a041b62b70dcd5d8e9252f6eb89680dfbdbd7406dd70135350",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "39e732d877034abc1b3d657eb722e2b287a711438f945c1282e7e7adc7f6daf9",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "53821e1dd6b9b098ba39aba4eaa8dad860aeb061cbd884170683cc658330ab5e",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "486580e0e117436bf93c20240accb2ed0120e8fef9eb035252a7121bdaa85033",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "071b4f1d21c52d61c211891d01754f865ea44a31adcdc46258229444c0fa336b",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "bc61601227e9532358ee8db0fca0a48fe4dce19db6ca4fc791b63266d7dc9c88",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": "788ede852a4d64db36efd2e1eff1b376f18622be2d09c9f5975c67414382da8d",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdin_sha256": null,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "result": "PASS",
+  "checker_sha256": "0b41fb41bb3363844592c901008ea68b35118b8b2c7d1b130deccc6876aae4dc",
+  "attempts": [
+    {
+      "result": "FAIL",
+      "error": "AssertionError(('docs/SOURCE_COMPILER.md', 'Path(\".toolchains/llvm-23.1.4\"'))",
+      "passed_checks": [
+        "scope_and_historical_preservation",
+        "exact_windows_import",
+        "unapplied_readme_proposal"
+      ],
+      "checker_sha256": "316fc860c9517fdf84cba0220f6faa0de4f86010fded37f176918911f79f8cdc",
+      "classification": "Validator bug: link regexp inspected Python code inside fenced block. No documentation or product failure; original full report/checker retained privately."
+    },
+    {
+      "result": "PASS",
+      "error": null,
+      "passed_checks": [
+        "scope_and_historical_preservation",
+        "exact_windows_import",
+        "unapplied_readme_proposal",
+        "links_and_syntax",
+        "linux_recipe_and_examples"
+      ],
+      "checker_sha256": "24c21e2c3299d5a7ebabdd1af84c434c7da6ace3361fe4492a8b718768648da5"
+    },
+    {
+      "result": "PASS",
+      "error": null,
+      "passed_checks": [
+        "scope_and_historical_preservation",
+        "exact_windows_import",
+        "unapplied_readme_proposal",
+        "links_and_syntax",
+        "documented_command_receipt_map",
+        "linux_recipe_and_examples"
+      ],
+      "checker_sha256": "0b41fb41bb3363844592c901008ea68b35118b8b2c7d1b130deccc6876aae4dc"
+    },
+    {
+      "result": "PASS",
+      "error": null,
+      "passed_checks": [
+        "scope_and_historical_preservation",
+        "exact_windows_import",
+        "unapplied_readme_proposal",
+        "links_and_syntax",
+        "documented_command_receipt_map",
+        "linux_recipe_and_examples"
+      ],
+      "checker_sha256": "0b41fb41bb3363844592c901008ea68b35118b8b2c7d1b130deccc6876aae4dc"
+    },
+    {
+      "result": "PASS",
+      "error": null,
+      "passed_checks": [
+        "scope_and_historical_preservation",
+        "exact_windows_import",
+        "unapplied_readme_proposal",
+        "links_and_syntax",
+        "documented_command_receipt_map",
+        "linux_recipe_and_examples"
+      ],
+      "checker_sha256": "0b41fb41bb3363844592c901008ea68b35118b8b2c7d1b130deccc6876aae4dc"
+    }
+  ]
+}
