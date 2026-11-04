@@ -1,0 +1,67 @@
+# Source review first. Boss controls the first dispatch; hosted evidence only.
+name: Installed VOID qualification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    name: Install / ${{ matrix.platform }} / Release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, platform: Linux x64, system: Linux, arch: X64}
+          - {os: windows-2022, platform: Windows x64, system: Windows, arch: X64}
+          # GitHub documents macos-15 as Apple Silicon ARM64, not Intel.
+          # The identity gate also rejects a runner whose actual ISA differs.
+          - {os: macos-15, platform: macOS ARM64, system: Darwin, arch: ARM64}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 360
+    env:
+      INSTALL_QUALIFICATION_NAME: void-install-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.os }}
+      INSTALL_EXPECTED_SYSTEM: ${{ matrix.system }}
+      INSTALL_EXPECTED_ARCH: ${{ matrix.arch }}
+      INSTALL_RUNNER_LABEL: ${{ matrix.os }}
+      MACOSX_DEPLOYMENT_TARGET: '14.0'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Record source and verify native runner identity
+        run: python tools/ci/install_smoke.py identity
+      - name: Windows native SDK environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Prepare and record platform prerequisites
+        run: python tools/ci/install_smoke.py host
+      # No compiled caches: download/hash the official SDK and build HTTP inputs
+      # afresh in this disposable checkout using the existing approved recipes.
+      - name: Install and verify LLVM Clang LLD 23.1.4
+        run: python tools/ci/install_smoke.py sdk
+      - name: Build and verify approved Release HTTP dependencies
+        run: python tools/ci/install_smoke.py dependencies
+      - name: Configure production Release without tests
+        run: python tools/ci/install_smoke.py configure
+      - name: Build compiler tooling and required Runtime resources
+        run: python tools/ci/install_smoke.py build
+      - name: Install compiler and tooling into fresh private prefix
+        run: python tools/ci/install_smoke.py install
+      - name: Exercise installed tools in external projects
+        run: python tools/ci/install_smoke.py smoke
+      - name: Report this operating system's acceptance status
+        if: always()
+        env:
+          INSTALL_PRIOR_JOB_STATUS: ${{ job.status }}
+        run: python tools/ci/install_smoke.py report
+      - name: Retain receipts and failure logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: install-${{ matrix.os }}-${{ matrix.arch }}-Release-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/evidence
+          if-no-files-found: error
+          retention-days: 14

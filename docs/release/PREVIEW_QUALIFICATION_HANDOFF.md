@@ -1,12 +1,169 @@
 # VOID 2.0 private preview qualification handoff
 
+## Installation CI source review — 4 November 2026
+
+**HARNESS CORRECTED — COMMIT HOLD FOR GOLDEN WRENCH SOURCE REVIEW.**
+Boss controls the first manual run. No commit, push or dispatch was performed.
+This section supersedes the earlier sprint's scope/stop wording only for the
+workflow, its supporting harness and this handoff update. Historical results and
+their tested SHAs remain unchanged. This work began on clean source
+`d99033d297357e3239952ef47d0fd5d0142ee69e`.
+
+The new [installation workflow](../../.github/workflows/ci-install-qualification.yml)
+has only `workflow_dispatch`, three Release matrix jobs, independent outcomes and
+`fail-fast: false`. Its [single supporting harness](../../tools/ci/install_smoke.py)
+records commands and performs bounded installed-use checks. Existing workflows,
+compiler/Runtime/CMake, dependency recipes and protected README are unchanged.
+
+### Golden Wrench native resource comparison correction
+
+Golden Wrench found that the layout comparison counted only `.a`/`.lib` paths,
+omitting Linux's hashed `libidn2.so` and `libunistring.so`. A realistic fixture
+also exposed the same suffix assumption treating the `-Xlinker` exclusion list
+ending in `.a` as a file. Both valid Linux fixtures failed before correction;
+the existing Windows `.lib` and macOS `.a` fixtures passed.
+
+The harness now compares resolved file arguments without filtering by extension.
+It consumes operands of the options emitted by `NativeBuild.cmake` (`-Xlinker`,
+`-framework`, `-isystem`, `-isysroot`, `-arch`), keeping flags, system libraries,
+framework names and SDK/rpath/exclusion-list operands out of the resource set.
+The existing hash, private-prefix containment, native manifest version/driver/
+linker and Windows static CRT checks remain. Missing or extra file resources
+still fail exact inventory equality; a dangling paired option also fails.
+
+The new [focused layout tests](../../tests/ci/install_smoke_test.py) call the real
+`Qualification.layout()` using temporary files and realistic platform manifests,
+without building or executing VOID. All **15 tests PASS**, including Linux `.so`
+aliases and versioned targets, Windows `.lib`, macOS archives/frameworks, missing/
+unhashed/corrupt resources, prefix/symlink escapes and preserved manifest checks.
+Reproduce with `python3 tests/ci/install_smoke_test.py`. Python syntax checks for
+both harness and tests and Actionlint 1.7.12 also pass. The workflow itself is
+unchanged by this correction. Earlier fixture checks below did not represent the
+Linux shared resources or exclusion-list operands; this focused suite supersedes
+that layout coverage. Hosted installation results remain UNKNOWN.
+
+| Proposed hosted job | ISA gate | Current installation result |
+| --- | --- | --- |
+| `ubuntu-24.04` / Release | Actual Linux x64 and runner X64 | UNKNOWN — not dispatched |
+| `windows-2022` / Release | Actual Windows x64 and native x64 MSVC environment | UNKNOWN — not dispatched |
+| `macos-15` / Release | Actual Darwin ARM64 and runner ARM64 | UNKNOWN — not dispatched |
+
+`macos-15` is an explicitly selected Apple Silicon image in
+[GitHub's runner table](https://docs.github.com/en/actions/reference/runners/github-hosted-runners),
+with an actual-architecture assertion before provisioning. An invented
+`macos-15-arm64` label is not used. Its
+[current image inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md)
+lists Xcode 16.4 as default and Xcode 26.3 as available. The harness explicitly
+selects `/Applications/Xcode_26.3.app/Contents/Developer` for VOID's required
+vendor libc++ headers, then records Xcode and physical SDK versions. If that
+version disappears or lacks required headers, provisioning/configuration fails;
+there is no alternate compiler or CMake repair path.
+
+### What a future PASS will establish
+
+- A fresh source build on each named hosted runner, at the recorded dispatch SHA.
+  No compiled VOID, SDK or HTTP cache is restored. The existing
+  [SDK helper](../../tools/ci/llvm_sdk.py) downloads the complete official
+  LLVM/Clang/LLD **23.1.4** archive and hashes it before extraction. All three
+  existing pins matched the official release asset digest metadata during local
+  review of [LLVM's release](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.4):
+  Linux `25d814fda50d5fb0084b42be09605d8b1595d49d5e2e03a3345d7e112ff6f9f3`,
+  Windows `854bffcfc84528e0ee92490ff5c178920abd358a79c3e98f053e41e3e8e4c6d2`,
+  macOS `5d3179db39adeca5b17a34d82708fe976bc60e055b05fe557878fb3fb64d39ef`.
+  Clang/Clang++ and platform LLD versions are checked and retained. Linux selects
+  pinned LLD; macOS retains the approved Apple system linker/vendor libc++ setup,
+  and Windows retains the approved SDK driver/native MSVC setup.
+- The existing [HTTP setup](../../tools/setup_http_deps.py) and its
+  [Windows/macOS recipe](../../tools/setup_http_deps_native.py) build the complete
+  Release closure afresh, followed by the existing dependency verifier. Providers
+  remain Linux AWS-LC/libidn2/libunistring, Windows Schannel/WinIDN/static MT and
+  macOS AWS-LC/SecTrust/Apple IDN. HTTP fixtures and protocol campaigns are omitted.
+  Windows also uses the SDK helper's real zlib/static zstd/LibXml2 bootstrap.
+- `BUILD_TESTING=OFF`, sanitizers/research OFF, and only the `voidc`/`voidls`
+  production targets and their required resources. Compiler and tooling component
+  installs go to a new private prefix in runner temp, outside the fresh build
+  directory and checkout. Provisioning refuses pre-existing `.toolchains` inputs
+  and installation refuses an existing prefix.
+- Installed PATH discovery; external `main.void` minimal check/run; installed
+  `console` import check/run; native build and direct execution with exact LF
+  output `VOID installed stdlib OK` and exit 0. Every VOID command names the
+  installed executable. Standard-source bytes match the checkout, and the
+  disposable checkout's stdlib is hidden during all smoke checks and restored in
+  `finally`, so a source fallback cannot supply the successful console import.
+- Installed native manifests have the expected version, pinned driver and
+  installation-relative Runtime/provider paths. Each resource hash is checked,
+  and link-manifest resources must equal the hashed inventory. Linux verifies
+  ldd resolution and installed IDN/Unicode libraries plus ELF dynamic metadata;
+  macOS verifies ARM64 Mach-O, system library imports and load commands; Windows
+  verifies x64 PE imports resolve to available system DLLs/API-set contracts.
+  Successful installed/native execution exercises each runner's loader.
+- Installed `voidls --discover` selects the external project. A real stdio process
+  receives ordered Content-Length framed initialize/initialized/shutdown/exit
+  messages on one connection; both response frames, protocol 1, null shutdown,
+  stderr and process exit are validated. This is a bounded pipelined handshake,
+  with raw sent/received bytes retained, not editor interaction coverage.
+
+### Receipts, failure behavior and acceptance limits
+
+Each job always attempts to produce its own `summary.json` and Actions summary.
+Required checks report PASS/FAIL; an interrupted check remains UNKNOWN, and a
+check never reached is SKIP. Overall PASS requires every required check to pass
+and prior Actions steps to succeed. Required failure fails the job; there is no
+`continue-on-error`. Cancellation/incomplete evidence cannot produce PASS.
+
+The `install-<runner>-<ISA>-Release-<attempt>` artifact retains compact JSON
+identity/check/command receipts, exact argv/cwd and selected environment, real
+exit codes (null if no exit was observed), raw stdout/stderr/stdin, exceptions,
+SDK archive identity, dependency receipts/configure logs, install inventory and
+native program hashes. A SHA-256 index seals the evidence files. Artifacts retain
+14 days; binaries/SDK payloads are not uploaded. Abrupt runner loss or a forced
+job timeout can prevent finalization/upload; missing evidence stays UNKNOWN and
+must be investigated from Actions logs, never treated as acceptance.
+
+A future hosted PASS will not establish independent physical-machine portability,
+bare-host provisioning without preinstalled platform tools, SDK-free operation,
+application relocation after moving its install prefix, a full runtime dependency
+matrix, complete Windows transitive/dynamic DLL closure, actual editor UI,
+installer packaging/uninstall, performance, licensing or public-release approval.
+Absolute native SDK paths and Linux application RUNPATH limits remain. Full
+CTest, sanitizer suites, logging/performance benchmarks, HTTP/HTTPS regression
+campaigns and historical LLVM crash reproductions are excluded. No optimization
+flags are changed to obtain a pass, and no speculative production repair is added.
+
+### Local review validation and stop
+
+YAML parsing and Actionlint 1.7.12 pass; Python AST/bytecode compilation passes.
+Local harness checks use disposable fake projects and stub executables, never
+existing VOID binaries: framing rejection, layout/resource corruption detection,
+external-project command orchestration, exact output/exit failure preservation,
+spawn/timeout recording, all three platform configure/provider command plans and
+runtime-metadata acceptance/rejection assertions with mocked tool output,
+source restoration after failure, PASS/FAIL/UNKNOWN reporting, SKIP classification
+and the evidence hash seal pass. These validate the harness, not installation on
+any of the three operating systems. The initial local validator reused its own
+fixture prefix and was correctly rejected by the fresh-build guard; giving each
+platform plan its own scratch directory corrected that validator only.
+
+Actionlint initially rejected `runner.temp` in job-level `env`; the corrected
+workflow derives the scratch path from `RUNNER_TEMP` inside Python and uses
+`runner.temp` only in the artifact step. No hosted failure was reproduced or
+claimed fixed. The macOS runner inventory review also supplied the explicit
+Xcode selection above. No SDK download, dependency/VOID build, component install
+or real VOID/LSP execution was performed locally in this sprint.
+
+The proposal comprises four paths: the workflow, harness, focused layout tests
+and this handoff. All remain unstaged and uncommitted. Golden Wrench
+must review the source; Boss decides the reviewed ref and first manual dispatch.
+On a future failure, preserve original receipts and classify it before proposing
+any out-of-scope compiler/Runtime/CMake fix. Engineering stops here for review.
+
 ## First-install documentation sprint — 4 November 2026
 
 **REPORT READY — STOP FOR GOLDEN WRENCH REVIEW.**
 
 Documentation validation passed; no implementation or host test was performed.
 
-This section is current. The original Linux qualification handoff below is a
+This section records the preceding sprint. The original Linux qualification handoff below is a
 preserved historical snapshot. Boss subsequently committed those 15 Linux records
 at `d52e6b708539dd3026c934c98332c58c8e5e311d`; their former uncommitted status is
 not the initial state of this sprint. This sprint began at that SHA on clean
