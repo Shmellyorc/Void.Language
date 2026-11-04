@@ -111,4 +111,17 @@
   <url>
     <loc>https://voidlang.com/roadmap/</loc>
   </url>
+  <url><loc>https://voidlang.com/docs/math-random/</loc></url>
+  <url><loc>https://voidlang.com/docs/collection-tools/</loc></url>
+  <url><loc>https://voidlang.com/docs/text-encoding/</loc></url>
+  <url><loc>https://voidlang.com/docs/binary-memory/</loc></url>
+  <url><loc>https://voidlang.com/docs/files-paths/</loc></url>
+  <url><loc>https://voidlang.com/docs/os-directories/</loc></url>
+  <url><loc>https://voidlang.com/docs/logging/</loc></url>
+  <url><loc>https://voidlang.com/docs/channels/</loc></url>
+  <url><loc>https://voidlang.com/docs/url-http/</loc></url>
+  <url><loc>https://voidlang.com/docs/compiler-workflow/</loc></url>
+  <url><loc>https://voidlang.com/docs/console-output/</loc></url>
+  <url><loc>https://voidlang.com/docs/json-data/</loc></url>
+  <url><loc>https://voidlang.com/docs/calendar-time/</loc></url>
 </urlset>

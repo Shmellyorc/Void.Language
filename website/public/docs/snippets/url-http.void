@@ -1,0 +1,5 @@
+use url
+
+func entry(extra: i32) -> i32:
+    var escaped = url.encode_component("a b")
+    return (escaped.length as i32) + extra

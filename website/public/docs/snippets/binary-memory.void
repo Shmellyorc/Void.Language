@@ -1,0 +1,5 @@
+use encoding/binary as binary
+
+func entry(identifier: i32) -> i32:
+    var packet = binary.encode(identifier as u16, binary.byte_order.big)
+    return packet[0] as i32

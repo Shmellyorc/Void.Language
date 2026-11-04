@@ -1,0 +1,8 @@
+use io/memory as memory
+
+func entry(low_byte: i32) -> i32:
+    var field: [u8] = [low_byte as u8, 1]
+    var packet = memory.stream(field)
+    if packet.read<u16>() is Ok(var number):
+        return number as i32
+    return -1

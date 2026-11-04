@@ -1,0 +1,6 @@
+use os
+
+func entry(input: i32) -> i32:
+    if os.platform().length > 0:
+        return input + 1
+    return input

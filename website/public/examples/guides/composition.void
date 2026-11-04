@@ -1,31 +1,9 @@
-value struct movement:
-    x: i32
+value struct reading:
+    degrees: i32
 
-func (m movement) move(amount: i32):
-    m.x += amount
+struct station:
+    using latest: reading
 
-struct combat:
-    health: i32
-
-func (c combat) hit(amount: i32):
-    c.health -= amount
-
-struct player:
-    using motion: movement
-    using combat
-
-value struct kit:
-    using movement
-    using combat
-
-func entry(value: i32) -> i32:
-    var shared = combat(health = 100)
-    var p = player(motion = movement(x = value), combat = shared)
-    p.move(2)
-    p.motion.move(3)
-    p.hit(4)
-    var a = kit(movement = movement(x = 1), combat = shared)
-    var b = a
-    b.move(2)
-    b.hit(4)
-    return p.x + a.x + b.x + a.health
+func entry(degrees: i32) -> i32:
+    var roof = station(latest = reading(degrees = degrees))
+    return roof.degrees

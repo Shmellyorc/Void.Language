@@ -1,0 +1,7 @@
+use log
+
+func entry(count: i32) -> i32:
+    var settings = log.config(minimum = log.level.warn)
+    if settings.minimum is log.level.warn:
+        return count
+    return 0

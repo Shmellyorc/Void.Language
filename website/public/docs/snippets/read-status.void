@@ -1,0 +1,8 @@
+use os
+use net/http as http
+
+func entry(fallback: i32) -> i32:
+    if os.env("VOID_GUIDE_URL") is Ok(var target):
+        if http.get(target) is Ok(var response):
+            return response.info.status
+    return fallback

@@ -1,2 +1,2 @@
-func increment(value: i32) -> i32:
-    return value + 1
+func with_spare(labels: i32) -> i32:
+    return labels + 1

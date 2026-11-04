@@ -1,2 +1,2 @@
-func double(value: i32) -> i32:
-    return value * 2
+func pair(boxes: i32) -> i32:
+    return boxes * 2

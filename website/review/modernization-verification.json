@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-04",
+  "baseline": "1afd881ecfa65c616261e7aeb76ecd2bf87770b6",
+  "compiler": "LLVM/Clang/LLD 23.1.4, Linux x86_64 Release",
+  "source_check": "PASS: 50 indexable pages + two noindex pages; unique metadata, canonicals, social assets, 50 sitemap URLs, robots, HTML reachability, 1 JSON-LD block, heading hierarchy, links, source/result parity",
+  "checker_tests": "........\n----------------------------------------------------------------------\nRan 8 tests in 58.071s\n\nOK",
+  "build": "Built 215 entries in /home/shmellyorc/Documents/Void.Language/website/dist",
+  "built_site_check": "PASS: 50 indexable pages + two noindex pages; unique metadata, canonicals, social assets, 50 sitemap URLs, robots, HTML reachability, 1 JSON-LD block, heading hierarchy, links, source/result parity",
+  "execution": "PASS: 310 result checks; 12 fresh async AOT builds; all website programs executed",
+  "programs": 84,
+  "contextual_fragments": 5,
+  "async_sources": 6,
+  "manifest_sha256": "a38444e11cc572b1a90dbc89685369442d3489a6d38679b391060dec83382545",
+  "browser_theme_check": {
+    "toggle": "aria-pressed=true; data-theme=dark",
+    "followed_link": "Read the guides -> Syntax basics; data-theme=dark"
+  },
+  "publication": "local build only"
+}

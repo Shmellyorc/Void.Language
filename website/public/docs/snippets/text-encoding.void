@@ -1,0 +1,5 @@
+use text
+
+func entry(extra: i32) -> i32:
+    var label = text.trim("  été  ")
+    return (label.length as i32) + extra

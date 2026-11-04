@@ -1,0 +1,13 @@
+use io
+use os
+
+func sample_size(filename: string, wanted: i32) -> result<i32, io.error>:
+    with io.open(filename)? as handle:
+        var block = handle.read_exact(wanted as i64)?
+        return Ok(block.count as i32)
+
+func entry(wanted: i32) -> i32:
+    if os.env("VOID_GUIDE_FILE") is Ok(var filename):
+        if sample_size(filename, wanted) is Ok(var count):
+            return count
+    return -1

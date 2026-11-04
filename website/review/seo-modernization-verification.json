@@ -1,0 +1,43 @@
+{
+  "source_check": "PASS: 50 indexable pages + two noindex pages; unique metadata, canonicals, social assets, 50 sitemap URLs, robots, HTML reachability, 1 JSON-LD block, heading hierarchy, links, source/result parity\n",
+  "built_check": "PASS: 50 indexable pages + two noindex pages; unique metadata, canonicals, social assets, 50 sitemap URLs, robots, HTML reachability, 1 JSON-LD block, heading hierarchy, links, source/result parity\n",
+  "checker_tests": ".........\n----------------------------------------------------------------------\nRan 9 tests in 66.591s\n\nOK\n",
+  "build_entries": 215,
+  "source_build_byte_parity": true,
+  "historical_live_200_and_canonical_matches": 37,
+  "original_gap_controls": {
+    "historical fragment": "incorrectly accepted with exit 0",
+    "blocked noindex notice": "incorrectly accepted with exit 0",
+    "contradictory HTML": "incorrectly accepted with exit 0",
+    "contradictory headers": "incorrectly accepted with exit 0",
+    "unsupported sitemap date": "incorrectly accepted with exit 0"
+  },
+  "corrected_gap_controls": "historical fragment 1 /tmp/tmpe4pebzxn/public/docs/generics/index.html: historical fragments missing: ['part-1']\n\nblocked noindex notice 1 /tmp/tmpydpua1hs/public/robots.txt: intended public URL is blocked: https://voidlang.com/github/\n\ncontradictory HTML 1 /tmp/tmpx3h7s9sw/public/github/index.html: conflicting HTML indexing directives\n\ncontradictory headers 1 /tmp/tmpbj7kk_d9/public/_headers: conflicting header indexing policy: /github/\n\nunsupported sitemap date 1 /tmp/tmpvw_8icmd/public/sitemap.xml: sitemap metadata needs verified provenance\n\n",
+  "counts": {
+    "html": 52,
+    "indexable": 50,
+    "noindex": 2,
+    "guides": 43,
+    "gallery": 27,
+    "sitemap": 50
+  },
+  "archived_live_preserved": true,
+  "final_availability_copy_correction": {
+    "source_check": "PASS: 50 indexable pages + two noindex pages; unique metadata, canonicals, social assets, 50 sitemap URLs, robots, HTML reachability, 1 JSON-LD block, heading hierarchy, links, source/result parity",
+    "build": "Built 215 entries in /home/shmellyorc/Documents/Void.Language/website/dist",
+    "built_check": "PASS: 50 indexable pages + two noindex pages; unique metadata, canonicals, social assets, 50 sitemap URLs, robots, HTML reachability, 1 JSON-LD block, heading hierarchy, links, source/result parity",
+    "regression_tests": ".........\n----------------------------------------------------------------------\nRan 9 tests in 63.544s\n\nOK",
+    "exact_copy_placements": 4,
+    "noindex_canonical_sitemap": "pass in source and build",
+    "github_anchor_destination": "/github/",
+    "changed_files": [
+      "website/public/github/index.html",
+      "website/dist/github/index.html",
+      "website/README.md",
+      "website/MODERNIZATION_REVIEW.md",
+      "website/SEO_MODERNIZATION_REVIEW.md",
+      "website/review/seo-modernization-inventory.json",
+      "website/review/seo-modernization-verification.json"
+    ]
+  }
+}

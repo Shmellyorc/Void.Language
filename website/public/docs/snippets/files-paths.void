@@ -1,0 +1,6 @@
+use path
+
+func entry(offset: i32) -> i32:
+    if path.filename("atlas/map.txt") is Ok(var name):
+        return (name.length as i32) + offset
+    return 0

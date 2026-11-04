@@ -1,0 +1,224 @@
+{
+  "/": [
+    "capabilities-title",
+    "code-title",
+    "hero-title",
+    "home",
+    "roadmap",
+    "tooling-title"
+  ],
+  "/docs/": [
+    "category-0",
+    "category-1",
+    "category-2",
+    "category-3"
+  ],
+  "/docs/async/": [
+    "completed-tasks",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/callables/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/cleanup/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/closures/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/collections/": [
+    "lookup",
+    "part-1",
+    "part-2",
+    "part-3",
+    "recoverable"
+  ],
+  "/docs/composition/": [
+    "part-1",
+    "part-2",
+    "part-3",
+    "relationships"
+  ],
+  "/docs/control-flow/": [
+    "if-values",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/dictionaries/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/editor-tooling/": [
+    "current-tooling",
+    "part-1",
+    "part-2",
+    "part-3",
+    "part-4"
+  ],
+  "/docs/errors/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/events/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/functions/": [
+    "call-rules",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/generics/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/inheritance/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/initialization/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/interfaces/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/live-development/": [
+    "part-1",
+    "part-2",
+    "part-3",
+    "part-4"
+  ],
+  "/docs/methods/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/modules/": [
+    "entry-discovery",
+    "nested-imports",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/native-integration/": [
+    "part-1",
+    "part-2",
+    "part-3",
+    "part-4"
+  ],
+  "/docs/nullable/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/parallelism/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/patterns/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/properties/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/strings/": [
+    "part-1",
+    "part-2",
+    "part-3",
+    "utf8"
+  ],
+  "/docs/structs/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/syntax/": [
+    "application",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/task-groups/": [
+    "completed-tasks",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/types/": [
+    "numeric-prelude",
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/docs/variables/": [
+    "part-1",
+    "part-2",
+    "part-3"
+  ],
+  "/examples/": [
+    "application",
+    "async",
+    "cleanup",
+    "closures",
+    "collections",
+    "errors",
+    "events",
+    "example-gallery",
+    "example-select",
+    "functions",
+    "generics",
+    "loops",
+    "modules",
+    "named-arguments",
+    "native",
+    "parallelism",
+    "properties",
+    "structs",
+    "task-groups",
+    "unicode"
+  ],
+  "/features/": [
+    "concurrency",
+    "features",
+    "generics",
+    "native"
+  ],
+  "/getting-started/": [
+    "getting-started"
+  ],
+  "/roadmap/": [
+    "current-development",
+    "foundation",
+    "future"
+  ],
+  "/why-void/": [
+    "balance",
+    "direction",
+    "influences",
+    "problems"
+  ]
+}

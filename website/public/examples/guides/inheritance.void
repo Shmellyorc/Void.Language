@@ -1,23 +1,16 @@
-struct base_user:
-    health: i32 = 100
+struct admission:
+    seats: i32
 
-virtual func (u base_user) take_damage(amount: i32):
-    u.health -= amount
+virtual func (item admission) capacity() -> i32:
+    return item.seats
 
-struct player extends base_user:
-    armor: i32
+struct group_pass extends admission:
+    guests: i32
 
-override func (p player) take_damage(amount: i32):
-    super.take_damage(amount)
-    p.armor++
+override func (item group_pass) capacity() -> i32:
+    return super.capacity() + item.guests
 
-func apply(u: base_user):
-    u.take_damage(3)
-
-func entry(value: i32) -> i32:
-    var p = player(armor = value)
-    var b: base_user = p
-    apply(b)
-    if b == p:
-        return b.health + p.armor
-    return 0
+func entry(guests: i32) -> i32:
+    var passholder = group_pass(seats = 2, guests = guests)
+    var booking: admission = passholder
+    return booking.capacity()

@@ -1,0 +1,3 @@
+func entry(bottles: i32) -> i32:
+    # Each full carton holds four bottles.
+    return bottles / 4

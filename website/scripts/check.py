@@ -2,6 +2,7 @@
 """Validate static SEO, crawlable links and teaching-example parity with stdlib."""
 import argparse
 from collections import deque
+from fnmatch import fnmatchcase
 from html.parser import HTMLParser
 import json
 from pathlib import Path
@@ -175,7 +176,16 @@ for path in sorted(PUBLIC.rglob('*.html')):
     page = Page(path)
     page.feed(path.read_text())
     pages[path.resolve()] = page
-indexable = {path: page for path, page in pages.items() if path != PUBLIC / '404.html'}
+indexable = {path: page for path, page in pages.items() if path not in (PUBLIC / '404.html', PUBLIC / 'github/index.html')}
+# Preserve published routes and addressable sections independently of the sitemap.
+history = json.loads((ROOT / 'scripts/seo-route-history.json').read_text())
+for route, anchors in history.items():
+    target = local_target(route)
+    if target not in indexable:
+        fail(PUBLIC, f'historical indexable route missing: {route}')
+    elif missing := set(anchors) - pages[target].ids:
+        fail(target, f'historical fragments missing: {sorted(missing)}')
+
 expected_urls = {SITE + page_route(path) for path in indexable}
 if not indexable:
     fail(PUBLIC, 'no indexable pages found')
@@ -192,10 +202,10 @@ for row in manifest:
     if row.get('mode') == 'app':
         if (type(row.get('expected_status')) is not int
                 or not 0 <= row['expected_status'] <= 255
-                or row.get('expected_stdout') != ''
+                or not isinstance(row.get('expected_stdout'), str)
                 or any(key in row for key in ('input', 'expected', 'cases'))
                 or row.get('kind') == 'fragment'):
-            fail(source, 'application manifest requires separate status and empty stdout, without adapter inputs')
+            fail(source, 'application manifest requires separate status and stdout, without adapter inputs')
     elif type(row.get('input')) is not int or type(row.get('expected')) is not int:
         fail(source, 'entry adapter manifest requires integer input and result')
     if row.get('maintenance') == 'repository-copy':
@@ -283,7 +293,9 @@ for path, page in pages.items():
         if not text.strip() or level > previous + 1:
             fail(path, f'empty heading or skipped heading level at {tag}: {text}')
         previous = level
-    directives = {token.strip().casefold() for key in ('robots', 'googlebot') for value in page.meta.get(key, []) for token in value.split(',')}
+    directives = {token.strip().casefold() for key in ('robots', 'googlebot') for value in page.meta.get(key, []) for token in re.split(r'[,\s]+', value)}
+    if {'noindex', 'none'} & directives and {'index', 'all'} & directives:
+        fail(path, 'conflicting HTML indexing directives')
     if path in indexable:
         if path.name != 'index.html':
             fail(path, 'indexable pages must use directory/index.html for clean slash URLs')
@@ -317,9 +329,11 @@ for path, page in pages.items():
                 fail(path, 'social preview needs descriptive image alt metadata')
     else:
         if 'noindex' not in directives:
-            fail(path, '404 must explicitly use noindex')
-        if page.canonicals:
+            fail(path, f'{route} must explicitly use noindex')
+        if path.name == '404.html' and page.canonicals:
             fail(path, '404 must not advertise another page as its canonical')
+        if route == '/github/' and page.canonicals != [canonical]:
+            fail(path, 'availability page requires its own canonical')
     for source, displayed in page.examples:
         sample = local_target(source)
         if sample is None or not sample.is_file() or sample.read_text().rstrip('\n') != displayed.rstrip('\n'):
@@ -360,7 +374,8 @@ for path, page in pages.items():
     for data, displayed in page.results:
         row = samples.get(data.get('data-source'))
         if row and row.get('mode') == 'app':
-            result = re.fullmatch(r'\s*Exit status\s+(\d+)\s+·\s+Standard output empty\s*', displayed)
+            output_label = json.dumps(row['expected_stdout']) if row['expected_stdout'] else 'empty'
+            result = re.fullmatch(r'\s*Exit status\s+(\d+)\s+·\s+Standard output ' + re.escape(output_label) + r'\s*', displayed)
             if (not result or int(result[1]) != row['expected_status']
                     or data.get('data-mode') != 'app'
                     or data.get('data-expected-status') != str(row['expected_status'])
@@ -393,11 +408,6 @@ for path, page in pages.items():
         if url.netloc == 'voidlang.net':
             fail(path, 'internal link uses redirecting secondary domain')
         if url.netloc != 'voidlang.com':
-            marker = '/blob/main/'
-            if reference.startswith('https://github.com/Shmellyorc/Void.Language' + marker):
-                original = REPO / unquote(url.path.split(marker, 1)[1])
-                if not original.is_file():
-                    fail(path, f'missing repository reference {reference}')
             if url.path.endswith('.md'):
                 fail(path, 'public explanation links to internal Markdown')
             continue
@@ -416,6 +426,12 @@ for path, page in pages.items():
             if path in graph and target in indexable and reference in [a.get('href') for a, _ in page.anchors]:
                 graph[path].add(target)
     content = path.read_text()
+    for attrs, label in page.anchors:
+        if 'github' in label.casefold() or 'github-nav' in attrs.get('class', '').split():
+            if attrs.get('href') != '/github/':
+                fail(path, 'GitHub link must open /github/')
+        if label.strip() == 'Docs' and attrs.get('href') != '/docs/syntax/':
+            fail(path, 'Docs must open the syntax guide')
     if re.search(r'clanker|owner review|hosted acceptance|handoff|stage [0-9]', content, re.I):
         fail(path, 'internal workflow language in public content')
     if 'VOID 2.0' in content:
@@ -455,6 +471,8 @@ try:
         if node.tag != namespace + 'url' or len(locations) != 1 or not locations[0].text:
             fail(sitemap_path, 'invalid or missing sitemap URL entry')
             continue
+        if len(node) != 1:
+            fail(sitemap_path, 'sitemap metadata needs verified provenance')
         url = locations[0].text.strip()
         sitemap_urls.append(url)
         if not is_site_url(url, page_url=True) or url not in expected_urls:
@@ -474,22 +492,33 @@ try:
         fail(robots_path, 'expected one correct absolute Sitemap reference')
     rules = RobotFileParser()
     rules.parse(robots.splitlines())
-    for url in sorted(expected_urls | {SOCIAL_IMAGE, SITE + '/assets/site.js', SITE + '/assets/style.css'}):
+    for url in sorted({SITE + page_route(p) for p in pages} | {SITE + '/' + p.relative_to(PUBLIC).as_posix() for p in (PUBLIC / 'assets').rglob('*') if p.is_file()}):
         if not rules.can_fetch('Googlebot', url) or not rules.can_fetch('*', url):
             fail(robots_path, f'intended public URL is blocked: {url}')
 except OSError as error:
     fail(robots_path, str(error))
 
-# Reject deploy headers that would inadvertently override the HTML indexing policy.
+# Match indexing headers against the HTML routes, including clean 404 aliases.
 headers_path = PUBLIC / '_headers'
 if headers_path.is_file():
     rule = None
     for line in headers_path.read_text().splitlines():
         if line and not line.startswith((' ', '\t', '#')):
             rule = line.strip()
-        if re.match(r'\s*X-Robots-Tag\s*:', line, re.I) and re.search(r'\b(?:noindex|none)\b', line, re.I):
-            if rule not in ('/404', '/404.html'):
+        if not re.match(r'\s*X-Robots-Tag\s*:', line, re.I):
+            continue
+        tokens = set(re.findall(r'\b(?:noindex|none|index|all)\b', line.casefold()))
+        pattern = urlsplit(rule).path if rule and '://' in rule else rule
+        pattern = re.sub(r':\w+', '*', pattern or '')
+        for path in pages:
+            route = page_route(path)
+            aliases = [route, route.removesuffix('.html')] if path.name == '404.html' else [route]
+            if not any(fnmatchcase(alias, pattern) for alias in aliases):
+                continue
+            if path in indexable and tokens & {'noindex', 'none'}:
                 fail(headers_path, f'indexing restriction requires review: {rule}')
+            if path not in indexable and tokens & {'index', 'all'}:
+                fail(headers_path, f'conflicting header indexing policy: {rule}')
 
 home = PUBLIC / 'index.html'
 visited = set()
@@ -501,6 +530,12 @@ while queue:
         queue.extend(graph.get(path, set()) - visited)
 for path in set(indexable) - visited:
     fail(path, 'not reachable from homepage through ordinary HTML links')
+
+# Scan the files delivered by the static build, including scripts and metadata.
+for asset in PUBLIC.rglob('*'):
+    if asset.is_file() and asset.suffix in ('.html', '.js', '.css', '.json', '.xml', '.txt', '.void'):
+        if re.search(r'github\.com/shmellyorc/void\.language', unquote(asset.read_text()), re.I):
+            fail(asset, 'public repository URL exposed')
 
 # Homepage and roadmap use the same content/source contracts as existing guides.
 showcase = {'/' + row['source'].removeprefix('public/') for row in manifest if row.get('showcase')}
@@ -524,7 +559,7 @@ if home in pages:
                if {'button', 'primary'} <= set(attrs.get('class', '').split())]
     if not primary or primary[0][0].get('href') != '/examples/' or primary[0][1].strip() != 'Explore VOID':
         fail(home, 'primary hero action must be Explore VOID without an arrow')
-    if not any(attrs.get('href') == '/docs/' and normalized(text) == 'read the docs ↗'
+    if not any(attrs.get('href') == '/docs/syntax/' and normalized(text) == 'read the docs ↗'
                for attrs, text in page.anchors):
         fail(home, 'secondary hero action must retain Read the docs and its diagonal arrow')
     if 'roadmap' not in page.ids:
@@ -534,7 +569,7 @@ for path, page in pages.items():
     if (path in indexable or roadmap_links) and (len(roadmap_links) != 1 or roadmap_links[0].get('href') != '/roadmap/'):
         fail(path, 'Roadmap navigation must point directly to /roadmap/')
 
-for route in ('why-void', 'features', 'examples', 'docs', 'getting-started', 'roadmap'):
+for route in ('why-void', 'features', 'examples', 'docs', 'getting-started', 'roadmap', 'github'):
 
     if PUBLIC / route / 'index.html' not in pages:
         fail(PUBLIC, f'missing page {route}')
@@ -553,6 +588,6 @@ if not architecture.is_file() or architecture.read_bytes() != (REPO / 'examples/
 if errors:
     print('\n'.join(errors), file=sys.stderr)
     raise SystemExit(1)
-print(f'PASS: {len(indexable)} indexable pages + 404; unique metadata, canonicals, social assets, '
+print(f'PASS: {len(indexable)} indexable pages + two noindex pages; unique metadata, canonicals, social assets, '
       f'{len(expected_urls)} sitemap URLs, robots, HTML reachability, {structured_count} JSON-LD block, '
       'heading hierarchy, links, source/result parity')

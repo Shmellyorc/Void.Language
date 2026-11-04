@@ -1,0 +1,823 @@
+{
+  "layouts": [
+    {
+      "route": "/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/why-void/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/features/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/examples/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/syntax/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/getting-started/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/roadmap/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/github/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1323,
+      "theme": "light",
+      "viewport": 1323
+    },
+    {
+      "route": "/docs/variables/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/types/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/functions/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/control-flow/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/modules/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/collections/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/dictionaries/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/strings/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/structs/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/initialization/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/methods/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/composition/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/inheritance/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/interfaces/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/generics/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/properties/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/callables/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/closures/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/events/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/nullable/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/patterns/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/errors/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/cleanup/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/async/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/task-groups/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/parallelism/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/native-integration/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/editor-tooling/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/live-development/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/math-random/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/collection-tools/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/text-encoding/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/binary-memory/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/files-paths/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/os-directories/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/logging/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/channels/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/url-http/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/compiler-workflow/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/console-output/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/json-data/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/calendar-time/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/docs/",
+      "label": "desktop",
+      "oversizeCode": 0,
+      "page": 1312,
+      "theme": "light",
+      "viewport": 1312
+    },
+    {
+      "route": "/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/why-void/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/features/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/examples/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/syntax/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/getting-started/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/roadmap/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/github/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/variables/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/types/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/functions/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/control-flow/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/modules/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/collections/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/dictionaries/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/strings/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/structs/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/initialization/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/methods/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/composition/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/inheritance/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/interfaces/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/generics/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/properties/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/callables/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/closures/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/events/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/nullable/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/patterns/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/errors/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/cleanup/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/async/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/task-groups/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/parallelism/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/native-integration/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/editor-tooling/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/live-development/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/math-random/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/collection-tools/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/text-encoding/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/binary-memory/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/files-paths/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/os-directories/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/logging/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/channels/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/url-http/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/compiler-workflow/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/console-output/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/json-data/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/calendar-time/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    },
+    {
+      "route": "/docs/",
+      "label": "mobile",
+      "oversizeCode": 0,
+      "page": 276,
+      "theme": "light",
+      "viewport": 276
+    }
+  ],
+  "followedGitHubLinks": 103,
+  "mobileMenuDocs": true,
+  "exampleSelector": true
+}

@@ -51,13 +51,13 @@ per-guide review and actual verification results.
 To compile and execute all programs with existing local builds:
 
 ```sh
-python3 website/scripts/verify_examples.py build/ci-release/voidc --async-build build/ci-release
+python3 website/scripts/verify_examples.py build/llvm23-release/voidc --async-build build/llvm23-release
 ```
 
 Select a current compatible build for your checkout. Async validation uses the
 existing `void_async_tests --emit` adapter and matching runtime archives from the
 selected directory. It freshly emits each exact website source in normal and
-optimized LLVM modes, links with `clang++-19` (override using `--cxx`), and executes
+optimized LLVM modes, links with the Clang/LLD driver and libraries from the build’s LLVM 23.1.4 `void-native.txt` manifest, and executes
 its documented cases. Synchronous documentation programs and contextual fragments
 run through both normal and optimized JIT modes. All generated objects/executables live in an automatically
 removed temporary directory. No compiler/runtime rebuild or modification occurs.
@@ -70,7 +70,7 @@ no numeric adapter input or printed-result field. Their result bars distinguish
 process status from standard output. The verifier compares the exact stdout and
 exit status independently in optimized/unoptimized modes; main-based downloads
 also execute through directory discovery. A successful return from main is not a
-printing API. See `STAGE8_WEBSITE_REVIEW.md` for the current content and validation
+printing API. See `STAGE8_WEBSITE_REVIEW.md` for the historical content and validation
 record.
 
 ## Homepage showcase and roadmap
@@ -83,13 +83,13 @@ No separate sample or SEO framework is required.
 
 `public/roadmap/index.html` describes the implemented foundation, current work and
 future direction. Main navigation links directly to `/roadmap/`; `/#roadmap`
-remains a working legacy target for the short homepage teaser. There are now 37
-indexable pages, plus the noindex error document. See `HOME_SHOWCASE_REVIEW.md`
+remains a working legacy target for the short homepage teaser. There are now 50
+indexable pages. Both the error page and the repository availability page are noindex. See `HOME_SHOWCASE_REVIEW.md`
 for scope, source evidence, preservation comparisons and verification.
 
 ## Public content
 
-The site contains 30 guides and 18 curated examples. Navigation and guides work
+The site contains 43 guides. The example selector includes 27 teaching programs. Navigation and guides work
 without JavaScript; all examples remain readable when the selector enhancement
 is unavailable. JavaScript supplies the menu, locally saved theme and dropdown. The default is
 light, independent of the operating-system preference; an explicitly saved theme
@@ -97,10 +97,29 @@ is honored. Without JavaScript, the CSS default is also light.
 Public pages do not expose internal workflow language or substitute Markdown
 links for explanations. Keep implemented behavior distinct from future design.
 
-The cleanup example is an in-memory model of scoped ownership, not a claim that a
-filesystem/native-resource API exists. Async programs require the explicit async
+The cleanup example models scope ownership in memory. See the files and paths guide for real filesystem operations. Async programs require the explicit async
 host adapter; the ordinary synchronous CLI entry adapter does not run them.
 Factorial demonstrates small non-negative inputs; i32 results beyond 12! wrap.
+
+## Repository availability and current review
+
+All public GitHub anchors use the stable internal route `/github/`. This works
+with JavaScript disabled. The availability page is excluded from the sitemap and
+declares `noindex`. When public access is officially announced, the maintainer can change that
+one landing page to link or redirect to the approved repository destination.
+Keep the current repository-link routing regression until that announcement.
+
+Primary Docs navigation opens `/docs/syntax/`. The sidebar and footer also link
+to the full guide index at `/docs/`. The verifier stages sources in a temporary
+directory to keep compiler caches out of the public build. Its HTTP example uses
+a loopback fixture. See [the modernization review](MODERNIZATION_REVIEW.md).
+
+## Modernized SEO acceptance
+
+[SEO modernization review](SEO_MODERNIZATION_REVIEW.md) records the current
+50 indexable pages, historical route/anchor compatibility, metadata inventory,
+crawl results and read-only live comparison. The existing checker also guards
+noindex/header conflicts and crawlability of the availability page.
 
 ## SEO maintenance
 

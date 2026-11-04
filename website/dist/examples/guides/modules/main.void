@@ -1,5 +1,5 @@
-use "/math/calculator.void" as calculator
-use "/helpers/numbers.void"
+use "./math/calculator.void" as packing
+use "./helpers/numbers.void" as labels
 
-func entry(value: i32) -> i32:
-    return calculator.double(value) + increment(value)
+func entry(boxes: i32) -> i32:
+    return labels.with_spare(packing.pair(boxes))

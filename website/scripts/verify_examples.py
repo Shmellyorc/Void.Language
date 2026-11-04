@@ -2,8 +2,11 @@
 """Compile and execute the website's exact downloadable teaching programs."""
 import argparse
 import json
+import os
+from contextlib import contextmanager
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from threading import Thread
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 import textwrap
@@ -12,24 +15,57 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('compiler', type=Path, help='Existing current voidc binary')
 parser.add_argument('--async-build', type=Path, required=True,
                     help='Matching existing build containing void_async_tests and runtime archives')
-parser.add_argument('--cxx', default='clang++-19', help='Matching C++ linker driver')
+parser.add_argument('--cxx', help='Optional matching C++ linker driver override')
 args = parser.parse_args()
 compiler = args.compiler.resolve(strict=True)
 build = args.async_build.resolve(strict=True)
 emitter = (build / 'void_async_tests').resolve(strict=True)
-archives = [(build / name).resolve(strict=True) for name in
-            ('libvoid_runtime.a', 'libvoid_native_fixture.a')]
-cxx = shutil.which(args.cxx)
-if not cxx:
-    parser.error(f'Cannot find C++ linker driver: {args.cxx}')
+link = (build / 'void-native.txt').read_text().splitlines()
+if link[0] not in ('VOID native 23.1.4 v1', 'VOID native 23.1.4 v2'):
+    parser.error('Expected the LLVM 23.1.4 native link manifest')
+cxx = args.cxx or link[1]
+link_flags = ['--driver-mode=g++', *link[3:]]
+if link[2]:
+    link_flags.append('--ld-path=' + link[2])
 root = Path(__file__).resolve().parents[1]
 samples = json.loads((root / 'scripts/guide-examples.json').read_text())
 # Keep a real recoverable-error branch in the verification set.
 samples.append({'source': 'public/examples/guides/errors.void', 'input': 0, 'expected': -1})
 
-def run(command):
+@contextmanager
+def example_environment(fixture):
+    if not fixture:
+        yield None
+        return
+    if fixture == 'three-byte-file':
+        with tempfile.TemporaryDirectory(prefix='void-guide-file-') as directory:
+            path = Path(directory) / 'field.bin'
+            path.write_bytes(bytes((12, 18, 30)))
+            yield dict(os.environ, VOID_GUIDE_FILE=str(path))
+        return
+    if fixture != 'loopback-http':
+        raise ValueError(f'Unknown example fixture: {fixture}')
+    class StatusHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200 if self.path == '/status' else 404)
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+        def log_message(self, *args):
+            pass
+
+    with HTTPServer(('127.0.0.1', 0), StatusHandler) as server:
+        thread = Thread(target=server.serve_forever)
+        thread.start()
+        try:
+            yield dict(os.environ, VOID_GUIDE_URL=f'http://127.0.0.1:{server.server_port}/status')
+        finally:
+            server.shutdown()
+            thread.join()
+
+
+def run(command, env=None):
     result = subprocess.run([str(arg) for arg in command], capture_output=True,
-                            text=True, timeout=60)
+                            text=True, timeout=60, env=env)
     if result.returncode:
         raise SystemExit(f'FAIL: {command}\n{result.stdout}\n{result.stderr}')
     return result.stdout.strip()
@@ -37,8 +73,15 @@ def run(command):
 executed = async_compilations = 0
 with tempfile.TemporaryDirectory(prefix='void-website-examples-') as temporary:
     output = Path(temporary)
+    # Compile outside public/: compiler caches must never become site assets.
+    staged = output / 'sources'
+    for original in (root / 'public').rglob('*.void'):
+        if original.is_file():
+            copy = staged / original.relative_to(root / 'public')
+            copy.parent.mkdir(parents=True, exist_ok=True)
+            copy.write_bytes(original.read_bytes())
     for index, sample in enumerate(samples):
-        source = root / sample['source']
+        source = staged / Path(sample['source']).relative_to('public')
         if sample.get('kind') == 'fragment':
             # Compile the exact displayed fragment in its explicit teaching context.
             fragment = textwrap.indent(source.read_text(), ' ' * sample.get('context_indent', 0))
@@ -54,7 +97,7 @@ with tempfile.TemporaryDirectory(prefix='void-website-examples-') as temporary:
             targets = (source, source.parent) if source.name == 'main.void' else (source,)
             for target, flags in ((target, flags) for target in targets
                                   for flags in ([], ['--no-opt'])):
-                command = [str(compiler), 'run', str(target), '--app', *flags]
+                command = [str(compiler), 'run', str(target), *flags]
                 result = subprocess.run(command, capture_output=True, text=True, timeout=60)
                 if (result.returncode != sample['expected_status']
                         or result.stdout != sample['expected_stdout'] or result.stderr):
@@ -73,7 +116,7 @@ with tempfile.TemporaryDirectory(prefix='void-website-examples-') as temporary:
                 obj = output / f'{index}-{optimization}.o'
                 executable = output / f'{index}-{optimization}'
                 run([emitter, '--emit', source, obj, optimization])
-                run([cxx, obj, *archives, '-o', executable])
+                run([cxx, obj, *link_flags, '-o', executable])
                 async_compilations += 1
                 for case in cases:
                     actual = run([executable, case['input']])
@@ -82,12 +125,13 @@ with tempfile.TemporaryDirectory(prefix='void-website-examples-') as temporary:
                                          f'expected {case["expected"]}, got {actual}')
                     executed += 1
         else:
-            modes = ([], ['--no-opt']) if sample.get('guide') or sample.get('showcase') else ([],)
-            for flags in modes:
-                for case in cases:
-                    actual = run([compiler, 'run', source, case['input'], *flags])
-                    if actual != str(case['expected']):
-                        raise SystemExit(f'FAIL: {source} input {case["input"]}: '
-                                         f'expected {case["expected"]}, got {actual}')
-                    executed += 1
+            modes = ([], ['--no-opt'])
+            with example_environment(sample.get('fixture')) as env:
+                for flags in modes:
+                    for case in cases:
+                        actual = run([compiler, 'run', source, case['input'], *flags], env=env)
+                        if actual != str(case['expected']):
+                            raise SystemExit(f'FAIL: {source} input {case["input"]}: '
+                                             f'expected {case["expected"]}, got {actual}')
+                        executed += 1
 print(f'PASS: {executed} result checks; {async_compilations} fresh async AOT builds; all website programs executed')

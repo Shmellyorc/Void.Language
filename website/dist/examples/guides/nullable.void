@@ -1,12 +1,10 @@
-func double(value: i32) -> i32:
-    return value * 2
-func apply<t>(callback: func(t) -> t, value: t) -> t:
-    return callback(value)
-func entry(value: i32) -> i32:
-    var callback: (func(i32) -> i32)?
-    if callback is Ok(var absent):
-        return absent(value)
-    callback = double
-    return match callback:
-        Ok(var present): apply(present, value)
-        null: -1
+struct platform_assignment:
+    number: i32
+
+func entry(number: i32) -> i32:
+    var platform: platform_assignment?
+    if number > 0:
+        platform = platform_assignment(number = number)
+    return match platform:
+        Ok(var assigned): assigned.number
+        null: 0

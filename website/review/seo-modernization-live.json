@@ -1,0 +1,1577 @@
+{
+  "observed_utc": "2026-11-04T12:28:41.969755+00:00",
+  "method": "Read-only GET with curl --location --compressed",
+  "responses": [
+    {
+      "requested": "https://voidlang.com/",
+      "final": "200 https://voidlang.com/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 15412,
+      "title": "VOID Language \u2014 Native Programming with LLVM",
+      "canonical": [
+        "https://voidlang.com/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/",
+      "final": "200 https://voidlang.com/docs/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9138,
+      "title": "VOID Language Documentation \u2014 Syntax, Types and Concurrency",
+      "canonical": [
+        "https://voidlang.com/docs/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/generics/",
+      "final": "200 https://voidlang.com/docs/generics/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8895,
+      "title": "Generics and Reusable Typed Functions \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/generics/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/async/",
+      "final": "200 https://voidlang.com/docs/async/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9866,
+      "title": "Async Functions and Await \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/async/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/examples/",
+      "final": "200 https://voidlang.com/examples/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 31937,
+      "title": "VOID Language Examples \u2014 Functions, Generics and Async",
+      "canonical": [
+        "https://voidlang.com/examples/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/robots.txt",
+      "final": "200 https://voidlang.com/robots.txt",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/plain; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=14400, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "content-encoding: br",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: REVALIDATED"
+      ],
+      "decoded_bytes": 65,
+      "robots_text": "User-agent: *\nAllow: /\nSitemap: https://voidlang.com/sitemap.xml\n"
+    },
+    {
+      "requested": "https://voidlang.com/sitemap.xml",
+      "final": "200 https://voidlang.com/sitemap.xml",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: application/xml",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "content-encoding: br",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC"
+      ],
+      "decoded_bytes": 2626,
+      "sitemap_urls": [
+        "https://voidlang.com/",
+        "https://voidlang.com/docs/",
+        "https://voidlang.com/docs/async/",
+        "https://voidlang.com/docs/callables/",
+        "https://voidlang.com/docs/cleanup/",
+        "https://voidlang.com/docs/closures/",
+        "https://voidlang.com/docs/collections/",
+        "https://voidlang.com/docs/composition/",
+        "https://voidlang.com/docs/control-flow/",
+        "https://voidlang.com/docs/dictionaries/",
+        "https://voidlang.com/docs/editor-tooling/",
+        "https://voidlang.com/docs/errors/",
+        "https://voidlang.com/docs/events/",
+        "https://voidlang.com/docs/functions/",
+        "https://voidlang.com/docs/generics/",
+        "https://voidlang.com/docs/inheritance/",
+        "https://voidlang.com/docs/initialization/",
+        "https://voidlang.com/docs/interfaces/",
+        "https://voidlang.com/docs/live-development/",
+        "https://voidlang.com/docs/methods/",
+        "https://voidlang.com/docs/modules/",
+        "https://voidlang.com/docs/native-integration/",
+        "https://voidlang.com/docs/nullable/",
+        "https://voidlang.com/docs/parallelism/",
+        "https://voidlang.com/docs/patterns/",
+        "https://voidlang.com/docs/properties/",
+        "https://voidlang.com/docs/strings/",
+        "https://voidlang.com/docs/structs/",
+        "https://voidlang.com/docs/syntax/",
+        "https://voidlang.com/docs/task-groups/",
+        "https://voidlang.com/docs/types/",
+        "https://voidlang.com/docs/variables/",
+        "https://voidlang.com/examples/",
+        "https://voidlang.com/features/",
+        "https://voidlang.com/getting-started/",
+        "https://voidlang.com/why-void/",
+        "https://voidlang.com/roadmap/"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/assets/social.png",
+      "final": "200 https://voidlang.com/assets/social.png",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: image/png",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=14400, must-revalidate",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "server: cloudflare",
+        "cf-cache-status: REVALIDATED"
+      ],
+      "decoded_bytes": 31556
+    },
+    {
+      "requested": "https://voidlang.com/404.html",
+      "final": "200 https://voidlang.com/404",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 308 ",
+        "x-frame-options: DENY",
+        "location: /404",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 915,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/seo-missing-page-check/",
+      "final": "404 https://voidlang.com/seo-missing-page-check/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.net/",
+      "final": "200 https://voidlang.com/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 301 ",
+        "content-type: text/html; charset=UTF-8",
+        "location: https://voidlang.com/",
+        "server: cloudflare",
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 15412,
+      "title": "VOID Language \u2014 Native Programming with LLVM",
+      "canonical": [
+        "https://voidlang.com/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.net/docs/generics/",
+      "final": "200 https://voidlang.com/docs/generics/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 301 ",
+        "content-type: text/html; charset=UTF-8",
+        "location: https://voidlang.com/docs/generics/",
+        "server: cloudflare",
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8895,
+      "title": "Generics and Reusable Typed Functions \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/generics/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "http://voidlang.com/",
+      "final": "200 https://voidlang.com/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/1.1 301 Moved Permanently",
+        "Content-Type: text/html; charset=UTF-8",
+        "Location: https://voidlang.com/",
+        "Server: cloudflare",
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 15412,
+      "title": "VOID Language \u2014 Native Programming with LLVM",
+      "canonical": [
+        "https://voidlang.com/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/generics",
+      "final": "200 https://voidlang.com/docs/generics/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 308 ",
+        "x-frame-options: DENY",
+        "location: /docs/generics/",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8895,
+      "title": "Generics and Reusable Typed Functions \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/generics/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/github/",
+      "final": "404 https://voidlang.com/github/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/roadmap/",
+      "final": "200 https://voidlang.com/roadmap/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8625,
+      "title": "VOID Language Roadmap \u2014 Foundation and Future Direction",
+      "canonical": [
+        "https://voidlang.com/roadmap/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/url-http/",
+      "final": "404 https://voidlang.com/docs/url-http/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/assets/style.css",
+      "final": "200 https://voidlang.com/assets/style.css",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/css; charset=utf-8",
+        "vary: accept-encoding",
+        "cache-control: public, max-age=14400, must-revalidate",
+        "x-frame-options: DENY",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "content-encoding: br",
+        "server: cloudflare",
+        "cf-cache-status: REVALIDATED"
+      ],
+      "decoded_bytes": 24015
+    },
+    {
+      "requested": "https://voidlang.com/why-void/",
+      "final": "200 https://voidlang.com/why-void/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 16549,
+      "title": "Why VOID? Language Goals and Design Choices",
+      "canonical": [
+        "https://voidlang.com/why-void/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/features/",
+      "final": "200 https://voidlang.com/features/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9212,
+      "title": "VOID Language Features \u2014 Native Code, Types and Async",
+      "canonical": [
+        "https://voidlang.com/features/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/getting-started/",
+      "final": "200 https://voidlang.com/getting-started/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 4217,
+      "title": "Getting Started with VOID \u2014 Development Status",
+      "canonical": [
+        "https://voidlang.com/getting-started/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/syntax/",
+      "final": "200 https://voidlang.com/docs/syntax/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 11021,
+      "title": "Syntax Basics \u2014 VOID Language Documentation",
+      "canonical": [
+        "https://voidlang.com/docs/syntax/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/variables/",
+      "final": "200 https://voidlang.com/docs/variables/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8526,
+      "title": "Variables and Constants \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/variables/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/types/",
+      "final": "200 https://voidlang.com/docs/types/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 10410,
+      "title": "Types, Numbers and Conversions \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/types/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/functions/",
+      "final": "200 https://voidlang.com/docs/functions/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 10116,
+      "title": "Functions and Recursion \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/functions/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/control-flow/",
+      "final": "200 https://voidlang.com/docs/control-flow/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9317,
+      "title": "Control Flow and Loops \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/control-flow/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/collections/",
+      "final": "200 https://voidlang.com/docs/collections/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 11619,
+      "title": "Collections and Growable Lists \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/collections/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/structs/",
+      "final": "200 https://voidlang.com/docs/structs/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9784,
+      "title": "Value Structs, Managed Objects and Memory \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/structs/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/errors/",
+      "final": "200 https://voidlang.com/docs/errors/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9161,
+      "title": "Results and Error Handling \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/errors/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/task-groups/",
+      "final": "200 https://voidlang.com/docs/task-groups/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 10007,
+      "title": "Task Groups and Cancellation \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/task-groups/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/parallelism/",
+      "final": "200 https://voidlang.com/docs/parallelism/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9135,
+      "title": "Parallel Workers and Spawn \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/parallelism/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/interfaces/",
+      "final": "200 https://voidlang.com/docs/interfaces/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8940,
+      "title": "Structural Interfaces \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/interfaces/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/properties/",
+      "final": "200 https://voidlang.com/docs/properties/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8749,
+      "title": "Properties and Computed Getters \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/properties/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/closures/",
+      "final": "200 https://voidlang.com/docs/closures/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8976,
+      "title": "Function Values and Closures \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/closures/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/events/",
+      "final": "200 https://voidlang.com/docs/events/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9131,
+      "title": "Events and Synchronous Notifications \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/events/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/cleanup/",
+      "final": "200 https://voidlang.com/docs/cleanup/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9634,
+      "title": "Defer, With and Scoped Cleanup \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/cleanup/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/patterns/",
+      "final": "200 https://voidlang.com/docs/patterns/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8859,
+      "title": "Enums and Pattern Matching \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/patterns/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/strings/",
+      "final": "200 https://voidlang.com/docs/strings/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 10220,
+      "title": "Strings and Unicode \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/strings/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/nullable/",
+      "final": "200 https://voidlang.com/docs/nullable/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8891,
+      "title": "Nullable Values and Callbacks \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/nullable/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/composition/",
+      "final": "200 https://voidlang.com/docs/composition/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 10696,
+      "title": "Composition with Using \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/composition/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/inheritance/",
+      "final": "200 https://voidlang.com/docs/inheritance/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9174,
+      "title": "Inheritance and Virtual Dispatch \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/inheritance/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/initialization/",
+      "final": "200 https://voidlang.com/docs/initialization/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9241,
+      "title": "Initialization and Field Defaults \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/initialization/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/dictionaries/",
+      "final": "200 https://voidlang.com/docs/dictionaries/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9348,
+      "title": "Ordered Dictionaries \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/dictionaries/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/callables/",
+      "final": "200 https://voidlang.com/docs/callables/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8763,
+      "title": "Callable Structs and the Call Method \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/callables/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/methods/",
+      "final": "200 https://voidlang.com/docs/methods/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 9250,
+      "title": "Receiver Methods \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/methods/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/modules/",
+      "final": "200 https://voidlang.com/docs/modules/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 12144,
+      "title": "Modules, Imports and Project Paths \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/modules/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/native-integration/",
+      "final": "200 https://voidlang.com/docs/native-integration/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8656,
+      "title": "Native Integration and C Bindings \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/native-integration/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/editor-tooling/",
+      "final": "200 https://voidlang.com/docs/editor-tooling/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 10107,
+      "title": "Editor Tooling and Source Diagnostics \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/editor-tooling/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/live-development/",
+      "final": "200 https://voidlang.com/docs/live-development/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 200 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: public, max-age=0, must-revalidate",
+        "x-content-type-options: nosniff",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "cf-cache-status: DYNAMIC",
+        "server: cloudflare",
+        "vary: accept-encoding",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 8956,
+      "title": "Live Development and Compatible Reload \u2014 VOID Language",
+      "canonical": [
+        "https://voidlang.com/docs/live-development/"
+      ],
+      "robots": []
+    },
+    {
+      "requested": "https://voidlang.com/docs/math-random/",
+      "final": "404 https://voidlang.com/docs/math-random/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/collection-tools/",
+      "final": "404 https://voidlang.com/docs/collection-tools/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/text-encoding/",
+      "final": "404 https://voidlang.com/docs/text-encoding/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/binary-memory/",
+      "final": "404 https://voidlang.com/docs/binary-memory/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/files-paths/",
+      "final": "404 https://voidlang.com/docs/files-paths/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/os-directories/",
+      "final": "404 https://voidlang.com/docs/os-directories/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/logging/",
+      "final": "404 https://voidlang.com/docs/logging/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/channels/",
+      "final": "404 https://voidlang.com/docs/channels/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/compiler-workflow/",
+      "final": "404 https://voidlang.com/docs/compiler-workflow/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/console-output/",
+      "final": "404 https://voidlang.com/docs/console-output/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/json-data/",
+      "final": "404 https://voidlang.com/docs/json-data/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    },
+    {
+      "requested": "https://voidlang.com/docs/calendar-time/",
+      "final": "404 https://voidlang.com/docs/calendar-time/",
+      "curl_exit": 0,
+      "error": "",
+      "response_chain": [
+        "HTTP/2 404 ",
+        "content-type: text/html; charset=utf-8",
+        "x-frame-options: DENY",
+        "cache-control: no-store",
+        "content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+        "referrer-policy: strict-origin-when-cross-origin",
+        "x-content-type-options: nosniff",
+        "vary: accept-encoding",
+        "server: cloudflare",
+        "cf-cache-status: DYNAMIC",
+        "content-encoding: br"
+      ],
+      "decoded_bytes": 701,
+      "title": "Page not found \u2014 VOID Language",
+      "canonical": [],
+      "robots": [
+        "noindex"
+      ]
+    }
+  ]
+}

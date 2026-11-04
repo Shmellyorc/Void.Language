@@ -1,0 +1,4 @@
+use math
+
+func entry(score: i32) -> i32:
+    return math.clamp(score, 0, 10)

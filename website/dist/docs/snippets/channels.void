@@ -1,0 +1,11 @@
+use channel
+
+func entry(count: i32) -> i32:
+    var updates = channel.router<i32>()
+    var displayed: i32 = 0
+    var token = updates.subscribe("stock", func(const quantity: i32):
+        displayed = quantity
+    )
+    updates.emit("stock", count)
+    updates.unsubscribe(token)
+    return displayed

@@ -1,0 +1,9 @@
+use random
+
+func entry(game_number: i32) -> i32:
+    var first = random.generator(game_number as u64)
+    var replay = first
+    var chosen = first.rand_range(1, 6)
+    if replay.rand_range(1, 6) == chosen:
+        return chosen
+    return 0

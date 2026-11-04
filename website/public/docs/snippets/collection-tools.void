@@ -1,0 +1,6 @@
+use collections
+
+func entry(last_stop: i32) -> i32:
+    var stops: [i32] = [12, 8, last_stop]
+    var newest = collections.reversed(stops)
+    return newest[0]

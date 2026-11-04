@@ -1,0 +1,6 @@
+use console
+
+func main() -> i32:
+    if console.stdout.write("Map loaded.\n") is Ok(var written):
+        return 0
+    return 1

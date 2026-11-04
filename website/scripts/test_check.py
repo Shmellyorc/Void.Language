@@ -37,6 +37,17 @@ class SEOChecks(unittest.TestCase):
                                '--directory', str(self.public)],
                               capture_output=True, text=True, timeout=30)
 
+    def test_historical_route_removal(self):
+        path = self.public / 'docs/native-integration/index.html'
+        before = path.read_bytes()
+        try:
+            path.unlink()
+            result = self.check()
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('historical indexable route missing', result.stderr)
+        finally:
+            path.write_bytes(before)
+
     def test_accepts_current_site(self):
         result = self.check()
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -65,7 +76,17 @@ class SEOChecks(unittest.TestCase):
             (guide, replace('<html lang="en">', '<html lang="fr">'), 'lang="en"'),
             (guide, replace('width=device-width', 'width=1200'), 'mobile viewport'),
             (guide, replace('</head>', '<meta name="robots" content="noindex"></head>'), 'unintended indexing'),
-            ('404.html', replace('<meta name="robots" content="noindex">', ''), '404 must explicitly use noindex'),
+            ('404.html', replace('<meta name="robots" content="noindex">', ''), 'must explicitly use noindex'),
+            ('github/index.html', replace('<meta name="robots" content="noindex">', ''), 'must explicitly use noindex'),
+            (guide, replace('class="github-nav" href="/github/"', 'class="github-nav" href="/"'), 'GitHub link must open'),
+            (guide, replace('href="/github/"', 'href="https://github.com/Shmellyorc/Void.Language"'), 'public repository URL exposed'),
+            ('assets/site.js', lambda b: b + b'\n// https://github.com/Shmellyorc/Void.Language\n', 'public repository URL exposed'),
+            (guide, lambda b: b.replace(b'part-1', b'renamed-section'), 'historical fragments missing'),
+            ('robots.txt', replace('Allow: /', 'Allow: /\nDisallow: /github/'), 'public URL is blocked'),
+            ('github/index.html', replace('content="noindex"', 'content="index, noindex"'), 'conflicting HTML'),
+            ('_headers', lambda b: b+b'\n/github/\n  X-Robots-Tag: index\n', 'conflicting header'),
+            ('sitemap.xml', replace('</loc>', '</loc><lastmod>2099-01-01</lastmod>'), 'verified provenance'),
+            (guide, replace('</head>', '<link rel="canonical" href="https://voidlang.com/docs/generics/"></head>'), 'canonical must be exactly'),
             ('robots.txt', replace('Allow: /', 'Disallow: /'), 'public URL is blocked'),
             ('robots.txt', replace('https://voidlang.com/sitemap.xml', 'https://voidlang.net/sitemap.xml'), 'correct absolute Sitemap'),
             ('sitemap.xml', lambda b: re.sub(rb'<url>.*?</url>', b'', b, count=1, flags=re.S), 'coverage mismatch'),

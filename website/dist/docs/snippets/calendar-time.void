@@ -1,0 +1,6 @@
+use time
+
+func entry(february_day: i32) -> i32:
+    if time.make_date(2024, 2, february_day as i64) is Ok(var valid):
+        return february_day
+    return 0

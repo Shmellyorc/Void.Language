@@ -1,21 +1,9 @@
-value struct label:
-    text: string = "before"
+value struct bookmark:
+    page: i32
 
-func (l label) init(text: string = "ready"):
-    l.text = text
+func (mark bookmark) init(chapter_start: i32):
+    mark.page = chapter_start + 1
 
-struct message:
-    title: string
-    nested: label
-
-func (m message) init(text: string = "done"):
-    m.title = m.nested.text + text
-
-func entry(value: i32) -> i32:
-    var m = message()
-    const item = label()
-    var copy = item
-    copy.text += "!"
-    if m.title == "readydone" and copy.text == "ready!" and item.text == "ready":
-        return value + 2
-    return -100
+func entry(start: i32) -> i32:
+    var mark = bookmark(start)
+    return mark.page

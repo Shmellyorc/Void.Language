@@ -1,11 +1,7 @@
-func counter(start: i32) -> func() -> i32:
-    var number = start
-    return func() -> i32:
-        number += 1
-        return number
+func warmer(start: i32) -> func(i32) -> i32:
+    return func(change: i32) -> i32:
+        return start + change
 
-func entry(value: i32) -> i32:
-    var next = counter(value)
-    var alias = next
-    var first = next()
-    return first + alias()
+func entry(temperature: i32) -> i32:
+    var adjust = warmer(temperature)
+    return adjust(3)

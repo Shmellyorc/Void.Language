@@ -76,10 +76,9 @@
   {
     "source": "public/examples/guides/async.void",
     "input": 5,
-    "expected": 13,
-    "repository_source": "examples/async/activation.void",
+    "expected": 12,
     "mode": "async",
-    "maintenance": "repository-copy"
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/task-groups.void",
@@ -130,9 +129,8 @@
   {
     "source": "public/examples/guides/interfaces.void",
     "input": 5,
-    "expected": 18,
-    "repository_source": "examples/interfaces/main.void",
-    "maintenance": "repository-copy"
+    "expected": 15,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/properties.void",
@@ -149,9 +147,8 @@
   {
     "source": "public/examples/guides/closures.void",
     "input": 5,
-    "expected": 13,
-    "repository_source": "examples/advanced/closures.void",
-    "maintenance": "repository-copy"
+    "expected": 8,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/events.void",
@@ -180,58 +177,50 @@
   {
     "source": "public/examples/guides/patterns.void",
     "input": 5,
-    "expected": 8,
-    "repository_source": "examples/patterns/values.void",
-    "maintenance": "repository-copy"
+    "expected": 5,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/strings.void",
     "input": 5,
-    "expected": 6,
-    "repository_source": "examples/strings/main.void",
-    "maintenance": "repository-copy"
+    "expected": 8,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/nullable.void",
     "input": 5,
-    "expected": 10,
-    "repository_source": "examples/advanced/nullable.void",
-    "maintenance": "repository-copy"
+    "expected": 5,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/composition.void",
     "input": 5,
-    "expected": 106,
-    "repository_source": "examples/composition/main.void",
-    "maintenance": "repository-copy"
+    "expected": 5,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/inheritance.void",
     "input": 5,
-    "expected": 103,
-    "repository_source": "examples/inheritance/main.void",
-    "maintenance": "repository-copy"
+    "expected": 7,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/initialization.void",
     "input": 5,
-    "expected": 7,
-    "repository_source": "examples/strings/initialization.void",
-    "maintenance": "repository-copy"
+    "expected": 6,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/dictionaries.void",
     "input": 5,
-    "expected": 8,
-    "repository_source": "examples/dictionaries/main.void",
-    "maintenance": "repository-copy"
+    "expected": 5,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/callables.void",
     "input": 5,
-    "expected": 18,
-    "repository_source": "examples/properties/callable.void",
-    "maintenance": "repository-copy"
+    "expected": 20,
+    "maintenance": "teaching"
   },
   {
     "source": "public/examples/guides/methods.void",
@@ -242,9 +231,8 @@
   {
     "source": "public/examples/guides/modules/main.void",
     "input": 5,
-    "expected": 16,
-    "repository_source": "examples/modules/main.void",
-    "maintenance": "repository-copy"
+    "expected": 11,
+    "maintenance": "teaching"
   },
   {
     "source": "public/docs/snippets/syntax.void",
@@ -373,7 +361,7 @@
     "input": 5,
     "expected": 1,
     "context_before": "func entry(input: i32) -> i32:\n",
-    "context_after": "    if message == \"Hello, 世界!\":\n        return 1\n    return 0\n",
+    "context_after": "    if message == \"Hello, \u4e16\u754c!\":\n        return 1\n    return 0\n",
     "context_indent": 4
   },
   {
@@ -869,5 +857,169 @@
     "mode": "app",
     "expected_status": 0,
     "expected_stdout": ""
+  },
+  {
+    "source": "public/docs/snippets/math-random.void",
+    "guide": "math-random",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 14,
+    "expected": 10
+  },
+  {
+    "source": "public/docs/snippets/collection-tools.void",
+    "guide": "collection-tools",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 21,
+    "expected": 21
+  },
+  {
+    "source": "public/docs/snippets/text-encoding.void",
+    "guide": "text-encoding",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 0,
+    "expected": 3
+  },
+  {
+    "source": "public/docs/snippets/binary-memory.void",
+    "guide": "binary-memory",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 258,
+    "expected": 1
+  },
+  {
+    "source": "public/docs/snippets/files-paths.void",
+    "guide": "files-paths",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 0,
+    "expected": 7
+  },
+  {
+    "source": "public/docs/snippets/os-directories.void",
+    "guide": "os-directories",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 4,
+    "expected": 5
+  },
+  {
+    "source": "public/docs/snippets/logging.void",
+    "guide": "logging",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 6,
+    "expected": 6
+  },
+  {
+    "source": "public/docs/snippets/channels.void",
+    "guide": "channels",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 9,
+    "expected": 9
+  },
+  {
+    "source": "public/docs/snippets/url-http.void",
+    "guide": "url-http",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 0,
+    "expected": 5
+  },
+  {
+    "source": "public/docs/snippets/cartons.void",
+    "guide": "compiler-workflow",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 8,
+    "expected": 2
+  },
+  {
+    "source": "public/docs/snippets/read-status.void",
+    "guide": "url-http",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 0,
+    "expected": 200,
+    "fixture": "loopback-http"
+  },
+  {
+    "source": "public/docs/snippets/replay-draw.void",
+    "guide": "math-random",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 8,
+    "expected": 5
+  },
+  {
+    "source": "public/docs/snippets/console-output.void",
+    "guide": "console-output",
+    "kind": "program",
+    "maintenance": "teaching",
+    "mode": "app",
+    "expected_status": 0,
+    "expected_stdout": "Map loaded.\n"
+  },
+  {
+    "source": "public/docs/snippets/json-data.void",
+    "guide": "json-data",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 2,
+    "expected": 5
+  },
+  {
+    "source": "public/docs/snippets/calendar-time.void",
+    "guide": "calendar-time",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 29,
+    "expected": 29,
+    "cases": [
+      {
+        "input": 30,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/examples/architecture.void",
+    "maintenance": "repository-copy",
+    "repository_source": "examples/architecture.void",
+    "input": 3,
+    "expected": 45,
+    "cases": [
+      {
+        "input": -1,
+        "expected": 7
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/count-bytes.void",
+    "guide": "files-paths",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 2,
+    "expected": 2,
+    "fixture": "three-byte-file",
+    "cases": [
+      {
+        "input": 4,
+        "expected": -1
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/read-field.void",
+    "guide": "binary-memory",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 2,
+    "expected": 258
   }
 ]

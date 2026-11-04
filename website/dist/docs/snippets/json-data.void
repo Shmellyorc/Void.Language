@@ -1,0 +1,6 @@
+use json
+
+func entry(additional: i32) -> i32:
+    if json.parse_as<i32>("3") is Ok(var shelves):
+        return shelves + additional
+    return 0
