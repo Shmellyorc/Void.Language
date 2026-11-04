@@ -49,13 +49,28 @@ double process_cpu() {
     return static_cast<double>(std::clock())/CLOCKS_PER_SEC;
 #endif
 }
-template<class Send> void measure(const char* name, Send send) {
-    for(unsigned n=0;n<8;++n)require(send().error.kind==vd::http::ErrorKind::success,"latency warmup");
+template<class Send> void measure(const char* name, const std::string& target, Send send) {
+    auto checked = [&](const char* phase, unsigned iteration) {
+        auto result = send();
+        if (result.error.kind != vd::http::ErrorKind::success || result.native_allocation_failure) {
+            std::cerr << "latency failure: profile=" << name << " phase=" << phase << " iteration=" << iteration
+                << " target=" << target << " kind=" << static_cast<int>(result.error.kind)
+                << " error_phase=" << static_cast<int>(result.error.phase) << " native_domain=" << static_cast<int>(result.error.native_domain)
+                << " native_code=" << result.error.native_code << " unknown=" << result.error.remote_outcome_unknown
+                << " status=" << (result.info ? result.info->status : 0)
+                << " version=" << (result.info ? static_cast<int>(result.info->version) : -1)
+                << " uploaded=" << result.uploaded << " encoded=" << result.downloaded_encoded
+                << " downloaded=" << result.downloaded << " buffered=" << result.bytes.size()
+                << " elapsed_ms=" << result.elapsed_ms << " native_allocation_failure=" << result.native_allocation_failure << '\n';
+            throw std::runtime_error(phase);
+        }
+    };
+    for(unsigned n=0;n<8;++n)checked("latency warmup", n);
     std::vector<double> samples; samples.reserve(64);
     const auto cpu=process_cpu();
     for(unsigned n=0;n<64;++n) {
         const auto start=std::chrono::steady_clock::now();
-        require(send().error.kind==vd::http::ErrorKind::success,"latency request");
+        checked("latency request", n);
         samples.push_back(std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count());
     }
     const auto cpu_seconds=process_cpu()-cpu;
@@ -63,6 +78,63 @@ template<class Send> void measure(const char* name, Send send) {
     std::cout<<"{\"http_latency\":{\"profile\":\""<<name<<"\",\"samples\":64,\"median_ms\":"<<samples[31]
         <<",\"p95_ms\":"<<samples[60]<<",\"process_cpu_seconds\":"<<cpu_seconds<<"}}\n";
 }
+#ifdef _WIN32
+void schannel_alpn_cases(const std::string& base, const std::string& certificate,
+                        const std::shared_ptr<vd::http::testing::Hooks>& diagnostics) {
+    using namespace vd::http;
+    auto hooks = std::make_shared<testing::Hooks>(*diagnostics);
+    hooks->omit_schannel_alpn = [](const char* target) noexcept {
+        return std::string_view(target).ends_with("/alpn-missing");
+    };
+    Driver driver(hooks);
+    ClientOptions settings; settings.tls.ca_bundle = certificate;
+    settings.max_connections = settings.max_per_origin = settings.max_idle = 1;
+    Error error;
+    auto client = driver.open(settings, error); require(bool(client), "Schannel ALPN control client");
+    Request request; request.target = base + "/alpn-observed";
+    RequestOptions required; required.protocol = Protocol::http2_required;
+    auto initial = driver.send(client, request, required)->take(); success(initial, "Schannel initial ALPN control");
+    require(initial.info && initial.info->version == Version::http2 && initial.bytes == "real-h2", "Schannel control negotiated real h2");
+    request.target = base + "/alpn-missing";
+    measure("HTTP/2 Schannel post-handshake control", request.target, [&] {
+        auto result = driver.send(client, request, required)->take();
+        if (result.error.kind == ErrorKind::success)
+            require(result.info && result.info->version == Version::http2 && result.bytes == "real-h2", "retained ALPN still delivers real h2");
+        return result;
+    });
+    // Churn beyond the four-entry bound in one owner. Each GOAWAY retires its
+    // socket; the next connection must establish its own proof and free slot.
+    for (unsigned n = 0; n < 6; ++n) {
+        request.target = base + "/goaway";
+        auto goaway = driver.send(client, request, required)->take();
+        success(goaway, "Schannel ALPN GOAWAY control");
+        request.target = base + "/alpn-missing";
+        auto unknown = driver.send(client, request, required)->take();
+        require(unknown.error.kind == ErrorKind::unsupported && unknown.error.phase == Phase::tls &&
+            !unknown.error.remote_outcome_unknown && !unknown.info && unknown.uploaded == 0,
+            "new connection after GOAWAY cannot inherit old ALPN proof");
+        request.target = base + "/alpn-observed";
+        success(driver.send(client, request, required)->take(), "Schannel replacement ALPN control");
+        request.target = base + "/alpn-missing";
+        success(driver.send(client, request, required)->take(), "Schannel replacement retains own ALPN");
+    }
+    success(driver.close(client)->take(), "Schannel ALPN control close");
+    // A different owner may reuse the numerical connection ID, never its proof.
+    auto fresh = driver.open(settings, error); require(bool(fresh), "fresh Schannel ALPN control client");
+    auto rejected = driver.send(fresh, request, required)->take();
+    require(rejected.error.kind == ErrorKind::unsupported && rejected.error.phase == Phase::tls &&
+        !rejected.error.remote_outcome_unknown && !rejected.info && rejected.uploaded == 0 && rejected.downloaded == 0,
+        "missing ALPN on a fresh connection fails before origin bytes");
+    success(driver.close(fresh)->take(), "fresh Schannel ALPN control close");
+    auto negotiated = driver.open(settings, error); require(bool(negotiated), "negotiating Schannel ALPN control client");
+    request.target = base + "/alpn-observed";
+    auto ordinary = driver.send(negotiated, request, {})->take(); success(ordinary, "ordinary negotiation records ALPN");
+    require(ordinary.info && ordinary.info->version == Version::http2, "ordinary negotiation selected h2");
+    request.target = base + "/alpn-missing";
+    success(driver.send(negotiated, request, required)->take(), "required h2 reuses ordinarily negotiated proof");
+    success(driver.close(negotiated)->take(), "negotiating Schannel ALPN control close");
+}
+#endif
 }
 int main(int argc, char** argv) {
     using namespace vd::http;
@@ -71,6 +143,12 @@ int main(int argc, char** argv) {
         auto diagnostics = std::make_shared<testing::Hooks>();
         diagnostics->provider_error = [](int code, const char* text) noexcept {
             std::fprintf(stderr, "curl provider error %d: %s\n", code, text);
+        };
+        diagnostics->prerequisite = [](const testing::Prerequisite& receipt) noexcept {
+            std::fprintf(stderr, "prerequisite: target=%s connection=%lld decision=%s request_bytes=%lld tls_info=%d alpn_query=%d alpn_status=%d alpn_length=%d alpn_omitted=%d\n",
+                receipt.target, static_cast<long long>(receipt.connection_id), receipt.decision,
+                static_cast<long long>(receipt.request_bytes), receipt.tls_info_code, receipt.alpn_query_code,
+                receipt.alpn_status, receipt.alpn_length, receipt.alpn_omitted);
         };
         Driver driver(diagnostics);
         ClientOptions settings; settings.cookies = true;
@@ -81,7 +159,7 @@ int main(int argc, char** argv) {
             Request request; request.target = base + path; return driver.send(client, std::move(request), options)->take();
         };
         RequestOptions tiny; tiny.max_buffer_bytes=1024;
-        measure("HTTP/1.1 plaintext",[&]{return get("/plain",tiny);});
+        measure("HTTP/1.1 plaintext",base + "/plain",[&]{return get("/plain",tiny);});
         {
             auto result = get("/plain"); success(result, "buffered GET");
             require(result.info && result.info->status == 200 && result.info->version == Version::http1_1, "actual status/version");
@@ -248,7 +326,7 @@ int main(int argc, char** argv) {
             }
             auto tls = driver.open(trusted, error); require(bool(tls), "custom trust acquisition");
             auto accepted = driver.send(tls, request, {})->take(); success(accepted, "verified TLS"); require(accepted.bytes.size() == 11, "verified body");
-            measure("HTTP/1.1 verified TLS",[&]{return driver.send(tls,request,tiny)->take();});
+            measure("HTTP/1.1 verified TLS",request.target,[&]{return driver.send(tls,request,tiny)->take();});
             for (auto kind : {Authentication::basic, Authentication::digest, Authentication::bearer}) {
                 request.target = secure + (kind == Authentication::basic ? "/auth-basic" : kind == Authentication::digest ? "/auth-digest" : "/auth-bearer");
                 request.auth.kind = kind; request.auth.user = "user"; request.auth.password = kind == Authentication::bearer ? "exact-token" : "password";
@@ -408,6 +486,9 @@ int main(int argc, char** argv) {
                 require(byte_limit && driver.send(owner, inspect, {})->take().bytes.empty(), "serialized cookie overflow fails and clears jar");
                 success(driver.close(owner)->take(), "cookie budget client close");
             }
+#ifdef _WIN32
+            schannel_alpn_cases(argv[4], argv[3], diagnostics);
+#endif
             ClientOptions options; options.tls.ca_bundle = argv[3];
             options.max_connections = options.max_per_origin = options.max_idle = 1;
             auto h2 = driver.open(options, error); require(bool(h2), "HTTP/2 client acquisition");
@@ -416,7 +497,12 @@ int main(int argc, char** argv) {
             { auto result = driver.send(h2, request, required)->take(); success(result, "real HTTP/2 TLS negotiation");
               require(result.info->version == Version::http2 && result.bytes == "real-h2", "actual h2 metadata/body"); }
             auto measured=required; measured.max_buffer_bytes=1024;
-            measure("HTTP/2 verified TLS",[&]{return driver.send(h2,request,measured)->take();});
+            measure("HTTP/2 verified TLS",request.target,[&]{
+                auto result = driver.send(h2,request,measured)->take();
+                if (result.error.kind == ErrorKind::success)
+                    require(result.info && result.info->version == Version::http2 && result.bytes == "real-h2", "every latency response remains real h2");
+                return result;
+            });
             {
                 Request fault;fault.target=std::string(argv[4])+"/large-header";
                 auto result=driver.send(h2,fault,required)->take();

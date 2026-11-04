@@ -32,6 +32,7 @@ proxy_events = []
 required_h2_violations = []
 h2_paused_events = []
 h2_retry_events = []
+h2_requests = []
 
 def dependency_prefix(binary):
     """Read the actual selected prefix, including native single-config layouts."""
@@ -189,6 +190,8 @@ class H2Handler(socketserver.BaseRequestHandler):
         import h2.events
         with self.server.context.wrap_socket(self.request, server_side=True) as connection:
             connection.settimeout(10)
+            h2_requests.append({"peer_port": self.client_address[1], "event": "connected",
+                "tls": connection.version(), "alpn": connection.selected_alpn_protocol()})
             protocol = h2.connection.H2Connection(config=h2.config.H2Configuration(client_side=False, header_encoding="utf-8"))
             protocol.initiate_connection(); connection.sendall(protocol.data_to_send())
             bodies, paths, pending = {}, {}, {}
@@ -221,6 +224,8 @@ class H2Handler(socketserver.BaseRequestHandler):
                 for event in protocol.receive_data(data):
                     if isinstance(event, h2.events.RequestReceived):
                         paths[event.stream_id] = dict(event.headers)[":path"]
+                        h2_requests.append({"peer_port": self.client_address[1], "stream": event.stream_id,
+                            "event": "request", "path": paths[event.stream_id], "method": dict(event.headers)[":method"]})
                         bodies[event.stream_id] = bytearray()
                         if paths[event.stream_id] == "/duplex":
                             protocol.send_headers(event.stream_id, [(":status", "200"), ("content-length", "150000")])
@@ -236,6 +241,8 @@ class H2Handler(socketserver.BaseRequestHandler):
                             bodies[event.stream_id].clear()
                     elif isinstance(event, h2.events.StreamEnded):
                         path = paths[event.stream_id]
+                        h2_requests.append({"peer_port": self.client_address[1], "stream": event.stream_id,
+                            "event": "request_end", "path": path, "bytes": len(bodies[event.stream_id])})
                         if path == "/duplex":
                             ended.add(event.stream_id)
                             pending.setdefault(event.stream_id, [b"", 0])
@@ -251,6 +258,19 @@ class H2Handler(socketserver.BaseRequestHandler):
                             protocol.send_data(event.stream_id, b"ok", end_stream=True)
                             protocol.close_connection(error_code=0, last_stream_id=event.stream_id)
                             connection.sendall(protocol.data_to_send())
+                            if os.name == 'nt':
+                                # Closing with unread client control frames can
+                                # reset Winsock and discard this final response.
+                                # GOAWAY forbids new streams, not receipt of the
+                                # existing connection's in-flight control bytes.
+                                # Let curl retire it after reading the response.
+                                drained, reason = 0, 'peer-eof'
+                                try:
+                                    while trailing := connection.recv(65536): drained += len(trailing)
+                                except OSError as error:
+                                    reason = type(error).__name__
+                                h2_requests.append({"peer_port": self.client_address[1], "stream": event.stream_id,
+                                    "event": "goaway_drain", "bytes": drained, "end": reason})
                             return
                         elif path == "/refused-post":
                             h2_retry_events.append({"peer_port": self.client_address[1], "stream": event.stream_id,
@@ -505,7 +525,7 @@ def main():
             started = time.monotonic()
             source_hashes = {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in
                 ["src/runtime/http.cpp", "src/runtime/http_bulk.cpp", "src/runtime/http_file.cpp", "src/runtime/http_resource.cpp", "src/runtime/http_abi.cpp", "src/runtime/native_work.cpp", "src/runtime/async.cpp", "include/void/http.hpp",
-                 "tests/net/http/native.cpp", "tests/net/http/runtime.cpp", "tests/net/http/fixture.py",
+                 "tests/net/http/native.cpp", "tests/net/http/runtime.cpp", "tests/net/http/fixture.py", "include/void/detail/http_hooks.hpp",
                  "third_party/curl/VOID-PROVENANCE.json", "third_party/http-versions.json"]}
             try:
                 import resource
@@ -543,6 +563,7 @@ def main():
                 "required_h2_incompatible_requests": required_h2_violations,
                 "h2_paused_events": h2_paused_events,
                 "h2_retry_events": h2_retry_events,
+                "h2_requests": h2_requests,
                 "scope": "loopback native transport; not complete source/platform acceptance"}, indent=2) + "\n")
             assert status == 0 and not timed_out, (status, (args.evidence / "native.stderr").read_text())
             if windows:
@@ -557,6 +578,23 @@ def main():
             assert not required_h2_violations, "Required HTTP/2 sent an incompatible HTTP request without h2 negotiation"
             if args.http2:
                 assert len(h2_retry_events) == 1 and h2_retry_events[0]['bytes'] == 13, ('Automatic mutating request replay', h2_retry_events)
+                plain = {}
+                for event in h2_requests:
+                    if event['event'] == 'request' and event['path'] == '/plain':
+                        plain.setdefault(event['peer_port'], []).append(event['stream'])
+                assert any(streams == list(range(1, 147, 2)) for streams in plain.values()), \
+                    ('Initial h2 request and all 8+64 latency requests must reuse one connection', plain)
+                if windows:
+                    drains = [event for event in h2_requests if event['event'] == 'goaway_drain']
+                    assert len(drains) == 7 and all(event['end'] == 'peer-eof' for event in drains), drains
+                    observed = [event for event in h2_requests if event['event'] == 'request' and event['path'] == '/alpn-observed']
+                    missing = [event for event in h2_requests if event['event'] == 'request' and event['path'] == '/alpn-missing']
+                    assert len(observed) == 8 and all(event['stream'] == 1 for event in observed), observed
+                    # 8+64 measurements, six replacements, one negotiate->required.
+                    # Seven fresh missing-proof controls must send no request.
+                    assert len(missing) == 79 and all(event['stream'] > 1 for event in missing), missing
+                    assert all(any(first['peer_port'] == event['peer_port'] for first in observed) for event in missing), missing
+                    assert [event['stream'] for event in missing if event['peer_port'] == observed[0]['peer_port']] == list(range(3, 147, 2)), missing
             credits = {}
             for event in h2_paused_events:
                 if event['event'] == 'window':

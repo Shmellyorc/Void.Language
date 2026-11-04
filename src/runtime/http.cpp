@@ -155,6 +155,13 @@ struct ClientState {
     // configured hop can resolve the origin and proxy. Old in-flight lookups
     // and connections retain only their own bounded address references.
     unsigned dns_hops = 0;
+#ifdef _WIN32
+    // At most four live connections (validate(ClientOptions)). Keep the
+    // original ALPN proof until curl closes that connection, never by origin
+    // or TLS context address, both of which can be reused for another session.
+    struct H2Connection { curl_socket_t socket = CURL_SOCKET_BAD; curl_off_t id = -1; };
+    std::array<H2Connection, 4> h2_connections{};
+#endif
 };
 struct TransferState {
     std::weak_ptr<DriverState> driver;
@@ -573,9 +580,33 @@ int progress_callback(void* context, curl_off_t, curl_off_t, curl_off_t, curl_of
     if (!update_upload_progress(transfer, sent)) return 1;
     return transfer.close_requested.load(std::memory_order_acquire) ? 1 : 0;
 }
+#ifdef _WIN32
+int close_socket_callback(void* context, curl_socket_t socket) noexcept {
+    // curl retains this ClientState pointer with its connection after the easy
+    // handle dies. ClientState owns the multi and outlives multi cleanup.
+    auto& client = *static_cast<ClientState*>(context);
+    for (auto& entry : client.h2_connections) if (entry.socket == socket) entry = {};
+    return closesocket(socket) == 0 ? 0 : 1;
+}
+#endif
 int prerequisite_callback(void* context, char*, char*, int, int) noexcept {
     auto& transfer = *static_cast<TransferState*>(context);
     std::lock_guard lock(transfer.mutex);
+    auto owner = transfer.driver.lock();
+    const auto* hooks = owner ? owner->hooks.get() : nullptr;
+    testing::Prerequisite receipt;
+    receipt.target = transfer.request.target.c_str();
+    curl_off_t connection_id = -1;
+    curl_easy_getinfo(transfer.easy, CURLINFO_CONN_ID, &connection_id);
+    receipt.connection_id = connection_id;
+    auto trace = [&](const char* decision) {
+        if (hooks && hooks->prerequisite) {
+            receipt.decision = decision;
+            long bytes = 0; curl_easy_getinfo(transfer.easy, CURLINFO_REQUEST_SIZE, &bytes);
+            receipt.request_bytes = bytes;
+            hooks->prerequisite(receipt);
+        }
+    };
     if (transfer.request_permitted) {
         const bool challenge = (transfer.block_status == 401 && transfer.request.auth.kind == Authentication::digest) ||
             (transfer.block_status == 407 && transfer.client->options.proxy.auth.kind == Authentication::digest);
@@ -587,6 +618,7 @@ int prerequisite_callback(void* context, char*, char*, int, int) noexcept {
             curl_easy_getinfo(transfer.easy, CURLINFO_REQUEST_SIZE, &bytes);
             transfer.request_sent |= bytes > 0 || transfer.uploaded > 0;
             transfer.fail(ErrorKind::transport_failure, transfer.request_sent ? Phase::headers : Phase::connect);
+            trace("replay-blocked");
             return CURL_PREREQFUNC_ABORT;
         }
         transfer.block_status = 0; transfer.block.clear(); transfer.block_bytes = 0;
@@ -596,16 +628,46 @@ int prerequisite_callback(void* context, char*, char*, int, int) noexcept {
     curl_easy_getinfo(transfer.easy, CURLINFO_POSTTRANSFER_TIME_T, &transfer.posttransfer_before_request);
     transfer.header_timer = transfer.write_timer = transfer.upload_transmitted = false;
     transfer.write_at = Clock::now();
+#ifndef _WIN32
     if (transfer.options.protocol != Protocol::http2_required) { transfer.request_permitted = true; return CURL_PREREQFUNC_OK; }
+#endif
     curl_tlssessioninfo* session = nullptr;
     bool h2 = false;
-    if (curl_easy_getinfo(transfer.easy, CURLINFO_TLS_SSL_PTR, &session) == CURLE_OK && session && session->internals) {
+    bool retained = false;
+    receipt.tls_info_code = curl_easy_getinfo(transfer.easy, CURLINFO_TLS_SSL_PTR, &session);
+    if (receipt.tls_info_code == CURLE_OK && session && session->internals) {
 #ifdef _WIN32
         if (session->backend == CURLSSLBACKEND_SCHANNEL) {
             SecPkgContext_ApplicationProtocol selected{};
-            if (QueryContextAttributesW(static_cast<PCtxtHandle>(session->internals), SECPKG_ATTR_APPLICATION_PROTOCOL, &selected) == SEC_E_OK)
+            receipt.alpn_query_code = QueryContextAttributesW(static_cast<PCtxtHandle>(session->internals), SECPKG_ATTR_APPLICATION_PROTOCOL, &selected);
+            if (receipt.alpn_query_code == SEC_E_OK) {
+                receipt.alpn_status = selected.ProtoNegoStatus; receipt.alpn_length = selected.ProtocolIdSize;
+                if (hooks && hooks->omit_schannel_alpn && hooks->omit_schannel_alpn(receipt.target)) {
+                    selected = {}; receipt.alpn_omitted = true;
+                }
                 h2 = selected.ProtoNegoStatus == SecApplicationProtocolNegotiationStatus_Success &&
                      selected.ProtocolIdSize == 2 && std::memcmp(selected.ProtocolId, "h2", 2) == 0;
+                curl_socket_t socket = CURL_SOCKET_BAD;
+                curl_easy_getinfo(transfer.easy, CURLINFO_ACTIVESOCKET, &socket);
+                if (connection_id >= 0 && socket != CURL_SOCKET_BAD) {
+                    auto& connections = transfer.client->h2_connections;
+                    const auto known = std::find_if(connections.begin(), connections.end(), [&](const auto& entry) {
+                        return entry.id == connection_id && entry.socket == socket;
+                    });
+                    // Schannel can report None after a TLS handshake update
+                    // (notably TLS 1.3 tickets). ALPN remains a property of the
+                    // established connection; pinned curl preserves it too.
+                    if (!h2 && selected.ProtoNegoStatus == SecApplicationProtocolNegotiationStatus_None &&
+                        selected.ProtocolIdSize == 0 && known != connections.end()) h2 = retained = true;
+                    if (!h2 && known != connections.end()) *known = {};
+                    if (h2 && known == connections.end()) {
+                        const auto empty = std::find_if(connections.begin(), connections.end(), [](const auto& entry) {
+                            return entry.socket == CURL_SOCKET_BAD;
+                        });
+                        if (empty != connections.end()) *empty = {socket, connection_id};
+                    }
+                }
+            }
         }
 #else
         if (session->backend == CURLSSLBACKEND_OPENSSL) {
@@ -615,10 +677,15 @@ int prerequisite_callback(void* context, char*, char*, int, int) noexcept {
         }
 #endif
     }
-    if (h2) { transfer.request_permitted = true; return CURL_PREREQFUNC_OK; }
+    if (transfer.options.protocol != Protocol::http2_required) {
+        if (h2) trace(retained ? "h2-retained" : "h2-observed");
+        transfer.request_permitted = true; return CURL_PREREQFUNC_OK;
+    }
+    if (h2) { trace(retained ? "h2-retained" : "h2-negotiated"); transfer.request_permitted = true; return CURL_PREREQFUNC_OK; }
     // The documented pre-request hook runs after TLS, before GET/HEAD/POST or
     // h2 request bytes. Required h2 cannot rely on a later response-version check.
     transfer.error = {ErrorKind::unsupported, Phase::tls};
+    trace("h2-not-negotiated");
     return CURL_PREREQFUNC_ABORT;
 }
 }
@@ -691,6 +758,9 @@ void DriverState::configure(const std::shared_ptr<TransferState>& state) {
     option(easy, CURLOPT_NOPROGRESS, hooks && hooks->suppress_progress_notifications ? 1L : 0L);
     option(easy, CURLOPT_XFERINFOFUNCTION, progress_callback); option(easy, CURLOPT_XFERINFODATA, state.get());
     option(easy, CURLOPT_PREREQFUNCTION, prerequisite_callback); option(easy, CURLOPT_PREREQDATA, state.get());
+#ifdef _WIN32
+    option(easy, CURLOPT_CLOSESOCKETFUNCTION, close_socket_callback); option(easy, CURLOPT_CLOSESOCKETDATA, &client);
+#endif
     if (client.options.proxy.mode == ProxyOptions::direct) option(easy, CURLOPT_PROXY, "");
     else if (client.options.proxy.mode == ProxyOptions::explicit_proxy) {
         option(easy, CURLOPT_PROXY, client.options.proxy.endpoint.c_str());
