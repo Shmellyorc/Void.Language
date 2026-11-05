@@ -1,0 +1,123 @@
+diff --git a/src/runtime/text_case.cpp b/src/runtime/text_case.cpp
+index b49a8af7..44914def 100644
+--- a/src/runtime/text_case.cpp
++++ b/src/runtime/text_case.cpp
+@@ -145,11 +145,12 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+                                    RegisteredRootWord replacements, const NativeArrayElement& strings,
+                                    std::int64_t max_bytes) {
+     // Validate all root authority before considering even an empty result.
++    std::size_t input_bytes;
+     {
+         std::lock_guard lock(mutex_);
+         require_buffer_output(output);
+         heap_.validate_output_address(output);
+-        (void)heap_.string_bytes(reference_source(input));
++        input_bytes = heap_.string_bytes(reference_source(input)).size();
+         (void)reference_source(keys);
+         (void)reference_source(replacements);
+     }
+@@ -179,6 +180,46 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+     };
+     RuleSnapshot snapshot{*this, {}};
+     auto& rules = snapshot.entries;
++    std::optional<std::size_t> unchanged_bytes;
++    // A scalar length hint is sufficient to bypass this helper on long input.
++    // All borrows and proof state stay in its separate native frame.
++    struct ShortAsciiNoMatch {
++#if defined(_MSC_VER)
++        __declspec(noinline)
++#else
++        __attribute__((noinline))
++#endif
++        static std::optional<std::size_t> prove(Runtime& runtime, RegisteredRootWord input,
++                void* key_backing, const BufferLayoutRef& key_layout,
++                void* string_backing, const BufferLayoutRef& string_layout, std::uint64_t count) {
++            if (count > 256) return {};
++            std::lock_guard lock(runtime.mutex_);
++            const auto source = runtime.heap_.string_bytes(runtime.reference_source(input));
++            if (source.size() > 128) return {};
++            std::uint64_t present[2] = {};
++            for (unsigned char byte : source) {
++                if (byte >= 128) return {};
++                present[byte / 64] |= std::uint64_t{1} << (byte % 64);
++            }
++            auto remaining = byte_quota - source.size();
++            std::int32_t previous = -1;
++            for (std::uint64_t i = 0; i < count; ++i) {
++                std::int32_t key;
++                std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
++                void* value = nullptr;
++                std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
++                // Stop at the first inconclusive entry; later rules cannot
++                // mask its failure in the original rule-processing path.
++                const auto bytes = runtime.heap_.string_bytes(value);
++                if (key <= previous || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff) ||
++                    bytes.size() > remaining ||
++                    (key < 128 && (present[key / 64] & (std::uint64_t{1} << (key % 64))))) return {};
++                remaining -= bytes.size();
++                previous = key;
++            }
++            return source.size();
++        }
++    };
+     {
+         void *key_backing = nullptr, *string_backing = nullptr, *replacement = nullptr;
+         constexpr std::size_t zero = 0;
+@@ -201,25 +242,42 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+         const auto key_count = lease(keys, key_schema, key_backing, key_layout, key_lease);
+         const auto string_count = lease(replacements, string_schema, string_backing, string_layout, string_lease);
+         if (key_count != string_count) return invalid_argument;
+-        auto replacement_root = root_word(&replacement);
+-        for (std::uint64_t i = 0; i < key_count; ++i) {
+-            if (i && i % 256 == 0) poll();
+-            std::int32_t key;
+-            {
+-                // Each backing is complete, rooted and leased, with its exact
+-                // checked layout and frozen live prefix. Recompute addresses.
+-                std::lock_guard lock(mutex_);
+-                std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
+-                void* value = nullptr;
+-                std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
+-                (void)heap_.string_bytes(value);
+-                replacement = value;
++        if (input_bytes <= 128) {
++            unchanged_bytes = ShortAsciiNoMatch::prove(*this, input, key_backing, key_layout,
++                                                       string_backing, string_layout, key_count);
++            // The helper has released all borrows. Cooperate before adding a
++            // general walk to the bounded speculative work, keeping both leases.
++            if (!unchanged_bytes) poll();
++        }
++        if (!unchanged_bytes) {
++            auto replacement_root = root_word(&replacement);
++            for (std::uint64_t i = 0; i < key_count; ++i) {
++                if (i && i % 256 == 0) poll();
++                std::int32_t key;
++                {
++                    // Each backing is complete, rooted and leased, with its exact
++                    // checked layout and frozen live prefix. Recompute addresses.
++                    std::lock_guard lock(mutex_);
++                    std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
++                    void* value = nullptr;
++                    std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
++                    (void)heap_.string_bytes(value);
++                    replacement = value;
++                }
++                if (key < 0 || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff)) return invalid_argument;
++                if (!rules.emplace(key, snapshot_string(replacement_root)).second) return invalid_argument;
+             }
+-            if (key < 0 || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff)) return invalid_argument;
+-            if (!rules.emplace(key, snapshot_string(replacement_root)).second) return invalid_argument;
+         }
+     }
+     if (max_bytes < 0) return invalid_range;
++    if (unchanged_bytes) {
++        if (*unchanged_bytes > static_cast<std::uint64_t>(max_bytes)) return limit_exceeded;
++        std::lock_guard lock(mutex_);
++        require_buffer_output(output);
++        heap_.validate_output_address(output);
++        *output = reference_source(input);
++        return translated;
++    }
+     auto source = snapshot_string(input);
+     std::string result;
+     bool changed = false;

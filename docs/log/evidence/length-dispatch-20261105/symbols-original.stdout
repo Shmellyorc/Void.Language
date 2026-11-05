@@ -1,0 +1,99 @@
+0000000000000000 0000000000000000 r GCC_except_table0
+0000000000000000 0000000000000000 r GCC_except_table11
+0000000000000094 0000000000000000 r GCC_except_table2
+0000000000000178 0000000000000000 r GCC_except_table4
+0000000000000188 0000000000000000 r GCC_except_table5
+00000000000001bc 0000000000000000 r GCC_except_table6
+00000000000001d4 0000000000000000 r GCC_except_table8
+                                  U _Unwind_Resume
+                                  U vd::Runtime::string_into(void**, std::basic_string_view<char, std::char_traits<char>>)
+                                  U vd::Runtime::BufferReadLease::BufferReadLease(vd::Runtime&, vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::BufferLayout const> const&)
+                                  U vd::Runtime::BufferReadLease::~BufferReadLease()
+                                  U vd::Runtime::fixed_scalar_schema(vd::ScalarEncoding)
+                                  U vd::Runtime::native_array_layout(vd::NativeArrayElement const&, unsigned long)
+                                  U vd::Runtime::string_payload_size(unsigned long, unsigned long)
+                                  U vd::Runtime::poll()
+                                  U vd::Runtime::Frame::Frame(vd::Runtime&, vd::Runtime::Slot const*, unsigned long)
+                                  U vd::Runtime::Frame::~Frame()
+                                  U vd::Runtime::Native::Native(vd::Runtime&)
+                                  U vd::Runtime::Native::~Native()
+                                  U vd::Runtime::current()
+                                  U vd::BufferLayout::element_offset(unsigned long) const
+                                  U vd::Heap::buffer_state(void*) const
+                                  U vd::Heap::string_bytes(void*) const
+                                  U vd::Heap::validate_output_address(void**) const
+                                  U vd::Runtime::list_header(vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::ElementSchema const> const&) const
+                                  U vd::Runtime::string_bytes(void*) const
+                                  U vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const
+                                  U vd::Runtime::require_buffer_output(void**) const
+                                  U vd::Runtime::root_word(void**) const
+                                  U std::logic_error::logic_error(char const*)
+                                  U std::logic_error::~logic_error()
+                                  U std::invalid_argument::invalid_argument(char const*)
+                                  U std::invalid_argument::~invalid_argument()
+                                  U std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>::_M_mutate(unsigned long, unsigned long, char const*, unsigned long)
+                                  U std::_Rb_tree_decrement(std::_Rb_tree_node_base*)
+                                  U std::_Rb_tree_increment(std::_Rb_tree_node_base*)
+                                  U std::__throw_logic_error(char const*)
+                                  U std::__throw_length_error(char const*)
+                                  U std::__throw_system_error(int)
+                                  U std::__throw_out_of_range_fmt(char const*, ...)
+                                  U std::_Rb_tree_insert_and_rebalance(bool, std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+                                  U std::terminate()
+                                  U vtable for __cxxabiv1::__class_type_info
+                                  U vtable for __cxxabiv1::__si_class_type_info
+                                  U operator delete(void*, unsigned long)
+                                  U operator new(unsigned long)
+                                  U __cxa_allocate_exception
+                                  U __cxa_begin_catch
+                                  U __cxa_end_catch
+                                  U __cxa_free_exception
+                                  U __cxa_throw
+                                  U __gxx_personality_v0
+                                  U __libc_single_threaded
+                                  U memcpy
+                                  U memset
+                                  U pthread_mutex_lock
+                                  U pthread_mutex_unlock
+0000000000000129 0000000000000003 r .L.str.9
+0000000000000000 0000000000000008 V DW.ref.__gxx_personality_v0
+0000000000000000 000000000000000b W __clang_call_terminate
+0000000000000000 000000000000000d V typeinfo name for std::bad_alloc
+0000000000000000 000000000000000d V typeinfo name for std::exception
+0000000000000000 0000000000000010 V typeinfo for std::exception
+0000000000000000 0000000000000010 V typeinfo name for std::logic_error
+0000000000002e09 0000000000000015 r .L.str.2958
+0000000000000000 0000000000000015 V typeinfo name for std::invalid_argument
+0000000000000000 0000000000000016 r .L.str
+00000000000000eb 0000000000000018 r .L.str.7
+0000000000000000 0000000000000018 V typeinfo for std::logic_error
+0000000000000000 0000000000000018 V typeinfo for std::invalid_argument
+0000000000000000 0000000000000018 V typeinfo for std::bad_alloc
+000000000000012c 000000000000001a r .L.str.10
+0000000000002e1e 000000000000001a r .L.str.2959
+000000000000007a 000000000000001a r .L.str.4
+000000000000005f 000000000000001b r .L.str.3
+0000000000002e69 0000000000000020 r .L.str.2961
+0000000000000016 0000000000000021 r .L.str.1
+0000000000000094 0000000000000025 r .L.str.5
+0000000000000103 0000000000000026 r .L.str.8
+0000000000000037 0000000000000028 r .L.str.2
+0000000000002e38 0000000000000031 r .L.str.2960
+00000000000000b9 0000000000000032 r .L.str.6
+0000000000000000 0000000000000032 W std::_Rb_tree<int, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, std::less<int>, std::allocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>>::_Auto_node::~_Auto_node()
+0000000000000000 000000000000003f W std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()
+0000000000000000 0000000000000065 W std::_Rb_tree<int, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, std::less<int>, std::allocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>>::_M_erase(std::_Rb_tree_node<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>*)
+0000000000000000 0000000000000069 W std::__shared_ptr<vd::BufferLayout const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()
+0000000000000000 0000000000000069 W std::__shared_ptr<vd::ElementSchema const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()
+0000000000002490 0000000000000072 t (anonymous namespace)::RuleSnapshot::~RuleSnapshot()
+0000000000000000 000000000000011e W std::_Rb_tree_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>> std::_Rb_tree<int, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, std::less<int>, std::allocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>>::_M_emplace_hint_unique<int&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>(std::_Rb_tree_const_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, int&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&&)
+0000000000002510 000000000000016b T vd_text_translate
+0000000000000000 00000000000001cb W std::_Rb_tree<int, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, std::less<int>, std::allocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>>::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, int const&)
+0000000000001fc0 00000000000001ea t vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::$_1::operator()(vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::ElementSchema const> const&, void*&, std::shared_ptr<vd::BufferLayout const>&, std::optional<vd::Runtime::BufferReadLease>&) const
+00000000000021b0 00000000000002dc t vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::$_0::operator()[abi:cxx11](vd::Runtime::RegisteredRootWord) const
+0000000000000e20 00000000000004f8 r (anonymous namespace)::cased_ranges
+0000000000000000 0000000000000a86 T vd_text_case
+0000000000000000 0000000000000e20 r (anonymous namespace)::ignorable_ranges
+0000000000000a90 0000000000001521 T vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)
+0000000000009180 00000000000088e0 d (anonymous namespace)::lower_mappings
+0000000000000000 0000000000009180 d (anonymous namespace)::upper_mappings

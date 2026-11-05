@@ -1,0 +1,5 @@
+In file included from /home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/correctness.cpp:2:
+/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/ownership.cpp:209:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+  209 | }
+      | ^
+1 warning generated.

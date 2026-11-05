@@ -1,0 +1,128 @@
+Object offsets 0xaed..0xb04
+     aed:      	callq	0xaf2 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x62>
+		0000000000000aee:  R_X86_64_PLT32	vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const-0x4
+     af2:      	leaq	0xd8(%r14), %rdi
+     af9:      	movq	%rax, %rsi
+     afc:      	callq	0xb01 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x71>
+		0000000000000afd:  R_X86_64_PLT32	vd::Heap::string_bytes(void*) const-0x4
+     b01:      	movq	%rax, %rbx
+     b04:      	leaq	0x310(%rsp), %r12
+Object offsets 0xe13..0xe77
+     e13:      	cmpq	%rax, %r12
+     e16:      	movq	%r15, 0x68(%rsp)
+     e1b:      	jne	0xe91 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x401>
+     e1d:      	cmpq	$0x80, %rbx
+     e24:      	ja	0xfd3 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x543>
+     e2a:      	movq	0x58(%rsp), %rsi
+     e2f:      	movq	0x50(%rsp), %rcx
+     e34:      	leaq	0x2f0(%rsp), %rax
+     e3c:      	movups	(%rax), %xmm0
+     e3f:      	movups	0x10(%rax), %xmm1
+     e43:      	movups	%xmm1, 0x10(%rsp)
+     e48:      	movups	%xmm0, (%rsp)
+     e4c:      	leaq	0x100(%rsp), %rdx
+     e54:      	leaq	0xf0(%rsp), %r8
+     e5c:      	movq	%r14, %rdi
+     e5f:      	movq	%r12, %r9
+     e62:      	callq	0x22a0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)>
+     e67:      	movq	%rax, 0x28(%rsp)
+     e6c:      	movb	$0x1, %bpl
+     e6f:      	testb	$0x1, %dl
+     e72:      	je	0xfcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x53b>
+Object offsets 0xfcb..0x10b0
+     fcb:      	movq	%r14, %rdi
+     fce:      	callq	0xfd3 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x543>
+		0000000000000fcf:  R_X86_64_PLT32	vd::Runtime::poll()-0x4
+     fd3:      	leaq	0x278(%rsp), %rdi
+     fdb:      	leaq	0x70(%rsp), %rdx
+     fe0:      	movq	%r14, %rsi
+     fe3:      	callq	0xfe8 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x558>
+		0000000000000fe4:  R_X86_64_PLT32	vd::Runtime::root_word(void**) const-0x4
+     fe8:      	testq	%r12, %r12
+     feb:      	je	0x11af <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x71f>
+     ff1:      	xorl	%ebp, %ebp
+     ff3:      	leaq	0x180(%rsp), %r13
+     ffb:      	leaq	0x110(%rsp), %rbx
+    1003:      	jmp	0x1022 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x592>
+    1005:      	nopw	%cs:(%rax,%rax)
+    1010:      	incq	%rbp
+    1013:      	cmpq	%r12, %rbp
+    1016:      	setne	%al
+    1019:      	testb	%al, %r15b
+    101c:      	je	0x11b7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x727>
+    1022:      	testq	%rbp, %rbp
+    1025:      	sete	%al
+    1028:      	testb	%bpl, %bpl
+    102b:      	setne	%cl
+    102e:      	orb	%al, %cl
+    1030:      	jne	0x103a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x5aa>
+    1032:      	movq	%r14, %rdi
+    1035:      	callq	0x103a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x5aa>
+		0000000000001036:  R_X86_64_PLT32	vd::Runtime::poll()-0x4
+    103a:      	leaq	0x80(%r14), %rdi
+    1041:      	callq	0x1046 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x5b6>
+		0000000000001042:  R_X86_64_PLT32	pthread_mutex_lock-0x4
+    1046:      	testl	%eax, %eax
+    1048:      	jne	0x1dcd <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x133d>
+    104e:      	movq	0x58(%rsp), %r15
+    1053:      	movq	0x100(%rsp), %rdi
+    105b:      	movq	%rbp, %rsi
+    105e:      	callq	0x1063 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x5d3>
+		000000000000105f:  R_X86_64_PLT32	vd::BufferLayout::element_offset(unsigned long) const-0x4
+    1063:      	movl	(%r15,%rax), %eax
+    1067:      	movl	%eax, 0x44(%rsp)
+    106b:      	movq	0x50(%rsp), %r15
+    1070:      	movq	0xf0(%rsp), %rdi
+    1078:      	movq	%rbp, %rsi
+    107b:      	callq	0x1080 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x5f0>
+		000000000000107c:  R_X86_64_PLT32	vd::BufferLayout::element_offset(unsigned long) const-0x4
+    1080:      	movq	(%r15,%rax), %r15
+    1084:      	leaq	0xd8(%r14), %rdi
+    108b:      	movq	%r15, %rsi
+    108e:      	callq	0x1093 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x603>
+		000000000000108f:  R_X86_64_PLT32	vd::Heap::string_bytes(void*) const-0x4
+    1093:      	movq	%r15, 0x70(%rsp)
+    1098:      	leaq	0x80(%r14), %rdi
+    109f:      	callq	0x10a4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x614>
+		00000000000010a0:  R_X86_64_PLT32	pthread_mutex_unlock-0x4
+    10a4:      	movl	0x44(%rsp), %eax
+    10a8:      	cmpl	$0x10ffff, %eax         # imm = 0x10FFFF
+    10ad:      	ja	0x11b4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x724>
+Object offsets 0x22a0..0x2320
+    22a0:      	pushq	%rbp
+    22a1:      	pushq	%r15
+    22a3:      	pushq	%r14
+    22a5:      	pushq	%r13
+    22a7:      	pushq	%r12
+    22a9:      	pushq	%rbx
+    22aa:      	subq	$0x58, %rsp
+    22ae:      	movq	%r8, 0x30(%rsp)
+    22b3:      	movq	%rcx, 0x20(%rsp)
+    22b8:      	movq	%rdx, 0x38(%rsp)
+    22bd:      	movq	%rsi, 0x28(%rsp)
+    22c2:      	movq	%r9, 0x10(%rsp)
+    22c7:      	cmpq	$0x100, %r9             # imm = 0x100
+    22ce:      	jbe	0x22d7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x37>
+    22d0:      	xorl	%ebp, %ebp
+    22d2:      	jmp	0x2431 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x191>
+    22d7:      	movq	%rdi, %r12
+    22da:      	leaq	0x80(%rdi), %rbx
+    22e1:      	movq	%rbx, %rdi
+    22e4:      	callq	0x22e9 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x49>
+		00000000000022e5:  R_X86_64_PLT32	pthread_mutex_lock-0x4
+    22e9:      	testl	%eax, %eax
+    22eb:      	jne	0x2445 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x1a5>
+    22f1:      	leaq	0x90(%rsp), %rsi
+    22f9:      	movq	%r12, %rdi
+    22fc:      	callq	0x2301 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x61>
+		00000000000022fd:  R_X86_64_PLT32	vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const-0x4
+    2301:      	addq	$0xd8, %r12
+    2308:      	movq	%r12, %rdi
+    230b:      	movq	%rax, %rsi
+    230e:      	callq	0x2313 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x73>
+		000000000000230f:  R_X86_64_PLT32	vd::Heap::string_bytes(void*) const-0x4
+    2313:      	movq	%rax, %r14
+    2316:      	cmpq	$0x80, %rax
+    231c:      	jbe	0x2325 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x85>
+    231e:      	xorl	%ebp, %ebp
+    2320:      	jmp	0x2429 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)+0x189>

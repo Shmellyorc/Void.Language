@@ -1,0 +1,1258 @@
+
+/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components-candidate:	file format elf64-x86-64
+
+Disassembly of section .text:
+
+00000000023dbac0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)>:
+ 23dbac0:      	pushq	%rbp
+ 23dbac1:      	pushq	%r15
+ 23dbac3:      	pushq	%r14
+ 23dbac5:      	pushq	%r13
+ 23dbac7:      	pushq	%r12
+ 23dbac9:      	pushq	%rbx
+ 23dbaca:      	subq	$0x2b8, %rsp            # imm = 0x2B8
+ 23dbad1:      	movq	%rcx, 0x38(%rsp)
+ 23dbad6:      	movq	%rdx, %r13
+ 23dbad9:      	movq	%rsi, %r15
+ 23dbadc:      	movq	%rdi, %r14
+ 23dbadf:      	addq	$0x80, %rdi
+ 23dbae6:      	movq	%rdi, 0x30(%rsp)
+ 23dbaeb:      	callq	0x3b67690 <pthread_mutex_lock@plt>
+ 23dbaf0:      	testl	%eax, %eax
+ 23dbaf2:      	jne	0x23dce22 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1362>
+ 23dbaf8:      	movq	%r14, %rdi
+ 23dbafb:      	movq	%r15, %rsi
+ 23dbafe:      	callq	0x23f5e70 <vd::Runtime::require_buffer_output(void**) const>
+ 23dbb03:      	leaq	0xd8(%r14), %rdi
+ 23dbb0a:      	movq	%r15, %rsi
+ 23dbb0d:      	callq	0x2419010 <vd::Heap::validate_output_address(void**) const>
+ 23dbb12:      	leaq	0x2f0(%rsp), %rsi
+ 23dbb1a:      	movq	%r14, %rdi
+ 23dbb1d:      	callq	0x23f7710 <vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const>
+ 23dbb22:      	leaq	0xd8(%r14), %rdi
+ 23dbb29:      	movq	%rax, %rsi
+ 23dbb2c:      	callq	0x24182e0 <vd::Heap::string_bytes(void*) const>
+ 23dbb31:      	movq	%rax, %rbx
+ 23dbb34:      	leaq	0x310(%rsp), %r12
+ 23dbb3c:      	movq	%r14, %rdi
+ 23dbb3f:      	movq	%r12, %rsi
+ 23dbb42:      	callq	0x23f7710 <vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const>
+ 23dbb47:      	leaq	0x330(%rsp), %rbp
+ 23dbb4f:      	movq	%r14, %rdi
+ 23dbb52:      	movq	%rbp, %rsi
+ 23dbb55:      	callq	0x23f7710 <vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const>
+ 23dbb5a:      	leaq	0x80(%r14), %rdi
+ 23dbb61:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dbb66:      	cmpq	$0x0, (%r13)
+ 23dbb6b:      	je	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbb71:      	cmpq	$0x8, 0x8(%r13)
+ 23dbb76:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbb7c:      	cmpq	$0x8, 0x10(%r13)
+ 23dbb81:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbb87:      	cmpq	$0x1, 0x18(%r13)
+ 23dbb8c:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbb92:      	movq	0x20(%r13), %rax
+ 23dbb96:      	testq	%rax, %rax
+ 23dbb99:      	je	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbb9f:      	cmpl	$0xc, 0x18(%rax)
+ 23dbba3:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbba9:      	cmpq	$0x0, 0x8(%rax)
+ 23dbbae:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbbb4:      	cmpq	$0x0, 0x10(%rax)
+ 23dbbb9:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbbbf:      	cmpl	$0x0, 0x1c(%rax)
+ 23dbbc3:      	jne	0x23dcdcb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x130b>
+ 23dbbc9:      	leaq	0x170(%rsp), %rdi
+ 23dbbd1:      	movq	%r14, %rsi
+ 23dbbd4:      	movl	$0x2, %edx
+ 23dbbd9:      	callq	0x23f8fc0 <vd::Runtime::fixed_scalar_schema(vd::ScalarEncoding)>
+ 23dbbde:      	leaq	0x200(%rsp), %rdi
+ 23dbbe6:      	movq	%r14, %rsi
+ 23dbbe9:      	movq	%r13, %rdx
+ 23dbbec:      	xorl	%ecx, %ecx
+ 23dbbee:      	callq	0x23fc7c0 <vd::Runtime::native_array_layout(vd::NativeArrayElement const&, unsigned long)>
+ 23dbbf3:      	movq	0x200(%rsp), %rcx
+ 23dbbfb:      	movq	0x8(%rcx), %rax
+ 23dbbff:      	movups	(%rcx), %xmm0
+ 23dbc02:      	movaps	%xmm0, 0x150(%rsp)
+ 23dbc0a:      	testq	%rax, %rax
+ 23dbc0d:      	je	0x23dbc31 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x171>
+ 23dbc0f:      	movq	0x1826c02(%rip), %rcx   # 0x3c02818 <write+0x3c02818>
+ 23dbc16:      	cmpb	$0x0, (%rcx)
+ 23dbc19:      	je	0x23dbfe6 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x526>
+ 23dbc1f:      	movl	0x8(%rax), %ecx
+ 23dbc22:      	leal	0x1(%rcx), %edx
+ 23dbc25:      	movl	%edx, 0x8(%rax)
+ 23dbc28:      	cmpl	$-0x1, %ecx
+ 23dbc2b:      	je	0x23dbff9 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x539>
+ 23dbc31:      	movq	0x208(%rsp), %r13
+ 23dbc39:      	testq	%r13, %r13
+ 23dbc3c:      	je	0x23dbc8f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1cf>
+ 23dbc3e:      	movq	0x8(%r13), %rax
+ 23dbc42:      	movabsq	$0x100000001, %rcx      # imm = 0x100000001
+ 23dbc4c:      	cmpq	%rcx, %rax
+ 23dbc4f:      	jne	0x23dbc6f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1af>
+ 23dbc51:      	movq	$0x0, 0x8(%r13)
+ 23dbc59:      	movq	(%r13), %rax
+ 23dbc5d:      	movq	%r13, %rdi
+ 23dbc60:      	callq	*0x10(%rax)
+ 23dbc63:      	movq	(%r13), %rax
+ 23dbc67:      	movq	%r13, %rdi
+ 23dbc6a:      	callq	*0x18(%rax)
+ 23dbc6d:      	jmp	0x23dbc8f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1cf>
+ 23dbc6f:      	movq	0x1826ba2(%rip), %rcx   # 0x3c02818 <write+0x3c02818>
+ 23dbc76:      	cmpb	$0x0, (%rcx)
+ 23dbc79:      	je	0x23dc206 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x746>
+ 23dbc7f:      	leal	-0x1(%rax), %ecx
+ 23dbc82:      	movl	%ecx, 0x8(%r13)
+ 23dbc86:      	cmpl	$0x1, %eax
+ 23dbc89:      	je	0x23dc21a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x75a>
+ 23dbc8f:      	movq	$0x4000, 0x110(%rsp)    # imm = 0x4000
+ 23dbc9b:      	movq	%r14, 0x118(%rsp)
+ 23dbca3:      	leaq	0x128(%rsp), %rax
+ 23dbcab:      	xorps	%xmm0, %xmm0
+ 23dbcae:      	movups	%xmm0, 0x120(%rsp)
+ 23dbcb6:      	movq	$0x0, 0x130(%rsp)
+ 23dbcc2:      	movq	%rax, 0x138(%rsp)
+ 23dbcca:      	movq	%rax, 0x140(%rsp)
+ 23dbcd2:      	movq	$0x0, 0x148(%rsp)
+ 23dbcde:      	movq	$0x0, 0x58(%rsp)
+ 23dbce7:      	movq	$0x0, 0x50(%rsp)
+ 23dbcf0:      	movq	$0x0, 0x70(%rsp)
+ 23dbcf9:      	movq	$0x0, 0x168(%rsp)
+ 23dbd05:      	leaq	0x58(%rsp), %rax
+ 23dbd0a:      	movq	%rax, 0x1a0(%rsp)
+ 23dbd12:      	movq	$0x8, 0x1a8(%rsp)
+ 23dbd1e:      	leaq	0x168(%rsp), %rax
+ 23dbd26:      	movq	%rax, 0x1b0(%rsp)
+ 23dbd2e:      	movq	$0x1, 0x1b8(%rsp)
+ 23dbd3a:      	leaq	0x50(%rsp), %rcx
+ 23dbd3f:      	movq	%rcx, 0x1c0(%rsp)
+ 23dbd47:      	movq	$0x8, 0x1c8(%rsp)
+ 23dbd53:      	movq	%rax, 0x1d0(%rsp)
+ 23dbd5b:      	movq	$0x1, 0x1d8(%rsp)
+ 23dbd67:      	leaq	0x70(%rsp), %rcx
+ 23dbd6c:      	movq	%rcx, 0x1e0(%rsp)
+ 23dbd74:      	movq	$0x8, 0x1e8(%rsp)
+ 23dbd80:      	movq	%rax, 0x1f0(%rsp)
+ 23dbd88:      	movq	$0x1, 0x1f8(%rsp)
+ 23dbd94:      	leaq	0x298(%rsp), %rdi
+ 23dbd9c:      	leaq	0x1a0(%rsp), %rdx
+ 23dbda4:      	movl	$0x3, %ecx
+ 23dbda9:      	movq	%r14, %rsi
+ 23dbdac:      	callq	0x24202e0 <vd::Runtime::Frame::Frame(vd::Runtime&, vd::Runtime::Slot const*, unsigned long)>
+ 23dbdb1:      	xorps	%xmm0, %xmm0
+ 23dbdb4:      	movaps	%xmm0, 0x100(%rsp)
+ 23dbdbc:      	movaps	%xmm0, 0xf0(%rsp)
+ 23dbdc4:      	movb	$0x0, 0x270(%rsp)
+ 23dbdcc:      	movb	$0x0, 0xe8(%rsp)
+ 23dbdd4:      	movups	(%r12), %xmm0
+ 23dbdd9:      	movups	0x10(%r12), %xmm1
+ 23dbddf:      	movups	%xmm1, 0x10(%rsp)
+ 23dbde4:      	movups	%xmm0, (%rsp)
+ 23dbde8:      	leaq	0x170(%rsp), %rsi
+ 23dbdf0:      	leaq	0x58(%rsp), %rdx
+ 23dbdf5:      	leaq	0x100(%rsp), %rcx
+ 23dbdfd:      	leaq	0x200(%rsp), %r8
+ 23dbe05:      	movq	%r14, %rdi
+ 23dbe08:      	callq	0x23dd0e0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::$_1::operator()(vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::ElementSchema const> const&, void*&, std::shared_ptr<vd::BufferLayout const>&, std::optional<vd::Runtime::BufferReadLease>&) const>
+ 23dbe0d:      	movq	%rax, %r12
+ 23dbe10:      	movups	(%rbp), %xmm0
+ 23dbe14:      	movups	0x10(%rbp), %xmm1
+ 23dbe18:      	movups	%xmm1, 0x10(%rsp)
+ 23dbe1d:      	movups	%xmm0, (%rsp)
+ 23dbe21:      	leaq	0x150(%rsp), %rsi
+ 23dbe29:      	leaq	0x50(%rsp), %rdx
+ 23dbe2e:      	leaq	0xf0(%rsp), %rcx
+ 23dbe36:      	leaq	0x78(%rsp), %r8
+ 23dbe3b:      	movq	%r14, %rdi
+ 23dbe3e:      	callq	0x23dd0e0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::$_1::operator()(vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::ElementSchema const> const&, void*&, std::shared_ptr<vd::BufferLayout const>&, std::optional<vd::Runtime::BufferReadLease>&) const>
+ 23dbe43:      	cmpq	%rax, %r12
+ 23dbe46:      	movq	%r15, 0x68(%rsp)
+ 23dbe4b:      	jne	0x23dbec1 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x401>
+ 23dbe4d:      	cmpq	$0x80, %rbx
+ 23dbe54:      	ja	0x23dc003 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x543>
+ 23dbe5a:      	movq	0x58(%rsp), %rsi
+ 23dbe5f:      	movq	0x50(%rsp), %rcx
+ 23dbe64:      	leaq	0x2f0(%rsp), %rax
+ 23dbe6c:      	movups	(%rax), %xmm0
+ 23dbe6f:      	movups	0x10(%rax), %xmm1
+ 23dbe73:      	movups	%xmm1, 0x10(%rsp)
+ 23dbe78:      	movups	%xmm0, (%rsp)
+ 23dbe7c:      	leaq	0x100(%rsp), %rdx
+ 23dbe84:      	leaq	0xf0(%rsp), %r8
+ 23dbe8c:      	movq	%r14, %rdi
+ 23dbe8f:      	movq	%r12, %r9
+ 23dbe92:      	callq	0x23dd2d0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::ShortAsciiNoMatch::prove(vd::Runtime&, vd::Runtime::RegisteredRootWord, void*, std::shared_ptr<vd::BufferLayout const> const&, void*, std::shared_ptr<vd::BufferLayout const> const&, unsigned long)>
+ 23dbe97:      	movq	%rax, 0x28(%rsp)
+ 23dbe9c:      	movb	$0x1, %bpl
+ 23dbe9f:      	testb	$0x1, %dl
+ 23dbea2:      	je	0x23dbffb <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x53b>
+ 23dbea8:      	movb	$0x1, %r15b
+ 23dbeab:      	movzbl	0xe8(%rsp), %eax
+ 23dbeb3:      	movb	$0x0, 0xe8(%rsp)
+ 23dbebb:      	cmpb	$0x1, %al
+ 23dbebd:      	je	0x23dbeda <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x41a>
+ 23dbebf:      	jmp	0x23dbee4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x424>
+ 23dbec1:      	xorl	%ebp, %ebp
+ 23dbec3:      	xorl	%r15d, %r15d
+ 23dbec6:      	movzbl	0xe8(%rsp), %eax
+ 23dbece:      	movb	$0x0, 0xe8(%rsp)
+ 23dbed6:      	cmpb	$0x1, %al
+ 23dbed8:      	jne	0x23dbee4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x424>
+ 23dbeda:      	leaq	0x78(%rsp), %rdi
+ 23dbedf:      	callq	0x23f8680 <vd::Runtime::BufferReadLease::~BufferReadLease()>
+ 23dbee4:      	movzbl	0x270(%rsp), %eax
+ 23dbeec:      	movb	$0x0, 0x270(%rsp)
+ 23dbef4:      	cmpb	$0x1, %al
+ 23dbef6:      	je	0x23dbf07 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x447>
+ 23dbef8:      	movq	0xf8(%rsp), %rbx
+ 23dbf00:      	testq	%rbx, %rbx
+ 23dbf03:      	jne	0x23dbf21 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x461>
+ 23dbf05:      	jmp	0x23dbf7f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x4bf>
+ 23dbf07:      	leaq	0x200(%rsp), %rdi
+ 23dbf0f:      	callq	0x23f8680 <vd::Runtime::BufferReadLease::~BufferReadLease()>
+ 23dbf14:      	movq	0xf8(%rsp), %rbx
+ 23dbf1c:      	testq	%rbx, %rbx
+ 23dbf1f:      	je	0x23dbf7f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x4bf>
+ 23dbf21:      	movq	0x8(%rbx), %rax
+ 23dbf25:      	movabsq	$0x100000001, %rcx      # imm = 0x100000001
+ 23dbf2f:      	cmpq	%rcx, %rax
+ 23dbf32:      	jne	0x23dbf60 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x4a0>
+ 23dbf34:      	movq	$0x0, 0x8(%rbx)
+ 23dbf3c:      	movq	(%rbx), %rax
+ 23dbf3f:      	movq	%rbx, %rdi
+ 23dbf42:      	callq	*0x10(%rax)
+ 23dbf45:      	movq	(%rbx), %rax
+ 23dbf48:      	movq	%rbx, %rdi
+ 23dbf4b:      	callq	*0x18(%rax)
+ 23dbf4e:      	movq	0x108(%rsp), %rbx
+ 23dbf56:      	testq	%rbx, %rbx
+ 23dbf59:      	jne	0x23dbf90 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x4d0>
+ 23dbf5b:      	jmp	0x23dc268 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x7a8>
+ 23dbf60:      	movq	0x18268b1(%rip), %rcx   # 0x3c02818 <write+0x3c02818>
+ 23dbf67:      	cmpb	$0x0, (%rcx)
+ 23dbf6a:      	je	0x23dc227 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x767>
+ 23dbf70:      	leal	-0x1(%rax), %ecx
+ 23dbf73:      	movl	%ecx, 0x8(%rbx)
+ 23dbf76:      	cmpl	$0x1, %eax
+ 23dbf79:      	je	0x23dc23a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x77a>
+ 23dbf7f:      	movq	0x108(%rsp), %rbx
+ 23dbf87:      	testq	%rbx, %rbx
+ 23dbf8a:      	je	0x23dc268 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x7a8>
+ 23dbf90:      	movq	0x8(%rbx), %rax
+ 23dbf94:      	movabsq	$0x100000001, %rcx      # imm = 0x100000001
+ 23dbf9e:      	cmpq	%rcx, %rax
+ 23dbfa1:      	jne	0x23dbfc2 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x502>
+ 23dbfa3:      	movq	$0x0, 0x8(%rbx)
+ 23dbfab:      	movq	(%rbx), %rax
+ 23dbfae:      	movq	%rbx, %rdi
+ 23dbfb1:      	callq	*0x10(%rax)
+ 23dbfb4:      	movq	(%rbx), %rax
+ 23dbfb7:      	movq	%rbx, %rdi
+ 23dbfba:      	callq	*0x18(%rax)
+ 23dbfbd:      	jmp	0x23dc268 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x7a8>
+ 23dbfc2:      	movq	0x182684f(%rip), %rcx   # 0x3c02818 <write+0x3c02818>
+ 23dbfc9:      	cmpb	$0x0, (%rcx)
+ 23dbfcc:      	je	0x23dc255 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x795>
+ 23dbfd2:      	leal	-0x1(%rax), %ecx
+ 23dbfd5:      	movl	%ecx, 0x8(%rbx)
+ 23dbfd8:      	cmpl	$0x1, %eax
+ 23dbfdb:      	jne	0x23dc268 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x7a8>
+ 23dbfe1:      	jmp	0x23dcdb4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12f4>
+ 23dbfe6:      	movl	$0x1, %ecx
+ 23dbfeb:      	lock
+ 23dbfec:      	xaddl	%ecx, 0x8(%rax)
+ 23dbff0:      	cmpl	$-0x1, %ecx
+ 23dbff3:      	jne	0x23dbc31 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x171>
+ 23dbff9:      	ud2
+ 23dbffb:      	movq	%r14, %rdi
+ 23dbffe:      	callq	0x241d6a0 <vd::Runtime::poll()>
+ 23dc003:      	leaq	0x278(%rsp), %rdi
+ 23dc00b:      	leaq	0x70(%rsp), %rdx
+ 23dc010:      	movq	%r14, %rsi
+ 23dc013:      	callq	0x23f7600 <vd::Runtime::root_word(void**) const>
+ 23dc018:      	testq	%r12, %r12
+ 23dc01b:      	je	0x23dc1df <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x71f>
+ 23dc021:      	xorl	%ebp, %ebp
+ 23dc023:      	leaq	0x180(%rsp), %r13
+ 23dc02b:      	leaq	0x110(%rsp), %rbx
+ 23dc033:      	jmp	0x23dc052 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x592>
+ 23dc035:      	nopw	%cs:(%rax,%rax)
+ 23dc040:      	incq	%rbp
+ 23dc043:      	cmpq	%r12, %rbp
+ 23dc046:      	setne	%al
+ 23dc049:      	testb	%al, %r15b
+ 23dc04c:      	je	0x23dc1e7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x727>
+ 23dc052:      	testq	%rbp, %rbp
+ 23dc055:      	sete	%al
+ 23dc058:      	testb	%bpl, %bpl
+ 23dc05b:      	setne	%cl
+ 23dc05e:      	orb	%al, %cl
+ 23dc060:      	jne	0x23dc06a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x5aa>
+ 23dc062:      	movq	%r14, %rdi
+ 23dc065:      	callq	0x241d6a0 <vd::Runtime::poll()>
+ 23dc06a:      	leaq	0x80(%r14), %rdi
+ 23dc071:      	callq	0x3b67690 <pthread_mutex_lock@plt>
+ 23dc076:      	testl	%eax, %eax
+ 23dc078:      	jne	0x23dcdfd <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x133d>
+ 23dc07e:      	movq	0x58(%rsp), %r15
+ 23dc083:      	movq	0x100(%rsp), %rdi
+ 23dc08b:      	movq	%rbp, %rsi
+ 23dc08e:      	callq	0x24175f0 <vd::BufferLayout::element_offset(unsigned long) const>
+ 23dc093:      	movl	(%r15,%rax), %eax
+ 23dc097:      	movl	%eax, 0x44(%rsp)
+ 23dc09b:      	movq	0x50(%rsp), %r15
+ 23dc0a0:      	movq	0xf0(%rsp), %rdi
+ 23dc0a8:      	movq	%rbp, %rsi
+ 23dc0ab:      	callq	0x24175f0 <vd::BufferLayout::element_offset(unsigned long) const>
+ 23dc0b0:      	movq	(%r15,%rax), %r15
+ 23dc0b4:      	leaq	0xd8(%r14), %rdi
+ 23dc0bb:      	movq	%r15, %rsi
+ 23dc0be:      	callq	0x24182e0 <vd::Heap::string_bytes(void*) const>
+ 23dc0c3:      	movq	%r15, 0x70(%rsp)
+ 23dc0c8:      	leaq	0x80(%r14), %rdi
+ 23dc0cf:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dc0d4:      	movl	0x44(%rsp), %eax
+ 23dc0d8:      	cmpl	$0x10ffff, %eax         # imm = 0x10FFFF
+ 23dc0dd:      	ja	0x23dc1e4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x724>
+ 23dc0e3:      	andl	$0x1ff800, %eax         # imm = 0x1FF800
+ 23dc0e8:      	cmpl	$0xd800, %eax           # imm = 0xD800
+ 23dc0ed:      	je	0x23dc1e4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x724>
+ 23dc0f3:      	movups	0x278(%rsp), %xmm0
+ 23dc0fb:      	movups	0x288(%rsp), %xmm1
+ 23dc103:      	movups	%xmm1, 0x10(%rsp)
+ 23dc108:      	movups	%xmm0, (%rsp)
+ 23dc10c:      	movq	%r13, %rdi
+ 23dc10f:      	movq	%rbx, %rsi
+ 23dc112:      	movq	%r14, %rdx
+ 23dc115:      	callq	0x23dd4a0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::$_0::operator()[abi:cxx11](vd::Runtime::RegisteredRootWord) const>
+ 23dc11a:      	movq	0x130(%rsp), %r8
+ 23dc122:      	leaq	0x128(%rsp), %rsi
+ 23dc12a:      	testq	%r8, %r8
+ 23dc12d:      	je	0x23dc17c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x6bc>
+ 23dc12f:      	movl	0x44(%rsp), %eax
+ 23dc133:      	nopw	%cs:(%rax,%rax)
+ 23dc140:      	movq	%rsi, %rcx
+ 23dc143:      	movq	%r8, %rdx
+ 23dc146:      	movl	0x20(%r8), %edi
+ 23dc14a:      	xorl	%r8d, %r8d
+ 23dc14d:      	cmpl	%eax, %edi
+ 23dc14f:      	setl	%r8b
+ 23dc153:      	movq	%rdx, %rsi
+ 23dc156:      	cmovlq	%rcx, %rsi
+ 23dc15a:      	movq	0x10(%rdx,%r8,8), %r8
+ 23dc15f:      	testq	%r8, %r8
+ 23dc162:      	jne	0x23dc140 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x680>
+ 23dc164:      	leaq	0x128(%rsp), %r8
+ 23dc16c:      	cmpq	%r8, %rsi
+ 23dc16f:      	je	0x23dc17c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x6bc>
+ 23dc171:      	cmpl	%eax, %edi
+ 23dc173:      	cmovlq	%rcx, %rdx
+ 23dc177:      	cmpl	0x20(%rdx), %eax
+ 23dc17a:      	jge	0x23dc1c2 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x702>
+ 23dc17c:      	movb	$0x1, %r15b
+ 23dc17f:      	leaq	0x120(%rsp), %rdi
+ 23dc187:      	leaq	0x44(%rsp), %rdx
+ 23dc18c:      	movq	%r13, %rcx
+ 23dc18f:      	callq	0x23ddac0 <std::_Rb_tree_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>> std::_Rb_tree<int, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, std::less<int>, std::allocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>>::_M_emplace_hint_unique<int&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>(std::_Rb_tree_const_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>>, int&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&&)>
+ 23dc194:      	movq	0x180(%rsp), %rdi
+ 23dc19c:      	leaq	0x190(%rsp), %rax
+ 23dc1a4:      	cmpq	%rax, %rdi
+ 23dc1a7:      	je	0x23dc040 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x580>
+ 23dc1ad:      	movq	0x190(%rsp), %rsi
+ 23dc1b5:      	incq	%rsi
+ 23dc1b8:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dc1bd:      	jmp	0x23dc040 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x580>
+ 23dc1c2:      	xorl	%r15d, %r15d
+ 23dc1c5:      	movq	0x180(%rsp), %rdi
+ 23dc1cd:      	leaq	0x190(%rsp), %rax
+ 23dc1d5:      	cmpq	%rax, %rdi
+ 23dc1d8:      	jne	0x23dc1ad <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x6ed>
+ 23dc1da:      	jmp	0x23dc040 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x580>
+ 23dc1df:      	movb	$0x1, %r15b
+ 23dc1e2:      	jmp	0x23dc1e7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x727>
+ 23dc1e4:      	xorl	%r15d, %r15d
+ 23dc1e7:      	xorl	%ebp, %ebp
+ 23dc1e9:      	movzbl	0xe8(%rsp), %eax
+ 23dc1f1:      	movb	$0x0, 0xe8(%rsp)
+ 23dc1f9:      	cmpb	$0x1, %al
+ 23dc1fb:      	je	0x23dbeda <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x41a>
+ 23dc201:      	jmp	0x23dbee4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x424>
+ 23dc206:      	movl	$0xffffffff, %eax       # imm = 0xFFFFFFFF
+ 23dc20b:      	lock
+ 23dc20c:      	xaddl	%eax, 0x8(%r13)
+ 23dc211:      	cmpl	$0x1, %eax
+ 23dc214:      	jne	0x23dbc8f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1cf>
+ 23dc21a:      	movq	%r13, %rdi
+ 23dc21d:      	callq	0x1f1e480 <std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()>
+ 23dc222:      	jmp	0x23dbc8f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1cf>
+ 23dc227:      	movl	$0xffffffff, %eax       # imm = 0xFFFFFFFF
+ 23dc22c:      	lock
+ 23dc22d:      	xaddl	%eax, 0x8(%rbx)
+ 23dc231:      	cmpl	$0x1, %eax
+ 23dc234:      	jne	0x23dbf7f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x4bf>
+ 23dc23a:      	movq	%rbx, %rdi
+ 23dc23d:      	callq	0x1f1e480 <std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()>
+ 23dc242:      	movq	0x108(%rsp), %rbx
+ 23dc24a:      	testq	%rbx, %rbx
+ 23dc24d:      	jne	0x23dbf90 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x4d0>
+ 23dc253:      	jmp	0x23dc268 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x7a8>
+ 23dc255:      	movl	$0xffffffff, %eax       # imm = 0xFFFFFFFF
+ 23dc25a:      	lock
+ 23dc25b:      	xaddl	%eax, 0x8(%rbx)
+ 23dc25f:      	cmpl	$0x1, %eax
+ 23dc262:      	je	0x23dcdb4 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12f4>
+ 23dc268:      	leaq	0x298(%rsp), %rdi
+ 23dc270:      	callq	0x2420490 <vd::Runtime::Frame::~Frame()>
+ 23dc275:      	movl	$0x2, %ebx
+ 23dc27a:      	testb	%r15b, %r15b
+ 23dc27d:      	je	0x23dcc9e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x11de>
+ 23dc283:      	cmpq	$0x0, 0x38(%rsp)
+ 23dc289:      	js	0x23dc2fc <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x83c>
+ 23dc28b:      	testb	%bpl, %bpl
+ 23dc28e:      	je	0x23dc306 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x846>
+ 23dc290:      	movl	$0x3, %ebx
+ 23dc295:      	movq	0x28(%rsp), %rax
+ 23dc29a:      	cmpq	0x38(%rsp), %rax
+ 23dc29f:      	ja	0x23dcc9e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x11de>
+ 23dc2a5:      	leaq	0x80(%r14), %rdi
+ 23dc2ac:      	callq	0x3b67690 <pthread_mutex_lock@plt>
+ 23dc2b1:      	testl	%eax, %eax
+ 23dc2b3:      	jne	0x23dce5b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x139b>
+ 23dc2b9:      	movq	%r14, %rdi
+ 23dc2bc:      	movq	0x68(%rsp), %rbx
+ 23dc2c1:      	movq	%rbx, %rsi
+ 23dc2c4:      	callq	0x23f5e70 <vd::Runtime::require_buffer_output(void**) const>
+ 23dc2c9:      	leaq	0xd8(%r14), %rdi
+ 23dc2d0:      	movq	%rbx, %rsi
+ 23dc2d3:      	callq	0x2419010 <vd::Heap::validate_output_address(void**) const>
+ 23dc2d8:      	movq	%r14, %rdi
+ 23dc2db:      	leaq	0x2f0(%rsp), %rsi
+ 23dc2e3:      	callq	0x23f7710 <vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const>
+ 23dc2e8:      	movq	%rax, (%rbx)
+ 23dc2eb:      	movq	0x30(%rsp), %rdi
+ 23dc2f0:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dc2f5:      	xorl	%ebx, %ebx
+ 23dc2f7:      	jmp	0x23dcc9e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x11de>
+ 23dc2fc:      	movl	$0x1, %ebx
+ 23dc301:      	jmp	0x23dcc9e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x11de>
+ 23dc306:      	leaq	0x2f0(%rsp), %rax
+ 23dc30e:      	movups	(%rax), %xmm0
+ 23dc311:      	movups	0x10(%rax), %xmm1
+ 23dc315:      	movups	%xmm1, 0x10(%rsp)
+ 23dc31a:      	movups	%xmm0, (%rsp)
+ 23dc31e:      	leaq	0x200(%rsp), %rdi
+ 23dc326:      	leaq	0x110(%rsp), %rsi
+ 23dc32e:      	movq	%r14, %rdx
+ 23dc331:      	callq	0x23dd4a0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)::$_0::operator()[abi:cxx11](vd::Runtime::RegisteredRootWord) const>
+ 23dc336:      	leaq	0x88(%rsp), %rax
+ 23dc33e:      	movq	%rax, 0x78(%rsp)
+ 23dc343:      	movb	$0x0, 0x88(%rsp)
+ 23dc34b:      	movq	$0x0, 0x80(%rsp)
+ 23dc357:      	leaq	0x1a0(%rsp), %rdi
+ 23dc35f:      	movq	%r14, %rsi
+ 23dc362:      	callq	0x241d4b0 <vd::Runtime::Native::Native(vd::Runtime&)>
+ 23dc367:      	movq	0x208(%rsp), %r13
+ 23dc36f:      	testq	%r13, %r13
+ 23dc372:      	je	0x23dc636 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xb76>
+ 23dc378:      	movq	0x200(%rsp), %rdx
+ 23dc380:      	movq	0x130(%rsp), %rsi
+ 23dc388:      	movq	$0x0, 0x48(%rsp)
+ 23dc391:      	xorl	%eax, %eax
+ 23dc393:      	xorl	%ecx, %ecx
+ 23dc395:      	xorl	%r8d, %r8d
+ 23dc398:      	movq	%r13, 0x28(%rsp)
+ 23dc39d:      	jmp	0x23dc3bc <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x8fc>
+ 23dc39f:      	addq	%r9, %rax
+ 23dc3a2:      	leaq	(%r8,%r10), %rcx
+ 23dc3a6:      	movb	$0x1, %dil
+ 23dc3a9:      	movq	%rdi, 0x48(%rsp)
+ 23dc3ae:      	nop
+ 23dc3b0:      	addq	%r10, %r8
+ 23dc3b3:      	cmpq	%r13, %r8
+ 23dc3b6:      	jae	0x23dc626 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xb66>
+ 23dc3bc:      	movzbl	(%rdx,%r8), %r11d
+ 23dc3c1:      	movl	$0x1, %r10d
+ 23dc3c7:      	testb	%r11b, %r11b
+ 23dc3ca:      	js	0x23dc3e0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x920>
+ 23dc3cc:      	testq	%rsi, %rsi
+ 23dc3cf:      	jne	0x23dc55d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xa9d>
+ 23dc3d5:      	jmp	0x23dc3b0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x8f0>
+ 23dc3d7:      	nopw	(%rax,%rax)
+ 23dc3e0:      	leal	0x3e(%r11), %ebx
+ 23dc3e4:      	cmpb	$0x1e, %bl
+ 23dc3e7:      	jae	0x23dc3f6 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x936>
+ 23dc3e9:      	movl	$0x2, %r10d
+ 23dc3ef:      	xorl	%ebp, %ebp
+ 23dc3f1:      	xorl	%r15d, %r15d
+ 23dc3f4:      	jmp	0x23dc42f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x96f>
+ 23dc3f6:      	movl	%r11d, %edi
+ 23dc3f9:      	andb	$-0x10, %dil
+ 23dc3fd:      	cmpb	$-0x20, %dil
+ 23dc401:      	jne	0x23dc411 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x951>
+ 23dc403:      	movl	$0x3, %r10d
+ 23dc409:      	movb	$0x1, %bpl
+ 23dc40c:      	xorl	%r15d, %r15d
+ 23dc40f:      	jmp	0x23dc42f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x96f>
+ 23dc411:      	leal	0x10(%r11), %edi
+ 23dc415:      	cmpb	$0x4, %dil
+ 23dc419:      	ja	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc41f:      	movl	$0x4, %r10d
+ 23dc425:      	movb	$0x1, %r15b
+ 23dc428:      	xorl	%ebp, %ebp
+ 23dc42a:      	movq	0x28(%rsp), %r13
+ 23dc42f:      	subq	%r8, %r13
+ 23dc432:      	cmpq	%r10, %r13
+ 23dc435:      	jb	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc43b:      	cmpb	$0x1e, %bl
+ 23dc43e:      	movzbl	%bpl, %edi
+ 23dc442:      	leal	0x7(,%rdi,8), %r12d
+ 23dc44a:      	movl	$0x1f, %edi
+ 23dc44f:      	cmovbl	%edi, %r12d
+ 23dc453:      	movzbl	0x1(%rdx,%r8), %r13d
+ 23dc459:      	movl	%r13d, %edi
+ 23dc45c:      	andl	$-0x40, %edi
+ 23dc45f:      	cmpl	$0x80, %edi
+ 23dc465:      	jne	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc46b:      	andl	%r11d, %r12d
+ 23dc46e:      	movl	%r12d, %r11d
+ 23dc471:      	shll	$0x6, %r11d
+ 23dc475:      	cmpb	$0x1e, %bl
+ 23dc478:      	jae	0x23dc47f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x9bf>
+ 23dc47a:      	movl	%r12d, %r13d
+ 23dc47d:      	jmp	0x23dc4c8 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xa08>
+ 23dc47f:      	movzbl	0x2(%rdx,%r8), %edi
+ 23dc485:      	movl	%edi, %r9d
+ 23dc488:      	andl	$-0x40, %r9d
+ 23dc48c:      	cmpl	$0x80, %r9d
+ 23dc493:      	jne	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc499:      	andl	$0x3f, %r13d
+ 23dc49d:      	orl	%r11d, %r13d
+ 23dc4a0:      	movl	%r13d, %r11d
+ 23dc4a3:      	shll	$0x6, %r11d
+ 23dc4a7:      	testb	%bpl, %bpl
+ 23dc4aa:      	jne	0x23dc4c8 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xa08>
+ 23dc4ac:      	cmpb	$-0x41, 0x3(%rdx,%r8)
+ 23dc4b2:      	jg	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc4b8:      	andl	$0x3f, %edi
+ 23dc4bb:      	orl	%r11d, %edi
+ 23dc4be:      	movl	%edi, %r11d
+ 23dc4c1:      	shll	$0x6, %r11d
+ 23dc4c5:      	movl	%edi, %r13d
+ 23dc4c8:      	cmpl	$0x800, %r11d           # imm = 0x800
+ 23dc4cf:      	setb	%r9b
+ 23dc4d3:      	cmpl	$0x10000, %r11d         # imm = 0x10000
+ 23dc4da:      	setb	%dil
+ 23dc4de:      	cmpl	$0x10ffff, %r11d        # imm = 0x10FFFF
+ 23dc4e5:      	ja	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc4eb:      	andl	$-0x20, %r13d
+ 23dc4ef:      	cmpl	$0x360, %r13d           # imm = 0x360
+ 23dc4f6:      	je	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc4fc:      	andb	%bpl, %r9b
+ 23dc4ff:      	jne	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc505:      	andb	%dil, %r15b
+ 23dc508:      	jne	0x23dce04 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1344>
+ 23dc50e:      	shll	$0x6, %r12d
+ 23dc512:      	movzbl	0x1(%rdx,%r8), %r11d
+ 23dc518:      	andl	$0x3f, %r11d
+ 23dc51c:      	orl	%r12d, %r11d
+ 23dc51f:      	cmpb	$0x1e, %bl
+ 23dc522:      	jb	0x23dc54f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xa8f>
+ 23dc524:      	movl	%r11d, %edi
+ 23dc527:      	shll	$0x6, %edi
+ 23dc52a:      	movzbl	0x2(%rdx,%r8), %r11d
+ 23dc530:      	andl	$0x3f, %r11d
+ 23dc534:      	orl	%edi, %r11d
+ 23dc537:      	testb	%bpl, %bpl
+ 23dc53a:      	jne	0x23dc54f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xa8f>
+ 23dc53c:      	shll	$0x6, %r11d
+ 23dc540:      	movzbl	0x3(%rdx,%r8), %edi
+ 23dc546:      	andl	$0x3f, %edi
+ 23dc549:      	orl	%r11d, %edi
+ 23dc54c:      	movl	%edi, %r11d
+ 23dc54f:      	movq	0x28(%rsp), %r13
+ 23dc554:      	testq	%rsi, %rsi
+ 23dc557:      	je	0x23dc3b0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x8f0>
+ 23dc55d:      	movq	%rsi, %r9
+ 23dc560:      	leaq	0x128(%rsp), %rdi
+ 23dc568:      	nopl	(%rax,%rax)
+ 23dc570:      	movq	%rdi, %r15
+ 23dc573:      	movq	%r9, %rbx
+ 23dc576:      	movl	0x20(%r9), %ebp
+ 23dc57a:      	xorl	%r9d, %r9d
+ 23dc57d:      	cmpl	%r11d, %ebp
+ 23dc580:      	setl	%r9b
+ 23dc584:      	movq	%rbx, %rdi
+ 23dc587:      	cmovlq	%r15, %rdi
+ 23dc58b:      	movq	0x10(%rbx,%r9,8), %r9
+ 23dc590:      	testq	%r9, %r9
+ 23dc593:      	jne	0x23dc570 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xab0>
+ 23dc595:      	leaq	0x128(%rsp), %r9
+ 23dc59d:      	cmpq	%r9, %rdi
+ 23dc5a0:      	je	0x23dc3b0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x8f0>
+ 23dc5a6:      	cmpl	%r11d, %ebp
+ 23dc5a9:      	movq	%rbx, %rdi
+ 23dc5ac:      	cmovlq	%r15, %rdi
+ 23dc5b0:      	cmpl	0x20(%rdi), %r11d
+ 23dc5b4:      	jl	0x23dc3b0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x8f0>
+ 23dc5ba:      	movq	%r13, %rdi
+ 23dc5bd:      	subq	%rcx, %rdi
+ 23dc5c0:      	jb	0x23dcb6c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x10ac>
+ 23dc5c6:      	movq	%r8, %r9
+ 23dc5c9:      	subq	%rcx, %r9
+ 23dc5cc:      	cmpq	%r9, %rdi
+ 23dc5cf:      	cmovbq	%rdi, %r9
+ 23dc5d3:      	movq	%rax, %rcx
+ 23dc5d6:      	notq	%rcx
+ 23dc5d9:      	cmpq	%rcx, %r9
+ 23dc5dc:      	ja	0x23dc6ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc3f>
+ 23dc5e2:      	movq	0x38(%rsp), %rcx
+ 23dc5e7:      	subq	%rax, %rcx
+ 23dc5ea:      	cmpq	%rcx, %r9
+ 23dc5ed:      	ja	0x23dc6ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc3f>
+ 23dc5f3:      	addq	%rax, %r9
+ 23dc5f6:      	cmpl	%r11d, %ebp
+ 23dc5f9:      	cmovlq	%r15, %rbx
+ 23dc5fd:      	movq	0x30(%rbx), %rax
+ 23dc601:      	movq	%r9, %rcx
+ 23dc604:      	notq	%rcx
+ 23dc607:      	cmpq	%rcx, %rax
+ 23dc60a:      	ja	0x23dc6ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc3f>
+ 23dc610:      	movq	0x38(%rsp), %rcx
+ 23dc615:      	subq	%r9, %rcx
+ 23dc618:      	cmpq	%rcx, %rax
+ 23dc61b:      	jbe	0x23dc39f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x8df>
+ 23dc621:      	jmp	0x23dc6ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc3f>
+ 23dc626:      	cmpq	%r13, %rcx
+ 23dc629:      	ja	0x23dcb6c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x10ac>
+ 23dc62f:      	movq	0x48(%rsp), %rdx
+ 23dc634:      	jmp	0x23dc63c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xb7c>
+ 23dc636:      	xorl	%edx, %edx
+ 23dc638:      	xorl	%eax, %eax
+ 23dc63a:      	xorl	%ecx, %ecx
+ 23dc63c:      	subq	%rcx, %r13
+ 23dc63f:      	movq	%rax, %rcx
+ 23dc642:      	notq	%rcx
+ 23dc645:      	cmpq	%rcx, %r13
+ 23dc648:      	ja	0x23dc6ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc3f>
+ 23dc64e:      	movq	0x38(%rsp), %rcx
+ 23dc653:      	subq	%rax, %rcx
+ 23dc656:      	cmpq	%rcx, %r13
+ 23dc659:      	ja	0x23dc6ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc3f>
+ 23dc65f:      	testb	$0x1, %dl
+ 23dc662:      	je	0x23dc716 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xc56>
+ 23dc668:      	addq	%rax, %r13
+ 23dc66b:      	movq	%r13, %rdi
+ 23dc66e:      	xorl	%esi, %esi
+ 23dc670:      	callq	0x241ea40 <vd::Runtime::string_payload_size(unsigned long, unsigned long)>
+ 23dc675:      	movq	0x78(%rsp), %rbx
+ 23dc67a:      	movl	$0xf, %eax
+ 23dc67f:      	leaq	0x88(%rsp), %rcx
+ 23dc687:      	cmpq	%rcx, %rbx
+ 23dc68a:      	je	0x23dc694 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xbd4>
+ 23dc68c:      	movq	0x88(%rsp), %rax
+ 23dc694:      	cmpq	%rax, %r13
+ 23dc697:      	jbe	0x23dc7ad <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xced>
+ 23dc69d:      	movabsq	$0x7fffffffffffffff, %rcx # imm = 0x7FFFFFFFFFFFFFFF
+ 23dc6a7:      	decq	%rcx
+ 23dc6aa:      	cmpq	%rcx, %r13
+ 23dc6ad:      	ja	0x23dce72 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13b2>
+ 23dc6b3:      	addq	%rax, %rax
+ 23dc6b6:      	movabsq	$0x7ffffffffffffffe, %r12 # imm = 0x7FFFFFFFFFFFFFFE
+ 23dc6c0:      	cmpq	%r12, %rax
+ 23dc6c3:      	cmovbq	%rax, %r12
+ 23dc6c7:      	cmpq	%rax, %r13
+ 23dc6ca:      	cmovaeq	%r13, %r12
+ 23dc6ce:      	leaq	0x1(%r12), %rdi
+ 23dc6d3:      	callq	0xed6160 <operator new(unsigned long)>
+ 23dc6d8:      	movq	%rax, %r15
+ 23dc6db:      	movq	0x80(%rsp), %rdx
+ 23dc6e3:      	testq	%rdx, %rdx
+ 23dc6e6:      	je	0x23dc77a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xcba>
+ 23dc6ec:      	incq	%rdx
+ 23dc6ef:      	movq	%r15, %rdi
+ 23dc6f2:      	movq	%rbx, %rsi
+ 23dc6f5:      	callq	0x3b67020 <memcpy@plt>
+ 23dc6fa:      	jmp	0x23dc780 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xcc0>
+ 23dc6ff:      	leaq	0x1a0(%rsp), %rdi
+ 23dc707:      	callq	0x241d5a0 <vd::Runtime::Native::~Native()>
+ 23dc70c:      	movl	$0x3, %ebx
+ 23dc711:      	jmp	0x23dcc57 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1197>
+ 23dc716:      	leaq	0x1a0(%rsp), %rdi
+ 23dc71e:      	callq	0x241d5a0 <vd::Runtime::Native::~Native()>
+ 23dc723:      	leaq	0x80(%r14), %rdi
+ 23dc72a:      	callq	0x3b67690 <pthread_mutex_lock@plt>
+ 23dc72f:      	testl	%eax, %eax
+ 23dc731:      	movq	0x68(%rsp), %rbx
+ 23dc736:      	jne	0x23dce62 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13a2>
+ 23dc73c:      	movq	%r14, %rdi
+ 23dc73f:      	movq	%rbx, %rsi
+ 23dc742:      	callq	0x23f5e70 <vd::Runtime::require_buffer_output(void**) const>
+ 23dc747:      	leaq	0xd8(%r14), %rdi
+ 23dc74e:      	movq	%rbx, %rsi
+ 23dc751:      	callq	0x2419010 <vd::Heap::validate_output_address(void**) const>
+ 23dc756:      	movq	%r14, %rdi
+ 23dc759:      	leaq	0x2f0(%rsp), %rsi
+ 23dc761:      	callq	0x23f7710 <vd::Runtime::reference_source(vd::Runtime::RegisteredRootWord const&) const>
+ 23dc766:      	movq	%rax, (%rbx)
+ 23dc769:      	movq	0x30(%rsp), %rdi
+ 23dc76e:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dc773:      	xorl	%ebx, %ebx
+ 23dc775:      	jmp	0x23dcc57 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1197>
+ 23dc77a:      	movzbl	(%rbx), %eax
+ 23dc77d:      	movb	%al, (%r15)
+ 23dc780:      	leaq	0x88(%rsp), %rax
+ 23dc788:      	cmpq	%rax, %rbx
+ 23dc78b:      	je	0x23dc7a0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xce0>
+ 23dc78d:      	movq	0x88(%rsp), %rsi
+ 23dc795:      	incq	%rsi
+ 23dc798:      	movq	%rbx, %rdi
+ 23dc79b:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dc7a0:      	movq	%r15, 0x78(%rsp)
+ 23dc7a5:      	movq	%r12, 0x88(%rsp)
+ 23dc7ad:      	movq	0x200(%rsp), %rbx
+ 23dc7b5:      	movq	0x208(%rsp), %rdx
+ 23dc7bd:      	testq	%rdx, %rdx
+ 23dc7c0:      	je	0x23dcb89 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x10c9>
+ 23dc7c6:      	movq	%rdx, 0x28(%rsp)
+ 23dc7cb:      	xorl	%ecx, %ecx
+ 23dc7cd:      	leaq	-0x2140cf5(%rip), %rax  # 0x29badf <SanCovCallbackGateSectionName+0x40dd5>
+ 23dc7d4:      	movq	%rax, 0x60(%rsp)
+ 23dc7d9:      	xorl	%r13d, %r13d
+ 23dc7dc:      	movq	%rbx, 0x30(%rsp)
+ 23dc7e1:      	jmp	0x23dc808 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd48>
+ 23dc7e3:      	nopw	%cs:(%rax,%rax)
+ 23dc7f0:      	movq	0x30(%rsp), %rbx
+ 23dc7f5:      	movq	0x38(%rsp), %r12
+ 23dc7fa:      	addq	%r12, %r13
+ 23dc7fd:      	cmpq	0x28(%rsp), %r13
+ 23dc802:      	jae	0x23dcb62 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x10a2>
+ 23dc808:      	movzbl	(%rbx,%r13), %r15d
+ 23dc80d:      	movl	$0x1, %r12d
+ 23dc813:      	testb	%r15b, %r15b
+ 23dc816:      	jns	0x23dc990 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xed0>
+ 23dc81c:      	leal	0x3e(%r15), %eax
+ 23dc820:      	cmpb	$0x1e, %al
+ 23dc822:      	jae	0x23dc830 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd70>
+ 23dc824:      	movl	$0x2, %r8d
+ 23dc82a:      	xorl	%edx, %edx
+ 23dc82c:      	xorl	%esi, %esi
+ 23dc82e:      	jmp	0x23dc85f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd9f>
+ 23dc830:      	movl	%r15d, %edx
+ 23dc833:      	andb	$-0x10, %dl
+ 23dc836:      	cmpb	$-0x20, %dl
+ 23dc839:      	jne	0x23dc847 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd87>
+ 23dc83b:      	movl	$0x3, %r8d
+ 23dc841:      	movb	$0x1, %dl
+ 23dc843:      	xorl	%esi, %esi
+ 23dc845:      	jmp	0x23dc85f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd9f>
+ 23dc847:      	leal	0x10(%r15), %edx
+ 23dc84b:      	cmpb	$0x4, %dl
+ 23dc84e:      	ja	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc854:      	movl	$0x4, %r8d
+ 23dc85a:      	movb	$0x1, %sil
+ 23dc85d:      	xorl	%edx, %edx
+ 23dc85f:      	movq	0x28(%rsp), %rdi
+ 23dc864:      	subq	%r13, %rdi
+ 23dc867:      	cmpq	%r8, %rdi
+ 23dc86a:      	jb	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc870:      	movq	%r8, %r12
+ 23dc873:      	cmpb	$0x1e, %al
+ 23dc875:      	movzbl	%dl, %edi
+ 23dc878:      	leal	0x7(,%rdi,8), %edi
+ 23dc87f:      	movl	$0x1f, %r8d
+ 23dc885:      	cmovbl	%r8d, %edi
+ 23dc889:      	movzbl	0x1(%rbx,%r13), %r8d
+ 23dc88f:      	movl	%r8d, %r9d
+ 23dc892:      	andl	$-0x40, %r9d
+ 23dc896:      	cmpl	$0x80, %r9d
+ 23dc89d:      	jne	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc8a3:      	andl	%r15d, %edi
+ 23dc8a6:      	movl	%edi, %r9d
+ 23dc8a9:      	shll	$0x6, %r9d
+ 23dc8ad:      	cmpb	$0x1e, %al
+ 23dc8af:      	jae	0x23dc8b6 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xdf6>
+ 23dc8b1:      	movl	%edi, %r8d
+ 23dc8b4:      	jmp	0x23dc8ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xe3f>
+ 23dc8b6:      	movzbl	0x2(%rbx,%r13), %r10d
+ 23dc8bc:      	movl	%r10d, %r11d
+ 23dc8bf:      	andl	$-0x40, %r11d
+ 23dc8c3:      	cmpl	$0x80, %r11d
+ 23dc8ca:      	jne	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc8d0:      	andl	$0x3f, %r8d
+ 23dc8d4:      	orl	%r9d, %r8d
+ 23dc8d7:      	movl	%r8d, %r9d
+ 23dc8da:      	shll	$0x6, %r9d
+ 23dc8de:      	testb	%dl, %dl
+ 23dc8e0:      	jne	0x23dc8ff <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xe3f>
+ 23dc8e2:      	cmpb	$-0x41, 0x3(%rbx,%r13)
+ 23dc8e8:      	jg	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc8ee:      	andl	$0x3f, %r10d
+ 23dc8f2:      	orl	%r9d, %r10d
+ 23dc8f5:      	movl	%r10d, %r9d
+ 23dc8f8:      	shll	$0x6, %r9d
+ 23dc8fc:      	movl	%r10d, %r8d
+ 23dc8ff:      	cmpl	$0x800, %r9d            # imm = 0x800
+ 23dc906:      	setb	%r11b
+ 23dc90a:      	cmpl	$0x10000, %r9d          # imm = 0x10000
+ 23dc911:      	setb	%r10b
+ 23dc915:      	cmpl	$0x10ffff, %r9d         # imm = 0x10FFFF
+ 23dc91c:      	ja	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc922:      	andl	$-0x20, %r8d
+ 23dc926:      	cmpl	$0x360, %r8d            # imm = 0x360
+ 23dc92d:      	je	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc933:      	andb	%dl, %r11b
+ 23dc936:      	jne	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc93c:      	andb	%r10b, %sil
+ 23dc93f:      	jne	0x23dce29 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1369>
+ 23dc945:      	shll	$0x6, %edi
+ 23dc948:      	movzbl	0x1(%rbx,%r13), %r15d
+ 23dc94e:      	andl	$0x3f, %r15d
+ 23dc952:      	orl	%edi, %r15d
+ 23dc955:      	cmpb	$0x1e, %al
+ 23dc957:      	jb	0x23dc990 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xed0>
+ 23dc959:      	movl	%r15d, %eax
+ 23dc95c:      	shll	$0x6, %eax
+ 23dc95f:      	movzbl	0x2(%rbx,%r13), %r15d
+ 23dc965:      	andl	$0x3f, %r15d
+ 23dc969:      	orl	%eax, %r15d
+ 23dc96c:      	testb	%dl, %dl
+ 23dc96e:      	jne	0x23dc990 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xed0>
+ 23dc970:      	shll	$0x6, %r15d
+ 23dc974:      	movzbl	0x3(%rbx,%r13), %eax
+ 23dc97a:      	andl	$0x3f, %eax
+ 23dc97d:      	orl	%r15d, %eax
+ 23dc980:      	movl	%eax, %r15d
+ 23dc983:      	nopw	%cs:(%rax,%rax)
+ 23dc990:      	movq	0x130(%rsp), %rdx
+ 23dc998:      	testq	%rdx, %rdx
+ 23dc99b:      	je	0x23dc7fa <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd3a>
+ 23dc9a1:      	movq	%r12, 0x38(%rsp)
+ 23dc9a6:      	leaq	0x128(%rsp), %rax
+ 23dc9ae:      	nop
+ 23dc9b0:      	movq	%rax, %r12
+ 23dc9b3:      	movq	%rdx, %rbp
+ 23dc9b6:      	movl	0x20(%rdx), %ebx
+ 23dc9b9:      	xorl	%edx, %edx
+ 23dc9bb:      	cmpl	%r15d, %ebx
+ 23dc9be:      	setl	%dl
+ 23dc9c1:      	movq	%rbp, %rax
+ 23dc9c4:      	cmovlq	%r12, %rax
+ 23dc9c8:      	movq	0x10(%rbp,%rdx,8), %rdx
+ 23dc9cd:      	testq	%rdx, %rdx
+ 23dc9d0:      	jne	0x23dc9b0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xef0>
+ 23dc9d2:      	leaq	0x128(%rsp), %rdx
+ 23dc9da:      	cmpq	%rdx, %rax
+ 23dc9dd:      	je	0x23dc7f0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd30>
+ 23dc9e3:      	cmpl	%r15d, %ebx
+ 23dc9e6:      	movq	%rbp, %rax
+ 23dc9e9:      	cmovlq	%r12, %rax
+ 23dc9ed:      	cmpl	0x20(%rax), %r15d
+ 23dc9f1:      	jl	0x23dc7f0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd30>
+ 23dc9f7:      	movq	0x28(%rsp), %rax
+ 23dc9fc:      	subq	%rcx, %rax
+ 23dc9ff:      	jb	0x23dcb6c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x10ac>
+ 23dca05:      	movq	%r13, %r8
+ 23dca08:      	subq	%rcx, %r8
+ 23dca0b:      	cmpq	%r8, %rax
+ 23dca0e:      	cmovbq	%rax, %r8
+ 23dca12:      	movq	0x80(%rsp), %rsi
+ 23dca1a:      	movq	%rsi, %rax
+ 23dca1d:      	notq	%rax
+ 23dca20:      	movabsq	$0x7fffffffffffffff, %rdx # imm = 0x7FFFFFFFFFFFFFFF
+ 23dca2a:      	addq	%rdx, %rax
+ 23dca2d:      	cmpq	%r8, %rax
+ 23dca30:      	jb	0x23dce7e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13be>
+ 23dca36:      	movq	0x78(%rsp), %rdi
+ 23dca3b:      	leaq	0x88(%rsp), %rax
+ 23dca43:      	cmpq	%rax, %rdi
+ 23dca46:      	je	0x23dca52 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xf92>
+ 23dca48:      	movq	0x88(%rsp), %rax
+ 23dca50:      	jmp	0x23dca57 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xf97>
+ 23dca52:      	movl	$0xf, %eax
+ 23dca57:      	addq	0x30(%rsp), %rcx
+ 23dca5c:      	leaq	(%rsi,%r8), %rdx
+ 23dca60:      	movq	%rdx, 0x48(%rsp)
+ 23dca65:      	cmpq	%rax, %rdx
+ 23dca68:      	jbe	0x23dca78 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xfb8>
+ 23dca6a:      	leaq	0x78(%rsp), %rdi
+ 23dca6f:      	xorl	%edx, %edx
+ 23dca71:      	callq	0x3b67400 <_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm@plt>
+ 23dca76:      	jmp	0x23dca98 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xfd8>
+ 23dca78:      	testq	%r8, %r8
+ 23dca7b:      	je	0x23dca98 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xfd8>
+ 23dca7d:      	addq	%rsi, %rdi
+ 23dca80:      	cmpq	$0x1, %r8
+ 23dca84:      	jne	0x23dca8d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xfcd>
+ 23dca86:      	movzbl	(%rcx), %eax
+ 23dca89:      	movb	%al, (%rdi)
+ 23dca8b:      	jmp	0x23dca98 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xfd8>
+ 23dca8d:      	movq	%rcx, %rsi
+ 23dca90:      	movq	%r8, %rdx
+ 23dca93:      	callq	0x3b67020 <memcpy@plt>
+ 23dca98:      	cmpl	%r15d, %ebx
+ 23dca9b:      	movq	0x78(%rsp), %rax
+ 23dcaa0:      	movq	0x48(%rsp), %rsi
+ 23dcaa5:      	movb	$0x0, (%rax,%rsi)
+ 23dcaa9:      	movq	%rsi, 0x80(%rsp)
+ 23dcab1:      	cmovlq	%r12, %rbp
+ 23dcab5:      	movq	0x30(%rbp), %r8
+ 23dcab9:      	movq	%rsi, %rax
+ 23dcabc:      	notq	%rax
+ 23dcabf:      	movabsq	$0x7fffffffffffffff, %rcx # imm = 0x7FFFFFFFFFFFFFFF
+ 23dcac9:      	addq	%rcx, %rax
+ 23dcacc:      	cmpq	%r8, %rax
+ 23dcacf:      	jb	0x23dce7e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13be>
+ 23dcad5:      	movq	0x78(%rsp), %rdi
+ 23dcada:      	leaq	0x88(%rsp), %rax
+ 23dcae2:      	cmpq	%rax, %rdi
+ 23dcae5:      	je	0x23dcb0a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x104a>
+ 23dcae7:      	movq	0x88(%rsp), %rax
+ 23dcaef:      	movq	0x28(%rbp), %rcx
+ 23dcaf3:      	leaq	(%r8,%rsi), %rbx
+ 23dcaf7:      	cmpq	%rax, %rbx
+ 23dcafa:      	jbe	0x23dcb1c <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x105c>
+ 23dcafc:      	leaq	0x78(%rsp), %rdi
+ 23dcb01:      	xorl	%edx, %edx
+ 23dcb03:      	callq	0x3b67400 <_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm@plt>
+ 23dcb08:      	jmp	0x23dcb3e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x107e>
+ 23dcb0a:      	movl	$0xf, %eax
+ 23dcb0f:      	movq	0x28(%rbp), %rcx
+ 23dcb13:      	leaq	(%r8,%rsi), %rbx
+ 23dcb17:      	cmpq	%rax, %rbx
+ 23dcb1a:      	ja	0x23dcafc <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x103c>
+ 23dcb1c:      	testq	%r8, %r8
+ 23dcb1f:      	je	0x23dcb3e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x107e>
+ 23dcb21:      	addq	0x48(%rsp), %rdi
+ 23dcb26:      	cmpq	$0x1, %r8
+ 23dcb2a:      	jne	0x23dcb33 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1073>
+ 23dcb2c:      	movzbl	(%rcx), %eax
+ 23dcb2f:      	movb	%al, (%rdi)
+ 23dcb31:      	jmp	0x23dcb3e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x107e>
+ 23dcb33:      	movq	%rcx, %rsi
+ 23dcb36:      	movq	%r8, %rdx
+ 23dcb39:      	callq	0x3b67020 <memcpy@plt>
+ 23dcb3e:      	movq	0x78(%rsp), %rax
+ 23dcb43:      	movb	$0x0, (%rax,%rbx)
+ 23dcb47:      	movq	%rbx, 0x80(%rsp)
+ 23dcb4f:      	movq	0x38(%rsp), %r12
+ 23dcb54:      	leaq	(%r12,%r13), %rcx
+ 23dcb58:      	movq	0x30(%rsp), %rbx
+ 23dcb5d:      	jmp	0x23dc7fa <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0xd3a>
+ 23dcb62:      	movq	0x28(%rsp), %rdx
+ 23dcb67:      	cmpq	%rdx, %rcx
+ 23dcb6a:      	jbe	0x23dcb8b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x10cb>
+ 23dcb6c:      	leaq	-0x20ecceb(%rip), %rdi  # 0x2efe88 <llvm::NaNU+0x46b>
+ 23dcb73:      	leaq	-0x22622e4(%rip), %rsi  # 0x17a896 <typeinfo name for std::exception+0x2998e>
+ 23dcb7a:      	movq	%rcx, %rdx
+ 23dcb7d:      	movq	0x28(%rsp), %rcx
+ 23dcb82:      	xorl	%eax, %eax
+ 23dcb84:      	callq	0x3b67320 <_ZSt24__throw_out_of_range_fmtPKcz@plt>
+ 23dcb89:      	xorl	%ecx, %ecx
+ 23dcb8b:      	movq	%rdx, %r8
+ 23dcb8e:      	subq	%rcx, %r8
+ 23dcb91:      	movq	0x80(%rsp), %rsi
+ 23dcb99:      	movq	%rsi, %rax
+ 23dcb9c:      	notq	%rax
+ 23dcb9f:      	movabsq	$0x7fffffffffffffff, %rdi # imm = 0x7FFFFFFFFFFFFFFF
+ 23dcba9:      	addq	%rdi, %rax
+ 23dcbac:      	cmpq	%r8, %rax
+ 23dcbaf:      	jb	0x23dce69 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13a9>
+ 23dcbb5:      	movq	%rbx, %r9
+ 23dcbb8:      	leaq	(%rsi,%r8), %rbx
+ 23dcbbc:      	movq	0x78(%rsp), %rdi
+ 23dcbc1:      	leaq	0x88(%rsp), %rax
+ 23dcbc9:      	cmpq	%rax, %rdi
+ 23dcbcc:      	je	0x23dcbef <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x112f>
+ 23dcbce:      	movq	0x88(%rsp), %rax
+ 23dcbd6:      	addq	%rcx, %r9
+ 23dcbd9:      	cmpq	%rax, %rbx
+ 23dcbdc:      	jbe	0x23dcbfc <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x113c>
+ 23dcbde:      	leaq	0x78(%rsp), %rdi
+ 23dcbe3:      	xorl	%edx, %edx
+ 23dcbe5:      	movq	%r9, %rcx
+ 23dcbe8:      	callq	0x3b67400 <_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm@plt>
+ 23dcbed:      	jmp	0x23dcc1d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x115d>
+ 23dcbef:      	movl	$0xf, %eax
+ 23dcbf4:      	addq	%rcx, %r9
+ 23dcbf7:      	cmpq	%rax, %rbx
+ 23dcbfa:      	ja	0x23dcbde <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x111e>
+ 23dcbfc:      	cmpq	%rcx, %rdx
+ 23dcbff:      	je	0x23dcc1d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x115d>
+ 23dcc01:      	addq	%rsi, %rdi
+ 23dcc04:      	cmpq	$0x1, %r8
+ 23dcc08:      	jne	0x23dcc12 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1152>
+ 23dcc0a:      	movzbl	(%r9), %eax
+ 23dcc0e:      	movb	%al, (%rdi)
+ 23dcc10:      	jmp	0x23dcc1d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x115d>
+ 23dcc12:      	movq	%r9, %rsi
+ 23dcc15:      	movq	%r8, %rdx
+ 23dcc18:      	callq	0x3b67020 <memcpy@plt>
+ 23dcc1d:      	movq	0x78(%rsp), %rax
+ 23dcc22:      	movb	$0x0, (%rax,%rbx)
+ 23dcc26:      	movq	%rbx, 0x80(%rsp)
+ 23dcc2e:      	leaq	0x1a0(%rsp), %rdi
+ 23dcc36:      	callq	0x241d5a0 <vd::Runtime::Native::~Native()>
+ 23dcc3b:      	xorl	%ebx, %ebx
+ 23dcc3d:      	movq	0x78(%rsp), %rcx
+ 23dcc42:      	movq	0x80(%rsp), %rdx
+ 23dcc4a:      	movq	%r14, %rdi
+ 23dcc4d:      	movq	0x68(%rsp), %rsi
+ 23dcc52:      	callq	0x241e440 <vd::Runtime::string_into(void**, std::basic_string_view<char, std::char_traits<char>>)>
+ 23dcc57:      	movq	0x78(%rsp), %rdi
+ 23dcc5c:      	leaq	0x88(%rsp), %rax
+ 23dcc64:      	cmpq	%rax, %rdi
+ 23dcc67:      	je	0x23dcc79 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x11b9>
+ 23dcc69:      	movq	0x88(%rsp), %rsi
+ 23dcc71:      	incq	%rsi
+ 23dcc74:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dcc79:      	movq	0x200(%rsp), %rdi
+ 23dcc81:      	leaq	0x210(%rsp), %rax
+ 23dcc89:      	cmpq	%rax, %rdi
+ 23dcc8c:      	je	0x23dcc9e <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x11de>
+ 23dcc8e:      	movq	0x210(%rsp), %rsi
+ 23dcc96:      	incq	%rsi
+ 23dcc99:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dcc9e:      	leaq	0x118(%rsp), %rdi
+ 23dcca6:      	callq	0x23dd780 <(anonymous namespace)::RuleSnapshot::~RuleSnapshot()>
+ 23dccab:      	movq	0x158(%rsp), %r14
+ 23dccb3:      	testq	%r14, %r14
+ 23dccb6:      	je	0x23dcd0f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x124f>
+ 23dccb8:      	movq	0x8(%r14), %rax
+ 23dccbc:      	movabsq	$0x100000001, %rcx      # imm = 0x100000001
+ 23dccc6:      	cmpq	%rcx, %rax
+ 23dccc9:      	jne	0x23dccf7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1237>
+ 23dcccb:      	movq	$0x0, 0x8(%r14)
+ 23dccd3:      	movq	(%r14), %rax
+ 23dccd6:      	movq	%r14, %rdi
+ 23dccd9:      	callq	*0x10(%rax)
+ 23dccdc:      	movq	(%r14), %rax
+ 23dccdf:      	movq	%r14, %rdi
+ 23dcce2:      	callq	*0x18(%rax)
+ 23dcce5:      	movq	0x178(%rsp), %r14
+ 23dcced:      	testq	%r14, %r14
+ 23dccf0:      	jne	0x23dcd20 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1260>
+ 23dccf2:      	jmp	0x23dcda0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12e0>
+ 23dccf7:      	movq	0x1825b1a(%rip), %rcx   # 0x3c02818 <write+0x3c02818>
+ 23dccfe:      	cmpb	$0x0, (%rcx)
+ 23dcd01:      	je	0x23dcd69 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12a9>
+ 23dcd03:      	leal	-0x1(%rax), %ecx
+ 23dcd06:      	movl	%ecx, 0x8(%r14)
+ 23dcd0a:      	cmpl	$0x1, %eax
+ 23dcd0d:      	je	0x23dcd79 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12b9>
+ 23dcd0f:      	movq	0x178(%rsp), %r14
+ 23dcd17:      	testq	%r14, %r14
+ 23dcd1a:      	je	0x23dcda0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12e0>
+ 23dcd20:      	movq	0x8(%r14), %rax
+ 23dcd24:      	movabsq	$0x100000001, %rcx      # imm = 0x100000001
+ 23dcd2e:      	cmpq	%rcx, %rax
+ 23dcd31:      	jne	0x23dcd4f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x128f>
+ 23dcd33:      	movq	$0x0, 0x8(%r14)
+ 23dcd3b:      	movq	(%r14), %rax
+ 23dcd3e:      	movq	%r14, %rdi
+ 23dcd41:      	callq	*0x10(%rax)
+ 23dcd44:      	movq	(%r14), %rax
+ 23dcd47:      	movq	%r14, %rdi
+ 23dcd4a:      	callq	*0x18(%rax)
+ 23dcd4d:      	jmp	0x23dcda0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12e0>
+ 23dcd4f:      	movq	0x1825ac2(%rip), %rcx   # 0x3c02818 <write+0x3c02818>
+ 23dcd56:      	cmpb	$0x0, (%rcx)
+ 23dcd59:      	je	0x23dcd90 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12d0>
+ 23dcd5b:      	leal	-0x1(%rax), %ecx
+ 23dcd5e:      	movl	%ecx, 0x8(%r14)
+ 23dcd62:      	cmpl	$0x1, %eax
+ 23dcd65:      	jne	0x23dcda0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12e0>
+ 23dcd67:      	jmp	0x23dcdc1 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1301>
+ 23dcd69:      	movl	$0xffffffff, %eax       # imm = 0xFFFFFFFF
+ 23dcd6e:      	lock
+ 23dcd6f:      	xaddl	%eax, 0x8(%r14)
+ 23dcd74:      	cmpl	$0x1, %eax
+ 23dcd77:      	jne	0x23dcd0f <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x124f>
+ 23dcd79:      	movq	%r14, %rdi
+ 23dcd7c:      	callq	0x1f1e480 <std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()>
+ 23dcd81:      	movq	0x178(%rsp), %r14
+ 23dcd89:      	testq	%r14, %r14
+ 23dcd8c:      	jne	0x23dcd20 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1260>
+ 23dcd8e:      	jmp	0x23dcda0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12e0>
+ 23dcd90:      	movl	$0xffffffff, %eax       # imm = 0xFFFFFFFF
+ 23dcd95:      	lock
+ 23dcd96:      	xaddl	%eax, 0x8(%r14)
+ 23dcd9b:      	cmpl	$0x1, %eax
+ 23dcd9e:      	je	0x23dcdc1 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1301>
+ 23dcda0:      	movl	%ebx, %eax
+ 23dcda2:      	addq	$0x2b8, %rsp            # imm = 0x2B8
+ 23dcda9:      	popq	%rbx
+ 23dcdaa:      	popq	%r12
+ 23dcdac:      	popq	%r13
+ 23dcdae:      	popq	%r14
+ 23dcdb0:      	popq	%r15
+ 23dcdb2:      	popq	%rbp
+ 23dcdb3:      	retq
+ 23dcdb4:      	movq	%rbx, %rdi
+ 23dcdb7:      	callq	0x1f1e480 <std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()>
+ 23dcdbc:      	jmp	0x23dc268 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x7a8>
+ 23dcdc1:      	movq	%r14, %rdi
+ 23dcdc4:      	callq	0x1f1e480 <std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()>
+ 23dcdc9:      	jmp	0x23dcda0 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x12e0>
+ 23dcdcb:      	movl	$0x10, %edi
+ 23dcdd0:      	callq	0x3b67080 <__cxa_allocate_exception@plt>
+ 23dcdd5:      	movq	%rax, %r14
+ 23dcdd8:      	leaq	-0x20da6d4(%rip), %rsi  # 0x30270b <llvm::NaNL+0x11fa3>
+ 23dcddf:      	movq	%rax, %rdi
+ 23dcde2:      	callq	0x3b676b0 <_ZNSt16invalid_argumentC1EPKc@plt>
+ 23dcde7:      	leaq	0x178e2f2(%rip), %rsi   # 0x3b6b0e0 <typeinfo for std::invalid_argument>
+ 23dcdee:      	movq	0x1825af3(%rip), %rdx   # 0x3c028e8 <write+0x3c028e8>
+ 23dcdf5:      	movq	%r14, %rdi
+ 23dcdf8:      	callq	0x3b670a0 <__cxa_throw@plt>
+ 23dcdfd:      	movl	%eax, %edi
+ 23dcdff:      	callq	0x3b67520 <_ZSt20__throw_system_errori@plt>
+ 23dce04:      	movl	$0x10, %edi
+ 23dce09:      	callq	0x3b67080 <__cxa_allocate_exception@plt>
+ 23dce0e:      	movq	%rax, %r14
+ 23dce11:      	leaq	-0x2222cbe(%rip), %rsi  # 0x1ba15a <typeinfo name for std::exception+0x69252>
+ 23dce18:      	movq	%rax, %rdi
+ 23dce1b:      	callq	0x3b676d0 <_ZNSt11logic_errorC1EPKc@plt>
+ 23dce20:      	jmp	0x23dce45 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1385>
+ 23dce22:      	movl	%eax, %edi
+ 23dce24:      	callq	0x3b67520 <_ZSt20__throw_system_errori@plt>
+ 23dce29:      	movl	$0x10, %edi
+ 23dce2e:      	callq	0x3b67080 <__cxa_allocate_exception@plt>
+ 23dce33:      	movq	%rax, %r14
+ 23dce36:      	leaq	-0x2222ce3(%rip), %rsi  # 0x1ba15a <typeinfo name for std::exception+0x69252>
+ 23dce3d:      	movq	%rax, %rdi
+ 23dce40:      	callq	0x3b676d0 <_ZNSt11logic_errorC1EPKc@plt>
+ 23dce45:      	leaq	0x178e2ac(%rip), %rsi   # 0x3b6b0f8 <typeinfo for std::logic_error>
+ 23dce4c:      	movq	0x1825a9d(%rip), %rdx   # 0x3c028f0 <write+0x3c028f0>
+ 23dce53:      	movq	%r14, %rdi
+ 23dce56:      	callq	0x3b670a0 <__cxa_throw@plt>
+ 23dce5b:      	movl	%eax, %edi
+ 23dce5d:      	callq	0x3b67520 <_ZSt20__throw_system_errori@plt>
+ 23dce62:      	movl	%eax, %edi
+ 23dce64:      	callq	0x3b67520 <_ZSt20__throw_system_errori@plt>
+ 23dce69:      	leaq	-0x2141391(%rip), %rax  # 0x29badf <SanCovCallbackGateSectionName+0x40dd5>
+ 23dce70:      	jmp	0x23dce79 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13b9>
+ 23dce72:      	leaq	-0x227ab76(%rip), %rax  # 0x162303 <typeinfo name for std::exception+0x113fb>
+ 23dce79:      	movq	%rax, 0x60(%rsp)
+ 23dce7e:      	movq	0x60(%rsp), %rdi
+ 23dce83:      	callq	0x3b670c0 <_ZSt20__throw_length_errorPKc@plt>
+ 23dce88:      	jmp	0x23dcea5 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13e5>
+ 23dce8a:      	jmp	0x23dcea5 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x13e5>
+ 23dce8c:      	jmp	0x23dced2 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1412>
+ 23dce8e:      	movq	%rax, %rbx
+ 23dce91:      	movq	0x30(%rsp), %rdi
+ 23dce96:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dce9b:      	jmp	0x23dcff9 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1539>
+ 23dcea0:      	jmp	0x23dcfe9 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1529>
+ 23dcea5:      	movq	%rax, %rbx
+ 23dcea8:      	jmp	0x23dcff9 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1539>
+ 23dcead:      	jmp	0x23dced2 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1412>
+ 23dceaf:      	movq	%rax, %rbx
+ 23dceb2:      	movq	0x30(%rsp), %rdi
+ 23dceb7:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dcebc:      	jmp	0x23dcf8d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14cd>
+ 23dcec1:      	jmp	0x23dd04b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x158b>
+ 23dcec6:      	jmp	0x23dd04b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x158b>
+ 23dcecb:      	jmp	0x23dcef7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1437>
+ 23dcecd:      	jmp	0x23dd04b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x158b>
+ 23dced2:      	movq	%rax, %rbx
+ 23dced5:      	jmp	0x23dcf8d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14cd>
+ 23dceda:      	movq	%rax, %rbx
+ 23dcedd:      	leaq	0x170(%rsp), %rdi
+ 23dcee5:      	callq	0x23dd9e0 <std::__shared_ptr<vd::ElementSchema const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()>
+ 23dceea:      	movq	%rbx, %rdi
+ 23dceed:      	callq	0x3b67150 <_Unwind_Resume@plt>
+ 23dcef2:      	jmp	0x23dd04b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x158b>
+ 23dcef7:      	movq	%rax, %rbx
+ 23dcefa:      	movq	%r14, %rdi
+ 23dcefd:      	callq	0x3b670d0 <__cxa_free_exception@plt>
+ 23dcf02:      	jmp	0x23dcfec <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x152c>
+ 23dcf07:      	jmp	0x23dd04b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x158b>
+ 23dcf0c:      	jmp	0x23dd06a <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x15aa>
+ 23dcf11:      	movq	%rax, %rbx
+ 23dcf14:      	movq	0x180(%rsp), %rdi
+ 23dcf1c:      	leaq	0x190(%rsp), %rax
+ 23dcf24:      	cmpq	%rax, %rdi
+ 23dcf27:      	jne	0x23dcfbc <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14fc>
+ 23dcf2d:      	movzbl	0xe8(%rsp), %eax
+ 23dcf35:      	movb	$0x0, 0xe8(%rsp)
+ 23dcf3d:      	cmpb	$0x1, %al
+ 23dcf3f:      	je	0x23dd0b7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x15f7>
+ 23dcf45:      	movzbl	0x270(%rsp), %eax
+ 23dcf4d:      	movb	$0x0, 0x270(%rsp)
+ 23dcf55:      	cmpb	$0x1, %al
+ 23dcf57:      	jne	0x23dcf66 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14a6>
+ 23dcf59:      	leaq	0x200(%rsp), %rdi
+ 23dcf61:      	callq	0x23f8680 <vd::Runtime::BufferReadLease::~BufferReadLease()>
+ 23dcf66:      	leaq	0xf0(%rsp), %rdi
+ 23dcf6e:      	callq	0x23dd970 <std::__shared_ptr<vd::BufferLayout const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()>
+ 23dcf73:      	leaq	0x100(%rsp), %rdi
+ 23dcf7b:      	callq	0x23dd970 <std::__shared_ptr<vd::BufferLayout const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()>
+ 23dcf80:      	leaq	0x298(%rsp), %rdi
+ 23dcf88:      	callq	0x2420490 <vd::Runtime::Frame::~Frame()>
+ 23dcf8d:      	leaq	0x118(%rsp), %rdi
+ 23dcf95:      	callq	0x23dd780 <(anonymous namespace)::RuleSnapshot::~RuleSnapshot()>
+ 23dcf9a:      	leaq	0x150(%rsp), %rdi
+ 23dcfa2:      	callq	0x23dd9e0 <std::__shared_ptr<vd::ElementSchema const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()>
+ 23dcfa7:      	leaq	0x170(%rsp), %rdi
+ 23dcfaf:      	callq	0x23dd9e0 <std::__shared_ptr<vd::ElementSchema const, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr()>
+ 23dcfb4:      	movq	%rbx, %rdi
+ 23dcfb7:      	callq	0x3b67150 <_Unwind_Resume@plt>
+ 23dcfbc:      	movq	0x190(%rsp), %rsi
+ 23dcfc4:      	incq	%rsi
+ 23dcfc7:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dcfcc:      	movzbl	0xe8(%rsp), %eax
+ 23dcfd4:      	movb	$0x0, 0xe8(%rsp)
+ 23dcfdc:      	cmpb	$0x1, %al
+ 23dcfde:      	jne	0x23dcf45 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1485>
+ 23dcfe4:      	jmp	0x23dd0b7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x15f7>
+ 23dcfe9:      	movq	%rax, %rbx
+ 23dcfec:      	leaq	0x1a0(%rsp), %rdi
+ 23dcff4:      	callq	0x241d5a0 <vd::Runtime::Native::~Native()>
+ 23dcff9:      	movq	0x78(%rsp), %rdi
+ 23dcffe:      	leaq	0x88(%rsp), %rax
+ 23dd006:      	cmpq	%rax, %rdi
+ 23dd009:      	je	0x23dd01b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x155b>
+ 23dd00b:      	movq	0x88(%rsp), %rsi
+ 23dd013:      	incq	%rsi
+ 23dd016:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dd01b:      	movq	0x200(%rsp), %rdi
+ 23dd023:      	leaq	0x210(%rsp), %rax
+ 23dd02b:      	cmpq	%rax, %rdi
+ 23dd02e:      	je	0x23dcf8d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14cd>
+ 23dd034:      	movq	0x210(%rsp), %rsi
+ 23dd03c:      	incq	%rsi
+ 23dd03f:      	callq	0xed61e8 <operator delete(void*, unsigned long)>
+ 23dd044:      	jmp	0x23dcf8d <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14cd>
+ 23dd049:      	jmp	0x23dd04b <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x158b>
+ 23dd04b:      	movq	%rax, %rbx
+ 23dd04e:      	movzbl	0xe8(%rsp), %eax
+ 23dd056:      	movb	$0x0, 0xe8(%rsp)
+ 23dd05e:      	cmpb	$0x1, %al
+ 23dd060:      	jne	0x23dcf45 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1485>
+ 23dd066:      	jmp	0x23dd0b7 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x15f7>
+ 23dd068:      	jmp	0x23dd092 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x15d2>
+ 23dd06a:      	movq	%rax, %rbx
+ 23dd06d:      	movq	0x30(%rsp), %rdi
+ 23dd072:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dd077:      	movq	%rbx, %rdi
+ 23dd07a:      	callq	0x3b67150 <_Unwind_Resume@plt>
+ 23dd07f:      	movq	%rax, %rbx
+ 23dd082:      	movq	%r14, %rdi
+ 23dd085:      	callq	0x3b670d0 <__cxa_free_exception@plt>
+ 23dd08a:      	movq	%rbx, %rdi
+ 23dd08d:      	callq	0x3b67150 <_Unwind_Resume@plt>
+ 23dd092:      	movq	%rax, %rbx
+ 23dd095:      	movq	0x30(%rsp), %rdi
+ 23dd09a:      	callq	0x3b676a0 <pthread_mutex_unlock@plt>
+ 23dd09f:      	movzbl	0xe8(%rsp), %eax
+ 23dd0a7:      	movb	$0x0, 0xe8(%rsp)
+ 23dd0af:      	cmpb	$0x1, %al
+ 23dd0b1:      	jne	0x23dcf45 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1485>
+ 23dd0b7:      	leaq	0x78(%rsp), %rdi
+ 23dd0bc:      	callq	0x23f8680 <vd::Runtime::BufferReadLease::~BufferReadLease()>
+ 23dd0c1:      	movzbl	0x270(%rsp), %eax
+ 23dd0c9:      	movb	$0x0, 0x270(%rsp)
+ 23dd0d1:      	cmpb	$0x1, %al
+ 23dd0d3:      	je	0x23dcf59 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x1499>
+ 23dd0d9:      	jmp	0x23dcf66 <vd::Runtime::translate_scalars(void**, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::Runtime::RegisteredRootWord, vd::NativeArrayElement const&, long)+0x14a6>

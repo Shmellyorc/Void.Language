@@ -1,5 +1,194 @@
 # Small-file logging attribution — 4 November 2026
 
+## Isolated short-message correction — 5 November 2026 (Golden Wrench review)
+
+**Recommendation: retain this one uncommitted candidate as a partial optimization
+for Golden Wrench review. File200 remains FAIL; LOG-PERF stays OPEN / release HOLD.**
+This is not release acceptance or an owner disposition of the <10 ms requirement.
+No second candidate, tuning variant, CI, commit or push was attempted. The earlier
+rejected no-match and allocator experiments below remain unchanged.
+
+The corrected candidate recovers the short-input benefit with no consistent
+heavy-logging slowdown demonstrated in the bounded matched comparison. Complete
+file200 measures **24.949 → 16.722 ms** pooled, but controls moved substantially
+between blocks; the apparent **8.227 ms / 33.0%** wall saving is descriptive,
+not exclusive translation attribution. Every candidate file200 sample is above
+10 ms. Heavy framing measures **7.941 → 7.993 ms (+0.65%)**, and console
+**18.536 → 18.339 ms (−1.06%)**. All candidate heavy samples and block medians
+pass their 10/20 ms thresholds. Exact equivalence and confidence intervals are
+not established; the recommendation has this host/mode/protocol scope.
+
+[Samples, commands, hashes and scope](evidence/length-dispatch-20261105/results.json) ·
+[Candidate patch](evidence/length-dispatch-20261105/candidate.patch) ·
+[Long-path disassembly excerpt](evidence/length-dispatch-20261105/long-path-extract.txt) ·
+[Static review](evidence/length-dispatch-20261105/static-review.json)
+
+### Implementation and optimized native path
+
+Started from restored production at HEAD `da2adf6f`; translation SHA-256 was
+`a977bdb662633f28ac373a713f6daf4920cc62ebc2b40d3f840b54dd2fd6e24a`.
+Only `src/runtime/text_case.cpp` changes production code: **74 added, 16 removed
+lines**, including indentation of the unchanged original rule loop.
+
+The mandatory root-validation block saves `string_bytes(...).size()` as a scalar
+hint. After the existing common schema/count checks and lease acquisition,
+`input_bytes > 128` enters the original rule loop directly. A local class's
+static `ShortAsciiNoMatch::prove` is marked no-inline with Clang/GCC and MSVC
+attributes; no Runtime header or public contract is added. The short helper
+re-resolves the registered input under the existing mutex and checks its current
+extent before scanning. It retains the earlier **128-byte ASCII / 256-rule /
+16 KiB input-plus-replacement-extent** bounds, presence bitmap, strict key order,
+scalar and current replacement identity/extent checks. It holds no persistent
+state or managed borrow across a poll.
+
+A successful proof releases the backing leases and uses the original checked
+alias-publication sequence, after rule validation and budget checks. An
+inconclusive short probe releases its borrows, polls once before adding general
+work to the bounded probe, then uses the **same selected rooted backing leases**
+and original rule loop. There is no recursive translation, second common
+root/schema/count validation, or second lease acquisition. Unsorted valid rules
+still reach the general path. The original general loop body and iteration
+condition are byte-identical apart from indentation; no optional-value test was
+added to its source iteration condition. General copying quotas, polls,
+NativeSafe work/disposal, error ordering and publication remain intact.
+
+**Optimized object inspection preceded correctness execution and timing.** In the
+Release `-O3 -DNDEBUG` object, the mandatory `reference_source` call is at
+`0xaed`, `Heap::string_bytes` at `0xafc`, and the returned extent is saved in
+`%rbx` at `0xb01`. After the count comparison:
+
+```text
+0xe1d: cmpq $0x80, %rbx
+0xe24: ja   0xfd3          ; long input: original rule-processing entry
+...
+0xe62: call 0x22a0         ; short input only: out-of-line proof
+...
+0xfce: call Runtime::poll ; inconclusive short proof only
+0xfd3: ... root_word(&replacement), then original rule loop
+```
+
+The long branch bypasses the helper's speculative mutex lock (`0x22e4`), input
+root lookup (`0x22fc`), string lookup (`0x230e`), bitmap and rule walk, and the
+short-fallback poll. It retains the normal per-rule and later source-snapshot
+checks. Native sizes are **5,409 → 5,662 bytes** for the main operation plus a
+separate **460-byte** proof. Main stack reservation remains **696 bytes**; the
+helper reserves another 88 only when called. The original loop also contains
+the compiler-generated compare/setne/test latch seen in the candidate; this is
+not evidence of an added per-rule optional check.
+
+The linked component host contains the main operation at `0x23dbac0` and the
+local proof at `0x23dd2d0`, with those same sizes. Its
+[main disassembly](evidence/length-dispatch-20261105/linked-main-disassembly.txt)
+and [helper disassembly](evidence/length-dispatch-20261105/linked-helper-disassembly.txt)
+are preserved. Different native layout/register assignments remain. The static
+inspection proves execution isolation, not why the old candidate slowed down
+or a guaranteed timing recovery on other hosts.
+
+### Correctness, failures and durability
+
+- Both the focused fixture and existing `text.void` pass **normal/O2 JIT and
+  normal/O2 linked AOT** with the candidate. Production controls also pass the
+  identical native and normal/O2 JIT byte/status/error oracles. The focused
+  [fixture](evidence/length-dispatch-20261105/translation_no_match.void) covers
+  distinct/repeated strings, escapes, Unicode, empty and 128/129-byte input,
+  unsorted/duplicate/invalid/mutated rules, count mismatches, budgets, aliases,
+  large replacements and 257-rule fallback.
+- Candidate focused native/JIT checks: **879**; additional native checks:
+  **876**, including late corrupt replacement extents and invalid-rule/error
+  precedence. Production controls pass **1,905 / 1,902** checks; extra assertions
+  reflect the larger injected-allocation sweep, not different semantic oracles.
+- For 0/1/81/256/257-rule no-match cases, exhaustive injected failures before
+  success are respectively **5/6/86/261/262** in production and **4/4/4/4/262**
+  for the candidate. Actually performed allocation failures preserve the Runtime
+  failure channel, untouched aliased output and collectible roots. Removing
+  unused allocations changes injection ordinals; exact old ordinals are not
+  claimed. The existing long translation ABI sweep recovers **11** failures.
+- Existing ownership/forced-GC/allocation coverage passes **31,224** checks
+  across normal/O2 JIT. Logging integration passes **1,688**, including startup,
+  reload, native partial/error boundaries, allocation failures and cancellation.
+  The native-only additional host passes **876** with ASan/UBSan and leak
+  detection. This overlays the current translation TU on the retained strict
+  Runtime; its older frontend was not invoked, and no full current strict-source
+  qualification is claimed.
+- Complete file200 byte/count oracles retain **15,000 bytes, 200 writes and one
+  required flush** in every sample. Acquisition, required fsync and close remain
+  inside the timed workload. Post-GC payload/handle equality passes, as do heavy
+  complete-byte/count oracles. Logger, I/O implementation and durability policy
+  are unchanged. All **51 recorded child commands exit 0**; no failed current
+  command or discarded timing sample is hidden.
+
+### Matched performance results
+
+Same retained Release LLVM/Clang/LLD **23.1.4** libraries and host, GC **256**,
+JIT **O2**, actual checked **1 MiB soft/hard stacks**. Control/candidate hosts
+link only the respective translation object ahead of the same Runtime archive.
+No native translation clocks or allocation counters are enabled. Compilation
+and admission precede timing. Order is **control A, candidate A, candidate B,
+control B**; every cell has one warmup and three measured samples. Pooled values
+use six measured samples per version, with actual observed ranges:
+
+| Workload, ms | Production control median [range] | Candidate median [range] |
+| --- | ---: | ---: |
+| Complete file200, <10 ms | **24.949 [20.459–31.116]** | **16.722 [16.420–17.237]** |
+| Prepared direct file200 | 11.312 [9.653–17.213] | 9.290 [9.126–9.411] |
+| Short ASCII quote200 | 4.688 [4.591–5.348] | 1.657 [1.639–1.675] |
+| Short complete frame200 | 7.754 [7.190–8.106] | 4.314 [4.009–4.399] |
+| Short full console200 | 11.309 [11.157–11.578] | 8.051 [7.847–8.086] |
+| Heavy quote100 | 5.324 [5.255–5.532] | 5.440 [4.927–5.744] |
+| Heavy complete frame100, ≤10 ms | **7.941 [7.646–8.357]** | **7.993 [7.052–8.753]** |
+| Heavy full console100, ≤20 ms | **18.536 [18.154–19.156]** | **18.339 [17.593–18.745]** |
+
+| Block median, ms, execution order | Control A | Candidate A | Candidate B | Control B |
+| --- | ---: | ---: | ---: | ---: |
+| Complete file200 | 29.961 | 16.852 | 16.592 | 20.973 |
+| Prepared direct file200 | 15.809 | 9.203 | 9.310 | 9.671 |
+| Heavy complete frame100 | 7.762 | 7.505 | 8.048 | 8.259 |
+| Heavy full console100 | 18.531 | 17.973 | 18.744 | 18.542 |
+
+File200 CPU medians are **15.286 → 10.997 ms**. Short quote200 improves **64.7%**.
+The file/control and direct-comparator wall shifts are substantial; no exclusive
+I/O cause or translation-only wall saving is inferred. Even against the trailing
+control block, candidate B improves file200 **20.973 → 16.592 ms**. This is a
+meaningful partial gain in the retained samples, while every candidate sample
+still fails the original file gate.
+
+Heavy pooled framing is **0.052 ms / 0.65% slower**, but both neighboring matched
+block medians improve. Console is **0.197 ms / 1.06% faster** pooled, with one
+candidate block faster and one **1.1% slower** than its neighboring control.
+Heavy quote is **2.18% slower** pooled, with opposite movement between matched
+blocks. These observations do not demonstrate a consistent material heavy
+regression; they also do not prove exact equivalence. All individual candidate
+heavy framing/console samples pass, unlike the previous rejected experiment.
+No concern required another measurement series, and no confirmatory/tuning run
+was launched after this balanced comparison.
+
+### Preserved evidence, limits and stop
+
+The receipt contains **120 rows: 96 measured and 24 component warmups**, plus
+eight untabulated original-workload warmups. It retains every wall/CPU sample,
+command, cwd/environment override, source/library/binary/toolchain hash, load
+observation and optimized disassembly. Small artifacts and drivers are copied
+beside it; large binaries and complete recorder data remain at
+`/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/`.
+Drivers are `static.py`, `prepare.py`, `check.py`, `extra-check.py`, `measure.py`,
+`final-check.py` and `record.py`. They use the retained build and prior host
+sources named in the driver; replay requires those inputs or verified equivalents
+and a fresh private directory. Accepted artifacts are not overwritten.
+
+This active-desktop, unrandomized comparison has no pinned frequency, CPU
+isolation or confidence intervals. Only JIT O2 is performance-timed; other
+JIT/AOT modes receive correctness checks. Other platforms, full current
+Debug/strict-source qualification, tail/worst-pause behavior and peak native-live
+memory remain unqualified. Existing full-input reserve and final immutable-string
+publication pause limitations remain. The earlier regression's cause remains
+unknown; the new measurements do not retrospectively attribute it to one lock.
+
+The measured candidate source and patch are unchanged after testing. Only the
+Runtime candidate and this report/evidence are new work; the pre-existing heavy
+investigation is untouched. No logging sinks, synchronization, formatting,
+licenses, HTTP, installation, CI or protected README changes occurred. **Leave
+the candidate uncommitted, stop for Golden Wrench review, and keep LOG-PERF OPEN.**
+
 ## Validated no-match translation experiment — 5 November 2026 (discarded)
 
 **One authorized candidate evaluated and discarded. Production translation is

@@ -1,0 +1,41 @@
+{
+  "root": "/home/shmellyorc/Documents/Void.Language",
+  "retained_build": "/home/shmellyorc/.local/state/void-log-performance/framing-candidate-hAebdlqN/build",
+  "head": "da2adf6f51ed0c1d56e95c91ddfdf88e72f15f0c",
+  "uname": {
+    "system": "Linux",
+    "node": "gamedev",
+    "release": "7.2.11-pikaos",
+    "version": "#101pika1 SMP PREEMPT_DYNAMIC Sat Oct 17 21:28:05 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "compiler": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n",
+  "flags": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+    "-DCURL_STATICLIB",
+    "-I/home/shmellyorc/Documents/Void.Language/include",
+    "-I/home/shmellyorc/Documents/Void.Language/third_party/curl/include",
+    "-isystem",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include",
+    "-O3",
+    "-DNDEBUG",
+    "-std=c++20",
+    "-fno-rtti",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic"
+  ],
+  "env": {
+    "LANG": "en_US.UTF-8",
+    "LC_CTYPE": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "PATH": "/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools"
+  },
+  "hashes": {
+    "/home/shmellyorc/.local/state/void-log-performance/framing-candidate-hAebdlqN/build/libvoid_runtime.a": "efca70c10498a97a3e5fa1db988ed702e635d4ba9da4c22ae6a60c659ac145f9",
+    "/home/shmellyorc/Documents/Void.Language/stdlib/log.void": "0a76c2ed77e01c454e7e15496eb649d825ba0f123df26bef674ac704d7549b2b",
+    "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-text_case.cpp": "bdbad97fffce38ed2f5213b825ee5917f773610e5901f0e88c21b9b00375c2f1",
+    "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/original-text_case.cpp": "a977bdb662633f28ac373a713f6daf4920cc62ebc2b40d3f840b54dd2fd6e24a"
+  }
+}

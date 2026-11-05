@@ -1,0 +1,309 @@
+{
+  "date": "2026-11-05",
+  "timezone": "America/Vancouver",
+  "scope": "Final source/evidence audit only. No Runtime, test, compiler, sanitizer or benchmark execution.",
+  "head": "da2adf6f51ed0c1d56e95c91ddfdf88e72f15f0c",
+  "candidate_source_sha256": "bdbad97fffce38ed2f5213b825ee5917f773610e5901f0e88c21b9b00375c2f1",
+  "baseline_source_sha256": "a977bdb662633f28ac373a713f6daf4920cc62ebc2b40d3f840b54dd2fd6e24a",
+  "complete_production_patch": "../candidate.patch",
+  "complete_production_patch_sha256": "c8cae74bfe64130d4c87ef122c61452b74b0d461940c972702cca3a9aa8ae4f4",
+  "production_changed_paths": [
+    "src/runtime/text_case.cpp"
+  ],
+  "candidate_function_only_changed": true,
+  "original_general_loop_identical_except_indentation": true,
+  "checked_alias_publication_sequence_identical": true,
+  "historical_manifest_sha256": "862746a5607cbc888d9ab30a7bfbdbc5ed8b4f50d82d2a64843039d313f07ae3",
+  "historical_artifacts_verified": 128,
+  "retained_binaries_libraries_tools_verified": 24,
+  "overlay": {
+    "only_change": "Make unicode_case_tables.inc include absolute; all candidate function bytes unchanged",
+    "sha256": "50f310ac46d0d1b9ca415aeacdc0fb34c149417504c9a893c93873eed8fc25ba"
+  },
+  "candidate_compilations": [
+    {
+      "source": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.cpp",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain-strict.o",
+      "output_sha256": "27f8c1ced8e1fc3143c6b5e8fc85e3ca675d878ccf0ee088ff79290072877af8",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCURL_STATICLIB",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-I/home/shmellyorc/Documents/Void.Language/third_party/curl/include",
+        "-isystem",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/include",
+        "-O2",
+        "-g",
+        "-DNDEBUG",
+        "-std=c++20",
+        "-fno-rtti",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-c",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.cpp",
+        "-o",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain-strict.o"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-rngvkszj/receipt.json"
+    },
+    {
+      "source": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.cpp",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "output_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DCURL_STATICLIB",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-I/home/shmellyorc/Documents/Void.Language/third_party/curl/include",
+        "-isystem",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include",
+        "-O3",
+        "-DNDEBUG",
+        "-std=c++20",
+        "-fno-rtti",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-c",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.cpp",
+        "-o",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-zc24wqbb/receipt.json"
+    }
+  ],
+  "candidate_links": [
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/correctness",
+      "output_sha256": "564e303b067b9d1bc3be1ba0b169faddc0c0abbd4207a4f0849154cd5637994f",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-6y88bcwr/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture2-normal",
+      "output_sha256": "95f99e6ebcab9f216b053d9213ba06cc07d5da5861d86d4d9005350f45e60945",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-9atxidjl/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture1-normal",
+      "output_sha256": "df392579a7ab2a74584e6e14d60111ffbb64c3737bd4ca1070361f1b41321807",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-_owsfju2/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/original-candidate",
+      "output_sha256": "997956d9d23d2f7c10058a967571e3535f955bf2ad5f0b0ca0f730b0546cd211",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-f595ullc/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture1-o2",
+      "output_sha256": "01bd1a0696a1046e644c60c9dbf60906689db51147b5d8f096895102c63d2185",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-lu9a456i/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/native-extra",
+      "output_sha256": "d27192a2fd3bd898e0c13a9cc2f519e4450923782878ab388868917711a4fe7c",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-m7v_u0v8/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain-strict.o",
+      "candidate_object_sha256": "27f8c1ced8e1fc3143c6b5e8fc85e3ca675d878ccf0ee088ff79290072877af8",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/native-extra-strict",
+      "output_sha256": "fb56acfbb4f27353eefc386a61711369d0398fdca3ab5839d11f7bb5e4f40cc9",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-mw2vkwhi/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/log-host",
+      "output_sha256": "081f6a24e99ce910cec9c863efcb083efe280993e864d358c4f1f80266125dde",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-pnrtzr8p/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/ownership",
+      "output_sha256": "7330772166526c74103801c539c4ef61f87805a478ae2782c873f54924ae6d2f",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-qgiodemg/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components-candidate",
+      "output_sha256": "dce61acffc9db6762feac34d428a46b7427b10c43f6f235869e087e978e54a4d",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-v4ac7_0n/receipt.json"
+    },
+    {
+      "candidate_object": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/candidate-plain.o",
+      "candidate_object_sha256": "3ac4101ee34e7d69871ec098336200a690f6a51a408290cb000811a62b449da7",
+      "output": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture2-o2",
+      "output_sha256": "bd53ca246dd8f331d4c2d7ed2ad3f0315ee558f14c024032363d3fac028dfdd7",
+      "object_precedes_runtime_archive": true,
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-wje_upu8/receipt.json"
+    }
+  ],
+  "candidate_successful_executions": [
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture2-o2",
+      "sha256": "bd53ca246dd8f331d4c2d7ed2ad3f0315ee558f14c024032363d3fac028dfdd7",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture2-o2"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-1899bfyc/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture1-o2",
+      "sha256": "01bd1a0696a1046e644c60c9dbf60906689db51147b5d8f096895102c63d2185",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture1-o2"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-28d96li9/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture2-normal",
+      "sha256": "95f99e6ebcab9f216b053d9213ba06cc07d5da5861d86d4d9005350f45e60945",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture2-normal"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-7ehpoyou/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture1-normal",
+      "sha256": "df392579a7ab2a74584e6e14d60111ffbb64c3737bd4ca1070361f1b41321807",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/fixture1-normal"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-bllcy53w/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/ownership",
+      "sha256": "7330772166526c74103801c539c4ef61f87805a478ae2782c873f54924ae6d2f",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/ownership",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-e990869y/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/log-host",
+      "sha256": "081f6a24e99ce910cec9c863efcb083efe280993e864d358c4f1f80266125dde",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/log-host",
+        "/home/shmellyorc/Documents/Void.Language",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/check-log-work"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-hcjdl230/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/native-extra-strict",
+      "sha256": "fb56acfbb4f27353eefc386a61711369d0398fdca3ab5839d11f7bb5e4f40cc9",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/native-extra-strict",
+        "unused",
+        "unused",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-mas7nefd/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/original-candidate",
+      "sha256": "997956d9d23d2f7c10058a967571e3535f955bf2ad5f0b0ca0f730b0546cd211",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/original-candidate",
+        "/home/shmellyorc/Documents/Void.Language",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/1-candidate-original"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-oloei82v/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components-candidate",
+      "sha256": "dce61acffc9db6762feac34d428a46b7427b10c43f6f235869e087e978e54a4d",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components-candidate",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components.void",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/1-candidate-components",
+        "optimized",
+        "timing"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-pk2kewbm/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/original-candidate",
+      "sha256": "997956d9d23d2f7c10058a967571e3535f955bf2ad5f0b0ca0f730b0546cd211",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/original-candidate",
+        "/home/shmellyorc/Documents/Void.Language",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/2-candidate-original"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-skvfkw6v/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/native-extra",
+      "sha256": "d27192a2fd3bd898e0c13a9cc2f519e4450923782878ab388868917711a4fe7c",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/native-extra",
+        "unused",
+        "unused",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-tyua439c/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/correctness",
+      "sha256": "564e303b067b9d1bc3be1ba0b169faddc0c0abbd4207a4f0849154cd5637994f",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/correctness",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/translation_no_match.void",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-vtjlqzok/receipt.json"
+    },
+    {
+      "executable": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components-candidate",
+      "sha256": "dce61acffc9db6762feac34d428a46b7427b10c43f6f235869e087e978e54a4d",
+      "argv": [
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components-candidate",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/components.void",
+        "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/2-candidate-components",
+        "optimized",
+        "timing"
+      ],
+      "receipt": "/home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/receipts/run-yibo90_g/receipt.json"
+    }
+  ],
+  "source_and_binary_chain_counts": {
+    "objects": 2,
+    "linked_candidate_executables": 11,
+    "successful_candidate_execution_records": 13
+  },
+  "historical_recorded_command_count": 51,
+  "historical_recorded_commands_all_pass": true,
+  "new_tests_or_measurements": 0,
+  "long_path_verified": "Saved mandatory extent -> e1d cmp $0x80,%rbx -> e24 ja fd3 original general path. Skips e62 call to 22a0 helper, its lock/root/string lookup and short-fallback poll. Linked disassembly copies match hashed private artifacts.",
+  "commit_state": "Uncommitted and unstaged. STOP for Golden Wrench final GO/HOLD.",
+  "log_perf": "OPEN: original file200 strictly <10 ms remains FAIL."
+}

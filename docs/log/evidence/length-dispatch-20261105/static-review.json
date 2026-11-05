@@ -1,0 +1,42 @@
+{
+  "reviewed_before_correctness_and_performance": true,
+  "review_unix": 1793880123.939081,
+  "compiler_optimized_flags": "Release -O3 -DNDEBUG, LLVM/Clang 23.1.4; exact flags in identity.json",
+  "original_main": {
+    "offset": "0xa90",
+    "size_bytes": 5409,
+    "stack_reservation_bytes": 696
+  },
+  "candidate_main": {
+    "offset": "0xa90",
+    "size_bytes": 5662,
+    "stack_reservation_bytes": 696
+  },
+  "helper": {
+    "offset": "0x22a0",
+    "size_bytes": 460,
+    "stack_reservation_bytes": 88,
+    "out_of_line": true
+  },
+  "control_flow": {
+    "initial_input_reference_call": "0xaed",
+    "initial_string_bytes_call": "0xafc",
+    "save_length_rax_to_rbx": "0xb01",
+    "count_check": "0xe13",
+    "length_compare": "0xe1d cmpq $0x80,%rbx",
+    "long_branch": "0xe24 ja 0xfd3",
+    "short_helper_call": "0xe62 callq 0x22a0",
+    "short_failed_proof_poll": "0xfce",
+    "general_path": "0xfd3 replacement root_word, then original rule loop",
+    "first_general_rule_lock": "0x1041",
+    "first_general_replacement_string_validation": "0x108e"
+  },
+  "findings": [
+    "Long input bypasses helper, redundant speculative input root/string lookup and speculative mutex",
+    "One common root/schema/count validation and two backing selections/leases; no recursive translation or reacquisition",
+    "General loop source condition unchanged; compare/setne/test at latch also exists in production",
+    "Short helper re-resolves registered input and confirms bounded current extent; saved length is not pointer authority",
+    "Failed short proof cooperates once after releasing helper borrows and before original rule walk under same leases",
+    "Different main native layout/register assignment remains; static isolation does not promise equal performance"
+  ]
+}

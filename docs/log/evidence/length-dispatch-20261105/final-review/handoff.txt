@@ -1,0 +1,241 @@
+VOID 2.0 — Final Golden Wrench length-dispatch source-review handoff
+5 November 2026. Commit HOLD pending final Golden Wrench GO/HOLD.
+Recommendation: retain the existing candidate as a partial optimization.
+LOG-PERF stays OPEN: every file200 candidate sample still fails strictly <10 ms.
+
+Production diff: src/runtime/text_case.cpp only, within Runtime::translate_scalars;
+74 additions / 16 deletions, including reindentation of the original general loop.
+Complete verbatim diff is appended below and preserved separately as candidate.patch.
+Candidate source SHA-256:
+bdbad97fffce38ed2f5213b825ee5917f773610e5901f0e88c21b9b00375c2f1
+Baseline HEAD: da2adf6f51ed0c1d56e95c91ddfdf88e72f15f0c
+Baseline source SHA-256:
+a977bdb662633f28ac373a713f6daf4920cc62ebc2b40d3f840b54dd2fd6e24a
+
+Contract verification:
+1. Length is saved during mandatory root validation as a scalar hint only.
+   Eligible short input is re-resolved under the mutex and its current extent
+   checked. No borrowed pointer authority is carried from initial validation.
+2. No-inline local static member function has no static data/cache. Proof bounds:
+   <=128 ASCII bytes, <=256 rules, <=16 KiB input plus replacement extents.
+   Every current replacement identity/extent and sorted valid disjoint key must
+   pass. Negative keys short-circuit before bitmap access; size checks precede
+   subtraction. Unsorted valid rules remain supported by general fallback.
+3. Common root/schema/count validation and both rooted backing leases occur once.
+   Fallback consumes the same selected backings; it may reinspect a probed short
+   prefix. No recursive translation or repeated common validation/lease pass.
+4. Replacement-reference checks precede the current key test; the probe stops at
+   the first inconclusive entry. Complete rule validation precedes budget errors.
+   Actual allocation/invariant failures retain RuntimeFailure without publication;
+   removed unnecessary allocations change injection ordinals.
+5. No heap borrow crosses a poll. Frame roots/leases retain backings and prefixes.
+   Failed short proof releases borrows then polls before the original rule walk.
+   The general loop is unchanged apart from indentation; its quotas, polls,
+   NativeSafe work/disposal and Runtime failure wrapper remain unchanged.
+6. Short success publishes after lease release and budget checks using the exact
+   original mutex + require_buffer_output + validate_output_address +
+   reference_source sequence. General construction/publication are preserved.
+No source correctness blocker found within this review's stated scope.
+
+Optimized long path, existing disassembly rechecked (no compiler rerun):
+Initial reference/string lookup: 0xaed/0xafc; saved length: 0xb01.
+0xe1d cmpq $0x80,%rbx; 0xe24 ja 0xfd3 -> original general rule processing.
+Long input bypasses 0xe62 -> 0x22a0 helper, its 0x22e4 lock, 0x22fc input root
+lookup, 0x230e string lookup, bitmap/rule walk and 0xfce short-fallback poll.
+Normal general per-rule/source-snapshot checks remain. Main: 5409 -> 5662 bytes;
+local helper: 460 bytes. Main stack reservation stays 696 bytes, helper adds 88
+only on short calls. Linked main/helper: 0x23dbac0 / 0x23dd2d0, matching sizes.
+
+Exact-source evidence correspondence:
+Current source == preserved source == compiled snapshot; current diff == patch.
+The .cpp overlay changes only the Unicode include to an absolute path. Verified
+128 historical manifest artifacts and 24 retained binaries/libraries/tools.
+Receipt hashes trace both candidate objects (Release and ASan/UBSan), 11 linked
+candidate executables (candidate object before Runtime archive), and 13 successful
+execution records. All 51 historical recorded commands passed. No tests or
+benchmarks were repeated. Full audit chains: final-review/verification.json.
+
+Correctness: focused + existing text fixtures pass normal/O2 JIT and normal/O2
+linked AOT. Candidate checks: focused 879; additional native 876; ownership/GC/
+failure 31224; logging 1688; native ASan/UBSan/leaks 876. Production native/JIT
+controls pass the same oracles (1905/1902 assertions). Allocation sweep failures
+for 0/1/81/256/257 rules: control 5/6/86/261/262, candidate 4/4/4/4/262; existing
+long ABI sweep recovers 11. File200 preserves 15000 bytes, 200 writes, one required
+flush, acquisition/fsync/close in timing and post-GC payload/handle restoration.
+
+Performance, milliseconds, median [range], six measured samples/version:
+Workload             Production control             Candidate
+Complete file200     24.949 [20.459–31.116]          16.722 [16.420–17.237] FAIL <10
+Heavy framing100      7.941 [7.646–8.357]             7.993 [7.052–8.753] PASS <=10
+Heavy console100     18.536 [18.154–19.156]          18.339 [17.593–18.745] PASS <=20
+File200 CPU: 15.286 -> 10.997 ms. Pooled wall saving: 8.227 ms/33.0%, with major
+control/direct-I/O movement; not exclusive translation attribution. Trailing
+matched file block: 20.973 -> 16.592 ms. Heavy framing +0.65%, console -1.06%,
+quote +2.18% pooled; framing improves in both neighboring matched block medians.
+No consistent material heavy regression demonstrated; exact equivalence unproven.
+All candidate heavy samples/blocks pass. Release LLVM 23.1.4, JIT O2, GC=256,
+checked soft/hard 1 MiB stacks; control/candidate/candidate/control blocks,
+one warmup plus three samples/cell. All eight cells/blocks/120 rows are retained.
+
+Inventory, repository-relative:
+- src/runtime/text_case.cpp: sole production file; candidate.patch below this
+  evidence root is the exact complete diff.
+- docs/log/SMALL_FILE_INVESTIGATION.md: existing full result report, first section.
+- docs/log/HEAVY_PATH_INVESTIGATION.md: pre-existing context, untouched.
+- docs/log/evidence/length-dispatch-20261105/:
+  results.json, identity.json, SHA256SUMS.json: samples, commands, hashes, scope.
+  candidate-text_case.cpp, candidate-plain.cpp, original-text_case.cpp: sources.
+  static-review.json, long-path-extract.txt, disassembly-{original,candidate}.stdout,
+  linked-{main,helper}-disassembly.txt: optimized native evidence.
+  translation_no_match.void, correctness.cpp, native-extra.cpp, ownership.cpp,
+  log-host.cpp, check-*.stdout, strict-check-native-extra.stdout, run-fixture*:
+  verification sources/outcomes.
+  static.py, prepare.py, check.py, extra-check.py, measure.py, final-check.py,
+  record.py: historical drivers.
+  final-review/{handoff.txt,audit.py,verification.json,SHA256SUMS.json}: this audit.
+- Private binaries/objects/full receipts:
+  /home/shmellyorc/.local/state/void-log-performance/length-dispatch-k_26u0ws/.
+- docs/log/evidence/no-match-20261105/: earlier rejected candidate, unchanged.
+  Earlier allocator rejection remains in the existing report. Other pre-existing
+  untracked research is outside this handoff and untouched.
+
+Unresolved risks/limits:
+- File200 <10 ms still FAILS. Partial optimization acceptance cannot close LOG-PERF.
+- Active desktop, no pinned CPU/frequency, randomization or confidence intervals;
+  exact heavy equivalence and exclusive wall-saving attribution are unproven.
+- Performance is JIT O2 on this host. Sanitizer scope is current candidate TU plus
+  native-only oracle over a retained strict Runtime/older frontend, not full
+  current strict-source, Debug, cross-platform, tail/pause or peak-memory coverage.
+- Native layout/register assignment differs. Prior regression cause is unknown;
+  existing full-input reserve/final-publication pause limits remain. Focused new
+  oracle sources are preserved in evidence, not a newly registered CI target.
+
+Candidate/historical evidence unchanged. No redesign, tuning, new application
+execution, CI, commit, push, sinks/fsync/formatting/API, licensing, HTTP,
+installation or unrelated changes. STOP for Golden Wrench final GO/HOLD.
+
+Complete production source diff (verbatim candidate.patch):
+
+diff --git a/src/runtime/text_case.cpp b/src/runtime/text_case.cpp
+index b49a8af7..44914def 100644
+--- a/src/runtime/text_case.cpp
++++ b/src/runtime/text_case.cpp
+@@ -145,11 +145,12 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+                                    RegisteredRootWord replacements, const NativeArrayElement& strings,
+                                    std::int64_t max_bytes) {
+     // Validate all root authority before considering even an empty result.
++    std::size_t input_bytes;
+     {
+         std::lock_guard lock(mutex_);
+         require_buffer_output(output);
+         heap_.validate_output_address(output);
+-        (void)heap_.string_bytes(reference_source(input));
++        input_bytes = heap_.string_bytes(reference_source(input)).size();
+         (void)reference_source(keys);
+         (void)reference_source(replacements);
+     }
+@@ -179,6 +180,46 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+     };
+     RuleSnapshot snapshot{*this, {}};
+     auto& rules = snapshot.entries;
++    std::optional<std::size_t> unchanged_bytes;
++    // A scalar length hint is sufficient to bypass this helper on long input.
++    // All borrows and proof state stay in its separate native frame.
++    struct ShortAsciiNoMatch {
++#if defined(_MSC_VER)
++        __declspec(noinline)
++#else
++        __attribute__((noinline))
++#endif
++        static std::optional<std::size_t> prove(Runtime& runtime, RegisteredRootWord input,
++                void* key_backing, const BufferLayoutRef& key_layout,
++                void* string_backing, const BufferLayoutRef& string_layout, std::uint64_t count) {
++            if (count > 256) return {};
++            std::lock_guard lock(runtime.mutex_);
++            const auto source = runtime.heap_.string_bytes(runtime.reference_source(input));
++            if (source.size() > 128) return {};
++            std::uint64_t present[2] = {};
++            for (unsigned char byte : source) {
++                if (byte >= 128) return {};
++                present[byte / 64] |= std::uint64_t{1} << (byte % 64);
++            }
++            auto remaining = byte_quota - source.size();
++            std::int32_t previous = -1;
++            for (std::uint64_t i = 0; i < count; ++i) {
++                std::int32_t key;
++                std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
++                void* value = nullptr;
++                std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
++                // Stop at the first inconclusive entry; later rules cannot
++                // mask its failure in the original rule-processing path.
++                const auto bytes = runtime.heap_.string_bytes(value);
++                if (key <= previous || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff) ||
++                    bytes.size() > remaining ||
++                    (key < 128 && (present[key / 64] & (std::uint64_t{1} << (key % 64))))) return {};
++                remaining -= bytes.size();
++                previous = key;
++            }
++            return source.size();
++        }
++    };
+     {
+         void *key_backing = nullptr, *string_backing = nullptr, *replacement = nullptr;
+         constexpr std::size_t zero = 0;
+@@ -201,25 +242,42 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+         const auto key_count = lease(keys, key_schema, key_backing, key_layout, key_lease);
+         const auto string_count = lease(replacements, string_schema, string_backing, string_layout, string_lease);
+         if (key_count != string_count) return invalid_argument;
+-        auto replacement_root = root_word(&replacement);
+-        for (std::uint64_t i = 0; i < key_count; ++i) {
+-            if (i && i % 256 == 0) poll();
+-            std::int32_t key;
+-            {
+-                // Each backing is complete, rooted and leased, with its exact
+-                // checked layout and frozen live prefix. Recompute addresses.
+-                std::lock_guard lock(mutex_);
+-                std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
+-                void* value = nullptr;
+-                std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
+-                (void)heap_.string_bytes(value);
+-                replacement = value;
++        if (input_bytes <= 128) {
++            unchanged_bytes = ShortAsciiNoMatch::prove(*this, input, key_backing, key_layout,
++                                                       string_backing, string_layout, key_count);
++            // The helper has released all borrows. Cooperate before adding a
++            // general walk to the bounded speculative work, keeping both leases.
++            if (!unchanged_bytes) poll();
++        }
++        if (!unchanged_bytes) {
++            auto replacement_root = root_word(&replacement);
++            for (std::uint64_t i = 0; i < key_count; ++i) {
++                if (i && i % 256 == 0) poll();
++                std::int32_t key;
++                {
++                    // Each backing is complete, rooted and leased, with its exact
++                    // checked layout and frozen live prefix. Recompute addresses.
++                    std::lock_guard lock(mutex_);
++                    std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
++                    void* value = nullptr;
++                    std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
++                    (void)heap_.string_bytes(value);
++                    replacement = value;
++                }
++                if (key < 0 || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff)) return invalid_argument;
++                if (!rules.emplace(key, snapshot_string(replacement_root)).second) return invalid_argument;
+             }
+-            if (key < 0 || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff)) return invalid_argument;
+-            if (!rules.emplace(key, snapshot_string(replacement_root)).second) return invalid_argument;
+         }
+     }
+     if (max_bytes < 0) return invalid_range;
++    if (unchanged_bytes) {
++        if (*unchanged_bytes > static_cast<std::uint64_t>(max_bytes)) return limit_exceeded;
++        std::lock_guard lock(mutex_);
++        require_buffer_output(output);
++        heap_.validate_output_address(output);
++        *output = reference_source(input);
++        return translated;
++    }
+     auto source = snapshot_string(input);
+     std::string result;
+     bool changed = false;
