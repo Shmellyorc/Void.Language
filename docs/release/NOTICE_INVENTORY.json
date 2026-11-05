@@ -1,0 +1,2024 @@
+{
+  "schema": 1,
+  "baseline": "95ce0a76e9a95198cd4fe9d5b6bb4cbfad9bd5c5",
+  "scope": "compiler/tooling component license installation; no SDK or public package; conservative common notices do not prove code presence",
+  "entries": [
+    {
+      "repository_path": "third_party/llvm-licenses/23.1.4/LICENSE.TXT",
+      "installed_path": "share/void/licenses/llvm-23.1.4/LICENSE.TXT",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "Apache-2.0 WITH LLVM-exception; legacy NCSA",
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/LICENSE.TXT",
+          "source_sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+          "byte_start": 0,
+          "byte_end_exclusive": 15141,
+          "text_sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+          "extraction": "whole-file"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-licenses/23.1.4/ConvertUTF-NOTICES.txt",
+      "installed_path": "share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "LLVM; Unicode",
+      "sha256": "14b0c910d5fa273751a659ea008ca6b860036bfcceb8f70712f02f8c1db57f1d",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/include/llvm/Support/ConvertUTF.h",
+          "source_sha256": "ec95a5b9bd32ebebde9c780833bdfc089f473ba9e9d1d7a6e0e3320b13f57c0e",
+          "byte_start": 0,
+          "byte_end_exclusive": 5142,
+          "text_sha256": "7793b7079264ccf3a4dce31f32a31037bf817bdb541874f080fe98882c39b871",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ConvertUTF.cpp",
+          "source_sha256": "bdbbdf159f5dda86bf70faa4be49f810a01c9e4c4f866889aedf2eec1efcd798",
+          "byte_start": 0,
+          "byte_end_exclusive": 3221,
+          "text_sha256": "02b0333df8dbb9e0f9c43245c112df04da8071f4657a49cf38f4a6015d629f67",
+          "extraction": "unchanged leading comment blocks"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-licenses/23.1.4/xxhash-NOTICES.txt",
+      "installed_path": "share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "BSD-2-Clause",
+      "sha256": "92833684a78193933bac2906c8b80d335f14a3efa8d525ab4d18dbde6d04acf5",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/include/llvm/Support/xxhash.h",
+          "source_sha256": "2a5c9e06ca8ad4cbd4d0da6ba4c135e11626bf369be1490769d7bee9499c4b4b",
+          "byte_start": 0,
+          "byte_end_exclusive": 1587,
+          "text_sha256": "4f26680010e675258618ff5bc4784f0d75915c52f3e081660c3d6cb1432ef2f9",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/xxhash.cpp",
+          "source_sha256": "699389b388a56d0caf330bb872739b2e23d51a22b7e2f758f2c11fac9936752d",
+          "byte_start": 0,
+          "byte_end_exclusive": 1829,
+          "text_sha256": "5baf3132c0c7fe3a06c3680d769fa6f3c2745c88fa4de536edda9f7f2cbf06e1",
+          "extraction": "unchanged leading comment blocks"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-licenses/23.1.4/BLAKE3-LICENSE.txt",
+      "installed_path": "share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "CC0-1.0 OR Apache-2.0",
+      "sha256": "6a94bedb8b707ed97f6e310d0d015ab14e0683ffa0a612b02958581b9cc9fc0e",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BLAKE3/LICENSE",
+          "source_sha256": "6a94bedb8b707ed97f6e310d0d015ab14e0683ffa0a612b02958581b9cc9fc0e",
+          "byte_start": 0,
+          "byte_end_exclusive": 18691,
+          "text_sha256": "6a94bedb8b707ed97f6e310d0d015ab14e0683ffa0a612b02958581b9cc9fc0e",
+          "extraction": "whole-file"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-licenses/23.1.4/Support-NOTICES.txt",
+      "installed_path": "share/void/licenses/llvm-23.1.4/Support-NOTICES.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "LLVM; BSD-3-Clause; ISC; Unicode; public-domain origin/fallback notices",
+      "sha256": "c06625a86661f31fcbbb4d8f764909f1ff73846e0f51e6f20c83b7f234580ed3",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MD5.cpp",
+          "source_sha256": "7b7e82f5508a7d5551b78a1140b1d6aa9cba87282168219743cb6377cd5f9acd",
+          "byte_start": 0,
+          "byte_end_exclusive": 1687,
+          "text_sha256": "fdf980d51caf7abb2f30d8208e4fef9cd0a03ea578fee141ae33f501da4f8678",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SHA1.cpp",
+          "source_sha256": "cc6c4b80b5c2a85f915fd336b72a87aeac696a03c30ce87756e71b060c5ca8a9",
+          "byte_start": 0,
+          "byte_end_exclusive": 744,
+          "text_sha256": "af4dbab2a457a90c8e255d680ca435c8191cf6417e83da2de71ed9ec4b140701",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SHA256.cpp",
+          "source_sha256": "9b1f22d8181e5776527fe8d45948dc31d99d264a68065f6da6d8fab0db7ea232",
+          "byte_start": 0,
+          "byte_end_exclusive": 829,
+          "text_sha256": "5baaacc549d8169cc3d74198dd84ec4370086360b4f1909fadbd88c471884fac",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/UnicodeNameToCodepointGenerated.cpp",
+          "source_sha256": "36d0880990bab4f512d943df0225080c1cd68d7c5721da2f50fac7346083e48c",
+          "byte_start": 0,
+          "byte_end_exclusive": 2952,
+          "text_sha256": "a567d92e50432e038a661edce838f45422c6a0b511084260c0afd33e73e810fe",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regcomp.c",
+          "source_sha256": "7f930ec43f21e591d6d2fc814b4557d597a2146b2c64c16ae7aff255f28d9a0c",
+          "byte_start": 0,
+          "byte_end_exclusive": 1860,
+          "text_sha256": "1eb453ecedcdcf7e47e643ab04e347bf52da613fa5ab3dc30f780ccca354dbb2",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regengine.inc",
+          "source_sha256": "cfbc4a3fbf0d7e7dc806d3f68e4b3f3042cdce6306ffc22e6f62b232ca1efe6a",
+          "byte_start": 0,
+          "byte_end_exclusive": 2097,
+          "text_sha256": "b7433d901d568e77e21511bd31812e7620f49365e696d75e5caf87991e27b47a",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regerror.c",
+          "source_sha256": "438f947e063eb351ed2830c384b8451a66a1caecfb36758f1c4395527c6bbf24",
+          "byte_start": 0,
+          "byte_end_exclusive": 1861,
+          "text_sha256": "d05019f608e32607975295b708023831facd794dfb89c6a6c379e0a37d3a13e5",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regex2.h",
+          "source_sha256": "ce6f38306170673c9bda3a5d2d638e7af858662d388e0b3884372677998fb7dd",
+          "byte_start": 0,
+          "byte_end_exclusive": 1859,
+          "text_sha256": "a74a9989b2f48bae6bbd2ccff835e63109626410a0fc0f6458bd9eeeede40b08",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regex_impl.h",
+          "source_sha256": "90cf33f4d2c50f516b669e8d17310e94f9241eb33b3ca2098478c41dab130f52",
+          "byte_start": 0,
+          "byte_end_exclusive": 1868,
+          "text_sha256": "090513c80e5290d51ac11848157ea355b41c33b60290ad9a86a1e21ec1f53ae7",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regexec.c",
+          "source_sha256": "b26ab983413177c81034ad4dfa66280697fc304a8b27d15b5eb7bf1955cb9745",
+          "byte_start": 0,
+          "byte_end_exclusive": 2091,
+          "text_sha256": "f5ae38ac5904bac528eecbe2736c36e82385b4ad8956dfd253d2a6f97727c5a7",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regfree.c",
+          "source_sha256": "cab827cecccf9f9446f1b1990b7ad5ae3ba930ba004c3ea04daed5753ce4557d",
+          "byte_start": 0,
+          "byte_end_exclusive": 1860,
+          "text_sha256": "45d8db19db751980ee15c9946aca0d3f47e9ab0686a298be65c9b8fd18ecd9df",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regstrlcpy.c",
+          "source_sha256": "b717e3355fdca040c161a7a179de9db1c9253da6519e60b77a074cbf5f7d423f",
+          "byte_start": 0,
+          "byte_end_exclusive": 876,
+          "text_sha256": "2f577b238134af30a0a535bed5a8038a08c570073146097969aafd9afc82d9cd",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regutils.h",
+          "source_sha256": "80606b2d8f0f063b9ddaa7b909fc1ef9c344807f22fd2f3a8cb4187f88734ac3",
+          "byte_start": 0,
+          "byte_end_exclusive": 1858,
+          "text_sha256": "bed18e1d01fa0b308f4f8463e0a2a89f4ea404c1ff625554428350b91a2f4be7",
+          "extraction": "unchanged leading comment blocks"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-dependency-licenses/zstd-1.5.7/LICENSE",
+      "installed_path": "share/void/licenses/zstd-1.5.7/LICENSE",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "BSD-3-Clause (selected alternative)",
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/LICENSE",
+          "source_sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+          "byte_start": 0,
+          "byte_end_exclusive": 1549,
+          "text_sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+          "extraction": "whole-file"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-dependency-licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt",
+      "installed_path": "share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "BSD route for zstd xxHash; MIT for divsufsort",
+      "sha256": "0b793f8f9744f40bd9edea4bbdc6b600e212b95da2edf955b3bf6485938310fe",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/lib/common/xxhash.h",
+          "source_sha256": "8cb837b21a8fe9a6b9dbcd0961ab16e733bfcbfa9e003f3a496ce07ae80aa8ee",
+          "byte_start": 0,
+          "byte_end_exclusive": 453,
+          "text_sha256": "25fae15ec322469a7fca8791c40064055c76b015c17e3dc01e2f6ba9c4035d74",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/lib/dictBuilder/divsufsort.c",
+          "source_sha256": "2081acb08865f623857d2c0dcb0e79fce9489f01416528c30cfee7097915c616",
+          "byte_start": 0,
+          "byte_end_exclusive": 1216,
+          "text_sha256": "889eb8dd211259a89866538cf1a1bcbffb108caf6ea06849a51c30aba6347e1f",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/lib/dictBuilder/divsufsort.h",
+          "source_sha256": "14c16c2f67019875a2ea6cd07a4e803adfadce448e0b80351c51e5f910230d38",
+          "byte_start": 0,
+          "byte_end_exclusive": 1189,
+          "text_sha256": "b62044805b16ac7cfe848c1f977fa4990320f4898fb0a1454055424745c66b59",
+          "extraction": "unchanged leading comment blocks"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-dependency-licenses/libxml2-2.15.4/Copyright",
+      "installed_path": "share/void/licenses/libxml2-2.15.4/Copyright",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "Windows",
+      "license": "MIT",
+      "sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/Copyright",
+          "source_sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+          "byte_start": 0,
+          "byte_end_exclusive": 1314,
+          "text_sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+          "extraction": "whole-file"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/llvm-dependency-licenses/libxml2-2.15.4/FILE-NOTICES.txt",
+      "installed_path": "share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "Windows",
+      "license": "per-file permissive terms; distinct authors",
+      "sha256": "ac374cd1931aed19c5bf09e380bf7c5efd60490259c06eb1bf18dc70e83df503",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/dict.c",
+          "source_sha256": "2663392f29dd45eb7ad802c471e146d4f6f509e317a4938b496920b4ea0228b4",
+          "byte_start": 0,
+          "byte_end_exclusive": 702,
+          "text_sha256": "bd9b2edca387270ccef27c3908d37f3b98806cb412b415675efc2d4c9bc82f90",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/list.c",
+          "source_sha256": "8a04740bfd8a37f3006bfc0404aa31429e56ef991cddcd47707ce2a9b1d98506",
+          "byte_start": 0,
+          "byte_end_exclusive": 650,
+          "text_sha256": "b2e629762220f1a3c48e557c04e15296ee06accc9a3ecf1a3f8182c0307c0f2f",
+          "extraction": "unchanged leading comment blocks"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/timsort.h",
+          "source_sha256": "e05f2fd14231bb96072e2b3d14d9a5773078963730e914eb245acdf34812e5c2",
+          "byte_start": 0,
+          "byte_end_exclusive": 1464,
+          "text_sha256": "65de2c4c84b5819128e360e80de2c4b4ae402de194fbffd75d05323a326bf544",
+          "extraction": "unchanged leading comment blocks"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/http-licenses/libpsl-0.21.5/LICENSE.chromium",
+      "installed_path": "share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "BSD-3-Clause",
+      "sha256": "1d7f52747a9169751cdf2641a8299c0098e9ecdf9429296ffd55bdb14c9ed5b3",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/rockdaboot/libpsl/0.21.5/src/LICENSE.chromium",
+          "source_sha256": "1d7f52747a9169751cdf2641a8299c0098e9ecdf9429296ffd55bdb14c9ed5b3",
+          "byte_start": 0,
+          "byte_end_exclusive": 1664,
+          "text_sha256": "1d7f52747a9169751cdf2641a8299c0098e9ecdf9429296ffd55bdb14c9ed5b3",
+          "extraction": "whole-file"
+        }
+      ]
+    },
+    {
+      "repository_path": "LICENSE",
+      "installed_path": "share/void/licenses/VOID-MIT-LICENSE.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "MIT (VOID-original code only)",
+      "sha256": "b7c3169df2c29805ee0ca6bc8e935f4cf3daffb0e39c60bde12213940d5f4467",
+      "sources": []
+    },
+    {
+      "repository_path": "docs/release/LICENSING_SCOPE.md",
+      "installed_path": "share/void/licenses/LICENSING_SCOPE.md",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "VOID licensing boundary",
+      "sha256": "904e15d4fc1156c9ba2af821f84245d7952718dab864c1f5281d4dcdfac6e78e",
+      "sources": []
+    },
+    {
+      "repository_path": "docs/release/REDISTRIBUTION_NOTICES.md",
+      "installed_path": "share/void/licenses/REDISTRIBUTION.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "component index and unresolved obligations",
+      "sha256": "19fc7fa896dee764d38c22553305db6e11d29cf2d1d71591d86fc9384d260211",
+      "sources": []
+    },
+    {
+      "repository_path": "third_party/http-licenses/zlib-1.3.2/LICENSE",
+      "installed_path": "share/void/licenses/zlib-1.3.2/LICENSE",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "Zlib",
+      "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
+      "sources": []
+    }
+  ],
+  "retained_entries": [
+    {
+      "repository_path": "third_party/http-licenses/aws-lc-5.12.0/LICENSE",
+      "installed_path": "share/void/licenses/http/aws-lc-5.12.0/LICENSE",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "977c541bd25ffe36975dde25c028c0cd15ddf3d08243983b58e8a6a3d9447523"
+    },
+    {
+      "repository_path": "third_party/http-licenses/aws-lc-5.12.0/NOTICE",
+      "installed_path": "share/void/licenses/http/aws-lc-5.12.0/NOTICE",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "f97c469fa666b51b3dae2e1530504a5ee73bbf47b980aa76746d26c271dd591d"
+    },
+    {
+      "repository_path": "third_party/http-licenses/aws-lc-5.12.0/UPSTREAM.json",
+      "installed_path": "share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "4654f3e63c03d0834b1a52c366a39d89f05e3702e6896db97da56efa29a45892"
+    },
+    {
+      "repository_path": "third_party/http-licenses/c-ares-1.34.9/LICENSE.md",
+      "installed_path": "share/void/licenses/http/c-ares-1.34.9/LICENSE.md",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "460f5e768fda3752ca2169a95df062578a10fb126bfd65f3b9b1a1bed2f84807"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libidn2-2.3.8/COPYING",
+      "installed_path": "share/void/licenses/http/libidn2-2.3.8/COPYING",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libidn2-2.3.8/COPYING.LESSERv3",
+      "installed_path": "share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libidn2-2.3.8/COPYING.unicode",
+      "installed_path": "share/void/licenses/http/libidn2-2.3.8/COPYING.unicode",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "01d621eef165cf4d3d3dbb737aa0699178d94c6f18cf87e9dde6db3ca7790f46"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libidn2-2.3.8/COPYINGv2",
+      "installed_path": "share/void/licenses/http/libidn2-2.3.8/COPYINGv2",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libidn2-2.3.8/README",
+      "installed_path": "share/void/licenses/http/libidn2-2.3.8/README",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "fd8b5fd38cb6e5599ff412bf7411108e83c830aea75a47bcc96c86f05b8ff607"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libpsl-0.21.5/COPYING",
+      "installed_path": "share/void/licenses/http/libpsl-0.21.5/COPYING",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "322392e6001b2b3b0fca705dc9f11f26e12441188ecde50eb1d22909980b2925"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libpsl-0.21.5/LICENSE",
+      "installed_path": "share/void/licenses/http/libpsl-0.21.5/LICENSE",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "322392e6001b2b3b0fca705dc9f11f26e12441188ecde50eb1d22909980b2925"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libpsl-0.21.5/README",
+      "installed_path": "share/void/licenses/http/libpsl-0.21.5/README",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libunistring-1.5/COPYING",
+      "installed_path": "share/void/licenses/http/libunistring-1.5/COPYING",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libunistring-1.5/COPYING.LIB",
+      "installed_path": "share/void/licenses/http/libunistring-1.5/COPYING.LIB",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c"
+    },
+    {
+      "repository_path": "third_party/http-licenses/libunistring-1.5/README",
+      "installed_path": "share/void/licenses/http/libunistring-1.5/README",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "0b77c6e58bab43cf80f817c778e917e25bd42a154893492d8ae284e3853cfa56"
+    },
+    {
+      "repository_path": "third_party/http-licenses/nghttp2-1.70.0/COPYING",
+      "installed_path": "share/void/licenses/http/nghttp2-1.70.0/COPYING",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "6b94f3abc1aabd0c72a7c7d92a77f79dda7c8a0cb3df839a97890b4116a2de2a"
+    },
+    {
+      "repository_path": "third_party/http-licenses/nghttp2-1.70.0/README",
+      "installed_path": "share/void/licenses/http/nghttp2-1.70.0/README",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "f3c22082da5ff8b5313d36e2b8a1a83d28ff1d379a9dfd3f18582ce933b9159c"
+    },
+    {
+      "repository_path": "third_party/http-licenses/openssl-3.5.9/LICENSE.txt",
+      "installed_path": "share/void/licenses/http/openssl-3.5.9/LICENSE.txt",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+    },
+    {
+      "repository_path": "third_party/http-licenses/zlib-1.3.2/LICENSE",
+      "installed_path": "share/void/licenses/http/zlib-1.3.2/LICENSE",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2"
+    },
+    {
+      "repository_path": "third_party/http-licenses/zlib-1.3.2/README",
+      "installed_path": "share/void/licenses/http/zlib-1.3.2/README",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "4026d921213bb2e311d8d42b44ef53361c102d5d45ae32f93f8e52eaee8d068f"
+    },
+    {
+      "repository_path": "third_party/publicsuffix/LICENSE",
+      "installed_path": "share/void/licenses/http/publicsuffix/LICENSE",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172"
+    },
+    {
+      "repository_path": "third_party/publicsuffix/UPSTREAM.json",
+      "installed_path": "share/void/licenses/http/publicsuffix/UPSTREAM.json",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "49eca4a0c92d4ee58266821be4142e8f626d9a38e90345430af1468054af1533"
+    },
+    {
+      "repository_path": "third_party/publicsuffix/public_suffix_list.dat",
+      "installed_path": "share/void/licenses/http/publicsuffix/public_suffix_list.dat",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "d3e6243b51695327984abb3e2a5aa7077096867f75121e031e6a5a3840ca8bcd"
+    },
+    {
+      "repository_path": "tools/unicode/LICENSE.txt",
+      "installed_path": "share/void/licenses/UNICODE-LICENSE.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "sha256": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+    },
+    {
+      "repository_path": "third_party/ryu/LICENSE-Boost",
+      "installed_path": "share/void/licenses/LICENSE-Boost",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+    },
+    {
+      "repository_path": "third_party/date/LICENSE.txt",
+      "installed_path": "share/void/licenses/LICENSE.txt",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "sha256": "c90f6c00fb961170560299cbda28ca2d45804913aa8b2a9f36dbb8e0028d6930"
+    },
+    {
+      "repository_path": "third_party/date/NOTICE",
+      "installed_path": "share/void/licenses/NOTICE",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "sha256": "b9d840b5a888bf6dfe9c22cddc75cfa5a9413d4b9a6a9c0ca7372dd4b58b6c8e"
+    },
+    {
+      "repository_path": "third_party/tzdata/LICENSE",
+      "installed_path": "share/void/licenses/LICENSE",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "sha256": "0613408568889f5739e5ae252b722a2659c02002839ad970a63dc5e9174b27cf"
+    },
+    {
+      "repository_path": "third_party/stage10-versions.json",
+      "installed_path": "share/void/licenses/stage10-versions.json",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "sha256": "dfd06fa5b4605b85d756e00923357ae05dc0c16199abce3d4ddc7c1d89cce184"
+    },
+    {
+      "repository_path": "third_party/curl/COPYING",
+      "installed_path": "share/void/licenses/http/COPYING",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681"
+    },
+    {
+      "repository_path": "third_party/curl/NOTICE",
+      "installed_path": "share/void/licenses/http/NOTICE",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "f30b8977b052458af98ea36850eaad6a7da3ec5be2b7f7922d1856abfd50a833"
+    },
+    {
+      "repository_path": "third_party/curl/VOID-PROVENANCE.json",
+      "installed_path": "share/void/licenses/http/VOID-PROVENANCE.json",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "19d4576434f81c9fe9b7c50855e3831134061427623ec20948d878f4fa493646"
+    },
+    {
+      "repository_path": "third_party/http-versions.json",
+      "installed_path": "share/void/licenses/http/http-versions.json",
+      "components": [
+        "compiler"
+      ],
+      "sha256": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496"
+    }
+  ],
+  "source_reconciliation": {
+    "scope": "LLVM Support top-level and Unix/Windows source leading notice blocks; LLVM Demangle sample; libxml2 root C/header leading notices; exact tagged files",
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/LICENSE.TXT",
+        "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/include/llvm/Support/ConvertUTF.h",
+        "sha256": "ec95a5b9bd32ebebde9c780833bdfc089f473ba9e9d1d7a6e0e3320b13f57c0e",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ConvertUTF.cpp",
+        "sha256": "bdbbdf159f5dda86bf70faa4be49f810a01c9e4c4f866889aedf2eec1efcd798",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/include/llvm/Support/xxhash.h",
+        "sha256": "2a5c9e06ca8ad4cbd4d0da6ba4c135e11626bf369be1490769d7bee9499c4b4b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/xxhash.cpp",
+        "sha256": "699389b388a56d0caf330bb872739b2e23d51a22b7e2f758f2c11fac9936752d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BLAKE3/LICENSE",
+        "sha256": "6a94bedb8b707ed97f6e310d0d015ab14e0683ffa0a612b02958581b9cc9fc0e",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SHA256.cpp",
+        "sha256": "9b1f22d8181e5776527fe8d45948dc31d99d264a68065f6da6d8fab0db7ea232",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SHA1.cpp",
+        "sha256": "cc6c4b80b5c2a85f915fd336b72a87aeac696a03c30ce87756e71b060c5ca8a9",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MD5.cpp",
+        "sha256": "7b7e82f5508a7d5551b78a1140b1d6aa9cba87282168219743cb6377cd5f9acd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SipHash.cpp",
+        "sha256": "20662e3d8e1149a7d09f651d70671c237b298283492fdc26900bc1730f09f1b8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regcomp.c",
+        "sha256": "7f930ec43f21e591d6d2fc814b4557d597a2146b2c64c16ae7aff255f28d9a0c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regexec.c",
+        "sha256": "b26ab983413177c81034ad4dfa66280697fc304a8b27d15b5eb7bf1955cb9745",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regex_impl.h",
+        "sha256": "90cf33f4d2c50f516b669e8d17310e94f9241eb33b3ca2098478c41dab130f52",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Demangle/ItaniumDemangle.cpp",
+        "sha256": "286eb7903b559ee91cdd9c63e1caebb784f7d80f23ea8b570b77006245013fdc",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/LICENSE",
+        "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/lib/common/xxhash.h",
+        "sha256": "8cb837b21a8fe9a6b9dbcd0961ab16e733bfcbfa9e003f3a496ce07ae80aa8ee",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/lib/dictBuilder/divsufsort.c",
+        "sha256": "2081acb08865f623857d2c0dcb0e79fce9489f01416528c30cfee7097915c616",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/lib/dictBuilder/divsufsort.h",
+        "sha256": "14c16c2f67019875a2ea6cd07a4e803adfadce448e0b80351c51e5f910230d38",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/Copyright",
+        "sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/dict.c",
+        "sha256": "2663392f29dd45eb7ad802c471e146d4f6f509e317a4938b496920b4ea0228b4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/list.c",
+        "sha256": "8a04740bfd8a37f3006bfc0404aa31429e56ef991cddcd47707ce2a9b1d98506",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/rockdaboot/libpsl/0.21.5/src/LICENSE.chromium",
+        "sha256": "1d7f52747a9169751cdf2641a8299c0098e9ecdf9429296ffd55bdb14c9ed5b3",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/AArch64AttributeParser.cpp",
+        "sha256": "47dfaae18e0e654cc3822500bc826928e6827e138a341207651afff25cee170c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/AArch64BuildAttributes.cpp",
+        "sha256": "3db2f5147e1cddbe451dab250efd0e5906b2bf173743a76a1d72b6cf90121ddb",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ABIBreak.cpp",
+        "sha256": "d1d90c7aa0ca39a7c4fd18b9762db7ed7958b8df662f58d3631eab6fd8455d40",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/AMDGPUMetadata.cpp",
+        "sha256": "a4c1a7ee75ab3da16b2f19247988486fb598573bdc0e7dc18a6fe907efd5050b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/APFixedPoint.cpp",
+        "sha256": "71d60e8896d906d59bbf3807553c54c7a26d67d173668ed9ef7ec827fd205547",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/APFloat.cpp",
+        "sha256": "199e7d48a3ffaacbe1cdf85068aada7aef822272383857fff29d2916e024f5b4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/APInt.cpp",
+        "sha256": "94cf8d96234a30d4a542dc5f6d17c9e6940ce3ff5804f7583f7d77c7882168fe",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/APSInt.cpp",
+        "sha256": "bb80a042ecf7e80180d752aba99f1ce1393e45552952481650e7cb9082a54e3a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ARMAttributeParser.cpp",
+        "sha256": "14a9bd7f6ff8b45cb9a2544fb4881439856e59a93b6131cba2689033dbe079ce",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ARMBuildAttributes.cpp",
+        "sha256": "d1fa68f92535486be859cf0d1add231dce21b64bba54f5e07d790da984fdcb0f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ARMWinEH.cpp",
+        "sha256": "b98c10d10d1694b51d25d76ef3626a32aeb96376e774f91d4fe26010f2ae9664",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/AllocToken.cpp",
+        "sha256": "4cc44c97ee14394d6c0b3e1bdf8dd9642cee014c28a6cb7bd67a234081236d9e",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Allocator.cpp",
+        "sha256": "0f419866162ed5569dd8d33814998b486e6263c3bfcca4a08d2db78ac23bb666",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Atomic.cpp",
+        "sha256": "a1bfe7ace5117887024e3f2e588932276ad532301d7145dff63b55a7d52b2048",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/AutoConvert.cpp",
+        "sha256": "70f8019b58567a47a58ae34208eea9a6338f15d191a3a375338cc5feb964a35b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BalancedPartitioning.cpp",
+        "sha256": "860d2113f8fd3b952d2f0ecc99d6e6d19be746798475dc058c0a0eb2015796c8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Base64.cpp",
+        "sha256": "bb0d057bcebeefd6987a7dd84e54a569f09a87e3e0a2ba405bc983b76ef2aead",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BinaryStreamError.cpp",
+        "sha256": "c648e4e535e1a8164927264693013108ee05485bffc741f3d21f2e8450de395c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BinaryStreamReader.cpp",
+        "sha256": "fa776ccd2ab535afc1dd745aab68b0e735886e0db761382c9e312246849d38d8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BinaryStreamRef.cpp",
+        "sha256": "721209fa8d1550d6959cac5d9fc2ce78eb19619e70d0abb70ef0eb9564063e36",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BinaryStreamWriter.cpp",
+        "sha256": "8df06b57ba0301980de228675f5defc320f1f1c2d519817717384ca88625ed69",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BlockFrequency.cpp",
+        "sha256": "f6f604d4bbd4110365b8acb4a6a36fa8233aff148d223772836b164097bed574",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BranchProbability.cpp",
+        "sha256": "f41573222b822af61a8b534cabb2eb5d18ee47204a63fc26449605aef05c9a7f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/BuryPointer.cpp",
+        "sha256": "cab879dc631c870f9442296ecdc0a81624adc194d4d6c8b74259935ba345c2e2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CHERICapabilityFormat.cpp",
+        "sha256": "3fa26990dd279438497ed30959c7c03c3c6b67435c86bc5138400677704743e4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/COM.cpp",
+        "sha256": "e594714ebd3b10e4bc40ea72bef8f320f400cd2abf61a4f611c8245b5860bdaf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CRC.cpp",
+        "sha256": "e0598bd4d93717b53ead3f5a0653412d2924a9534c48dbf5f9fff5e48a1488dc",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CSKYAttributeParser.cpp",
+        "sha256": "9d21327b2bc872258c6b3e4d30d11370e2f414ce65ca89f7c34e9a066ddf34c5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CSKYAttributes.cpp",
+        "sha256": "c47791209b172b373bc6bf473c71fe444d402efe18f85fad1065c4831d838755",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CachePruning.cpp",
+        "sha256": "07f9928e840b92c0ae01d7200e42b5f17aa2e353dfae8546593d4b891c07cb67",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Caching.cpp",
+        "sha256": "bbf7ed4e42fe9cb1fe6db154e76103a995f1198fb3688b6eac9541a27508e3e2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Chrono.cpp",
+        "sha256": "5b12eeb90db9754223019ef2589c650311158ca46865ff2aac982eca9322bbcd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CodeGenCoverage.cpp",
+        "sha256": "c5c68c2f0ba7006b459fff4baabc41826e75e7cc2cebf0dfe13dab9c1cfdaccf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CommandLine.cpp",
+        "sha256": "42fa0419766b833ba301ba3f8a6d6381c6322495b3dbc52654686e615a72852f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Compression.cpp",
+        "sha256": "cfc5e650b88b59305812ca23cfe18f3716942a22ee48ab0fc62d69a416464c9d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ConvertEBCDIC.cpp",
+        "sha256": "36ddfff1eb944d2879e0505409ffe7927c028c3315719076365a90df5b85bf39",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ConvertUTFWrapper.cpp",
+        "sha256": "366e132ad6394da491c55c8215505f8ad026b07b05f1625008389fe202c4a4bf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/CrashRecoveryContext.cpp",
+        "sha256": "220f6204b6169f811cdae655d0644c67dff41c2b201258fcf3300ae859576432",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DAGDeltaAlgorithm.cpp",
+        "sha256": "1ac58dab159bccb2ead503d6f8cb8aeea224a56e04693d29be173a3ac7516059",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DJB.cpp",
+        "sha256": "fa4c3e6bb4465d89cdda3cc97a22edd5ee2619bdef2890a30cd1b8795d523c3a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DXILABI.cpp",
+        "sha256": "b922e476f6cad41421a026e89215eab87bd7eb164d5fef232e07ee1d6bba0815",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DataExtractor.cpp",
+        "sha256": "5786cbd4f9b8b41d9bf449628036869018bf8af81d2796892b49d969182f3702",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Debug.cpp",
+        "sha256": "612c587ad910274acf1c3ee194eb50cad07aa83bd18984cd959ee713f8039d53",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DebugCounter.cpp",
+        "sha256": "9c76c14df34a993cc761501d0ec595f2dcfbd7120367d58c9d683c63386c99dd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DebugOptions.h",
+        "sha256": "9350fbd250426c6c81ca75e76ee961d29b0302381f93d4226bc91d31fde92632",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DeltaAlgorithm.cpp",
+        "sha256": "335a68eafedf25017b5ac4d547910721785d722e520c2c17673dcfaa0a2ad42f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DeltaTree.cpp",
+        "sha256": "8056318922b9e12aa171d3897a1d21fe55dab07cae9dbdded9575cbdde85af70",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DivisionByConstantInfo.cpp",
+        "sha256": "fc482b40a4caca7ce9af922a3183efd36a4def6a250a0d23a9ce699881bbf0fa",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DynamicAPInt.cpp",
+        "sha256": "15d42a5bb0f409822f9ef0a9191d79779a5bbc64f4b78ea9d1cbe838f3216bd6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/DynamicLibrary.cpp",
+        "sha256": "defdd5467c28258798fa00fc3dbdcc68b0f2a129a51b0018edd153e959ce0590",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ELFAttrParserCompact.cpp",
+        "sha256": "2d85d9c129c871ba7ac395b627ccdecb8d7f175c21682c194f0ba54da1601e4b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ELFAttrParserExtended.cpp",
+        "sha256": "202fe8cb18abdd68dc636f9e7b162bd174f5a3273bea62074a69601bf63cf28c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ELFAttributes.cpp",
+        "sha256": "71ed00a035faf0362f012b8312821eb4cc7dc99f45b2b8ba64e90f2c6be1474c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Errno.cpp",
+        "sha256": "cea6053d877a3f92fcf926de30e773d7c30f0aec452d9c051151f0f3dce7ee32",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Error.cpp",
+        "sha256": "2bae27b1f79bf11a3897c6286df8020557cfa53bd09a90e3a4e60135b579f32d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ErrorHandling.cpp",
+        "sha256": "41d5b31250aac91b016a07c831fc55bcaf74d54edd36c09817c69a6cd534c9f0",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ExponentialBackoff.cpp",
+        "sha256": "ef75dace637b2c84cdf2bf5f8cbd5c508d9ccef1e2ca52aad29d37bac386276b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ExtensibleRTTI.cpp",
+        "sha256": "8b4e8fa624999a215d44275f8b79c33755028ceaddfa6a1b5aac4d8904d78757",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FileCollector.cpp",
+        "sha256": "3e443e1e29af5c7ac93fb79839661cac42956cb7ea77ec4a4240d2a0fb515cb5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FileOutputBuffer.cpp",
+        "sha256": "a3ff65062247d64c9a44ff422ca01700a0b197e0d0c2806315b37a459df48f8f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FileUtilities.cpp",
+        "sha256": "0c78a65ee488294ab0f2c308db6bc56756dec8d1883a2f990965e76d32483f0f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FloatingPointMode.cpp",
+        "sha256": "428f0d0ab23fe7d7669fe2f3b22b2d6ed3ca675196fbf976ab2ab17e5706ff0b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FoldingSet.cpp",
+        "sha256": "6dc569f2a71e10982db2634c87d84ebc38870c0442a741bb05895da598d45ca3",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FormatVariadic.cpp",
+        "sha256": "bc54b45fd19b1b2ddb7357c4ae306f67b264ea4c61cc1dd783079a54247aa44b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/FormattedStream.cpp",
+        "sha256": "4c50edf2b05e842ae862994bccbced27d127e7abf0e9ea57e431e0507febd1c4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/GlobPattern.cpp",
+        "sha256": "4931255e795b29496c6476eb3549a88e56fd28fddba73bcc55d29bd50dd90176",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/GraphWriter.cpp",
+        "sha256": "c8724769035d64db536df62ea045a39cf3c9bd4d74d5fe2ce80afb5894bfa3f1",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/HexagonAttributeParser.cpp",
+        "sha256": "3237ef83b6cb6691c018ae65d9e9259acac4556df1829ee795e55d8943ea018b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/HexagonAttributes.cpp",
+        "sha256": "8623eaf4ee2adc718a4d3b517af5dcc014dc35954682aec807c770ccb4875ae5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/InitLLVM.cpp",
+        "sha256": "cbe91e8b1a503c27097bf213fab56127be4f060201f96e7ffe4103494bda145a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/InstructionCost.cpp",
+        "sha256": "8faa4f1ec840d7b78539684f5bdc2eeedf50d1857892cff5141949af535f0f59",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/IntEqClasses.cpp",
+        "sha256": "894658593618f06a4f7246d2616bf0730afab3778ddfcbac3a5475842f4db7b0",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/IntegerInclusiveInterval.cpp",
+        "sha256": "445ece6fe22fcabb9e81dab7b9f3888b1a07653f4cf46b88213c44f3cfdf3aa2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/IntervalMap.cpp",
+        "sha256": "b5d06e6e3b0726d61ebdd2cbb8a0a1c80a54d1c12e12bb0c6fb7587300685d75",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/JSON.cpp",
+        "sha256": "6d25200062b3f674b242385d2e68a9009c9446895b8aa662d03df1ded6e4b7f0",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Jobserver.cpp",
+        "sha256": "cf4a20ff82e61428e1129ba39dffe02d662ab5b3bd6d724308b6843db3d9fb94",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/KnownBits.cpp",
+        "sha256": "e6c39a56c2eb9dc25abb7d73f6fe7f518eeb2d974b26c0571a33b4a495434d6b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/KnownFPClass.cpp",
+        "sha256": "d3023e7a9702e5b30b53e15013d857414c0bb550101bf720cddd249ac1a3f6a0",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/LEB128.cpp",
+        "sha256": "f650d9a6726d552fd21fb05f3ae5866cee0a707a54d7ad28510b0f67f78b04bd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/LineIterator.cpp",
+        "sha256": "a97620f76c1eb9fa05106c1fe941fe6a1375f8e8a3ac1634511e02cc83650577",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Locale.cpp",
+        "sha256": "ab10be99eac807741238bbe0960786bbadf8c5263a8416283339487c8cdea8d5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/LockFileManager.cpp",
+        "sha256": "9904822bc869485782f9f28be4abf15171e5ea7150180dc0009b4b0393feb928",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MSP430AttributeParser.cpp",
+        "sha256": "caf52309a2c5e5e11c5dbd029b806067c9126e0f404487818fdb95d6e73f3407",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MSP430Attributes.cpp",
+        "sha256": "47f07a44d25a3d7e94ebd4f1498c0a3a6e12c95d3f68ba6e7301b94b35743395",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ManagedStatic.cpp",
+        "sha256": "a03a9ff2c4176b3a6c72e1682392dba1e411b44d2a8effa89d4b90f36c43e403",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MathExtras.cpp",
+        "sha256": "763f49c8735717ad60255bd9e4be7cdd91651ecf274bfbf6f99c8aa62699d3fa",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MemAlloc.cpp",
+        "sha256": "1c0595c9225e139b5940266c107eba258e3bb84b510217db5819234f14284eb1",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Memory.cpp",
+        "sha256": "e0b04a4a72c9731c4732206e0201e08eafdd4b3b901f1437e31cb59c63414630",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MemoryBuffer.cpp",
+        "sha256": "60a9f4eaf56e24565361182a629990084e361bab89513232f1a307401b33ba00",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/MemoryBufferRef.cpp",
+        "sha256": "63f2adf0cf7b680b9a07f6e089f11527a985c8a8e99e79605302d01d1633c3f2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ModRef.cpp",
+        "sha256": "2aa2aee8a1637400e52b36ce3ef4412c922de9ac4b2ab7270c4fb3b633aa6447",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Mustache.cpp",
+        "sha256": "85bca961fd13fd456f5be72da497afd87153294be42895f7225b40accf93e16f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/NativeFormatting.cpp",
+        "sha256": "7f83df3d612a43dfa3c3a1a6d1e19df13fc93dd5edde13ce498e55e9ef523ce4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/OptimizedStructLayout.cpp",
+        "sha256": "bb893f74b7fcebeb57a1d5f059238a82ed1eab2e4fe0825bbbde717ed8ae79c6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/OptionStrCmp.cpp",
+        "sha256": "26aa4a5a46f215ad191331e24952110a9c701c0fc7c6341ff8f8769b818698ca",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Optional.cpp",
+        "sha256": "fb4e66ecbd15e997c7dcb4212057120a15ecbdba761c3d8352195356b13e0abf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/PGOOptions.cpp",
+        "sha256": "631bb41e91a02265051b40af1505ac31a3dafe9b6c5106c3bb2cc716568b9e7b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Parallel.cpp",
+        "sha256": "342042cc7c7882589b28ec16010e7c77c1d283608ad799d3f16cc0d4b01df7fe",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Path.cpp",
+        "sha256": "625b94aca482f7a14b3031917ec0a097a1cec03103932cb675aebbc4f1b0ca05",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/PluginLoader.cpp",
+        "sha256": "7bfe289581bf56521279d144bbcc3caba15f51aac16b1895186e2284d7695154",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/PrettyStackTrace.cpp",
+        "sha256": "fb31e4b04678b8d8e5f0181452c21bcd2d90f138b5592949b0bc94a97671f857",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Process.cpp",
+        "sha256": "3e18d548ed5f80987d0118d6831a79bd8d80f48e01ba2fd4a544d259e5b5ade4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Program.cpp",
+        "sha256": "69e2fb85804db9d65c4c6dc1b36af51c0e1a23905d882602e969ae3def1f27ad",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ProgramStack.cpp",
+        "sha256": "97b4944057da163aa50f3a1597fef296535369db34ccf7ad6bb65d97ae4b1847",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RISCVAttributeParser.cpp",
+        "sha256": "cc94cc4e475440645c1fea0e2690539afb93fc20ce288e2a9758da15801184ee",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RISCVAttributes.cpp",
+        "sha256": "7c9280c86ab28b6a16cc141c67befc7fc50c386062fd3a0a6fef9c36e4b6b8b4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RISCVISAUtils.cpp",
+        "sha256": "a0c5f2a15347092fe756abc931c30f27074f40c53895f4571a3a3c55d9726691",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RWMutex.cpp",
+        "sha256": "3555f2d9caf0cfcea268d051d95dcb80db8e2dac660c307da8c64892433539f9",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RandomNumberGenerator.cpp",
+        "sha256": "078b227e7115c915233ffe233f2df2a9c1b32214c6dbb4a82214c390865d9b46",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Regex.cpp",
+        "sha256": "c63dd5a442edc125b358ea11f4d29e281d0697062bb0e04a86d205ddafbbaa4f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RewriteBuffer.cpp",
+        "sha256": "2489c9d19a7fffa0b8557ca4db0c301aebf41508a1a6331c1022235c9b8c3451",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/RewriteRope.cpp",
+        "sha256": "44d8c53678aa099132ac1885a45b9ecedf9fdbfeeca19ca1509fcb5a35772cb4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ScaledNumber.cpp",
+        "sha256": "b6672440040a47ecf45e092b2812b0894806f3e41b07eadb6bca81e6bcbfa8f1",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ScopedPrinter.cpp",
+        "sha256": "b4a0ac7dca4af051dc1b17ed063dc8ee28f606d331ed8e236d72c17e7b7609f6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Signals.cpp",
+        "sha256": "36e49d11066352e9393eb95b2c0af1e9465bcf23705f12e04edca92aa2e0a468",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Signposts.cpp",
+        "sha256": "d7bf0c1a396236309f5df973ecc673ab384b0353fef83d9bad684fe5361e05ca",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SlowDynamicAPInt.cpp",
+        "sha256": "66598abfa23253ece7cfa99234040023d89c73cfa88f724c3c4ed4534c119855",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SmallPtrSet.cpp",
+        "sha256": "f346cf5afbf0632dc977de4c041b9f56b224254c59949490dfe0996884bcaf0a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SmallVector.cpp",
+        "sha256": "558f9269e4fa0d166c2522562ac80dfa767be78be85be969f075bdb6b4890a97",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SourceMgr.cpp",
+        "sha256": "d7d85c322eb14601c563cf9366dab42174bb241e2e7e12775df5577352410141",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SpecialCaseList.cpp",
+        "sha256": "4554b12d13f7a66dc28f7db75ef154a965421edbc0df65efc048a62f1b469964",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Statistic.cpp",
+        "sha256": "1781f807bc1b2aea022d5847001eb117320ff288f3e51156cfa96b42ea3dbdd2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/StringExtras.cpp",
+        "sha256": "a070ab2e8bef6cea90b5debd9ea63735a511d1373d4a6dd2b368f18a8adef768",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/StringMap.cpp",
+        "sha256": "309d2306a1bf2d9df8040b45cb0d8fb3f2ec33c05d33680b4fbe3a04c9e46432",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/StringRef.cpp",
+        "sha256": "7d7cacccd462fa12373a821c5353d725a9d512d8e0e4a07abafacb528bd6f44b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/StringSaver.cpp",
+        "sha256": "e69f53f00a6b666d81f8ba588b6bac8404dca9364b6bd921ee4ef7be53f714da",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SuffixTree.cpp",
+        "sha256": "a881d3656afe23c2530bba2121c1bba40a6df2ea8ff541bf80c3fb4d7699f578",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SuffixTreeNode.cpp",
+        "sha256": "dbeb6c4c8769c55c3e51f6826a6af324718bd9dda0f6a2c46e390610e19d4459",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/SystemUtils.cpp",
+        "sha256": "32773f9b480285b8cc2c01a7821bc2e53603467829a35471be5c60c15442289d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/TarWriter.cpp",
+        "sha256": "092961368a0708120dd46ee6253287fba422854ca0d9877c389c74a38280b148",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/TextEncoding.cpp",
+        "sha256": "286557ebf519a541f44b7ad76afeb09e01e03a48d578d79ac7fbbf5195eeda43",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ThreadPool.cpp",
+        "sha256": "850e69e291cfc109cb7fa7f62cec593e8cdf216de9954aa8b245e27ef90e232f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Threading.cpp",
+        "sha256": "3ae6b19dd16109d075b30a6e17cb4246da50fe874875c370d28e1eca7b1699b9",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/TimeProfiler.cpp",
+        "sha256": "f0bd9e1a87c1411e3f9291563ece6e0b48daff79c6ae4b235f928b93fa81010b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Timer.cpp",
+        "sha256": "485ad14f1f5f92e8a252869eef86d3fd98dd1b84c9cb0ef5fc91db957190920c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/ToolOutputFile.cpp",
+        "sha256": "84f23acd3a8dae8f4a5f6c91f3607a5511278a7a8f4e4b925b9999637fdb9636",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/TrieRawHashMap.cpp",
+        "sha256": "a4f53b132fc36b70706b10d465e7d32579f29a2cc53353bb01c18e18e6c422b5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Twine.cpp",
+        "sha256": "e631eff7014c21a80e35571f4bea5fc3b4c007a18bb8e30221546ce426e280bf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unicode.cpp",
+        "sha256": "5f45338939950fecf74c266d476b80be0d1e3da41c168a7b1f4723c5344af9d5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/UnicodeCaseFold.cpp",
+        "sha256": "1e77d2c58b07bfd0ed0ee1caf672b361a291b45f8c13372aa9f064604eb57be1",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/UnicodeNameToCodepoint.cpp",
+        "sha256": "a7f3f9dc52bb2d54ef0f26cba8a912d69f853ce613f95edd82bb18ae533a212a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/UnicodeNameToCodepointGenerated.cpp",
+        "sha256": "36d0880990bab4f512d943df0225080c1cd68d7c5721da2f50fac7346083e48c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Valgrind.cpp",
+        "sha256": "08c1ef8d6f287d00bd5a6f761732957b5a926c6fef387f386b7d967fd63d32dd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VersionTuple.cpp",
+        "sha256": "61385a3f47faae938e9b899e938277b04bf0c7b70f27f9d75ca3958e28619ce3",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VirtualFileSystem.cpp",
+        "sha256": "e87d0d2b968641dced25f390a66fb34e2d780aff90467e6fa2608604e91024e6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VirtualOutputBackend.cpp",
+        "sha256": "f86ce36739ae19871542c44a32029718c5529a37c2adcf9bc1817b444e5b9833",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VirtualOutputBackends.cpp",
+        "sha256": "98441bd76ccf8d06cb7479b8d9ad303626f2b24d90276d4b034815bc33d0a7eb",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VirtualOutputConfig.cpp",
+        "sha256": "d42cfbb192f8d34d73d1d7cc5a5e8f94a4d4ef0c92309cf460fc591b073a1b6c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VirtualOutputError.cpp",
+        "sha256": "15bbbaf44452b71c6db6bb4dd713d0c026944f05283f540e987e64696d470705",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/VirtualOutputFile.cpp",
+        "sha256": "e77d1abf48732ae8e74c7d94a5c8f7e151cf86deab0d6be17a8b8b07ac334924",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Watchdog.cpp",
+        "sha256": "264e30fd9d0879b33bd3955ee68ca4ef7dfbc1cdcfd7e68dbeb00c5b1d8d5f3e",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Win64EH.cpp",
+        "sha256": "ba0203bfcf5155075b9d266deb1f92a0c40d46f9c0aa21745ac966bb746aa881",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/WithColor.cpp",
+        "sha256": "08ea7f8a3ad6bf8f7874bedc24c23526fa1ef91804a439d5e1922259fb2829aa",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/YAMLParser.cpp",
+        "sha256": "0c9b226f42c5e6985d6ced58bd59e4e8167b8d604c583f4cbb01fa66b74c1131",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/YAMLTraits.cpp",
+        "sha256": "1f6062084d7b201835b94d4165e03320e485c39609be247655fda7edbcd0972f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Z3Solver.cpp",
+        "sha256": "796800ca9c49eb08f5a838a9c023449182ded4323565936df640e6eb3c5034fd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/circular_raw_ostream.cpp",
+        "sha256": "99aae8ec7aec8e1edd932f28d442ba13dc194f78450bd0c7880a062c0c99f737",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/raw_os_ostream.cpp",
+        "sha256": "29ec27665b8dfdfaacc68c5033a4831396117b006d1b84bd2d2d4da3c0b91e19",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/raw_ostream.cpp",
+        "sha256": "1e560c9dad6df2a82f36a76365d2e37c659b94d3dc1d0805153a10da42aa3c50",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/raw_ostream_proxy.cpp",
+        "sha256": "e96b511c0c1cb0ee15d0c1ad02cdf5d3c242dc8dfd26a5cbda653d2fd3ad8391",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/raw_socket_stream.cpp",
+        "sha256": "1732ddeb4f7917106e81e97e3c6bc39b0a6e6a754ce654f95e4f450dabbc597a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regengine.inc",
+        "sha256": "cfbc4a3fbf0d7e7dc806d3f68e4b3f3042cdce6306ffc22e6f62b232ca1efe6a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regerror.c",
+        "sha256": "438f947e063eb351ed2830c384b8451a66a1caecfb36758f1c4395527c6bbf24",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regex2.h",
+        "sha256": "ce6f38306170673c9bda3a5d2d638e7af858662d388e0b3884372677998fb7dd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regfree.c",
+        "sha256": "cab827cecccf9f9446f1b1990b7ad5ae3ba930ba004c3ea04daed5753ce4557d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regstrlcpy.c",
+        "sha256": "b717e3355fdca040c161a7a179de9db1c9253da6519e60b77a074cbf5f7d423f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/regutils.h",
+        "sha256": "80606b2d8f0f063b9ddaa7b909fc1ef9c344807f22fd2f3a8cb4187f88734ac3",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/zOSLibFunctions.cpp",
+        "sha256": "c9bee64c184dd861898ef92f2989b0127f436322732e5782efe9cedd43473c72",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/COM.inc",
+        "sha256": "5929c895a8c7d700de26fd8fb14bdc82e65203dcd62f5e2e74eb7ba70adbe88e",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/DynamicLibrary.inc",
+        "sha256": "e8ca97c035239e68563ba023f37478b32d92c904d17510405bda2f528a955fe5",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Jobserver.inc",
+        "sha256": "c8d5e3f353eb98a47a58b2abf2f5dcdf5d571b9cddb9b20c59449bb32c2fcade",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Memory.inc",
+        "sha256": "cc0d9fdeb4eebc10da8b0cff37d61221d7b7e65249f16e1f80717705e34cb61a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Path.inc",
+        "sha256": "4eb29bfcf362f99f2c1cf8b0088da05e759ee66115b726724877983153e6ffa7",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Process.inc",
+        "sha256": "969c4a820e0ebbe197d6aeb07ada489056fe8520a621ee6befbbfc520b4c2c19",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Program.inc",
+        "sha256": "33b3c3cd324fba24815b37704a124db6b31d4c966f5a4e307ba7f6ba8db587dc",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Signals.inc",
+        "sha256": "462bb0fdf8510d5d1fdc2462dec6deccc14fd36a976c978e1ad6b108937c3901",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Threading.inc",
+        "sha256": "db718f15a174d34889d51f5dbfd59c8a8298e8c563a9ebca46047dc4e4a71108",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Unix.h",
+        "sha256": "36dd713bef02b96d8e112467c2548eb0cac496ea97d30445a68747ce24cc57a6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Unix/Watchdog.inc",
+        "sha256": "2842394de68bcd926f22cc3976ce1968ce3bf214a0be6d96f7bf2465fe0b725b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/COM.inc",
+        "sha256": "208fa61dfdcfa3ddca79bd1f7068cee7a331c5adddef4e6f99540c71d494073d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/DynamicLibrary.inc",
+        "sha256": "90112792c0b8132201a0269fb478d4ce91e1aedde612b20d14fc7fe9502c744a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Jobserver.inc",
+        "sha256": "e8040a30cb852d200c4c9b1af1aed7c875477466d199d3a93472157a2a8889e7",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Memory.inc",
+        "sha256": "e0ceb3af372ee7e1a2bb961cc788cb148de56060ab82c43f6c35acc6366ab251",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Path.inc",
+        "sha256": "b901efe0e7ecbf4187db5047a51142c8772888ec7b00709ee3d4c4bf2c558eda",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Process.inc",
+        "sha256": "0c731d4ad75a302500912043e8b41ab86e778b2b448e4e1584177b62cb4c829c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Program.inc",
+        "sha256": "7a8dfc83cbda92a0994b39442acc7914440d5db879ab6d1f6c394e645ddde917",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Signals.inc",
+        "sha256": "f0380de9bfa0d4f7b80b88b15ff6ce9d0d6eb10e45ef3a861781f0b7cae6803e",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Threading.inc",
+        "sha256": "82195247e216e499a1c10e3f3de243221d68b18775e7004d7c617d7b91754356",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/Watchdog.inc",
+        "sha256": "bafadb50554f75b434aa227e4c8e16364e4280e44018693be702e65c9ad17d4f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.4/llvm/lib/Support/Windows/explicit_symbols.inc",
+        "sha256": "ebefd1ee1d7dcb412965cfbd83c1a2b4f2bff440890c5665f8609d9599c18108",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/HTMLparser.c",
+        "sha256": "39b16dc8a54828427044b5b29d78c5c7c39ae9d06f057712b7b4e851bec2f6da",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/HTMLtree.c",
+        "sha256": "a34d2e638dded149c2322794b8aed7300ac0caccd6d25036ad44f944264064a2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/SAX2.c",
+        "sha256": "6760326727e1403e32419db2f53274a316a66b7b2ac2a12a910d6c256b73db08",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/buf.c",
+        "sha256": "45bb230d220e4b2a28280bb995ca2533c7cb1b8c04a5313def8134727ae67b3b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/c14n.c",
+        "sha256": "19b874a26bb277fed574242b6638f25e51a927a7ff7f359730eefc59b6ce96b6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/catalog.c",
+        "sha256": "6ce40ad3db56b0e8d4eb638f1c669d0f4b69641dd56e03ad1662630140f119eb",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/chvalid.c",
+        "sha256": "d0d2a3ce584b2cdd109ec095a49daa3e8ffbb7b98a0738fedba79220b0839a0c",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/debugXML.c",
+        "sha256": "f4f492ad59aef9ca5d79074b2f8223316432b5c8759e1e07e57ba7bb8e02dc94",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/encoding.c",
+        "sha256": "45fc7bc3332409ed55bc7dd94cc356d378e3028efbeb795f7d7867bae67263ad",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/entities.c",
+        "sha256": "ecd30cbc797fb40874fd014a635f2c4b006ee8bc476fc851c33cb0103b68f310",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/error.c",
+        "sha256": "65b87de097325318da252c7cff809133bfd94ef6e13a112bb8a567a689a8bba4",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/globals.c",
+        "sha256": "e1140b0040629b52aaaa2d6b094a0bfbd6486768f6e2b392d22b9e73e1bbec9a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/hash.c",
+        "sha256": "ccf2ce1dc3067020b94baf9b7ee0f8e535b38b750e4f3fe27eff0df93046eb81",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/libxml.h",
+        "sha256": "8825b737b8ad7c220adbb1d0c242a66296036b2978b22607d7c5406d9665a912",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/lintmain.c",
+        "sha256": "7711504748c08d3454443619d1ef96b606f715506a363f5656eb4893ba19eaf8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/nanohttp.c",
+        "sha256": "a87bd99c7e07f691c6c43d9ed81eafdfaf778617e219bfe7c1371a40fcc61599",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/parser.c",
+        "sha256": "b77dc43e5e284efcdc87d5c6ec4112eb41a810ef19bb05570c3d1880858cb843",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/parserInternals.c",
+        "sha256": "62b005e11c8d9af96ee49bb4e9e5cc3f02dd3378d7d4cfb775a253dce43fe56b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/pattern.c",
+        "sha256": "645f248f321015426fad6f8526fff549059d94abba81b5646708f5ede5908e8a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/relaxng.c",
+        "sha256": "66fa775d28a6d4e97f7d08ab676c9a00c0529a78d08d0cea42007e3e93ff3ca8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/runsuite.c",
+        "sha256": "36b6e168cddcb2ad56aba71a1b525a5dd529dde338dafdddbd0f74601dc87f86",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/runtest.c",
+        "sha256": "4c0e05c3ba71326d40e08e96247b1d540eb9a676a8262c797faec646032fc4fc",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/runxmlconf.c",
+        "sha256": "11ad9ee328e17182b762ac31602db3f66f1395153bc12696264b310f4be2d021",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/schematron.c",
+        "sha256": "3277fe48f5337e22bdd5fbc8cc62e050afa225843bff2f705bba6bc85fe3cf12",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/shell.c",
+        "sha256": "f310c9794d484bca5adfacfdda546500624a646d72180df7e9b4006ab6f060ec",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testModule.c",
+        "sha256": "88b9867b758152bd1729cc0d831ca57fff65b44615eee302f62228d53d83d7ae",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testapi.c",
+        "sha256": "d1757834551b367623e8f123e1f885e9a492d9c23637293c2fc5757aa9494daf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testcatalog.c",
+        "sha256": "3d0283d9e4c5dc4a8d7f07af761cce9a312324c0cc48fb089c9e7f5201331bc2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testchar.c",
+        "sha256": "9bc0e15a9c3f41e2d1d1fe6d8e4d2b05ed6816492291266954c1f7341f745623",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testdict.c",
+        "sha256": "450ccb5794d5017ee9f84156d98314eb88d615645ddec16934eac010bbce093b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testdso.c",
+        "sha256": "081394d3a4df71e770c27bec223d843325b6838c4a3e63f55e4c867bbd59dedd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testlimits.c",
+        "sha256": "3c3c40057443601e807daaba3b6b36c48abce839be0097bbf41075458fcd9785",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testparser.c",
+        "sha256": "bb0c69a966c61598ff0b18142c50f73d50117552206eb22ce9b15226285f8cdd",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/testrecurse.c",
+        "sha256": "9416455de231d538d22781eee28d3277869f7d79f4124a70a0d088f87732853d",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/threads.c",
+        "sha256": "844cfb6750ec1275752676f5cb6922fbfa1875c7b20b5b634114fff613cb0843",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/timsort.h",
+        "sha256": "e05f2fd14231bb96072e2b3d14d9a5773078963730e914eb245acdf34812e5c2",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/tree.c",
+        "sha256": "2045cf4d1a93bd5d2e9b2781ed92a748e146e30c2919f59fb3ea1845f5795dea",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/uri.c",
+        "sha256": "16cc4794868487cb3dac76faffef603163f8d8472508735df7b5a4cf0a4c4e44",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/valid.c",
+        "sha256": "cd6633e52070f2bcd808b745ef55ae7fa2569fb6eb48c672615744d50b09e21a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xinclude.c",
+        "sha256": "1fd040e0bcd75303be24fbed61746baae4e6646f4ca6abb36e743616e7674998",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xlink.c",
+        "sha256": "a75f3f60c2ab6617e614ce07fad7074ebb50f2caa2167cddf8fff12ea457289a",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlIO.c",
+        "sha256": "802eb83c7e2b2ac4e146908258b5bf73e33a3325ff84a53cf92ef216eead9bc6",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlcatalog.c",
+        "sha256": "30bf8d910caf31f7ee153b992f7a847d4634cfdaf5d4183525b115bc7842883b",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmllint.c",
+        "sha256": "19af18ede29133c39a457cc3ac315aa01e09f6e5fab218ec64d40e81dd0a63f8",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlmemory.c",
+        "sha256": "c1a46db028e2a12e70b083e1a9b19bb5ca0fa0101dc3f1494e2547cd1a6db4d9",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlmodule.c",
+        "sha256": "42dd1b340b738ea358eacde7ce52424a4d48d9d8e682d8979c52cd0217dd9c84",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlreader.c",
+        "sha256": "c6820eb7f3563845629ae1a0fb06ed2fffb4fcabd90e6a7a6404481cf30f4def",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlregexp.c",
+        "sha256": "3b2ba46567d52d898864b9c3b7478066c25720cbb9ad69f5961f6b329cd64aaf",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlsave.c",
+        "sha256": "cfa0f88bd90a615a4131663c716edf123808f930a8b3d0d51d92fda37539c666",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlschemas.c",
+        "sha256": "bed8bfbfd61a2025b67b7a0e4d05ce50093e7a6bb5e43a3ebac343b8df4329a7",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlschemastypes.c",
+        "sha256": "08cac7d1dbdb617688ac5b36ab6fee75f634e5bf0372aa0e6569a0bebe3b0c8f",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlstring.c",
+        "sha256": "ce4ad70f28c61c61dc64a513ff909e2d614368f552dc285f256a3fc05d5be135",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xmlwriter.c",
+        "sha256": "d6b47a82bf9b5f76e44a0a7cf3b3a4988ca58a6bd20ebe094b2ecfa80fbc29e3",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xpath.c",
+        "sha256": "e3699c8768b4dc1be8bbe9f19abed217ac0866e656d256581b082b5216f45fba",
+        "error": null
+      },
+      {
+        "url": "https://raw.githubusercontent.com/GNOME/libxml2/v2.15.4/xpointer.c",
+        "sha256": "73d0a6b451b21e3060e89d663698de5f4417bf26f691a91d9e1acf53a3475911",
+        "error": null
+      }
+    ],
+    "limitations": "Not an exhaustive whole-LLVM or final Windows/macOS binary clearance. Exact final platform link membership and platform runtime conditions remain unresolved."
+  },
+  "external_sdk_pins_reference": "tools/ci/llvm_sdk.py",
+  "http_pins_reference": "third_party/http-versions.json",
+  "original_owner_evidence": "Owner MIT directive and approved attribution; Git records shmellyorc, 174 commits, earliest 2026-10-10; third-party/imported rights are not independently proven."
+}

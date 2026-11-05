@@ -1,5 +1,15 @@
 # VOID documentation
 
+## MIT licensing implementation — Golden Wrench review
+
+Owner-selected MIT is applied to VOID-original code; compiler/tooling installs
+include MIT and the audit's missing known third-party notices. The
+[implementation and focused results](release/LICENSING_IMPLEMENTATION.md),
+[scope](release/LICENSING_SCOPE.md) and [component inventory](release/NOTICE_INVENTORY.json)
+record exact coverage and remaining rights/GNU/platform questions. Uncommitted;
+no release clearance. LOG-PERF remains OPEN / release HOLD. Accepted installation
+and HTTP qualification are unchanged.
+
 ## HTTP/HTTPS accepted — 4 November 2026
 
 Golden Wrench closes HTTP/HTTPS cross-platform acceptance at

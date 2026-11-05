@@ -1,0 +1,7 @@
+{
+  "result": "PASS",
+  "source_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+  "source_sha256": "b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5",
+  "local_sha256": "b7c3169df2c29805ee0ca6bc8e935f4cf3daffb0e39c60bde12213940d5f4467",
+  "comparison": "Complete wording equal after substituting approved copyright line and normalizing whitespace/display title"
+}

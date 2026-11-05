@@ -4,7 +4,7 @@
   "description": "VOID compiler language assistance, navigation, guarded rename, formatting and diagnostics.",
   "version": "0.1.0",
   "publisher": "void-language",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.141.0",
     "node": ">=24.19.0 <25"

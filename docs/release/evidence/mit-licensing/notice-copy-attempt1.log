@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/void-licensing-copy.py", line 30, in <module>
+    head=prefix(Path(r['path']).read_bytes())
+  File "/tmp/void-licensing-copy.py", line 10, in prefix
+    assert m,'No leading notice block';return m.group(0)
+           ^
+AssertionError: No leading notice block

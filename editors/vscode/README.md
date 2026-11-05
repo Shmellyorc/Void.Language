@@ -36,7 +36,11 @@ codium --install-extension dist/void-language-0.1.0.vsix
 A generic VSIX requires a separately built/installed `voidls` from LLVM 23.1.4.
 Owner-local platform packages can include the matching server. Host runtime
 libraries still apply; no clean-machine portability claim is made. Repository
-UNLICENSED: public publication/redistribution requires the owner's license decision.
+VOID-original integration source is MIT-licensed under the repository's `LICENSE`.
+Third-party dependencies retain their own licenses; see
+`docs/release/LICENSING_SCOPE.md` and `docs/release/REDISTRIBUTION_NOTICES.md`.
+This source-license declaration does not certify a distributable VSIX or native
+server bundle. Public release remains subject to the recorded release holds.
 See the repository's `docs/EDITOR_INTEGRATION.md`, `docs/STAGE7_IMPLEMENTATION.md`
 and `docs/stage7/ACCEPTANCE.md` for setup, exact executed versions and limitations.
 

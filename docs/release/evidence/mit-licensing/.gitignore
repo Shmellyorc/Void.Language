@@ -1,0 +1,2 @@
+# Keep this sprint's original command output and failure evidence reviewable.
+!*.log

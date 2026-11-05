@@ -1,5 +1,16 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## MIT licensing handoff — Golden Wrench review
+
+Boss authorized applying MIT to VOID-original code and repairing the known
+component-install notice omissions. [Implementation/results](release/LICENSING_IMPLEMENTATION.md)
+record separate Linux compiler/tooling installs and Windows notice-rule checks,
+with native platform and GNU compliance limits explicit. No compiler/Runtime
+behavior change, SDK bundle, package, CI or Git action. Review the uncommitted
+scope, exact notice provenance and focused evidence. LOG-PERF remains OPEN /
+release HOLD; accepted installation/HTTP work and historical failures stay closed
+or preserved in their recorded scope. Stop before commit/push; no next task.
+
 ## Current Boss checkpoint and HTTP authorization, 30 October 2026
 
 Boss records LLVM/Clang/LLD 23.1.4 hosted acceptance at `15f7868b`,

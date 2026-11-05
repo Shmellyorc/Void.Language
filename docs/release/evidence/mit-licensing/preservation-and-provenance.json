@@ -1,0 +1,74 @@
+{
+  "result": "PASS",
+  "upstream_text_reconstruction": [
+    {
+      "path": "third_party/llvm-licenses/23.1.4/LICENSE.TXT",
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "verified_upstream_extracts": 1
+    },
+    {
+      "path": "third_party/llvm-licenses/23.1.4/ConvertUTF-NOTICES.txt",
+      "sha256": "14b0c910d5fa273751a659ea008ca6b860036bfcceb8f70712f02f8c1db57f1d",
+      "verified_upstream_extracts": 2
+    },
+    {
+      "path": "third_party/llvm-licenses/23.1.4/xxhash-NOTICES.txt",
+      "sha256": "92833684a78193933bac2906c8b80d335f14a3efa8d525ab4d18dbde6d04acf5",
+      "verified_upstream_extracts": 2
+    },
+    {
+      "path": "third_party/llvm-licenses/23.1.4/BLAKE3-LICENSE.txt",
+      "sha256": "6a94bedb8b707ed97f6e310d0d015ab14e0683ffa0a612b02958581b9cc9fc0e",
+      "verified_upstream_extracts": 1
+    },
+    {
+      "path": "third_party/llvm-licenses/23.1.4/Support-NOTICES.txt",
+      "sha256": "c06625a86661f31fcbbb4d8f764909f1ff73846e0f51e6f20c83b7f234580ed3",
+      "verified_upstream_extracts": 13
+    },
+    {
+      "path": "third_party/llvm-dependency-licenses/zstd-1.5.7/LICENSE",
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+      "verified_upstream_extracts": 1
+    },
+    {
+      "path": "third_party/llvm-dependency-licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt",
+      "sha256": "0b793f8f9744f40bd9edea4bbdc6b600e212b95da2edf955b3bf6485938310fe",
+      "verified_upstream_extracts": 3
+    },
+    {
+      "path": "third_party/llvm-dependency-licenses/libxml2-2.15.4/Copyright",
+      "sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+      "verified_upstream_extracts": 1
+    },
+    {
+      "path": "third_party/llvm-dependency-licenses/libxml2-2.15.4/FILE-NOTICES.txt",
+      "sha256": "ac374cd1931aed19c5bf09e380bf7c5efd60490259c06eb1bf18dc70e83df503",
+      "verified_upstream_extracts": 3
+    },
+    {
+      "path": "third_party/http-licenses/libpsl-0.21.5/LICENSE.chromium",
+      "sha256": "1d7f52747a9169751cdf2641a8299c0098e9ecdf9429296ffd55bdb14c9ed5b3",
+      "verified_upstream_extracts": 1
+    }
+  ],
+  "documentation_links": [
+    "docs/release/LICENSING_SCOPE.md",
+    "docs/release/REDISTRIBUTION_NOTICES.md",
+    "docs/release/LICENSING_IMPLEMENTATION.md"
+  ],
+  "unchanged_preexisting_inputs_count": 2898,
+  "unchanged_build_artifacts_sha256": {
+    "voidc": "b6bd8fc8284516ee89365dbd1668ff0b0e7df2a9e21cf5056ac1f26bda934699",
+    "voidls": "89d5998b65534389d10542e8b6f9c1ae6f74afcd04bb2f99d7753d423548b175",
+    "libvoid_runtime.a": "d047f497cbea7e1187040883a9515cec791ba5ec58ff8fcb87b1d563e7a2f3e5",
+    "libvoid_native_fixture.a": "4666b73441c229f23b5795e4cbe63baf6b6d0ffb448b03566f9385ecadae1865"
+  },
+  "head": "95ce0a76e9a95198cd4fe9d5b6bb4cbfad9bd5c5",
+  "no_staged_changes": true,
+  "ownership_evidence": {
+    "recorded_identities": "174\tshmellyorc <shmelyorc@gmail.com>",
+    "earliest_recorded_commit": "8ed7e395bd4789f4cb82c61a346794f37a435077 2026-10-10 shmellyorc",
+    "limits": "Metadata corroborates attribution, not independent rights to imported/generated/contributor material."
+  }
+}
