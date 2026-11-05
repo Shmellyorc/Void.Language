@@ -1,5 +1,171 @@
 # Small-file logging attribution — 4 November 2026
 
+## Validated no-match translation experiment — 5 November 2026 (discarded)
+
+**One authorized candidate evaluated and discarded. Production translation is
+restored byte-for-byte to HEAD `da2edda0`. LOG-PERF remains OPEN / release HOLD;
+the original file200 <10 ms requirement remains FAIL. Stop after this experiment.**
+The patch, tests, raw samples and failed harness setup remain uncommitted for
+Golden Wrench review. No second implementation or tuning candidate was attempted.
+
+The complete workload improved materially: **21.984 → 16.688 ms**, a reduction
+of **5.297 ms / 24.1%**. However, the required absence of a heavy-path regression
+was not established. A confirmatory comparison of the same binaries measured
+heavy framing **9.4% slower** and console **4.2% slower** for the candidate. One
+candidate console block had a **20.731 ms median**, failing its ≤20 ms screen.
+Discard conservatively under the approved decision rule. These active-host
+observations do not isolate the cause of the heavy-path movement.
+
+[Complete receipt and samples](evidence/no-match-20261105/results.json) ·
+[Rejected patch](evidence/no-match-20261105/candidate.patch) ·
+[Artifact hashes](evidence/no-match-20261105/SHA256SUMS.json)
+
+### Exact candidate and restoration
+
+Only `src/runtime/text_case.cpp` received a production-code change: **46 added,
+five removed lines**. Inside `Runtime::translate_scalars`, after the existing
+root/schema/count checks and backing lease acquisition, an invocation-local
+probe accepted at most **128 ASCII input bytes**, **256 rules**, and **16 KiB**
+of input plus replacement extents. Two 64-bit words recorded byte presence.
+Under the existing mutex it checked each current replacement's string identity
+and extent, scalar validity, strict key ordering and disjointness from the input.
+It did not copy replacement payloads or construct map nodes on proven no-match
+calls. Null/empty managed strings retained their existing representation.
+
+A match, invalid or non-increasing key, non-ASCII/long input, large table, or
+quota limit fell back to the original loop **inside the same selected backing
+leases**. Reference validation preceded the current key check; probing stopped
+at the first inconclusive entry, so later entries could not mask an earlier
+invalid rule. Unsorted valid tables still used the general path. Invalid rules
+were resolved before negative/insufficient budgets. A proven no-match result
+used the original checked alias publication, factored into a local lambda and
+shared with the general unchanged-result branch. No persistent state or public
+API was added. Leases and heap borrows stayed within their existing lifetime and
+mutex rules; general safepoints and NativeSafe disposal remained in place.
+
+The [focused VOID fixture](evidence/no-match-20261105/translation_no_match.void)
+and [native checks](evidence/no-match-20261105/native-extra.cpp) were experimental
+test artifacts. The VOID fixture was removed from `tests/` on rejection; no
+CMake or existing test source change remains. `git diff --exit-code` confirms
+production translation, logging source, existing ownership tests and CMake are
+unchanged. Restored translation SHA-256 is
+`a977bdb662633f28ac373a713f6daf4920cc62ebc2b40d3f840b54dd2fd6e24a`, equal to HEAD.
+Logging sinks, fsync, HTTP, installation CI, licenses and protected README were
+not changed. Earlier rejected allocator evidence below is preserved unchanged.
+
+### Correctness and failure results
+
+- Both the new fixture and existing `text.void` passed **normal/O2 JIT and normal/O2
+  linked AOT**. The AOT objects were linked with the same candidate translation
+  object before the retained Runtime archive. No stale translation implementation
+  was used for the candidate checks.
+- Coverage includes 200 distinct and repeated ordinary messages, escapes, Unicode
+  with/without matches, empty input, 128/129-byte boundaries, ASCII bit boundaries,
+  sorted/unsorted and duplicate tables, invalid scalars, mismatched counts,
+  negative/insufficient/exact budgets, same-backing indexed key and replacement
+  mutations, input/replacement aliases, oversized replacement payloads and
+  257-rule fallback.
+- Focused native/JIT checks passed **879** assertions. Additional native checks
+  passed **876**, including checked output authority, malformed schemas, original
+  alias identity, late corrupt replacement extents, invalid/duplicate-rule
+  precedence over later corruption, pending collection and collection after
+  failure. The native-only host also passed **876** checks with ASan/UBSan and
+  leak detection, using the current candidate TU over the retained strict Runtime.
+  Its older frontend was intentionally not invoked; this is not full current
+  strict-source qualification.
+- No-match allocation sweeps recovered **four injected failures each** for
+  0/1/81/256-rule cases and **262** for 257-rule fallback. Failure left output
+  untouched and roots collectible; success published exactly the original alias.
+  Removed allocations can change injection ordinals. The existing translation
+  ABI sweep recovered **11** failures. The existing ownership suite passed
+  **31,224** checks across normal/O2 JIT with GC and allocation-failure coverage.
+- Existing logging integration passed **1,688** checks, including startup,
+  reload, native partial/error boundaries, allocation failures and cancellation.
+  Benchmark complete-byte/transfer-count and post-GC payload/handle oracles passed.
+
+One **harness setup failure** is retained: the extra native test initially passed
+64-bit all-ones as i32 -1 to `list_write`, which correctly rejected invalid scalar
+bits. The test was corrected to `0xffffffffu`; production code was not changed.
+The initial source, driver, binary identity and
+[failed output/receipt](evidence/no-match-20261105/initial-harness-failure/receipt.json)
+remain. This was exit 1, not a signal or sanitizer finding. All **47 child-command
+receipts** are preserved: **46 exit 0, one exit 1**. No failed run was erased.
+
+### Complete workload and heavy screens
+
+Same retained Linux host and Release LLVM/Clang/LLD **23.1.4** build, Runtime
+GC budget **256**, JIT **O2**, actual checked soft/hard **1 MiB** stacks. The
+control and candidate each override only translation in the same retained
+libraries. No translation timers or allocation counters are enabled. Compilation
+and admission precede timing. File200 retains acquisition, **200 writes, required
+fsync and close**, with full byte/count oracles. Prepared direct I/O is a separate
+comparator and does not replace the requirement.
+
+Primary order was **control A, candidate A, candidate B, control B**, each cell
+with one warmup and three measured samples. Pooled medians below use six measured
+samples per version. Brackets retain the actual measured minimum and maximum;
+no outlier is removed.
+
+| Primary workload, ms | Production control median [range] | Candidate median [range] |
+| --- | ---: | ---: |
+| Complete file200 | **21.984 [20.139–25.132]** | **16.688 [16.295–20.751]** |
+| Prepared direct file200 | 9.606 [9.268–9.863] | 9.420 [9.341–12.476] |
+| Short ASCII quote200 | 4.801 [4.665–6.253] | 1.701 [1.690–1.775] |
+| Short complete frame200 | 7.619 [7.249–9.233] | 4.387 [4.303–4.545] |
+| Short full console200 | 11.556 [10.969–12.731] | 8.145 [8.011–8.488] |
+| Heavy quote100 | 5.547 [5.305–6.309] | 6.104 [5.769–6.694] |
+| Heavy complete frame100, ≤10 ms | 7.817 [7.182–8.370] | 7.985 [7.753–8.471] |
+| Heavy full console100, ≤20 ms | 18.293 [17.492–19.203] | 19.462 [18.704–19.845] |
+
+File200 block medians were **21.056 / 16.621 / 17.222 / 22.809 ms** in execution
+order. Process CPU medians were **15.691 → 10.865 ms**. Every measured candidate
+file200 sample still fails <10 ms. Primary heavy console was **6.4% slower**
+pooled, while the control block medians moved **19.045 → 17.874 ms**. This
+unresolved heavy-path concern justified one heavy-only confirmation with the
+**same binaries**, not a new candidate or implementation change.
+
+Confirmation order was **candidate A, control A, control B, candidate B**, again
+one warmup and three samples per cell:
+
+| Heavy confirmation, ms | Production control median [range] | Candidate median [range] |
+| --- | ---: | ---: |
+| Complete frame100, ≤10 ms | **8.197 [7.626–8.459]** | **8.970 [8.251–9.929]** |
+| Full console100, ≤20 ms | **18.804 [18.221–19.206]** | **19.589 [18.873–25.172]** |
+
+Candidate framing block medians were **9.291 / 8.876 ms**; controls were
+**8.422 / 7.917 ms**. Console block medians were **20.731 / 18.883 ms** for the
+candidate and **19.148 / 18.565 ms** for controls. Pooled candidate framing still
+passes 10 ms but regresses **9.4%**; pooled console passes 20 ms but regresses
+**4.2%**, with one failing candidate block. Passing pooled thresholds does not
+satisfy the separate no-heavy-regression condition. **Discard and stop.**
+
+### Reproduction and remaining limits
+
+The receipt retains **152 timing rows**: **120 measured and 32 component warmup
+rows**, plus eight untabulated original-workload warmups. It includes exact argv,
+cwd, environment overrides, wall/CPU samples, load observations, source/library/
+binary/toolchain hashes and restoration checks. Small source, driver and output
+artifacts are copied beside it; large binaries and complete recorder incidents
+remain private at
+`/home/shmellyorc/.local/state/void-log-performance/no-match-zi9i7gbl/`.
+Drivers are `prepare.py`, `check.py`, `extra-check.py`, `measure.py`,
+`confirm-heavy.py` and `record.py`. Preparation uses the retained build at
+`framing-candidate-hAebdlqN/build` and prior host sources named in the recorded
+driver; replay needs those retained artifacts or verified equivalent inputs.
+It creates a fresh private directory and never overwrites accepted binaries.
+
+This is an unrandomized active-desktop study without CPU isolation, pinned
+frequency or confidence intervals. The file gain is material in these samples;
+no causal explanation or universal magnitude is claimed. Heavy no-regression
+is not demonstrated. Only JIT O2 was performance-timed; other JIT/AOT modes
+received correctness checks. Full current Debug/strict suites, other platforms,
+tail latency, worst pauses and peak native-live memory remain unqualified.
+The bounded speculative walk can add work before a fallback's existing poll;
+exact worst-pause equivalence was not established. Existing full-input reserve
+and final immutable-string publication pause limitations remain unchanged.
+Production is restored, its earlier accepted heavy-path evidence remains
+separate, and **LOG-PERF remains OPEN with the original file200 FAIL**.
+
 ## Release gate review — 4 November 2026
 
 **LOG-PERF HOLD / OPEN.** The [decision memorandum](LOG_PERF_DECISION.md)

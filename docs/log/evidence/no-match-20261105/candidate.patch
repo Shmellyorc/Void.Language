@@ -1,0 +1,84 @@
+diff --git a/src/runtime/text_case.cpp b/src/runtime/text_case.cpp
+index b49a8af7..0ab029d1 100644
+--- a/src/runtime/text_case.cpp
++++ b/src/runtime/text_case.cpp
+@@ -179,6 +179,7 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+     };
+     RuleSnapshot snapshot{*this, {}};
+     auto& rules = snapshot.entries;
++    std::optional<std::size_t> unchanged_bytes;
+     {
+         void *key_backing = nullptr, *string_backing = nullptr, *replacement = nullptr;
+         constexpr std::size_t zero = 0;
+@@ -201,8 +202,40 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+         const auto key_count = lease(keys, key_schema, key_backing, key_layout, key_lease);
+         const auto string_count = lease(replacements, string_schema, string_backing, string_layout, string_lease);
+         if (key_count != string_count) return invalid_argument;
++        // Bounded, invocation-local proof: the leased backings cannot be
++        // modified while we validate their current contents. No heap borrow
++        // survives this lock, and inconclusive probes use these same leases.
++        auto short_ascii_no_match = [&]() -> std::optional<std::size_t> {
++            if (key_count > 256) return {};
++            std::lock_guard lock(mutex_);
++            const auto source = heap_.string_bytes(reference_source(input));
++            if (source.size() > 128) return {};
++            std::uint64_t present[2] = {};
++            for (unsigned char byte : source) {
++                if (byte >= 128) return {};
++                present[byte / 64] |= std::uint64_t{1} << (byte % 64);
++            }
++            auto remaining = byte_quota - source.size();
++            std::int32_t previous = -1;
++            for (std::uint64_t i = 0; i < key_count; ++i) {
++                std::int32_t key;
++                std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
++                void* value = nullptr;
++                std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
++                // Preserve reference-before-key validation. Stop at the first
++                // inconclusive entry so later rules cannot mask its failure.
++                const auto bytes = heap_.string_bytes(value);
++                if (key <= previous || key > 0x10ffff || (key >= 0xd800 && key <= 0xdfff) ||
++                    bytes.size() > remaining ||
++                    (key < 128 && (present[key / 64] & (std::uint64_t{1} << (key % 64))))) return {};
++                remaining -= bytes.size();
++                previous = key;
++            }
++            return source.size();
++        };
++        unchanged_bytes = short_ascii_no_match();
+         auto replacement_root = root_word(&replacement);
+-        for (std::uint64_t i = 0; i < key_count; ++i) {
++        for (std::uint64_t i = 0; !unchanged_bytes && i < key_count; ++i) {
+             if (i && i % 256 == 0) poll();
+             std::int32_t key;
+             {
+@@ -220,6 +253,17 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+         }
+     }
+     if (max_bytes < 0) return invalid_range;
++    auto publish_alias = [&] {
++        std::lock_guard lock(mutex_);
++        require_buffer_output(output);
++        heap_.validate_output_address(output);
++        *output = reference_source(input);
++    };
++    if (unchanged_bytes) {
++        if (*unchanged_bytes > static_cast<std::uint64_t>(max_bytes)) return limit_exceeded;
++        publish_alias();
++        return translated;
++    }
+     auto source = snapshot_string(input);
+     std::string result;
+     bool changed = false;
+@@ -245,10 +289,7 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+     if (changed) {
+         string_into(output, result);
+     } else {
+-        std::lock_guard lock(mutex_);
+-        require_buffer_output(output);
+-        heap_.validate_output_address(output);
+-        *output = reference_source(input);
++        publish_alias();
+     }
+     return translated;
+ }

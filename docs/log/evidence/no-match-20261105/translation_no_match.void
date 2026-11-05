@@ -1,0 +1,96 @@
+use text
+
+
+private func translated(source: string, keys: [i32], replacements: [string], budget: i64, expected: string) -> bool:
+    if text.translate_scalars(source, keys, replacements, budget) is Ok(var value):
+        return value == expected
+    return false
+
+
+private func rejected(source: string, keys: [i32], replacements: [string], budget: i64, expected: text.error_kind) -> bool:
+    if text.translate_scalars(source, keys, replacements, budget) is Err(var reason):
+        if expected is text.error_kind.invalid_range:
+            return reason.kind is text.error_kind.invalid_range
+        if expected is text.error_kind.invalid_argument:
+            return reason.kind is text.error_kind.invalid_argument
+        return reason.kind is text.error_kind.limit_exceeded
+    return false
+
+
+func main() -> i32:
+    var keys = [0, 10, 34, 92, 127, 38634]
+    var replacements = ["\\0", "\\n", "\\\"", "\\\\", "DEL", "snow"]
+    for index in 0..<200:
+        var ordinary = "message {index} abc XYZ 123 !?"
+        if not translated(ordinary, keys, replacements, 128, ordinary):
+            return 1
+        if not translated("repeated ordinary message", keys, replacements, 128, "repeated ordinary message"):
+            return 2
+    if not translated("a\n\"\\\0\u{7f}", keys, replacements, 64, "a\\n\\\"\\\\\\0DEL"):
+        return 3
+    if not translated("雪🔥é", keys, replacements, 64, "snow🔥é"):
+        return 4
+    if not translated("🔥é", keys, replacements, 6, "🔥é"):
+        return 5
+    if not translated("", keys, replacements, 0, ""):
+        return 6
+    if not rejected("ordinary", keys, replacements, -1, text.error_kind.invalid_range):
+        return 7
+    if not rejected("ordinary", keys, replacements, 7, text.error_kind.limit_exceeded):
+        return 8
+    if not translated("ordinary", keys, replacements, 8, "ordinary"):
+        return 9
+    if not rejected("", [10, 10], ["", ""], -1, text.error_kind.invalid_argument):
+        return 10
+    if not rejected("ordinary", [10, 10], ["", ""], 0, text.error_kind.invalid_argument):
+        return 11
+    if not rejected("", [10], [], -1, text.error_kind.invalid_argument):
+        return 12
+    for invalid in [-1, 55296, 57343, 1114112]:
+        if not rejected("ordinary", [0, invalid], ["", ""], -1, text.error_kind.invalid_argument):
+            return 13
+    if not translated("ordinary", [92, 10, 0], ["slash", "newline", "zero"], 8, "ordinary"):
+        return 14
+    if not translated("a\n\\", [92, 10, 0], ["slash", "newline", "zero"], 13, "anewlineslash"):
+        return 15
+    # Same identities, counts and backings; indexed writes must be revalidated.
+    keys[5] = 111
+    replacements[5] = "O"
+    if not translated("ordinary", keys, replacements, 8, "Ordinary"):
+        return 16
+    replacements[5] = "OO"
+    if not translated("ordinary", keys, replacements, 9, "OOrdinary"):
+        return 17
+    keys[5] = 10
+    if not rejected("ordinary", keys, replacements, -1, text.error_kind.invalid_argument):
+        return 18
+    keys[5] = 38634
+    if not translated("ordinary", keys, replacements, 8, "ordinary"):
+        return 19
+    var alias = "aa"
+    if not translated(alias, [97], [alias], 4, "aaaa") or alias != "aa":
+        return 20
+    var boundary = "x"
+    for index in 0..<7:
+        boundary += boundary
+    if boundary.byte_length != 128 or not translated(boundary, keys, replacements, 128, boundary):
+        return 21
+    boundary += "x"
+    if not translated(boundary, keys, replacements, 129, boundary):
+        return 22
+    if not translated("\u{1}\u{3f}\u{40}\u{7f}", [0, 2, 62, 65, 126], ["", "", "", "", ""], 4, "\u{1}\u{3f}\u{40}\u{7f}"):
+        return 23
+    # Oversized replacement payload and rule count take the general path.
+    var large = "R"
+    for index in 0..<15:
+        large += large
+    if not translated("ordinary", [0], [large], 8, "ordinary"):
+        return 24
+    var many_keys: [i32] = []
+    var many_replacements: [string] = []
+    for index in 0..<257:
+        many_keys.push(1000 + index)
+        many_replacements.push("R")
+    if not translated("ordinary", many_keys, many_replacements, 8, "ordinary"):
+        return 25
+    return 0

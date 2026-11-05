@@ -1,0 +1,6 @@
+no-match rules=0 allocation failures=4
+no-match rules=1 allocation failures=4
+no-match rules=81 allocation failures=4
+no-match rules=256 allocation failures=4
+no-match rules=257 allocation failures=262
+876 bounded no-match native checks passed

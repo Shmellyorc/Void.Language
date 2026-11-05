@@ -1,0 +1,5 @@
+In file included from /home/shmellyorc/.local/state/void-log-performance/no-match-zi9i7gbl/correctness.cpp:2:
+/home/shmellyorc/.local/state/void-log-performance/no-match-zi9i7gbl/ownership.cpp:209:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+  209 | }
+      | ^
+1 warning generated.
