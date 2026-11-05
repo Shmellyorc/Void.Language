@@ -1,0 +1,89 @@
+diff --git a/src/runtime/text_case.cpp b/src/runtime/text_case.cpp
+index b49a8af7..907d91c7 100644
+--- a/src/runtime/text_case.cpp
++++ b/src/runtime/text_case.cpp
+@@ -5,6 +5,7 @@
+ #include <cstdint>
+ #include <cstring>
+ #include <map>
++#include <memory_resource>
+ #include <iterator>
+ #include <string>
+ #include <string_view>
+@@ -104,16 +105,65 @@ namespace {
+ // Status values are consumed by the canonical text wrapper. Runtime failures
+ // travel separately through RuntimeFailure and never publish a partial result.
+ enum TranslationStatus { translated, invalid_range, invalid_argument, limit_exceeded };
+-using Rules = std::map<std::int32_t, std::string>;
++
++// Invocation-local map nodes only. Fixed blocks avoid geometric growth and
++// eager allocation based on an unvalidated rule count. Ordinary operator new
++// keeps block failures on the same injectable allocation channel as map nodes.
++class RuleStorage final : public std::pmr::memory_resource {
++    struct Block {
++        Block* previous;
++        alignas(std::max_align_t) std::byte bytes[8192];
++    };
++    Block* head_ = nullptr;
++    std::size_t used_ = 0;
++
++    void* do_allocate(std::size_t bytes, std::size_t alignment) override {
++        // The sole client is the ordered map's native node type, whose keys
++        // and values require no extended alignment or large single allocation.
++        if (bytes > sizeof(Block::bytes) || alignment > alignof(std::max_align_t))
++            throw std::bad_alloc();
++        auto take = [&]() -> void* {
++            if (!head_) return nullptr;
++            void* next = head_->bytes + used_;
++            auto remaining = sizeof(Block::bytes) - used_;
++            auto* result = std::align(alignment, bytes, next, remaining);
++            if (result) used_ = sizeof(Block::bytes) - remaining + bytes;
++            return result;
++        };
++        if (auto* result = take()) return result;
++        auto* block = new Block;
++        block->previous = head_;
++        head_ = block;
++        used_ = 0;
++        return take();
++    }
++    void do_deallocate(void*, std::size_t, std::size_t) override {}
++    bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
++        return this == &other;
++    }
++public:
++    void release() noexcept {
++        while (head_) {
++            auto* previous = head_->previous;
++            delete head_;
++            head_ = previous;
++        }
++        used_ = 0;
++    }
++    ~RuleStorage() override { release(); }
++};
++using Rules = std::pmr::map<std::int32_t, std::string>;
+ 
+ struct RuleSnapshot {
+     vd::Runtime& runtime;
+-    Rules entries;
++    RuleStorage storage;
++    Rules entries{&storage};
+     ~RuleSnapshot() {
+         // A large rule set must also be disposable during unwinding without
+         // retaining the Managed world. These entries own only native bytes.
+         vd::Runtime::Native native(runtime);
+         entries.clear();
++        storage.release();
+     }
+ };
+ 
+@@ -177,7 +227,7 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
+             if (copy.size() == bytes.size()) return copy;
+         }
+     };
+-    RuleSnapshot snapshot{*this, {}};
++    RuleSnapshot snapshot{*this};
+     auto& rules = snapshot.entries;
+     {
+         void *key_backing = nullptr, *string_backing = nullptr, *replacement = nullptr;
