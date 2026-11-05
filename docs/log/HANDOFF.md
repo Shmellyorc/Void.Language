@@ -1,5 +1,160 @@
 # VOID logging — mandatory performance repair handoff
 
+## Release gate decision — 4 November 2026 (documentation handoff authorized)
+
+**LOG-PERF OPEN / release HOLD.** The [decision memorandum](LOG_PERF_DECISION.md)
+consolidates accepted heavy screens (8.603 ms framing / 18.501 ms console) and
+latest unchanged-production controls (7.408 / 18.536 ms heavy; file200 20.091 ms).
+The original **file200 <10 ms** requirement remains **FAIL**. The approximately
+2.06× direct-I/O result does not replace the absolute requirement.
+
+**Allocator experiment: REJECTED.** The discarded allocator delivers only 3.0% file200 improvement with 40.7% more
+requested map-storage bytes; its patch, positive component results and failures
+remain preserved. CPU work, required `fsync`, measurement variation and unresolved
+costs remain distinct. No specific narrow repair is established likely to close
+the gate; the roughly 0.85 ms byte-snapshot scope cannot alone do so.
+
+Least-work next action: Golden Wrench obtains the requirement owner's recorded
+choice to retain <10 ms and HOLD pending separately scoped work, or explicitly
+disposition the requirement. The evidence does not prove the target impossible
+or authorize relaxation. The memorandum specifies evidence for an engineering
+PASS and separate requirements for an owner exception. Earlier proposed next
+actions below are historical and confer no authorization.
+
+Boss authorized committing and pushing only `LOG_PERF_DECISION.md`, this handoff
+and `docs/release/PREVIEW_BLOCKERS.md`, with `[skip ci]`. Supporting reports,
+receipts, rejected patches and the release qualification handoff remain preserved
+locally outside this commit. References to that uncommitted evidence resolve in
+the working checkout. Earlier entries retain their historical review status.
+No new code, experiment, infrastructure or regression run; HTTP/HTTPS and
+installation qualification remain unchanged. **Stop after the documentation handoff.**
+
+## Bounded rule allocation — 4 November 2026 (discarded; review pending)
+
+**LOG-PERF OPEN; file200 <10 ms remains FAIL.** One invocation-local fixed-block
+allocator was evaluated on the same Release LLVM 23.1.4 host. The production
+change is discarded and `text_case.cpp` restored exactly to `11e95f4a`; no second
+candidate is launched. All work remains uncommitted for Golden Wrench review.
+[Report](SMALL_FILE_INVESTIGATION.md#bounded-rule-allocation-experiment--4-november-2026-discarded)
+· [Receipt](evidence/small-file-20261104/results.json), `rule_allocation_experiment`
+· [Rejected patch](evidence/small-file-20261104/rule-allocation-candidate.patch).
+
+Uninstrumented original/candidate/candidate/original controls give six samples
+per version: file200 **20.091 → 19.485 ms**, only **0.605 ms / 3.0%**. Treat that
+end-to-end gain as small under the stop rule, despite quote200 improving 16.0%,
+heavy framing 7.408 → 6.916 ms and heavy console 18.536 → 17.030 ms. No heavy
+regression is observed. Map allocations fall 16,200 → 200; requested map-storage
+bytes rise 1,166,400 → 1,641,600 (40.7%). Coarse preparation/disposal scopes and
+allocation counts run separately; their larger deltas are not acceptance gains.
+
+The candidate retains all validation, rooting, leases, quotas, NativeSafe cleanup
+and atomic publication with no new shared Runtime contract or formatter change.
+Release ownership passes 31,210 checks and native logging 1,688. A four-block
+400-rule test passes 18 injected failures and ASan/UBSan/leak checks, including
+complete release and aliased-output preservation. Broader strict ownership setup
+exits 1 because the older retained strict frontend lacks `_translate_scalars`;
+that failure is preserved and no full strict pass is claimed.
+
+All 18 benchmark processes / 270 observations pass their bounded oracles.
+54/55 compile/link/check/measurement commands exit 0; the strict setup above is
+the sole exit 1. Prior evidence/failures remain intact. Snapshot-reserve and
+unpolled-publication pause limits remain; tail latency and full native peak live
+memory remain UNKNOWN. No commit/push/CI or installation/HTTP requalification.
+**Documented and stopped for Golden Wrench review.**
+
+## Translation attribution — 4 November 2026 (review pending)
+
+**LOG-PERF OPEN; production unchanged at verified `11e95f4a`.**
+[Latest report](SMALL_FILE_INVESTIGATION.md#translation-follow-up--golden-wrench-review-pending)
+· [Evidence](evidence/small-file-20261104/results.json), `translation_followup`.
+The byte-array copy proposal remains on hold and was not implemented.
+
+Actual file200 already returns 200 translation aliases, with no replacement
+assembly or transformed-string publication, after validating/snapshotting all
+81 rules per call. One current sample spends 5.944 ms in translation, including
+4.411 ms in the rule loop and 0.748 ms in disposal. The separate counter run
+identifies 16,200 map-node allocations (1,166,400 bytes); short replacement snapshots
+allocate no ordinary C++ storage. Input lookup is about 0.12 ms/200 calls.
+Root/validation/allocator time within the loop is not independently established.
+Coarse timer on/off checks shift medians 0.9–2.7%; sampled inner timings are
+perturbed and are not extrapolated or used for acceptance.
+
+Smallest candidate for review: per-invocation native node allocation for the
+existing ordered map in text_case.cpp, retaining every validation, root, lease,
+safepoint, duplicate-error order and NativeSafe disposal boundary. No persistent
+cache, new managed lifecycle or output-builder change. This targets allocation
+traffic, not the whole rule-loop cost; time savings remain unmeasured and may be
+modest. No <10 ms promise. Current production-control file200 medians remain
+21.238–23.755 ms (FAIL). All 28 commands and 13 benchmark processes pass, with
+142 observations; prior reports/failures are preserved.
+
+No implementation or new commit. The same five investigation files remain
+uncommitted. Snapshot-reserve/unpolled-publication limitations remain; tail latency
+and peak native-live memory remain UNKNOWN. Stop for Golden Wrench review.
+Installation and HTTP/HTTPS acceptance remain closed.
+
+## Small-file CPU attribution — 4 November 2026 (review pending)
+
+**LOG-PERF OPEN / HOLD. No production change or new commit.** The approved
+formatter remains at verified remote commit `11e95f4a6a7d60071bd754008662e88e022fbe16`.
+The [CPU follow-up](SMALL_FILE_INVESTIGATION.md#cpu-follow-up--golden-wrench-review-pending)
+and [receipt](evidence/small-file-20261104/results.json) retain contemporaneous
+controls, detailed/reduced timers and a separate allocation run. All 16 final
+benchmark processes pass their bounded oracles (276 rows); three harness setup/
+source diagnostic failures and earlier observations remain preserved.
+
+Short frame200 is the largest measured CPU component (control medians 7.187–7.776 ms).
+A same-sample reduced-timer write-only breakdown totals 14.026 ms: translation
+4.934 ms, GC 0.794 ms, byte snapshot 0.846 ms, checked I/O reply 0.888 ms and
+native writes 0.516 ms. Independent component medians are not summed. Detailed
+root/lock timers substantially perturb execution; their counts establish repeated
+work, not mutex contention. File200 counts 41,435 ordinary C++ allocations,
+including 16,600 within translation, and 17 collections.
+
+The smallest separately reviewable repair proposal is a bounded bulk copy in
+Runtime::byte_array_bytes, preserving its existing checked roots/lease/snapshot
+contract. It targets a secondary cost under roughly 1 ms/200 records, so it
+cannot alone close the unchanged <10 ms gate. No formatter, synchronization,
+GC-safety or flush/close change is implemented or proposed for weakening.
+The five investigation documentation/evidence files remain uncommitted.
+Full-input snapshot reserve and unpolled final immutable-string publication
+remain pause-time limitations; tail latency/native-live peak remain UNKNOWN.
+Stop for Golden Wrench review. Installation and HTTP/HTTPS acceptance stay closed.
+
+## Small-file attribution — 4 November 2026 (review pending)
+
+**LOG-PERF OPEN / release HOLD.** Golden Wrench's reviewed formatter, targeted
+checks and evidence are committed/pushed as
+`11e95f4a6a7d60071bd754008662e88e022fbe16` with `[skip ci]`; `origin/main`
+was independently verified at that exact SHA. No hosted CI was dispatched.
+The dated entries below retain their historical state and evidence.
+
+The separately scoped [small-file report](SMALL_FILE_INVESTIGATION.md) and
+[receipt](evidence/small-file-20261104/results.json) isolate framing,
+write, flush and close on the same Release/LLVM23 JIT O2 host. Original-runtime
+file200 repeats at **26.806 ms** (FAIL <10); prepared direct I/O is **12.952 ms**.
+Separate phases measure **15.138 ms** for logger writes200, **3.449 ms** for
+prepared direct writes200, and about **6–9 ms** for dirty flush. Short frame200
+is **7.505 ms**. Instrumented original file200 attributes **0.501–0.518 ms** to
+native writes, **5.597–5.906 ms** to flush, and **0.006–0.008 ms** to close scopes.
+Dirty logger close is dominated by its specified flush, not native close.
+Control/profile differences demonstrate variation; independent medians are not
+summed as exclusive attribution. The direct comparator is not a fixed floor.
+
+All nine preparation/measurement commands exit 0; byte/count/checksum and
+post-GC resource checks pass. Heavy framing/console PASS remains the retained
+candidate result (8.603/18.501 ms), not a new run. Native peak-live memory,
+platform scaling and tail latency remain UNKNOWN. Full-input snapshot reserve
+and unpolled final immutable-string publication remain pause-time limitations.
+
+Next: Golden Wrench reviews attribution before authorizing any further production
+change. The smallest next diagnostic is a bounded per-record CPU split across
+logger admission/guard/preparation/delivery and checked I/O bridge work. No
+formatter rewrite or flush/sink semantic change is proposed. Only this new
+investigation's report, receipt and handoffs remain uncommitted for separate review.
+Installation qualification stays ACCEPTED / CLOSED; baseline and historical
+crash evidence are preserved.
+
 ## Bounded framing implementation — 4 November 2026
 
 **LOG-PERF OPEN / release HOLD. Golden Wrench approved the bounded candidate for commit and push.**
