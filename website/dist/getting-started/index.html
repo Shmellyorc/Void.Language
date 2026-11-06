@@ -26,10 +26,30 @@
       <h1 class="page-title">Start exploring <span class="gradient">VOID.</span></h1>
       <p class="section-lead">The VOID compiler is in active development. There are no public builds available yet.</p>
     </div>
+    <p>Developers with a source checkout can follow the <a href="#source-installation">source installation workflow</a>. Start with the prerequisites for <a href="#linux">Linux x64</a>, <a href="#windows">Windows x64</a> or <a href="#macos">macOS ARM64</a>.</p>
     <div class="features-grid">
       <a class="topic-card" href="/docs/syntax/"><h2>Learn the language</h2><p>Start with Syntax Basics. Read a small program and see how its input becomes a result.</p></a>
       <a class="topic-card" href="/examples/"><h2>Explore examples</h2><p>Browse verified VOID programs by topic and follow each one from source to output.</p></a>
       <a class="topic-card" href="/roadmap/"><h2>See the roadmap</h2><p>See which features work today, what is being tested and what is planned.</p></a>
     </div>
+  </section>
+  <section id="source-installation" class="section container">
+    <h2>Install from source</h2>
+    <p>VOID needs the complete LLVM/Clang/LLD <strong>23.1.4</strong> development SDK, <strong>Python 3.12+</strong>, CMake 3.24+ and the platform’s C/C++ development files. A compiler-only LLVM installer is insufficient. <a href="/github/">Check repository availability</a> before obtaining source; no public binary package or package-manager installation is offered here.</p>
+    <p>In a source checkout, the source-install helper uses the existing pinned SDK and HTTP dependency recipes, checks downloads and cached inputs, builds the compiler and language server, installs Runtime and standard-library resources, then checks the installed tools. It does not install operating-system prerequisites or edit your shell profile.</p>
+    <h3 id="linux">Linux x64</h3>
+    <p>The userspace baseline is Ubuntu 24.04 x86-64/glibc. Install build-essential, CMake, Ninja, Python, Make, Perl, CA certificates, xz and the libffi, libedit, LibXml2, zstd, zlib and terminfo development packages. Other distributions need equivalent packages; no lower glibc floor is certified.</p>
+    <pre tabindex="0" aria-label="Linux source installation commands"><code>python3 tools/install.py --prefix "$HOME/.local"
+export PATH="$HOME/.local/bin:$PATH"
+voidc --version
+python3 tools/verify_install.py "$HOME/.local"</code></pre>
+    <p>Keep the SDK for later native builds. Add the PATH export to your shell configuration for future sessions. The checkout’s <code>docs/install/linux.md</code> contains exact prerequisites and qualification evidence.</p>
+    <h3 id="windows">Windows x64</h3>
+    <p>Use Visual Studio Build Tools 2022’s x64 developer environment, C++ desktop tools, Windows/UCRT and DIA SDKs, Python 3.12+, CMake and Ninja. The source helper uses the full pinned LLVM SDK and native Schannel dependency recipe. Follow <code>docs/install/windows.md</code> in the checkout. Earlier isolated developer-host installation passed; the new helper still needs native Windows qualification.</p>
+    <h3 id="macos">macOS ARM64</h3>
+    <p>Use Apple Silicon, selected Xcode 26+ and its matching SDK/libc++, Python 3.12+, CMake, Make and Perl. Follow <code>docs/install/macos.md</code> in the checkout. Compiler tests cover macOS ARM64, but the new source-install helper has no native macOS installation result yet. A deployment target does not certify execution on that OS version.</p>
+    <h3>Check, run and build</h3>
+    <p>After installing, <code>voidc --help</code> lists commands; <code>voidc run --help</code> explains execution and cache options. Run <code>voidc check main.void</code>, <code>voidc run main.void</code> or <code>voidc build main.void -o hello</code>. Entry selection is automatic. A directory selects exact-case <code>main.void</code>; no entry flag is required.</p>
+    <p>This is source installation, not independently portable binary packaging. Keep the compiler, matching installed stdlib, Runtime archives and native manifests together. Learn the <a href="/docs/compiler-workflow/">compiler workflow</a> and configure <a href="/docs/editor-tooling/">your editor</a>.</p>
   </section>
 </main><footer><div class="container footer-inner"><a class="brand" href="/"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M2 5h12l13 23-6 11z"/><path fill="#6b779b" d="M17 5h11l-6 10z"/><path fill="#303b64" d="M31 5h11L29 28l-6-10z"/></svg><span>VOID <small>LANGUAGE</small></span></a><p>Native code. Clear intent.</p><div><a href="/docs/syntax/">Docs</a><a href="/docs/">All guides</a><a href="/github/">GitHub ↗</a></div></div></footer><div class="sr-only" id="announcement" role="status"></div></body></html>

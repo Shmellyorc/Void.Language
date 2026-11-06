@@ -52,6 +52,26 @@ class SEOChecks(unittest.TestCase):
         result = self.check()
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_source_install_contract_and_binary_boundary(self):
+        path = self.public / 'getting-started/index.html'
+        before = path.read_bytes()
+        for original, changed, message in [
+            (b'23.1.4', b'19.1.7', 'source-installation prerequisites'),
+            (b'Python 3.12+', b'Python 3.9+', 'source-installation prerequisites'),
+            (b'tools/verify_install.py', b'tools/unknown.py', 'source-installation prerequisites'),
+            (b'id="source-installation"', b'id="missing-installation"', 'source-installation prerequisites'),
+            (b'There are no public builds available yet.', b'Download a stable release.', 'public binary availability'),
+        ]:
+            with self.subTest(original=original):
+                try:
+                    self.assertIn(original, before)
+                    path.write_bytes(before.replace(original, changed))
+                    result = self.check()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(message, result.stderr)
+                finally:
+                    path.write_bytes(before)
+
     def test_rejects_seo_and_content_regressions(self):
         guide = 'docs/generics/index.html'
         cases = [

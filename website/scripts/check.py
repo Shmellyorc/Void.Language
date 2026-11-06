@@ -579,8 +579,12 @@ for route in ('syntax', 'variables', 'types', 'functions', 'control-flow', 'coll
 getting_started = PUBLIC / 'getting-started/index.html'
 if getting_started.is_file():
     text = getting_started.read_text()
-    if 'There are no public builds available yet.' not in text or 'build/debug' in text:
-        fail(getting_started, 'must describe development status without install steps')
+    if 'There are no public builds available yet.' not in text:
+        fail(getting_started, 'must retain the public binary availability boundary')
+    if any(required not in text for required in
+           ('id="source-installation"', '23.1.4', 'Python 3.12+', 'tools/install.py',
+            'tools/verify_install.py', 'id="linux"', 'id="windows"', 'id="macos"')):
+        fail(getting_started, 'source-installation prerequisites, verification and platform limits must remain discoverable')
 architecture = PUBLIC / 'examples/architecture.void'
 if not architecture.is_file() or architecture.read_bytes() != (REPO / 'examples/architecture.void').read_bytes():
     fail(architecture, 'download differs from preserved repository example')
