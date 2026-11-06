@@ -1,0 +1,16 @@
+{
+  "json_typed": {
+    "changed_functions": [
+      "__vd_2f407374646c69622f6a736f6e2e766f69643a3a5f7363616c6172__void"
+    ],
+    "functions_baseline": 86,
+    "functions_candidate": 86
+  },
+  "json_validated": {
+    "changed_functions": [
+      "__vd_2f407374646c69622f6a736f6e2e766f69643a3a5f7363616c6172__void"
+    ],
+    "functions_baseline": 64,
+    "functions_candidate": 64
+  }
+}

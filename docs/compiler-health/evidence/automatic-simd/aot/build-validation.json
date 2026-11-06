@@ -1,0 +1,1546 @@
+[
+  {
+    "cpu_ms": 296.30799999999994,
+    "tag": "guarded/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-baseline-False.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 298.29963500378653,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 295.924,
+    "tag": "guarded/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-candidate-False.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 297.87970799952745,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 296.391,
+    "tag": "guarded/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-candidate-False.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 298.4397180262022,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 296.7979999999999,
+    "tag": "guarded/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-baseline-False.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 299.00530399754643,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 113.90899999999985,
+    "tag": "guarded/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-baseline-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 115.68884301232174,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 42.50299999999971,
+    "tag": "guarded/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-candidate-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 43.61071699531749,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 42.11399999999982,
+    "tag": "guarded/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-candidate-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 43.57194801559672,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 113.78500000000025,
+    "tag": "guarded/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-baseline-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 115.12682802276686,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 113.80900000000044,
+    "tag": "guarded/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-baseline-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 115.10790995089337,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 41.67199999999999,
+    "tag": "guarded/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-candidate-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 42.76340897195041,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 41.477000000000096,
+    "tag": "guarded/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-candidate-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 42.47542202938348,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 114.11599999999977,
+    "tag": "guarded/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-guarded-baseline-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 115.40532700018957,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 333.5549999999996,
+    "tag": "conditional/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-conditional-baseline-False.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 335.7080949936062,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 334.77000000000004,
+    "tag": "conditional/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-conditional-candidate-False.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 337.0859940187074,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 115.21599999999977,
+    "tag": "conditional/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-conditional-baseline-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 116.5826540091075,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 41.81600000000052,
+    "tag": "conditional/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-conditional-candidate-True.bin",
+      "100000000"
+    ],
+    "status": 0,
+    "stdout": "2005030733\n",
+    "stderr": "",
+    "wall_ms": 42.9589890409261,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 5.613999999999897,
+    "tag": "bidirectional/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-bidirectional-baseline-False.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "wall_ms": 6.350746029056609,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 5.522999999999834,
+    "tag": "bidirectional/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-bidirectional-candidate-False.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "wall_ms": 6.243330950383097,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.996999999999473,
+    "tag": "bidirectional/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-bidirectional-baseline-True.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "wall_ms": 5.16549899475649,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.32200000000027,
+    "tag": "bidirectional/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-bidirectional-candidate-True.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "wall_ms": 5.319212039466947,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 6.769999999999832,
+    "tag": "f32_streams/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-f32_streams-baseline-False.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 7.47957598650828,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 6.8379999999999,
+    "tag": "f32_streams/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-f32_streams-candidate-False.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 7.600551005452871,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.4440000000001145,
+    "tag": "f32_streams/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-f32_streams-baseline-True.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 5.164408998098224,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.2559999999999265,
+    "tag": "f32_streams/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-f32_streams-candidate-True.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 4.962439008522779,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.0110000000003225,
+    "tag": "dependent_f64/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-dependent_f64-baseline-False.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 7.734585029538721,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 6.900999999999158,
+    "tag": "dependent_f64/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-dependent_f64-candidate-False.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 7.618549978360534,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.703000000000124,
+    "tag": "dependent_f64/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-dependent_f64-baseline-True.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 5.5048439535312355,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.590000000000094,
+    "tag": "dependent_f64/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-dependent_f64-candidate-True.bin",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 5.268525972496718,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.53000000000028,
+    "tag": "checked_i32/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-baseline-False.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.475203006062657,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.499999999999417,
+    "tag": "checked_i32/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-candidate-False.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.477483000140637,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.78700000000023,
+    "tag": "checked_i32/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-candidate-False.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.87228600634262,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.72399999999986,
+    "tag": "checked_i32/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-baseline-False.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.69209400564432,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.606000000000687,
+    "tag": "checked_i32/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-baseline-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.67164501408115,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.12599999999932,
+    "tag": "checked_i32/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-candidate-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.098943039774895,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 28.839000000000283,
+    "tag": "checked_i32/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-candidate-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 29.923680005595088,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.827999999999967,
+    "tag": "checked_i32/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-baseline-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.85727902362123,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.327000000000545,
+    "tag": "checked_i32/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-baseline-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.34516196930781,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.58900000000053,
+    "tag": "checked_i32/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-candidate-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 30.550083029083908,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.637000000001358,
+    "tag": "checked_i32/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-candidate-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 31.8519480060786,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.096999999999152,
+    "tag": "checked_i32/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_i32-baseline-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 31.11829998670146,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.877000000000486,
+    "tag": "checked_f32/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_f32-baseline-False.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 31.94986400194466,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 31.6790000000009,
+    "tag": "checked_f32/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_f32-candidate-False.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 32.950439024716616,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.330999999999886,
+    "tag": "checked_f32/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_f32-baseline-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 31.301361974328756,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.067999999999095,
+    "tag": "checked_f32/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-checked_f32-candidate-True.bin",
+      "8192"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 31.088814954273403,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 969.392,
+    "tag": "fixed_i32/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-fixed_i32-baseline-False.bin",
+      "1024"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 974.3612720048986,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 941.7540000000005,
+    "tag": "fixed_i32/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-fixed_i32-candidate-False.bin",
+      "1024"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 946.3929809862748,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 951.6400000000002,
+    "tag": "fixed_i32/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-fixed_i32-baseline-True.bin",
+      "1024"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 956.3103770487942,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 1018.0360000000013,
+    "tag": "fixed_i32/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-fixed_i32-candidate-True.bin",
+      "1024"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": "",
+    "wall_ms": 1022.8051639860496,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.747000000000611,
+    "tag": "text/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.416746029164642,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.7519999999995335,
+    "tag": "text/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.438894975464791,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.7359999999999616,
+    "tag": "text/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.397886979859322,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.82400000000116,
+    "tag": "text/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.486354009713978,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.035999999999262,
+    "tag": "text/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.786669975146651,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.892999999999258,
+    "tag": "text/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.574250022415072,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.721999999999781,
+    "tag": "text/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.389818001072854,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.8720000000003196,
+    "tag": "text/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.592779034283012,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.815000000001234,
+    "tag": "text/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.529492987785488,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.575000000000994,
+    "tag": "text/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.297902982216328,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.782000000000174,
+    "tag": "text/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.450314969290048,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.701999999998762,
+    "tag": "text/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-text-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "307\n",
+    "stderr": "",
+    "wall_ms": 4.360969003755599,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.052999999996864,
+    "tag": "managed/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.785974986385554,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.224000000001226,
+    "tag": "managed/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 4.161279008258134,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.021999999999192,
+    "tag": "managed/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.867870953399688,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.1530000000006275,
+    "tag": "managed/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.9308590348809958,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.9519999999987334,
+    "tag": "managed/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.8897100021131337,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.7009999999995102,
+    "tag": "managed/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 4.684656974859536,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.8929999999998124,
+    "tag": "managed/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.601423988584429,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.014000000000294,
+    "tag": "managed/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.778635000344366,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.001999999999061,
+    "tag": "managed/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.8072150200605392,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.975000000000616,
+    "tag": "managed/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.7687270087189972,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.022999999999776,
+    "tag": "managed/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.736608021426946,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 3.029000000001947,
+    "tag": "managed/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-managed-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "47\n",
+    "stderr": "",
+    "wall_ms": 3.6920499987900257,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 320.9879999999994,
+    "tag": "collections_2m/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 323.1188739882782,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 321.6229999999989,
+    "tag": "collections_2m/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 323.97095795022324,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 323.50399999999627,
+    "tag": "collections_2m/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 325.8440369972959,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 325.2200000000003,
+    "tag": "collections_2m/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 327.6015219744295,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 326.7990000000012,
+    "tag": "collections_2m/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 329.13850503973663,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 327.10900000000277,
+    "tag": "collections_2m/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 329.5146599994041,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 320.16,
+    "tag": "collections_2m/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 322.4082459928468,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 320.6040000000008,
+    "tag": "collections_2m/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 322.7126030251384,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 340.8279999999997,
+    "tag": "collections_2m/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 343.07421796256676,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 322.0270000000012,
+    "tag": "collections_2m/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 324.1905190516263,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 324.0820000000042,
+    "tag": "collections_2m/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 326.24347205273807,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 326.09599999999796,
+    "tag": "collections_2m/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_2m-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "14\n",
+    "stderr": "",
+    "wall_ms": 328.5243639838882,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.309999999997707,
+    "tag": "json_typed/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-baseline-False.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.059696992859244,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.544999999997248,
+    "tag": "json_typed/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-False.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.481231983751059,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.457999999999743,
+    "tag": "json_typed/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-False.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.279353030957282,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.405000000004769,
+    "tag": "json_typed/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-baseline-False.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.217198017518967,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.360999999999507,
+    "tag": "json_typed/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.375943987630308,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.410000000001915,
+    "tag": "json_typed/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.221495023462921,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.246000000004749,
+    "tag": "json_typed/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.09720199322328,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.334000000001062,
+    "tag": "json_typed/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.135563984978944,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.220999999995037,
+    "tag": "json_typed/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 7.978513021953404,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.729999999997794,
+    "tag": "json_typed/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.663790009450167,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.525999999997701,
+    "tag": "json_typed/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.416211989242584,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 7.421999999995599,
+    "tag": "json_typed/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "stderr": "",
+    "wall_ms": 8.152215043082833,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.097000000014006,
+    "tag": "json_validated/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-baseline-False.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.9151910352520645,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.283000000012471,
+    "tag": "json_validated/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-candidate-False.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.993918992113322,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.13699999998407,
+    "tag": "json_validated/candidate/False/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-candidate-False.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.872144025284797,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.803000000000779,
+    "tag": "json_validated/baseline/False/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-baseline-False.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 5.628826969768852,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.32499999999969,
+    "tag": "json_validated/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 5.179193976800889,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.140000000009358,
+    "tag": "json_validated/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.926374997012317,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.015000000012314,
+    "tag": "json_validated/candidate/True/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.790481005329639,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.108000000009326,
+    "tag": "json_validated/baseline/True/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.899207968264818,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.495000000002136,
+    "tag": "json_validated/baseline/True/4",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 5.3251939825713634,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.621000000000208,
+    "tag": "json_validated/candidate/True/5",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 5.6142929825000465,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.445999999995287,
+    "tag": "json_validated/candidate/True/6",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 5.340585019439459,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4.215000000002078,
+    "tag": "json_validated/baseline/True/7",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_validated-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "{\"score\":7}\nScore must be nonnegative\n",
+    "stderr": "",
+    "wall_ms": 4.898331011645496,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.789000000003483,
+    "tag": "collections_small/baseline/False/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_small-baseline-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "12\n",
+    "stderr": "",
+    "wall_ms": 3.770723007619381,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.761999999993492,
+    "tag": "collections_small/candidate/False/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_small-candidate-False.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "12\n",
+    "stderr": "",
+    "wall_ms": 3.456523991189897,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.7020000000010924,
+    "tag": "collections_small/baseline/True/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_small-baseline-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "12\n",
+    "stderr": "",
+    "wall_ms": 3.3857469679787755,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2.8919999999947876,
+    "tag": "collections_small/candidate/True/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-collections_small-candidate-True.bin",
+      "7"
+    ],
+    "status": 0,
+    "stdout": "12\n",
+    "stderr": "",
+    "wall_ms": 3.6675570299848914,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  }
+]

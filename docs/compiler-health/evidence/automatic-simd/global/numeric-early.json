@@ -1,0 +1,6 @@
+{
+  "status": 1,
+  "stdout": "",
+  "stderr": "FAILED: Checked source calls require a source diagnostic context\n",
+  "stack_soft_hard": 1048576
+}

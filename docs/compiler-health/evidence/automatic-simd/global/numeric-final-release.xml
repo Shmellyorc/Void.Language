@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="13"
+	timestamp="2026-11-06T05:30:06"
+	>
+	<testcase name="numeric" classname="numeric" time="1.93718" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="11.5822" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

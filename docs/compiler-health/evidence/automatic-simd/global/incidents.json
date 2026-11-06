@@ -1,0 +1,17 @@
+[
+  {
+    "kind": "driver orchestration",
+    "failure": "Cache driver started while candidate-host was being relinked: FileNotFoundError for candidate-host. Baseline cache had already been populated.",
+    "resolution": "Waited for link; retained old cache directory. The first retry correctly hit that cache, triggering its cold-cache assertion; retained retry-original log/receipt. Repeated in a fresh v2 directory with expected miss/hit sequences."
+  },
+  {
+    "kind": "new test fixture",
+    "failure": "numeric-early.json: Checked source calls require a source diagnostic context",
+    "resolution": "Gave the private FP bit-pattern wrapper the source module identity/context required by the existing checked-call ABI; no production contract weakened."
+  },
+  {
+    "kind": "new fixture placement",
+    "failure": "Initial Release numeric_cli: undefined Runtime ABI symbols from newly added simd_alias_dependency.void in the Runtime-free numeric/programs AOT glob. Original linker output retained in suites-release.log/xml and CTest LastTest.log.",
+    "resolution": "Moved alias source to numeric/automatic_simd and exercised through explicit Runtime-backed numeric JIT test. Independently linked production AOT comparison links normal Runtime libraries and already passed. Rerun final numeric/numeric_cli in all builds."
+  }
+]

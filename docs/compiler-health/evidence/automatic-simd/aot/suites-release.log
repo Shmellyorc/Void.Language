@@ -1,0 +1,61 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  50: json_execution_typed_smoke
+      Start  52: json_execution_ownership
+ 1/28 Test  #52: json_execution_ownership .........   Passed   10.45 sec
+      Start  80: arrays_source
+ 2/28 Test  #80: arrays_source ....................   Passed    2.60 sec
+      Start 393: numeric_cli
+ 3/28 Test  #50: json_execution_typed_smoke .......   Passed   18.10 sec
+      Start  89: debug_cache_processes
+ 4/28 Test  #89: debug_cache_processes ............   Passed    2.65 sec
+      Start 358: numeric_sprint2
+ 5/28 Test #358: numeric_sprint2 ..................   Passed    1.44 sec
+      Start 109: reference_values_source
+ 6/28 Test #109: reference_values_source ..........   Passed    1.07 sec
+      Start  88: debug_cache
+ 7/28 Test  #88: debug_cache ......................   Passed    1.24 sec
+      Start 101: managed_source
+ 8/28 Test #101: managed_source ...................   Passed    0.97 sec
+      Start 294: async_source
+ 9/28 Test #393: numeric_cli ......................   Passed   16.85 sec
+      Start  78: fixed_arrays_source
+10/28 Test #294: async_source .....................   Passed    4.70 sec
+      Start  79: growable_arrays_source
+11/28 Test  #78: fixed_arrays_source ..............   Passed    1.48 sec
+      Start  76: runtime_coordination
+12/28 Test  #79: growable_arrays_source ...........   Passed    1.25 sec
+      Start 355: numeric
+13/28 Test #355: numeric ..........................   Passed    1.95 sec
+      Start  90: automatic_cache_processes
+14/28 Test  #76: runtime_coordination .............   Passed    2.04 sec
+      Start 299: async_lifecycle
+15/28 Test  #90: automatic_cache_processes ........   Passed    0.50 sec
+      Start 347: reload
+16/28 Test #347: reload ...........................   Passed    0.31 sec
+      Start 346: jit
+17/28 Test #346: jit ..............................   Passed    0.04 sec
+      Start 297: async_ir
+18/28 Test #297: async_ir .........................   Passed    0.04 sec
+      Start 345: core
+19/28 Test #345: core .............................   Passed    0.01 sec
+      Start 348: gc
+20/28 Test #348: gc ...............................   Passed    0.02 sec
+      Start 349: native
+21/28 Test #349: native ...........................   Passed    0.02 sec
+      Start 131: runtime_aot_normal
+22/28 Test #131: runtime_aot_normal ...............   Passed    0.03 sec
+      Start 132: runtime_aot_optimized
+23/28 Test #132: runtime_aot_optimized ............   Passed    0.04 sec
+      Start 110: reference_values_aot_normal
+24/28 Test #110: reference_values_aot_normal ......   Passed    0.01 sec
+      Start 111: reference_values_aot_optimized
+25/28 Test #111: reference_values_aot_optimized ...   Passed    0.01 sec
+      Start 103: managed_aot_optimized
+26/28 Test #103: managed_aot_optimized ............   Passed    0.01 sec
+      Start 102: managed_aot_normal
+27/28 Test #102: managed_aot_normal ...............   Passed    0.01 sec
+28/28 Test #299: async_lifecycle ..................   Passed    1.98 sec
+
+100% tests passed, 0 tests failed out of 28
+
+Total Test time (real) =  35.41 sec

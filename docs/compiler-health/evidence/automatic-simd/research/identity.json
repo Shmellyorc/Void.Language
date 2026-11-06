@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-06",
+  "root": "/home/shmellyorc/Documents/Void.Language",
+  "machine": {
+    "system": "Linux",
+    "node": "gamedev",
+    "release": "7.2.11-pikaos",
+    "version": "#101pika1 SMP PREEMPT_DYNAMIC Sat Oct 17 21:28:05 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "hashes": {
+    "src/backend/llvm/backend.cpp": "dd67d152fe28f025499f56cced2b0c39187bfdf80a47aa1e87c31e408c53b39d",
+    "src/runtime/array.cpp": "533f1474c77c97e4e9885af690ae5aae1d15fa61c6b9976077e801299fefebb1",
+    "src/runtime/fixed_abi.cpp": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4",
+    "src/runtime/coordination.cpp": "7be0f8cf1aa00b411c3c693d3e88a861612b4547132882849d1274127f69e732",
+    "include/void/backend.hpp": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2",
+    "src/ir/module.cpp": "64ac2619ef446273e14cf7bead0e1d0c08a13e8f80218bdfccbeaf2205cfb58b"
+  }
+}

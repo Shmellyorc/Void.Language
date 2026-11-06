@@ -1,0 +1,10 @@
+Initial cache driver orchestration failure, retained from tool output:
+Traceback (most recent call last):
+  File "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cache-invalidation.py", line 6, in <module>
+    p=subprocess.run([str(d/(label+'-host')),str(d/'fixtures/guarded-range-i32.void'),'129','1'],env=dict(os.environ,SIMD_CACHE=str(cache)),capture_output=True,text=True,preexec_fn=stack)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host'
+
+The host was being relinked. The driver had already populated the baseline cache.
+The retained cache-invalidation-retry-original.log/json record the subsequent
+cold-cache assertion on that already-populated root. The corrected driver uses
+a fresh private v2 root; neither old cache nor unfavorable results were deleted.

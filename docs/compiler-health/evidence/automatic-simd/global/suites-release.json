@@ -1,0 +1,24 @@
+{
+  "args": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+    "--output-on-failure",
+    "-j",
+    "2",
+    "--timeout",
+    "180",
+    "-R",
+    "^(target_triple|core|jit|reload|gc|native|numeric|numeric_cli|numeric_sprint2|gc_buffers|gc_schemas|arrays_foundation|fixed_arrays_source|growable_arrays_source|arrays_source|fixed_arrays_cli|growable_arrays_cli|arrays_cli|runtime_coordination|runtime_generated|runtime_callbacks|runtime_failures|runtime_invariants|debug_cache|debug_cache_processes|automatic_cache_processes|managed_source|reference_values_source|async_source|async_ir|async_parallel|async_lifecycle|async_syntax_source|native_workers|stage6_integrated|stage6_cache_processes|math_execution|math_ir|random_execution|log_execution|log_oracles|log_cache|collections_stdlib_execution|collections_stdlib_failures|collections_stdlib_cache|memory_execution|combined_execution|aot|source_cli|stage11_globals|stage11_globals_aot|stage10_conversion_aot|stage10_operators_aot|text_encoding_oracles|text_encoding_ownership|memory_ownership|combined_ownership|log_probe_(normal|optimized)|runtime_aot_(normal|optimized)|managed_aot_(normal|optimized)|reference_values_aot_(normal|optimized)|native_aot_integrated_(normal|optimized)|native_aot_integrated_(cancel|failure)_(normal|optimized)|async_aot_(spawn|spawn_cancel|spawn_failure|managed|lifecycle|lifecycle_cancelled|lifecycle_failures|lifecycle_primary)_(normal|optimized))$",
+    "--output-junit",
+    "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/suites-release.xml"
+  ],
+  "status": 8,
+  "seconds": 336.22647738456726,
+  "stack_soft_hard": 1048576,
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": "exitcode=23"
+  }
+}

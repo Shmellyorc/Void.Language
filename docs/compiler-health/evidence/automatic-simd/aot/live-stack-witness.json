@@ -1,0 +1,7 @@
+[
+  {
+    "pid": "1208790",
+    "command": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void -o /home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-json_typed-candidate-True.bin ",
+    "stack_limits": "Max stack size            1048576              1048576              bytes     "
+  }
+]

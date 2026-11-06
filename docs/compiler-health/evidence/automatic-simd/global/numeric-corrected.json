@@ -1,0 +1,6 @@
+{
+  "status": 0,
+  "stdout": "216 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n",
+  "stderr": "",
+  "stack_soft_hard": 1048576
+}

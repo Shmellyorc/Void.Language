@@ -79,6 +79,11 @@ func entry(n: i32) -> i32:
      vd::Jit fresh({root,identity});auto reused=fresh.compile(*a,true);
      require(reused->invoke(7)==47 && fresh.cache_status()==(supported?"hit":"unavailable"),"optimized fresh JIT cache hit");
      require(reused->runtime_owner()!=optimized->runtime_owner(),"cached object shared Runtime state");
+     vd::ReloadSlot optimized_slot(reused);
+     require(fresh.replace(optimized_slot,*next,true) && optimized_slot.invoke(7)==48 && reused->invoke(7)==47,
+             "optimized reload changed an old generation lease");
+     require(fresh.replace(optimized_slot,*next,true) && fresh.cache_status()==(supported?"hit":"unavailable") && optimized_slot.invoke(7)==48,
+             "optimized reload cache hit");
      vd::Jit changed_build({root,identity+"different"});
      require(changed_build.compile(*a,true)->invoke(7)==47 && changed_build.cache_status()!="hit","optimized build invalidation");
      vd::Jit entry_only({root,identity},vd::ir::Emission::entry);

@@ -1,0 +1,9 @@
+func entry(n: i32) -> i32:
+    var a: [i32] = [1, 99, 99, 99, 99, 99, 99, 99]
+    var b = a
+    for i in 1..<8:
+        a[i] = b[i - 1] + 1
+    for i in 0..<8:
+        if a[i] != i + 1:
+            return 2
+    return 1

@@ -1,0 +1,15 @@
+func entry(n: i32) -> i32:
+    var a: [u8] = []
+    var b: [u8] = []
+    var out: [u8] = []
+    for i in 0..n:
+        a.push((i % 31) as u8)
+        b.push((i % 7) as u8)
+        out.push(0)
+    for i in 1..n:
+        out[i] = a[i] * 3 + b[i]
+    for i in 1..n:
+        var expected: u8 = ((i % 31) as u8) * 3 + ((i % 7) as u8)
+        if out[i] != expected:
+            return 2
+    return 1

@@ -1,0 +1,46 @@
+{
+  "baseline_commit": "83036facdf74c5a1eee6f475b6cfe110f4752f27",
+  "host": {
+    "system": "Linux",
+    "node": "gamedev",
+    "release": "7.2.11-pikaos",
+    "version": "#101pika1 SMP PREEMPT_DYNAMIC Sat Oct 17 21:28:05 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           43 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 7 1700X Eight-Core Processor\nCPU family:                              23\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                1\nMicrocode version:                       0x8001139\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      86%\nCPU max MHz:                             3900.0000\nCPU min MHz:                             2200.0000\nBogoMIPS:                                6800.16\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb hw_pstate ssbd ibpb vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 clzero xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif overflow_recov succor smca sev\nVirtualization:                          AMD-V\nL1d cache:                               256 KiB (8 instances)\nL1i cache:                               512 KiB (8 instances)\nL2 cache:                                4 MiB (8 instances)\nL3 cache:                                16 MiB (2 instances)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; untrained return thunk; SMT vulnerable\nVulnerability Spec rstack overflow:      Mitigation; Safe RET\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+  "compiler": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n",
+  "original_stack_limits": [
+    8388608,
+    -1
+  ],
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "source_sha256": {
+    "src/backend/llvm/backend.cpp": "40bd1295a55226e01482611cfa9e2e255c9862bbc13004c5d9d7d3b1903eed32",
+    "tests/numeric/tests.cpp": "f726c186bb6f976059be03d08e052a3dc55ccabccfaf223e7e236b1aaabe86b9",
+    "tests/cache/tests.cpp": "f6f4f83d2c38154a98c07b45470f673a8b1858a5fa92062d49b96bd056a14f5c",
+    "tests/numeric/automatic_simd/guarded-range-i32.void": "ceb45840951145aa5987774d884cf318fd05e0dcbf1b2e990cb417aeee46f34c",
+    "tests/numeric/automatic_simd/failure-order.void": "0b1287f552523f2b69b432cbbf8f3d40e40273d40bc9d1fda9373c8d4e5e06b0",
+    "tests/numeric/automatic_simd/alias-dependent.void": "7fd5f61888e634c1890e51be8668604a86905f2e59150d8475380b98374e30f9",
+    "tests/numeric/programs/simd_numeric_edges.void": "0642ec76869f708ee3cdda81b1f37162192192c5c692667bf56f2084d0b4c07d",
+    "tests/numeric/programs/simd_independent_f32.void": "1cbe382a6d20974695da4a6133d767c31ea4547915273dba1d7ece270114a4c7",
+    "tests/numeric/programs/simd_dependent_f64.void": "72b2d6201353705ba0a286266104bfea4da8540f5a7162fdfed31e916d35758e"
+  }
+}

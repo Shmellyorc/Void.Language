@@ -1,0 +1,30 @@
+[
+  {
+    "case": "guarded",
+    "optimize": false,
+    "entries": 1,
+    "cross_backend_hit": true,
+    "envelope_sha256": "af3a1eb8c7834c6b685e3729a329df913dae9fbe0a810f5fce695205cf9729a4"
+  },
+  {
+    "case": "guarded",
+    "optimize": true,
+    "entries": 1,
+    "cross_backend_hit": true,
+    "envelope_sha256": "995d3a854f9cd0a69d7052e2bc78139cfa2005b8243ef261dace5ae0f385db75"
+  },
+  {
+    "case": "managed",
+    "optimize": false,
+    "entries": 1,
+    "cross_backend_hit": true,
+    "envelope_sha256": "7e83a41cb252a9f41c56233c35569812e9790b6d2c5d0ce806cc2a3467a58f1b"
+  },
+  {
+    "case": "managed",
+    "optimize": true,
+    "entries": 1,
+    "cross_backend_hit": true,
+    "envelope_sha256": "caf606376949bdab40cd7b6c351a9b04090d3ec816ab74e45ce9cf8d86d48aca"
+  }
+]

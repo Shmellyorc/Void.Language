@@ -10,33 +10,30 @@ scope. The old FILE200 10 ms aim is not a Boss-mandated release requirement.
 
 ## Future optimization: automatic SIMD — Boss direction, 5 November 2026
 
-**Automatic SIMD wherever safe and profitable; ordinary scalar fallback otherwise.
-No new source keywords or mandatory SIMD array types.** This is future work only,
-for ordinary numeric variables, arrays and loops. Golden Wrench and Boss may
-select it as the next optional compiler investigation after the current
-integration is settled. No SIMD implementation or benchmark is authorized in
-this qualification sprint.
+**6 November status: AOT-only candidate retained for cross-platform qualification.**
+The original direction remains automatic SIMD where safe and profitable, scalar
+fallback otherwise, with ordinary syntax and no mandatory vector types.
 
-The [detailed automatic SIMD roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) preserves
-the approved direction. A future investigation must:
+The [global JIT+AOT trial](compiler-health/AUTOMATIC_SIMD_QUALIFICATION.md) was
+rejected/reverted because cold O2 CLI execution regressed 28–34%. The
+[retained AOT-only repair](compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md)
+uses the already configured native generic AOT TargetMachine for standard O2
+analysis. JIT optimization, ORC setup and logical persistent-cache policy remain
+unchanged; existing whole-compiler fingerprinting still applies. SLP stays off,
+normal compilation is unchanged, and checked arrays keep their Runtime checks.
+There is no general checked-array SIMD or application-wide speedup claim.
 
-- Establish actual LLVM/Clang/LLD **23.1.4** behavior. The current shared O2
-  `PassBuilder` has no `TargetMachine`; the [captured pipeline](llvm23/IMPLEMENTATION.md#sdk-and-first-integrated-checks)
-  documents disabled SLP in that configuration. Inspect LLVM loop/SLP
-  vectorization and target-aware machine code separately; this observation
-  alone proves neither absence of vectorization nor a profitable change.
-- Preserve integer overflow/wrapping and floating-point semantics, aliasing,
-  evaluation/error ordering, bounds and mutation checks, ownership, precise GC
-  roots and safepoints. Do not silently enable fast-math or suppress failures.
-- Verify x86-64 and ARM64 feature compatibility and scalar fallback, including
-  normal/O2 JIT, independently linked AOT, reload and target/feature/cache
-  identities. Host detection and portable AOT feature policy require explicit
-  examination.
-- Inspect optimized IR and machine code, then compare matched scalar/vectorized
-  execution with equivalent outputs across eligible and dependent loops,
-  numeric edge cases, checked arrays, sizes and alignments. Retain wall/CPU
-  samples and regressions. Make no unverified speedup claims and impose no
-  arbitrary performance threshold.
+Local Linux qualification demonstrates target-legal packed arithmetic with scalar
+tails in eligible integer loops, while retaining dependent/descending behavior,
+floating-point rules, precise roots, error order and cancellation. Compile-time
+and code-size costs remain recorded. Native Windows/macOS/ARM64 qualification is
+pending the [Boss-controlled seven-job workflow](compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md).
+This preparation authorizes explicit staging only, not commit, push or CI dispatch.
+
+The [detailed roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) preserves the original
+research/semantic requirements. Broader checked-array SIMD, SLP enablement,
+range specialization and public SIMD APIs remain deferred. No arbitrary
+performance threshold or new release hold is introduced.
 
 ## LLVM 23.1.4 migration — 28 October 2026
 

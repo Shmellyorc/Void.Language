@@ -1,0 +1,122 @@
+{
+  "purpose": "Boss-authorized exact-path staging only; no new performance experiment or broad test rerun. No commit/push/reset/delete/branch/CI dispatch.",
+  "baseline_commit": "83036facdf74c5a1eee6f475b6cfe110f4752f27",
+  "production_backend_sha256": "9725476c2c4001bf3a4d1d775b00893f6d7b5e60f7517839c8f51aa3abfc9525",
+  "suggested_commit_title": "Retain AOT-only target-aware O2 SIMD analysis [skip ci]",
+  "approved_stage_count": 160,
+  "categories": {
+    "production": 1,
+    "test_sources": 2,
+    "test_fixtures": 6,
+    "documentation": 8,
+    "evidence_and_metadata": 143
+  },
+  "initial_untracked_count": 13727,
+  "initial_existing_files_selected": 9,
+  "initial_untracked_excluded_count": 13718,
+  "excluded_categories": {
+    "docs/collections": 4675,
+    "docs/json": 90,
+    "docs/log": 1712,
+    "docs/math": 6,
+    "experiments/byte-assembly": 157,
+    "experiments/exact-byte-assembly": 164,
+    "experiments/integration-qualification": 1102,
+    "experiments/internal-performance": 2665,
+    "experiments/log-integrated": 2454,
+    "experiments/log-sync-path": 513,
+    "experiments/log-v2": 157,
+    "experiments/staging-preparation": 23
+  },
+  "excluded_inventory_local": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-git-preparation-wadao8dg/excluded-initial-untracked.json",
+  "excluded_inventory_sha256": "c0ff6a10a7d2d78c1f7941384cc8c093941009fd18c858c865a2cca1e4830158",
+  "published_report_hashes": {
+    "docs/compiler-health/AUTOMATIC_SIMD_FEASIBILITY.md": {
+      "original_sha256": "7369c842e73f0df36683f2650561fdcb79bf1db76a593c76aeb96ff3cd4380de",
+      "published_sha256": "18b684dcec80f05c4898393c0b2d8162623acdef38c0ab3f4c3bafa0109dcbba",
+      "original_preserved_path": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-git-preparation-wadao8dg/original-documents/docs/compiler-health/AUTOMATIC_SIMD_FEASIBILITY.md"
+    },
+    "docs/compiler-health/AUTOMATIC_SIMD_QUALIFICATION.md": {
+      "original_sha256": "f1e3be278f5bd60c824eb42da14c976bb8254926e8705b615e4f0209d689cb75",
+      "published_sha256": "9ef97ef8781bb1ebf0ad4733de3b6376445c60623bc38a3dd3fc6f93cd59388d",
+      "original_preserved_path": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-git-preparation-wadao8dg/original-documents/docs/compiler-health/AUTOMATIC_SIMD_QUALIFICATION.md"
+    },
+    "docs/compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md": {
+      "original_sha256": "32824aa616b9dfad48b520292c65fa9d6bb3605ffe9a9b48a7ec010cba59d7e4",
+      "published_sha256": "4126be2a6345fceaad3b4a6d3371d953ca7834c08258f7c64c1e68b0270bf172",
+      "original_preserved_path": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-git-preparation-wadao8dg/original-documents/docs/compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md"
+    }
+  },
+  "user_concurrent_changes": "User is independently editing .gitignore and may change unrelated repo/index state. These files are outside this allowlist and are not edited/staged/unstaged by this task. Initial exclusion counts are dated snapshots; ignored/visible counts may change with user work.",
+  "ci": {
+    "workflow": "Compiler link experiment",
+    "file": ".github/workflows/ci-link-experiment.yml",
+    "mode": "thinlto-cache",
+    "jobs": 7,
+    "dispatch_by": "Boss, after commit and push",
+    "dispatched_by_agent": false
+  },
+  "static_validation": {
+    "approved_staged_paths": 160,
+    "approved_index_status_counts": {
+      "M": 7,
+      "A": 153
+    },
+    "staged_bytes_before_final_receipt": 2898351,
+    "largest_staged_blob": {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/functional.json",
+      "bytes": 746694,
+      "git_blob_oid": "f781a272cf690b52fb590667310021f79e4c07c9"
+    },
+    "unrelated_staged_paths_preserved": [],
+    "unselected_index_changes_observed": [],
+    "unselected_index_unchanged": true,
+    "source_fixtures_documents_whitespace_clean": true,
+    "preserved_raw_evidence_whitespace_notices": {
+      "docs/compiler-health/evidence/automatic-simd/aot/json_typed-normalized-ir.diff": 7,
+      "docs/compiler-health/evidence/automatic-simd/aot/json_validated-normalized-ir.diff": 7
+    },
+    "raw_whitespace_notice_count": 14,
+    "initial_excluded_paths_still_on_disk": 13718,
+    "initial_excluded_paths_total": 13718,
+    "current_head": "83036facdf74c5a1eee6f475b6cfe110f4752f27",
+    "current_unstaged_tracked_paths": [
+      ".gitignore"
+    ],
+    "current_nonignored_untracked_count": 8,
+    "local_links_checked": 338,
+    "blockers": [],
+    "new_performance_or_test_runs": 0,
+    "agent_commits_pushes_resets_deletes_branches_ci_dispatches": 0
+  },
+  "explicitly_forced_approved_text_paths": [
+    "docs/compiler-health/evidence/automatic-simd/aot/arm64-loop.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/broad-codegen.log",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/alias-dependent.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/alias-dependent.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/dependent-f64.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/dependent-f64.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/edge.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/edge.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/fixed-i32.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/fixed-i32.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.baseline.True.jit.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.candidate.True.jit.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/slp-f32.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/slp-f32.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/while-i32.baseline.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/captures/while-i32.candidate.True.aot.post.ll",
+    "docs/compiler-health/evidence/automatic-simd/aot/fp-bit-oracle-initial.log",
+    "docs/compiler-health/evidence/automatic-simd/aot/suites-debug.log",
+    "docs/compiler-health/evidence/automatic-simd/aot/suites-release.log",
+    "docs/compiler-health/evidence/automatic-simd/aot/suites-strict.log",
+    "docs/compiler-health/evidence/automatic-simd/global/cache-invalidation-retry-original.log",
+    "docs/compiler-health/evidence/automatic-simd/global/numeric-final-release.log",
+    "docs/compiler-health/evidence/automatic-simd/global/suites-debug.log",
+    "docs/compiler-health/evidence/automatic-simd/global/suites-release.log",
+    "docs/compiler-health/evidence/automatic-simd/global/suites-strict.log"
+  ],
+  "force_reason": "Exact approved LLVM IR/log proof files match ignore patterns. Force-add is limited to these literal paths; .gitignore and unrelated files are outside the allowlist."
+}

@@ -1,0 +1,141 @@
+--- __vd_2f407374646c69622f6a736f6e2e766f69643a3a5f7363616c6172__void baseline
+
++++ __vd_2f407374646c69622f6a736f6e2e766f69643a3a5f7363616c6172__void candidate
+
+@@ -490,14 +490,14 @@
+
+ 
+ numeric_valid75:                                  ; preds = %worker.continue71
+   %.lhs.trunc = trunc nsw i64 %2 to i16
+-  %.lhs.trunc.frozen = freeze i16 %.lhs.trunc
+-  %142 = sdiv i16 %.lhs.trunc.frozen, 64
++  %142 = sdiv i16 %.lhs.trunc, 64
++  %143 = srem i16 %.lhs.trunc, 64
+   %narrow357 = add nsw i16 %142, 192
+-  %143 = zext nneg i16 %narrow357 to i64
++  %144 = zext nneg i16 %narrow357 to i64
+   store ptr %139, ptr %46, align 8
+-  call void @vd_list_push(ptr nonnull %46, i32 4, i64 %143, ptr nonnull %3)
+-  %144 = load ptr, ptr %3, align 8
+-  %.not327 = icmp eq ptr %144, null
++  call void @vd_list_push(ptr nonnull %46, i32 4, i64 %144, ptr nonnull %3)
++  %145 = load ptr, ptr %3, align 8
++  %.not327 = icmp eq ptr %145, null
+   br i1 %.not327, label %numeric_valid77, label %numeric_error76
+ 
+ numeric_error76:                                  ; preds = %numeric_valid75
+@@ -505,13 +505,11 @@
+
+   br label %common.ret
+ 
+ numeric_valid77:                                  ; preds = %numeric_valid75
+-  %145 = load ptr, ptr %5, align 8
+-  store ptr %145, ptr %47, align 8
+-  store ptr %145, ptr %14, align 8
+-  %146 = mul i16 %142, 64
+-  %.decomposed = sub i16 %.lhs.trunc.frozen, %146
+-  store ptr %145, ptr %48, align 8
+-  %147 = and i16 %.decomposed, 255
++  %146 = load ptr, ptr %5, align 8
++  store ptr %146, ptr %47, align 8
++  store ptr %146, ptr %14, align 8
++  store ptr %146, ptr %48, align 8
++  %147 = and i16 %143, 255
+   %148 = xor i16 %147, 128
+   %149 = zext nneg i16 %148 to i64
+   call void @vd_list_push(ptr nonnull %48, i32 4, i64 %149, ptr nonnull %3)
+@@ -560,17 +558,17 @@
+
+   %159 = load ptr, ptr %5, align 8
+   store ptr %159, ptr %51, align 8
+   store ptr %159, ptr %16, align 8
+-  %.lhs.trunc336.frozen = freeze i32 %.lhs.trunc336
+-  %160 = sdiv i32 %.lhs.trunc336.frozen, 64
++  %160 = sdiv i32 %.lhs.trunc336, 64
++  %161 = srem i32 %.lhs.trunc336, 64
+   %.lhs.trunc340 = trunc nsw i32 %160 to i16
+-  %161 = srem i16 %.lhs.trunc340, 64
++  %162 = srem i16 %.lhs.trunc340, 64
+   store ptr %159, ptr %52, align 8
+-  %162 = and i16 %161, 255
+-  %163 = xor i16 %162, 128
+-  %164 = zext nneg i16 %163 to i64
+-  call void @vd_list_push(ptr nonnull %52, i32 4, i64 %164, ptr nonnull %3)
+-  %165 = load ptr, ptr %3, align 8
+-  %.not325 = icmp eq ptr %165, null
++  %163 = and i16 %162, 255
++  %164 = xor i16 %163, 128
++  %165 = zext nneg i16 %164 to i64
++  call void @vd_list_push(ptr nonnull %52, i32 4, i64 %165, ptr nonnull %3)
++  %166 = load ptr, ptr %3, align 8
++  %.not325 = icmp eq ptr %166, null
+   br i1 %.not325, label %numeric_valid103, label %numeric_error102
+ 
+ numeric_error102:                                 ; preds = %numeric_valid95
+@@ -578,13 +576,11 @@
+
+   br label %common.ret
+ 
+ numeric_valid103:                                 ; preds = %numeric_valid95
+-  %166 = load ptr, ptr %5, align 8
+-  store ptr %166, ptr %53, align 8
+-  store ptr %166, ptr %17, align 8
+-  %167 = mul i32 %160, 64
+-  %.decomposed7 = sub i32 %.lhs.trunc336.frozen, %167
+-  store ptr %166, ptr %54, align 8
+-  %168 = and i32 %.decomposed7, 255
++  %167 = load ptr, ptr %5, align 8
++  store ptr %167, ptr %53, align 8
++  store ptr %167, ptr %17, align 8
++  store ptr %167, ptr %54, align 8
++  %168 = and i32 %161, 255
+   %169 = xor i32 %168, 128
+   %170 = zext nneg i32 %169 to i64
+   call void @vd_list_push(ptr nonnull %54, i32 4, i64 %170, ptr nonnull %3)
+@@ -647,16 +643,16 @@
+
+   %185 = load ptr, ptr %5, align 8
+   store ptr %185, ptr %59, align 8
+   store ptr %185, ptr %20, align 8
+-  %.lhs.trunc344.frozen = freeze i32 %.lhs.trunc344
+-  %186 = sdiv i32 %.lhs.trunc344.frozen, 64
+-  %187 = srem i32 %186, 64
++  %186 = sdiv i32 %.lhs.trunc344, 64
++  %187 = srem i32 %.lhs.trunc344, 64
++  %188 = srem i32 %186, 64
+   store ptr %185, ptr %60, align 8
+-  %188 = and i32 %187, 255
+-  %189 = xor i32 %188, 128
+-  %190 = zext nneg i32 %189 to i64
+-  call void @vd_list_push(ptr nonnull %60, i32 4, i64 %190, ptr nonnull %3)
+-  %191 = load ptr, ptr %3, align 8
+-  %.not322 = icmp eq ptr %191, null
++  %189 = and i32 %188, 255
++  %190 = xor i32 %189, 128
++  %191 = zext nneg i32 %190 to i64
++  call void @vd_list_push(ptr nonnull %60, i32 4, i64 %191, ptr nonnull %3)
++  %192 = load ptr, ptr %3, align 8
++  %.not322 = icmp eq ptr %192, null
+   br i1 %.not322, label %numeric_valid133, label %numeric_error132
+ 
+ numeric_error132:                                 ; preds = %numeric_valid125
+@@ -664,13 +660,11 @@
+
+   br label %common.ret
+ 
+ numeric_valid133:                                 ; preds = %numeric_valid125
+-  %192 = load ptr, ptr %5, align 8
+-  store ptr %192, ptr %61, align 8
+-  store ptr %192, ptr %21, align 8
+-  %193 = mul i32 %186, 64
+-  %.decomposed8 = sub i32 %.lhs.trunc344.frozen, %193
+-  store ptr %192, ptr %62, align 8
+-  %194 = and i32 %.decomposed8, 255
++  %193 = load ptr, ptr %5, align 8
++  store ptr %193, ptr %61, align 8
++  store ptr %193, ptr %21, align 8
++  store ptr %193, ptr %62, align 8
++  %194 = and i32 %187, 255
+   %195 = xor i32 %194, 128
+   %196 = zext nneg i32 %195 to i64
+   call void @vd_list_push(ptr nonnull %62, i32 4, i64 %196, ptr nonnull %3)

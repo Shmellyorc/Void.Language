@@ -1,0 +1,30 @@
+{
+  "build/llvm23-release/voidc": {
+    "bytes": 76086696,
+    "sha256": "51143b015d7a4b47b8b7e5048ad89e8ce3cc9efe8c9d39529bd7e48a85ae154d"
+  },
+  "build/llvm23-release/libvoid_core.a": {
+    "bytes": 9424506,
+    "sha256": "df62c8294c48b4bc6054f71a9085326f9619cde20a7c6c4e1f2a7ab72ca6e958"
+  },
+  "build/llvm23-release/libvoid_runtime.a": {
+    "bytes": 4084476,
+    "sha256": "f6523b5c01d5b264febdd11d780f4e71e6e411bf0732e3d712de5ce3db3ab6c3"
+  },
+  "build/llvm23-release/libvoid_llvm.a": {
+    "bytes": 1631038,
+    "sha256": "ac9fbcf4417fac2db6cf34012035ebdb3c94150fc675cbe5c669d2b53f154376"
+  },
+  ".toolchains/llvm-23.1.4/bin/clang++": {
+    "bytes": 282507120,
+    "sha256": "c336d48383874cffaab0dc4c5c359456d871f21380b746520dde5c7f4c125a67"
+  },
+  ".toolchains/llvm-23.1.4/bin/opt": {
+    "bytes": 200048624,
+    "sha256": "41bb44d036d67ab021b83a3af260139b5bd2a188f1444d63ade193f877940738"
+  },
+  ".toolchains/llvm-23.1.4/bin/llc": {
+    "bytes": 191087544,
+    "sha256": "6b4cfeb36a0f5f444969089a8a469583ddd9b85900a4773c0abf062e1a1c9f3e"
+  }
+}

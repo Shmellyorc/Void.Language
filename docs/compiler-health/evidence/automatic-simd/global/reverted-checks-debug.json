@@ -1,0 +1,16 @@
+{
+  "args": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+    "-R",
+    "^(numeric|debug_cache|jit|reload|gc)$",
+    "--output-on-failure",
+    "-j",
+    "2",
+    "--output-junit",
+    "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/reverted-checks-debug.xml"
+  ],
+  "status": 0,
+  "stack_soft_hard": 1048576
+}

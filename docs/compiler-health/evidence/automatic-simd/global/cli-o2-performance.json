@@ -1,0 +1,578 @@
+[
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 0,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b0-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 28.196761035360396,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 0,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b0-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 8.987069013528526,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 1,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b1-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 36.03287402074784,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 1,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b1-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 9.579460951499641,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 2,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b2-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 40.01372097991407,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 2,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b2-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 9.00854798965156,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 3,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b3-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 26.77746396511793,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 3,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b3-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 8.91834800131619,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 4,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b4-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 28.95136398728937,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 4,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b4-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 9.007697983179241,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 5,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b5-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 37.05154801718891,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 5,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b5-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 9.194858954288065,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 6,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b6-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 33.509303990285844,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 17,
+    "block": 6,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b6-candidate/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 9.076819056645036,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 7,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b7-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 29.440446000080556,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 17,
+    "block": 7,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n17-b7-baseline/guarded-range-i32.void",
+      "17"
+    ],
+    "status": 0,
+    "stdout": "136\n",
+    "stderr": "",
+    "process_ms": 9.016028954647481,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 0,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b0-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 32.04322699457407,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 0,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b0-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 13.508056988939643,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 1,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b1-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 37.27424901444465,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 1,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b1-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 15.53256600163877,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 2,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b2-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 55.54601695621386,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 2,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b2-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 12.750565016176552,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 3,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b3-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 33.182311977725476,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 3,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b3-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 10.704746004194021,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 4,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b4-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 27.58013701532036,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 4,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b4-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 10.392935015261173,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 5,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b5-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 36.71126696281135,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 5,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b5-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 10.050582990515977,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 6,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b6-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 42.40793100325391,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "candidate",
+    "n": 1000000,
+    "block": 6,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b6-candidate/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 9.619570977520198,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 7,
+    "cache": "miss",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b7-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 27.201835997402668,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "label": "baseline",
+    "n": 1000000,
+    "block": 7,
+    "cache": "hit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/cli-auto-o2-n1000000-b7-baseline/guarded-range-i32.void",
+      "1000000"
+    ],
+    "status": 0,
+    "stdout": "62999875\n",
+    "stderr": "",
+    "process_ms": 9.618431038688868,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  }
+]

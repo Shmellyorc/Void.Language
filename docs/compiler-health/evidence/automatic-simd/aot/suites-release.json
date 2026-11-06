@@ -1,0 +1,24 @@
+{
+  "args": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+    "--output-on-failure",
+    "-j",
+    "2",
+    "--timeout",
+    "240",
+    "-R",
+    "^(core|jit|native|reload|gc|numeric|numeric_cli|numeric_sprint2|debug_cache|debug_cache_processes|automatic_cache_processes|fixed_arrays_source|growable_arrays_source|arrays_source|runtime_coordination|managed_source|reference_values_source|async_ir|async_lifecycle|async_source|runtime_aot_(normal|optimized)|managed_aot_(normal|optimized)|reference_values_aot_(normal|optimized)|json_execution_typed_smoke|json_execution_ownership)$",
+    "--output-junit",
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/suites-release.xml"
+  ],
+  "status": 0,
+  "seconds": 35.44657039642334,
+  "stack_soft_hard": 1048576,
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": "exitcode=23"
+  }
+}

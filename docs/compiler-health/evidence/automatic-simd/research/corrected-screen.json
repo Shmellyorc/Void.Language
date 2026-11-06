@@ -1,0 +1,58 @@
+[
+  {
+    "case": "edge",
+    "mode": "baseline",
+    "status": 0,
+    "stdout": "1,1,0.00029,0.007\n",
+    "stderr": ""
+  },
+  {
+    "case": "edge",
+    "mode": "slp",
+    "status": 0,
+    "stdout": "1,1,0.00031,0.008\n",
+    "stderr": ""
+  },
+  {
+    "case": "edge",
+    "mode": "target",
+    "status": 0,
+    "stdout": "1,1,0.00032,0.008\n",
+    "stderr": ""
+  },
+  {
+    "case": "edge",
+    "mode": "target-slp",
+    "status": 0,
+    "stdout": "1,1,0.0003,0.008\n",
+    "stderr": ""
+  },
+  {
+    "case": "while-i32",
+    "mode": "baseline",
+    "status": 0,
+    "stdout": "1024,64036,0.00119,0.008\n",
+    "stderr": ""
+  },
+  {
+    "case": "while-i32",
+    "mode": "slp",
+    "status": 0,
+    "stdout": "1024,64036,0.0012,0.007\n",
+    "stderr": ""
+  },
+  {
+    "case": "while-i32",
+    "mode": "target",
+    "status": 0,
+    "stdout": "1024,64036,0.00047,0.008\n",
+    "stderr": ""
+  },
+  {
+    "case": "while-i32",
+    "mode": "target-slp",
+    "status": 0,
+    "stdout": "1024,64036,0.00049,0.008\n",
+    "stderr": ""
+  }
+]

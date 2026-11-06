@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="28"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="100"
+	timestamp="2026-11-06T06:04:37"
+	>
+	<testcase name="json_execution_typed_smoke" classname="json_execution_typed_smoke" time="44.3129" status="run">
+		<properties/>
+		<system-out>execution Debug: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_ownership" classname="json_execution_ownership" time="29.5597" status="run">
+		<properties/>
+		<system-out>execution Debug: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_coordination" classname="runtime_coordination" time="2.06916" status="run">
+		<properties/>
+		<system-out>NativeSafe rendezvous baseline (1000, one frozen object): mean 1.5627 us, max 21.12 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_source" classname="fixed_arrays_source" time="2.67762" status="run">
+		<properties/>
+		<system-out>source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="7.403" status="run">
+		<properties/>
+		<system-out>list transaction 0: 13 failing allocation budgets passed
+list transaction 1: 0 failing allocation budgets passed
+list transaction 2: 0 failing allocation budgets passed
+list transaction 3: 8 failing allocation budgets passed
+cold list construction: 46 failing allocation budgets passed
+growable source normal: 19 failing allocation budgets, recovery and cleanup passed
+growable source O2: 19 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="arrays_source" classname="arrays_source" time="6.52942" status="run">
+		<properties/>
+		<system-out>reference transaction 0: 17 failing budgets passed
+reference transaction 1: 2 failing budgets passed
+reference transaction 2: 1 failing budgets passed
+cold reference construction: 62 failing budgets passed
+failures source normal: 236 failing allocation budgets; cleanup/retry passed
+defaults source normal: 246 failing allocation budgets; cleanup/retry passed
+failures source O2: 236 failing allocation budgets; cleanup/retry passed
+defaults source O2: 246 failing allocation budgets; cleanup/retry passed
+Phase 23 arrays/ranges: source, GC, readonly, publication and failure checks passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache" classname="debug_cache" time="2.3037" status="run">
+		<properties/>
+		<system-out>cache generations, source/build invalidation, revisions, roots, failures and fallback passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="17.6528" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="automatic_cache_processes" classname="automatic_cache_processes" time="0.556792" status="run">
+		<properties/>
+		<system-out>Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="managed_source" classname="managed_source" time="1.99564" status="run">
+		<properties/>
+		<system-out>managed source: readonly, cyclic metadata, publication, GC, failure cleanup, source polls and reload passed
+</system-out>
+	</testcase>
+	<testcase name="managed_aot_normal" classname="managed_aot_normal" time="0.0222999" status="run">
+		<properties/>
+		<system-out>parsed source AOT: roots, cyclic graphs, complete publication, automatic/forced GC and startup/failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="managed_aot_optimized" classname="managed_aot_optimized" time="0.0225066" status="run">
+		<properties/>
+		<system-out>parsed source AOT: roots, cyclic graphs, complete publication, automatic/forced GC and startup/failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="reference_values_source" classname="reference_values_source" time="3.07037" status="run">
+		<properties/>
+		<system-out>reference values: copies, capabilities, construction, sole aggregate roots, failure, tooling and reload passed
+</system-out>
+	</testcase>
+	<testcase name="reference_values_aot_normal" classname="reference_values_aot_normal" time="0.0547542" status="run">
+		<properties/>
+		<system-out>native reference values: sole aggregate carriers, cycles, GC, failure and recovery passed
+</system-out>
+	</testcase>
+	<testcase name="reference_values_aot_optimized" classname="reference_values_aot_optimized" time="0.054211" status="run">
+		<properties/>
+		<system-out>native reference values: sole aggregate carriers, cycles, GC, failure and recovery passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_normal" classname="runtime_aot_normal" time="0.0517097" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_optimized" classname="runtime_aot_optimized" time="0.0559187" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="async_source" classname="async_source" time="46.5691" status="run">
+		<properties/>
+		<system-out>async activations passed
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.045968" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_lifecycle" classname="async_lifecycle" time="4.14309" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.0181532" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="jit" classname="jit" time="0.0444072" status="run">
+		<properties/>
+		<system-out>jit: passed
+</system-out>
+	</testcase>
+	<testcase name="reload" classname="reload" time="0.335563" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="gc" classname="gc" time="0.0994658" status="run">
+		<properties/>
+		<system-out>gc: passed
+</system-out>
+	</testcase>
+	<testcase name="native" classname="native" time="0.0237808" status="run">
+		<properties/>
+		<system-out>JIT session error: Symbols not found: [ missing_native ]
+native: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="4.85291" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="2.34572" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="23.9296" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

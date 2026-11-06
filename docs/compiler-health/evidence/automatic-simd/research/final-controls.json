@@ -1,0 +1,163 @@
+[
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/fixed-f64.void",
+      "1024",
+      "1"
+    ],
+    "status": 0,
+    "stdout": "1024,1,932.925,929.061\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/fixed-f64.void",
+      "1024",
+      "1"
+    ],
+    "status": 0,
+    "stdout": "1024,1,982.975,978.82\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/fixed-f64.void",
+      "1024",
+      "1"
+    ],
+    "status": 0,
+    "stdout": "1024,1,968.878,964.108\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/fixed-f64.void",
+      "1024",
+      "1"
+    ],
+    "status": 0,
+    "stdout": "1024,1,958.894,954.582\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/dynamic-u8.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/dynamic-i32.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/dynamic-i64.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/dynamic-f32.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/dynamic-f64.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/fixed-i32.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void",
+      "1",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/alias-dependent.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "1\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/guarded-range-i32.void",
+      "1024",
+      "--no-cache",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "64036\n",
+    "stderr": ""
+  }
+]

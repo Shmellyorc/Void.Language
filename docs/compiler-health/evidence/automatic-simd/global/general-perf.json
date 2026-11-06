@@ -1,0 +1,410 @@
+[
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "baseline",
+    "block": 0,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.05794,0.053\n7,47,0.05159,0.053\n7,47,0.04872,0.05\n7,47,0.04833,0.05\n7,47,0.04718,0.048\n7,47,0.079139,0.08\n7,47,0.04542,0.046\n7,47,0.04604,0.047\n7,47,0.0469,0.048\n7,47,0.04646,0.048\n7,47,0.04698,0.048\n7,47,0.04769,0.049\n7,47,0.04688,0.048\n7,47,0.0766,0.078\n7,47,0.04407,0.045\n7,47,0.04567,0.046\n7,47,0.045949,0.047\n7,47,0.0454,0.046\n7,47,0.04689,0.048\n7,47,0.06261,0.057\n",
+    "stderr": "compile_ms,98.2312,total_ms,102.577,cache,disabled\n",
+    "process_ms": 112.52737999893725,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "candidate",
+    "block": 1,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.05742,0.054\n7,47,0.05187,0.053\n7,47,0.04725,0.048\n7,47,0.04693,0.048\n7,47,0.04727,0.048\n7,47,0.077579,0.079\n7,47,0.04529,0.046\n7,47,0.04581,0.046\n7,47,0.04744,0.048\n7,47,0.04606,0.046\n7,47,0.04632,0.047\n7,47,0.047,0.047\n7,47,0.04706,0.048\n7,47,0.07691,0.078\n7,47,0.04346,0.044\n7,47,0.04546,0.047\n7,47,0.04552,0.046\n7,47,0.045259,0.046\n7,47,0.04582,0.047\n7,47,0.05261,0.049\n",
+    "stderr": "compile_ms,98.4838,total_ms,102.983,cache,disabled\n",
+    "process_ms": 112.53240000223741,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "candidate",
+    "block": 2,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.06213,0.065\n7,47,0.06753,0.069\n7,47,0.0581,0.052\n7,47,0.04873,0.049\n7,47,0.04724,0.048\n7,47,0.08181,0.083\n7,47,0.04545,0.046\n7,47,0.04603,0.047\n7,47,0.04695,0.048\n7,47,0.0464,0.048\n7,47,0.046919,0.048\n7,47,0.04681,0.048\n7,47,0.04646,0.047\n7,47,0.07578,0.077\n7,47,0.04375,0.045\n7,47,0.04518,0.046\n7,47,0.04524,0.046\n7,47,0.04525,0.046\n7,47,0.04652,0.048\n7,47,0.04577,0.046\n",
+    "stderr": "compile_ms,98.5086,total_ms,103.007,cache,disabled\n",
+    "process_ms": 112.92501899879426,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "baseline",
+    "block": 3,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.04977,0.051\n7,47,0.05154,0.052\n7,47,0.04812,0.049\n7,47,0.04777,0.049\n7,47,0.04745,0.048\n7,47,0.07839,0.08\n7,47,0.045659,0.046\n7,47,0.04684,0.048\n7,47,0.04648,0.048\n7,47,0.04658,0.048\n7,47,0.04746,0.048\n7,47,0.05378,0.05\n7,47,0.04743,0.048\n7,47,0.07573,0.076\n7,47,0.04386,0.045\n7,47,0.04586,0.047\n7,47,0.07997,0.049\n7,47,0.04641,0.048\n7,47,0.046949,0.048\n7,47,0.04651,0.048\n",
+    "stderr": "compile_ms,97.7549,total_ms,102.051,cache,disabled\n",
+    "process_ms": 111.59057402983308,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "baseline",
+    "block": 4,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.04998,0.051\n7,47,0.050879,0.052\n7,47,0.04753,0.048\n7,47,0.04763,0.048\n7,47,0.0468,0.047\n7,47,0.07691,0.077\n7,47,0.04533,0.046\n7,47,0.06328,0.051\n7,47,0.04882,0.05\n7,47,0.04647,0.047\n7,47,0.04744,0.048\n7,47,0.04714,0.048\n7,47,0.04632,0.047\n7,47,0.075559,0.077\n7,47,0.04329,0.044\n7,47,0.04553,0.046\n7,47,0.04538,0.046\n7,47,0.0458,0.047\n7,47,0.04826,0.049\n7,47,0.0463,0.047\n",
+    "stderr": "compile_ms,97.0947,total_ms,101.3,cache,disabled\n",
+    "process_ms": 110.70416599977762,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "candidate",
+    "block": 5,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.04941,0.051\n7,47,0.05122,0.052\n7,47,0.04851,0.05\n7,47,0.04812,0.049\n7,47,0.04716,0.048\n7,47,0.07796,0.079\n7,47,0.04576,0.047\n7,47,0.04635,0.047\n7,47,0.064749,0.059\n7,47,0.04986,0.051\n7,47,0.04778,0.049\n7,47,0.04686,0.048\n7,47,0.04701,0.048\n7,47,0.07535,0.076\n7,47,0.04454,0.045\n7,47,0.04576,0.047\n7,47,0.04525,0.046\n7,47,0.04644,0.047\n7,47,0.04605,0.047\n7,47,0.04703,0.047\n",
+    "stderr": "compile_ms,99.2156,total_ms,103.727,cache,disabled\n",
+    "process_ms": 113.26278297929093,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "candidate",
+    "block": 6,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.0494,0.051\n7,47,0.05205,0.053\n7,47,0.04819,0.049\n7,47,0.04747,0.049\n7,47,0.047659,0.049\n7,47,0.07932,0.08\n7,47,0.04584,0.047\n7,47,0.04681,0.048\n7,47,0.04696,0.048\n7,47,0.04677,0.048\n7,47,0.04728,0.049\n7,47,0.04727,0.048\n7,47,0.04701,0.048\n7,47,0.07628,0.077\n7,47,0.0528,0.046\n7,47,0.04631,0.047\n7,47,0.04682,0.048\n7,47,0.046,0.047\n7,47,0.04701,0.047\n7,47,0.04681,0.047\n",
+    "stderr": "compile_ms,98.4491,total_ms,102.893,cache,disabled\n",
+    "process_ms": 112.20244399737567,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/advanced/combined.void",
+    "label": "baseline",
+    "block": 7,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,47,0.04945,0.052\n7,47,0.05768,0.054\n7,47,0.04857,0.049\n7,47,0.047269,0.048\n7,47,0.04705,0.048\n7,47,0.07877,0.08\n7,47,0.04545,0.046\n7,47,0.04578,0.046\n7,47,0.04653,0.047\n7,47,0.04627,0.047\n7,47,0.04648,0.047\n7,47,0.04547,0.047\n7,47,0.04613,0.047\n7,47,0.07642,0.078\n7,47,0.04438,0.045\n7,47,0.044839,0.045\n7,47,0.04751,0.048\n7,47,0.05381,0.055\n7,47,0.05456,0.056\n7,47,0.05555,0.056\n",
+    "stderr": "compile_ms,97.7959,total_ms,102.005,cache,disabled\n",
+    "process_ms": 111.4184750476852,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "baseline",
+    "block": 0,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.00325,1.002\n7,307,1.03005,1.028\n7,307,1.04444,1.042\n7,307,1.03729,1.033\n7,307,1.09501,1.092\n7,307,1.07119,1.069\n7,307,1.07797,1.07\n7,307,1.04357,1.041\n7,307,1.03675,1.033\n7,307,1.05943,1.054\n7,307,1.03001,1.027\n7,307,1.07441,1.072\n7,307,1.04736,1.045\n7,307,1.10165,1.099\n7,307,1.03703,1.035\n7,307,1.07952,1.073\n7,307,1.03291,1.03\n7,307,1.05317,1.05\n7,307,1.05236,1.047\n7,307,1.03332,1.03\n",
+    "stderr": "compile_ms,36.6255,total_ms,39.6306,cache,disabled\n",
+    "process_ms": 72.144933976233,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "candidate",
+    "block": 1,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.01872,1.017\n7,307,1.06702,1.064\n7,307,1.03785,1.036\n7,307,1.05192,1.05\n7,307,1.10247,1.1\n7,307,1.0131,1.011\n7,307,0.983738,0.982\n7,307,1.01919,1.014\n7,307,1.01913,1.017\n7,307,1.05404,1.051\n7,307,1.01438,1.012\n7,307,1.01883,1.016\n7,307,1.03762,1.033\n7,307,1.02214,1.016\n7,307,1.01452,1.011\n7,307,1.03853,1.035\n7,307,1.05648,1.054\n7,307,1.03022,1.027\n7,307,1.04175,1.038\n7,307,1.06336,1.06\n",
+    "stderr": "compile_ms,37.0996,total_ms,40.2612,cache,disabled\n",
+    "process_ms": 71.93870400078595,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "candidate",
+    "block": 2,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.14589,1.143\n7,307,1.1226,1.12\n7,307,1.16339,1.157\n7,307,1.10457,1.102\n7,307,1.11917,1.117\n7,307,1.10953,1.105\n7,307,1.1302,1.125\n7,307,1.14921,1.147\n7,307,1.09943,1.097\n7,307,1.12716,1.123\n7,307,1.10115,1.099\n7,307,1.11827,1.111\n7,307,1.12893,1.123\n7,307,1.14582,1.143\n7,307,1.11001,1.108\n7,307,1.16216,1.16\n7,307,1.10213,1.099\n7,307,1.12184,1.119\n7,307,1.10498,1.103\n7,307,1.10732,1.1\n",
+    "stderr": "compile_ms,37.1075,total_ms,40.3903,cache,disabled\n",
+    "process_ms": 74.35622002230957,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "baseline",
+    "block": 3,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,0.999199,0.994\n7,307,0.997898,0.994\n7,307,1.0084,1.004\n7,307,1.00376,0.998\n7,307,1.02783,1.024\n7,307,1.00699,1.003\n7,307,1.01032,1.006\n7,307,1.02135,1.018\n7,307,1.00498,1.003\n7,307,1.02237,1.017\n7,307,1.03626,1.034\n7,307,1.00577,1.003\n7,307,1.06593,1.063\n7,307,1.00811,1.003\n7,307,1.04337,1.041\n7,307,1.0269,1.019\n7,307,1.00185,0.997\n7,307,1.03075,1.027\n7,307,1.00489,1.002\n7,307,1.0127,1.009\n",
+    "stderr": "compile_ms,36.5873,total_ms,39.6289,cache,disabled\n",
+    "process_ms": 71.01938599953428,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "baseline",
+    "block": 4,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.00961,1.008\n7,307,1.01732,1.014\n7,307,1.03109,1.028\n7,307,1.02665,1.023\n7,307,1.04982,1.043\n7,307,1.03308,1.03\n7,307,1.05624,1.053\n7,307,1.02114,1.019\n7,307,1.02228,1.019\n7,307,1.07013,1.064\n7,307,0.999519,0.996\n7,307,1.06292,1.059\n7,307,1.05309,1.051\n7,307,1.00729,1.004\n7,307,1.0554,1.05\n7,307,1.0171,1.014\n7,307,1.04895,1.046\n7,307,1.02438,1.022\n7,307,1.04497,1.042\n7,307,1.00932,1.007\n",
+    "stderr": "compile_ms,36.4692,total_ms,39.5005,cache,disabled\n",
+    "process_ms": 71.34071399923414,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "candidate",
+    "block": 5,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.03666,1.035\n7,307,1.02357,1.02\n7,307,1.02356,1.02\n7,307,1.01655,1.014\n7,307,1.038,1.035\n7,307,1.01807,1.015\n7,307,1.06185,1.059\n7,307,1.0339,1.031\n7,307,1.01981,1.016\n7,307,1.03138,1.028\n7,307,1.01602,1.013\n7,307,1.05085,1.049\n7,307,1.02565,1.019\n7,307,1.0566,1.05\n7,307,1.01939,1.017\n7,307,1.07026,1.067\n7,307,1.01632,1.014\n7,307,1.02831,1.026\n7,307,1.01391,1.011\n7,307,1.03134,1.028\n",
+    "stderr": "compile_ms,37.3404,total_ms,40.6322,cache,disabled\n",
+    "process_ms": 72.74729298660532,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "candidate",
+    "block": 6,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.00759,1.006\n7,307,1.00275,0.999\n7,307,1.03434,1.03\n7,307,1.05893,1.045\n7,307,1.02049,1.017\n7,307,1.05155,1.047\n7,307,1.01217,1.008\n7,307,1.05747,1.055\n7,307,1.00586,1.003\n7,307,1.06306,1.061\n7,307,0.998658,0.994\n7,307,1.03216,1.03\n7,307,1.01841,1.016\n7,307,1.04592,1.04\n7,307,1.00948,1.006\n7,307,1.02028,1.017\n7,307,1.00621,1.003\n7,307,1.01881,1.016\n7,307,1.00536,1.003\n7,307,1.00727,1.005\n",
+    "stderr": "compile_ms,37.5459,total_ms,40.7649,cache,disabled\n",
+    "process_ms": 72.56375398719683,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/strings/stress.void",
+    "label": "baseline",
+    "block": 7,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,307,1.04155,1.04\n7,307,1.00328,1.001\n7,307,1.01444,1.011\n7,307,1.03853,1.036\n7,307,1.01284,1.01\n7,307,1.04274,1.039\n7,307,1.00439,1.001\n7,307,1.01456,1.012\n7,307,1.26907,1.266\n7,307,1.03424,1.025\n7,307,1.01968,1.014\n7,307,1.00591,1.003\n7,307,1.035,1.025\n7,307,1.00394,0.998\n7,307,1.0399,1.036\n7,307,1.00129,0.999\n7,307,1.0398,1.037\n7,307,0.995498,0.992\n7,307,1.0266,1.023\n7,307,0.983019,0.98\n",
+    "stderr": "compile_ms,36.738,total_ms,39.7542,cache,disabled\n",
+    "process_ms": 71.90223602810875,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "baseline",
+    "block": 0,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,313.95,312.374\n7,14,315.379,313.989\n7,14,313.574,312.384\n7,14,315.177,313.849\n7,14,316.431,315.182\n7,14,314.091,312.895\n7,14,313.956,312.46\n7,14,315.531,314.238\n7,14,313.012,311.687\n7,14,313.135,311.841\n7,14,313.12,311.905\n7,14,312.12,310.873\n7,14,324.337,322.165\n7,14,311.19,309.971\n7,14,312.777,311.432\n7,14,316.619,315.415\n7,14,312.058,310.814\n7,14,313.175,311.819\n7,14,355.07,353.289\n7,14,311.973,310.575\n",
+    "stderr": "compile_ms,20.6515,total_ms,23.0061,cache,disabled\n",
+    "process_ms": 7310.158174019307,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "candidate",
+    "block": 1,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,322.522,320.903\n7,14,321.616,320.078\n7,14,319.023,317.554\n7,14,318.502,317.148\n7,14,318.014,316.759\n7,14,317.95,316.673\n7,14,318.942,317.686\n7,14,319.019,317.659\n7,14,319.495,317.983\n7,14,315.643,314.118\n7,14,315.572,314.349\n7,14,317.523,316.237\n7,14,317.052,315.853\n7,14,328.719,327.31\n7,14,331.505,329.585\n7,14,319.749,318.48\n7,14,319.09,317.763\n7,14,334.865,333.181\n7,14,361.132,358.96\n7,14,320.133,318.231\n",
+    "stderr": "compile_ms,21.2285,total_ms,23.8999,cache,disabled\n",
+    "process_ms": 7477.464271010831,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "candidate",
+    "block": 2,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,315.252,314.047\n7,14,317.902,316.59\n7,14,316.232,315.018\n7,14,317.822,316.293\n7,14,318.839,317.549\n7,14,318.831,317.506\n7,14,318.196,316.762\n7,14,318.415,317.172\n7,14,316.828,315.291\n7,14,317.821,316.542\n7,14,324.074,322.349\n7,14,315.297,313.987\n7,14,316.692,315.329\n7,14,317.542,316.14\n7,14,315.768,314.515\n7,14,317.355,316.085\n7,14,316.84,315.373\n7,14,318.497,317.159\n7,14,362.757,361.039\n7,14,318.04,316.822\n",
+    "stderr": "compile_ms,20.8092,total_ms,23.3455,cache,disabled\n",
+    "process_ms": 7405.390378029551,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "baseline",
+    "block": 3,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,314.594,313.314\n7,14,315.897,314.588\n7,14,314.697,313.475\n7,14,316.228,314.966\n7,14,313.382,312.164\n7,14,318.333,316.978\n7,14,317.309,316.144\n7,14,313.677,312.422\n7,14,316.751,315.536\n7,14,315.265,314.114\n7,14,312.474,311.273\n7,14,313.806,312.549\n7,14,317.631,316.254\n7,14,316.083,314.843\n7,14,315.925,314.687\n7,14,314.041,312.847\n7,14,312.715,311.508\n7,14,311.767,310.509\n7,14,355.962,353.959\n7,14,314.994,313.641\n",
+    "stderr": "compile_ms,20.5017,total_ms,22.9119,cache,disabled\n",
+    "process_ms": 7336.489490000531,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "baseline",
+    "block": 4,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,313.782,312.644\n7,14,312.945,311.555\n7,14,312.655,311.416\n7,14,311.416,310.197\n7,14,313.447,312.232\n7,14,312.513,311.377\n7,14,310.664,309.36\n7,14,313.236,311.821\n7,14,313.803,312.501\n7,14,312.621,311.411\n7,14,309.561,308.422\n7,14,309.671,308.514\n7,14,309.633,308.177\n7,14,367.008,363.976\n7,14,312.636,311.158\n7,14,309.407,308.228\n7,14,309.772,308.56\n7,14,307.819,306.658\n7,14,349.765,348.169\n7,14,309.966,308.784\n",
+    "stderr": "compile_ms,20.2661,total_ms,22.6341,cache,disabled\n",
+    "process_ms": 7300.474977004342,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "candidate",
+    "block": 5,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,314.088,312.918\n7,14,314.646,313.447\n7,14,313.353,312.194\n7,14,318.042,316.668\n7,14,313.94,312.694\n7,14,313.622,312.387\n7,14,314.122,312.896\n7,14,313.419,312.27\n7,14,313.306,312.111\n7,14,314.113,312.958\n7,14,314.338,312.926\n7,14,317.716,316.493\n7,14,312.748,311.587\n7,14,312.514,311.312\n7,14,313.085,311.77\n7,14,312.513,311.36\n7,14,313.063,311.694\n7,14,312.839,311.656\n7,14,354.109,352.515\n7,14,313.796,312.585\n",
+    "stderr": "compile_ms,21.1088,total_ms,23.6736,cache,disabled\n",
+    "process_ms": 7301.501081965398,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "candidate",
+    "block": 6,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/candidate-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,316.242,315.025\n7,14,315.1,313.78\n7,14,314.187,313.012\n7,14,315.473,314.338\n7,14,314.982,313.864\n7,14,316.438,315.263\n7,14,315.607,314.248\n7,14,314.286,312.983\n7,14,313.897,312.738\n7,14,313.496,312.341\n7,14,313.215,312.101\n7,14,313.249,312.098\n7,14,312.98,311.65\n7,14,312.317,311.102\n7,14,312.995,311.782\n7,14,313.271,312.112\n7,14,313.289,312.081\n7,14,313.33,312.146\n7,14,355.527,353.55\n7,14,313.68,312.387\n",
+    "stderr": "compile_ms,20.9025,total_ms,23.3864,cache,disabled\n",
+    "process_ms": 7308.799738995731,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  },
+  {
+    "source": "examples/collections/large.void",
+    "label": "baseline",
+    "block": 7,
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/baseline-host",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "7",
+      "20"
+    ],
+    "status": 0,
+    "stdout": "7,14,309.679,308.521\n7,14,310.104,308.926\n7,14,309.428,308.121\n7,14,310.576,309.32\n7,14,309.153,308.009\n7,14,309.086,307.959\n7,14,310.31,309.15\n7,14,310.203,308.888\n7,14,310.821,309.375\n7,14,309.423,308.165\n7,14,309.984,308.738\n7,14,309.448,308.216\n7,14,308.525,307.395\n7,14,308.424,307.279\n7,14,308.793,307.495\n7,14,309.348,308.043\n7,14,308.348,307.163\n7,14,308.295,307.139\n7,14,350.053,348.338\n7,14,309.239,307.975\n",
+    "stderr": "compile_ms,20.1539,total_ms,22.4416,cache,disabled\n",
+    "process_ms": 7196.977887011599,
+    "cpu_affinity": 2,
+    "stack_soft_hard": 1048576
+  }
+]

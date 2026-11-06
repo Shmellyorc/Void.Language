@@ -1,0 +1,116 @@
+{
+  "text": {
+    "baseline": {
+      "object_bytes": 32152,
+      "object_sha256": "8097269349dafe882043865b9015a8738927a200df32d9e2db903fae0567b8b0",
+      "IR_bytes": 84803,
+      "function_definitions": 4,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/text.baseline.o  :\nsection              size   addr\n.text                4484      0\n.rodata.str1.1      14178      0\n.rodata               724      0\n.data.rel.ro         1672      0\n.debug_abbrev          90      0\n.debug_info           205      0\n.debug_str            370      0\n.debug_pubnames        62      0\n.debug_pubtypes        83      0\n.note.GNU-stack         0      0\n.eh_frame             272      0\n.debug_line           575      0\nTotal               22715\n\n\n",
+      "fast_fp": []
+    },
+    "candidate": {
+      "object_bytes": 32152,
+      "object_sha256": "8097269349dafe882043865b9015a8738927a200df32d9e2db903fae0567b8b0",
+      "IR_bytes": 84803,
+      "function_definitions": 4,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/text.candidate.o  :\nsection              size   addr\n.text                4484      0\n.rodata.str1.1      14178      0\n.rodata               724      0\n.data.rel.ro         1672      0\n.debug_abbrev          90      0\n.debug_info           205      0\n.debug_str            370      0\n.debug_pubnames        62      0\n.debug_pubtypes        83      0\n.note.GNU-stack         0      0\n.eh_frame             272      0\n.debug_line           575      0\nTotal               22715\n\n\n",
+      "fast_fp": []
+    },
+    "identical_objects": true
+  },
+  "managed": {
+    "baseline": {
+      "object_bytes": 64648,
+      "object_sha256": "c4b4356ccc73d49cece3f73656083594d23734b34c63cf12cdcdae5c89e2cd25",
+      "IR_bytes": 212639,
+      "function_definitions": 12,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/managed.baseline.o  :\nsection              size   addr\n.text               11812      0\n.rodata.str1.1      19093      0\n.rodata              2008      0\n.data.rel.ro         4272      0\n.debug_abbrev         248      0\n.debug_info           521      0\n.debug_str           1238      0\n.debug_pubnames       197      0\n.debug_pubtypes       118      0\n.note.GNU-stack         0      0\n.eh_frame             888      0\n.debug_line          1342      0\nTotal               41737\n\n\n",
+      "fast_fp": []
+    },
+    "candidate": {
+      "object_bytes": 64648,
+      "object_sha256": "c4b4356ccc73d49cece3f73656083594d23734b34c63cf12cdcdae5c89e2cd25",
+      "IR_bytes": 212639,
+      "function_definitions": 12,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/managed.candidate.o  :\nsection              size   addr\n.text               11812      0\n.rodata.str1.1      19093      0\n.rodata              2008      0\n.data.rel.ro         4272      0\n.debug_abbrev         248      0\n.debug_info           521      0\n.debug_str           1238      0\n.debug_pubnames       197      0\n.debug_pubtypes       118      0\n.note.GNU-stack         0      0\n.eh_frame             888      0\n.debug_line          1342      0\nTotal               41737\n\n\n",
+      "fast_fp": []
+    },
+    "identical_objects": true
+  },
+  "collections_2m": {
+    "baseline": {
+      "object_bytes": 14232,
+      "object_sha256": "b3cd9035a3a82833e14e7e4a59ce8ff690f3d1a2304300d8555dbe85141cd2f4",
+      "IR_bytes": 39978,
+      "function_definitions": 2,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/collections_2m.baseline.o  :\nsection             size   addr\n.text               2353      0\n.rodata              320      0\n.data.rel.ro         168      0\n.rodata.str1.1      3914      0\n.debug_abbrev         59      0\n.debug_info           83      0\n.debug_str           152      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            200      0\n.debug_line          397      0\nTotal               7700\n\n\n",
+      "fast_fp": []
+    },
+    "candidate": {
+      "object_bytes": 14232,
+      "object_sha256": "b3cd9035a3a82833e14e7e4a59ce8ff690f3d1a2304300d8555dbe85141cd2f4",
+      "IR_bytes": 39978,
+      "function_definitions": 2,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/collections_2m.candidate.o  :\nsection             size   addr\n.text               2353      0\n.rodata              320      0\n.data.rel.ro         168      0\n.rodata.str1.1      3914      0\n.debug_abbrev         59      0\n.debug_info           83      0\n.debug_str           152      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            200      0\n.debug_line          397      0\nTotal               7700\n\n\n",
+      "fast_fp": []
+    },
+    "identical_objects": true
+  },
+  "json_typed": {
+    "baseline": {
+      "object_bytes": 1305256,
+      "object_sha256": "99c8fa71a0cd1d63e8018fc5af04e87cef06a53f73763f25e2a0ce9f965ef332",
+      "IR_bytes": 6304727,
+      "function_definitions": 86,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/json_typed.baseline.o  :\nsection               size   addr\n.text               362996      0\n.rodata.str1.1      400410      0\n.rodata              72344      0\n.data.rel.ro         74280      0\n.debug_abbrev          429      0\n.debug_info           3772      0\n.debug_ranges          144      0\n.debug_str           10465      0\n.debug_pubnames       1813      0\n.debug_pubtypes       1224      0\n.note.GNU-stack          0      0\n.eh_frame             7368      0\n.debug_line          45687      0\nTotal               980932\n\n\n",
+      "fast_fp": []
+    },
+    "candidate": {
+      "object_bytes": 1305232,
+      "object_sha256": "21b86df46d94e24ba7e94e29ec66fda7bc07558441ebcebb2fd53f57f0e6d992",
+      "IR_bytes": 6304336,
+      "function_definitions": 86,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/json_typed.candidate.o  :\nsection               size   addr\n.text               362980      0\n.rodata.str1.1      400410      0\n.rodata              72344      0\n.data.rel.ro         74280      0\n.debug_abbrev          429      0\n.debug_info           3772      0\n.debug_ranges          144      0\n.debug_str           10465      0\n.debug_pubnames       1813      0\n.debug_pubtypes       1224      0\n.note.GNU-stack          0      0\n.eh_frame             7368      0\n.debug_line          45675      0\nTotal               980904\n\n\n",
+      "fast_fp": []
+    },
+    "identical_objects": false
+  },
+  "json_validated": {
+    "baseline": {
+      "object_bytes": 853992,
+      "object_sha256": "8c3b54b0dffd58834c928cd18495e0f0b46a96ced7a9621566b39f67d20f2e24",
+      "IR_bytes": 3617277,
+      "function_definitions": 64,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/json_validated.baseline.o  :\nsection               size   addr\n.text               206068      0\n.rodata.str1.1      300171      0\n.rodata              39824      0\n.data.rel.ro         45256      0\n.debug_abbrev          492      0\n.debug_info           2721      0\n.debug_ranges           96      0\n.debug_str            7802      0\n.debug_pubnames       1474      0\n.debug_pubtypes        875      0\n.note.GNU-stack          0      0\n.eh_frame             4904      0\n.debug_line          34025      0\nTotal               643708\n\n\n",
+      "fast_fp": []
+    },
+    "candidate": {
+      "object_bytes": 853960,
+      "object_sha256": "91c5c0ead8b527be11b3fea61fddf4820c7d731cad66b2dd78ef4cdc40c99171",
+      "IR_bytes": 3616886,
+      "function_definitions": 64,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/json_validated.candidate.o  :\nsection               size   addr\n.text               206052      0\n.rodata.str1.1      300171      0\n.rodata              39824      0\n.data.rel.ro         45256      0\n.debug_abbrev          492      0\n.debug_info           2721      0\n.debug_ranges           96      0\n.debug_str            7802      0\n.debug_pubnames       1474      0\n.debug_pubtypes        875      0\n.note.GNU-stack          0      0\n.eh_frame             4904      0\n.debug_line          34013      0\nTotal               643680\n\n\n",
+      "fast_fp": []
+    },
+    "identical_objects": false
+  },
+  "collections_small": {
+    "baseline": {
+      "object_bytes": 23336,
+      "object_sha256": "ed94216d8f7caac6eb060ff463fb3f784d1e8fc16dc1cf4ec172934f5e59be5e",
+      "IR_bytes": 74854,
+      "function_definitions": 2,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/collections_small.baseline.o  :\nsection             size   addr\n.text               4049      0\n.rodata              640      0\n.data.rel.ro         136      0\n.rodata.str1.1      7904      0\n.debug_abbrev         59      0\n.debug_info           83      0\n.debug_str           149      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            256      0\n.debug_line          885      0\nTotal              14215\n\n\n",
+      "fast_fp": []
+    },
+    "candidate": {
+      "object_bytes": 23336,
+      "object_sha256": "ed94216d8f7caac6eb060ff463fb3f784d1e8fc16dc1cf4ec172934f5e59be5e",
+      "IR_bytes": 74854,
+      "function_definitions": 2,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-captures-verified/collections_small.candidate.o  :\nsection             size   addr\n.text               4049      0\n.rodata              640      0\n.data.rel.ro         136      0\n.rodata.str1.1      7904      0\n.debug_abbrev         59      0\n.debug_info           83      0\n.debug_str           149      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            256      0\n.debug_line          885      0\nTotal              14215\n\n\n",
+      "fast_fp": []
+    },
+    "identical_objects": true
+  }
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "label": "baseline",
+    "status": 0,
+    "stdout": "129,8002,0.00024,0.003\n",
+    "stderr": "compile_ms,0.347983,total_ms,2.29822,cache,hit\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623",
+      "b3bdabc138ec96ee7d03a17cb3ca434f2f75f687e9e23a2f105735ae83e13158"
+    ]
+  }
+]

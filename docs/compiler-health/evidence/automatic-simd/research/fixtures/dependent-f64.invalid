@@ -1,0 +1,5 @@
+func entry(n: i32) -> i32:
+    var sum: f64 = 0.125
+    for i in 0..<n:
+        sum = sum * 1.0000001 + 0.125
+    return if sum > 0.0: 1 else: 2

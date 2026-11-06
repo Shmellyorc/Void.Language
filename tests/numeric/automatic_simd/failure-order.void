@@ -1,0 +1,4 @@
+func entry(n: i32) -> i32:
+    var a: [i32, 2] = [7, 8]
+    a[2] = 1 / (n - n)
+    return 0

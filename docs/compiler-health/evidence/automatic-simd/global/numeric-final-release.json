@@ -1,0 +1,14 @@
+{
+  "args": [
+    "ctest",
+    "--test-dir",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+    "-R",
+    "^(numeric|numeric_cli)$",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/shmellyorc/.local/state/void-log-performance/simd-qualification/numeric-final-release.xml"
+  ],
+  "status": 0,
+  "stack_soft_hard": 1048576
+}

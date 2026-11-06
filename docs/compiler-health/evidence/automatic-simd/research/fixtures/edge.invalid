@@ -1,0 +1,19 @@
+func entry(n: i32) -> i32:
+    var u: u8 = 255
+    var i: i32 = 2147483647
+    var j: i64 = 9223372036854775807
+    var z: f64 = -0.0
+    var tiny: f32 = 1.401298464324817e-45
+    for k in 0..<n:
+        u += 1
+        i += 1
+        j += 1
+    if n == 1:
+        if u != 0 or i != -2147483648 or j != -9223372036854775808:
+            return 2
+    if 1.0 / z >= 0.0 or tiny * 2.0 <= 0.0:
+        return 3
+    var nan: f64 = 0.0 / (z + 0.0)
+    if nan == nan:
+        return 4
+    return 1

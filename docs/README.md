@@ -1,6 +1,6 @@
 # VOID documentation
 
-## Integrated performance qualification and future SIMD — 5 November 2026
+## Integrated performance qualification and AOT-only SIMD — 6 November 2026
 
 [Integrated source review and local qualification](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
 consolidate refined logging, checked roots, Runtime metadata and analysis-backed
@@ -10,10 +10,14 @@ LSP storage. The original measurements and failures remain in the
 FILE200's historical 10 ms aim is not a Boss release requirement; unfavorable
 measurements remain recorded. Git, hosted CI and release decisions remain with Boss.
 
-[Future automatic SIMD in the development strategy](DEVELOPMENT_STRATEGY.md#future-optimization-automatic-simd--boss-direction-5-november-2026)
-and the [detailed roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) record automatic safe,
-profitable SIMD with scalar fallback and ordinary source types. SIMD is deferred;
-no implementation or SIMD benchmarking is part of this qualification.
+[Automatic SIMD in the development strategy](DEVELOPMENT_STRATEGY.md#future-optimization-automatic-simd--boss-direction-5-november-2026)
+and the [roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) distinguish the
+[rejected global candidate](compiler-health/AUTOMATIC_SIMD_QUALIFICATION.md) from
+the [retained AOT-only candidate](compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md).
+Only native AOT O2 receives target-aware analysis. JIT/ORC/logical cache policy
+remain unchanged, SLP stays off, and checked arrays retain their checks.
+[Exact staged scope and Boss CI instructions](compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md)
+prepare the seven-job cross-platform qualification; no hosted run has been sent.
 
 ## MIT licensing implementation — Golden Wrench review
 

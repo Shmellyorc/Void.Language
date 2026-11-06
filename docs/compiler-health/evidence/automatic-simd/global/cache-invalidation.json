@@ -1,0 +1,60 @@
+[
+  {
+    "label": "baseline",
+    "status": 0,
+    "stdout": "129,8002,0.00025,0.002\n",
+    "stderr": "compile_ms,25.654,total_ms,27.963,cache,miss\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623"
+    ]
+  },
+  {
+    "label": "baseline",
+    "status": 0,
+    "stdout": "129,8002,0.00064,0.008\n",
+    "stderr": "compile_ms,0.785236,total_ms,4.92138,cache,hit\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623"
+    ]
+  },
+  {
+    "label": "candidate",
+    "status": 0,
+    "stdout": "129,8002,0.00015,0.002\n",
+    "stderr": "compile_ms,33.7067,total_ms,36.0739,cache,miss\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623",
+      "8bf822b99fd8ccb2b0fd1e2fafcdebad26f812b3dd3f86abeafce27960a47e96"
+    ]
+  },
+  {
+    "label": "candidate",
+    "status": 0,
+    "stdout": "129,8002,0.0002,0.002\n",
+    "stderr": "compile_ms,0.371153,total_ms,2.60866,cache,hit\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623",
+      "8bf822b99fd8ccb2b0fd1e2fafcdebad26f812b3dd3f86abeafce27960a47e96"
+    ]
+  },
+  {
+    "label": "baseline",
+    "status": 0,
+    "stdout": "129,8002,0.00022,0.002\n",
+    "stderr": "compile_ms,0.361874,total_ms,2.51657,cache,hit\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623",
+      "8bf822b99fd8ccb2b0fd1e2fafcdebad26f812b3dd3f86abeafce27960a47e96"
+    ]
+  },
+  {
+    "label": "candidate",
+    "status": 0,
+    "stdout": "129,8002,0.00013,0.001\n",
+    "stderr": "compile_ms,0.359953,total_ms,2.69952,cache,hit\n",
+    "entries": [
+      "28b27d85399e8fbf6e9a787571c930b483e271b7cd6715aeed0b4dd695b5c623",
+      "8bf822b99fd8ccb2b0fd1e2fafcdebad26f812b3dd3f86abeafce27960a47e96"
+    ]
+  }
+]

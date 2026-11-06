@@ -1,0 +1,124 @@
+[
+  {
+    "name": "guarded",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/guarded-range-i32.void",
+    "args": [
+      "100000000"
+    ],
+    "expected": "2005030733\n",
+    "compile_sample": true
+  },
+  {
+    "name": "conditional",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/while-i32.void",
+    "args": [
+      "100000000"
+    ],
+    "expected": "2005030733\n",
+    "compile_sample": false
+  },
+  {
+    "name": "bidirectional",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/reduction-i32.void",
+    "args": [
+      "1000000"
+    ],
+    "expected": "62999875\n",
+    "compile_sample": false
+  },
+  {
+    "name": "f32_streams",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/slp-f32.void",
+    "args": [
+      "1000000"
+    ],
+    "expected": "1\n",
+    "compile_sample": false
+  },
+  {
+    "name": "dependent_f64",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dependent-f64.void",
+    "args": [
+      "1000000"
+    ],
+    "expected": "1\n",
+    "compile_sample": false
+  },
+  {
+    "name": "checked_i32",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dynamic-i32.void",
+    "args": [
+      "8192"
+    ],
+    "expected": "1\n",
+    "compile_sample": true
+  },
+  {
+    "name": "checked_f32",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dynamic-f32.void",
+    "args": [
+      "8192"
+    ],
+    "expected": "1\n",
+    "compile_sample": false
+  },
+  {
+    "name": "fixed_i32",
+    "source": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/fixed-i32.void",
+    "args": [
+      "1024"
+    ],
+    "expected": "1\n",
+    "compile_sample": false
+  },
+  {
+    "name": "text",
+    "source": "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+    "args": [
+      "7"
+    ],
+    "expected": "307\n",
+    "compile_sample": true
+  },
+  {
+    "name": "managed",
+    "source": "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+    "args": [
+      "7"
+    ],
+    "expected": "47\n",
+    "compile_sample": true
+  },
+  {
+    "name": "collections_2m",
+    "source": "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+    "args": [
+      "7"
+    ],
+    "expected": "14\n",
+    "compile_sample": true
+  },
+  {
+    "name": "json_typed",
+    "source": "/home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void",
+    "args": [],
+    "expected": "0: 10\n1: 20\n2: 30\n{\"hp\":100}\nhp 100\n{\"name\":\"Ada\",\"hp\":7,\"levels\":[1,2]}\n[1,2,3]\n\"blue\"\n18446744073709551615\n18446744073709551615\n",
+    "compile_sample": true
+  },
+  {
+    "name": "json_validated",
+    "source": "/home/shmellyorc/Documents/Void.Language/examples/json/validated.void",
+    "args": [],
+    "expected": "{\"score\":7}\nScore must be nonnegative\n",
+    "compile_sample": true
+  },
+  {
+    "name": "collections_small",
+    "source": "/home/shmellyorc/Documents/Void.Language/examples/collections/main.void",
+    "args": [
+      "7"
+    ],
+    "expected": "12\n",
+    "compile_sample": false
+  }
+]

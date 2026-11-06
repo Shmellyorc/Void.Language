@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/broad-codegen.py", line 11, in <module>
+    assert obj.read_bytes()==stock.read_bytes(),(item['name'],label,'capture fidelity')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('text', 'baseline', 'capture fidelity')

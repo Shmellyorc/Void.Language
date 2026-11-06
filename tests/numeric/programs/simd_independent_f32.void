@@ -1,0 +1,13 @@
+func entry(n: i32) -> i32:
+    var a: f32 = 0.125
+    var b: f32 = 0.25
+    var c: f32 = 0.5
+    var d: f32 = 1.0
+    for i in 0..<n:
+        a = a * 1.0000001 + 0.125
+        b = b * 1.0000001 + 0.25
+        c = c * 1.0000001 + 0.5
+        d = d * 1.0000001 + 1.0
+    if b != a * 2 or c != a * 4 or d != a * 8:
+        return 2
+    return 1

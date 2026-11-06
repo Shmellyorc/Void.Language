@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 355: numeric
+1/2 Test #355: numeric ..........................   Passed    1.94 sec
+    Start 393: numeric_cli
+2/2 Test #393: numeric_cli ......................   Passed   11.58 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  13.53 sec

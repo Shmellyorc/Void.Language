@@ -78,7 +78,7 @@ template<class T> T unwrap(llvm::Expected<T> value) {
     if (!value) throw std::runtime_error(llvm::toString(value.takeError()));
     return std::move(*value);
 }
-void finish(llvm::Module& module, bool optimize) {
+void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_machine = nullptr) {
     std::string message;
     llvm::raw_string_ostream stream(message);
     if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid LLVM lowering: " + message);
@@ -87,7 +87,9 @@ void finish(llvm::Module& module, bool optimize) {
         llvm::FunctionAnalysisManager functions;
         llvm::CGSCCAnalysisManager cgscc;
         llvm::ModuleAnalysisManager modules;
-        llvm::PassBuilder builder;
+        llvm::PipelineTuningOptions tuning;
+        tuning.SLPVectorization = false;
+        llvm::PassBuilder builder(analysis_machine, tuning);
         builder.registerModuleAnalyses(modules);
         builder.registerCGSCCAnalyses(cgscc);
         builder.registerFunctionAnalyses(functions);
@@ -2342,7 +2344,9 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
 #endif
     // Public AOT retains the original optimizer/emitter path. The proof service
     // and its CLI-home normalization are deliberately NOT activated here.
-    finish(*module, optimize);
+    // Analyze against the same generic deployment machine that emits the object.
+    // JIT callers retain target-independent O2 and their existing ORC policy.
+    finish(*module, optimize, machine.get());
     write_object(*module,*machine,output);
 }
 void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
@@ -2361,7 +2365,7 @@ void emit_private_fixed_call_research(const ir::Module& input, const std::filesy
     llvm::LLVMContext context;
     auto module=lower(input,context,"",machine->createDataLayout(),input.entry_symbol,nullptr,nullptr,nullptr,true);
     module->setTargetTriple(machine->getTargetTriple());
-    finish(*module,optimize);
+    finish(*module,optimize,machine.get());
     write_object(*module,*machine,output);
 }
 void emit_aot_storage_proof(const ir::Module& input, const std::filesystem::path& output,

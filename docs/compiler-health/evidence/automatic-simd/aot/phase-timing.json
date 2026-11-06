@@ -1,0 +1,578 @@
+[
+  {
+    "cpu_ms": 19.68600000000631,
+    "tag": "guarded/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/guarded-range-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-guarded-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.017453e+00\nLLVM_PHASE,codegen_ms,6.649815e+00\n",
+    "wall_ms": 20.52544499747455,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 25.752000000005992,
+    "tag": "guarded/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/guarded-range-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-guarded-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.661475e+00\nLLVM_PHASE,codegen_ms,1.032941e+01\n",
+    "wall_ms": 26.76105499267578,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 25.891999999990034,
+    "tag": "guarded/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/guarded-range-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-guarded-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.775261e+00\nLLVM_PHASE,codegen_ms,1.050191e+01\n",
+    "wall_ms": 27.073325007222593,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 19.802999999997795,
+    "tag": "guarded/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/guarded-range-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-guarded-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,4.808170e+00\nLLVM_PHASE,codegen_ms,6.888747e+00\n",
+    "wall_ms": 20.719900028780103,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 21.517000000012665,
+    "tag": "f32_streams/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/slp-f32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-f32_streams-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,4.908877e+00\nLLVM_PHASE,codegen_ms,7.747197e+00\n",
+    "wall_ms": 22.571123961824924,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 22.35099999999246,
+    "tag": "f32_streams/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/slp-f32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-f32_streams-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.648281e+00\nLLVM_PHASE,codegen_ms,7.170147e+00\n",
+    "wall_ms": 23.34749698638916,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 22.145999999999333,
+    "tag": "f32_streams/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/slp-f32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-f32_streams-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.614492e+00\nLLVM_PHASE,codegen_ms,7.347830e+00\n",
+    "wall_ms": 23.12100399285555,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 21.62500000000378,
+    "tag": "f32_streams/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/slp-f32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-f32_streams-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.035313e+00\nLLVM_PHASE,codegen_ms,7.640560e+00\n",
+    "wall_ms": 22.710419027134776,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 19.08800000000177,
+    "tag": "dependent_f64/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dependent-f64.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-dependent_f64-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,4.345137e+00\nLLVM_PHASE,codegen_ms,6.482771e+00\n",
+    "wall_ms": 20.077752007637173,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 19.580000000001263,
+    "tag": "dependent_f64/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dependent-f64.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-dependent_f64-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.028563e+00\nLLVM_PHASE,codegen_ms,5.982449e+00\n",
+    "wall_ms": 20.512305956799537,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 19.806999999996577,
+    "tag": "dependent_f64/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dependent-f64.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-dependent_f64-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.329612e+00\nLLVM_PHASE,codegen_ms,5.796665e+00\n",
+    "wall_ms": 20.74733900371939,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 19.104000000001342,
+    "tag": "dependent_f64/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dependent-f64.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-dependent_f64-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,4.354707e+00\nLLVM_PHASE,codegen_ms,6.426603e+00\n",
+    "wall_ms": 20.089641970116645,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 36.34199999999055,
+    "tag": "checked_i32/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dynamic-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-checked_i32-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,8.753391e+00\nLLVM_PHASE,codegen_ms,1.620002e+01\n",
+    "wall_ms": 37.394400977063924,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 37.091999999996794,
+    "tag": "checked_i32/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dynamic-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-checked_i32-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,9.676039e+00\nLLVM_PHASE,codegen_ms,1.550154e+01\n",
+    "wall_ms": 38.12002600170672,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 37.390999999995955,
+    "tag": "checked_i32/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dynamic-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-checked_i32-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,9.606962e+00\nLLVM_PHASE,codegen_ms,1.558539e+01\n",
+    "wall_ms": 38.41191501123831,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 36.70400000000029,
+    "tag": "checked_i32/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fixtures/dynamic-i32.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-checked_i32-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,8.885906e+00\nLLVM_PHASE,codegen_ms,1.605644e+01\n",
+    "wall_ms": 37.79090801253915,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 45.12399999999417,
+    "tag": "text/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-text-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.249827e+01\nLLVM_PHASE,codegen_ms,2.072960e+01\n",
+    "wall_ms": 46.21921997750178,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 46.02399999999918,
+    "tag": "text/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-text-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.314151e+01\nLLVM_PHASE,codegen_ms,2.014864e+01\n",
+    "wall_ms": 47.16735699912533,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 45.445999999991216,
+    "tag": "text/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-text-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.309760e+01\nLLVM_PHASE,codegen_ms,1.985263e+01\n",
+    "wall_ms": 46.726821979973465,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 45.07000000000261,
+    "tag": "text/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/strings/stress.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-text-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.245111e+01\nLLVM_PHASE,codegen_ms,2.036111e+01\n",
+    "wall_ms": 46.22900998219848,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 101.36899999999471,
+    "tag": "managed/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-managed-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,3.042043e+01\nLLVM_PHASE,codegen_ms,4.954185e+01\n",
+    "wall_ms": 102.87868202431127,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 102.1719999999906,
+    "tag": "managed/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-managed-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,3.166920e+01\nLLVM_PHASE,codegen_ms,4.873762e+01\n",
+    "wall_ms": 103.70660200715065,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 102.21800000000681,
+    "tag": "managed/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-managed-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,3.122567e+01\nLLVM_PHASE,codegen_ms,4.933035e+01\n",
+    "wall_ms": 103.85257797315717,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 101.62399999999838,
+    "tag": "managed/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/advanced/combined.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-managed-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,3.037584e+01\nLLVM_PHASE,codegen_ms,4.994666e+01\n",
+    "wall_ms": 103.09281497029588,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.023999999999162,
+    "tag": "collections_2m/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-collections_2m-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.485606e+00\nLLVM_PHASE,codegen_ms,1.420786e+01\n",
+    "wall_ms": 31.095964019186795,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.190000000009043,
+    "tag": "collections_2m/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-collections_2m-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.029538e+00\nLLVM_PHASE,codegen_ms,1.353618e+01\n",
+    "wall_ms": 31.166403961833566,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 30.394000000001142,
+    "tag": "collections_2m/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-collections_2m-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.055596e+00\nLLVM_PHASE,codegen_ms,1.371509e+01\n",
+    "wall_ms": 31.37500595767051,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 29.509000000005337,
+    "tag": "collections_2m/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/collections/large.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-collections_2m-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,5.480287e+00\nLLVM_PHASE,codegen_ms,1.400268e+01\n",
+    "wall_ms": 30.5097569944337,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4041.9119999999866,
+    "tag": "json_typed/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_typed-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.216046e+03\nLLVM_PHASE,codegen_ms,2.087740e+03\n",
+    "wall_ms": 4068.39906796813,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4058.357999999992,
+    "tag": "json_typed/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_typed-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.222217e+03\nLLVM_PHASE,codegen_ms,2.098637e+03\n",
+    "wall_ms": 4084.4687809585594,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4070.7860000000073,
+    "tag": "json_typed/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_typed-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.223678e+03\nLLVM_PHASE,codegen_ms,2.109869e+03\n",
+    "wall_ms": 4097.330319986213,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 4069.718999999999,
+    "tag": "json_typed/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/tests/json/typed_smoke.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_typed-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,1.234237e+03\nLLVM_PHASE,codegen_ms,2.105275e+03\n",
+    "wall_ms": 4096.722106973175,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2247.31500000001,
+    "tag": "json_validated/baseline/0",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/json/validated.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_validated-0.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.858208e+02\nLLVM_PHASE,codegen_ms,1.117061e+03\n",
+    "wall_ms": 2263.010847964324,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2229.738000000009,
+    "tag": "json_validated/candidate/1",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/json/validated.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_validated-1.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.769430e+02\nLLVM_PHASE,codegen_ms,1.108351e+03\n",
+    "wall_ms": 2244.71982603427,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2234.6009999999737,
+    "tag": "json_validated/candidate/2",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/json/validated.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_validated-2.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,6.778229e+02\nLLVM_PHASE,codegen_ms,1.110148e+03\n",
+    "wall_ms": 2249.509298009798,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  },
+  {
+    "cpu_ms": 2267.3089999999975,
+    "tag": "json_validated/baseline/3",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-capture",
+      "/home/shmellyorc/Documents/Void.Language/examples/json/validated.void",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/phase-json_validated-3.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "LLVM_PHASE,opt_ms,7.066602e+02\nLLVM_PHASE,codegen_ms,1.116154e+03\n",
+    "wall_ms": 2283.420357038267,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": 2
+  }
+]

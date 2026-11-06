@@ -1,0 +1,135 @@
+{
+  "date": "2026-11-06",
+  "recommendation": "RETAIN AOT-only",
+  "host": {
+    "system": "Linux",
+    "node": "gamedev",
+    "release": "7.2.11-pikaos",
+    "version": "#101pika1 SMP PREEMPT_DYNAMIC Sat Oct 17 21:28:05 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "toolchain": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\n",
+  "git_head": "83036facdf74c5a1eee6f475b6cfe110f4752f27",
+  "files": {
+    "/home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp": {
+      "bytes": 215900,
+      "sha256": "9725476c2c4001bf3a4d1d775b00893f6d7b5e60f7517839c8f51aa3abfc9525"
+    },
+    "/home/shmellyorc/Documents/Void.Language/include/void/backend.hpp": {
+      "bytes": 2445,
+      "sha256": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2"
+    },
+    "/home/shmellyorc/Documents/Void.Language/src/runtime/array.cpp": {
+      "bytes": 30841,
+      "sha256": "533f1474c77c97e4e9885af690ae5aae1d15fa61c6b9976077e801299fefebb1"
+    },
+    "/home/shmellyorc/Documents/Void.Language/src/runtime/fixed_abi.cpp": {
+      "bytes": 13629,
+      "sha256": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4"
+    },
+    "/home/shmellyorc/Documents/Void.Language/src/runtime/coordination.cpp": {
+      "bytes": 35309,
+      "sha256": "7be0f8cf1aa00b411c3c693d3e88a861612b4547132882849d1274127f69e732"
+    },
+    "/home/shmellyorc/Documents/Void.Language/src/runtime/buffer.cpp": {
+      "bytes": 36127,
+      "sha256": "c69a37995fe77aace3174b5626b7797b8405e28440f8ca13e5078f8edf55acf5"
+    },
+    "/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp": {
+      "bytes": 136103,
+      "sha256": "64ac2619ef446273e14cf7bead0e1d0c08a13e8f80218bdfccbeaf2205cfb58b"
+    },
+    "/home/shmellyorc/Documents/Void.Language/src/native_build.cpp": {
+      "bytes": 14587,
+      "sha256": "6ab8b0a3a4ae4ee34e72f2e8b37314ff152fa9e7d5932cf42b1e6d7cabd30229"
+    },
+    "/home/shmellyorc/Documents/Void.Language/README.md": {
+      "bytes": 5598,
+      "sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+    },
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/libvoid_core.a": {
+      "bytes": 9424506,
+      "sha256": "df62c8294c48b4bc6054f71a9085326f9619cde20a7c6c4e1f2a7ab72ca6e958"
+    },
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/libvoid_runtime.a": {
+      "bytes": 4084476,
+      "sha256": "f6523b5c01d5b264febdd11d780f4e71e6e411bf0732e3d712de5ce3db3ab6c3"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-release/voidc": {
+      "bytes": 76086696,
+      "sha256": "51143b015d7a4b47b8b7e5048ad89e8ce3cc9efe8c9d39529bd7e48a85ae154d"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-release/libvoid_llvm.a": {
+      "bytes": 1631038,
+      "sha256": "ac9fbcf4417fac2db6cf34012035ebdb3c94150fc675cbe5c669d2b53f154376"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-release/libvoid_cache_identity.a": {
+      "bytes": 1596,
+      "sha256": "e0c6ede14d75bcac23cd69097fd10bc30b44a961beef79b4b48bca25c8fb0191"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-debug/voidc": {
+      "bytes": 124052280,
+      "sha256": "c662a8dcc62db830c595e1b4338ffc6ff0e27e379ab1cc33527cba4a6f04ff01"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-debug/libvoid_llvm.a": {
+      "bytes": 24802074,
+      "sha256": "358ab03ec838ae1662b4a9d918904abec085f04d99e5494e74f951c9d9cebbdf"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-debug/libvoid_cache_identity.a": {
+      "bytes": 24794,
+      "sha256": "c2229a7062330da6081b6444bf571655c309bb0c907078975a28c219dc7d673b"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-strict/voidc": {
+      "bytes": 184391112,
+      "sha256": "c99a806d4b2d5d3908033bfa2e498be50987a25ec7fe4b93d2ace2579c38686d"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-strict/libvoid_llvm.a": {
+      "bytes": 15695356,
+      "sha256": "f5a17ad1407b36bfe41c3c6711046a19395dbe66e5cd1ee104670a6f85fc5bc2"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-strict/libvoid_cache_identity.a": {
+      "bytes": 24476,
+      "sha256": "f4d5ce3942976d108965d9d462f44056d48e6a9e665eb46632bc7ca28b163bad"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/voidc": {
+      "bytes": 76087224,
+      "sha256": "e3ebf34d2c62bb38b7d986c4da4b828dcefe7ba0cd3ed8255f47023f439c5800"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/libvoid_llvm.a": {
+      "bytes": 1631654,
+      "sha256": "f6d46807beb39e2120c2aa4120af6d7e6a66aee6521e0c65ec414ac99b4ec9d3"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/libvoid_cache_identity.a": {
+      "bytes": 1596,
+      "sha256": "e9bfd98ef613319081a93c35710545388c83a9b7eccd008935f857d2d3380173"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-debug/voidc": {
+      "bytes": 124052568,
+      "sha256": "75f57b481cb419d40da5fdf5dc75376a54268287db8fe57f8a3f789c571f51c6"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-debug/libvoid_llvm.a": {
+      "bytes": 24802498,
+      "sha256": "953a26451c59b22be1b1a83f2e31432cce34d71099ef0a391be14ad4fd1c86b5"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-debug/libvoid_cache_identity.a": {
+      "bytes": 24794,
+      "sha256": "0459eb6e9522a681a1a9225ddb3d50302a90126b09950aa62b873ec946a37326"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-strict/voidc": {
+      "bytes": 184391392,
+      "sha256": "a63421c26f402274ba7757e94561bbd8788bdabe832dbf8c1f63c77ac0cc4638"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-strict/libvoid_llvm.a": {
+      "bytes": 15695788,
+      "sha256": "d98127344a194886ed9588998107fe8ee475b38df8e615d63fbf7706f5de460f"
+    },
+    "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-strict/libvoid_cache_identity.a": {
+      "bytes": 24476,
+      "sha256": "b729e6cec9d6055a763c3e688879ba0abbb67286a931719a9ce5d167c3b93e18"
+    }
+  },
+  "prior_tracked_tests_unchanged": true,
+  "protected_readme_unchanged": true,
+  "json_harness_new_receipts": 6
+}

@@ -1,0 +1,226 @@
+{
+  "guarded": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 8984,
+        "candidate": 8984
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 8928,
+        "candidate": 9608
+      },
+      "identical": false
+    }
+  },
+  "conditional": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 8864,
+        "candidate": 8864
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 8880,
+        "candidate": 9560
+      },
+      "identical": false
+    }
+  },
+  "bidirectional": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 8856,
+        "candidate": 8856
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 8872,
+        "candidate": 8872
+      },
+      "identical": true
+    }
+  },
+  "f32_streams": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 9176,
+        "candidate": 9176
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 9240,
+        "candidate": 9240
+      },
+      "identical": true
+    }
+  },
+  "dependent_f64": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 8712,
+        "candidate": 8712
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 8912,
+        "candidate": 8912
+      },
+      "identical": true
+    }
+  },
+  "checked_i32": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1899064,
+        "candidate": 1899064
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1897472,
+        "candidate": 1897472
+      },
+      "identical": true
+    }
+  },
+  "checked_f32": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1899168,
+        "candidate": 1899168
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1897552,
+        "candidate": 1897552
+      },
+      "identical": true
+    }
+  },
+  "fixed_i32": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1902160,
+        "candidate": 1902160
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1899168,
+        "candidate": 1899168
+      },
+      "identical": true
+    }
+  },
+  "text": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1882880,
+        "candidate": 1882880
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1881928,
+        "candidate": 1881928
+      },
+      "identical": true
+    }
+  },
+  "managed": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1943160,
+        "candidate": 1943160
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1938160,
+        "candidate": 1938160
+      },
+      "identical": true
+    }
+  },
+  "collections_2m": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1899888,
+        "candidate": 1899888
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1898576,
+        "candidate": 1898576
+      },
+      "identical": true
+    }
+  },
+  "json_typed": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 3051304,
+        "candidate": 3051304
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 2945528,
+        "candidate": 2945504
+      },
+      "identical": false
+    }
+  },
+  "json_validated": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 2654384,
+        "candidate": 2654384
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 2583336,
+        "candidate": 2583304
+      },
+      "identical": false
+    }
+  },
+  "collections_small": {
+    "False": {
+      "executable_bytes": {
+        "baseline": 1906648,
+        "candidate": 1906648
+      },
+      "identical": true
+    },
+    "True": {
+      "executable_bytes": {
+        "baseline": 1905064,
+        "candidate": 1905064
+      },
+      "identical": true
+    }
+  }
+}

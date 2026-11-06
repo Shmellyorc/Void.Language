@@ -1,0 +1,90 @@
+{
+  "baseline_commit": "83036facdf74c5a1eee6f475b6cfe110f4752f27",
+  "retained_scope": "Native AOT standard O2 receives its existing generic TargetMachine; JIT remains null-target. SLP off; normal compilation unchanged.",
+  "production_file_count": 1,
+  "approved_source_files": [
+    {
+      "path": "src/backend/llvm/backend.cpp",
+      "bytes": 215900,
+      "sha256": "9725476c2c4001bf3a4d1d775b00893f6d7b5e60f7517839c8f51aa3abfc9525",
+      "git_blob_oid": "4978d89aba527d62f52b3047ae340b9b385e9c4d",
+      "basis": "AOT-only candidate final-identity.json"
+    },
+    {
+      "path": "tests/cache/tests.cpp",
+      "bytes": 8188,
+      "sha256": "f6f4f83d2c38154a98c07b45470f673a8b1858a5fa92062d49b96bd056a14f5c",
+      "git_blob_oid": "88d42e84173ab1c8a0dc3162cf964792036f7e5d",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/tests.cpp",
+      "bytes": 13151,
+      "sha256": "f726c186bb6f976059be03d08e052a3dc55ccabccfaf223e7e236b1aaabe86b9",
+      "git_blob_oid": "12efb048176e21ce981f6c275d4cbfb9cab00295",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/automatic_simd/guarded-range-i32.void",
+      "bytes": 144,
+      "sha256": "ceb45840951145aa5987774d884cf318fd05e0dcbf1b2e990cb417aeee46f34c",
+      "git_blob_oid": "2869e580532cda28b242cae2b5e07391ce0e0682",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/automatic_simd/alias-dependent.void",
+      "bytes": 220,
+      "sha256": "7fd5f61888e634c1890e51be8668604a86905f2e59150d8475380b98374e30f9",
+      "git_blob_oid": "5c61653cf86fe4a737ff6ccab67803ca1d300556",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/automatic_simd/failure-order.void",
+      "bytes": 92,
+      "sha256": "0b1287f552523f2b69b432cbbf8f3d40e40273d40bc9d1fda9373c8d4e5e06b0",
+      "git_blob_oid": "e25cd9ee83be893ceb33fc2d71423f31d83467d2",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/programs/simd_numeric_edges.void",
+      "bytes": 514,
+      "sha256": "0642ec76869f708ee3cdda81b1f37162192192c5c692667bf56f2084d0b4c07d",
+      "git_blob_oid": "0b063001df16e2c57c5555b6cfc06ce64dc18ddc",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/programs/simd_independent_f32.void",
+      "bytes": 342,
+      "sha256": "1cbe382a6d20974695da4a6133d767c31ea4547915273dba1d7ece270114a4c7",
+      "git_blob_oid": "1ed498d532546d1e5c2b025190dca29a30f74ead",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    },
+    {
+      "path": "tests/numeric/programs/simd_dependent_f64.void",
+      "bytes": 158,
+      "sha256": "72b2d6201353705ba0a286266104bfea4da8540f5a7162fdfed31e916d35758e",
+      "git_blob_oid": "955cd0c2d552f2e085ef4acba5893b7e9da3dc77",
+      "basis": "Prior qualification reversion.json final_source_hashes"
+    }
+  ],
+  "jit_region_sha256": "e56a3da1e6d509421aa4fb1efe7ba05c27ec4224a9a85d3138dc2422d727caa0",
+  "jit_region_byte_identical_to_baseline": true,
+  "native_machine_factory_byte_identical_to_baseline": true,
+  "unchanged_baseline_files": {
+    "src/backend/llvm/target.hpp": "c0e6b3d988d47c530f7efb51c0e6cbcb956994d0e83cfab03bc57f8ca0a3179a",
+    "src/backend/llvm/native_cache.cpp": "89074f43ea6efa50639e2740b578035d4f8d557b2f9ad63008a3a57c2c0a9085",
+    "src/backend/llvm/native_cache.hpp": "3756e700ac36d641a27bb45b4677c62b42433de58565c7d6231545c9e14378e6",
+    "src/frontend/compiler.cpp": "d9c37ed1ec3214d4483b9dd68c3e5c6341251db9bc4f0dbbd7cedf33f06131ac",
+    "src/runtime/array.cpp": "533f1474c77c97e4e9885af690ae5aae1d15fa61c6b9976077e801299fefebb1",
+    "src/runtime/fixed_abi.cpp": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4",
+    "src/runtime/buffer.cpp": "c69a37995fe77aace3174b5626b7797b8405e28440f8ca13e5078f8edf55acf5",
+    "src/runtime/coordination.cpp": "7be0f8cf1aa00b411c3c693d3e88a861612b4547132882849d1274127f69e732",
+    "include/void/backend.hpp": "49ae39c9e6e1232ca8470ea3cd85f1848ac09dff4d358049134da64fd5daaee2",
+    "cmake/CacheBuildIdentity.cmake": "18e9644260a361590c91e9224327a9cdd0ad49135f31b63beb91a9a699ced528",
+    "CMakeLists.txt": "f1522c2dd03352b082152f2b08942a0ac84cf3528d96b47c0f70e26047942c10",
+    ".github/workflows/ci-link-experiment.yml": "f69ffda09d7f67fde574148f7804fde26e5f1fe20cf162cddbfd5ae4254c6731",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+  },
+  "cache_policy": "No logical key/schema/target/pipeline revision. Preserve existing whole-compiler archive fingerprinting; different compiler builds still receive different normal build identities.",
+  "validation": "Static review and recorded evidence/hash verification only; no new compiler run, test or performance experiment."
+}

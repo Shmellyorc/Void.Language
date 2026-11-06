@@ -1,0 +1,14 @@
+func recur32(n: i32) -> f32:
+    var value: f32 = 0.125
+    for i in 0..<n:
+        value = value * 1.0000001 + 0.125
+    return value
+func recur64(n: i32) -> f64:
+    var value: f64 = 0.125
+    for i in 0..<n:
+        value = value * 1.0000001 + 0.125
+    return value
+func entry(n: i32) -> i32:
+    if recur32(n) <= 0.0 or recur64(n) <= 0.0:
+        return 2
+    return 1

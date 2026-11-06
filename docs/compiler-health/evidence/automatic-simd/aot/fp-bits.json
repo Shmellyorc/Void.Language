@@ -1,0 +1,352 @@
+[
+  {
+    "cpu_ms": 20.413999999999998,
+    "tag": "baseline/False/emit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-release/voidc",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.void",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.o",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "Wrote native source object: /home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.o\n",
+    "stderr": "",
+    "wall_ms": 21.419394004624337,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 3.406000000000002,
+    "tag": "baseline/False/symbols",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-nm",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.o"
+    ],
+    "status": 0,
+    "stdout": "0000000000000000 r .LCPI0_0\n0000000000000004 r .LCPI0_1\n0000000000000000 r .LCPI1_0\n0000000000000008 r .LCPI1_1\n0000000000000000 r .L__unnamed_1\n00000000000000cf r .L__unnamed_2\n00000000000001e2 r .L__unnamed_3\n00000000000001e5 r .L__unnamed_4\n0000000000000210 r .L__unnamed_5\n0000000000000212 r .L__unnamed_6\n00000000000001b4 r .L__unnamed_7\n0000000000000160 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a656e747279__void\n0000000000000000 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void\n00000000000000b0 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void\n0000000000000008 R __vd_type_count__void\n0000000000000008 R __vd_types__void\n0000000000000010 R __vd_witness_count__void\n0000000000000010 R __vd_witnesses__void\n                 U fprintf\n0000000000000220 T main\n                 U printf\n                 U puts\n                 U stderr\n                 U strtoll\n",
+    "stderr": "",
+    "wall_ms": 4.108306020498276,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 5.192999999999998,
+    "tag": "baseline/False/test-symbol-aliases",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objcopy",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void=void_recur32",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void=void_recur64",
+      "--redefine-sym",
+      "main=void_generated_main",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.renamed.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 18.400266009848565,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 1258.3580000000002,
+    "tag": "baseline/False/independent-link",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-ffp-contract=off",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.cpp",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.renamed.o",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.bin"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 1268.2748949737288,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 17.46099999999981,
+    "tag": "baseline/False/execute",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-False.bin"
+    ],
+    "status": 0,
+    "stdout": "-129,41820042,41820042,40304006de782e42,40304006de782e42\n-17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n0,3e000000,3e000000,3fc0000000000000,3fc0000000000000\n1,3e800000,3e800000,3fd000000d6bf94e,3fd000000d6bf94e\n17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n129,41820042,41820042,40304006de782e42,40304006de782e42\n1025,43004202,43004202,40600835d8a84b60,40600835d8a84b60\n1000000,480199f7,480199f7,41000c3e3b0f28c8,41000c3e3b0f28c8\n",
+    "stderr": "",
+    "wall_ms": 18.193721014540642,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 26.73800000000004,
+    "tag": "baseline/True/emit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-release/voidc",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.void",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.o"
+    ],
+    "status": 0,
+    "stdout": "Wrote native source object: /home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.o\n",
+    "stderr": "",
+    "wall_ms": 27.6642789831385,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 3.429000000000154,
+    "tag": "baseline/True/symbols",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-nm",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.o"
+    ],
+    "status": 0,
+    "stdout": "0000000000000000 r .LCPI0_0\n0000000000000004 r .LCPI0_1\n0000000000000000 r .LCPI1_0\n0000000000000008 r .LCPI1_1\n0000000000000008 r .LCPI2_0\n000000000000000c r .LCPI2_1\n0000000000000010 r .LCPI2_2\n0000000000000018 r .LCPI2_3\n0000000000000010 r .LCPI3_0\n0000000000000014 r .LCPI3_1\n0000000000000020 r .LCPI3_2\n0000000000000028 r .LCPI3_3\n0000000000000000 r .L__unnamed_1\n0000000000000128 r .L__unnamed_2\n00000000000000cf r .L__unnamed_3\n00000000000000fd r .L__unnamed_4\n0000000000000080 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a656e747279__void\n0000000000000000 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void\n0000000000000040 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void\n0000000000000000 R __vd_type_count__void\n0000000000000000 R __vd_types__void\n0000000000000008 R __vd_witness_count__void\n0000000000000008 R __vd_witnesses__void\n                 U fputc\n                 U fputs\n                 U fwrite\n0000000000000140 T main\n                 U memset\n                 U printf\n                 U puts\n                 U stderr\n                 U strtoll\n",
+    "stderr": "",
+    "wall_ms": 4.0932270349003375,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 3.2660000000000466,
+    "tag": "baseline/True/test-symbol-aliases",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objcopy",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void=void_recur32",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void=void_recur64",
+      "--redefine-sym",
+      "main=void_generated_main",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.renamed.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 4.098656994756311,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 1261.244,
+    "tag": "baseline/True/independent-link",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-ffp-contract=off",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.cpp",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.renamed.o",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 1266.1157569964416,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 12.999000000000205,
+    "tag": "baseline/True/execute",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-baseline-True.bin"
+    ],
+    "status": 0,
+    "stdout": "-129,41820042,41820042,40304006de782e42,40304006de782e42\n-17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n0,3e000000,3e000000,3fc0000000000000,3fc0000000000000\n1,3e800000,3e800000,3fd000000d6bf94e,3fd000000d6bf94e\n17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n129,41820042,41820042,40304006de782e42,40304006de782e42\n1025,43004202,43004202,40600835d8a84b60,40600835d8a84b60\n1000000,480199f7,480199f7,41000c3e3b0f28c8,41000c3e3b0f28c8\n",
+    "stderr": "",
+    "wall_ms": 14.103225024882704,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 18.822000000000283,
+    "tag": "candidate/False/emit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/voidc",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.void",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.o",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "Wrote native source object: /home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.o\n",
+    "stderr": "",
+    "wall_ms": 19.68597201630473,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 3.3599999999998076,
+    "tag": "candidate/False/symbols",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-nm",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.o"
+    ],
+    "status": 0,
+    "stdout": "0000000000000000 r .LCPI0_0\n0000000000000004 r .LCPI0_1\n0000000000000000 r .LCPI1_0\n0000000000000008 r .LCPI1_1\n0000000000000000 r .L__unnamed_1\n00000000000000cf r .L__unnamed_2\n00000000000001e2 r .L__unnamed_3\n00000000000001e5 r .L__unnamed_4\n0000000000000210 r .L__unnamed_5\n0000000000000212 r .L__unnamed_6\n00000000000001b4 r .L__unnamed_7\n0000000000000160 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a656e747279__void\n0000000000000000 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void\n00000000000000b0 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void\n0000000000000008 R __vd_type_count__void\n0000000000000008 R __vd_types__void\n0000000000000010 R __vd_witness_count__void\n0000000000000010 R __vd_witnesses__void\n                 U fprintf\n0000000000000220 T main\n                 U printf\n                 U puts\n                 U stderr\n                 U strtoll\n",
+    "stderr": "",
+    "wall_ms": 4.024369001854211,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 2.9870000000001284,
+    "tag": "candidate/False/test-symbol-aliases",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objcopy",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void=void_recur32",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void=void_recur64",
+      "--redefine-sym",
+      "main=void_generated_main",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.renamed.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 3.6083569866605103,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 1263.398,
+    "tag": "candidate/False/independent-link",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-ffp-contract=off",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.cpp",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.renamed.o",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.bin"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 1268.2620709529147,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 17.564999999999888,
+    "tag": "candidate/False/execute",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-False.bin"
+    ],
+    "status": 0,
+    "stdout": "-129,41820042,41820042,40304006de782e42,40304006de782e42\n-17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n0,3e000000,3e000000,3fc0000000000000,3fc0000000000000\n1,3e800000,3e800000,3fd000000d6bf94e,3fd000000d6bf94e\n17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n129,41820042,41820042,40304006de782e42,40304006de782e42\n1025,43004202,43004202,40600835d8a84b60,40600835d8a84b60\n1000000,480199f7,480199f7,41000c3e3b0f28c8,41000c3e3b0f28c8\n",
+    "stderr": "",
+    "wall_ms": 18.3973090024665,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 25.252000000000663,
+    "tag": "candidate/True/emit",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/voidc",
+      "emit",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.void",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.o"
+    ],
+    "status": 0,
+    "stdout": "Wrote native source object: /home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.o\n",
+    "stderr": "",
+    "wall_ms": 26.199972024187446,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 3.559999999999952,
+    "tag": "candidate/True/symbols",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-nm",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.o"
+    ],
+    "status": 0,
+    "stdout": "0000000000000000 r .LCPI0_0\n0000000000000004 r .LCPI0_1\n0000000000000000 r .LCPI1_0\n0000000000000008 r .LCPI1_1\n0000000000000008 r .LCPI2_0\n000000000000000c r .LCPI2_1\n0000000000000010 r .LCPI2_2\n0000000000000018 r .LCPI2_3\n0000000000000010 r .LCPI3_0\n0000000000000014 r .LCPI3_1\n0000000000000020 r .LCPI3_2\n0000000000000028 r .LCPI3_3\n0000000000000000 r .L__unnamed_1\n0000000000000128 r .L__unnamed_2\n00000000000000cf r .L__unnamed_3\n00000000000000fd r .L__unnamed_4\n0000000000000080 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a656e747279__void\n0000000000000000 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void\n0000000000000040 T __vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void\n0000000000000000 R __vd_type_count__void\n0000000000000000 R __vd_types__void\n0000000000000008 R __vd_witness_count__void\n0000000000000008 R __vd_witnesses__void\n                 U fputc\n                 U fputs\n                 U fwrite\n0000000000000140 T main\n                 U memset\n                 U printf\n                 U puts\n                 U stderr\n                 U strtoll\n",
+    "stderr": "",
+    "wall_ms": 4.44466999033466,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 3.058000000000005,
+    "tag": "candidate/True/test-symbol-aliases",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objcopy",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723332__void=void_recur32",
+      "--redefine-sym",
+      "__vd_2f66702d6269742d6f7261636c652e766f69643a3a72656375723634__void=void_recur64",
+      "--redefine-sym",
+      "main=void_generated_main",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.renamed.o"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 3.808973007835448,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 1284.1290000000004,
+    "tag": "candidate/True/independent-link",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-ffp-contract=off",
+      "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bit-oracle.cpp",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.renamed.o",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_ms": 1291.093292995356,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  },
+  {
+    "cpu_ms": 12.858999999999842,
+    "tag": "candidate/True/execute",
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/fp-bits-candidate-True.bin"
+    ],
+    "status": 0,
+    "stdout": "-129,41820042,41820042,40304006de782e42,40304006de782e42\n-17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n0,3e000000,3e000000,3fc0000000000000,3fc0000000000000\n1,3e800000,3e800000,3fd000000d6bf94e,3fd000000d6bf94e\n17,4010000a,4010000a,4002000100b108e4,4002000100b108e4\n129,41820042,41820042,40304006de782e42,40304006de782e42\n1025,43004202,43004202,40600835d8a84b60,40600835d8a84b60\n1000000,480199f7,480199f7,41000c3e3b0f28c8,41000c3e3b0f28c8\n",
+    "stderr": "",
+    "wall_ms": 13.684566016308963,
+    "stack_soft_hard": 1048576,
+    "cpu_affinity": null
+  }
+]

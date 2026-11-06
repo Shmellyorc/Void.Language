@@ -1,0 +1,5 @@
+func entry(n: i32) -> i32:
+    var sum: i32 = 0
+    for i in 0..<n:
+        sum += i % 127
+    return sum

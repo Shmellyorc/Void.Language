@@ -1,0 +1,18 @@
+{
+  "backend_restored_byte_identical_to_83036fac": true,
+  "baseline_backend_sha256": "dd67d152fe28f025499f56cced2b0c39187bfdf80a47aa1e87c31e408c53b39d",
+  "candidate_backend_sha256": "40bd1295a55226e01482611cfa9e2e255c9862bbc13004c5d9d7d3b1903eed32",
+  "candidate_patch_sha256": "e9f71a5a674881b686b2de0fdca44ac0131ea90104e07cae14320ad9212f3d8c",
+  "reason": "User performance stop condition: default O2 CLI cold execution regressed from 28.574 to 36.542 ms (n=17), and 29.812 to 39.841 ms (n=1000000).",
+  "recommendation": "REVISE",
+  "final_source_hashes": {
+    "tests/numeric/tests.cpp": "f726c186bb6f976059be03d08e052a3dc55ccabccfaf223e7e236b1aaabe86b9",
+    "tests/cache/tests.cpp": "f6f4f83d2c38154a98c07b45470f673a8b1858a5fa92062d49b96bd056a14f5c",
+    "tests/numeric/automatic_simd/alias-dependent.void": "7fd5f61888e634c1890e51be8668604a86905f2e59150d8475380b98374e30f9",
+    "tests/numeric/automatic_simd/failure-order.void": "0b1287f552523f2b69b432cbbf8f3d40e40273d40bc9d1fda9373c8d4e5e06b0",
+    "tests/numeric/automatic_simd/guarded-range-i32.void": "ceb45840951145aa5987774d884cf318fd05e0dcbf1b2e990cb417aeee46f34c",
+    "tests/numeric/programs/simd_dependent_f64.void": "72b2d6201353705ba0a286266104bfea4da8540f5a7162fdfed31e916d35758e",
+    "tests/numeric/programs/simd_independent_f32.void": "1cbe382a6d20974695da4a6133d767c31ea4547915273dba1d7ece270114a4c7",
+    "tests/numeric/programs/simd_numeric_edges.void": "0642ec76869f708ee3cdda81b1f37162192192c5c692667bf56f2084d0b4c07d"
+  }
+}

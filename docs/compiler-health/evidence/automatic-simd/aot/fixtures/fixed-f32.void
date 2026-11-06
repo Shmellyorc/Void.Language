@@ -1,0 +1,14 @@
+func entry(n: i32) -> i32:
+    var a: [f32, 8193]
+    var b: [f32, 8193]
+    var out: [f32, 8193]
+    for i in 0..n:
+        a[i] = (i % 31) as f32
+        b[i] = (i % 7) as f32
+    for i in 1..n:
+        out[i] = a[i] * 3 + b[i]
+    for i in 1..n:
+        var expected: f32 = ((i % 31) as f32) * 3 + ((i % 7) as f32)
+        if out[i] != expected:
+            return 2
+    return 1

@@ -92,6 +92,13 @@ remains distinct. `evidence/llvm23-standard-O2-pipeline.txt` captures the actual
 23.1.4 default recipe (SLP remains off in this direct-builder configuration).
 ORC resource trackers and generation leases are retained.
 
+**6 November 2026 follow-up:** that paragraph records the migration checkpoint.
+The [retained AOT-only SIMD repair](../compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md)
+now passes the existing native AOT TargetMachine to standard O2. JIT keeps null-target
+analysis and its original ORC/cache policy; SLP remains off in both. The
+[global JIT+AOT experiment](../compiler-health/AUTOMATIC_SIMD_QUALIFICATION.md)
+was rejected and reverted. Native cross-platform qualification is pending Boss CI.
+
 The native manifest producer/consumer and fake Windows test driver require
 `VOID native 23.1.4 v1` / matching tool versions. Existing cache identity already
 hashes the LLVM version and linked compiler/LLVM libraries; no second cache or

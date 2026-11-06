@@ -1,0 +1,67 @@
+[
+  {
+    "case": "dependent-f64.void",
+    "status": 1,
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/dependent-f64.void:5:26: error: Expected end of statement, found '1'.\n    code: VOID1101\n\n 5 |     return if sum > 0.0: 1 else: 2\n   |                          ^\n    Module: /dependent-f64.void\n    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.\n\n"
+  },
+  {
+    "case": "dynamic-f32.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "dynamic-f64.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "dynamic-i32.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "dynamic-i64.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "dynamic-u8.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "fixed-f32.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "fixed-f64.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "fixed-i32.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "fixed-i64.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "fixed-u8.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "reduction-i32.void",
+    "status": 0,
+    "stderr": ""
+  },
+  {
+    "case": "slp-f32.void",
+    "status": 0,
+    "stderr": ""
+  }
+]

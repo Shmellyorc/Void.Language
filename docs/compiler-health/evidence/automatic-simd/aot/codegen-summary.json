@@ -1,0 +1,362 @@
+{
+  "alias-dependent": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 13104,
+        "candidate": 13104
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 9760,
+        "candidate": 9760
+      }
+    }
+  },
+  "dependent-f64": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 4720,
+        "candidate": 4720
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 4616,
+        "candidate": 4616
+      }
+    }
+  },
+  "dynamic-f32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 15136,
+        "candidate": 15136
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 13024,
+        "candidate": 13024
+      }
+    }
+  },
+  "dynamic-f64": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 15128,
+        "candidate": 15128
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 13040,
+        "candidate": 13040
+      }
+    }
+  },
+  "dynamic-i32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 14872,
+        "candidate": 14872
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 12776,
+        "candidate": 12776
+      }
+    }
+  },
+  "dynamic-i64": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 16616,
+        "candidate": 16616
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 12784,
+        "candidate": 12784
+      }
+    }
+  },
+  "dynamic-u8": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 16448,
+        "candidate": 16448
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 14296,
+        "candidate": 14296
+      }
+    }
+  },
+  "edge": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 5536,
+        "candidate": 5536
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": false,
+      "aot_bytes": {
+        "baseline": 4648,
+        "candidate": 4696
+      }
+    }
+  },
+  "failure-order": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 8672,
+        "candidate": 8672
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 6464,
+        "candidate": 6464
+      }
+    }
+  },
+  "fixed-f32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 23352,
+        "candidate": 23352
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 15360,
+        "candidate": 15360
+      }
+    }
+  },
+  "fixed-f64": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 23344,
+        "candidate": 23344
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 15360,
+        "candidate": 15360
+      }
+    }
+  },
+  "fixed-i32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 23056,
+        "candidate": 23056
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 15048,
+        "candidate": 15048
+      }
+    }
+  },
+  "fixed-i64": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 24840,
+        "candidate": 24840
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 15048,
+        "candidate": 15048
+      }
+    }
+  },
+  "fixed-u8": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 24568,
+        "candidate": 24568
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 16528,
+        "candidate": 16528
+      }
+    }
+  },
+  "guarded-range-i32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 4792,
+        "candidate": 4792
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": false,
+      "aot_bytes": {
+        "baseline": 4312,
+        "candidate": 5576
+      }
+    }
+  },
+  "reduction-i32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 4672,
+        "candidate": 4672
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 4264,
+        "candidate": 4264
+      }
+    }
+  },
+  "slp-f32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 5464,
+        "candidate": 5464
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 5736,
+        "candidate": 5736
+      }
+    }
+  },
+  "while-i32": {
+    "False": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": true,
+      "aot_bytes": {
+        "baseline": 4672,
+        "candidate": 4672
+      }
+    },
+    "True": {
+      "jit_identical": true,
+      "jit_ir_identical": true,
+      "aot_identical": false,
+      "aot_bytes": {
+        "baseline": 4264,
+        "candidate": 5528
+      }
+    }
+  }
+}

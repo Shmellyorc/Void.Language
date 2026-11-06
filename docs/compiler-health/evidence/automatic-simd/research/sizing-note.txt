@@ -1,0 +1,3 @@
+Initial fixed f32/f64 cases use 8193 elements. Fixed f64 baseline had already loaded original bytes when sizing was narrowed, so original source restored before other variants. Inspected pre-IR confirms 8193. Remaining fixed u8/i32/i64 narrowed to 1025 before their first load. All use n=1024 in screen. Preserve and verify exact IR extent per variant; no mixed-size timing comparison.
+
+Final IR inspection proved original fixed-f64 baseline was extent8193 and other three were1025. Exclude that original comparison. Repeated all4 extent1025 to new fixed-f64-matched prefixes; original artifacts preserved.

@@ -1,0 +1,22 @@
+use json as json
+func run() -> result<i32, json.error>:
+    print(json.parse("\"\\u0000\"")?.as_string()? == "\u{0}")
+    print(json.parse("\"\\u001f\"")?.as_string()? == "\u{1f}")
+    print(json.parse("\"\\u0020\"")?.as_string()? == " ")
+    print(json.parse("\"\\u007f\"")?.as_string()? == "\u{7f}")
+    print(json.parse("\"\\u0080\"")?.as_string()? == "")
+    print(json.parse("\"\\u07ff\"")?.as_string()? == "߿")
+    print(json.parse("\"\\u0800\"")?.as_string()? == "ࠀ")
+    print(json.parse("\"\\ud7ff\"")?.as_string()? == "퟿")
+    print(json.parse("\"\\ue000\"")?.as_string()? == "")
+    print(json.parse("\"\\uffff\"")?.as_string()? == "￿")
+    print(json.parse("\"\\ud800\\udc00\"")?.as_string()? == "𐀀")
+    print(json.parse("\"\\udbff\\udfff\"")?.as_string()? == "􏿿")
+    if json.parse("\"\\ud800\"") is Err(var failure):
+        print("invalid-high")
+    if json.parse("\"\\udc00\"") is Err(var failure):
+        print("invalid-low")
+    return Ok(0)
+func main():
+    if run() is Err(var failure):
+        print("unexpected error")

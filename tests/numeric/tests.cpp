@@ -2,6 +2,7 @@
 #include "void/backend.hpp"
 #include "void/numeric.hpp"
 #include <fstream>
+#include <bit>
 #include <algorithm>
 #include <iostream>
 #include <stdexcept>
@@ -22,6 +23,76 @@ void reject(const std::string& text, vd::DiagnosticCode expected) {
 void numeric_tests(const std::filesystem::path& root) {
     using C = vd::DiagnosticCode;
     vd::Jit jit;
+    // Target-aware O2 may vectorize the guarded loop, but wrapping sums,
+    // scalar tails and the existing bidirectional range contract must agree.
+    auto guarded = vd::read_source(root / "tests/numeric/automatic_simd/guarded-range-i32.void").text();
+    guarded.replace(guarded.find("func entry"), 10, "func guarded");
+    const auto range = vd::compile_source({"numeric-simd-ranges.void", guarded + R"(func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for i in 0..<n:
+        total += i % 127
+    return total + guarded(n)
+)"});
+    for (bool optimized : {false, true}) {
+        auto code = jit.compile(range, "entry", optimized);
+        for (int n : {-1025, -129, -17, -1, 0, 1, 2, 17, 127, 128, 129, 1025, 1000000}) {
+            std::uint32_t expected = 0;
+            for (int i = 0; i != n; i += n > 0 ? 1 : -1)
+                expected += static_cast<std::uint32_t>(i % 127);
+            if (n > 0) expected += expected;
+            require(static_cast<std::uint32_t>(code->invoke(n)) == expected,
+                    "target-aware range sum/direction/tail mismatch at " + std::to_string(n));
+        }
+    }
+    const auto alias_dependency = vd::compile_project(root / "tests/numeric/automatic_simd/alias-dependent.void").module;
+    for (bool optimized : {false, true})
+        require(jit.compile(alias_dependency, "entry", optimized)->invoke(1) == 1,
+                "target-aware checked-array alias dependency changed");
+    const auto ordered_failure = vd::compile_project(root / "tests/numeric/automatic_simd/failure-order.void").module;
+    for (bool optimized : {false, true}) {
+        auto code = jit.compile(ordered_failure, "entry", optimized);
+        bool failed = false;
+        try { code->invoke(1); }
+        catch (const std::runtime_error& failure) {
+            const std::string message = failure.what();
+            failed = message.find("Fixed array index outside extent") != std::string::npos &&
+                     message.find("Division by zero") == std::string::npos;
+        }
+        require(failed, "target-aware O2 changed checked-array first-failure order");
+    }
+    // Read dependent FP result bits through the existing private typed IR ABI.
+    // Volatile intermediates in the oracle preserve each rounding step.
+    auto recurrence = vd::compile_source({"numeric-simd-rounding.void", R"(func recur(n: i32) -> f32:
+    var value: f32 = 0.125
+    for i in 0..<n:
+        value = value * 1.0000001 + 0.125
+    return value
+)"});
+    vd::ir::Function probe;
+    probe.name = recurrence.identity + "::rounding_probe";
+    probe.module_identity = recurrence.identity;
+    probe.source_name = "rounding_probe";
+    probe.source = recurrence.functions.front().source;
+    vd::ir::Instruction argument{vd::ir::Op::argument};
+    vd::ir::Instruction call{vd::ir::Op::call};
+    call.callee = recurrence.functions.front().name;
+    call.arguments = {0};
+    vd::ir::Instruction bits{vd::ir::Op::bitcast, 1};
+    bits.type = vd::ir::Type::i32;
+    probe.blocks = {{{argument, call, bits}, {vd::ir::Terminator::Kind::return_value, 2}}};
+    recurrence.functions.push_back(probe);
+    for (bool optimized : {false, true}) {
+        auto code = jit.compile(recurrence, "rounding_probe", optimized);
+        for (int n : {0, 1, 17, 129, 1025}) {
+            volatile float expected = 0.125f;
+            for (int i = 0; i < n; ++i) {
+                volatile float product = expected * 1.0000001f;
+                expected = product + 0.125f;
+            }
+            require(static_cast<std::uint32_t>(code->invoke(n)) == std::bit_cast<std::uint32_t>(float(expected)),
+                    "target-aware dependent f32 rounding mismatch");
+        }
+    }
     unsigned executions = 0;
     for (const auto& item : std::filesystem::directory_iterator(root / "tests/numeric/programs")) {
         if (item.path().extension() != ".void") continue;

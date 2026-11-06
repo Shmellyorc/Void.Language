@@ -1,0 +1,15 @@
+func entry(n: i32) -> i32:
+    var a: [i64] = []
+    var b: [i64] = []
+    var out: [i64] = []
+    for i in 0..n:
+        a.push((i % 31) as i64)
+        b.push((i % 7) as i64)
+        out.push(0)
+    for i in 1..n:
+        out[i] = a[i] * 3 + b[i]
+    for i in 1..n:
+        var expected: i64 = ((i % 31) as i64) * 3 + ((i % 7) as i64)
+        if out[i] != expected:
+            return 2
+    return 1

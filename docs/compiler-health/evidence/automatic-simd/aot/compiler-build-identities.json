@@ -1,0 +1,30 @@
+[
+  {
+    "label": "baseline",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-std=c++20",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-identity.cpp",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-release/libvoid_cache_identity.a",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/baseline-build-identity"
+    ],
+    "status": 0,
+    "compiler_build_identity": "a1f2326913e24ad86371e907003e65b8e18e48db0bebf14d3b4eb5bbe9359c9f"
+  },
+  {
+    "label": "candidate",
+    "args": [
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+      "-std=c++20",
+      "-I/home/shmellyorc/Documents/Void.Language/include",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/build-identity.cpp",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-release/libvoid_cache_identity.a",
+      "-o",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/candidate-build-identity"
+    ],
+    "status": 0,
+    "compiler_build_identity": "e7d3f141583c5fd2c527af8a3f63435c4212b114c754479d39485f48d6deeeaa"
+  }
+]

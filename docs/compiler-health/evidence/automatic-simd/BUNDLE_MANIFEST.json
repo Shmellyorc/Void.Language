@@ -1,0 +1,1001 @@
+{
+  "format": "automatic-simd-curated-text-evidence-v1",
+  "selection": "Existing recorded evidence only; no new experiment or qualification test run. Raw absolute paths inside receipts identify the original producer environment.",
+  "local_archives": {
+    "research": {
+      "path": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk",
+      "manifest_sha256": "7e64641cb83fedda89a70cd70417d86a55d2ee90e774ea1308e502d4b1436753"
+    },
+    "global": {
+      "path": "/home/shmellyorc/.local/state/void-log-performance/simd-qualification",
+      "manifest_sha256": "cd6590cb0c860a652f5b98bd0ee0145875dad61cb47d5903a5129ee289e74b1e"
+    },
+    "aot": {
+      "path": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7",
+      "manifest_sha256": "bee85ac3cd815fdb9d326f4c2cb3a25cac4eb988c54b9cee93b0b2c478067e54"
+    }
+  },
+  "copied_artifacts": [
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/additional-screen-initial.json",
+      "phase": "research",
+      "original_artifact": "additional-screen-initial.json",
+      "bytes": 12184,
+      "sha256": "0f36457ba52565f81c143f264af5eb73959ec5ee2dd042249ca7f225d843ea75"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/additional-screen.json",
+      "phase": "research",
+      "original_artifact": "additional-screen.json",
+      "bytes": 12184,
+      "sha256": "0f36457ba52565f81c143f264af5eb73959ec5ee2dd042249ca7f225d843ea75"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/baseline-equivalence.json",
+      "phase": "research",
+      "original_artifact": "baseline-equivalence.json",
+      "bytes": 207,
+      "sha256": "3c409ff180ecabd14a5e5718a25a7d89d7f8b45e6fc6ea940a613a11afd72ebb"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/corrected-screen.json",
+      "phase": "research",
+      "original_artifact": "corrected-screen.json",
+      "bytes": 1030,
+      "sha256": "22f9d33fe75c8a67796ca05b60fa2601f9639549e511f8e92429f9f60d3ed679"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/final-controls.json",
+      "phase": "research",
+      "original_artifact": "final-controls.json",
+      "bytes": 4164,
+      "sha256": "9e869b735bff41846e961ac77f4173e52cd8b8fa1bc600029e8ac69c5d6fb39e"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/fixtures/dependent-f64.invalid",
+      "phase": "research",
+      "original_artifact": "fixtures/dependent-f64.invalid",
+      "bytes": 145,
+      "sha256": "395ba54986da27287b8f0d15f5e1c62b9c0715bec1c9f676629def192575aa50"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/fixtures/edge.invalid",
+      "phase": "research",
+      "original_artifact": "fixtures/edge.invalid",
+      "bytes": 490,
+      "sha256": "a01581d6665db8234cfd11beed33a1049ba9bfbbed4e89467aa7d65265848157"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/fixtures/failure-order.negative",
+      "phase": "research",
+      "original_artifact": "fixtures/failure-order.negative",
+      "bytes": 92,
+      "sha256": "0b1287f552523f2b69b432cbbf8f3d40e40273d40bc9d1fda9373c8d4e5e06b0"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/fixtures/while-i32.invalid",
+      "phase": "research",
+      "original_artifact": "fixtures/while-i32.invalid",
+      "bytes": 143,
+      "sha256": "6e8379cbbdc6823947da01c5e1d920beb1301821e9a28c25434f3ba4121542c1"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/identity.json",
+      "phase": "research",
+      "original_artifact": "identity.json",
+      "bytes": 917,
+      "sha256": "067966624f6ffb0f1aa5c508ce0eaeb61b7fcff4d6ba3d4571a1ea0215037e20"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/linked-input-identity.json",
+      "phase": "research",
+      "original_artifact": "linked-input-identity.json",
+      "bytes": 1052,
+      "sha256": "1e6c91469befff37e9a6a6af10119cf30cd974d715aee9da6355fa35beeba835"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/manifest.json",
+      "phase": "research",
+      "original_artifact": "manifest.json",
+      "bytes": 71959,
+      "sha256": "7e64641cb83fedda89a70cd70417d86a55d2ee90e774ea1308e502d4b1436753"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/matched-jit.json",
+      "phase": "research",
+      "original_artifact": "matched-jit.json",
+      "bytes": 20950,
+      "sha256": "af0e133c82661cba2922a3cd9fbdd794914e292763fbdc8eef46804408c74eba"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/matched-summary.json",
+      "phase": "research",
+      "original_artifact": "matched-summary.json",
+      "bytes": 9835,
+      "sha256": "9827b68eebbb0fac24b602e6d365d839cd36b0d8bb87cac4b6320d39bf75041c"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/native-controls.csv",
+      "phase": "research",
+      "original_artifact": "native-controls.csv",
+      "bytes": 2925,
+      "sha256": "2673b25b81b5dcc72366dd7a63cdacad66b0dfc3e9a35fb69501ca4a6d5b675e"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/native-run.json",
+      "phase": "research",
+      "original_artifact": "native-run.json",
+      "bytes": 133,
+      "sha256": "f23921d12394ab2db0f1799234cd885245a16f98a8fd8641b863562ee69dcfc0"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/production-recheck.json",
+      "phase": "research",
+      "original_artifact": "production-recheck.json",
+      "bytes": 640,
+      "sha256": "5a1a8443dd70c4b3682ef2ebc1957834332b894b7190742e7422ef88c6296348"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/screen.json",
+      "phase": "research",
+      "original_artifact": "screen.json",
+      "bytes": 8906,
+      "sha256": "ad50d165a027b6a4607282d3279c731a59d3dd8cb17fb55f8df9c1afdeac5687"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/sizing-note.txt",
+      "phase": "research",
+      "original_artifact": "sizing-note.txt",
+      "bytes": 607,
+      "sha256": "cae569f20a12551595eb772434332cac5414d89de60469d4992e1913a3a6495f"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/research/source-checks.json",
+      "phase": "research",
+      "original_artifact": "source-checks.json",
+      "bytes": 1328,
+      "sha256": "5fde830c6dd44912f6e936501a7069d00d8270e665eec9d4f2fd26beea0c41ed"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/cache-invalidation-retry-original.json",
+      "phase": "global",
+      "original_artifact": "cache-invalidation-retry-original.json",
+      "bytes": 331,
+      "sha256": "1d844cfa600b882395dda7e9822267f600a46341b21ce83f4034731d4ac35876"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/cache-invalidation-retry-original.log",
+      "phase": "global",
+      "original_artifact": "cache-invalidation-retry-original.log",
+      "bytes": 620,
+      "sha256": "d2c23c206a60a88325fcef87acbaa37141e1d9fd6718357b8fedfea309ba44e4"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/cache-invalidation.json",
+      "phase": "global",
+      "original_artifact": "cache-invalidation.json",
+      "bytes": 1828,
+      "sha256": "2116b66001b0c866d5f02b5b8b640368e5e7fee30be83d35d6738f595b42333a"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/cli-o2-performance.json",
+      "phase": "global",
+      "original_artifact": "cli-o2-performance.json",
+      "bytes": 16266,
+      "sha256": "54bbd5b925bbe390e8e88809a917e64417d4d6ba4ba90c82de778aaaebf88947"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/general-perf.json",
+      "phase": "global",
+      "original_artifact": "general-perf.json",
+      "bytes": 22297,
+      "sha256": "0529ed3c93b9415b0dffb437371ca558b486bce10a41b24a9770631f5c28c9f3"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/incidents.json",
+      "phase": "global",
+      "original_artifact": "incidents.json",
+      "bytes": 1335,
+      "sha256": "2b1dab28237f5b890fef5faee2232fb358c8f489f0ba907a0a907698bc8e5e45"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/initial-cache-driver-error.txt",
+      "phase": "global",
+      "original_artifact": "initial-cache-driver-error.txt",
+      "bytes": 880,
+      "sha256": "e6747b110a4b2aa99c90db79e254456f1eb8cef1c1f6cabfce49ae16a8acf116"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/manifest.json",
+      "phase": "global",
+      "original_artifact": "manifest.json",
+      "bytes": 98573,
+      "sha256": "cd6590cb0c860a652f5b98bd0ee0145875dad61cb47d5903a5129ee289e74b1e"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/matched-aot-compile.json",
+      "phase": "global",
+      "original_artifact": "matched-aot-compile.json",
+      "bytes": 37875,
+      "sha256": "a8a62c178788eb6091cf8fc745d6eca10188b2825cbee68526086d5b138a5d9d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/matched-production-all.json",
+      "phase": "global",
+      "original_artifact": "matched-production-all.json",
+      "bytes": 45273,
+      "sha256": "aee10ba2fa47aaed3929bdc744030864a6d00452cfdb8d5ee257ecac71a5fa7d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/numeric-corrected.json",
+      "phase": "global",
+      "original_artifact": "numeric-corrected.json",
+      "bytes": 178,
+      "sha256": "29edd3bc125842c647fc1c8ea1ca4d307e83dae740fc92dc170c3d563ac6b374"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/numeric-early.json",
+      "phase": "global",
+      "original_artifact": "numeric-early.json",
+      "bytes": 145,
+      "sha256": "b3420ea9559262d6192926b4212dc27348fb678304d4e0633a8d6c0e55ff1800"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/numeric-final-release.json",
+      "phase": "global",
+      "original_artifact": "numeric-final-release.json",
+      "bytes": 356,
+      "sha256": "c40175eb71c40dee47a87eb5e1d2ee7b57790654d443ed8b2dd0bca54bad6879"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/numeric-final-release.log",
+      "phase": "global",
+      "original_artifact": "numeric-final-release.log",
+      "bytes": 348,
+      "sha256": "8dae348191917a775db58df64077ecf27d7c6934acd7b10d2faaa50644b9cdea"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/numeric-final-release.xml",
+      "phase": "global",
+      "original_artifact": "numeric-final-release.xml",
+      "bytes": 654,
+      "sha256": "c89dc4ad97770b79cf403ab95130c84e5225e0950800396be01992035ab081fa"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/qualification-identity.json",
+      "phase": "global",
+      "original_artifact": "qualification-identity.json",
+      "bytes": 5365,
+      "sha256": "8de3a18cf82c8535407313c550e8befec37aded8c9196419e5948578739691a7"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/reversion.json",
+      "phase": "global",
+      "original_artifact": "reversion.json",
+      "bytes": 1506,
+      "sha256": "e55091b21c93660643768f633a3f570bfd01f259770c5dbad7b21c460d147f3d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/reverted-checks-debug.json",
+      "phase": "global",
+      "original_artifact": "reverted-checks-debug.json",
+      "bytes": 387,
+      "sha256": "0d1b3bbce5d46024c0cbfb9a9b8c4f5ef0363d8d6c20493a3fab32b53a8a812d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/reverted-checks-release.json",
+      "phase": "global",
+      "original_artifact": "reverted-checks-release.json",
+      "bytes": 391,
+      "sha256": "b242f11b4c1d080b31e378486afea3b525935d68214d54fc042b03e4fa66ba9e"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/reverted-checks-strict.json",
+      "phase": "global",
+      "original_artifact": "reverted-checks-strict.json",
+      "bytes": 389,
+      "sha256": "ba586f6743847f02c60fb5284c1e95c79d466e1807e633d8657664fe61dcb42b"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-debug.json",
+      "phase": "global",
+      "original_artifact": "suites-debug.json",
+      "bytes": 1875,
+      "sha256": "980a855cd318536c686bcbd1859d36a6cb3faa8aa962da2623b422297410e484"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-debug.log",
+      "phase": "global",
+      "original_artifact": "suites-debug.log",
+      "bytes": 10585,
+      "sha256": "1725f89e07a10a63567fd78dfafcdcfafd95b26016adf675fabd9ad9eda378e3"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-debug.xml",
+      "phase": "global",
+      "original_artifact": "suites-debug.xml",
+      "bytes": 29775,
+      "sha256": "d6032caec681d1242a44d2359ee616d3438064dddb76a795dff4119dd7bb54bc"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-release.json",
+      "phase": "global",
+      "original_artifact": "suites-release.json",
+      "bytes": 1880,
+      "sha256": "de2d218b77fce0cc7d04b14c38c0c80616bd7ba960aeeb525c1e4c7d3fcb9804"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-release.log",
+      "phase": "global",
+      "original_artifact": "suites-release.log",
+      "bytes": 16550,
+      "sha256": "9168cfd3b6cc8aa44e38aa7e8a77845aeb5820886c7674c5534df0844668b1b2"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-release.xml",
+      "phase": "global",
+      "original_artifact": "suites-release.xml",
+      "bytes": 35984,
+      "sha256": "1863389bbe135ae95dd06ea3a9a9f971d90a84cc8047eb04bab34bb9150fcb77"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-strict.json",
+      "phase": "global",
+      "original_artifact": "suites-strict.json",
+      "bytes": 1877,
+      "sha256": "ae1766fec41b23511e68d8855e6ef85845fc21058b5e152ba3f9d3221cc0ceac"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-strict.log",
+      "phase": "global",
+      "original_artifact": "suites-strict.log",
+      "bytes": 10586,
+      "sha256": "4a0fe26621d659440a0eb0ceb802635c4b13705ef66c59e88de9938706b1ebbf"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/suites-strict.xml",
+      "phase": "global",
+      "original_artifact": "suites-strict.xml",
+      "bytes": 29772,
+      "sha256": "f452fea863333cafface251af3e21d87f44a4421b629767d89cebd9c76b1a5c7"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/global/summary.json",
+      "phase": "global",
+      "original_artifact": "summary.json",
+      "bytes": 19510,
+      "sha256": "85aba39464403fe7e2caecace67d7f2a537060db0a98a000265e8f6551e98221"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/arm64-cross.json",
+      "phase": "aot",
+      "original_artifact": "arm64-cross.json",
+      "bytes": 949,
+      "sha256": "578d31bb33fa5eabcfcf90ad50530181977cc8bcf8faac3c0b6d2fdda9ec196d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/arm64-loop.ll",
+      "phase": "aot",
+      "original_artifact": "arm64-loop.ll",
+      "bytes": 19692,
+      "sha256": "c906759197277d89afb6267a97d37f02835783a7249286409fa968c97e533043"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/arm64-loop.s",
+      "phase": "aot",
+      "original_artifact": "arm64-loop.s",
+      "bytes": 22506,
+      "sha256": "db98c06345fb79e3031cf6f6ce33a9ad938a9f36e8bbf7c8868be998f74aca54"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/broad-codegen-summary.json",
+      "phase": "aot",
+      "original_artifact": "broad-codegen-summary.json",
+      "bytes": 10618,
+      "sha256": "672581a3846de104ec9ca1f2b44d453fbb7d808cfc88f695166e75b807f6bcd6"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/broad-codegen.log",
+      "phase": "aot",
+      "original_artifact": "broad-codegen.log",
+      "bytes": 350,
+      "sha256": "ce9124c283079ce34b7e6783d8147d1482b4999776b656333d7b75a6020a74af"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/build-timing.json",
+      "phase": "aot",
+      "original_artifact": "build-timing.json",
+      "bytes": 82258,
+      "sha256": "39b8951115f0c166e97307a40cb6b4cb624fceed7e0df3cc859289db6c0268eb"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/build-validation.json",
+      "phase": "aot",
+      "original_artifact": "build-validation.json",
+      "bytes": 44846,
+      "sha256": "aec70ef96b39827fe9ceeb00fd8b940ee2ae8a76ea50ea972e5426218216abaa"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/cache-proof-summary.json",
+      "phase": "aot",
+      "original_artifact": "cache-proof-summary.json",
+      "bytes": 776,
+      "sha256": "bcb78923cd0a440635aa196a039b4bf67aa9b965b319f1b525e7a2f9d19ebe65"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/cache-proof.json",
+      "phase": "aot",
+      "original_artifact": "cache-proof.json",
+      "bytes": 8526,
+      "sha256": "f79a49f097710f50e507d64120c887b49adac038036ec7708c4e6fdb518721c9"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/alias-dependent.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/alias-dependent.baseline.True.aot.post.ll",
+      "bytes": 30544,
+      "sha256": "5174240326c49ea88db4a79ff07bfff29b41dc9774ece7d44602a2e5e995ca4f"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/alias-dependent.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/alias-dependent.candidate.True.aot.post.ll",
+      "bytes": 30544,
+      "sha256": "270a54356593696ee451d2dc74ba15ab00e3672706844fad1f4f71a0f9a81df4"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/dependent-f64.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/dependent-f64.baseline.True.aot.post.ll",
+      "bytes": 9476,
+      "sha256": "e8d58c306fd8e256f4164a67b3bdeb9d04754ad10a7d0c4c6274d5fb918f6685"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/dependent-f64.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/dependent-f64.candidate.True.aot.post.ll",
+      "bytes": 9476,
+      "sha256": "e8d58c306fd8e256f4164a67b3bdeb9d04754ad10a7d0c4c6274d5fb918f6685"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/edge.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/edge.baseline.True.aot.post.ll",
+      "bytes": 12607,
+      "sha256": "791a496246ac163d34b7797b6228b7a0513c55788b4c89f85727b89543085a8d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/edge.baseline.True.asm",
+      "phase": "aot",
+      "original_artifact": "captures/edge.baseline.True.asm",
+      "bytes": 11082,
+      "sha256": "569706f93f20e016f3f8119fcf84b42171c1b38449f8ebd62a548efa22a2ca9c"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/edge.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/edge.candidate.True.aot.post.ll",
+      "bytes": 13061,
+      "sha256": "0d84f39c65395fb9ef1630a402db9d47fc80401d1c48afa3810022632b741c59"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/edge.candidate.True.asm",
+      "phase": "aot",
+      "original_artifact": "captures/edge.candidate.True.asm",
+      "bytes": 11875,
+      "sha256": "266771acd5ac39a965dda8f52e01ae98321a71f034e1e04b0343313f9e999c58"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/fixed-i32.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/fixed-i32.baseline.True.aot.post.ll",
+      "bytes": 48397,
+      "sha256": "31ea12a84c98e2f21a958a47991888ef15dfc0726a733b3002ce0118976422b5"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/fixed-i32.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/fixed-i32.candidate.True.aot.post.ll",
+      "bytes": 48397,
+      "sha256": "31ea12a84c98e2f21a958a47991888ef15dfc0726a733b3002ce0118976422b5"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/guarded-range-i32.baseline.True.aot.post.ll",
+      "bytes": 8668,
+      "sha256": "3271c4797d26c3c6462294547941247e95fa8d690e91200cafb6af5452d6b8b0"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.baseline.True.asm",
+      "phase": "aot",
+      "original_artifact": "captures/guarded-range-i32.baseline.True.asm",
+      "bytes": 9676,
+      "sha256": "ed5b411be8712f4a55bbd9a7189dd09881c3f77c03312f375308e863b2aaa2b7"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.baseline.True.jit.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/guarded-range-i32.baseline.True.jit.post.ll",
+      "bytes": 2508,
+      "sha256": "e83504387acb077f37df6bc19c5562aa1c213a130c689cfbd29cbb4afc989f6d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/guarded-range-i32.candidate.True.aot.post.ll",
+      "bytes": 13137,
+      "sha256": "d6e7e89e4ce251b61820faeca385855ae3cdfb5871e1846946ce28caf6f2edc5"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.candidate.True.asm",
+      "phase": "aot",
+      "original_artifact": "captures/guarded-range-i32.candidate.True.asm",
+      "bytes": 18746,
+      "sha256": "819822091099c4b6bd02e97716411addb93c84b5e1df0ea81d3a932309f8e617"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/guarded-range-i32.candidate.True.jit.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/guarded-range-i32.candidate.True.jit.post.ll",
+      "bytes": 2508,
+      "sha256": "e83504387acb077f37df6bc19c5562aa1c213a130c689cfbd29cbb4afc989f6d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/slp-f32.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/slp-f32.baseline.True.aot.post.ll",
+      "bytes": 12969,
+      "sha256": "d25207b1c42a1d860ab3c2dd82a9ee1c3b63d8c38c82e1564f43db82fa1f3ba2"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/slp-f32.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/slp-f32.candidate.True.aot.post.ll",
+      "bytes": 12969,
+      "sha256": "d25207b1c42a1d860ab3c2dd82a9ee1c3b63d8c38c82e1564f43db82fa1f3ba2"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/while-i32.baseline.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/while-i32.baseline.True.aot.post.ll",
+      "bytes": 8581,
+      "sha256": "5dd3d95ba219b573000ffe5f771662b21341c282454be8192cf66ac4a2bf3463"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/while-i32.baseline.True.asm",
+      "phase": "aot",
+      "original_artifact": "captures/while-i32.baseline.True.asm",
+      "bytes": 9620,
+      "sha256": "ceaa94cc04c933d08251c2a261325aa08a92f71dcb9ef0cc3a77f61b497ff981"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/while-i32.candidate.True.aot.post.ll",
+      "phase": "aot",
+      "original_artifact": "captures/while-i32.candidate.True.aot.post.ll",
+      "bytes": 13038,
+      "sha256": "1fbc41c0bb6aa1a6aac32995d12b2ec4a9d994b882840e8a16f4aad6de5e2942"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/captures/while-i32.candidate.True.asm",
+      "phase": "aot",
+      "original_artifact": "captures/while-i32.candidate.True.asm",
+      "bytes": 18578,
+      "sha256": "ac8865b7ec487355f0d393ff4d9ca7b2bd482f782cbd5dc5ab0758ade2e34d24"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/codegen-inventory.json",
+      "phase": "aot",
+      "original_artifact": "codegen-inventory.json",
+      "bytes": 16012,
+      "sha256": "4ca5842a888c6cebd6190d438320c64a90ee5227bb5c223622f79734d37e4d46"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/codegen-summary.json",
+      "phase": "aot",
+      "original_artifact": "codegen-summary.json",
+      "bytes": 7382,
+      "sha256": "7b3ca8d98d4890a41d74ae0d360b94cec78bc6d5d8252d2048c26804f1dfa1c4"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/compiler-build-identities.json",
+      "phase": "aot",
+      "original_artifact": "compiler-build-identities.json",
+      "bytes": 1367,
+      "sha256": "b0ca1a0e338a85283535403ae040693a3958fa45ce561df4260c3248a10c13a0"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/executable-comparison.json",
+      "phase": "aot",
+      "original_artifact": "executable-comparison.json",
+      "bytes": 4200,
+      "sha256": "422d39ccfa6aabfb5980b965fb48630351dc23bb1f4aee7793a4ba65bbb56850"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/execution-timing.json",
+      "phase": "aot",
+      "original_artifact": "execution-timing.json",
+      "bytes": 43843,
+      "sha256": "58690b14d6e019e58d6382457265fd8fb4359a89c9c2f1fde906f6741c44b8a2"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/final-identity.json",
+      "phase": "aot",
+      "original_artifact": "final-identity.json",
+      "bytes": 6913,
+      "sha256": "bcbcb30681eeab567bcf7e1e2fda25e23e07440dadaf251fff646b2b1363b9d1"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/alias-dependent.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/alias-dependent.void",
+      "bytes": 220,
+      "sha256": "7fd5f61888e634c1890e51be8668604a86905f2e59150d8475380b98374e30f9"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/dependent-f64.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/dependent-f64.void",
+      "bytes": 158,
+      "sha256": "72b2d6201353705ba0a286266104bfea4da8540f5a7162fdfed31e916d35758e"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/dynamic-f32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/dynamic-f32.void",
+      "bytes": 402,
+      "sha256": "fdcf7d5b22db9f683d5492723f16e340c26f45498eec2790fe1634ead41b341f"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/dynamic-f64.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/dynamic-f64.void",
+      "bytes": 402,
+      "sha256": "87c0f2161ae0e7ee03cf6769e42b471e22d624fda6ad36ebd5ae5e5e3a24486c"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/dynamic-i32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/dynamic-i32.void",
+      "bytes": 402,
+      "sha256": "abef446a5ef9e3a76b2fa5525fafa4ff8dab5df493a4ce62a10ba19adf0ef07c"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/dynamic-i64.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/dynamic-i64.void",
+      "bytes": 402,
+      "sha256": "5840a7819a6ce1a43a580c85f5dabb4bf07c0b59d21c774b81cfbe66fe164118"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/dynamic-u8.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/dynamic-u8.void",
+      "bytes": 394,
+      "sha256": "c4510924fb39002b5bbb619ca478f91fbd52f5b9cd3a5f5259411d1775a78e1f"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/edge.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/edge.void",
+      "bytes": 514,
+      "sha256": "0642ec76869f708ee3cdda81b1f37162192192c5c692667bf56f2084d0b4c07d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/failure-order.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/failure-order.void",
+      "bytes": 92,
+      "sha256": "0b1287f552523f2b69b432cbbf8f3d40e40273d40bc9d1fda9373c8d4e5e06b0"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/fixed-f32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/fixed-f32.void",
+      "bytes": 383,
+      "sha256": "a3e560455af510def63929849b43f2070da6435b3cf9f7d9947ad24f3ee2dc14"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/fixed-f64.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/fixed-f64.void",
+      "bytes": 383,
+      "sha256": "96d4b26795b048b76629746d6a42680aaad2ed933654dd970e7960107e08c90a"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/fixed-i32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/fixed-i32.void",
+      "bytes": 383,
+      "sha256": "2a6efd88740c52be7c7eaa1921df25d271513fb0bf228a79fb974cb5c19c9b5d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/fixed-i64.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/fixed-i64.void",
+      "bytes": 383,
+      "sha256": "b458cd37c8c8a86684ffd9c7305286bc2f9aa03fdac8dd51e3e9e3ee8bbebd59"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/fixed-u8.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/fixed-u8.void",
+      "bytes": 375,
+      "sha256": "bf4e5e38643363adb2e18e5ab9751583fea325f4481096962688597889d63b58"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/guarded-range-i32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/guarded-range-i32.void",
+      "bytes": 144,
+      "sha256": "ceb45840951145aa5987774d884cf318fd05e0dcbf1b2e990cb417aeee46f34c"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/reduction-i32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/reduction-i32.void",
+      "bytes": 106,
+      "sha256": "f6561ba2cca18448c69653226ce5dcc861026f05c0f7502e283091e50ed48da3"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/slp-f32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/slp-f32.void",
+      "bytes": 342,
+      "sha256": "1cbe382a6d20974695da4a6133d767c31ea4547915273dba1d7ece270114a4c7"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fixtures/while-i32.void",
+      "phase": "aot",
+      "original_artifact": "fixtures/while-i32.void",
+      "bytes": 141,
+      "sha256": "da0613fe02bb0359f1c5823db6995bb13c91d6c23a5974a06f34c21f3f0cd4a5"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fp-bit-oracle-initial.log",
+      "phase": "aot",
+      "original_artifact": "fp-bit-oracle-initial.log",
+      "bytes": 302,
+      "sha256": "ea97931f0e714756c26d4311fe059d32200e302edcc221586ec18b288411402d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fp-bit-oracle.cpp",
+      "phase": "aot",
+      "original_artifact": "fp-bit-oracle.cpp",
+      "bytes": 951,
+      "sha256": "550496fe0a2409602298fdee2e7cffe754631fefaceea6bd577d856ab872c717"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fp-bit-oracle.void",
+      "phase": "aot",
+      "original_artifact": "fp-bit-oracle.void",
+      "bytes": 374,
+      "sha256": "01d15d4ca09ec74c45551736b7b1fb3019fcd049d6b3efcea3022e66eb4cece5"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fp-bits-initial.json",
+      "phase": "aot",
+      "original_artifact": "fp-bits-initial.json",
+      "bytes": 2098,
+      "sha256": "1e286fa1bc2eb9cb81761628bc61d0993e4888b55806e76c5a45d71e0cc9e777"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/fp-bits.json",
+      "phase": "aot",
+      "original_artifact": "fp-bits.json",
+      "bytes": 19033,
+      "sha256": "299f7b7cb7560aad876a9dfe431e7f8ca3bb107525226903e603d52542ac6a93"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/functional.json",
+      "phase": "aot",
+      "original_artifact": "functional.json",
+      "bytes": 746694,
+      "sha256": "0ab4fa13df88301b2e12d7478fe046fd0e6bb32c4da5b239db6789f568c0c180"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/incidents.json",
+      "phase": "aot",
+      "original_artifact": "incidents.json",
+      "bytes": 975,
+      "sha256": "55dba171c7e5dbe7c369ddf4e474bab6d24cb7c4a64928240a10bd00fe35023f"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/input-identity.json",
+      "phase": "aot",
+      "original_artifact": "input-identity.json",
+      "bytes": 6193,
+      "sha256": "e7d0a2e1238811d87a212722ed0ad5d35199533a350846512e66921eaf918baf"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/jit-execution.json",
+      "phase": "aot",
+      "original_artifact": "jit-execution.json",
+      "bytes": 5507,
+      "sha256": "75d0fa880df94be80cee1787cd909e1e19d6895af8a068b22c30960a98b4ee3c"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/jit-source-proof.json",
+      "phase": "aot",
+      "original_artifact": "jit-source-proof.json",
+      "bytes": 283,
+      "sha256": "6db9818d8c530ff712b5317a21a9562922d71bdbe9eb43e73b1d2db5a9142d51"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/jit-startup.json",
+      "phase": "aot",
+      "original_artifact": "jit-startup.json",
+      "bytes": 16079,
+      "sha256": "1efc6a3883d8f4580d03bcac0e06672511c235dfb9c88c064574cea1f613af90"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/json-ir-inspection.json",
+      "phase": "aot",
+      "original_artifact": "json-ir-inspection.json",
+      "bytes": 388,
+      "sha256": "64f96f721a43249aa4fe28dbbcb420515617d62929afbee18da56af3f40f388d"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/json-unicode-control.void",
+      "phase": "aot",
+      "original_artifact": "json-unicode-control.void",
+      "bytes": 1061,
+      "sha256": "0a6bd6021f65f7d24eb0381ed89088e9da243e6fd866ac9b184d42a4f3a04c79"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/json-unicode.json",
+      "phase": "aot",
+      "original_artifact": "json-unicode.json",
+      "bytes": 9868,
+      "sha256": "f14e5a8b9f0c3ddf194d9abbfeae1d1ce9f023390e2f1658c55e808f1494d5c6"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/json_typed-normalized-ir.diff",
+      "phase": "aot",
+      "original_artifact": "json_typed-normalized-ir.diff",
+      "bytes": 5299,
+      "sha256": "ab142ffc7871ab61e304ae2dcdea877187a882f33dc8bc29f937f397450f8e25"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/json_validated-normalized-ir.diff",
+      "phase": "aot",
+      "original_artifact": "json_validated-normalized-ir.diff",
+      "bytes": 5299,
+      "sha256": "ab142ffc7871ab61e304ae2dcdea877187a882f33dc8bc29f937f397450f8e25"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/live-stack-witness.json",
+      "phase": "aot",
+      "original_artifact": "live-stack-witness.json",
+      "bytes": 439,
+      "sha256": "4c6ac30e089f0835d9b6c615b2c6a97596d06231479a0be6b4a9a7f110371881"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/manifest.json",
+      "phase": "aot",
+      "original_artifact": "manifest.json",
+      "bytes": 172571,
+      "sha256": "bee85ac3cd815fdb9d326f4c2cb3a25cac4eb988c54b9cee93b0b2c478067e54"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/paired-build-execution.json",
+      "phase": "aot",
+      "original_artifact": "paired-build-execution.json",
+      "bytes": 1600,
+      "sha256": "39cc5c5e7db7482bafe2e6a108c6af7f07dafba513dd0dccc3cfd7cb6d5d5473"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/phase-timing.json",
+      "phase": "aot",
+      "original_artifact": "phase-timing.json",
+      "bytes": 22340,
+      "sha256": "74b9f33003c93e394a321eb78aa833b016744211da5efeca6b9b4eb76ba55d24"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/ranges.json",
+      "phase": "aot",
+      "original_artifact": "ranges.json",
+      "bytes": 71778,
+      "sha256": "5e54b7d95d35e8f45c855c08454bec25a74ba32441bd1dfe564253d6229242ab"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-debug.json",
+      "phase": "aot",
+      "original_artifact": "suites-debug.json",
+      "bytes": 1027,
+      "sha256": "3b4653682f0348fc2c45102002e282662da6fb2acc80d4d127736fae2dd792b0"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-debug.log",
+      "phase": "aot",
+      "original_artifact": "suites-debug.log",
+      "bytes": 3145,
+      "sha256": "666733900fd804531200b04f5c3834bede44e72334528d8c922d5d6f7c08035e"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-debug.xml",
+      "phase": "aot",
+      "original_artifact": "suites-debug.xml",
+      "bytes": 7475,
+      "sha256": "d08047ba36a2a961d925b6b71477d6ef934ce63bbd2b2a8de052e0543a6a7449"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-release.json",
+      "phase": "aot",
+      "original_artifact": "suites-release.json",
+      "bytes": 1030,
+      "sha256": "cc24bba902537e80f06b65d9ab121a57891652fd66c03ccb06bab3e4f8c38450"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-release.log",
+      "phase": "aot",
+      "original_artifact": "suites-release.log",
+      "bytes": 3147,
+      "sha256": "ea7528ded2ffdcbd5783b27434477771ae11187787f3c108cd4a1b4b8792e871"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-release.xml",
+      "phase": "aot",
+      "original_artifact": "suites-release.xml",
+      "bytes": 7486,
+      "sha256": "debfb273d9f9fe0db8b2936768d838f3c7b69ce755d1b0504904a5ddd89ee200"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-strict.json",
+      "phase": "aot",
+      "original_artifact": "suites-strict.json",
+      "bytes": 1028,
+      "sha256": "58cbe9218350c3a053381ce111eb662ed16fabadca2a1a2782ed667395e82dd3"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-strict.log",
+      "phase": "aot",
+      "original_artifact": "suites-strict.log",
+      "bytes": 3146,
+      "sha256": "441583207f0d30b90aa551c8a4384a171db73b7134e51c239142a45587970d65"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/suites-strict.xml",
+      "phase": "aot",
+      "original_artifact": "suites-strict.xml",
+      "bytes": 7492,
+      "sha256": "957ed8b27b7d49ee2a37f11971873de5a6e779904bb2b45fdc6930314fbd867b"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/summary.json",
+      "phase": "aot",
+      "original_artifact": "summary.json",
+      "bytes": 43967,
+      "sha256": "837c5b2b1d2b4f56b610840c954daf39709335a994e9289eb9eb76a90ebceeca"
+    },
+    {
+      "path": "docs/compiler-health/evidence/automatic-simd/aot/workloads.json",
+      "phase": "aot",
+      "original_artifact": "workloads.json",
+      "bytes": 3343,
+      "sha256": "2a6dddc4df7c6e2b415d81e2b6b3a977f449971b28b7d10cb078a66eda71f91c"
+    }
+  ],
+  "not_copied": [
+    "executables",
+    "object and archive binaries",
+    "persistent caches",
+    "full duplicate assembly in JSON command receipts",
+    "compiler/backend copies and toolchain source",
+    "unrelated repository evidence and experiments"
+  ],
+  "archive_totals": {
+    "research": {
+      "files": 513,
+      "bytes": 118312170
+    },
+    "global": {
+      "files": 654,
+      "bytes": 2052793854
+    },
+    "aot": {
+      "files": 1130,
+      "bytes": 1684381714
+    }
+  }
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "kind": "capture-harness emission-scope mismatch",
+    "original_log": "broad-codegen.log",
+    "original_receipt": "broad-codegen.json",
+    "failure": "Entry-reachable capture compared against all-exports CLI emit object: text baseline byte comparison failed.",
+    "resolution": "Existing native_build.cpp confirms build uses Emission::entry and public emit uses analysis.lower() all exports. Main timing matrix and LLVM phase timing already match build. Added a separate all-exports capture driver and compare matching scopes; no production source or performance candidate changed."
+  },
+  {
+    "kind": "FP test symbol parser",
+    "original_log": "fp-bit-oracle-initial.log",
+    "original_driver": "fp-bit-oracle-initial.py",
+    "original_receipt": "fp-bits-initial.json",
+    "failure": "Parser also tried to hex-decode __vd_types__void metadata symbols.",
+    "resolution": "Skip non-hex metadata symbols; emitted VOID object and backend unchanged."
+  }
+]

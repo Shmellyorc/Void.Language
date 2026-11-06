@@ -1,0 +1,242 @@
+[
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void",
+      "1",
+      "1"
+    ],
+    "mode": "baseline",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:6:21: error: Unsupported numeric literal.\n    code: VOID1004\n\n 6 |     var tiny: f32 = 1.401298464324817e-45\n   |                     ^^^^^^^^^^^^^^^^^^^^^\n    Module: /edge.void\n    Hint: Use decimal digits, an optional fractional part, and optional f or d suffix; separators and exponents are not implemented.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:14:26: error: Unknown identifier 'tiny'.\n    code: VOID2002\n\n 14 |     if 1.0 / z >= 0.0 or tiny * 2.0 <= 0.0:\n    |                          ^^^^\n    Module: /edge.void\n    Hint: Declare it with var before use.\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void",
+      "1",
+      "1"
+    ],
+    "mode": "slp",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:6:21: error: Unsupported numeric literal.\n    code: VOID1004\n\n 6 |     var tiny: f32 = 1.401298464324817e-45\n   |                     ^^^^^^^^^^^^^^^^^^^^^\n    Module: /edge.void\n    Hint: Use decimal digits, an optional fractional part, and optional f or d suffix; separators and exponents are not implemented.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:14:26: error: Unknown identifier 'tiny'.\n    code: VOID2002\n\n 14 |     if 1.0 / z >= 0.0 or tiny * 2.0 <= 0.0:\n    |                          ^^^^\n    Module: /edge.void\n    Hint: Declare it with var before use.\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void",
+      "1",
+      "1"
+    ],
+    "mode": "target",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:6:21: error: Unsupported numeric literal.\n    code: VOID1004\n\n 6 |     var tiny: f32 = 1.401298464324817e-45\n   |                     ^^^^^^^^^^^^^^^^^^^^^\n    Module: /edge.void\n    Hint: Use decimal digits, an optional fractional part, and optional f or d suffix; separators and exponents are not implemented.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:14:26: error: Unknown identifier 'tiny'.\n    code: VOID2002\n\n 14 |     if 1.0 / z >= 0.0 or tiny * 2.0 <= 0.0:\n    |                          ^^^^\n    Module: /edge.void\n    Hint: Declare it with var before use.\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void",
+      "1",
+      "1"
+    ],
+    "mode": "target-slp",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:6:21: error: Unsupported numeric literal.\n    code: VOID1004\n\n 6 |     var tiny: f32 = 1.401298464324817e-45\n   |                     ^^^^^^^^^^^^^^^^^^^^^\n    Module: /edge.void\n    Hint: Use decimal digits, an optional fractional part, and optional f or d suffix; separators and exponents are not implemented.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/edge.void:14:26: error: Unknown identifier 'tiny'.\n    code: VOID2002\n\n 14 |     if 1.0 / z >= 0.0 or tiny * 2.0 <= 0.0:\n    |                          ^^^^\n    Module: /edge.void\n    Hint: Declare it with var before use.\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/alias-dependent.void",
+      "1024",
+      "1"
+    ],
+    "mode": "baseline",
+    "status": 0,
+    "stdout": "1024,1,0.01268,0.02\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/alias-dependent.void",
+      "1024",
+      "1"
+    ],
+    "mode": "slp",
+    "status": 0,
+    "stdout": "1024,1,0.01248,0.019\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/alias-dependent.void",
+      "1024",
+      "1"
+    ],
+    "mode": "target",
+    "status": 0,
+    "stdout": "1024,1,0.012139,0.02\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/alias-dependent.void",
+      "1024",
+      "1"
+    ],
+    "mode": "target-slp",
+    "status": 0,
+    "stdout": "1024,1,0.012259,0.02\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void",
+      "1",
+      "1"
+    ],
+    "mode": "baseline",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void:3:7: runtime error: Fixed array index outside extent\n    a[2] = 1 / (n - n)\n      ^\nIn function /failure-order.void::entry\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void",
+      "1",
+      "1"
+    ],
+    "mode": "slp",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void:3:7: runtime error: Fixed array index outside extent\n    a[2] = 1 / (n - n)\n      ^\nIn function /failure-order.void::entry\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void",
+      "1",
+      "1"
+    ],
+    "mode": "target",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void:3:7: runtime error: Fixed array index outside extent\n    a[2] = 1 / (n - n)\n      ^\nIn function /failure-order.void::entry\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void",
+      "1",
+      "1"
+    ],
+    "mode": "target-slp",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/failure-order.void:3:7: runtime error: Fixed array index outside extent\n    a[2] = 1 / (n - n)\n      ^\nIn function /failure-order.void::entry\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "baseline",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:4:5: error: VOID uses 'for' for all loops.\n    code: VOID1104\n\n 4 |     while i < n:\n   |     ^^^^^\n    Module: /while-i32.void\n    Hint: Replace 'while condition:' with 'for condition:'.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:5:9: error: Expected an expression, found '<indent>'.\n    code: VOID1101\n\n 5 |         total += i % 127\n   |         ^\n    Module: /while-i32.void\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "slp",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:4:5: error: VOID uses 'for' for all loops.\n    code: VOID1104\n\n 4 |     while i < n:\n   |     ^^^^^\n    Module: /while-i32.void\n    Hint: Replace 'while condition:' with 'for condition:'.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:5:9: error: Expected an expression, found '<indent>'.\n    code: VOID1101\n\n 5 |         total += i % 127\n   |         ^\n    Module: /while-i32.void\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "target",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:4:5: error: VOID uses 'for' for all loops.\n    code: VOID1104\n\n 4 |     while i < n:\n   |     ^^^^^\n    Module: /while-i32.void\n    Hint: Replace 'while condition:' with 'for condition:'.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:5:9: error: Expected an expression, found '<indent>'.\n    code: VOID1101\n\n 5 |         total += i % 127\n   |         ^\n    Module: /while-i32.void\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "target-slp",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:4:5: error: VOID uses 'for' for all loops.\n    code: VOID1104\n\n 4 |     while i < n:\n   |     ^^^^^\n    Module: /while-i32.void\n    Hint: Replace 'while condition:' with 'for condition:'.\n\n/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/while-i32.void:5:9: error: Expected an expression, found '<indent>'.\n    code: VOID1101\n\n 5 |         total += i % 127\n   |         ^\n    Module: /while-i32.void\n\n"
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/guarded-range-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "baseline",
+    "status": 0,
+    "stdout": "1024,64036,0.00125,0.008\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/guarded-range-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "slp",
+    "status": 0,
+    "stdout": "1024,64036,0.00123,0.008\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/guarded-range-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "target",
+    "status": 0,
+    "stdout": "1024,64036,0.00051,0.009\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/host",
+      "/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk/fixtures/guarded-range-i32.void",
+      "1024",
+      "1"
+    ],
+    "mode": "target-slp",
+    "status": 0,
+    "stdout": "1024,64036,0.00047,0.008\n",
+    "stderr": ""
+  }
+]

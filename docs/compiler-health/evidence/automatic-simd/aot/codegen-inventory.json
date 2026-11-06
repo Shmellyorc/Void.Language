@@ -1,0 +1,230 @@
+{
+  "guarded-range-i32": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4312,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/guarded-range-i32.baseline.True.o  :\nsection             size   addr\n.text                491      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           209      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line           90      0\nTotal               1195\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 10,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [
+        "58: 66 0f fe e9                  \tpaddd\t%xmm1, %xmm5",
+        "60: 66 0f f4 fa                  \tpmuludq\t%xmm2, %xmm7",
+        "6f: 66 44 0f f4 c2               \tpmuludq\t%xmm2, %xmm8",
+        "8f: 66 44 0f fe c7               \tpaddd\t%xmm7, %xmm8",
+        "ad: 66 0f f4 fa                  \tpmuludq\t%xmm2, %xmm7"
+      ],
+      "object_bytes": 5576,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/guarded-range-i32.candidate.True.o  :\nsection             size   addr\n.text               1071      0\n.rodata.cst16        128      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           209      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line          116      0\nTotal               1929\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": true
+    }
+  },
+  "while-i32": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4264,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/while-i32.baseline.True.o  :\nsection             size   addr\n.text                491      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           185      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line           91      0\nTotal               1172\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 10,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [
+        "58: 66 0f fe e9                  \tpaddd\t%xmm1, %xmm5",
+        "60: 66 0f f4 fa                  \tpmuludq\t%xmm2, %xmm7",
+        "6f: 66 44 0f f4 c2               \tpmuludq\t%xmm2, %xmm8",
+        "8f: 66 44 0f fe c7               \tpaddd\t%xmm7, %xmm8",
+        "ad: 66 0f f4 fa                  \tpmuludq\t%xmm2, %xmm7"
+      ],
+      "object_bytes": 5528,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/while-i32.candidate.True.o  :\nsection             size   addr\n.text               1071      0\n.rodata.cst16        128      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           185      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line          114      0\nTotal               1903\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": true
+    }
+  },
+  "edge": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4648,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/edge.baseline.True.o  :\nsection             size   addr\n.text                579      0\n.rodata.cst4          16      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           170      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line          103      0\nTotal               1273\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": true
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4696,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/edge.candidate.True.o  :\nsection             size   addr\n.text                620      0\n.rodata.cst4          16      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           170      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line          109      0\nTotal               1320\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": true
+    }
+  },
+  "fixed-i32": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 15048,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/fixed-i32.baseline.True.o  :\nsection             size   addr\n.text               2945      0\n.rodata              192      0\n.data.rel.ro          96      0\n.rodata.str1.1      4008      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           185      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            152      0\n.debug_line          537      0\nTotal               8307\n\n\n",
+      "gc_poll_mentions": 22,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 15048,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/fixed-i32.candidate.True.o  :\nsection             size   addr\n.text               2945      0\n.rodata              192      0\n.data.rel.ro          96      0\n.rodata.str1.1      4008      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           185      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            152      0\n.debug_line          537      0\nTotal               8307\n\n\n",
+      "gc_poll_mentions": 22,
+      "tail_blocks": false
+    }
+  },
+  "dynamic-i32": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 12776,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/dynamic-i32.baseline.True.o  :\nsection             size   addr\n.text               2385      0\n.rodata              256      0\n.data.rel.ro          64      0\n.rodata.str1.1      2928      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           191      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            152      0\n.debug_line          471      0\nTotal               6639\n\n\n",
+      "gc_poll_mentions": 22,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 12776,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/dynamic-i32.candidate.True.o  :\nsection             size   addr\n.text               2385      0\n.rodata              256      0\n.data.rel.ro          64      0\n.rodata.str1.1      2928      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           191      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            152      0\n.debug_line          471      0\nTotal               6639\n\n\n",
+      "gc_poll_mentions": 22,
+      "tail_blocks": false
+    }
+  },
+  "alias-dependent": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 9760,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/alias-dependent.baseline.True.o  :\nsection             size   addr\n.text               1745      0\n.rodata              136      0\n.data.rel.ro          64      0\n.rodata.str1.1      1645      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           203      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            152      0\n.debug_line          242      0\nTotal               4379\n\n\n",
+      "gc_poll_mentions": 14,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 9760,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/alias-dependent.candidate.True.o  :\nsection             size   addr\n.text               1745      0\n.rodata              136      0\n.data.rel.ro          64      0\n.rodata.str1.1      1645      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           203      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.eh_frame            152      0\n.debug_line          242      0\nTotal               4379\n\n\n",
+      "gc_poll_mentions": 14,
+      "tail_blocks": false
+    }
+  },
+  "slp-f32": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 5736,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/slp-f32.baseline.True.o  :\nsection             size   addr\n.text                778      0\n.rodata.cst4          56      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           179      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line          142      0\nTotal               1560\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 5736,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/slp-f32.candidate.True.o  :\nsection             size   addr\n.text                778      0\n.rodata.cst4          56      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           179      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line          142      0\nTotal               1560\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    }
+  },
+  "dependent-f64": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4616,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/dependent-f64.baseline.True.o  :\nsection             size   addr\n.text                470      0\n.rodata.cst8          32      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           197      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line           97      0\nTotal               1201\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4616,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/dependent-f64.candidate.True.o  :\nsection             size   addr\n.text                470      0\n.rodata.cst8          32      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           197      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line           97      0\nTotal               1201\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    }
+  },
+  "reduction-i32": {
+    "baseline": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4264,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/reduction-i32.baseline.True.o  :\nsection             size   addr\n.text                460      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           197      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line           95      0\nTotal               1157\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    },
+    "candidate": {
+      "vector_integer_ops": 0,
+      "fast_fp_flags": [],
+      "avx_in_asm": false,
+      "fma_in_asm": false,
+      "packed_examples": [],
+      "object_bytes": 4264,
+      "sections": "/home/shmellyorc/.local/state/void-log-performance/simd-aot-only-glgoup_7/captures/reduction-i32.candidate.True.o  :\nsection             size   addr\n.text                460      0\n.rodata               16      0\n.rodata.str1.1        93      0\n.debug_abbrev         59      0\n.debug_info           79      0\n.debug_str           197      0\n.debug_pubnames       28      0\n.debug_pubtypes       26      0\n.note.GNU-stack        0      0\n.debug_frame         104      0\n.debug_line           95      0\nTotal               1157\n\n\n",
+      "gc_poll_mentions": 0,
+      "tail_blocks": false
+    }
+  }
+}
